@@ -1,0 +1,2 @@
+# Normalize detected text files to LF; leave binary files unchanged.
+* text=auto eol=lf
