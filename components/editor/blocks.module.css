@@ -1,0 +1,96 @@
+.page {
+  min-height: 100vh;
+  background: #fafaf7;
+  color: #202520;
+  font-family: var(--site-body-font);
+  overflow-wrap: anywhere;
+}
+
+.hero {
+  padding: clamp(2rem, 8vw, 6rem) clamp(1.25rem, 5vw, 4rem);
+  background: #eeefe8;
+  border-bottom: 1px solid #d5d8cf;
+}
+
+.heroContent {
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
+.hero[data-alignment="center"] {
+  text-align: center;
+}
+
+.hero[data-alignment="center"] .supportingText {
+  margin-inline: auto;
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.12em;
+}
+
+.heroHeading,
+.sectionHeading {
+  font-family: var(--site-heading-font);
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+.heroHeading {
+  margin: 0;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.supportingText {
+  max-width: 42rem;
+  margin: 1.5rem 0 0;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.cta {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.8rem 1.2rem;
+  background: #202520;
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.cta:focus-visible {
+  outline: 2px solid #202520;
+  outline-offset: 4px;
+}
+
+.contentSection {
+  padding: clamp(2rem, 6vw, 4rem) clamp(1.25rem, 5vw, 4rem);
+}
+
+.contentInner {
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
+.contentInner[data-width="narrow"] {
+  max-width: 40rem;
+}
+
+.sectionHeading {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.body {
+  margin: 1.5rem 0 0;
+  font-size: 1.125rem;
+  line-height: 1.75;
+  white-space: pre-line;
+}
