@@ -1,4 +1,5 @@
 import type { Data } from "@puckeditor/core";
+import type { ContentWidth, SectionSpacing } from "./site-theme";
 
 export type HeroProps = {
   eyebrow: string;
@@ -7,12 +8,16 @@ export type HeroProps = {
   ctaLabel?: string;
   ctaUrl?: string;
   alignment: "left" | "center";
+  width: "standard" | "wide";
+  spacing: SectionSpacing;
 };
 
 export type ContentSectionProps = {
   heading: string;
   body: string;
-  width: "normal" | "narrow";
+  width: ContentWidth;
+  alignment: "left" | "center";
+  spacing: SectionSpacing;
 };
 
 export type EditorComponents = {

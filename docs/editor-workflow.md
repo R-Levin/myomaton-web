@@ -54,6 +54,30 @@ review the recovery choice; there is no merge UI or revision history.
 The preview and public site use `PageRenderer`, Puck's normal `Render` API, the
 same two-block configuration as the editor, and the snapshot's SiteTheme.
 
+## Site Styles v1
+
+SiteTheme contains heading/body fonts, base text size, heading scale, accent,
+background and text colors, content width, and section spacing. Sizes/scales and
+layout use small named presets. Colors accept only six-digit hex colors, not CSS.
+All values become shared `--site-*` variables at the page root. Hero and
+ContentSection use the same tokens in editor, preview, and published rendering.
+
+Standard block width/spacing follows the site default. Block Narrow/Wide widths
+use 70%/125% of the global maximum width; Compact/Generous spacing uses 60%/150%
+of the global spacing. Hero offers Standard/Wide; ContentSection also offers
+Narrow. Both offer Left/Center alignment. These controls never override the
+global fonts or palette. Widths shrink to fit mobile viewports.
+
+The dialog warns about low text/background contrast. Button text is automatically
+black or white for contrast against the accent. The hero tint derives from the
+accent/background rather than introducing another editable color.
+
+Existing two-font themes receive the new defaults on read. The old ContentSection
+`normal` width becomes `standard`; missing block alignment/spacing receive
+defaults. This applies to saved, published, preview, and recovery data without
+rewriting files or changing save/publish timestamps. The storage format remains
+compatible; old content takes on the default token-based appearance.
+
 ## Verification
 
 ```text

@@ -25,10 +25,35 @@ load.extensions[".css"] = (module) => {
 
 const { JsonFileContentRepository } = load("../lib/content/json-file-repository.ts");
 const { initialEditorData } = load("../lib/editor/initial-data.ts");
-const { defaultSiteTheme } = load("../lib/site-theme.ts");
-const { sameWorkingCopy } = load("../lib/content/validation.ts");
+const { defaultSiteTheme, siteThemeVariables } = load("../lib/site-theme.ts");
+const { sameWorkingCopy, parseWorkingCopy, parseHomepageContent } = load("../lib/content/validation.ts");
 const browserStorage = load("../lib/editor/browser-storage.ts");
 const copy = () => structuredClone({ page: initialEditorData, theme: defaultSiteTheme });
+
+test("legacy content gains bounded style defaults without mutating stored data", () => {
+  const legacy = copy();
+  legacy.theme = { headingFont: "geist", bodyFont: "system-sans" };
+  delete legacy.page.content[0].props.width;
+  delete legacy.page.content[0].props.spacing;
+  legacy.page.content[1].props.width = "normal";
+  delete legacy.page.content[1].props.alignment;
+  delete legacy.page.content[1].props.spacing;
+  const before = JSON.stringify(legacy);
+  const migrated = parseWorkingCopy(legacy);
+  assert.deepEqual(migrated.theme, { ...defaultSiteTheme, bodyFont: "system-sans" });
+  assert.equal(migrated.page.content[0].props.width, "standard");
+  assert.equal(migrated.page.content[1].props.width, "standard");
+  assert.equal(migrated.page.content[1].props.alignment, "left");
+  assert.equal(JSON.stringify(legacy), before);
+  assert.equal(sameWorkingCopy(legacy, migrated), true);
+  const state = parseHomepageContent({ schemaVersion: 1, draft: { snapshot: legacy, savedAt: "2026-01-01" }, published: { snapshot: legacy, savedAt: "2026-01-01", publishedAt: "2026-01-02" } });
+  assert.deepEqual(state.published.snapshot, migrated);
+  for (const [key, value] of [["baseTextSize", "24px"], ["headingScale", "huge"], ["contentWidth", "100vw"], ["sectionSpacing", "6em"], ["accentColor", "red; background: url(x)"]]) {
+    assert.throws(() => parseWorkingCopy({ ...copy(), theme: { ...defaultSiteTheme, [key]: value } }));
+  }
+  const invalidBlock = copy(); invalidBlock.page.content[0].props.width = "narrow";
+  assert.throws(() => parseWorkingCopy(invalidBlock));
+});
 
 test("draft/publish persistence, optimistic conflicts, and corrupt-file protection", async () => {
   const directory = await mkdtemp(path.join(os.tmpdir(), "myomaton-storage-test-"));
@@ -105,14 +130,18 @@ test("editor controls, preview, recovery choice, and theme follow the workflow",
   globalThis.window = window;
   globalThis.getComputedStyle = window.getComputedStyle.bind(window);
   globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+  const sheet = document.createElement("style");
+  sheet.textContent = readFileSync("components/editor/blocks.module.css", "utf8");
+  document.head.append(sheet);
   const React = load("react");
   const { createRoot } = load("react-dom/client");
   const core = load("@puckeditor/core");
   let puck;
   const corePath = load.resolve("@puckeditor/core");
   load.cache[corePath].exports = { ...core, Puck: (props) => {
-    puck = props;
-    return React.createElement(core.Render, { config: props.config, data: props.data });
+    const [page, setPage] = React.useState(props.data);
+    puck = { ...props, onChange: (next) => { setPage(next); props.onChange(next); } };
+    return React.createElement(core.Render, { config: props.config, data: page });
   } };
   const { SiteEditor } = load("../components/editor/site-editor.tsx");
   const { WorkingPreview } = load("../components/editor/working-preview.tsx");
@@ -126,6 +155,14 @@ test("editor controls, preview, recovery choice, and theme follow the workflow",
     return Response.json(result);
   })();
   const host = document.createElement("div"); document.body.append(host);
+  // This simulated DOM does not lay out clamp()/rem values. Verify that actual
+  // stylesheet declarations bind both blocks to the changing page tokens.
+  const boundSize = (selector) => {
+    const declaration = [...sheet.sheet.cssRules].find((rule) => rule.selectorText === selector).style.fontSize;
+    const match = declaration.match(/^var\((--site-[a-z-]+)\)$/);
+    assert.ok(match, `${selector} must use a global size token`);
+    return host.querySelector("main").style.getPropertyValue(match[1]);
+  };
   let root = createRoot(host);
   const button = (label) => [...host.querySelectorAll("button")].find((node) => node.textContent === label);
   const mount = async () => {
@@ -139,12 +176,44 @@ test("editor controls, preview, recovery choice, and theme follow the workflow",
     assert.match(host.textContent, /Saved Draft/);
     assert.equal(button("Publish").disabled, false);
     const saved = await repository.read();
-    const working = copy(); working.page.content[0].props.heading = "Unsaved preview heading";
-    await React.act(async () => puck.onChange(working.page));
+    const beforeHeroSize = boundSize(".heroHeading");
+    const beforeSectionSize = boundSize(".sectionHeading");
+    const beforeBodySize = boundSize(".page");
     await React.act(async () => button("Site Styles").click());
-    const select = host.querySelector("select");
-    await React.act(async () => { select.value = "system-serif"; select.dispatchEvent(new window.Event("change", { bubbles: true })); });
+    const changedTheme = {
+      headingFont: "system-serif", bodyFont: "system-sans", baseTextSize: "large",
+      headingScale: "editorial", accentColor: "#cc6633", backgroundColor: "#101820",
+      textColor: "#f3efdf", contentWidth: "wide", sectionSpacing: "generous",
+    };
+    for (const [name, value] of Object.entries(changedTheme)) {
+      const control = host.querySelector(`[name="${name}"]`);
+      assert.ok(control, name);
+      await React.act(async () => {
+        if (control.tagName === "SELECT") control.value = value;
+        else Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set.call(control, value);
+        control.dispatchEvent(new window.Event("input", { bubbles: true }));
+        control.dispatchEvent(new window.Event("change", { bubbles: true }));
+      });
+    }
+    assert.match(host.textContent, /Unsaved changes/);
     assert.equal(button("Publish").disabled, true);
+    const tokens = siteThemeVariables(changedTheme);
+    for (const [key, value] of Object.entries(tokens)) assert.equal(host.querySelector("main").style.getPropertyValue(key), value, key);
+    assert.notEqual(boundSize(".heroHeading"), beforeHeroSize);
+    assert.notEqual(boundSize(".sectionHeading"), beforeSectionSize);
+    assert.notEqual(boundSize(".page"), beforeBodySize);
+    const appearance = (element) => {
+      const style = getComputedStyle(element);
+      return { font: style.fontFamily, size: style.fontSize, color: style.color };
+    };
+    const heroAppearance = appearance(host.querySelector("h1"));
+    const sectionAppearance = appearance(host.querySelector("main h2"));
+    const working = copy(); working.page.content[0].props.heading = "Unsaved preview heading";
+    Object.assign(working.page.content[0].props, { alignment: "center", width: "wide", spacing: "compact" });
+    Object.assign(working.page.content[1].props, { alignment: "center", width: "narrow", spacing: "generous" });
+    await React.act(async () => puck.onChange(working.page));
+    assert.deepEqual(appearance(host.querySelector("h1")), heroAppearance);
+    assert.deepEqual(appearance(host.querySelector("main h2")), sectionAppearance);
     await React.act(async () => button("Publish").click());
     assert.equal((await repository.read()).published, null);
     await React.act(async () => host.querySelector('a[href="/preview/home"]').dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true })));
@@ -153,6 +222,9 @@ test("editor controls, preview, recovery choice, and theme follow the workflow",
     await React.act(async () => previewRoot.render(React.createElement(WorkingPreview)));
     assert.equal(previewHost.querySelector("h1").textContent, "Unsaved preview heading");
     assert.match(previewHost.querySelector("main").style.getPropertyValue("--site-heading-font"), /Georgia/);
+    for (const [key, value] of Object.entries(tokens)) assert.equal(previewHost.querySelector("main").style.getPropertyValue(key), value, key);
+    assert.ok(previewHost.querySelector('.hero[data-spacing="compact"][data-alignment="center"] [data-width="wide"]'));
+    assert.ok(previewHost.querySelector('.contentSection[data-spacing="generous"][data-alignment="center"] [data-width="narrow"]'));
     assert.equal(previewHost.querySelector("button"), null);
     assert.deepEqual(await repository.read(), saved);
     await React.act(async () => previewRoot.unmount());
@@ -169,11 +241,12 @@ test("editor controls, preview, recovery choice, and theme follow the workflow",
     await React.act(async () => { button("Save Draft").click(); await pendingRequest; });
     assert.equal(localStorage.getItem(browserStorage.RECOVERY_KEY), null);
     await React.act(async () => { button("Publish").click(); await pendingRequest; });
-    assert.equal((await repository.read()).published.snapshot.theme.headingFont, "system-serif");
+    assert.deepEqual((await repository.read()).published.snapshot.theme, changedTheme);
     await React.act(async () => root.unmount()); root = createRoot(host);
     await mount();
     assert.equal(host.querySelector("h1").textContent, "Unsaved preview heading");
     assert.equal(button("Save Draft").disabled, true);
+    for (const [key, value] of Object.entries(tokens)) assert.equal(host.querySelector("main").style.getPropertyValue(key), value, key);
     const next = copy(); next.page.content[0].props.heading = "Discard this recovery";
     browserStorage.writeRecovery(localStorage, next, (await repository.read()).draft.savedAt);
     await React.act(async () => root.unmount()); root = createRoot(host); await mount();

@@ -1,5 +1,6 @@
 import type { EditorData } from "@/types/editor";
 import type { HomepageContent, WorkingCopy } from "@/types/content";
+import { defaultSiteTheme } from "@/lib/site-theme";
 
 export class InvalidContentError extends Error {}
 
@@ -15,6 +16,22 @@ function text(value: unknown): string {
     throw new InvalidContentError("Text must be a string of at most 50,000 characters.");
   }
   return value;
+}
+
+function choice<T extends string>(value: unknown, options: readonly T[], fallback?: T): T {
+  if (value === undefined && fallback !== undefined) return fallback;
+  if (typeof value !== "string" || !options.includes(value as T)) {
+    throw new InvalidContentError(`Choose one of: ${options.join(", ")}.`);
+  }
+  return value as T;
+}
+
+function color(value: unknown, fallback: string): string {
+  if (value === undefined) return fallback;
+  if (typeof value !== "string" || !/^#[0-9a-f]{6}$/i.test(value)) {
+    throw new InvalidContentError("Colors must use six-digit hexadecimal notation.");
+  }
+  return value.toLowerCase();
 }
 
 export function timestamp(value: unknown): string {
@@ -45,14 +62,17 @@ export function parsePageData(value: unknown): EditorData {
         supportingText: text(props.supportingText),
         ctaLabel: text(props.ctaLabel ?? ""), ctaUrl: text(props.ctaUrl ?? ""),
         alignment: props.alignment,
+        width: choice(props.width, ["standard", "wide"], "standard"),
+        spacing: choice(props.spacing, ["compact", "standard", "generous"], "standard"),
       } };
     }
     if (block.type === "ContentSection") {
-      if (props.width !== "normal" && props.width !== "narrow") {
-        throw new InvalidContentError("Invalid ContentSection width.");
-      }
       return { type: "ContentSection", props: {
-        id, heading: text(props.heading), body: text(props.body), width: props.width,
+        id, heading: text(props.heading), body: text(props.body),
+        // The first prototype called its standard width "normal".
+        width: choice(props.width === "normal" ? "standard" : props.width, ["narrow", "standard", "wide"], "standard"),
+        alignment: choice(props.alignment, ["left", "center"], "left"),
+        spacing: choice(props.spacing, ["compact", "standard", "generous"], "standard"),
       } };
     }
     throw new InvalidContentError("Unknown block type.");
@@ -70,6 +90,13 @@ export function parseWorkingCopy(value: unknown): WorkingCopy {
   }
   return { page: parsePageData(copy.page), theme: {
     headingFont: theme.headingFont, bodyFont: theme.bodyFont,
+    baseTextSize: choice(theme.baseTextSize, ["small", "standard", "large"], defaultSiteTheme.baseTextSize),
+    headingScale: choice(theme.headingScale, ["compact", "standard", "editorial"], defaultSiteTheme.headingScale),
+    accentColor: color(theme.accentColor, defaultSiteTheme.accentColor),
+    backgroundColor: color(theme.backgroundColor, defaultSiteTheme.backgroundColor),
+    textColor: color(theme.textColor, defaultSiteTheme.textColor),
+    contentWidth: choice(theme.contentWidth, ["narrow", "standard", "wide"], defaultSiteTheme.contentWidth),
+    sectionSpacing: choice(theme.sectionSpacing, ["compact", "standard", "generous"], defaultSiteTheme.sectionSpacing),
   } };
 }
 

@@ -21,13 +21,15 @@ export function Hero({
   ctaLabel,
   ctaUrl,
   alignment,
+  width,
+  spacing,
   isEditing = false,
 }: HeroProps & { isEditing?: boolean }) {
   const href = safeCtaUrl(ctaUrl);
 
   return (
-    <section className={styles.hero} data-alignment={alignment}>
-      <div className={styles.heroContent}>
+    <section className={styles.hero} data-alignment={alignment} data-spacing={spacing}>
+      <div className={styles.heroContent} data-width={width}>
         {eyebrow && <p className={styles.eyebrow}>{eyebrow}</p>}
         <h1 className={styles.heroHeading}>{heading}</h1>
         {supportingText && <p className={styles.supportingText}>{supportingText}</p>}
@@ -45,9 +47,9 @@ export function Hero({
   );
 }
 
-export function ContentSection({ heading, body, width }: ContentSectionProps) {
+export function ContentSection({ heading, body, width, alignment, spacing }: ContentSectionProps) {
   return (
-    <section className={styles.contentSection}>
+    <section className={styles.contentSection} data-alignment={alignment} data-spacing={spacing}>
       <div className={styles.contentInner} data-width={width}>
         <h2 className={styles.sectionHeading}>{heading}</h2>
         {body && <p className={styles.body}>{body}</p>}

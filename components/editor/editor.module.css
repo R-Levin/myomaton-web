@@ -22,13 +22,14 @@
 }
 
 .button:focus-visible,
-.field select:focus-visible {
+.field select:focus-visible,
+.field input:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 3px;
 }
 
 .dialog {
-  width: min(28rem, calc(100vw - 2rem));
+  width: min(38rem, calc(100vw - 2rem));
   max-height: calc(100dvh - 2rem);
   margin: auto;
   padding: 1.5rem;
@@ -37,6 +38,8 @@
   background: white;
   color: #17212b;
   font-family: var(--font-geist-sans), sans-serif;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .dialog::backdrop {
@@ -79,6 +82,31 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 1.5rem;
+  position: sticky;
+  bottom: -1.5rem;
+  padding-block: 1rem;
+  background: white;
+}
+
+.styleGroup {
+  min-width: 0;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid #cbd5e1;
+}
+
+.styleGroup legend { padding-right: 0.75rem; font-weight: 600; }
+.groupHelp { margin: 0.5rem 0 0; color: #52606d; font-size: 0.8rem; line-height: 1.5; }
+.styleGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; }
+.colorGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 1rem; }
+.field input[type="color"] { width: 100%; height: 44px; padding: 0.2rem; border: 1px solid #829ab1; border-radius: 4px; background: white; cursor: pointer; }
+.contrastNote { margin: 0.75rem 0 0; font-size: 0.8rem; line-height: 1.5; color: #9f1239; }
+
+@media (max-width: 480px) {
+  .styleGrid, .colorGrid { grid-template-columns: minmax(0, 1fr); }
+  .dialog { padding: 1rem; }
+  .dialogActions { bottom: -1rem; }
 }
 
 .toolbar {
