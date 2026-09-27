@@ -27,11 +27,14 @@ export function SectionRenderer({ section }: { section: MicrositeSection }) {
   const Heading = section.type === "hero" ? "h1" : "h2";
 
   return (
-    <section id={textField(section.configuration, "anchor")} className="space-y-3 py-8">
-      {heading && <Heading className={section.type === "hero" ? "text-4xl font-semibold" : "text-2xl font-semibold"}>{heading}</Heading>}
-      {text && <p className="leading-relaxed">{text}</p>}
+    <section
+      id={textField(section.configuration, "anchor")}
+      className={`microsite-section microsite-section-${section.type}`}
+    >
+      {heading && <Heading>{heading}</Heading>}
+      {text && <p>{text}</p>}
       {section.type === "cta" && actionLabel && actionHref && (
-        <a href={actionHref} className="inline-block underline">{actionLabel}</a>
+        <a href={actionHref} className="microsite-action">{actionLabel}</a>
       )}
     </section>
   );

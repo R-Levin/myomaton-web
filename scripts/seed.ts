@@ -11,6 +11,8 @@ import { sections } from "../lib/platform/db/schema/sections";
 import { subjects } from "../lib/platform/db/schema/subjects";
 import { subjectTypes } from "../lib/platform/db/schema/subject-types";
 import { webPresences } from "../lib/platform/db/schema/web-presences";
+import { designSystems } from "../lib/platform/db/schema/design-systems";
+import { myomatonDesignConfiguration } from "./seed-data/myomaton-design-system";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -109,6 +111,21 @@ async function seed() {
     // Serialize this seed's check-and-insert operations without schema changes.
     await tx.execute(sql`select pg_advisory_xact_lock(179052, 1)`);
 
+    // Preserve an existing identity, including one intentionally made inactive.
+    const [existingDesignSystem] = await tx
+      .select({ id: designSystems.id })
+      .from(designSystems)
+      .where(eq(designSystems.webPresenceId, presence.id))
+      .limit(1);
+
+    if (!existingDesignSystem) {
+      await tx.insert(designSystems).values({
+        webPresenceId: presence.id,
+        name: "Myomaton",
+        configuration: myomatonDesignConfiguration,
+      });
+    }
+
     const [existingMicrosite] = await tx
       .select()
       .from(microsites)
@@ -178,6 +195,7 @@ async function seed() {
       }
     }
 
+    console.log(`Design system seed created: ${existingDesignSystem ? 0 : 1} design systems.`);
     console.log(`Microsite seed created: ${existingMicrosite ? 0 : 1} microsites, ${existingPage ? 0 : 1} pages, ${createdSections} sections.`);
   });
 

@@ -7,6 +7,10 @@ import { microsites } from "@/lib/platform/db/schema/microsites";
 import { pages } from "@/lib/platform/db/schema/pages";
 import { sections } from "@/lib/platform/db/schema/sections";
 import { webPresences } from "@/lib/platform/db/schema/web-presences";
+import {
+  getDesignSystemByWebPresenceId,
+  type ResolvedDesignSystem,
+} from "@/lib/platform/design-systems/service";
 
 export type MicrositeSection = {
   id: string;
@@ -21,6 +25,7 @@ export type MicrositePage = {
   microsite: { id: string; name: string };
   page: { id: string; name: string; title: string; slug: string };
   sections: MicrositeSection[];
+  designSystem: ResolvedDesignSystem;
 };
 
 export async function getMicrositePageByDomain(
@@ -29,6 +34,7 @@ export async function getMicrositePageByDomain(
 ): Promise<MicrositePage | null> {
   const matches = await db
     .select({
+      webPresenceId: webPresences.id,
       microsite: { id: microsites.id, name: microsites.name },
       page: { id: pages.id, name: pages.name, title: pages.title, slug: pages.slug },
     })
@@ -64,5 +70,12 @@ export async function getMicrositePageByDomain(
     .where(and(eq(sections.pageId, match.page.id), eq(sections.status, "active")))
     .orderBy(asc(sections.sortOrder), asc(sections.id));
 
-  return { microsite: match.microsite, page: match.page, sections: orderedSections };
+  const designSystem = await getDesignSystemByWebPresenceId(match.webPresenceId);
+
+  return {
+    microsite: match.microsite,
+    page: match.page,
+    sections: orderedSections,
+    designSystem,
+  };
 }
