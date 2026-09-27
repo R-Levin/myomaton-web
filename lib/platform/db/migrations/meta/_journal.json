@@ -8,6 +8,13 @@
       "when": 1790522828994,
       "tag": "0000_initial-foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790525683157,
+      "tag": "0001_microsite-foundation",
+      "breakpoints": true
     }
   ]
 }
