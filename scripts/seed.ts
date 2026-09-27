@@ -1,10 +1,13 @@
 import "dotenv/config";
 
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
 import { organizations } from "../lib/platform/db/schema/organizations";
+import { microsites } from "../lib/platform/db/schema/microsites";
+import { pages } from "../lib/platform/db/schema/pages";
+import { sections } from "../lib/platform/db/schema/sections";
 import { subjects } from "../lib/platform/db/schema/subjects";
 import { subjectTypes } from "../lib/platform/db/schema/subject-types";
 import { webPresences } from "../lib/platform/db/schema/web-presences";
@@ -101,6 +104,82 @@ async function seed() {
       description: "An open practical robotics project.",
     });
   }
+
+  await db.transaction(async (tx) => {
+    // Serialize this seed's check-and-insert operations without schema changes.
+    await tx.execute(sql`select pg_advisory_xact_lock(179052, 1)`);
+
+    const [existingMicrosite] = await tx
+      .select()
+      .from(microsites)
+      .where(and(eq(microsites.webPresenceId, presence.id), eq(microsites.name, "Myomaton")))
+      .limit(1);
+
+    const microsite = existingMicrosite ?? (await tx
+      .insert(microsites)
+      .values({ webPresenceId: presence.id, name: "Myomaton" })
+      .returning())[0];
+
+    const [existingPage] = await tx
+      .select()
+      .from(pages)
+      .where(and(eq(pages.micrositeId, microsite.id), eq(pages.slug, "/")))
+      .limit(1);
+
+    const page = existingPage ?? (await tx
+      .insert(pages)
+      .values({ micrositeId: microsite.id, slug: "/", name: "Home", title: "Myomaton", sortOrder: 0 })
+      .returning())[0];
+
+    const seedSections = [
+      {
+        type: "hero",
+        name: "Hero",
+        sortOrder: 0,
+        content: {
+          heading: "Myomaton",
+          text: "Open practical robotics for everyday life.",
+        },
+      },
+      {
+        type: "intro",
+        name: "Introduction",
+        sortOrder: 10,
+        content: {
+          heading: "Robots we can understand, repair, and make our own.",
+          text: "Myomaton explores practical, affordable robotics built around open systems, understandable technology, and useful real-world applications.",
+        },
+        configuration: { anchor: "about" },
+      },
+      {
+        type: "cta",
+        name: "Primary Call to Action",
+        sortOrder: 20,
+        content: {
+          heading: "Follow the project",
+          text: "Myomaton is being developed in the open.",
+          actionLabel: "Learn more",
+          actionHref: "#about",
+        },
+      },
+    ];
+
+    let createdSections = 0;
+    for (const section of seedSections) {
+      const [existingSection] = await tx
+        .select({ id: sections.id })
+        .from(sections)
+        .where(and(eq(sections.pageId, page.id), eq(sections.type, section.type), eq(sections.name, section.name)))
+        .limit(1);
+
+      if (!existingSection) {
+        await tx.insert(sections).values({ ...section, pageId: page.id, variant: "default" });
+        createdSections += 1;
+      }
+    }
+
+    console.log(`Microsite seed created: ${existingMicrosite ? 0 : 1} microsites, ${existingPage ? 0 : 1} pages, ${createdSections} sections.`);
+  });
 
   console.log("Development seed complete.");
 }
