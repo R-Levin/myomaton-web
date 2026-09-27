@@ -1,9 +1,17 @@
-import { connection } from "next/server";
-import { contentRepository } from "@/lib/content/storage";
-import { PageRenderer } from "@/components/editor/page-renderer";
+import { getWebPresenceByDomain } from "@/lib/platform/web-presences/service";
 
 export default async function Home() {
-  await connection();
-  const { published } = await contentRepository.read();
-  return published ? <PageRenderer snapshot={published.snapshot} /> : <main />;
+  const presence = await getWebPresenceByDomain("myomaton.com");
+
+  if (!presence) {
+    return <main>Web presence not found.</main>;
+  }
+
+  return (
+    <main>
+      <h1>{presence.subjectName}</h1>
+      <p>{presence.organizationName}</p>
+      <p>{presence.subjectType}</p>
+    </main>
+  );
 }
