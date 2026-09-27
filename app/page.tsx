@@ -9,9 +9,15 @@ export default async function Home() {
 
   return (
     <main>
-      <h1>{presence.subjectName}</h1>
-      <p>{presence.organizationName}</p>
-      <p>{presence.subjectType}</p>
+      <h1>{presence.name}</h1>
+      <p>{presence.organization.name}</p>
+
+      {presence.subjects.map((subject) => (
+        <div key={subject.id}>
+          <p>{subject.name}</p>
+          {subject.type && <p>{subject.type.name}</p>}
+        </div>
+      ))}
     </main>
   );
 }
