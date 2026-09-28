@@ -91,3 +91,31 @@ body {
   outline: 2px solid var(--design-accent);
   outline-offset: 4px;
 }
+
+.microsite-header {
+  padding-block: calc(var(--design-space) * 3);
+  border-bottom: 1px solid var(--design-border);
+}
+
+.microsite-header ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--design-space) * 3);
+  list-style: none;
+}
+
+.microsite-header ul ul {
+  display: block;
+  padding-left: calc(var(--design-space) * 2);
+}
+
+.microsite-header a {
+  color: var(--design-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.microsite-header a:focus-visible {
+  outline: 2px solid var(--design-accent);
+  outline-offset: 4px;
+}

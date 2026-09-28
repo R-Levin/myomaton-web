@@ -15,6 +15,8 @@ import { designSystems } from "../lib/platform/db/schema/design-systems";
 import { myomatonDesignConfiguration } from "./seed-data/myomaton-design-system";
 import { actions } from "../lib/platform/db/schema/actions";
 import { myomatonAction, upgradeMyomatonCtaContent } from "./seed-data/myomaton-action";
+import { navigations } from "../lib/platform/db/schema/navigations";
+import { navigationItems } from "../lib/platform/db/schema/navigation-items";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -214,6 +216,24 @@ async function seed() {
       }
     }
 
+    const [existingNavigation] = await tx.select().from(navigations)
+      .where(and(eq(navigations.webPresenceId, presence.id), eq(navigations.name, "Primary Navigation")))
+      .limit(1);
+    const navigation = existingNavigation ?? (await tx.insert(navigations)
+      .values({ webPresenceId: presence.id, name: "Primary Navigation" }).returning())[0];
+    const [intro] = await tx.select({ id: sections.id }).from(sections)
+      .where(and(eq(sections.pageId, page.id), eq(sections.type, "intro"), eq(sections.name, "Introduction"))).limit(1);
+    const seedNavigationItems = [
+      ...(intro ? [{ name: "About", label: "About", targetType: "section", targetReference: intro.id, sortOrder: 0 }] : []),
+      { name: "Learn about Myomaton", label: action.label, targetType: "action", targetReference: action.id, sortOrder: 10 },
+    ];
+    let createdNavigationItems = 0;
+    for (const item of seedNavigationItems) {
+      const inserted = await tx.insert(navigationItems).values({ ...item, navigationId: navigation.id })
+        .onConflictDoNothing({ target: [navigationItems.navigationId, navigationItems.name] }).returning({ id: navigationItems.id });
+      createdNavigationItems += inserted.length;
+    }
+    console.log(`Navigation seed created: ${existingNavigation ? 0 : 1} navigations, ${createdNavigationItems} items.`);
     console.log(`Design system seed created: ${existingDesignSystem ? 0 : 1} design systems.`);
     console.log(`Action seed created: ${existingAction ? 0 : 1} actions.`);
     console.log(`Microsite seed created: ${existingMicrosite ? 0 : 1} microsites, ${existingPage ? 0 : 1} pages, ${createdSections} sections.`);

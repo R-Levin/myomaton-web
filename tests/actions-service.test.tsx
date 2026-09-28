@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { transpileModule, ModuleKind, ScriptTarget } from "typescript";
 import * as orm from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { Pool } from "pg";
@@ -16,21 +14,7 @@ import * as presencesSchema from "../lib/platform/db/schema/web-presences";
 import { myomatonAction } from "../scripts/seed-data/myomaton-action";
 import { myomatonDesignConfiguration } from "../scripts/seed-data/myomaton-design-system";
 import { MicrositePageView } from "../components/microsites/microsite-page";
-
-// Load server-only services with an in-memory driver; exercise real Drizzle SQL
-// and row mapping without requiring or applying the pending database migration.
-function loadService(file: string, dependencies: Record<string, unknown>) {
-  const compiled = transpileModule(readFileSync(file, "utf8"), {
-    compilerOptions: { module: ModuleKind.CommonJS, target: ScriptTarget.ES2017 },
-  });
-  const exports: Record<string, unknown> = {};
-  new Function("require", "exports", compiled.outputText)((name: string) => {
-    if (name === "server-only") return {};
-    assert.ok(Object.hasOwn(dependencies, name), `Unexpected dependency: ${name}`);
-    return dependencies[name];
-  }, exports);
-  return exports;
-}
+import { loadService } from "./helpers/load-service";
 
 test("services load seeded Action, enforce tenant scope, and resolve shared CTA references", async () => {
   const tenant = "11111111-1111-4111-8111-111111111111";
@@ -85,6 +69,15 @@ test("services load seeded Action, enforce tenant scope, and resolve shared CTA 
     "@/lib/platform/db/schema/web-presences": presencesSchema,
     "@/lib/platform/actions/service": actionService,
     "@/lib/platform/actions/model": actionModel,
+    "@/lib/platform/navigations/service": {
+      async getNavigationByName(presenceId: string, name: string, surface: string, context: unknown) {
+        assert.equal(presenceId, tenant);
+        assert.equal(name, "Primary Navigation");
+        assert.equal(surface, "microsite");
+        assert.deepEqual(context, { micrositeId: "microsite", pageId: "page" });
+        return null;
+      },
+    },
     "@/lib/platform/design-systems/service": {
       async getDesignSystemByWebPresenceId(presenceId: string) {
         assert.equal(presenceId, tenant);

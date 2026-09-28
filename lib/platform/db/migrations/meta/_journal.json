@@ -29,6 +29,13 @@
       "when": 1790558322905,
       "tag": "0003_action-foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790600904099,
+      "tag": "0004_navigation-foundation",
+      "breakpoints": true
     }
   ]
 }

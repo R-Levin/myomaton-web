@@ -9,6 +9,8 @@ import { sections } from "@/lib/platform/db/schema/sections";
 import { webPresences } from "@/lib/platform/db/schema/web-presences";
 import { getActionsByIds } from "@/lib/platform/actions/service";
 import { sectionActionId, type Action } from "@/lib/platform/actions/model";
+import { getNavigationByName } from "@/lib/platform/navigations/service";
+import type { Navigation } from "@/lib/platform/navigations/model";
 import {
   getDesignSystemByWebPresenceId,
   type ResolvedDesignSystem,
@@ -29,6 +31,7 @@ export type MicrositePage = {
   page: { id: string; name: string; title: string; slug: string };
   sections: MicrositeSection[];
   designSystem: ResolvedDesignSystem;
+  navigation?: Navigation | null;
 };
 
 export async function getMicrositePageByDomain(
@@ -78,6 +81,10 @@ export async function getMicrositePageByDomain(
     .map((section) => sectionActionId(section.content))
     .filter((id) => id !== null);
   const resolvedActions = await getActionsByIds(match.webPresenceId, actionIds);
+  const navigation = await getNavigationByName(match.webPresenceId, "Primary Navigation", "microsite", {
+    micrositeId: match.microsite.id,
+    pageId: match.page.id,
+  });
 
   return {
     microsite: match.microsite,
@@ -87,5 +94,6 @@ export async function getMicrositePageByDomain(
       action: resolvedActions.get(sectionActionId(section.content) ?? "") ?? null,
     })),
     designSystem,
+    navigation,
   };
 }
