@@ -21,7 +21,7 @@ test("seed configuration resolves unchanged and reaches server-rendered tokens",
     sections: [
       { id: "hero", type: "hero", variant: "default", name: "Hero", content: { heading: "Hero title" }, configuration: {} },
       { id: "intro", type: "intro", variant: "default", name: "Intro", content: { heading: "Introduction" }, configuration: { anchor: "about" } },
-      { id: "cta", type: "cta", variant: "default", name: "CTA", content: { heading: "Follow", actionLabel: "Learn more", actionHref: "#about" }, configuration: {} },
+      { id: "cta", type: "cta", variant: "default", name: "CTA", content: { heading: "Follow", actionId: "11111111-1111-4111-8111-111111111111" }, configuration: {}, action: { id: "11111111-1111-4111-8111-111111111111", name: "Learn more", type: "section", label: "Learn more", destination: "#about" } },
       { id: "unknown", type: "future", variant: null, name: null, content: { heading: "Not supported" }, configuration: {} },
     ],
   };

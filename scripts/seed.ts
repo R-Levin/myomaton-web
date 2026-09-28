@@ -13,6 +13,8 @@ import { subjectTypes } from "../lib/platform/db/schema/subject-types";
 import { webPresences } from "../lib/platform/db/schema/web-presences";
 import { designSystems } from "../lib/platform/db/schema/design-systems";
 import { myomatonDesignConfiguration } from "./seed-data/myomaton-design-system";
+import { actions } from "../lib/platform/db/schema/actions";
+import { myomatonAction, upgradeMyomatonCtaContent } from "./seed-data/myomaton-action";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -126,6 +128,17 @@ async function seed() {
       });
     }
 
+    const [existingAction] = await tx
+      .select()
+      .from(actions)
+      .where(and(eq(actions.webPresenceId, presence.id), eq(actions.name, myomatonAction.name)))
+      .limit(1);
+
+    const action = existingAction ?? (await tx
+      .insert(actions)
+      .values({ ...myomatonAction, webPresenceId: presence.id })
+      .returning())[0];
+
     const [existingMicrosite] = await tx
       .select()
       .from(microsites)
@@ -175,8 +188,7 @@ async function seed() {
         content: {
           heading: "Follow the project",
           text: "Myomaton is being developed in the open.",
-          actionLabel: "Learn more",
-          actionHref: "#about",
+          actionId: action.id,
         },
       },
     ];
@@ -184,7 +196,7 @@ async function seed() {
     let createdSections = 0;
     for (const section of seedSections) {
       const [existingSection] = await tx
-        .select({ id: sections.id })
+        .select({ id: sections.id, content: sections.content })
         .from(sections)
         .where(and(eq(sections.pageId, page.id), eq(sections.type, section.type), eq(sections.name, section.name)))
         .limit(1);
@@ -192,10 +204,18 @@ async function seed() {
       if (!existingSection) {
         await tx.insert(sections).values({ ...section, pageId: page.id, variant: "default" });
         createdSections += 1;
+      } else if (section.type === "cta") {
+        const content = upgradeMyomatonCtaContent(existingSection.content, action.id);
+        if (content) {
+          await tx.update(sections)
+            .set({ content, updatedAt: new Date(), version: sql`${sections.version} + 1` })
+            .where(and(eq(sections.id, existingSection.id), eq(sections.content, existingSection.content)));
+        }
       }
     }
 
     console.log(`Design system seed created: ${existingDesignSystem ? 0 : 1} design systems.`);
+    console.log(`Action seed created: ${existingAction ? 0 : 1} actions.`);
     console.log(`Microsite seed created: ${existingMicrosite ? 0 : 1} microsites, ${existingPage ? 0 : 1} pages, ${createdSections} sections.`);
   });
 

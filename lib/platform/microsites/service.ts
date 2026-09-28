@@ -7,6 +7,8 @@ import { microsites } from "@/lib/platform/db/schema/microsites";
 import { pages } from "@/lib/platform/db/schema/pages";
 import { sections } from "@/lib/platform/db/schema/sections";
 import { webPresences } from "@/lib/platform/db/schema/web-presences";
+import { getActionsByIds } from "@/lib/platform/actions/service";
+import { sectionActionId, type Action } from "@/lib/platform/actions/model";
 import {
   getDesignSystemByWebPresenceId,
   type ResolvedDesignSystem,
@@ -19,6 +21,7 @@ export type MicrositeSection = {
   name: string | null;
   content: unknown;
   configuration: unknown;
+  action?: Action | null;
 };
 
 export type MicrositePage = {
@@ -71,11 +74,18 @@ export async function getMicrositePageByDomain(
     .orderBy(asc(sections.sortOrder), asc(sections.id));
 
   const designSystem = await getDesignSystemByWebPresenceId(match.webPresenceId);
+  const actionIds = orderedSections
+    .map((section) => sectionActionId(section.content))
+    .filter((id) => id !== null);
+  const resolvedActions = await getActionsByIds(match.webPresenceId, actionIds);
 
   return {
     microsite: match.microsite,
     page: match.page,
-    sections: orderedSections,
+    sections: orderedSections.map((section) => ({
+      ...section,
+      action: resolvedActions.get(sectionActionId(section.content) ?? "") ?? null,
+    })),
     designSystem,
   };
 }

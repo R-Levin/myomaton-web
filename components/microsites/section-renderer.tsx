@@ -1,4 +1,5 @@
 import type { MicrositeSection } from "@/lib/platform/microsites/service";
+import { normalizeDestination } from "../../lib/platform/actions/model";
 
 function textField(value: unknown, key: string): string | undefined {
   if (!value || typeof value !== "object" || Array.isArray(value)) return;
@@ -6,24 +7,13 @@ function textField(value: unknown, key: string): string | undefined {
   return typeof field === "string" ? field : undefined;
 }
 
-function safeHref(value: string | undefined): string | undefined {
-  if (!value || /[\s\\]/.test(value)) return;
-  if (value.startsWith("#") || (value.startsWith("/") && !value.startsWith("//"))) return value;
-  try {
-    const url = new URL(value);
-    if (url.protocol === "https:" || url.protocol === "http:") return value;
-  } catch {
-    return;
-  }
-}
-
 export function SectionRenderer({ section }: { section: MicrositeSection }) {
   if (!["hero", "intro", "cta"].includes(section.type)) return null;
 
   const heading = textField(section.content, "heading");
   const text = textField(section.content, "text");
-  const actionLabel = textField(section.content, "actionLabel");
-  const actionHref = safeHref(textField(section.content, "actionHref"));
+  const action = section.action;
+  const actionHref = action ? normalizeDestination(action.type, action.destination) : null;
   const Heading = section.type === "hero" ? "h1" : "h2";
 
   return (
@@ -33,8 +23,8 @@ export function SectionRenderer({ section }: { section: MicrositeSection }) {
     >
       {heading && <Heading>{heading}</Heading>}
       {text && <p>{text}</p>}
-      {section.type === "cta" && actionLabel && actionHref && (
-        <a href={actionHref} className="microsite-action">{actionLabel}</a>
+      {section.type === "cta" && action && actionHref && (
+        <a href={actionHref} className="microsite-action">{action.label}</a>
       )}
     </section>
   );
