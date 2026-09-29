@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { MicrositeSection } from "@/lib/platform/microsites/service";
 import { normalizeDestination } from "../../lib/platform/actions/model";
 
@@ -23,6 +24,10 @@ export function SectionRenderer({ section }: { section: MicrositeSection }) {
     >
       {heading && <Heading>{heading}</Heading>}
       {text && <p>{text}</p>}
+      {section.type === "intro" && section.image && (
+        <Image className="microsite-photo" src={section.image.src} alt={section.image.alt}
+          width={section.image.width} height={section.image.height} unoptimized />
+      )}
       {section.type === "cta" && action && actionHref && (
         <a href={actionHref} className="microsite-action">{action.label}</a>
       )}

@@ -119,3 +119,11 @@ body {
   outline: 2px solid var(--design-accent);
   outline-offset: 4px;
 }
+
+.microsite-photo {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-top: calc(var(--design-space) * 3);
+  border-radius: var(--design-radius);
+}

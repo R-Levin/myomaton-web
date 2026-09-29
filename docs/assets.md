@@ -1,55 +1,187 @@
-# Asset foundation
+# Assets and the first microsite image
 
-Assets are customer-owned canonical Web Presence state. Each has a stable UUID,
-an owning Web Presence, name, open-ended type (default `image`), MIME type,
-nullable positive pixel width/height, nullable alt text, status (default `active`),
-configuration, metadata, version and timestamps. Names and source references
-are not unique: neither is identity. Null alt text means unspecified; an empty
-string can intentionally describe a decorative image. Dimensions may be unknown
-or inapplicable. Version is a current-record revision, not a history table;
-future writers must increment it and update `updatedAt` as existing seeds do.
+Assets are customer-owned canonical Web Presence state. Their UUID is logical
+identity, independent of storage location, source key, filename, and delivery URL.
+Names and sources are not unique. Types/statuses remain open text; version is a
+current-record revision, not a history table. Future updates must increment version
+and update `updatedAt`. Nullable dimensions allow unknown/inapplicable sizes;
+null alt text is unspecified, while an empty string can intentionally be decorative.
+The operator photograph command requires approved descriptive alt text.
 
-`sourceType` identifies a resolver kind and `sourceReference` holds its opaque
-locator. For example, `url` with an externally hosted HTTPS URL can represent
-an existing photograph. These fields can change without changing the Asset ID.
-No provider enum, credentials, binary payload, data URL, signed URL generation,
-or resolver is introduced. Do not place bytes or credentials in either field or
-JSON metadata. Future source writers/resolvers must validate each supported
-kind and enforce safe delivery; a stored locator is not a renderable URL.
+## Managed source contract
 
-AssetUsage records a current association `(Web Presence, entity type, entity
-UUID, role, Asset UUID)`. Exact duplicates are prohibited; multiple assets can
-share a role, and one asset can serve multiple entities/roles. Types such as
-`page`, `section`, `subject`, or `web_presence` identify owners; `hero`, `gallery`,
-or `social` describe semantic roles rather than separate target types.
-No ordering or singular-role policy is imposed yet.
+- `source_type = "managed"` identifies a managed-object resolver, not a provider.
+- `source_reference` is a durable relative object key, scoped by `web_presence_id`.
+  The only accepted form is `objects/<64 lowercase SHA-256 hex digits>`.
+  The hash identifies immutable stored bytes, **not** the Asset UUID.
+- No absolute paths, credentials, source URLs, signed URLs, or CDN delivery URLs
+  belong in this reference or canonical metadata. Object keys are not browser URLs.
+- Local bytes live at `<root>/<web-presence-uuid>/<source-reference>`.
+  `MYOMATON_ASSET_ROOT` configures the root; the development default is the ignored
+  `runtime-assets/` directory. Real photograph bytes are never committed.
+- Roots, buckets, credentials, provider selection and CDN configuration are
+  deployment configuration. A later object-store adapter can preserve logical keys;
+  moving locations or changing a source reference does not change Asset identity.
+- The browser receives a generated `/media/assets/<asset-uuid>` URL, dimensions,
+  alt text and Asset identity only. It does not receive source keys or filesystem paths.
 
-The composite foreign key enforces that usage and asset belong to the same Web
-Presence. Its default NO ACTION deletion behavior prevents deleting a referenced
-asset. Ownership of the usage's Web Presence is inherited through this key.
-Polymorphic entity IDs cannot have a conventional foreign key: future write
-services must validate target existence and derive/check its Web Presence
-(Pages through Microsites, Sections through Pages). They must remove usages
-transactionally when a reference is replaced or a target deleted. Direct SQL
-can currently create dangling or incorrectly scoped target references; no write
-API is exposed in this slice. This follows the existing polymorphic Navigation
-target approach without adding an entity registry or speculative triggers.
+Generic local storage is media-neutral: it accepts validated bytes, enforces the
+current 20 MiB object/read limit, verifies SHA-256, and creates immutable objects
+without overwriting existing files. Keys have no extension. Storage neither decodes
+images nor infers MIME. Invalid paths, traversal, encoded alternatives, absolute
+paths, backslashes, symlinks/junctions at the root or below, and escapes are rejected.
+An interrupted write may leave an incomplete object; digest verification rejects it.
+Filesystem provisioning is not a PostgreSQL transaction.
 
-Every usage row counts as a reference, including references from inactive
-entities. There is deliberately no usage status or soft-delete/history state.
-Removing an association removes its row. Once references are removed, no schema
-rule requires retaining the asset forever. Later bounded retention/purge must
-coordinate concurrent reference writes; reading an empty inventory alone is
-not a safe deletion workflow.
+Separate ingestion derives format from bytes, never the filename:
 
-The server-only service supplies tenant-scoped canonical reads by Asset IDs,
-entity, and reverse usage inventory. It includes inactive Assets and does not
-perform caller authorization, target resolution, availability filtering, or
-URL delivery. Callers must supply an authorized Web Presence. Invalid query
-identifiers throw rather than reporting a misleading empty reference inventory.
+- JPEG/JPG, PNG and WebP use Sharp 0.35.4. They are fully decoded, oriented, stripped
+  of embedded metadata, and re-encoded in the accepted format (JPEG/WebP quality 90;
+  PNG lossless). PNG/WebP alpha is preserved. Dimensions describe the prepared output.
+  The pixel limit is 40 million. Animated/multipage inputs are rejected, including
+  APNG animation-control chunks and JPEG MPO directories that decoders may flatten.
+- SVG uses strict XML parsing with jsdom and DOMPurify's SVG/filter profile. DTDs,
+  malformed XML and non-SVG roots are rejected. Scripts, event handlers, style/CSS,
+  foreign content, animation, embedded images, links/use and external references
+  are removed. Paint-server URLs may reference local IDs only. Sanitized output is
+  parsed again as SVG and stored as `image/svg+xml`; it is never rasterized. Numeric
+  dimensions or viewBox provide presentation dimensions when available; otherwise
+  canonical dimensions are null. This is a focused static-SVG policy, not an editor.
+- PDF uses PDF.js to parse the catalog/page tree after checking the PDF header and
+  EOF envelope; unreadable, encrypted (no password supplied), empty and malformed
+  documents fail. Accepted bytes are preserved as `application/pdf`, type `document`,
+  with null dimensions. No rendering, text extraction or optimization occurs.
+  Validation is structural, not malware scanning or removal of PDF active content;
+  PDFs are delivered as downloads with restrictive security headers.
 
-Deferred: writes/editor endpoints, uploads, storage adapters, source validation
-and rendering, microsite/seed integration, target lifecycle integration,
-retirement, garbage collection, retention scheduling, archival and export.
-The stable IDs, source separation and explicit usages allow a future export to
-carry canonical records and remap physical asset locations independently.
+Raster/SVG records have type `image`. SHA-256 always covers the exact stored
+representation, including sanitized SVG. Delivery rechecks MIME/content outside
+storage and rejects SVG that is no longer the canonical sanitized representation.
+Keep originals separately if needed; ingestion does not archive them.
+
+Managed video ingestion is disabled. The neutral source contract can accommodate
+future media after the required large-media policy decision (A7).
+
+The store is operator-controlled and must not be writable by untrusted processes.
+Filesystem checks are not an OS sandbox against a privileged process concurrently
+swapping directories. Local storage requires a persistent writable volume; it is
+not durable storage for an ephemeral/serverless deployment. No provider framework,
+upload UI, automatic storage migration, or image-rendition pipeline is introduced.
+
+The validator dependencies are DOMPurify 3.4.16, jsdom 30.1.1 and PDF.js
+(`pdfjs-dist`) 6.3.289; jsdom types are development-only. Use a supported Node
+runtime satisfying their engine requirements (validated here on Node 24.18.0).
+PDF.js's in-process parser worker is explicitly imported so production bundling
+includes it. The production integration mode exercises all five MIME types through
+the built route with disposable records and synthetic files outside the project.
+
+## Association and write integrity
+
+AssetUsage is the sole canonical Section-to-Asset association. The first renderer
+uses `entity_type = "section"`, the real Section UUID, and `role = "image"` on
+`intro` sections. Section JSON contains neither an Asset ID nor a delivery URL.
+The database permits multiple Assets per role generally; this writer enforces one
+image by locking the Section and its ownership chain before checking associations.
+PDF attachments use `role = "attachment"` with the same singular-role locking protocol.
+All future writers of either singular role must use that protocol. No schema or
+format-specific AssetUsage fields are introduced; the intro renderer still shows images only.
+
+The composite FK enforces usage-to-asset Web Presence ownership and prevents
+referenced Asset deletion. Polymorphic target existence/ownership is enforced by
+the narrow writer through Section -> Page -> Microsite -> Web Presence. Incorrectly
+scoped or ambiguous target associations are rejected, not silently replaced.
+
+Asset creation and usage creation run transactionally. Bootstrap target lookup is
+also locked in the transaction. An exact existing Asset-ID association is a no-op,
+including when canonical Asset metadata/status differs from the command arguments.
+Otherwise an occupied image role is a conflict. An existing unassociated Asset may
+be reused only when ownership, active state, type, MIME, source and dimensions agree;
+its metadata is preserved. No Section fields, timestamps, versions, or metadata
+are modified, and no bootstrap marker is stored anywhere.
+
+File provisioning occurs only after association conflict checks. File errors roll
+back database writes. PostgreSQL cannot roll back filesystem changes: a successful
+file write followed by a database failure can leave an unreferenced immutable file.
+It remains available for explicit retry/operator inspection; this slice neither
+silently deletes it nor treats it as an archive. Automated cleanup and crash recovery
+remain part of the existing lifecycle/physical-cleanup deferrals.
+
+## Explicit operator bootstrap
+
+Normal `db:seed` and application startup never create or restore image associations.
+After the usual development seed exists, explicitly invoke:
+
+```powershell
+npm.cmd run db:bootstrap-photo -- --file "C:\Photos\robot.jpg" --asset-id "<chosen-stable-uuid>" --name "Myomaton robot" --alt "<approved description of this photograph>"
+```
+
+Choose and retain the Asset UUID for this photograph; do not derive it from its
+path or bytes. The command loads `.env.local` using the same workflow as `db:seed`.
+A configured `MYOMATON_ASSET_ROOT` is optional. The command requires exactly one
+active Myomaton Web Presence (`myomaton.com`), Myomaton Microsite, Home page (`/`),
+and Introduction (`intro`) Section. Missing/ambiguous targets are errors.
+
+Each invocation evaluates current canonical usages: exact association means no-op;
+a different/ambiguous association means refusal; an empty role permits creation.
+If a usage is deliberately removed, reads and normal seed do not restore it. Only
+another explicit operator invocation may attempt initialization against current
+state. The supplied supported image must remain readable even on a no-op invocation because
+input validation precedes the database transaction. No real photograph is included
+or bootstrapped by installing this code.
+
+## Public presentation and delivery
+
+Canonical Asset reads still include all statuses. Separate presentation reads batch
+resolve images and require active Assets and active Section/Page/Microsite/Web
+Presence ancestors, matching ownership, `intro` section type and the applicable `image` or `attachment` role.
+Ambiguous image roles raise an error; unavailable/unsupported Assets are omitted.
+The existing intro text always renders when no image resolves.
+
+The read-only Node Route Handler independently applies those eligibility checks in
+the explicit `myomaton.com` context, matching the current homepage. It does not trust
+request Host for tenant selection. UUID knowledge alone does not expose inactive,
+unreferenced or foreign-presence files. Valid responses use the validated stored MIME, `nosniff`, `Cache-Control: no-store`,
+and `Content-Security-Policy: default-src 'none'; sandbox`. PDFs use an attachment
+disposition with a fixed filename; images use inline disposition. Errors never return source paths. The renderer uses
+`next/image` with explicit dimensions, responsive CSS and `unoptimized` to avoid a
+second delivery/cache pipeline. Active content is public in the existing microsite
+model; this does not invent a draft/published workflow.
+
+## Verification and remaining scope
+
+```powershell
+npm.cmd test
+# Explicit connection to a development/test DB whose role can CREATE SCHEMA:
+$env:ASSET_TEST_DATABASE_URL = "<development-or-test-connection>"
+npm.cmd run test:postgres
+npm.cmd run lint
+npm.cmd run build
+# After a production build, also exercise the actual built Route Handler:
+$env:ASSET_TEST_PRODUCTION = "1"
+npm.cmd run test:postgres
+```
+
+The PostgreSQL suite never silently skips. First it compares every installed Drizzle
+migration hash/timestamp with the checked-in chain using Drizzle's own migration
+reader. It replays those SQL files in a disposable schema (only public schema
+qualification is replaced), then compares PostgreSQL catalog columns/defaults,
+constraints and indexes for all fixture tables against the installed public schema.
+This uses checked-in migrations as the expected specification instead of maintaining
+a second schema. The replay schema is rolled back. It then clones the installed public table
+structures (including checks, indexes and separately recreated foreign keys) into
+a random `myomaton_asset_test_<uuid>` schema. Every fixture query uses that schema;
+catalog definitions are compared again and FK target namespaces must all stay inside it. The schema is dropped after the suite, including on failure.
+No migrations or real Myomaton content records are changed. A crashed test process
+can leave a clearly named fixture schema for operator cleanup.
+
+Coverage includes ownership, FK/uniqueness/delete rejection, forced transactional
+rollback, concurrent singular-role attachment, canonical no-op/conflict behavior,
+public eligibility and delivery of all five supported formats. Unit tests cover key/filesystem safety,
+DTOs, raster orientation/alpha/animation, SVG sanitization, PDF validation, rendering
+and absent-image behavior. A negative fixture-schema test proves drift is detected.
+
+Still deferred: other target writers; replacement/removal/deletion workflows;
+customer-facing authentication/authorization and private assets; object-store/CDN
+integration; lifecycle timestamps, retention/purge/archival; customer editing and
+revision history; export. An empty usage inventory alone never authorizes deletion.
+See [the active architecture register](deferred-architecture.md) for triggers.

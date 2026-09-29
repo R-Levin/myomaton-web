@@ -1,6 +1,8 @@
 import "server-only";
 
 import { and, asc, eq } from "drizzle-orm";
+import { getSectionImages } from "@/lib/platform/assets/presentation-service";
+import type { SectionImage } from "@/lib/platform/assets/source";
 
 import { db } from "@/lib/platform/db/connection";
 import { microsites } from "@/lib/platform/db/schema/microsites";
@@ -24,6 +26,7 @@ export type MicrositeSection = {
   content: unknown;
   configuration: unknown;
   action?: Action | null;
+  image?: SectionImage | null;
 };
 
 export type MicrositePage = {
@@ -76,6 +79,7 @@ export async function getMicrositePageByDomain(
     .where(and(eq(sections.pageId, match.page.id), eq(sections.status, "active")))
     .orderBy(asc(sections.sortOrder), asc(sections.id));
 
+  const images = await getSectionImages(match.webPresenceId, orderedSections.filter((section) => section.type === "intro").map((section) => section.id));
   const designSystem = await getDesignSystemByWebPresenceId(match.webPresenceId);
   const actionIds = orderedSections
     .map((section) => sectionActionId(section.content))
@@ -91,6 +95,7 @@ export async function getMicrositePageByDomain(
     page: match.page,
     sections: orderedSections.map((section) => ({
       ...section,
+      image: images.get(section.id) ?? null,
       action: resolvedActions.get(sectionActionId(section.content) ?? "") ?? null,
     })),
     designSystem,

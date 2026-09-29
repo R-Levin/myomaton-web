@@ -12,7 +12,7 @@ those capabilities already exist. A trigger is an implementation gate, not a dat
 - **OPEN**: unresolved question; decide when its trigger supplies the necessary context.
 - **OPTIONAL**: possible enhancement, not a product or architecture commitment.
 
-All REQUIRED items below are pending at their stated gates; DECISION items apply
+Remaining REQUIRED scopes below are pending at their stated gates; DECISION items apply
 continuously; OPEN items remain unresolved. No OPTIONAL items are currently recorded.
 
 ## Slice workflow
@@ -27,14 +27,21 @@ For each coherent implementation slice:
 
 ## REQUIRED: Assets
 
+Satisfied for the first microsite slice: **A1/A2** for transactional `intro` Section
+`image` and document `attachment` roles only; **A3** for the format-neutral managed-object/local-storage contract; **A6**
+for that writer and relevant PostgreSQL constraints in disposable fixtures, with
+installed migration-chain and replayed-schema fidelity checks. See
+[Assets](assets.md). This does not complete broader Asset lifecycle or management.
+
 | ID | Deferred requirement | Implementation trigger / reason |
 | --- | --- | --- |
-| A1 | Validate AssetUsage target existence and Web Presence ownership, following Page/Section ownership through their parents. | Before introducing AssetUsage writers. The composite FK validates the asset side, not the polymorphic target. |
-| A2 | Maintain usages transactionally when references are attached, replaced, removed, or their target is deleted. | When those mutations become possible; reference inventory must describe current state. |
-| A3 | Establish a durable `source_type` / `source_reference` contract. Keep stable Asset identity independent of location; canonical records must not depend on transient delivery URLs or credentials. | Before physical storage/provider integration. |
+| A1 | Validate AssetUsage target existence and Web Presence ownership, following Page/Section ownership through their parents. | Before each additional target writer or operation. Section intro image/document attachment is covered; the composite FK still does not validate generic targets. |
+| A2 | Maintain usages transactionally when references are attached, replaced, removed, or their target is deleted. | Before replacement/removal/target deletion or other attachment writers are introduced. The implemented Section attachment is transactional. |
+| A3 | Establish a durable `source_type` / `source_reference` contract. Keep stable Asset identity independent of location; canonical records must not depend on transient delivery URLs or credentials. | Before additional source kinds or production storage/provider integration. Format-neutral managed/local semantics are established and must be preserved. |
 | A4 | Track asset lifecycle and unreferenced state explicitly; do not use `updated_at` as the unreferenced timestamp. | Before retention/purge implementation; see O1 and D1. |
-| A5 | Define safe physical-file cleanup for replacement/deletion, including displaced source locations and concurrent references. | Before asset replacement/deletion can leave obsolete bytes or delete referenced bytes. A source-reference overwrite alone loses cleanup information. |
-| A6 | Add live PostgreSQL integrity coverage for relevant cross-tenant, reference, and delete constraints. | When Asset write operations are introduced; current tests inspect schema/query behavior without exercising database rejection paths. |
+| A5 | Define safe physical-file cleanup for replacement/deletion, including displaced source locations and concurrent references. | Before asset replacement/deletion or automatic orphan-file cleanup. Local provisioning can leave retryable bytes after a DB failure; do not delete them blindly. A source-reference overwrite loses cleanup information. |
+| A6 | Add live PostgreSQL integrity coverage for relevant cross-tenant, reference, and delete constraints. | With each additional Asset write operation or target type. Section attachment and relevant FK/uniqueness/delete rejection now have live PostgreSQL coverage, migration hash/timestamp preflight, replayed-schema catalog comparison, and cloned-FK fidelity checks. |
+| A7 | Before enabling managed video ingestion, define the large-media storage and delivery policy, including capacity/cost behavior, file-size constraints, optimization/transcoding strategy where appropriate, retention implications, and external-provider options. The policy must accommodate legitimate high-video customers without imposing arbitrary growth penalties while protecting platform storage and delivery economics. | Before managed video ingestion is enabled. Video is deliberately unsupported in this slice; this policy has not been designed. |
 
 Customer-facing Asset authorization is covered by P7. Asset data **and bytes** in
 customer export/offboarding are covered by P5; these are REQUIRED, not optional
