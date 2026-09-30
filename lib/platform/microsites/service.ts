@@ -12,6 +12,8 @@ import { webPresences } from "@/lib/platform/db/schema/web-presences";
 import { getActionsByIds } from "@/lib/platform/actions/service";
 import { sectionActionId, type Action } from "@/lib/platform/actions/model";
 import { normalizeSection } from "./sections";
+import { presentCollection, type CollectionItem } from "./collections";
+import { getPresentedSubjectsByIds } from "@/lib/platform/subjects/presentation-service";
 import { getNavigationByName } from "@/lib/platform/navigations/service";
 import type { Navigation } from "@/lib/platform/navigations/model";
 import {
@@ -28,6 +30,7 @@ export type MicrositeSection = {
   configuration: unknown;
   action?: Action | null;
   image?: SectionImage | null;
+  collectionItems?: CollectionItem[];
 };
 
 export type MicrositePage = {
@@ -87,9 +90,14 @@ export async function getMicrositePageByDomain(
   const images = await getSectionImages(match.webPresenceId, supportedSections.filter((section) => section.type === "intro").map((section) => section.id));
   const designSystem = await getDesignSystemByWebPresenceId(match.webPresenceId);
   const actionIds = supportedSections
-    .map((section) => sectionActionId(section.content))
+    .flatMap((section) => section.type === "collection"
+      ? section.content.items.map((item) => item.actionId ?? null)
+      : [sectionActionId(section.content)])
     .filter((id) => id !== null);
   const resolvedActions = await getActionsByIds(match.webPresenceId, actionIds);
+  const subjectIds = supportedSections.flatMap((section) => section.type === "collection" && section.content.itemSource === "subjects"
+    ? section.content.items.map((item) => item.subjectId) : []);
+  const resolvedSubjects = await getPresentedSubjectsByIds(match.webPresenceId, subjectIds);
   const navigation = await getNavigationByName(match.webPresenceId, "Primary Navigation", "microsite", {
     micrositeId: match.microsite.id,
     pageId: match.page.id,
@@ -102,6 +110,7 @@ export async function getMicrositePageByDomain(
       ...section,
       image: images.get(section.id) ?? null,
       action: resolvedActions.get(sectionActionId(section.content) ?? "") ?? null,
+      ...(section.type === "collection" ? { collectionItems: presentCollection(section.content, resolvedSubjects, resolvedActions) } : {}),
     })),
     designSystem,
     navigation,

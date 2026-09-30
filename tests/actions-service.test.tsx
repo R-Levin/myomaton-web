@@ -6,6 +6,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import type { Pool } from "pg";
 
 import * as actionModel from "../lib/platform/actions/model";
+import * as collections from "../lib/platform/microsites/collections";
 import * as sectionModel from "../lib/platform/microsites/sections";
 import * as actionsSchema from "../lib/platform/db/schema/actions";
 import * as micrositesSchema from "../lib/platform/db/schema/microsites";
@@ -65,6 +66,8 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
 
   const micrositeService = loadService("lib/platform/microsites/service.ts", {
     "./sections": sectionModel,
+    "./collections": collections,
+    "@/lib/platform/subjects/presentation-service": { getPresentedSubjectsByIds: async () => new Map() },
     "drizzle-orm": orm,
     "@/lib/platform/db/connection": { db },
     "@/lib/platform/db/schema/microsites": micrositesSchema,

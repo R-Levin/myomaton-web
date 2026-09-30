@@ -9,6 +9,7 @@ import * as pages from "../lib/platform/db/schema/pages";
 import * as sections from "../lib/platform/db/schema/sections";
 import * as presences from "../lib/platform/db/schema/web-presences";
 import * as actions from "../lib/platform/actions/model";
+import * as collections from "../lib/platform/microsites/collections";
 import * as sectionModel from "../lib/platform/microsites/sections";
 import { myomatonDesignConfiguration } from "../scripts/seed-data/myomaton-design-system";
 import { MicrositePageView } from "../components/microsites/microsite-page";
@@ -26,6 +27,8 @@ test("microsite resolves intro images through the Asset service and renders opti
   const image = { assetId: id(5), src: `/media/assets/${id(5)}`, width: 640, height: 480, alt: "A real robot" };
   const service = loadService("lib/platform/microsites/service.ts", {
     "./sections": sectionModel,
+    "./collections": collections,
+    "@/lib/platform/subjects/presentation-service": { getPresentedSubjectsByIds: async () => new Map() },
     "drizzle-orm": orm,
     "@/lib/platform/db/connection": { db: drizzle({ client: client as unknown as Pool }) },
     "@/lib/platform/db/schema/microsites": sites, "@/lib/platform/db/schema/pages": pages,

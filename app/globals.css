@@ -179,3 +179,38 @@ body {
   object-fit: contain;
 }
 .microsite-section[data-media-fit="cover"] .microsite-photo { object-fit: cover; }
+
+/* Grid adapts to the actual inner width, including the reading-width preset. */
+.microsite-section-collection .microsite-section-inner { container-type: inline-size; }
+.microsite-collection {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: calc(var(--design-space) * 3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.microsite-collection-item {
+  min-width: 0;
+  padding: calc(var(--design-space) * 3);
+  border: 1px solid var(--design-border);
+  border-radius: var(--design-radius);
+  background: var(--design-surface);
+  color: var(--design-text);
+  --section-copy: var(--design-muted);
+  --section-action-background: var(--design-accent);
+  --section-action-text: var(--design-on-accent);
+}
+.microsite-collection-item h3 {
+  font-family: var(--design-heading-font);
+  font-size: calc(var(--design-base-size) * 1.25);
+  font-weight: 600;
+  line-height: var(--design-line-height);
+}
+.microsite-section[data-alignment="center"] .microsite-collection-item { text-align: center; }
+@container (min-width: 36rem) {
+  .microsite-collection { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (min-width: 60rem) {
+  .microsite-section[data-columns="3"] .microsite-collection { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
