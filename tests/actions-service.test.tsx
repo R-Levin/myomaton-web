@@ -6,6 +6,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import type { Pool } from "pg";
 
 import * as actionModel from "../lib/platform/actions/model";
+import * as sectionModel from "../lib/platform/microsites/sections";
 import * as actionsSchema from "../lib/platform/db/schema/actions";
 import * as micrositesSchema from "../lib/platform/db/schema/microsites";
 import * as pagesSchema from "../lib/platform/db/schema/pages";
@@ -16,7 +17,7 @@ import { myomatonDesignConfiguration } from "../scripts/seed-data/myomaton-desig
 import { MicrositePageView } from "../components/microsites/microsite-page";
 import { loadService } from "./helpers/load-service";
 
-test("services load seeded Action, enforce tenant scope, and resolve shared CTA references", async () => {
+test("services load seeded Action, enforce tenant scope, and resolve shared Hero/Intro/CTA references", async () => {
   const tenant = "11111111-1111-4111-8111-111111111111";
   const id = "22222222-2222-4222-8222-222222222222";
   const otherTenant = "33333333-3333-4333-8333-333333333333";
@@ -37,8 +38,10 @@ test("services load seeded Action, enforce tenant scope, and resolve shared CTA 
       }
       if (query.text.includes('from "sections"')) {
         return { rows: [
-          ["first", "cta", "default", "CTA", { heading: "First", actionId: id }, {}],
-          ["second", "cta", "default", "CTA", { heading: "Second", actionId: id }, {}],
+          ["first", "hero", "default", "Hero", { heading: "First", actionId: id }, {}],
+          ["second", "intro", "split-image-first", "Introduction", { heading: "Second", actionId: id }, {}],
+          ["third", "cta", "default", "CTA", { heading: "Third", actionId: id }, {}],
+          ["unknown", "future", null, null, { actionId: "33333333-3333-4333-8333-333333333333" }, {}],
         ] };
       }
       throw new Error(`Unexpected SQL: ${query.text}`);
@@ -61,6 +64,7 @@ test("services load seeded Action, enforce tenant scope, and resolve shared CTA 
   assert.equal(actionQueries, 1);
 
   const micrositeService = loadService("lib/platform/microsites/service.ts", {
+    "./sections": sectionModel,
     "drizzle-orm": orm,
     "@/lib/platform/db/connection": { db },
     "@/lib/platform/db/schema/microsites": micrositesSchema,
@@ -89,20 +93,23 @@ test("services load seeded Action, enforce tenant scope, and resolve shared CTA 
 
   const page = await micrositeService.getMicrositePageByDomain("myomaton.com", "/");
   assert.ok(page);
-  assert.equal(actionQueries, 2, "One batch query for both presentations");
+  assert.equal(actionQueries, 2, "One batch query for all three presentations");
+  assert.equal(page.sections.length, 3, "Unsupported types are omitted before dependency resolution");
   assert.equal(page.sections[0].action?.id, id);
   assert.strictEqual(page.sections[0].action, page.sections[1].action);
   const html = renderToStaticMarkup(<MicrositePageView page={page} />);
-  assert.equal((html.match(/href="#about"/g) ?? []).length, 2);
+  assert.equal((html.match(/href="#about"/g) ?? []).length, 3);
   assert.ok(html.includes("--design-accent:#214e43"));
 
   for (const rows of [[], [[id, otherTenant, "Other", "section", "Other tenant", "#about", "active"]], [[id, tenant, "Inactive", "section", "Inactive", "#about", "inactive"]], [[id, tenant, "Unsafe", "link", "Unsafe", "javascript:alert(1)", "active"]]]) {
     actionRows = rows;
     const unavailable = await micrositeService.getMicrositePageByDomain("myomaton.com", "/");
     assert.ok(unavailable);
-    assert.equal(unavailable.sections[0].action, null);
+    assert.ok(unavailable.sections.every((section) => section.action === null));
     const fallback = renderToStaticMarkup(<MicrositePageView page={unavailable} />);
     assert.ok(fallback.includes("First"));
+    assert.ok(fallback.includes("Second"));
+    assert.ok(fallback.includes("Third"));
     assert.ok(!fallback.includes("href="));
   }
 });

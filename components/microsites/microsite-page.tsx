@@ -7,14 +7,14 @@ import { PrimaryNavigation } from "./primary-navigation";
 export function MicrositePageView({ page }: { page: MicrositePage }) {
   return (
     <div className="microsite" style={designTokens(page.designSystem.configuration)}>
-      <div className="microsite-content">
+      <div className="microsite-navigation-container">
         <PrimaryNavigation navigation={page.navigation} />
-        <main>
+      </div>
+      <main>
         {page.sections.map((section) => (
           <SectionRenderer key={section.id} section={section} />
         ))}
-        </main>
-      </div>
+      </main>
     </div>
   );
 }

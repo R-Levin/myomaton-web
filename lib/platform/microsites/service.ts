@@ -11,6 +11,7 @@ import { sections } from "@/lib/platform/db/schema/sections";
 import { webPresences } from "@/lib/platform/db/schema/web-presences";
 import { getActionsByIds } from "@/lib/platform/actions/service";
 import { sectionActionId, type Action } from "@/lib/platform/actions/model";
+import { normalizeSection } from "./sections";
 import { getNavigationByName } from "@/lib/platform/navigations/service";
 import type { Navigation } from "@/lib/platform/navigations/model";
 import {
@@ -79,9 +80,13 @@ export async function getMicrositePageByDomain(
     .where(and(eq(sections.pageId, match.page.id), eq(sections.status, "active")))
     .orderBy(asc(sections.sortOrder), asc(sections.id));
 
-  const images = await getSectionImages(match.webPresenceId, orderedSections.filter((section) => section.type === "intro").map((section) => section.id));
+  const supportedSections = orderedSections.flatMap((section) => {
+    const normalized = normalizeSection(section);
+    return normalized ? [{ ...section, ...normalized }] : [];
+  });
+  const images = await getSectionImages(match.webPresenceId, supportedSections.filter((section) => section.type === "intro").map((section) => section.id));
   const designSystem = await getDesignSystemByWebPresenceId(match.webPresenceId);
-  const actionIds = orderedSections
+  const actionIds = supportedSections
     .map((section) => sectionActionId(section.content))
     .filter((id) => id !== null);
   const resolvedActions = await getActionsByIds(match.webPresenceId, actionIds);
@@ -93,7 +98,7 @@ export async function getMicrositePageByDomain(
   return {
     microsite: match.microsite,
     page: match.page,
-    sections: orderedSections.map((section) => ({
+    sections: supportedSections.map((section) => ({
       ...section,
       image: images.get(section.id) ?? null,
       action: resolvedActions.get(sectionActionId(section.content) ?? "") ?? null,

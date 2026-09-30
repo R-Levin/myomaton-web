@@ -27,21 +27,65 @@ body {
   font-family: var(--design-body-font);
   font-size: var(--design-base-size);
   line-height: var(--design-line-height);
-  padding: 0 calc(var(--design-space) * 3) var(--design-section-space);
+  padding-bottom: var(--design-section-space);
   overflow-wrap: anywhere;
 }
 
-.microsite-content {
-  max-width: 64rem;
+.microsite-navigation-container {
+  max-width: calc(64rem + var(--design-space) * 6);
+  padding-inline: calc(var(--design-space) * 3);
   margin-inline: auto;
 }
 
 .microsite-section {
+  --section-heading: var(--design-accent);
+  --section-copy: var(--design-muted);
+  --section-action-background: var(--design-accent);
+  --section-action-text: var(--design-on-accent);
+  background: var(--design-background);
+  color: var(--design-text);
   padding-block: var(--design-section-space);
+  padding-inline: calc(var(--design-space) * 3);
 }
 
-.microsite-section + .microsite-section {
+.microsite-section + .microsite-section[data-divider="rule"] {
   border-top: 1px solid var(--design-border);
+}
+
+.microsite-section-inner {
+  max-width: 64rem;
+  margin-inline: auto;
+  display: grid;
+  gap: calc(var(--design-space) * 4);
+  align-items: center;
+}
+
+.microsite-section-inner > * { min-width: 0; }
+.microsite-section[data-width="reading"] .microsite-section-inner { max-width: 42rem; }
+.microsite-section[data-width="wide"] .microsite-section-inner { max-width: 80rem; }
+.microsite-section[data-spacing="compact"] { padding-block: calc(var(--design-section-space) * 0.5); }
+.microsite-section[data-spacing="spacious"] { padding-block: calc(var(--design-section-space) * 1.5); }
+.microsite-section[data-divider="spacing"] { margin-top: calc(var(--design-space) * 3); }
+.microsite-section[data-surface="subtle"] { background: var(--design-surface); }
+.microsite-section[data-surface="accent"] {
+  --section-heading: var(--design-on-accent);
+  --section-copy: var(--design-on-accent);
+  --section-action-background: var(--design-on-accent);
+  --section-action-text: var(--design-accent);
+  background: var(--design-accent);
+  color: var(--design-on-accent);
+}
+
+.microsite-section[data-alignment="center"] .microsite-section-copy { text-align: center; }
+.microsite-section[data-alignment="center"] :is(h1, h2, p) { margin-inline: auto; }
+
+/* Text leads in the DOM and on narrow screens in both split variants. */
+@media (min-width: 48rem) {
+  .microsite-section[data-layout^="split-"] .microsite-section-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .microsite-section[data-layout="split-image-first"] .microsite-section-media { grid-column: 1; grid-row: 1; }
+  .microsite-section[data-layout="split-image-first"] .microsite-section-copy { grid-column: 2; grid-row: 1; }
 }
 
 .microsite-section h1,
@@ -55,7 +99,7 @@ body {
 }
 
 .microsite-section h1 {
-  color: var(--design-accent);
+  color: var(--section-heading);
   font-size: clamp(2rem, 7vw, var(--design-heading-size));
 }
 
@@ -65,20 +109,20 @@ body {
 
 .microsite-section p {
   max-width: 62ch;
-  color: var(--design-muted);
+  color: var(--section-copy);
   margin-top: calc(var(--design-space) * 2);
 }
 
-.microsite-section-cta {
-  background: var(--design-surface);
-  border-radius: var(--design-radius);
-  padding: calc(var(--design-space) * 4);
+.microsite-section .microsite-eyebrow {
+  margin-top: 0;
+  margin-bottom: var(--design-space);
+  font-weight: 600;
 }
 
 .microsite-action {
   display: inline-block;
-  background: var(--design-accent);
-  color: var(--design-on-accent);
+  background: var(--section-action-background);
+  color: var(--section-action-text);
   border-radius: var(--design-radius);
   padding: calc(var(--design-space) * 1.5) calc(var(--design-space) * 2.5);
   margin-top: calc(var(--design-space) * 3);
@@ -88,7 +132,7 @@ body {
 }
 
 .microsite-action:focus-visible {
-  outline: 2px solid var(--design-accent);
+  outline: 2px solid var(--section-action-background);
   outline-offset: 4px;
 }
 
@@ -124,6 +168,14 @@ body {
   display: block;
   max-width: 100%;
   height: auto;
-  margin-top: calc(var(--design-space) * 3);
   border-radius: var(--design-radius);
 }
+
+/* Explicit framed modes use one platform-owned ratio; natural never crops. */
+.microsite-section[data-media-fit="contain"] .microsite-photo,
+.microsite-section[data-media-fit="cover"] .microsite-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+}
+.microsite-section[data-media-fit="cover"] .microsite-photo { object-fit: cover; }

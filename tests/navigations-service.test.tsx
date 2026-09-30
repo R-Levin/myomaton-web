@@ -112,7 +112,7 @@ test("Navigation service resolves entity targets, scopes every lookup, and filte
   assert.equal(microsite.items[2].targetReference, actionId);
   assert.ok(renderToStaticMarkup(<PrimaryNavigation navigation={microsite} />).includes('href="#about"'));
   const loadedAction = (await actionService.getActionsByIds(tenant, [actionId])).get(actionId);
-  const cta = renderToStaticMarkup(<SectionRenderer section={{ id: "cta", type: "cta", variant: null, name: null, content: {}, configuration: {}, action: loadedAction }} />);
+  const cta = renderToStaticMarkup(<SectionRenderer section={{ id: "cta", type: "cta", variant: null, name: null, content: { actionId }, configuration: {}, action: loadedAction }} />);
   assert.ok(cta.includes('href="#about"'), "CTA and Navigation share contextual semantics");
 
   const anotherPage = await resolve("microsite", { micrositeId, pageId });
