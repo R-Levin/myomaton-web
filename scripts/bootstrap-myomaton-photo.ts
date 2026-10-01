@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { assetRoot } from "../lib/platform/assets/local-storage";
 import { requireAssetUuid } from "../lib/platform/assets/model";
-import { bootstrapMyomatonPhoto } from "./seed-data/myomaton-photo";
+import { bootstrapMyomatonPhoto } from "./customer-bootstrap/myomaton-photo";
 
 async function main() {
   const { values } = parseArgs({ options: {

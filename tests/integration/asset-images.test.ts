@@ -22,7 +22,7 @@ import { assets } from "../../lib/platform/db/schema/assets";
 import { assetUsages } from "../../lib/platform/db/schema/asset-usages";
 import { attachSectionAsset } from "../../lib/platform/assets/writes";
 import { publicAsset, sectionImages } from "../../lib/platform/assets/presentation-queries";
-import { bootstrapMyomatonPhoto } from "../../scripts/seed-data/myomaton-photo";
+import { bootstrapMyomatonPhoto } from "../../scripts/customer-bootstrap/myomaton-photo";
 import { deliverPublicAsset } from "../../lib/platform/assets/delivery";
 
 import { startProductionFixture } from "./production-server";

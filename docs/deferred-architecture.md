@@ -49,6 +49,13 @@ Asset enhancements.
 
 ## REQUIRED: Platform
 
+The seed/customer-initialization part of P1 is implemented: generic seed contains
+only reference data; explicit Myomaton initialization creates a fresh customer
+graph atomically and performs no child repair or updates once the Web Presence
+exists. The legacy CTA seed updater is retired. See [bootstrap boundaries](bootstrap.md).
+P1 remains an ongoing gate for every later customer-state writer; this does not
+implement customer editing, provenance, revisions or publishing (P2/P3).
+
 | ID | Requirement to implement or preserve | Implementation trigger / reason |
 | --- | --- | --- |
 | P1 | Keep the platform database canonical for the customer's current Web Presence. Customer edits become canonical and must not be silently overwritten by templates, AI, automation, or reseeding. Seeds/source files must not remain a competing authority. | When real customer editing is introduced, and whenever a later writer can update existing customer state. |

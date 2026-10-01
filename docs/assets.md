@@ -109,7 +109,8 @@ remain part of the existing lifecycle/physical-cleanup deferrals.
 ## Explicit operator bootstrap
 
 Normal `db:seed` and application startup never create or restore image associations.
-After the usual development seed exists, explicitly invoke:
+After the customer baseline exists (for a new database: `db:seed`, then
+`bootstrap:myomaton`; see [bootstrap boundaries](bootstrap.md)), explicitly invoke:
 
 ```powershell
 npm.cmd run db:bootstrap-photo -- --file "C:\Photos\robot.jpg" --asset-id "<chosen-stable-uuid>" --name "Myomaton robot" --alt "<approved description of this photograph>"

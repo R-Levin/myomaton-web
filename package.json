@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "tsx --env-file=.env.local scripts/seed.ts",
+    "bootstrap:myomaton": "tsx --env-file=.env.local scripts/bootstrap-myomaton.ts",
     "db:bootstrap-photo": "tsx --env-file=.env.local scripts/bootstrap-myomaton-photo.ts",
     "test": "tsx --test tests/*.test.tsx",
     "test:postgres": "tsx --test tests/integration/*.test.ts"

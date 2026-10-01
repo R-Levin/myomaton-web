@@ -24,7 +24,7 @@ export async function bootstrapMyomatonPhoto(db: NodePgDatabase, options: PhotoO
         eq(sections.name, "Introduction"), eq(sections.type, "intro"),
         eq(webPresences.status, "active"), eq(microsites.status, "active"), eq(pages.status, "active"), eq(sections.status, "active")))
       .limit(2).for("update");
-    if (targets.length !== 1) throw new Error("Expected exactly one active Myomaton Home Introduction section. Run the normal seed first if absent.");
+    if (targets.length !== 1) throw new Error("Expected exactly one active Myomaton Home Introduction section. Initialize a new customer with bootstrap:myomaton first; existing customer state is never repaired automatically.");
     const target = targets[0];
     return attachSectionAsset(tx, { ...target, assetId: options.assetId, name: options.name, altText: options.altText,
       sourceReference: photo.sourceReference, width: photo.width, height: photo.height, type: photo.type, mimeType: photo.mimeType, role: "image" },

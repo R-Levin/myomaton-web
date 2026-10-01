@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { normalizeAction, normalizeDestination, sectionActionId } from "../lib/platform/actions/model";
-import { myomatonAction, upgradeMyomatonCtaContent } from "../scripts/seed-data/myomaton-action";
+import { myomatonAction } from "../scripts/customer-bootstrap/myomaton-action";
 import { SectionRenderer } from "../components/microsites/section-renderer";
 
 const presenceId = "11111111-1111-4111-8111-111111111111";
@@ -51,14 +51,4 @@ test("missing, inactive, cross-tenant, malformed, and unsafe Actions fail closed
   const html = renderToStaticMarkup(<SectionRenderer section={section} />);
   assert.ok(html.includes("Still visible"));
   assert.ok(!html.includes("href="));
-});
-
-test("CTA seed upgrade is repeatable and preserves customized content and references", () => {
-  const legacy = { heading: "Edited heading", text: "Keep this", actionLabel: "Learn more", actionHref: "#about", extra: true };
-  const upgraded = upgradeMyomatonCtaContent(legacy, id);
-  assert.deepEqual(upgraded, { heading: "Edited heading", text: "Keep this", extra: true, actionId: id });
-  assert.equal(upgradeMyomatonCtaContent(upgraded, id), null);
-  assert.equal(upgradeMyomatonCtaContent({ ...legacy, actionHref: "/custom" }, id), null);
-  assert.equal(upgradeMyomatonCtaContent({ ...legacy, actionId: "existing-reference" }, id), null);
-  assert.equal(legacy.actionHref, "#about");
 });

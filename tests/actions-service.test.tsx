@@ -13,8 +13,8 @@ import * as micrositesSchema from "../lib/platform/db/schema/microsites";
 import * as pagesSchema from "../lib/platform/db/schema/pages";
 import * as sectionsSchema from "../lib/platform/db/schema/sections";
 import * as presencesSchema from "../lib/platform/db/schema/web-presences";
-import { myomatonAction } from "../scripts/seed-data/myomaton-action";
-import { myomatonDesignConfiguration } from "../scripts/seed-data/myomaton-design-system";
+import { myomatonAction } from "../scripts/customer-bootstrap/myomaton-action";
+import { myomatonDesignConfiguration } from "../scripts/customer-bootstrap/myomaton-design-system";
 import { MicrositePageView } from "../components/microsites/microsite-page";
 import { loadService } from "./helpers/load-service";
 

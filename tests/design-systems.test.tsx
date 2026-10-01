@@ -6,7 +6,7 @@ import {
   defaultDesignConfiguration,
   resolveDesignConfiguration,
 } from "../lib/platform/design-systems/configuration";
-import { myomatonDesignConfiguration } from "../scripts/seed-data/myomaton-design-system";
+import { myomatonDesignConfiguration } from "../scripts/customer-bootstrap/myomaton-design-system";
 import { MicrositePageView } from "../components/microsites/microsite-page";
 import { SectionRenderer } from "../components/microsites/section-renderer";
 import type { MicrositePage } from "../lib/platform/microsites/service";

@@ -11,7 +11,7 @@ import * as presences from "../lib/platform/db/schema/web-presences";
 import * as actions from "../lib/platform/actions/model";
 import * as collections from "../lib/platform/microsites/collections";
 import * as sectionModel from "../lib/platform/microsites/sections";
-import { myomatonDesignConfiguration } from "../scripts/seed-data/myomaton-design-system";
+import { myomatonDesignConfiguration } from "../scripts/customer-bootstrap/myomaton-design-system";
 import { MicrositePageView } from "../components/microsites/microsite-page";
 import { loadService } from "./helpers/load-service";
 
