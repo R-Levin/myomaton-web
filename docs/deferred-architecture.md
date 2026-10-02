@@ -5,6 +5,11 @@ Items come from established platform requirements and the [Asset foundation](ass
 Content Engine entries are commitments for future implementation, not claims that
 those capabilities already exist. A trigger is an implementation gate, not a date.
 
+The [platform capability catalog](platform-capabilities.md) defines the intended
+product envelope; this register owns active implementation state, triggers and
+deferred requirements. A capability's inclusion there does not by itself create
+a backlog item here.
+
 ## Classifications and status
 
 - **REQUIRED**: established requirement; implementation is pending until its trigger. Do not silently omit it when triggered.
@@ -19,7 +24,7 @@ continuously; OPEN items remain unresolved. No OPTIONAL items are currently reco
 
 For each coherent implementation slice:
 
-1. Review this register and identify items whose triggers the proposed work reaches.
+1. Check the [capability catalog](platform-capabilities.md), then review this register's implementation triggers against that envelope and identify REQUIRED gates the proposed slice reaches.
 2. Satisfy or explicitly reconsider triggered REQUIRED items; never silently bypass them. Record the rationale and revised requirement/trigger if reconsidered.
 3. Record material new deferrals, with an explicit trigger wherever possible and a reason when useful.
 4. Architecture review must distinguish genuine future requirements from speculative enhancements.
