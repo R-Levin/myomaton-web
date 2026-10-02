@@ -8,7 +8,8 @@ import { Client, Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 
 import { prepareManagedBytes } from "../../lib/platform/assets/ingestion";
-import { provisionManagedObject } from "../../lib/platform/assets/local-storage";
+import { provisionManagedObject, readManagedObject } from "../../lib/platform/assets/local-storage";
+import { importManagedAssets } from "../../scripts/operator-assets/import-managed-assets";
 import { mediaFixtures } from "../helpers/managed-media";
 
 import { eq, sql } from "drizzle-orm";
@@ -68,6 +69,66 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
       return { presence, site, page, section };
     }
     const first = await fixture(); const second = await fixture();
+    await t.test("standalone batch import preserves PNG, creates no usages, refuses duplicates and rolls back atomically", async () => {
+      const target = await fixture();
+      const root = path.join(temp, "standalone-storage");
+      const file = path.join(temp, "standalone-one.png"), otherFile = path.join(temp, "standalone-two.png");
+      const png = await sharp({ create: { width: 12, height: 9, channels: 4, background: "blue" } }).png().toBuffer();
+      const otherPng = await sharp({ create: { width: 13, height: 10, channels: 4, background: "green" } }).png().toBuffer();
+      await writeFile(file, png); await writeFile(otherFile, otherPng);
+      const items = [
+        { file, assetId: randomUUID(), name: "Fixture close-up", altText: "Approved fixture one" },
+        { file: otherFile, assetId: randomUUID(), name: "Fixture angle", altText: "Approved fixture two" },
+      ];
+      const beforeUsages = await db.select().from(assetUsages);
+      const beforeSections = await db.select().from(sections);
+      const beforeAssets = await db.select().from(assets);
+      const options = { webPresenceId: target.presence.id, root, items };
+      await assert.rejects(importManagedAssets(db, { ...options, items: [items[0], { ...items[1], file }] }), /Duplicate prepared/);
+      await assert.rejects(importManagedAssets(db, { ...options, items: [items[0], { ...items[1], assetId: items[0].assetId }] }), /Duplicate Asset UUID/);
+      await assert.rejects(importManagedAssets(db, { ...options, webPresenceId: randomUUID() }), /Active Web Presence not found/);
+      assert.deepEqual(await db.select().from(assets), beforeAssets);
+      const imported = await importManagedAssets(db, options);
+      assert.equal(imported.length, 2);
+      for (const [index, row] of imported.entries()) {
+        assert.equal(row.id, items[index].assetId); assert.equal(row.name, items[index].name);
+        assert.equal(row.altText, items[index].altText); assert.equal(row.webPresenceId, target.presence.id);
+        assert.equal(row.mimeType, "image/png"); assert.equal(row.type, "image");
+        assert.equal(row.width, 12 + index); assert.equal(row.height, 9 + index);
+        assert.equal(row.status, "active"); assert.equal(row.sourceType, "managed");
+        assert.equal(row.assetUsageCreated, false);
+        const prepared = await prepareManagedBytes(index ? otherPng : png);
+        assert.deepEqual(await readManagedObject(root, target.presence.id, row.sourceReference), prepared.bytes);
+      }
+      assert.deepEqual(await db.select().from(assetUsages), beforeUsages);
+      assert.deepEqual(await db.select().from(sections), beforeSections);
+      const afterAssets = await db.select().from(assets).orderBy(assets.id);
+      await assert.rejects(importManagedAssets(db, options), /Existing Asset UUID or same managed bytes/);
+      await assert.rejects(importManagedAssets(db, { ...options, items: items.map(item => ({ ...item, assetId: randomUUID() })) }), /same managed bytes/);
+      assert.deepEqual(await db.select().from(assets).orderBy(assets.id), afterAssets);
+      await db.update(assets).set({ status: "inactive" }).where(eq(assets.id, items[0].assetId));
+      await assert.rejects(importManagedAssets(db, { ...options, items: [{ ...items[0], assetId: randomUUID() }] }), /same managed bytes/);
+      // The same UUID is a conflict even when requested in a different tenant.
+      await assert.rejects(importManagedAssets(db, { ...options, webPresenceId: second.presence.id }), /Existing Asset UUID/);
+      const rollbackTarget = await fixture();
+      const rollbackOptions = { ...options, webPresenceId: rollbackTarget.presence.id, items: items.map(item => ({ ...item, assetId: randomUUID() })) };
+      await assert.rejects(db.transaction(async tx => {
+        await importManagedAssets(tx, rollbackOptions);
+        throw new Error("Forced import rollback");
+      }), /Forced import rollback/);
+      assert.deepEqual(await db.select().from(assets).where(eq(assets.webPresenceId, rollbackTarget.presence.id)), []);
+      // Retry uses the immutable objects left by rollback, not new Asset identities for duplicates.
+      assert.equal((await importManagedAssets(db, rollbackOptions)).length, 2);
+      const concurrentTarget = await fixture();
+      const concurrentOptions = { ...options, webPresenceId: concurrentTarget.presence.id, items: [{ ...items[0], assetId: randomUUID() }] };
+      const outcomes = await Promise.allSettled([
+        importManagedAssets(db, concurrentOptions),
+        importManagedAssets(db, { ...concurrentOptions, items: [{ ...items[0], assetId: randomUUID() }] }),
+      ]);
+      assert.equal(outcomes.filter(outcome => outcome.status === "fulfilled").length, 1);
+      assert.equal((await db.select().from(assets).where(eq(assets.webPresenceId, concurrentTarget.presence.id))).length, 1);
+      assert.deepEqual(await db.select().from(assetUsages), beforeUsages);
+    });
     const input = (f = first, id = randomUUID()) => ({ webPresenceId: f.presence.id, sectionId: f.section.id, assetId: id, type: "image" as const, mimeType: "image/jpeg", role: "image" as const, name: "Photo", altText: "Approved photo", width: 8, height: 6, sourceReference: `objects/${"a".repeat(64)}` });
     const firstInput = input();
     await t.test("writer creates once, preserves Section and canonical Asset fields, and rejects conflicts", async () => {

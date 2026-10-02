@@ -108,6 +108,37 @@ remain part of the existing lifecycle/physical-cleanup deferrals.
 
 ## Explicit operator bootstrap
 
+For standalone managed Assets without Section/Page attachment, use:
+
+```powershell
+npm.cmd run assets:import -- --web-presence-id "<existing-active-uuid>" --file "C:\Photos\robot.png" --asset-id "<chosen-stable-uuid>" --name "Robot" --alt "<approved description>"
+```
+
+Repeat `--file`, `--asset-id`, `--name` and `--alt` once per item; each list is matched
+by occurrence order. The batch uses existing supported-format preparation and
+configured runtime storage, preserves PNG as PNG, and creates active managed
+Assets only. It creates no AssetUsage and never alters existing records. Source
+files remain external; prepared immutable objects belong in ignored/runtime
+storage. Unattached Assets do not pass the current public delivery eligibility.
+
+All inputs are prepared before writes. An existing UUID (any tenant), or an
+existing managed source key in the requested Web Presence (any status), refuses
+the whole batch before provisioning. Duplicate prepared bytes/UUIDs within the
+batch also refuse. The model still permits nonunique source references: the command
+does not invent a global uniqueness constraint, auto-reuse, overwrite, or merge.
+It uses a short Asset-table maintenance lock with a 5-second lock timeout to
+protect checks against concurrent inserts; the active Web Presence is locked
+against reparenting/deletion. PostgreSQL inserts commit together. As with photograph
+bootstrap, files cannot roll back with the database and may remain as immutable,
+retryable objects after failure; no automatic file cleanup is performed.
+
+The isolated PostgreSQL suite covers this writer's FK-backed creation, no-usage
+behavior, PNG bytes/dimensions, duplicate refusal (including inactive Assets),
+cross-tenant UUID conflicts, rollback/retry and concurrent duplicate attempts.
+No new schema/migration or Asset attachment/lifecycle operation is introduced.
+The deferred register's A6 writer gate is covered by these fixture tests; existing
+lifecycle, cleanup, authorization, editing and publishing gates remain deferred.
+
 Normal `db:seed` and application startup never create or restore image associations.
 After the customer baseline exists (for a new database: `db:seed`, then
 `bootstrap:myomaton`; see [bootstrap boundaries](bootstrap.md)), explicitly invoke:
