@@ -3,6 +3,7 @@ import type { MicrositeSection } from "@/lib/platform/microsites/service";
 import { normalizeDestination, type Action } from "../../lib/platform/actions/model";
 import { normalizeSection } from "../../lib/platform/microsites/sections";
 import { presentCollection } from "../../lib/platform/microsites/collections";
+import { PlainTextParagraphs } from "./plain-text-paragraphs";
 
 function SectionAction({ action }: { action?: Action | null }) {
   const href = action && typeof action.label === "string" && action.label.trim()
@@ -40,7 +41,7 @@ export function SectionRenderer({ section }: { section: MicrositeSection }) {
         <div className="microsite-section-copy">
           {normalized.type === "hero" && normalized.content.eyebrow && <p className="microsite-eyebrow">{normalized.content.eyebrow}</p>}
           {heading && <Heading>{heading}</Heading>}
-          {text && <p>{text}</p>}
+          <PlainTextParagraphs text={text} />
           <SectionAction action={action} />
         </div>
         {image && <div className="microsite-section-media">
@@ -50,7 +51,7 @@ export function SectionRenderer({ section }: { section: MicrositeSection }) {
         {items.length > 0 && <ul className="microsite-collection" role="list">
           {items.map((item) => <li key={item.id} className="microsite-collection-item">
             <h3>{item.heading}</h3>
-            {item.text && <p>{item.text}</p>}
+            <PlainTextParagraphs text={item.text} />
             <SectionAction action={item.action} />
           </li>)}
         </ul>}

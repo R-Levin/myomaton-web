@@ -1,0 +1,193 @@
+{
+  "web_presences": [
+    {
+      "id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "organization_id": "af4ed9b8-713e-49b3-859e-f941d6fc168c",
+      "name": "Myomaton",
+      "primary_domain": "myomaton.com",
+      "locale": "en-US",
+      "timezone": "America/New_York",
+      "status": "active",
+      "configuration": {},
+      "version": 1
+    }
+  ],
+  "microsites": [
+    {
+      "id": "7fd60824-a933-401d-8099-7b64f24cc408",
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "name": "Myomaton",
+      "status": "active",
+      "configuration": {},
+      "version": 1
+    }
+  ],
+  "pages": [
+    {
+      "id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "microsite_id": "7fd60824-a933-401d-8099-7b64f24cc408",
+      "slug": "/",
+      "name": "Home",
+      "title": "Myomaton",
+      "status": "active",
+      "sort_order": 0,
+      "configuration": {},
+      "version": 1
+    }
+  ],
+  "sections": [
+    {
+      "id": "680318d0-a606-4d70-af92-1b5a69735ca6",
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "type": "intro",
+      "variant": "default",
+      "name": "Introduction",
+      "sort_order": 10,
+      "content": {
+        "text": "Myomaton explores practical, affordable robotics built around open systems, understandable technology, and useful real-world applications.",
+        "heading": "Robots we can understand, repair, and make our own."
+      },
+      "configuration": {
+        "anchor": "about"
+      },
+      "status": "active",
+      "version": 1
+    },
+    {
+      "id": "6c763a29-4404-4fe7-be6f-ab60de3bfcbe",
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "type": "hero",
+      "variant": "default",
+      "name": "Hero",
+      "sort_order": 0,
+      "content": {
+        "text": "Open practical robotics for everyday life.",
+        "heading": "Myomaton"
+      },
+      "configuration": {},
+      "status": "active",
+      "version": 1
+    },
+    {
+      "id": "a0afbe15-927b-46f6-bb2b-474523124934",
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "type": "cta",
+      "variant": "default",
+      "name": "Primary Call to Action",
+      "sort_order": 20,
+      "content": {
+        "text": "Myomaton is being developed in the open.",
+        "heading": "Follow the project",
+        "actionId": "d8a3924b-52af-41c7-b6c9-c4b3b41f035f"
+      },
+      "configuration": {},
+      "status": "active",
+      "version": 2
+    }
+  ],
+  "actions": [
+    {
+      "id": "d8a3924b-52af-41c7-b6c9-c4b3b41f035f",
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "name": "Learn about Myomaton",
+      "type": "section",
+      "label": "Learn more",
+      "destination": "#about",
+      "status": "active",
+      "configuration": {},
+      "version": 1
+    }
+  ],
+  "subjects": [
+    {
+      "id": "abfcc180-4bcd-478b-8c3b-1f0fd3664ac3",
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "subject_type_id": "4a1cf484-bfc3-4e3d-baee-0882353a6590",
+      "name": "Myomaton",
+      "legal_name": null,
+      "description": "An open practical robotics project.",
+      "status": "active",
+      "configuration": {},
+      "version": 1
+    }
+  ],
+  "subject_types": [
+    {
+      "id": "4a1cf484-bfc3-4e3d-baee-0882353a6590",
+      "parent_id": null,
+      "key": "project",
+      "name": "Project",
+      "description": "A project, initiative, or undertaking represented by a web presence.",
+      "status": "active",
+      "configuration": {},
+      "version": 1
+    }
+  ],
+  "navigations": [
+    {
+      "id": "9dfdb35b-ef37-4656-b56e-1468b5ba9690",
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "name": "Primary Navigation",
+      "status": "active",
+      "configuration": {},
+      "version": 1
+    }
+  ],
+  "navigation_items": [
+    {
+      "id": "258a8640-91a8-49de-a0be-fca753937494",
+      "navigation_id": "9dfdb35b-ef37-4656-b56e-1468b5ba9690",
+      "parent_id": null,
+      "name": "Learn about Myomaton",
+      "label": "Learn more",
+      "target_type": "action",
+      "target_reference": "d8a3924b-52af-41c7-b6c9-c4b3b41f035f",
+      "sort_order": 10,
+      "status": "active",
+      "configuration": {},
+      "version": 1
+    },
+    {
+      "id": "4d8b5c08-534e-4566-ac8d-8a84351d2b13",
+      "navigation_id": "9dfdb35b-ef37-4656-b56e-1468b5ba9690",
+      "parent_id": null,
+      "name": "About",
+      "label": "About",
+      "target_type": "section",
+      "target_reference": "680318d0-a606-4d70-af92-1b5a69735ca6",
+      "sort_order": 0,
+      "status": "active",
+      "configuration": {},
+      "version": 1
+    }
+  ],
+  "assets": [
+    {
+      "id": "eb1ea754-2f6d-4514-bf42-f4781f5f1d80",
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "name": "Tabot robotics hardware",
+      "type": "image",
+      "mime_type": "image/png",
+      "width": 1448,
+      "height": 1086,
+      "alt_text": "Close-up of Tabot robotics hardware with a Makerfabs AOA display, circuit boards, antenna, and connected cables.",
+      "status": "active",
+      "source_type": "managed",
+      "source_reference": "objects/b3388ddf50a8fdb7630098314ec29f74306aefe948607e67fe78fef53189681c",
+      "configuration": {},
+      "version": 1
+    }
+  ],
+  "asset_usages": [
+    {
+      "id": "9475a91c-e0ad-4373-b5e9-65ca6fe649e7",
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "asset_id": "eb1ea754-2f6d-4514-bf42-f4781f5f1d80",
+      "entity_type": "section",
+      "entity_id": "680318d0-a606-4d70-af92-1b5a69735ca6",
+      "role": "image",
+      "configuration": {},
+      "version": 1
+    }
+  ]
+}

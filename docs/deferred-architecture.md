@@ -55,6 +55,9 @@ graph atomically and performs no child repair or updates once the Web Presence
 exists. The legacy CTA seed updater is retired. See [bootstrap boundaries](bootstrap.md).
 P1 remains an ongoing gate for every later customer-state writer; this does not
 implement customer editing, provenance, revisions or publishing (P2/P3).
+The [Customer #1 Home v1 operator transition](myomaton-home-v1.md) uses a frozen
+expected-state guard for this bounded update; it does not complete those future
+workflows or make its source definition continuing authority over customer state.
 
 | ID | Requirement to implement or preserve | Implementation trigger / reason |
 | --- | --- | --- |

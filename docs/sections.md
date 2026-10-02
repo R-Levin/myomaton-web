@@ -10,6 +10,15 @@ UUID `actionId`. Hero also accepts `eyebrow`. Actions resolve in one tenant-scop
 existing Action service. Unavailable or unsafe Actions are omitted independently
 of content. Labels and destinations belong to Action, never Section JSON.
 
+Body text in Hero, Intro, CTA, collection introductions and collection cards uses
+the same plain-text paragraph renderer. CRLF/CR line endings normalize to LF;
+blank lines (including whitespace-only blank lines) separate semantic `<p>`
+elements. Paragraph edges are trimmed and empty/non-string content emits no
+paragraphs. Single newlines stay within one paragraph with ordinary HTML whitespace
+behavior. React escapes the text; no HTML or Markdown is interpreted, and canonical
+stored content is never rewritten. Headings, Hero eyebrow and Action labels retain
+their existing semantics.
+
 Hero and CTA use the `default` variant. Intro supports `stack`, `split-text-first`
 and `split-image-first`; null, `default`, and unsupported variants fall back to
 stack. Images come exclusively from AssetUsage via the existing presentation
