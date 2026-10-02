@@ -1,3 +1,4 @@
+import * as pageDestinations from "../lib/platform/managed-sites/page-destinations";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -89,6 +90,7 @@ test("managedSite batches Subject and item Action dependencies, preserves curate
     "@/lib/platform/db/schema/subjects": subjects, "@/lib/platform/db/schema/web-presences": presences, "./presentation": subjectModel,
   });
   const actionService = loadService("lib/platform/actions/service.ts", {
+    "../managed-sites/page-destinations": pageDestinations,
     "drizzle-orm": orm, "@/lib/platform/db/connection": connection, "@/lib/platform/db/schema/actions": actions, "./model": actionModel,
   });
   const service = loadService("lib/platform/managed-sites/service.ts", {

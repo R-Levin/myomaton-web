@@ -5,10 +5,12 @@ import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/platform/db/connection";
 import { actions } from "@/lib/platform/db/schema/actions";
 import { actionId, normalizeAction, type Action } from "./model";
+import { resolvePageDestinations, type PageTargetContext } from "../managed-sites/page-destinations";
 
 export async function getActionsByIds(
   webPresenceId: string,
   ids: readonly string[],
+  context?: PageTargetContext,
 ): Promise<Map<string, Action>> {
   const validIds = [...new Set(ids.map(actionId).filter((id) => id !== null))];
   const resolved = new Map<string, Action>();
@@ -32,8 +34,10 @@ export async function getActionsByIds(
       inArray(actions.id, validIds),
     ));
 
+  const pageDestinations = await resolvePageDestinations(db, presenceId,
+    rows.filter(row => row.type === "page").map(row => row.destination), context);
   for (const row of rows) {
-    const action = normalizeAction(row, presenceId);
+    const action = normalizeAction(row, presenceId, pageDestinations);
     if (action && validIds.includes(action.id)) resolved.set(action.id, action);
   }
   return resolved;

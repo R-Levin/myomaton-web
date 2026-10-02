@@ -98,7 +98,7 @@ export async function getManagedSitePage(
       ? section.content.items.map((item) => item.actionId ?? null)
       : [sectionActionId(section.content)])
     .filter((id) => id !== null);
-  const resolvedActions = await getActionsByIds(match.webPresenceId, actionIds);
+  const resolvedActions = await getActionsByIds(match.webPresenceId, actionIds, { managedSiteId: match.managedSite.id });
   const subjectIds = supportedSections.flatMap((section) => section.type === "collection" && section.content.itemSource === "subjects"
     ? section.content.items.map((item) => item.subjectId) : []);
   const resolvedSubjects = await getPresentedSubjectsByIds(match.webPresenceId, subjectIds);

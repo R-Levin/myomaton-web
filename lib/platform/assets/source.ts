@@ -1,4 +1,5 @@
 import { requireAssetUuid, type Asset } from "./model";
+import { resolveUsageAlt } from "./usage-presentation";
 
 export const MAX_MANAGED_BYTES = 20 * 1024 * 1024;
 export const MAX_IMAGE_PIXELS = 40_000_000;
@@ -20,15 +21,16 @@ export function imageDimensions(width: unknown, height: unknown): boolean {
 
 export type SectionImage = { assetId: string; src: string; width: number; height: number; alt: string };
 
-export function presentImage(asset: Asset): SectionImage | null {
+export function presentImage(asset: Asset, usageConfiguration: unknown = {}): SectionImage | null {
   try {
     requireAssetUuid(asset.id);
     requireManagedKey(asset.sourceReference);
   } catch { return null; }
+  const alt = resolveUsageAlt(asset.altText, usageConfiguration);
   if (asset.status !== "active" || asset.type !== "image" || !IMAGE_MIMES.includes(asset.mimeType)
     || asset.sourceType !== "managed" || !imageDimensions(asset.width, asset.height)
-    || typeof asset.altText !== "string") return null;
-  return { assetId: asset.id, src: `/media/assets/${asset.id}`, width: asset.width!, height: asset.height!, alt: asset.altText };
+    || alt === null) return null;
+  return { assetId: asset.id, src: `/media/assets/${asset.id}`, width: asset.width!, height: asset.height!, alt };
 }
 
 export const IMAGE_MIMES = ["image/jpeg", "image/png", "image/webp", "image/svg+xml"];

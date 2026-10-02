@@ -114,3 +114,35 @@ test("media route binds delivery to the configured Myomaton domain, never the re
   assert.equal(route.runtime, "nodejs");
   assert.strictEqual(await route.GET(new Request("https://foreign.example/media/assets/" + uuid), { params: Promise.resolve({ assetId: uuid }) }), response);
 });
+
+
+test("usage image metadata resolves defaults, overrides and decoration without mutating the reusable Asset", () => {
+  const asset = row(`objects/${"a".repeat(64)}`);
+  const before = structuredClone(asset);
+  assert.equal(presentImage(asset, {})?.alt, asset.altText);
+  assert.equal(presentImage(asset, { image: {} })?.alt, asset.altText);
+  const custom = presentImage(asset, { image: { altText: '  Robot <detail> & "sensor"  ', decorative: false } })!;
+  assert.equal(custom.alt, 'Robot <detail> & "sensor"');
+  for (const altText of [undefined, null, 42, "Descriptive fallback must not appear"]) {
+    const decorative = presentImage(asset, { image: { decorative: true, altText } })!;
+    assert.equal(decorative.alt, ""); assert.equal(decorative.assetId, custom.assetId);
+    assert.equal(decorative.src, custom.src);
+    const html = renderToStaticMarkup(<SectionRenderer section={{ id: randomUUID(), type: "intro", name: null, variant: null,
+      content: { text: "Keep" }, configuration: {}, image: decorative }} />);
+    assert.ok(html.includes('alt=""')); assert.ok(!html.includes(asset.altText!));
+  }
+  for (const bad of [null, [], 1, { image: null }, { image: [] }, { image: { decorative: "false" } },
+    { image: { altText: "" } }, { image: { altText: "  " } }, { image: { altText: null } },
+    { image: { altText: 1 } }, { image: { altText: "a\n" } }, { image: { altText: "a".repeat(2001) } }]) {
+    assert.equal(presentImage(asset, bad), null);
+  }
+  assert.equal(presentImage({ ...asset, altText: null }, { image: { altText: "Context supplies description" } })?.alt, "Context supplies description");
+  assert.equal(presentImage({ ...asset, altText: null }, { image: { decorative: true } })?.alt, "");
+  assert.equal(presentImage({ ...asset, altText: "" }, {})?.alt, "", "Legacy empty default remains decorative");
+  assert.equal(presentImage({ ...asset, altText: "" }, { image: { decorative: false } }), null);
+  assert.equal(presentImage(asset, { other: true, image: { caption: "Unsupported", css: "display:none" } })?.alt, asset.altText);
+  const html = renderToStaticMarkup(<SectionRenderer section={{ id: randomUUID(), type: "intro", name: null, variant: null,
+    content: { text: "Keep" }, configuration: {}, image: custom }} />);
+  assert.ok(html.includes('alt="Robot &lt;detail&gt; &amp; &quot;sensor&quot;"'));
+  assert.deepEqual(asset, before);
+});

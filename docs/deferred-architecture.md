@@ -38,6 +38,13 @@ for that writer and relevant PostgreSQL constraints in disposable fixtures, with
 installed migration-chain and replayed-schema fidelity checks. See
 [Assets](assets.md). This does not complete broader Asset lifecycle or management.
 
+The intentional Asset-reuse accessibility prerequisite is satisfied for the
+initial `AssetUsage.configuration.image` contract: informative alt override,
+Asset-level fallback and explicit decorative treatment. See [usage-specific image
+accessibility](assets.md#usage-specific-image-accessibility). This does not complete
+usage editing, captions, cropping, focal points or renditions. Future usage writers
+must preserve these semantics and the existing A1/A2/A6 gates.
+
 | ID | Deferred requirement | Implementation trigger / reason |
 | --- | --- | --- |
 | A1 | Validate AssetUsage target existence and Web Presence ownership, following Page/Section ownership through their parents. | Before each additional target writer or operation. Section intro image/document attachment is covered; the composite FK still does not validate generic targets. |
@@ -69,6 +76,10 @@ selected active Managed Site, preserving P8 without a page-count cap. It introdu
 no customer-state writer or management surface. P9 remains deferred: deployment
 selection is explicit configuration, not request-host/domain tenant resolution.
 Basic per-Page titles do not complete the capability catalog's production SEO track.
+
+[Page-target Actions](actions.md) now resolve stable Page UUIDs in the explicit
+Managed Site context using the same Page destination policy as Navigation. This
+adds no customer Pages or authoring workflow; P9 and P10 remain deferred.
 
 | ID | Requirement to implement or preserve | Implementation trigger / reason |
 | --- | --- | --- |

@@ -48,9 +48,11 @@ classifications serve a different purpose from the capability statuses above.
 - **Subject:** canonical customer-owned identity and descriptive content, including
   the existing project Subject Type. This is not an implemented Offering domain.
 - **Asset:** managed media identity, metadata, ingestion and bounded usage support;
-  broader lifecycle and management remain deferred. See [Assets](assets.md).
+  usage-specific image alt/decorative presentation with Asset defaults. Broader
+  lifecycle and management remain deferred. See [Assets](assets.md).
 - **Action:** first-class labels and destinations referenced by Sections and
-  Navigation.
+  Navigation, including stable Page UUID targets resolved within the selected
+  Managed Site at presentation time. See [Actions](actions.md).
 
 **Core planned:**
 

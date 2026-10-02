@@ -1,3 +1,4 @@
+import * as pageDestinations from "../lib/platform/managed-sites/page-destinations";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -61,7 +62,7 @@ test("Navigation service resolves entity targets, scopes every lookup, and filte
         return { rows: actionRows };
       }
       if (query.text.includes('from "pages"')) {
-        assert.deepEqual(params.slice(-4), [expectedManagedSiteId, tenant, "active", "active"]);
+        assert.deepEqual(params.slice(-5), [expectedManagedSiteId, tenant, "active", "active", "active"]);
         assert.ok(query.text.includes('"managed_sites"."id" ='));
         assert.ok(query.text.includes('"managed_sites"."web_presence_id"'));
         return { rows: pageRows };
@@ -82,9 +83,11 @@ test("Navigation service resolves entity targets, scopes every lookup, and filte
   };
   const db = drizzle({ client: client as unknown as Pool });
   const actionService = loadService("lib/platform/actions/service.ts", {
+    "../managed-sites/page-destinations": pageDestinations,
     "drizzle-orm": orm, "@/lib/platform/db/connection": { db }, "@/lib/platform/db/schema/actions": actionsSchema, "./model": actionModel,
   }) as typeof import("../lib/platform/actions/service");
   const service = loadService("lib/platform/navigations/service.ts", {
+    "../managed-sites/page-destinations": pageDestinations,
     "drizzle-orm": orm,
     "@/lib/platform/db/connection": { db },
     "@/lib/platform/db/schema/navigations": navigationSchema,
@@ -152,6 +155,13 @@ test("Navigation service resolves entity targets, scopes every lookup, and filte
   assert.equal(sectionQueries, previousSectionQueries);
   actionRows = [[actionId, tenant, "Homepage About", "link", "About", "/#about", "active"]];
   assert.equal((await resolve())?.items[0].href, "/#about");
+
+  actionRows = [[actionId, tenant, "Projects", "page", "Projects", pageId, "active"]];
+  pageRows = [[pageId, managedSiteId, "/teams/northeast"]];
+  assert.equal((await resolve())?.items[0].href, "/teams/northeast");
+  assert.deepEqual((await resolve("content", null))?.items, [], "Page Actions require explicit site context");
+  pageRows = [[pageId, managedSiteId, "/media/private"]];
+  assert.deepEqual((await resolve())?.items, []);
 
   // Distinct Page UUIDs with identical slugs must not resolve across ManagedSites.
   itemRows = [item(10, "page", pageId), item(11, "page", uuid(88)), item(12, "section", sectionId)];

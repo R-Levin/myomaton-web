@@ -9,13 +9,15 @@ import { webPresences } from "../db/schema/web-presences";
 import { requireAssetUuid, type Asset } from "./model";
 import { managedAssetEligible, presentImage, type SectionImage } from "./source";
 
+type EligibleUsage = { asset: Asset; configuration: unknown };
+
 // The current site has active content, not a draft/published workflow. Only
 // active intro image/document associations are public in this slice.
 export async function eligibleSectionAssets(db: NodePgDatabase, webPresenceId: string, sectionIds?: readonly string[]) {
   const presenceId = requireAssetUuid(webPresenceId);
   const ids = sectionIds?.map(requireAssetUuid);
-  if (ids?.length === 0) return new Map<string, Asset>();
-  const rows = await db.select({ sectionId: sections.id, usagePresenceId: assetUsages.webPresenceId, role: assetUsages.role, asset: getTableColumns(assets) })
+  if (ids?.length === 0) return new Map<string, EligibleUsage>();
+  const rows = await db.select({ sectionId: sections.id, usagePresenceId: assetUsages.webPresenceId, role: assetUsages.role, asset: getTableColumns(assets), configuration: assetUsages.configuration })
     .from(sections)
     .innerJoin(pages, eq(sections.pageId, pages.id))
     .innerJoin(managedSites, eq(pages.managedSiteId, managedSites.id))
@@ -27,18 +29,18 @@ export async function eligibleSectionAssets(db: NodePgDatabase, webPresenceId: s
       ids ? inArray(sections.id, ids) : undefined));
   const groups = new Map<string, typeof rows>();
   for (const row of rows) groups.set(`${row.sectionId}:${row.role}`, [...(groups.get(`${row.sectionId}:${row.role}`) ?? []), row]);
-  const result = new Map<string, Asset>();
+  const result = new Map<string, EligibleUsage>();
   for (const [sectionId, group] of groups) {
     if (group.length !== 1) throw new Error("Ambiguous Section Asset association.");
     const row = group[0];
-    if (row.usagePresenceId === presenceId && row.asset.webPresenceId === presenceId && managedAssetEligible(row.asset) && (row.role === "image" ? row.asset.type === "image" : row.asset.type === "document")) result.set(sectionId, row.asset);
+    if (row.usagePresenceId === presenceId && row.asset.webPresenceId === presenceId && managedAssetEligible(row.asset) && (row.role === "image" ? row.asset.type === "image" : row.asset.type === "document")) result.set(sectionId, { asset: row.asset, configuration: row.configuration });
   }
   return result;
 }
 
 export async function sectionImages(db: NodePgDatabase, webPresenceId: string, sectionIds: readonly string[]): Promise<Map<string, SectionImage>> {
   const eligible = await eligibleSectionAssets(db, webPresenceId, sectionIds);
-  return new Map([...eligible].flatMap(([id, asset]) => { const image = presentImage(asset); return image ? [[id.split(":")[0], image] as const] : []; }));
+  return new Map([...eligible].flatMap(([id, usage]) => { const image = presentImage(usage.asset, usage.configuration); return image ? [[id.split(":")[0], image] as const] : []; }));
 }
 
 export async function publicAsset(db: NodePgDatabase, domain: string, assetId: string): Promise<Asset | null> {
@@ -48,5 +50,5 @@ export async function publicAsset(db: NodePgDatabase, domain: string, assetId: s
   if (presences.length > 1) throw new Error("Ambiguous public Web Presence.");
   if (!presences.length) return null;
   const eligible = await eligibleSectionAssets(db, presences[0].id);
-  return [...eligible.values()].find((asset) => asset.id === id) ?? null;
+  return [...eligible.values()].find(({ asset }) => asset.id === id)?.asset ?? null;
 }

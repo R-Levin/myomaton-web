@@ -11,6 +11,7 @@ import { pages } from "@/lib/platform/db/schema/pages";
 import { sections } from "@/lib/platform/db/schema/sections";
 import { getActionsByIds } from "@/lib/platform/actions/service";
 import { actionId as uuid, normalizeDestination } from "@/lib/platform/actions/model";
+import { resolvePageDestinations } from "../managed-sites/page-destinations";
 import {
   navigationDestination, navigationTree, normalizeNavigationItem,
   pageDestination, sectionAnchor, visibleOnSurface,
@@ -48,14 +49,10 @@ export async function getNavigationByName(
     ? { managedSiteId, pageId: currentPageId }
     : undefined;
   const refs = (type: string) => [...new Set(items.filter((item) => item.targetType === type).map((item) => item.targetReference))];
-  const actions = await getActionsByIds(presenceId, refs("action"));
+  const actions = await getActionsByIds(presenceId, refs("action"), routingContext);
   const pageIds = refs("page");
   const sectionIds = refs("section");
-  const pageRows = !routingContext || pageIds.length === 0 ? [] : await db
-    .select({ id: pages.id, managedSiteId: pages.managedSiteId, slug: pages.slug })
-    .from(pages).innerJoin(managedSites, eq(pages.managedSiteId, managedSites.id))
-    .where(and(inArray(pages.id, pageIds), eq(managedSites.id, routingContext.managedSiteId), eq(managedSites.webPresenceId, presenceId), eq(managedSites.status, "active"), eq(pages.status, "active")));
-  const pageLinks = new Map(pageRows.map((page) => [page.id, pageDestination(page, routingContext)]));
+  const pageLinks = await resolvePageDestinations(db, presenceId, pageIds, routingContext);
 
   const sectionRows = !routingContext || sectionIds.length === 0 ? [] : await db
     .select({ id: sections.id, configuration: sections.configuration, pageId: pages.id, managedSiteId: pages.managedSiteId, slug: pages.slug })

@@ -94,7 +94,7 @@ scoped or ambiguous target associations are rejected, not silently replaced.
 Asset creation and usage creation run transactionally. Bootstrap target lookup is
 also locked in the transaction. An exact existing Asset-ID association is a no-op,
 including when canonical Asset metadata/status differs from the command arguments.
-Otherwise an occupied image role is a conflict. An existing unassociated Asset may
+Otherwise an occupied image role is a conflict. An existing Asset may
 be reused only when ownership, active state, type, MIME, source and dimensions agree;
 its metadata is preserved. No Section fields, timestamps, versions, or metadata
 are modified, and no bootstrap marker is stored anywhere.
@@ -162,6 +162,40 @@ input validation precedes the database transaction. No real photograph is includ
 or bootstrapped by installing this code.
 
 ## Public presentation and delivery
+
+### Usage-specific image accessibility
+
+Asset defaults describe the reusable thing. `AssetUsage.configuration.image`
+describes this particular presentation, with optional `altText` and `decorative`
+fields. For example: `{ "image": { "altText": "Detail relevant here" } }` or
+`{ "image": { "decorative": true } }`. Usage `metadata` remains unrelated
+descriptive metadata; it is not a second source of accessibility overrides.
+
+- With no image configuration, retain the Asset's existing alt behavior.
+- For an informative use, a valid usage `altText` wins; otherwise, when the field
+  is absent, fall back to Asset `altText`. Overrides must be nonblank plain strings,
+  at most 2000 characters, without control characters; outer whitespace is trimmed.
+- `decorative: true` always resolves to empty alt, even if an alt override is also
+  present or malformed. It never falls back to the Asset description. The existing
+  noninteractive image renderer emits `alt=""`, the semantic decorative treatment.
+- Malformed configuration/image objects, nonboolean decorative flags and invalid
+  informative overrides omit the image while keeping the Section text. An explicit
+  `decorative: false` also rejects an empty default. Legacy empty Asset defaults
+  remain supported when informative intent is not explicitly asserted.
+- Unknown fields are ignored. All resolved alt text is escaped by React.
+
+Presentation queries carry usage configuration alongside the canonical Asset;
+normalization resolves it into `SectionImage.alt` before the renderer receives it.
+One Asset can therefore supply default, contextual and decorative presentations
+without changing its record or bytes. Invalid presentation metadata does not change
+reverse-reference inventory or the existing media-delivery eligibility rules.
+
+The initial accessibility contract satisfies the intentional-reuse metadata gate.
+This adds no metadata editing API, caption, crop/focal-point editor, filters,
+rendition management or per-usage CSS. Existing writers retain their behavior;
+future usage writers must preserve this contract and A1/A2 attachment integrity.
+
+### Eligibility and bytes
 
 Canonical Asset reads still include all statuses. Separate presentation reads batch
 resolve images and require active Assets and active Section/Page/Managed Site/Web

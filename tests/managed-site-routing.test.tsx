@@ -73,7 +73,9 @@ function fixture() {
     "@/lib/platform/db/schema/managed-sites": sites, "@/lib/platform/db/schema/pages": pages,
     "@/lib/platform/db/schema/sections": sections, "@/lib/platform/db/schema/web-presences": presences,
     "@/lib/platform/actions/model": actions,
-    "@/lib/platform/actions/service": { getActionsByIds: async () => new Map() },
+    "@/lib/platform/actions/service": { getActionsByIds: async (presenceId: string, _ids: readonly string[], context: unknown) => {
+      assert.equal(presenceId, id(1)); assert.deepEqual(context, { managedSiteId: id(2) }); return new Map();
+    } },
     "@/lib/platform/subjects/presentation-service": { getPresentedSubjectsByIds: async () => new Map() },
     "@/lib/platform/assets/presentation-service": { getSectionImages: async () => new Map() },
     "@/lib/platform/design-systems/service": { getDesignSystemByWebPresenceId: async () => ({ id: id(9), name: "Design", configuration: myomatonDesignConfiguration }) },

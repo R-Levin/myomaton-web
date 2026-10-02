@@ -28,6 +28,7 @@ import { deliverPublicAsset } from "../../lib/platform/assets/delivery";
 
 import { startProductionFixture } from "./production-server";
 import { assertMigrationFidelity, assertFixtureFidelity, fixtureTables } from "./schema-fidelity";
+import { resolvePageDestinations } from "../../lib/platform/managed-sites/page-destinations";
 
 // Required explicit opt-in. Clone definitions into a randomly named schema.
 // All fixtures use that schema; public Myomaton records are never mutated.
@@ -69,6 +70,24 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
       return { presence, site, page, section };
     }
     const first = await fixture(); const second = await fixture();
+    await t.test("shared Page target lookup enforces active presence/site ownership and canonical nested paths", async () => {
+      const target = await fixture();
+      const [nested] = await db.insert(pages).values({ managedSiteId: target.site.id, name: "Nested", title: "Nested", slug: "/teams/northeast" }).returning();
+      const context = { managedSiteId: target.site.id };
+      const resolve = () => resolvePageDestinations(db, target.presence.id, [nested.id, target.page.id, second.page.id], context);
+      assert.deepEqual(await resolve(), new Map([[nested.id, "/teams/northeast"], [target.page.id, "/"]]));
+      assert.equal((await resolvePageDestinations(db, second.presence.id, [nested.id], context)).size, 0);
+      assert.equal((await resolvePageDestinations(db, target.presence.id, [nested.id], { managedSiteId: second.site.id })).size, 0);
+      for (const [table, id] of [[pages, nested.id], [managedSites, target.site.id], [webPresences, target.presence.id]] as const) {
+        await db.update(table).set({ status: "inactive" }).where(eq(table.id, id));
+        assert.equal((await resolve()).has(nested.id), false);
+        await db.update(table).set({ status: "active" }).where(eq(table.id, id));
+      }
+      for (const slug of ["/media/foo", "/trailing/", "//foreign.test", "/a%2fb"]) {
+        await db.update(pages).set({ slug }).where(eq(pages.id, nested.id));
+        assert.equal((await resolve()).has(nested.id), false);
+      }
+    });
     await t.test("standalone batch import preserves PNG, creates no usages, refuses duplicates and rolls back atomically", async () => {
       const target = await fixture();
       const root = path.join(temp, "standalone-storage");
@@ -131,6 +150,32 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
     });
     const input = (f = first, id = randomUUID()) => ({ webPresenceId: f.presence.id, sectionId: f.section.id, assetId: id, type: "image" as const, mimeType: "image/jpeg", role: "image" as const, name: "Photo", altText: "Approved photo", width: 8, height: 6, sourceReference: `objects/${"a".repeat(64)}` });
     const firstInput = input();
+    await t.test("one reusable Asset resolves three usage-specific accessibility contexts and preserves delivery/identity", async () => {
+      const target = await fixture();
+      const candidate = input(target);
+      await attachSectionAsset(db, candidate);
+      const [original] = await db.select().from(assets).where(eq(assets.id, candidate.assetId));
+      const [custom, decorative] = await db.insert(sections).values([
+        { pageId: target.page.id, type: "intro", name: "Custom" },
+        { pageId: target.page.id, type: "intro", name: "Decorative" },
+      ]).returning();
+      const usages = await db.insert(assetUsages).values([
+        { webPresenceId: target.presence.id, assetId: candidate.assetId, entityType: "section", entityId: custom.id, role: "image", configuration: { image: { altText: "Context-specific robot detail" } } },
+        { webPresenceId: target.presence.id, assetId: candidate.assetId, entityType: "section", entityId: decorative.id, role: "image", configuration: { image: { decorative: true } } },
+      ]).returning();
+      const ids = [target.section.id, custom.id, decorative.id];
+      const images = await sectionImages(db, target.presence.id, ids);
+      assert.deepEqual(ids.map(id => images.get(id)?.alt), ["Approved photo", "Context-specific robot detail", ""]);
+      assert.ok([...images.values()].every(image => image.assetId === candidate.assetId && image.src === `/media/assets/${candidate.assetId}`));
+      for (const configuration of [{ image: { decorative: "false" } }, { image: { altText: "" } }, { image: null }]) {
+        await db.update(assetUsages).set({ configuration }).where(eq(assetUsages.id, usages[0].id));
+        assert.equal((await sectionImages(db, target.presence.id, ids)).has(custom.id), false);
+        assert.equal((await publicAsset(db, target.presence.primaryDomain!, candidate.assetId))?.id, candidate.assetId);
+      }
+      assert.deepEqual((await db.select().from(assets).where(eq(assets.id, candidate.assetId)))[0], original);
+      const reverse = await db.select().from(assetUsages).where(eq(assetUsages.assetId, candidate.assetId));
+      assert.equal(reverse.length, 3); assert.deepEqual(reverse.map(row => row.entityId).sort(), ids.sort());
+    });
     await t.test("writer creates once, preserves Section and canonical Asset fields, and rejects conflicts", async () => {
       assert.equal((await attachSectionAsset(db, firstInput)).created, true);
       let provisioned = false;

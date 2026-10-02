@@ -1,3 +1,4 @@
+import * as pageDestinations from "../lib/platform/managed-sites/page-destinations";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -54,6 +55,7 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
   };
   const db = drizzle({ client: client as unknown as Pool });
   const actionService = loadService("lib/platform/actions/service.ts", {
+    "../managed-sites/page-destinations": pageDestinations,
     "drizzle-orm": orm,
     "@/lib/platform/db/connection": { db },
     "@/lib/platform/db/schema/actions": actionsSchema,
