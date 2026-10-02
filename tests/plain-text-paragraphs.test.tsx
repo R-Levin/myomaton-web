@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { PlainTextParagraphs } from "../components/microsites/plain-text-paragraphs";
-import { SectionRenderer } from "../components/microsites/section-renderer";
+import { PlainTextParagraphs } from "../components/managed-sites/plain-text-paragraphs";
+import { SectionRenderer } from "../components/managed-sites/section-renderer";
 
 const render = (text: unknown) => renderToStaticMarkup(<PlainTextParagraphs text={text} />);
 

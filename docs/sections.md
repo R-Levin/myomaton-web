@@ -1,7 +1,7 @@
 # Editorial Section presentation
 
 Sections remain structured content, not a free-form page builder. `normalizeSection`
-is a read-time projection shared by the microsite service and renderer. Unknown
+is a read-time projection shared by the managed site service and renderer. Unknown
 Section types are omitted; malformed fields and unknown configuration keys are
 ignored. Stored JSON, identity, version and timestamps are never rewritten.
 
@@ -92,7 +92,7 @@ items become an empty list. An invalid `itemSource` omits the Section rather tha
 guessing a mode. Unknown fields, HTML controls, Asset references, URLs and embedded
 Action labels/destinations are discarded. Plain text is escaped by React.
 
-The microsite service batches explicit Subject IDs in the same Web Presence,
+The managed site service batches explicit Subject IDs in the same Web Presence,
 requiring active Subjects and an active Web Presence. Missing, inactive, foreign,
 or malformed Subjects are omitted. Subject Type is not a collection filter or
 publication gate. Active eligibility uses the existing public presentation model;

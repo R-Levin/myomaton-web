@@ -19,6 +19,12 @@ result; future edits must not be applied by changing this transition definition.
 
 ## Reviewed live baseline (2026-10-01)
 
+The frozen JSON evidence retains historical `microsites` / `microsite_id` keys.
+`home-v1-baseline-adapter.ts` projects only those identifiers to `managed_sites` /
+`managed_site_id` in memory. The original file, customer values and expected-state
+guards remain unchanged. The operator queries the renamed schema and therefore
+requires [migration 0006](managed-site-rename.md) before future execution.
+
 Read in PostgreSQL repeatable-read, read-only transactions. All listed records
 are active. There are no material differences from the repository baseline.
 CTA version 2 is the existing first-class Action conversion, not a conflict.
@@ -26,7 +32,7 @@ CTA version 2 is the existing first-class Action conversion, not a conflict.
 | Identity | UUID |
 | --- | --- |
 | Myomaton Web Presence | `1b72cd7d-92b9-4f55-aba6-825d69d493af` |
-| Myomaton Microsite | `7fd60824-a933-401d-8099-7b64f24cc408` |
+| Myomaton Managed Site | `7fd60824-a933-401d-8099-7b64f24cc408` |
 | Home Page (`/`) | `fd7bdc57-c9b7-4274-b871-43cf2e9b09ee` |
 | Photograph Asset | `eb1ea754-2f6d-4514-bf42-f4781f5f1d80` |
 | Introduction image AssetUsage | `9475a91c-e0ad-4373-b5e9-65ca6fe649e7` |

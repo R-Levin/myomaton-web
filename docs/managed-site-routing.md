@@ -1,19 +1,22 @@
-# Microsite Page routing
+# Managed Site Page routing
 
 The public application serves active Pages through `app/[[...path]]/page.tsx`.
 Root and secondary Pages use the same lookup, metadata and structured
-Microsite/Page/Section rendering. This adds no customer Pages or Navigation items.
+Managed Site/Page/Section rendering. This adds no customer Pages or Navigation items.
+
+The terminology/schema transition is documented in the
+[Managed Site rename deployment note](managed-site-rename.md).
 
 ## Explicit deployment selection
 
-`lib/platform/microsites/deployment.ts` selects the current deployment by exact
-Web Presence primary domain and Microsite name. It currently selects Customer #1:
+`lib/platform/managed-sites/deployment.ts` selects the current deployment by exact
+Web Presence primary domain and Managed Site name. It currently selects Customer #1:
 `myomaton.com` / `Myomaton`. The domain is configuration, never the request Host.
 Exactly one active pair must match before any Page is loaded; missing or duplicate
-matches fail closed. Renaming that Microsite requires updating the explicit
+matches fail closed. Renaming that Managed Site requires updating the explicit
 deployment selection. Managed media uses the same configured Web Presence domain.
 
-Page queries then use the resolved Microsite UUID, exact slug and `active` status.
+Page queries then use the resolved Managed Site UUID, exact slug and `active` status.
 The existing model has no separate published state; this does not implement a
 draft/publishing workflow. Production host/domain selection remains deferred at
 P9 in [the architecture register](deferred-architecture.md). Replace the selection
@@ -39,7 +42,7 @@ Lookup accepts a single trailing slash and normalizes it; Next.js also performs
 its normal trailing-slash redirect. Catch-all params are already decoded by Next
 and are validated without another decoding pass. A decoded slash within a single
 param is rejected. Noncanonical stored slugs are not aliases and are not served.
-Canonical path equality retains the database's `(microsite_id, slug)` uniqueness
+Canonical path equality retains the database's `(managed_site_id, slug)` uniqueness
 guarantee; an unexpected multiple-result lookup returns not-found.
 
 Navigation Page and Section targets use this same canonical path contract. URLs
@@ -58,7 +61,7 @@ speculative reserved-word catalog.
 ## Metadata and not-found behavior
 
 Document title comes from canonical `Page.title`, falling back to `Page.name`, then
-the selected Microsite's name if the preceding fields are blank. Home retains its
+the selected Managed Site's name if the preceding fields are blank. Home retains its
 current title. The untyped metadata JSON does not currently define a validated SEO
 description contract, so this slice does not infer descriptions from Section copy
 or blindly spread that JSON into Next metadata. The metadata contract and public
@@ -66,13 +69,13 @@ canonical-URL rules are deferred under P10, before SEO authoring or production
 indexing/launch. Sitemap and related production work remain on the capability
 catalog's production-readiness track.
 
-Unknown, inactive, malformed, reserved, ambiguous and foreign-Microsite paths
+Unknown, inactive, malformed, reserved, ambiguous and foreign-Managed Site paths
 invoke Next.js `notFound()`; they never fall back or redirect to Home. Database
 availability errors remain errors rather than being disguised as missing Pages.
 
 ## Verification
 
-`tests/microsite-routing.test.tsx` exercises real service query generation with
+`tests/managed-site-routing.test.tsx` exercises real service query generation with
 an isolated in-memory driver, the catch-all component, metadata, shared rendering
 and Next's not-found exception. Existing Navigation, collection, image and Home v1
 tests cover their preserved behavior. No fixture mutates customer PostgreSQL state.

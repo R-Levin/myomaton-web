@@ -11,7 +11,7 @@ import { prepareManagedAsset } from "../lib/platform/assets/ingestion";
 import { presentImage, requireManagedKey } from "../lib/platform/assets/source";
 import { deliverPublicAsset } from "../lib/platform/assets/delivery";
 import type { Asset } from "../lib/platform/assets/model";
-import { SectionRenderer } from "../components/microsites/section-renderer";
+import { SectionRenderer } from "../components/managed-sites/section-renderer";
 
 const uuid = randomUUID();
 const presence = randomUUID();
@@ -102,7 +102,7 @@ test("media route binds delivery to the configured Myomaton domain, never the re
   const { loadService } = await import("./helpers/load-service");
   const response = new Response("JPEG fixture");
   const route = loadService("app/media/assets/[assetId]/route.ts", {
-    "@/lib/platform/microsites/deployment": await import("../lib/platform/microsites/deployment"),
+    "@/lib/platform/managed-sites/deployment": await import("../lib/platform/managed-sites/deployment"),
     "@/lib/platform/assets/presentation-service": { getPublicAsset: async (domain: string, assetId: string) => {
       assert.equal(domain, "myomaton.com"); assert.equal(assetId, uuid); return null;
     } },

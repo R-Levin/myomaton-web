@@ -29,7 +29,7 @@ creates the old three-section baseline unchanged in a single transaction:
 | Open Practical Robotics Organization | Myomaton customer bootstrap |
 | Myomaton Web Presence and Subject | Myomaton customer bootstrap |
 | Myomaton Design System and Learn about Myomaton Action | Myomaton customer bootstrap |
-| Myomaton Microsite and Home Page | Myomaton customer bootstrap |
+| Myomaton Managed Site and Home Page | Myomaton customer bootstrap |
 | Hero, Introduction, Primary Call to Action Sections | Myomaton customer bootstrap |
 | Primary Navigation, About and Learn about Myomaton items | Myomaton customer bootstrap |
 
@@ -83,7 +83,7 @@ command can still attach to an empty role as documented in [Assets](assets.md).
 No real photograph or AssetUsage is changed by this refactor.
 
 Future clients normally originate from interview/business knowledge interpreted
-into structured Organization/Web Presence, Subjects, Design System, Microsite,
+into structured Organization/Web Presence, Subjects, Design System, Managed Site,
 Pages, Sections, Actions and Navigation through application onboarding and
 customer review/approval. They should not require permanent source-controlled
 customer seed files. This operator baseline is not that product or a template

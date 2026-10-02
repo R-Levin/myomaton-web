@@ -5,7 +5,7 @@ import { getSectionImages } from "@/lib/platform/assets/presentation-service";
 import type { SectionImage } from "@/lib/platform/assets/source";
 
 import { db } from "@/lib/platform/db/connection";
-import { microsites } from "@/lib/platform/db/schema/microsites";
+import { managedSites } from "@/lib/platform/db/schema/managed-sites";
 import { pages } from "@/lib/platform/db/schema/pages";
 import { sections } from "@/lib/platform/db/schema/sections";
 import { webPresences } from "@/lib/platform/db/schema/web-presences";
@@ -22,7 +22,7 @@ import {
   type ResolvedDesignSystem,
 } from "@/lib/platform/design-systems/service";
 
-export type MicrositeSection = {
+export type ManagedSiteSection = {
   id: string;
   type: string;
   variant: string | null;
@@ -34,34 +34,34 @@ export type MicrositeSection = {
   collectionItems?: CollectionItem[];
 };
 
-export type MicrositePage = {
-  microsite: { id: string; name: string };
+export type ManagedSitePage = {
+  managedSite: { id: string; name: string };
   page: { id: string; name: string; title: string; slug: string };
-  sections: MicrositeSection[];
+  sections: ManagedSiteSection[];
   designSystem: ResolvedDesignSystem;
   navigation?: Navigation | null;
 };
 
-export type MicrositeSelection = { domain: string; micrositeName: string };
+export type ManagedSiteSelection = { domain: string; managedSiteName: string };
 
-export async function getMicrositePage(
-  selection: MicrositeSelection,
+export async function getManagedSitePage(
+  selection: ManagedSiteSelection,
   path: string,
-): Promise<MicrositePage | null> {
+): Promise<ManagedSitePage | null> {
   const slug = normalizePagePath(path);
-  if (!slug || !selection.domain || !selection.micrositeName) return null;
+  if (!slug || !selection.domain || !selection.managedSiteName) return null;
   const sites = await db
     .select({
       webPresenceId: webPresences.id,
-      microsite: { id: microsites.id, name: microsites.name },
+      managedSite: { id: managedSites.id, name: managedSites.name },
     })
     .from(webPresences)
-    .innerJoin(microsites, eq(microsites.webPresenceId, webPresences.id))
+    .innerJoin(managedSites, eq(managedSites.webPresenceId, webPresences.id))
     .where(and(
       eq(webPresences.primaryDomain, selection.domain),
-      eq(microsites.name, selection.micrositeName),
+      eq(managedSites.name, selection.managedSiteName),
       eq(webPresences.status, "active"),
-      eq(microsites.status, "active"),
+      eq(managedSites.status, "active"),
     ))
     .limit(2);
 
@@ -69,7 +69,7 @@ export async function getMicrositePage(
   const site = sites[0];
   const matches = await db.select({ id: pages.id, name: pages.name, title: pages.title, slug: pages.slug })
     .from(pages)
-    .where(and(eq(pages.micrositeId, site.microsite.id), eq(pages.slug, slug), eq(pages.status, "active")))
+    .where(and(eq(pages.managedSiteId, site.managedSite.id), eq(pages.slug, slug), eq(pages.status, "active")))
     .limit(2);
   if (matches.length !== 1) return null;
   const match = { ...site, page: matches[0] };
@@ -102,13 +102,13 @@ export async function getMicrositePage(
   const subjectIds = supportedSections.flatMap((section) => section.type === "collection" && section.content.itemSource === "subjects"
     ? section.content.items.map((item) => item.subjectId) : []);
   const resolvedSubjects = await getPresentedSubjectsByIds(match.webPresenceId, subjectIds);
-  const navigation = await getNavigationByName(match.webPresenceId, "Primary Navigation", "microsite", {
-    micrositeId: match.microsite.id,
+  const navigation = await getNavigationByName(match.webPresenceId, "Primary Navigation", "managedSite", {
+    managedSiteId: match.managedSite.id,
     pageId: match.page.id,
   });
 
   return {
-    microsite: match.microsite,
+    managedSite: match.managedSite,
     page: match.page,
     sections: supportedSections.map((section) => ({
       ...section,

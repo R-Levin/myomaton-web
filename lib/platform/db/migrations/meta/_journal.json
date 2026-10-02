@@ -43,6 +43,13 @@
       "when": 1790641266624,
       "tag": "0005_asset-foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790959692569,
+      "tag": "0006_managed-site-terminology",
+      "breakpoints": true
     }
   ]
 }

@@ -1,15 +1,15 @@
 import { isDeepStrictEqual } from "node:util";
 import type { Pool } from "pg";
-import baselineJson from "./myomaton-home-v1-baseline.json";
+import { homeV1Baseline } from "./home-v1-baseline-adapter";
 import { homeV1Ids, homeV1Sections, projectDrafts, projectsActionDraft } from "./myomaton-home-v1-content";
 
 export type Row = Record<string, unknown> & { id: string };
-export const tables = ["web_presences", "microsites", "pages", "sections", "actions", "subjects", "subject_types", "navigations", "navigation_items", "assets", "asset_usages"] as const;
+export const tables = ["web_presences", "managed_sites", "pages", "sections", "actions", "subjects", "subject_types", "navigations", "navigation_items", "assets", "asset_usages"] as const;
 export type Table = typeof tables[number];
 export type State = Record<Table, Row[]>;
 type WriteTable = "sections" | "subjects" | "actions";
 type Insert = { table: WriteTable; row: Row };
-export const baseline: State = baselineJson;
+export const baseline: State = homeV1Baseline;
 export const presenceId = baseline.web_presences[0].id;
 export const pageId = baseline.pages[0].id;
 const intro = baseline.sections.find(row => row.name === "Introduction")!;
@@ -35,8 +35,8 @@ export function planHomeV1(state: State) {
   const root = baseline.web_presences[0];
   requireRows(state.web_presences.filter(row => row.id === presenceId || normalized(row.name) === "myomaton"
     || normalized(row.primary_domain) === "myomaton.com"), [root], "Web Presence identity");
-  requireRows(state.microsites.filter(row => row.web_presence_id === presenceId || row.id === baseline.microsites[0].id), baseline.microsites, "Microsite identity");
-  requireRows(state.pages.filter(row => row.id === pageId || (row.microsite_id === baseline.microsites[0].id && row.slug === "/")), baseline.pages, "Home Page identity");
+  requireRows(state.managed_sites.filter(row => row.web_presence_id === presenceId || row.id === baseline.managed_sites[0].id), baseline.managed_sites, "ManagedSite identity");
+  requireRows(state.pages.filter(row => row.id === pageId || (row.managed_site_id === baseline.managed_sites[0].id && row.slug === "/")), baseline.pages, "Home Page identity");
   for (const table of ["subject_types", "subjects", "actions", "navigations", "assets"] as const) {
     for (const expected of baseline[table]) {
       if (!sameFields(state[table].find(row => row.id === expected.id), expected)) refuse(`${table} ${expected.id} differs from baseline`);

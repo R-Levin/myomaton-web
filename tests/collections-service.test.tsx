@@ -6,16 +6,16 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import type { Pool } from "pg";
 import * as subjects from "../lib/platform/db/schema/subjects";
 import * as presences from "../lib/platform/db/schema/web-presences";
-import * as sites from "../lib/platform/db/schema/microsites";
+import * as sites from "../lib/platform/db/schema/managed-sites";
 import * as pages from "../lib/platform/db/schema/pages";
 import * as sections from "../lib/platform/db/schema/sections";
 import * as actions from "../lib/platform/db/schema/actions";
 import * as subjectModel from "../lib/platform/subjects/presentation";
 import * as actionModel from "../lib/platform/actions/model";
-import * as paths from "../lib/platform/microsites/paths";
-import * as sectionModel from "../lib/platform/microsites/sections";
-import * as collections from "../lib/platform/microsites/collections";
-import { SectionRenderer } from "../components/microsites/section-renderer";
+import * as paths from "../lib/platform/managed-sites/paths";
+import * as sectionModel from "../lib/platform/managed-sites/sections";
+import * as collections from "../lib/platform/managed-sites/collections";
+import { SectionRenderer } from "../components/managed-sites/section-renderer";
 import { loadService } from "./helpers/load-service";
 
 const id = (n: number) => `11111111-1111-4111-8111-${String(n).padStart(12, "0")}`;
@@ -56,7 +56,7 @@ test("Subject presentation lookup validates requested IDs, tenant and active eli
   assert.equal((await service.getPresentedSubjectsByIds(id(1), requested)).size, 0);
 });
 
-test("microsite batches Subject and item Action dependencies, preserves curated order, and keeps content canonical", async () => {
+test("managedSite batches Subject and item Action dependencies, preserves curated order, and keeps content canonical", async () => {
   let subjectQueries = 0, actionQueries = 0;
   let actionRows: unknown[][] = [[id(20), id(1), "Details", "link", "Learn", "/details", "active"]];
   const curated = { heading: "Services", itemSource: "subjects", items: [
@@ -91,18 +91,18 @@ test("microsite batches Subject and item Action dependencies, preserves curated 
   const actionService = loadService("lib/platform/actions/service.ts", {
     "drizzle-orm": orm, "@/lib/platform/db/connection": connection, "@/lib/platform/db/schema/actions": actions, "./model": actionModel,
   });
-  const service = loadService("lib/platform/microsites/service.ts", {
+  const service = loadService("lib/platform/managed-sites/service.ts", {
     "./paths": paths,
     "drizzle-orm": orm, "@/lib/platform/db/connection": connection,
-    "@/lib/platform/db/schema/microsites": sites, "@/lib/platform/db/schema/pages": pages,
+    "@/lib/platform/db/schema/managed-sites": sites, "@/lib/platform/db/schema/pages": pages,
     "@/lib/platform/db/schema/sections": sections, "@/lib/platform/db/schema/web-presences": presences,
     "@/lib/platform/actions/model": actionModel, "@/lib/platform/actions/service": actionService,
     "@/lib/platform/subjects/presentation-service": subjectService, "./sections": sectionModel, "./collections": collections,
     "@/lib/platform/assets/presentation-service": { getSectionImages: async (_tenant: string, ids: string[]) => { assert.deepEqual(ids, []); return new Map(); } },
     "@/lib/platform/navigations/service": { getNavigationByName: async () => null },
     "@/lib/platform/design-systems/service": { getDesignSystemByWebPresenceId: async () => ({ id: null, name: null, configuration: {} }) },
-  }) as typeof import("../lib/platform/microsites/service");
-  const page = await service.getMicrositePage({ domain: "example.test", micrositeName: "Site" }, "/"); assert.ok(page);
+  }) as typeof import("../lib/platform/managed-sites/service");
+  const page = await service.getManagedSitePage({ domain: "example.test", managedSiteName: "Site" }, "/"); assert.ok(page);
   assert.equal(subjectQueries, 1); assert.equal(actionQueries, 1);
   assert.deepEqual(curated, before);
   const section = page.sections[0];
@@ -117,7 +117,7 @@ test("microsite batches Subject and item Action dependencies, preserves curated 
     [[id(20), id(1), "Details", "link", "Unsafe", "javascript:alert(1)", "active"]],
     [[id(20), id(1), "Details", "link", {}, "/details", "active"]]]) {
     actionRows = rows;
-    const unavailable = await service.getMicrositePage({ domain: "example.test", micrositeName: "Site" }, "/"); assert.ok(unavailable);
+    const unavailable = await service.getManagedSitePage({ domain: "example.test", managedSiteName: "Site" }, "/"); assert.ok(unavailable);
     const fallback = unavailable.sections.map((section) => renderToStaticMarkup(<SectionRenderer section={section} />)).join("");
     assert.match(fallback, /Service B/); assert.match(fallback, /Service A/); assert.match(fallback, /Feature/);
     assert.ok(!fallback.includes("href="));

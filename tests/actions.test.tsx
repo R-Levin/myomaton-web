@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { normalizeAction, normalizeDestination, sectionActionId } from "../lib/platform/actions/model";
 import { myomatonAction } from "../scripts/customer-bootstrap/myomaton-action";
-import { SectionRenderer } from "../components/microsites/section-renderer";
+import { SectionRenderer } from "../components/managed-sites/section-renderer";
 
 const presenceId = "11111111-1111-4111-8111-111111111111";
 const id = "22222222-2222-4222-8222-222222222222";
@@ -20,7 +20,7 @@ test("seeded Action normalizes to a reusable presentation-independent value", ()
   const section = { id: "cta", type: "cta", variant: "default", name: "CTA", content: { heading: "Follow", actionId: id }, configuration: {}, action };
   const html = renderToStaticMarkup(<><SectionRenderer section={section} /><SectionRenderer section={{ ...section, id: "another-cta" }} /></>);
   assert.equal((html.match(/href="#about"/g) ?? []).length, 2);
-  assert.equal((html.match(/class="microsite-action"/g) ?? []).length, 2);
+  assert.equal((html.match(/class="managed-site-action"/g) ?? []).length, 2);
 });
 
 test("destinations permit only the intended link, section, and minimal contact targets", () => {

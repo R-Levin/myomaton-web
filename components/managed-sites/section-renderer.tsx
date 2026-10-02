@@ -1,17 +1,17 @@
 import Image from "next/image";
-import type { MicrositeSection } from "@/lib/platform/microsites/service";
+import type { ManagedSiteSection } from "@/lib/platform/managed-sites/service";
 import { normalizeDestination, type Action } from "../../lib/platform/actions/model";
-import { normalizeSection } from "../../lib/platform/microsites/sections";
-import { presentCollection } from "../../lib/platform/microsites/collections";
+import { normalizeSection } from "../../lib/platform/managed-sites/sections";
+import { presentCollection } from "../../lib/platform/managed-sites/collections";
 import { PlainTextParagraphs } from "./plain-text-paragraphs";
 
 function SectionAction({ action }: { action?: Action | null }) {
   const href = action && typeof action.label === "string" && action.label.trim()
     ? normalizeDestination(action.type, action.destination) : null;
-  return action && href ? <a href={href} className="microsite-action">{action.label}</a> : null;
+  return action && href ? <a href={href} className="managed-site-action">{action.label}</a> : null;
 }
 
-export function SectionRenderer({ section }: { section: MicrositeSection }) {
+export function SectionRenderer({ section }: { section: ManagedSiteSection }) {
   const normalized = normalizeSection(section);
   if (!normalized) return null;
   const { type, variant, content, configuration: config } = normalized;
@@ -27,7 +27,7 @@ export function SectionRenderer({ section }: { section: MicrositeSection }) {
   return (
     <section
       id={config.anchor}
-      className={`microsite-section microsite-section-${type}`}
+      className={`managed-site-section managed-site-section-${type}`}
       data-layout={layout}
       data-width={config.width}
       data-spacing={config.spacing}
@@ -37,19 +37,19 @@ export function SectionRenderer({ section }: { section: MicrositeSection }) {
       data-media-fit={config.mediaFit}
       data-columns={normalized.type === "collection" ? normalized.configuration.columns : undefined}
     >
-      <div className="microsite-section-inner">
-        <div className="microsite-section-copy">
-          {normalized.type === "hero" && normalized.content.eyebrow && <p className="microsite-eyebrow">{normalized.content.eyebrow}</p>}
+      <div className="managed-site-section-inner">
+        <div className="managed-site-section-copy">
+          {normalized.type === "hero" && normalized.content.eyebrow && <p className="managed-site-eyebrow">{normalized.content.eyebrow}</p>}
           {heading && <Heading>{heading}</Heading>}
           <PlainTextParagraphs text={text} />
           <SectionAction action={action} />
         </div>
-        {image && <div className="microsite-section-media">
-          <Image className="microsite-photo" src={image.src} alt={image.alt}
+        {image && <div className="managed-site-section-media">
+          <Image className="managed-site-photo" src={image.src} alt={image.alt}
             width={image.width} height={image.height} unoptimized />
         </div>}
-        {items.length > 0 && <ul className="microsite-collection" role="list">
-          {items.map((item) => <li key={item.id} className="microsite-collection-item">
+        {items.length > 0 && <ul className="managed-site-collection" role="list">
+          {items.map((item) => <li key={item.id} className="managed-site-collection-item">
             <h3>{item.heading}</h3>
             <PlainTextParagraphs text={item.text} />
             <SectionAction action={item.action} />

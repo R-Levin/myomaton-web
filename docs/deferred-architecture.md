@@ -32,7 +32,7 @@ For each coherent implementation slice:
 
 ## REQUIRED: Assets
 
-Satisfied for the first microsite slice: **A1/A2** for transactional `intro` Section
+Satisfied for the first managed site slice: **A1/A2** for transactional `intro` Section
 `image` and document `attachment` roles only; **A3** for the format-neutral managed-object/local-storage contract; **A6**
 for that writer and relevant PostgreSQL constraints in disposable fixtures, with
 installed migration-chain and replayed-schema fidelity checks. See
@@ -64,8 +64,8 @@ The [Customer #1 Home v1 operator transition](myomaton-home-v1.md) uses a frozen
 expected-state guard for this bounded update; it does not complete those future
 workflows or make its source definition continuing authority over customer state.
 
-[Multi-page serving](microsite-routing.md) is implemented within one explicitly
-selected active Microsite, preserving P8 without a page-count cap. It introduces
+[Multi-page serving](managed-site-routing.md) is implemented within one explicitly
+selected active Managed Site, preserving P8 without a page-count cap. It introduces
 no customer-state writer or management surface. P9 remains deferred: deployment
 selection is explicit configuration, not request-host/domain tenant resolution.
 Basic per-Page titles do not complete the capability catalog's production SEO track.
@@ -79,9 +79,9 @@ Basic per-Page titles do not complete the capability catalog's production SEO tr
 | P5 | Provide a usable export of current customer-owned Web Presence state and applicable Asset data and bytes, usable without the proprietary platform. | When customer export is introduced, and before supporting real customer offboarding. |
 | P6 | Keep customer-owned state distinguishable from platform implementation/IP. | Whenever a new domain or integration stores customer state; use D4 as the architecture check. |
 | P7 | Implement authentication and authorization before exposing customer-facing management operations, including Assets. | Before any customer-facing management surface or API is exposed. Tenant-scoped queries alone are not caller authorization. |
-| P8 | Preserve structurally multi-page Microsites; any page-count restriction is product policy, not a schema limitation. | Whenever page management, product limits, or Microsite schema changes are introduced. |
-| P9 | Implement robust request-host/domain-to-Web-Presence resolution. | Before production multi-presence/tenant routing depends on request domains. |
-| P10 | Define a validated canonical Page/Web Presence SEO metadata contract, including description and public canonical-URL rules. Do not treat untyped metadata JSON or Section copy as that contract. | Before SEO metadata authoring or production indexing/launch. Multi-page routing currently uses Page title with name fallback; the schema has no defined description contract. See [routing metadata](microsite-routing.md#metadata-and-not-found-behavior). |
+| P8 | Preserve structurally multi-page Managed Sites; any page-count restriction is product policy, not a schema limitation. | Whenever page management, product limits, or Managed Site schema changes are introduced. |
+| P9 | Implement robust request-host/domain-to-Web-Presence / Managed Site resolution. | Before production multi-presence/tenant routing depends on request domains. |
+| P10 | Define a validated canonical Page/Web Presence SEO metadata contract, including description and public canonical-URL rules. Do not treat untyped metadata JSON or Section copy as that contract. | Before SEO metadata authoring or production indexing/launch. Multi-page routing currently uses Page title with name fallback; the schema has no defined description contract. See [routing metadata](managed-site-routing.md#metadata-and-not-found-behavior). |
 
 ## REQUIRED: Content Engine
 

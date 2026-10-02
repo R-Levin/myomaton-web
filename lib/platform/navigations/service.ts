@@ -6,7 +6,7 @@ import { db } from "@/lib/platform/db/connection";
 import { navigations } from "@/lib/platform/db/schema/navigations";
 import { navigationItems } from "@/lib/platform/db/schema/navigation-items";
 import { webPresences } from "@/lib/platform/db/schema/web-presences";
-import { microsites } from "@/lib/platform/db/schema/microsites";
+import { managedSites } from "@/lib/platform/db/schema/managed-sites";
 import { pages } from "@/lib/platform/db/schema/pages";
 import { sections } from "@/lib/platform/db/schema/sections";
 import { getActionsByIds } from "@/lib/platform/actions/service";
@@ -24,7 +24,7 @@ export async function getNavigationByName(
   context?: NavigationContext,
 ): Promise<Navigation | null> {
   const presenceId = uuid(webPresenceId);
-  if (!presenceId || (surface !== "microsite" && surface !== "content")) return null;
+  if (!presenceId || (surface !== "managedSite" && surface !== "content")) return null;
   const [navigation] = await db
     .select({ id: navigations.id, name: navigations.name, configuration: navigations.configuration })
     .from(navigations)
@@ -42,29 +42,29 @@ export async function getNavigationByName(
     .where(and(eq(navigationItems.navigationId, navigation.id), eq(navigationItems.status, "active")))
     .orderBy(asc(navigationItems.sortOrder), asc(navigationItems.id));
   const items = rows.map((row) => normalizeNavigationItem(row, navigation.id, surface)).filter((item) => item !== null);
-  const micrositeId = uuid(context?.micrositeId);
+  const managedSiteId = uuid(context?.managedSiteId);
   const currentPageId = context?.pageId === undefined ? undefined : uuid(context.pageId);
-  const routingContext = micrositeId && currentPageId !== null
-    ? { micrositeId, pageId: currentPageId }
+  const routingContext = managedSiteId && currentPageId !== null
+    ? { managedSiteId, pageId: currentPageId }
     : undefined;
   const refs = (type: string) => [...new Set(items.filter((item) => item.targetType === type).map((item) => item.targetReference))];
   const actions = await getActionsByIds(presenceId, refs("action"));
   const pageIds = refs("page");
   const sectionIds = refs("section");
   const pageRows = !routingContext || pageIds.length === 0 ? [] : await db
-    .select({ id: pages.id, micrositeId: pages.micrositeId, slug: pages.slug })
-    .from(pages).innerJoin(microsites, eq(pages.micrositeId, microsites.id))
-    .where(and(inArray(pages.id, pageIds), eq(microsites.id, routingContext.micrositeId), eq(microsites.webPresenceId, presenceId), eq(microsites.status, "active"), eq(pages.status, "active")));
+    .select({ id: pages.id, managedSiteId: pages.managedSiteId, slug: pages.slug })
+    .from(pages).innerJoin(managedSites, eq(pages.managedSiteId, managedSites.id))
+    .where(and(inArray(pages.id, pageIds), eq(managedSites.id, routingContext.managedSiteId), eq(managedSites.webPresenceId, presenceId), eq(managedSites.status, "active"), eq(pages.status, "active")));
   const pageLinks = new Map(pageRows.map((page) => [page.id, pageDestination(page, routingContext)]));
 
   const sectionRows = !routingContext || sectionIds.length === 0 ? [] : await db
-    .select({ id: sections.id, configuration: sections.configuration, pageId: pages.id, micrositeId: pages.micrositeId, slug: pages.slug })
+    .select({ id: sections.id, configuration: sections.configuration, pageId: pages.id, managedSiteId: pages.managedSiteId, slug: pages.slug })
     .from(sections)
     .innerJoin(pages, eq(sections.pageId, pages.id))
-    .innerJoin(microsites, eq(pages.micrositeId, microsites.id))
+    .innerJoin(managedSites, eq(pages.managedSiteId, managedSites.id))
     .where(and(
-      inArray(sections.id, sectionIds), eq(microsites.id, routingContext.micrositeId),
-      eq(microsites.webPresenceId, presenceId), eq(microsites.status, "active"), eq(pages.status, "active"), eq(sections.status, "active"),
+      inArray(sections.id, sectionIds), eq(managedSites.id, routingContext.managedSiteId),
+      eq(managedSites.webPresenceId, presenceId), eq(managedSites.status, "active"), eq(pages.status, "active"), eq(sections.status, "active"),
     ));
   const sectionTargets = sectionRows.map((section) => {
     const anchor = sectionAnchor(section.configuration);

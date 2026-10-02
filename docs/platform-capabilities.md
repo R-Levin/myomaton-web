@@ -6,6 +6,12 @@ This document defines the intended capability envelope of the managed Web Presen
 platform: a data-driven lead-generation and business-presence system, not a
 free-form page builder or general-purpose CMS.
 
+**Web Presence** is the broader customer-owned managed presence. A **Managed
+Site** is one concrete rendered/deployable multi-page site within it; a **Page**
+is addressable content within that site. “Conversion Site” may be product-facing
+wording, but is not an internal/domain type. Historical “Microsite” terminology
+refers to the current Managed Site concept; see the [rename deployment note](managed-site-rename.md).
+
 The platform aims to:
 
 - Turn structured business knowledge into an effective web presence.
@@ -124,8 +130,8 @@ require a reusable FAQ entity.
 Campaign / Landing, and Flex / Generic.
 
 The current Page/Section foundation, Myomaton Home and active multi-page serving
-within an explicitly selected Microsite are **Implemented**. See
-[Microsite routing](microsite-routing.md). Archetype automation, secondary customer
+within an explicitly selected Managed Site are **Implemented**. See
+[Managed Site routing](managed-site-routing.md). Archetype automation, secondary customer
 content and production host/domain routing are not thereby implemented.
 Archetypes describe page purpose and sensible composition, not a requirement to
 create one of every kind.
@@ -155,7 +161,7 @@ because a template expects them. For example:
 - One location: a Contact/Location section may be sufficient.
 - Several meaningful locations: a Locations page and optional detail pages.
 
-No architectural page-count limit exists; Microsites remain structurally
+No architectural page-count limit exists; Managed Sites remain structurally
 multi-page. Product/service quantities are not arbitrarily capped in the intended
 product envelope. The platform remains optimized for manageable lead-generation
 catalogs rather than giant commerce catalogs. This is not a claim of unbounded
@@ -250,7 +256,7 @@ and operational verification:
 - Hosting/deployment.
 - Persistent managed Asset storage.
 - Custom domains, DNS and SSL.
-- Host -> Web Presence resolution.
+- Host -> Web Presence / Managed Site resolution.
 - Forms/submission handling.
 - SMTP/outbound email.
 - Email deliverability/sender-domain setup.

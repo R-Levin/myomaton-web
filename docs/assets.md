@@ -1,4 +1,4 @@
-# Assets and the first microsite image
+# Assets and the first managed site image
 
 Assets are customer-owned canonical Web Presence state. Their UUID is logical
 identity, independent of storage location, source key, filename, and delivery URL.
@@ -88,7 +88,7 @@ format-specific AssetUsage fields are introduced; the intro renderer still shows
 
 The composite FK enforces usage-to-asset Web Presence ownership and prevents
 referenced Asset deletion. Polymorphic target existence/ownership is enforced by
-the narrow writer through Section -> Page -> Microsite -> Web Presence. Incorrectly
+the narrow writer through Section -> Page -> Managed Site -> Web Presence. Incorrectly
 scoped or ambiguous target associations are rejected, not silently replaced.
 
 Asset creation and usage creation run transactionally. Bootstrap target lookup is
@@ -150,7 +150,7 @@ npm.cmd run db:bootstrap-photo -- --file "C:\Photos\robot.jpg" --asset-id "<chos
 Choose and retain the Asset UUID for this photograph; do not derive it from its
 path or bytes. The command loads `.env.local` using the same workflow as `db:seed`.
 A configured `MYOMATON_ASSET_ROOT` is optional. The command requires exactly one
-active Myomaton Web Presence (`myomaton.com`), Myomaton Microsite, Home page (`/`),
+active Myomaton Web Presence (`myomaton.com`), Myomaton Managed Site, Home page (`/`),
 and Introduction (`intro`) Section. Missing/ambiguous targets are errors.
 
 Each invocation evaluates current canonical usages: exact association means no-op;
@@ -164,7 +164,7 @@ or bootstrapped by installing this code.
 ## Public presentation and delivery
 
 Canonical Asset reads still include all statuses. Separate presentation reads batch
-resolve images and require active Assets and active Section/Page/Microsite/Web
+resolve images and require active Assets and active Section/Page/Managed Site/Web
 Presence ancestors, matching ownership, `intro` section type and the applicable `image` or `attachment` role.
 Ambiguous image roles raise an error; unavailable/unsupported Assets are omitted.
 The existing intro text always renders when no image resolves.
@@ -176,7 +176,7 @@ unreferenced or foreign-presence files. Valid responses use the validated stored
 and `Content-Security-Policy: default-src 'none'; sandbox`. PDFs use an attachment
 disposition with a fixed filename; images use inline disposition. Errors never return source paths. The renderer uses
 `next/image` with explicit dimensions, responsive CSS and `unoptimized` to avoid a
-second delivery/cache pipeline. Active content is public in the existing microsite
+second delivery/cache pipeline. Active content is public in the existing managed site
 model; this does not invent a draft/published workflow.
 
 ## Verification and remaining scope
@@ -199,12 +199,18 @@ reader. It replays those SQL files in a disposable schema (only public schema
 qualification is replaced), then compares PostgreSQL catalog columns/defaults,
 constraints and indexes for all fixture tables against the installed public schema.
 This uses checked-in migrations as the expected specification instead of maintaining
-a second schema. The replay schema is rolled back. It then clones the installed public table
+a second schema. An exact installed prefix through 0005 is also accepted while
+0006 awaits deployment: pending SQL runs only in the disposable reference schema.
+It then clones the fully replayed reference table
 structures (including checks, indexes and separately recreated foreign keys) into
 a random `myomaton_asset_test_<uuid>` schema. Every fixture query uses that schema;
-catalog definitions are compared again and FK target namespaces must all stay inside it. The schema is dropped after the suite, including on failure.
+catalog definitions are compared again and FK target namespaces must all stay inside it. Both schemas are dropped after the suite, including on failure.
 No migrations or real Myomaton content records are changed. A crashed test process
 can leave a clearly named fixture schema for operator cleanup.
+
+The [Managed Site rename rehearsal](managed-site-rename.md) additionally copies
+the current customer graph into isolated schemas, verifies upgrade/fresh fidelity,
+and exercises the production routing/media handlers with read-only connections.
 
 Coverage includes ownership, FK/uniqueness/delete rejection, forced transactional
 rollback, concurrent singular-role attachment, canonical no-op/conflict behavior,

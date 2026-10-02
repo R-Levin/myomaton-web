@@ -4,7 +4,7 @@ import { assets } from "../db/schema/assets";
 import { assetUsages } from "../db/schema/asset-usages";
 import { sections } from "../db/schema/sections";
 import { pages } from "../db/schema/pages";
-import { microsites } from "../db/schema/microsites";
+import { managedSites } from "../db/schema/managed-sites";
 import { webPresences } from "../db/schema/web-presences";
 import { requireAssetUuid, type Asset } from "./model";
 import { managedAssetEligible, presentImage, type SectionImage } from "./source";
@@ -18,12 +18,12 @@ export async function eligibleSectionAssets(db: NodePgDatabase, webPresenceId: s
   const rows = await db.select({ sectionId: sections.id, usagePresenceId: assetUsages.webPresenceId, role: assetUsages.role, asset: getTableColumns(assets) })
     .from(sections)
     .innerJoin(pages, eq(sections.pageId, pages.id))
-    .innerJoin(microsites, eq(pages.micrositeId, microsites.id))
-    .innerJoin(webPresences, eq(microsites.webPresenceId, webPresences.id))
+    .innerJoin(managedSites, eq(pages.managedSiteId, managedSites.id))
+    .innerJoin(webPresences, eq(managedSites.webPresenceId, webPresences.id))
     .innerJoin(assetUsages, and(eq(assetUsages.entityId, sections.id), eq(assetUsages.entityType, "section"), or(eq(assetUsages.role, "image"), eq(assetUsages.role, "attachment"))))
     .innerJoin(assets, eq(assets.id, assetUsages.assetId))
     .where(and(eq(webPresences.id, presenceId), eq(webPresences.status, "active"),
-      eq(microsites.status, "active"), eq(pages.status, "active"), eq(sections.status, "active"), eq(sections.type, "intro"),
+      eq(managedSites.status, "active"), eq(pages.status, "active"), eq(sections.status, "active"), eq(sections.type, "intro"),
       ids ? inArray(sections.id, ids) : undefined));
   const groups = new Map<string, typeof rows>();
   for (const row of rows) groups.set(`${row.sectionId}:${row.role}`, [...(groups.get(`${row.sectionId}:${row.role}`) ?? []), row]);

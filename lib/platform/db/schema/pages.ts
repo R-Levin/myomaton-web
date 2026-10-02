@@ -8,16 +8,16 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { microsites } from "./microsites";
+import { managedSites } from "./managed-sites";
 
 export const pages = pgTable(
   "pages",
   {
     id: uuid("id").defaultRandom().primaryKey(),
 
-    micrositeId: uuid("microsite_id")
+    managedSiteId: uuid("managed_site_id")
       .notNull()
-      .references(() => microsites.id),
+      .references(() => managedSites.id),
 
     slug: text("slug").notNull(),
     name: text("name").notNull(),
@@ -39,6 +39,6 @@ export const pages = pgTable(
       .defaultNow(),
   },
   (table) => [
-    unique("pages_microsite_id_slug_unique").on(table.micrositeId, table.slug),
+    unique("pages_managed_site_id_slug_unique").on(table.managedSiteId, table.slug),
   ],
 );

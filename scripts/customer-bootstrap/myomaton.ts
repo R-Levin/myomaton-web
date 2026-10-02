@@ -6,7 +6,7 @@ import { subjects } from "../../lib/platform/db/schema/subjects";
 import { subjectTypes } from "../../lib/platform/db/schema/subject-types";
 import { designSystems } from "../../lib/platform/db/schema/design-systems";
 import { actions } from "../../lib/platform/db/schema/actions";
-import { microsites } from "../../lib/platform/db/schema/microsites";
+import { managedSites } from "../../lib/platform/db/schema/managed-sites";
 import { pages } from "../../lib/platform/db/schema/pages";
 import { sections } from "../../lib/platform/db/schema/sections";
 import { navigations } from "../../lib/platform/db/schema/navigations";
@@ -56,8 +56,8 @@ export async function bootstrapMyomaton(db: NodePgDatabase, existingPresenceId?:
       name: "Myomaton", description: "An open practical robotics project." });
     await tx.insert(designSystems).values({ webPresenceId: presence.id, name: "Myomaton", configuration: myomatonDesignConfiguration });
     const [action] = await tx.insert(actions).values({ ...myomatonAction, webPresenceId: presence.id }).returning({ id: actions.id });
-    const [microsite] = await tx.insert(microsites).values({ webPresenceId: presence.id, name: "Myomaton" }).returning({ id: microsites.id });
-    const [page] = await tx.insert(pages).values({ micrositeId: microsite.id, slug: "/", name: "Home", title: "Myomaton", sortOrder: 0 }).returning({ id: pages.id });
+    const [managedSite] = await tx.insert(managedSites).values({ webPresenceId: presence.id, name: "Myomaton" }).returning({ id: managedSites.id });
+    const [page] = await tx.insert(pages).values({ managedSiteId: managedSite.id, slug: "/", name: "Home", title: "Myomaton", sortOrder: 0 }).returning({ id: pages.id });
     const initialSections = [
       {
         type: "hero",

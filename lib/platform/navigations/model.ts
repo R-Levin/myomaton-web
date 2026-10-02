@@ -1,13 +1,13 @@
 import { actionId as uuid, normalizeDestination } from "../actions/model";
-import { canonicalPagePath } from "../microsites/paths";
+import { canonicalPagePath } from "../managed-sites/paths";
 
-export type NavigationSurface = "microsite" | "content";
+export type NavigationSurface = "managedSite" | "content";
 export type NavigationTargetType = "page" | "section" | "action" | "link";
 
-// Supplied by the presentation when this Microsite's slugs are known to be
-// rooted in the current deployment. No cross-Microsite routing is inferred.
+// Supplied by the presentation when this ManagedSite's slugs are known to be
+// rooted in the current deployment. No cross-ManagedSite routing is inferred.
 export type NavigationContext = {
-  micrositeId: string;
+  managedSiteId: string;
   pageId?: string;
 };
 
@@ -40,12 +40,15 @@ export function record(value: unknown): Record<string, unknown> | null {
 }
 
 export function visibleOnSurface(configuration: unknown, surface: NavigationSurface): boolean {
-  if (surface !== "microsite" && surface !== "content") return false;
+  if (surface !== "managedSite" && surface !== "content") return false;
   const config = record(configuration);
   if (!config) return false;
   if (!Object.hasOwn(config, "surfaces")) return true;
   const surfaces = record(config.surfaces);
   if (!surfaces || Object.values(surfaces).some((value) => typeof value !== "boolean")) return false;
+  // Legacy serialization must never silently turn hidden navigation visible.
+  // Migration 0006 refuses this key; also fail closed if it is later reintroduced.
+  if (Object.hasOwn(surfaces, "microsite")) return false;
   return surfaces[surface] !== false;
 }
 
@@ -72,8 +75,8 @@ export function navigationDestination(destination: unknown): string | null {
   );
 }
 
-export function pageDestination(page: { micrositeId: string; slug: unknown }, context?: NavigationContext): string | null {
-  if (!context || !uuid(context.micrositeId) || uuid(page.micrositeId) !== uuid(context.micrositeId)) return null;
+export function pageDestination(page: { managedSiteId: string; slug: unknown }, context?: NavigationContext): string | null {
+  if (!context || !uuid(context.managedSiteId) || uuid(page.managedSiteId) !== uuid(context.managedSiteId)) return null;
   return canonicalPagePath(page.slug);
 }
 

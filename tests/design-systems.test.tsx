@@ -7,15 +7,15 @@ import {
   resolveDesignConfiguration,
 } from "../lib/platform/design-systems/configuration";
 import { myomatonDesignConfiguration } from "../scripts/customer-bootstrap/myomaton-design-system";
-import { MicrositePageView } from "../components/microsites/microsite-page";
-import { SectionRenderer } from "../components/microsites/section-renderer";
-import type { MicrositePage } from "../lib/platform/microsites/service";
+import { ManagedSitePageView } from "../components/managed-sites/managed-site-page";
+import { SectionRenderer } from "../components/managed-sites/section-renderer";
+import type { ManagedSitePage } from "../lib/platform/managed-sites/service";
 
 test("seed configuration resolves unchanged and reaches server-rendered tokens", () => {
   const configuration = resolveDesignConfiguration(myomatonDesignConfiguration);
   assert.deepEqual(configuration, myomatonDesignConfiguration);
-  const page: MicrositePage = {
-    microsite: { id: "microsite", name: "Example tenant" },
+  const page: ManagedSitePage = {
+    managedSite: { id: "managedSite", name: "Example tenant" },
     page: { id: "page", name: "Home", title: "Home", slug: "/" },
     designSystem: { id: "design", name: "Example design", configuration },
     sections: [
@@ -25,7 +25,7 @@ test("seed configuration resolves unchanged and reaches server-rendered tokens",
       { id: "unknown", type: "future", variant: null, name: null, content: { heading: "Not supported" }, configuration: {} },
     ],
   };
-  const html = renderToStaticMarkup(<MicrositePageView page={page} />);
+  const html = renderToStaticMarkup(<ManagedSitePageView page={page} />);
   for (const token of ["--design-accent:#214e43", "--design-base-size:18px", "--design-section-space:72px", "--design-radius:12px"]) {
     assert.ok(html.includes(token), token);
   }
@@ -36,7 +36,7 @@ test("seed configuration resolves unchanged and reaches server-rendered tokens",
   assert.ok(html.includes('href="#about"'));
   assert.ok(!html.includes("Not supported"));
 
-  const fallback = renderToStaticMarkup(<MicrositePageView page={{
+  const fallback = renderToStaticMarkup(<ManagedSitePageView page={{
     ...page,
     designSystem: { id: null, name: null, configuration: resolveDesignConfiguration(undefined) },
   }} />);

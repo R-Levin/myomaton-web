@@ -15,7 +15,7 @@ export function normalizePagePath(value: unknown): string | null {
 export function canonicalPagePath(value: unknown): string | null {
   const path = normalizePagePath(value);
   // Do not infer aliases from noncanonical database slugs. Exact canonical
-  // paths retain the database's (microsite_id, slug) uniqueness guarantee.
+  // paths retain the database's (managed_site_id, slug) uniqueness guarantee.
   return path === value ? path : null;
 }
 

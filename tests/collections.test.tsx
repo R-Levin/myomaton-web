@@ -2,14 +2,14 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
-import { normalizeSection, type CollectionContent } from "../lib/platform/microsites/sections";
-import { presentCollection } from "../lib/platform/microsites/collections";
-import { SectionRenderer } from "../components/microsites/section-renderer";
-import type { MicrositeSection } from "../lib/platform/microsites/service";
+import { normalizeSection, type CollectionContent } from "../lib/platform/managed-sites/sections";
+import { presentCollection } from "../lib/platform/managed-sites/collections";
+import { SectionRenderer } from "../components/managed-sites/section-renderer";
+import type { ManagedSiteSection } from "../lib/platform/managed-sites/service";
 
 const uuid = (n: number) => `abcdefab-1111-4111-8111-${String(n).padStart(12, "0")}`;
-const base: MicrositeSection = { id: uuid(1), type: "collection", name: "Collection", variant: "grid", configuration: {}, content: {} };
-const normalize = (content: unknown, changes: Partial<MicrositeSection> = {}) => normalizeSection({ ...base, content, ...changes });
+const base: ManagedSiteSection = { id: uuid(1), type: "collection", name: "Collection", variant: "grid", configuration: {}, content: {} };
+const normalize = (content: unknown, changes: Partial<ManagedSiteSection> = {}) => normalizeSection({ ...base, content, ...changes });
 const inline = { heading: "Features", text: "Overview", itemSource: "inline", items: [
   { id: "second", heading: "Second", text: "Detail", actionId: uuid(2) },
   { id: "first", heading: "First" },
@@ -105,6 +105,6 @@ test("collection grid exposes only finite semantics and adapts 3 to 2 to 1 by av
   assert.match(css, /@container \(min-width: 60rem\)/);
   assert.match(css, /data-columns="3"[\s\S]*repeat\(3, minmax\(0, 1fr\)\)/);
   assert.match(css, /repeat\(2, minmax\(0, 1fr\)\)/);
-  const card = css.slice(css.indexOf(".microsite-collection-item {"));
+  const card = css.slice(css.indexOf(".managed-site-collection-item {"));
   for (const token of ["space", "border", "radius", "surface", "text", "muted", "accent", "on-accent", "heading-font"]) assert.ok(card.includes(`var(--design-${token})`));
 });

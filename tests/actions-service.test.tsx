@@ -6,17 +6,17 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import type { Pool } from "pg";
 
 import * as actionModel from "../lib/platform/actions/model";
-import * as collections from "../lib/platform/microsites/collections";
-import * as sectionModel from "../lib/platform/microsites/sections";
-import * as paths from "../lib/platform/microsites/paths";
+import * as collections from "../lib/platform/managed-sites/collections";
+import * as sectionModel from "../lib/platform/managed-sites/sections";
+import * as paths from "../lib/platform/managed-sites/paths";
 import * as actionsSchema from "../lib/platform/db/schema/actions";
-import * as micrositesSchema from "../lib/platform/db/schema/microsites";
+import * as managedSitesSchema from "../lib/platform/db/schema/managed-sites";
 import * as pagesSchema from "../lib/platform/db/schema/pages";
 import * as sectionsSchema from "../lib/platform/db/schema/sections";
 import * as presencesSchema from "../lib/platform/db/schema/web-presences";
 import { myomatonAction } from "../scripts/customer-bootstrap/myomaton-action";
 import { myomatonDesignConfiguration } from "../scripts/customer-bootstrap/myomaton-design-system";
-import { MicrositePageView } from "../components/microsites/microsite-page";
+import { ManagedSitePageView } from "../components/managed-sites/managed-site-page";
 import { loadService } from "./helpers/load-service";
 
 test("services load seeded Action, enforce tenant scope, and resolve shared Hero/Intro/CTA references", async () => {
@@ -36,7 +36,7 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
         return { rows: actionRows };
       }
       if (query.text.includes('from "web_presences"')) {
-        return { rows: [[tenant, "microsite", "Myomaton"]] };
+        return { rows: [[tenant, "managedSite", "Myomaton"]] };
       }
       if (query.text.includes('from "pages"')) {
         return { rows: [["page", "Home", "Myomaton", "/"]] };
@@ -68,14 +68,14 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
   assert.equal((await actionService.getActionsByIds("invalid", [id])).size, 0);
   assert.equal(actionQueries, 1);
 
-  const micrositeService = loadService("lib/platform/microsites/service.ts", {
+  const managedSiteService = loadService("lib/platform/managed-sites/service.ts", {
     "./paths": paths,
     "./sections": sectionModel,
     "./collections": collections,
     "@/lib/platform/subjects/presentation-service": { getPresentedSubjectsByIds: async () => new Map() },
     "drizzle-orm": orm,
     "@/lib/platform/db/connection": { db },
-    "@/lib/platform/db/schema/microsites": micrositesSchema,
+    "@/lib/platform/db/schema/managed-sites": managedSitesSchema,
     "@/lib/platform/db/schema/pages": pagesSchema,
     "@/lib/platform/db/schema/sections": sectionsSchema,
     "@/lib/platform/db/schema/web-presences": presencesSchema,
@@ -86,8 +86,8 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
       async getNavigationByName(presenceId: string, name: string, surface: string, context: unknown) {
         assert.equal(presenceId, tenant);
         assert.equal(name, "Primary Navigation");
-        assert.equal(surface, "microsite");
-        assert.deepEqual(context, { micrositeId: "microsite", pageId: "page" });
+        assert.equal(surface, "managedSite");
+        assert.deepEqual(context, { managedSiteId: "managedSite", pageId: "page" });
         return null;
       },
     },
@@ -97,24 +97,24 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
         return { id: "design", name: "Myomaton", configuration: myomatonDesignConfiguration };
       },
     },
-  }) as typeof import("../lib/platform/microsites/service");
+  }) as typeof import("../lib/platform/managed-sites/service");
 
-  const page = await micrositeService.getMicrositePage({ domain: "myomaton.com", micrositeName: "Myomaton" }, "/");
+  const page = await managedSiteService.getManagedSitePage({ domain: "myomaton.com", managedSiteName: "Myomaton" }, "/");
   assert.ok(page);
   assert.equal(actionQueries, 2, "One batch query for all three presentations");
   assert.equal(page.sections.length, 3, "Unsupported types are omitted before dependency resolution");
   assert.equal(page.sections[0].action?.id, id);
   assert.strictEqual(page.sections[0].action, page.sections[1].action);
-  const html = renderToStaticMarkup(<MicrositePageView page={page} />);
+  const html = renderToStaticMarkup(<ManagedSitePageView page={page} />);
   assert.equal((html.match(/href="#about"/g) ?? []).length, 3);
   assert.ok(html.includes("--design-accent:#214e43"));
 
   for (const rows of [[], [[id, otherTenant, "Other", "section", "Other tenant", "#about", "active"]], [[id, tenant, "Inactive", "section", "Inactive", "#about", "inactive"]], [[id, tenant, "Unsafe", "link", "Unsafe", "javascript:alert(1)", "active"]]]) {
     actionRows = rows;
-    const unavailable = await micrositeService.getMicrositePage({ domain: "myomaton.com", micrositeName: "Myomaton" }, "/");
+    const unavailable = await managedSiteService.getManagedSitePage({ domain: "myomaton.com", managedSiteName: "Myomaton" }, "/");
     assert.ok(unavailable);
     assert.ok(unavailable.sections.every((section) => section.action === null));
-    const fallback = renderToStaticMarkup(<MicrositePageView page={unavailable} />);
+    const fallback = renderToStaticMarkup(<ManagedSitePageView page={unavailable} />);
     assert.ok(fallback.includes("First"));
     assert.ok(fallback.includes("Second"));
     assert.ok(fallback.includes("Third"));

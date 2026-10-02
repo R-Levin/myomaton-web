@@ -15,7 +15,7 @@ type Row = Record<string, unknown>;
 function fixture() {
   let state: Record<string, Row[]> = Object.fromEntries([
     "subject_types", "organizations", "web_presences", "subjects", "design_systems", "actions",
-    "microsites", "pages", "sections", "navigations", "navigation_items", "assets", "asset_usages",
+    "managed_sites", "pages", "sections", "navigations", "navigation_items", "assets", "asset_usages",
   ].map((name) => [name, []]));
   let snapshot: typeof state | undefined;
   const statements: string[] = [];
@@ -102,12 +102,12 @@ test("customer bootstrap creates the unchanged baseline with linked generated id
   assert.equal(f.state.web_presences[0].id, result.webPresenceId);
   assert.equal(f.state.web_presences[0].organization_id, f.state.organizations[0].id);
   assert.equal(f.state.subjects[0].subject_type_id, f.state.subject_types[0].id);
-  for (const table of ["subjects", "design_systems", "actions", "microsites", "navigations"]) {
+  for (const table of ["subjects", "design_systems", "actions", "managed_sites", "navigations"]) {
     assert.equal(f.state[table].length, 1); assert.equal(f.state[table][0].web_presence_id, result.webPresenceId);
   }
   assert.deepEqual(f.state.design_systems[0].configuration, myomatonDesignConfiguration);
   for (const [key, value] of Object.entries(myomatonAction)) assert.equal(f.state.actions[0][key], value);
-  assert.equal(f.state.pages[0].microsite_id, f.state.microsites[0].id);
+  assert.equal(f.state.pages[0].managed_site_id, f.state.managed_sites[0].id);
   assert.deepEqual(f.state.sections.map((row) => [row.type, row.name, row.sort_order]), [["hero", "Hero", 0], ["intro", "Introduction", 10], ["cta", "Primary Call to Action", 20]]);
   for (const row of f.state.sections) assert.equal(row.page_id, f.state.pages[0].id);
   const intro = f.state.sections[1], cta = f.state.sections[2];
@@ -124,7 +124,7 @@ test("customer bootstrap creates the unchanged baseline with linked generated id
 
 test("existing customized/inactive state, stable IDs, legacy CTA and photograph associations remain byte-for-byte unchanged", async () => {
   const f = fixture(); await seedPlatform(f.db); const initial = await bootstrapMyomaton(f.db);
-  for (const table of ["organizations", "web_presences", "subjects", "microsites", "pages", "sections", "design_systems", "actions", "navigations", "navigation_items"]) {
+  for (const table of ["organizations", "web_presences", "subjects", "managed_sites", "pages", "sections", "design_systems", "actions", "navigations", "navigation_items"]) {
     for (const row of f.state[table]) Object.assign(row, { name: "Customized", status: "inactive", version: 8, configuration: { custom: true }, updated_at: "custom time" });
   }
   f.state.sections[1].name = "Introduction";
@@ -142,7 +142,7 @@ test("existing customized/inactive state, stable IDs, legacy CTA and photograph 
 
 test("seed and repeated bootstrap never restore deliberately removed children or an empty existing presence", async () => {
   const f = fixture(); await seedPlatform(f.db); await bootstrapMyomaton(f.db);
-  for (const table of ["subjects", "design_systems", "actions", "microsites", "pages", "sections", "navigations", "navigation_items"]) f.state[table].length = 0;
+  for (const table of ["subjects", "design_systems", "actions", "managed_sites", "pages", "sections", "navigations", "navigation_items"]) f.state[table].length = 0;
   const before = structuredClone(f.state);
   await seedPlatform(f.db); await bootstrapMyomaton(f.db);
   assert.deepEqual(f.state, before);

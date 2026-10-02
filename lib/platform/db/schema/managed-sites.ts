@@ -9,7 +9,7 @@ import {
 
 import { webPresences } from "./web-presences";
 
-export const microsites = pgTable("microsites", {
+export const managedSites = pgTable("managed_sites", {
   id: uuid("id").defaultRandom().primaryKey(),
 
   webPresenceId: uuid("web_presence_id")

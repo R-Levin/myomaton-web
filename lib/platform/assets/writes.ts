@@ -4,7 +4,7 @@ import { assets } from "../db/schema/assets";
 import { assetUsages } from "../db/schema/asset-usages";
 import { sections } from "../db/schema/sections";
 import { pages } from "../db/schema/pages";
-import { microsites } from "../db/schema/microsites";
+import { managedSites } from "../db/schema/managed-sites";
 import { webPresences } from "../db/schema/web-presences";
 import { requireAssetUuid } from "./model";
 import { imageDimensions, IMAGE_MIMES, requireManagedKey } from "./source";
@@ -32,11 +32,11 @@ export async function attachSectionAsset(db: NodePgDatabase, input: SectionAsset
     // Lock the whole ownership chain so reparenting/deletion cannot race checks.
     const [target] = await tx.select({ id: sections.id }).from(sections)
       .innerJoin(pages, eq(sections.pageId, pages.id))
-      .innerJoin(microsites, eq(pages.micrositeId, microsites.id))
-      .innerJoin(webPresences, eq(microsites.webPresenceId, webPresences.id))
+      .innerJoin(managedSites, eq(pages.managedSiteId, managedSites.id))
+      .innerJoin(webPresences, eq(managedSites.webPresenceId, webPresences.id))
       .where(and(eq(sections.id, sectionId), eq(webPresences.id, presenceId),
         eq(sections.type, "intro"), eq(sections.status, "active"), eq(pages.status, "active"),
-        eq(microsites.status, "active"), eq(webPresences.status, "active")))
+        eq(managedSites.status, "active"), eq(webPresences.status, "active")))
       .for("update");
     if (!target) throw new Error("Active Introduction section not found in the requested Web Presence.");
     // Include incorrectly scoped target rows as conflicts, rather than ignoring

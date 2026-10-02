@@ -2,17 +2,17 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
-import { normalizeSection } from "../lib/platform/microsites/sections";
-import { SectionRenderer } from "../components/microsites/section-renderer";
-import type { MicrositeSection } from "../lib/platform/microsites/service";
-import { designTokens } from "../components/microsites/design-tokens";
+import { normalizeSection } from "../lib/platform/managed-sites/sections";
+import { SectionRenderer } from "../components/managed-sites/section-renderer";
+import type { ManagedSiteSection } from "../lib/platform/managed-sites/service";
+import { designTokens } from "../components/managed-sites/design-tokens";
 
 const id = "abcdefab-1111-4111-8111-111111111111";
-const base: MicrositeSection = { id: "section", name: "Introduction", type: "intro", variant: null,
+const base: ManagedSiteSection = { id: "section", name: "Introduction", type: "intro", variant: null,
   content: { heading: "Heading", text: "Body", actionId: id }, configuration: { anchor: "about" } };
 const action = { id, type: "section" as const, name: "About", label: "Read more", destination: "#about" };
 const image = { assetId: id, src: `/media/assets/${id}`, width: 640, height: 480, alt: "Robot" };
-const render = (changes: Partial<MicrositeSection> = {}) => renderToStaticMarkup(<SectionRenderer section={{ ...base, ...changes }} />);
+const render = (changes: Partial<ManagedSiteSection> = {}) => renderToStaticMarkup(<SectionRenderer section={{ ...base, ...changes }} />);
 
 test("typed sections allow only supported content, type/variant pairs, and semantic options", () => {
   for (const type of ["hero", "intro", "cta"]) {
@@ -69,7 +69,7 @@ test("Intro layouts use associated images, text-first reading order, and clean t
     assert.match(html, /width="640" height="480"/);
     const absent = render({ variant, image: null, content: { heading: "Heading", imageUrl: "https://bad.example", assetId: id } });
     assert.match(absent, /data-layout="stack"/);
-    assert.ok(!absent.includes("microsite-section-media"));
+    assert.ok(!absent.includes("managed-site-section-media"));
     assert.ok(!absent.includes("<img"));
     assert.ok(!absent.includes("bad.example"));
   }
@@ -89,7 +89,7 @@ test("platform CSS owns responsive geometry and maps presentation to existing De
   const css = readFileSync("app/globals.css", "utf8");
   assert.match(css, /@media \(min-width: 48rem\)/);
   assert.match(css, /grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\)/);
-  assert.match(css, /split-image-first"\] \.microsite-section-media \{ grid-column: 1; grid-row: 1;/);
+  assert.match(css, /split-image-first"\] \.managed-site-section-media \{ grid-column: 1; grid-row: 1;/);
   assert.match(css, /height: auto/);
   assert.match(css, /object-fit: contain/);
   assert.match(css, /object-fit: cover/);

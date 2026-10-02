@@ -16,7 +16,7 @@ function Items({ items }: { items: NavigationItem[] }) {
 export function PrimaryNavigation({ navigation }: { navigation: Navigation | null | undefined }) {
   if (!navigation?.items.length) return null;
   return (
-    <header className="microsite-header">
+    <header className="managed-site-header">
       <nav aria-label={navigation.name}><Items items={navigation.items} /></nav>
     </header>
   );

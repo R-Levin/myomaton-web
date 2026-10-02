@@ -16,7 +16,7 @@ import { eq, sql } from "drizzle-orm";
 import sharp from "sharp";
 import { organizations } from "../../lib/platform/db/schema/organizations";
 import { webPresences } from "../../lib/platform/db/schema/web-presences";
-import { microsites } from "../../lib/platform/db/schema/microsites";
+import { managedSites } from "../../lib/platform/db/schema/managed-sites";
 import { pages } from "../../lib/platform/db/schema/pages";
 import { sections } from "../../lib/platform/db/schema/sections";
 import { assets } from "../../lib/platform/db/schema/assets";
@@ -42,29 +42,29 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
   let pool: Pool | undefined;
   const temp = await mkdtemp(path.join(os.tmpdir(), "asset-pg-"));
   try {
-    await assertMigrationFidelity(admin, name);
+    const referenceSchema = await assertMigrationFidelity(admin, name);
     await admin.query(`CREATE SCHEMA "${name}"`); created = true;
-    pool = new Pool({ connectionString: adminUrl, options: `-c search_path=${name},public` });
+    pool = new Pool({ connectionString: adminUrl, options: `-c search_path=${name}` });
     const db = drizzle({ client: pool });
     const tables = fixtureTables;
-    for (const table of tables) await admin.query(`CREATE TABLE "${name}"."${table}" (LIKE public."${table}" INCLUDING ALL)`);
+    for (const table of tables) await admin.query(`CREATE TABLE "${name}"."${table}" (LIKE "${referenceSchema}"."${table}" INCLUDING ALL)`);
     const foreignKeys = await admin.query<{ table_name: string; name: string; definition: string }>(
-      "SELECT rel.relname AS table_name, con.conname AS name, pg_get_constraintdef(con.oid) AS definition FROM pg_constraint con JOIN pg_class rel ON rel.oid=con.conrelid JOIN pg_namespace ns ON ns.oid=rel.relnamespace WHERE ns.nspname='public' AND con.contype='f' AND rel.relname=ANY($1::text[])", [tables]);
+      "SELECT rel.relname AS table_name, con.conname AS name, pg_get_constraintdef(con.oid) AS definition FROM pg_constraint con JOIN pg_class rel ON rel.oid=con.conrelid JOIN pg_namespace ns ON ns.oid=rel.relnamespace WHERE ns.nspname=$1 AND con.contype='f' AND rel.relname=ANY($2::text[])", [referenceSchema, tables]);
     for (const fk of foreignKeys.rows) {
-      const definition = fk.definition.replace(/REFERENCES (?:public\.)?([a-z_]+)/, (_match, target: string) => {
+      const definition = fk.definition.replaceAll(`${referenceSchema}.`, "").replace(/REFERENCES ([a-z_]+)/, (_match, target: string) => {
         assert.ok(tables.includes(target), "Foreign key must stay within fixture schema");
         return `REFERENCES "${name}"."${target}"`;
       });
       assert.ok(definition.includes(`REFERENCES "${name}".`));
       await admin.query(`ALTER TABLE "${name}"."${fk.table_name}" ADD CONSTRAINT "${fk.name}" ${definition}`);
     }
-    await assertFixtureFidelity(admin, name);
+    await assertFixtureFidelity(admin, name, referenceSchema);
     const scope = await pool.query("SELECT current_schema() AS schema"); assert.equal(scope.rows[0].schema, name);
     async function fixture(myomaton = false) {
       const [org] = await db.insert(organizations).values({ name: "Disposable test" }).returning();
       const [presence] = await db.insert(webPresences).values({ organizationId: org.id, name: myomaton ? "Myomaton" : "Test", primaryDomain: myomaton ? "myomaton.com" : `${randomUUID()}.test` }).returning();
-      const [site] = await db.insert(microsites).values({ webPresenceId: presence.id, name: "Myomaton" }).returning();
-      const [page] = await db.insert(pages).values({ micrositeId: site.id, name: "Home", title: "Home", slug: "/" }).returning();
+      const [site] = await db.insert(managedSites).values({ webPresenceId: presence.id, name: "Myomaton" }).returning();
+      const [page] = await db.insert(pages).values({ managedSiteId: site.id, name: "Home", title: "Home", slug: "/" }).returning();
       const [section] = await db.insert(sections).values({ pageId: page.id, type: "intro", name: "Introduction", content: { text: "Preserve" }, metadata: { custom: true } }).returning();
       return { presence, site, page, section };
     }
@@ -179,7 +179,7 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
       assert.ok(!JSON.stringify([...images]).includes("sourceReference"));
       assert.equal((await sectionImages(db, second.presence.id, [first.section.id])).size, 0);
       assert.equal(await publicAsset(db, first.presence.primaryDomain!, randomUUID()), null);
-      for (const [table, id] of [[assets, firstInput.assetId], [sections, first.section.id], [pages, first.page.id], [microsites, first.site.id], [webPresences, first.presence.id]] as const) {
+      for (const [table, id] of [[assets, firstInput.assetId], [sections, first.section.id], [pages, first.page.id], [managedSites, first.site.id], [webPresences, first.presence.id]] as const) {
         await db.update(table).set({ status: "inactive" }).where(eq(table.id, id));
         assert.equal((await sectionImages(db, first.presence.id, [first.section.id])).size, 0);
         assert.equal(await publicAsset(db, first.presence.primaryDomain!, firstInput.assetId), null);
@@ -225,9 +225,9 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
     });
     await t.test("fidelity checks detect altered fixture constraints", async () => {
       await admin.query(`ALTER TABLE "${name}".assets DROP CONSTRAINT assets_width_positive`);
-      try { await assert.rejects(assertFixtureFidelity(admin, name), /Fixture constraints/); }
+      try { await assert.rejects(assertFixtureFidelity(admin, name, referenceSchema), /Fixture constraints/); }
       finally { await admin.query(`ALTER TABLE "${name}".assets ADD CONSTRAINT assets_width_positive CHECK (width IS NULL OR width > 0)`); }
-      await assertFixtureFidelity(admin, name);
+      await assertFixtureFidelity(admin, name, referenceSchema);
     });
     await t.test("operator initialization uses current state only; no marker, no overwrites, real delivery eligibility", async () => {
       const f = await fixture(true);
@@ -257,6 +257,7 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
   } finally {
     await pool?.end();
     if (created) await admin.query(`DROP SCHEMA "${name}" CASCADE`);
+    await admin.query(`DROP SCHEMA IF EXISTS "${name}_expected" CASCADE`);
     await admin.end();
     await rm(temp, { recursive: true, force: true });
   }

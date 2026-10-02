@@ -6,10 +6,10 @@ import type { Pool } from "pg";
 import { renderToStaticMarkup } from "react-dom/server";
 import { baseline, pageId, planHomeV1, presenceId, tables, updateMyomatonHomeV1, type Row, type State, type Table } from "../scripts/customer-updates/myomaton-home-v1";
 import { homeV1Ids, projectDrafts, projectsActionDraft } from "../scripts/customer-updates/myomaton-home-v1-content";
-import { normalizeSection } from "../lib/platform/microsites/sections";
+import { normalizeSection } from "../lib/platform/managed-sites/sections";
 import { normalizeAction } from "../lib/platform/actions/model";
-import { presentCollection } from "../lib/platform/microsites/collections";
-import { SectionRenderer } from "../components/microsites/section-renderer";
+import { presentCollection } from "../lib/platform/managed-sites/collections";
+import { SectionRenderer } from "../components/managed-sites/section-renderer";
 
 // Isolated SQL protocol fixture, with no pg Client/Pool construction or environment loading.
 // Tests the real writer and rollback control flow; not PostgreSQL locking/constraint coverage.
@@ -270,7 +270,7 @@ test("unrelated customer state, additional pages and unrelated current-customer 
     page_id: unrelatedPage, name: "Unrelated", metadata: { untouched: true } });
   f.state.subjects.push({ id: randomUUID(), web_presence_id: presenceId, name: "Another Subject" });
   f.state.actions.push({ id: randomUUID(), web_presence_id: presenceId, name: "Another Action" });
-  f.state.pages.push({ id: unrelatedPage, microsite_id: baseline.microsites[0].id, slug: "/other", name: "Other" });
+  f.state.pages.push({ id: unrelatedPage, managed_site_id: baseline.managed_sites[0].id, slug: "/other", name: "Other" });
   const before = structuredClone(f.state);
   await updateMyomatonHomeV1(f.pool);
   for (const table of tables) for (const row of before[table]) {
@@ -283,7 +283,7 @@ test("unrelated customer state, additional pages and unrelated current-customer 
 test("ambiguous roots, reparented Page and changed Navigation/reference data refuse", async () => {
   for (const alter of [
     (state: State) => { state.web_presences.push({ ...state.web_presences[0], id: randomUUID(), name: " MYOMATON " }); },
-    (state: State) => { state.pages[0].microsite_id = randomUUID(); },
+    (state: State) => { state.pages[0].managed_site_id = randomUUID(); },
     (state: State) => { state.subject_types[0].status = "inactive"; },
     (state: State) => { state.navigation_items[0].target_reference = randomUUID(); },
   ]) {
