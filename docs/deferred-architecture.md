@@ -64,6 +64,12 @@ The [Customer #1 Home v1 operator transition](myomaton-home-v1.md) uses a frozen
 expected-state guard for this bounded update; it does not complete those future
 workflows or make its source definition continuing authority over customer state.
 
+[Multi-page serving](microsite-routing.md) is implemented within one explicitly
+selected active Microsite, preserving P8 without a page-count cap. It introduces
+no customer-state writer or management surface. P9 remains deferred: deployment
+selection is explicit configuration, not request-host/domain tenant resolution.
+Basic per-Page titles do not complete the capability catalog's production SEO track.
+
 | ID | Requirement to implement or preserve | Implementation trigger / reason |
 | --- | --- | --- |
 | P1 | Keep the platform database canonical for the customer's current Web Presence. Customer edits become canonical and must not be silently overwritten by templates, AI, automation, or reseeding. Seeds/source files must not remain a competing authority. | When real customer editing is introduced, and whenever a later writer can update existing customer state. |
@@ -75,6 +81,7 @@ workflows or make its source definition continuing authority over customer state
 | P7 | Implement authentication and authorization before exposing customer-facing management operations, including Assets. | Before any customer-facing management surface or API is exposed. Tenant-scoped queries alone are not caller authorization. |
 | P8 | Preserve structurally multi-page Microsites; any page-count restriction is product policy, not a schema limitation. | Whenever page management, product limits, or Microsite schema changes are introduced. |
 | P9 | Implement robust request-host/domain-to-Web-Presence resolution. | Before production multi-presence/tenant routing depends on request domains. |
+| P10 | Define a validated canonical Page/Web Presence SEO metadata contract, including description and public canonical-URL rules. Do not treat untyped metadata JSON or Section copy as that contract. | Before SEO metadata authoring or production indexing/launch. Multi-page routing currently uses Page title with name fallback; the schema has no defined description contract. See [routing metadata](microsite-routing.md#metadata-and-not-found-behavior). |
 
 ## REQUIRED: Content Engine
 

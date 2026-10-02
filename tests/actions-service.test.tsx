@@ -8,6 +8,7 @@ import type { Pool } from "pg";
 import * as actionModel from "../lib/platform/actions/model";
 import * as collections from "../lib/platform/microsites/collections";
 import * as sectionModel from "../lib/platform/microsites/sections";
+import * as paths from "../lib/platform/microsites/paths";
 import * as actionsSchema from "../lib/platform/db/schema/actions";
 import * as micrositesSchema from "../lib/platform/db/schema/microsites";
 import * as pagesSchema from "../lib/platform/db/schema/pages";
@@ -35,7 +36,10 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
         return { rows: actionRows };
       }
       if (query.text.includes('from "web_presences"')) {
-        return { rows: [[tenant, "microsite", "Myomaton", "page", "Home", "Myomaton", "/"]] };
+        return { rows: [[tenant, "microsite", "Myomaton"]] };
+      }
+      if (query.text.includes('from "pages"')) {
+        return { rows: [["page", "Home", "Myomaton", "/"]] };
       }
       if (query.text.includes('from "sections"')) {
         return { rows: [
@@ -65,6 +69,7 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
   assert.equal(actionQueries, 1);
 
   const micrositeService = loadService("lib/platform/microsites/service.ts", {
+    "./paths": paths,
     "./sections": sectionModel,
     "./collections": collections,
     "@/lib/platform/subjects/presentation-service": { getPresentedSubjectsByIds: async () => new Map() },
@@ -94,7 +99,7 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
     },
   }) as typeof import("../lib/platform/microsites/service");
 
-  const page = await micrositeService.getMicrositePageByDomain("myomaton.com", "/");
+  const page = await micrositeService.getMicrositePage({ domain: "myomaton.com", micrositeName: "Myomaton" }, "/");
   assert.ok(page);
   assert.equal(actionQueries, 2, "One batch query for all three presentations");
   assert.equal(page.sections.length, 3, "Unsupported types are omitted before dependency resolution");
@@ -106,7 +111,7 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
 
   for (const rows of [[], [[id, otherTenant, "Other", "section", "Other tenant", "#about", "active"]], [[id, tenant, "Inactive", "section", "Inactive", "#about", "inactive"]], [[id, tenant, "Unsafe", "link", "Unsafe", "javascript:alert(1)", "active"]]]) {
     actionRows = rows;
-    const unavailable = await micrositeService.getMicrositePageByDomain("myomaton.com", "/");
+    const unavailable = await micrositeService.getMicrositePage({ domain: "myomaton.com", micrositeName: "Myomaton" }, "/");
     assert.ok(unavailable);
     assert.ok(unavailable.sections.every((section) => section.action === null));
     const fallback = renderToStaticMarkup(<MicrositePageView page={unavailable} />);

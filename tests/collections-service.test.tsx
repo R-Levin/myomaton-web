@@ -12,6 +12,7 @@ import * as sections from "../lib/platform/db/schema/sections";
 import * as actions from "../lib/platform/db/schema/actions";
 import * as subjectModel from "../lib/platform/subjects/presentation";
 import * as actionModel from "../lib/platform/actions/model";
+import * as paths from "../lib/platform/microsites/paths";
 import * as sectionModel from "../lib/platform/microsites/sections";
 import * as collections from "../lib/platform/microsites/collections";
 import { SectionRenderer } from "../components/microsites/section-renderer";
@@ -73,7 +74,8 @@ test("microsite batches Subject and item Action dependencies, preserves curated 
     if (query.text.includes('from "actions"')) {
       actionQueries++; assert.deepEqual(params, [id(1), "active", id(20)]); return { rows: actionRows };
     }
-    if (query.text.includes('from "web_presences"')) return { rows: [[id(1), id(10), "Site", id(11), "Page", "Title", "/"]] };
+    if (query.text.includes('from "web_presences"')) return { rows: [[id(1), id(10), "Site"]] };
+    if (query.text.includes('from "pages"')) return { rows: [[id(11), "Page", "Title", "/"]] };
     if (query.text.includes('from "sections"')) return { rows: [
       [id(12), "collection", "grid", "Subjects", curated, { columns: 3 }],
       [id(13), "collection", "grid", "Inline", { itemSource: "inline", items: [{ id: "feature", heading: "Feature", actionId: id(20) }] }, { columns: 2 }],
@@ -90,6 +92,7 @@ test("microsite batches Subject and item Action dependencies, preserves curated 
     "drizzle-orm": orm, "@/lib/platform/db/connection": connection, "@/lib/platform/db/schema/actions": actions, "./model": actionModel,
   });
   const service = loadService("lib/platform/microsites/service.ts", {
+    "./paths": paths,
     "drizzle-orm": orm, "@/lib/platform/db/connection": connection,
     "@/lib/platform/db/schema/microsites": sites, "@/lib/platform/db/schema/pages": pages,
     "@/lib/platform/db/schema/sections": sections, "@/lib/platform/db/schema/web-presences": presences,
@@ -99,7 +102,7 @@ test("microsite batches Subject and item Action dependencies, preserves curated 
     "@/lib/platform/navigations/service": { getNavigationByName: async () => null },
     "@/lib/platform/design-systems/service": { getDesignSystemByWebPresenceId: async () => ({ id: null, name: null, configuration: {} }) },
   }) as typeof import("../lib/platform/microsites/service");
-  const page = await service.getMicrositePageByDomain("example.test", "/"); assert.ok(page);
+  const page = await service.getMicrositePage({ domain: "example.test", micrositeName: "Site" }, "/"); assert.ok(page);
   assert.equal(subjectQueries, 1); assert.equal(actionQueries, 1);
   assert.deepEqual(curated, before);
   const section = page.sections[0];
@@ -114,7 +117,7 @@ test("microsite batches Subject and item Action dependencies, preserves curated 
     [[id(20), id(1), "Details", "link", "Unsafe", "javascript:alert(1)", "active"]],
     [[id(20), id(1), "Details", "link", {}, "/details", "active"]]]) {
     actionRows = rows;
-    const unavailable = await service.getMicrositePageByDomain("example.test", "/"); assert.ok(unavailable);
+    const unavailable = await service.getMicrositePage({ domain: "example.test", micrositeName: "Site" }, "/"); assert.ok(unavailable);
     const fallback = unavailable.sections.map((section) => renderToStaticMarkup(<SectionRenderer section={section} />)).join("");
     assert.match(fallback, /Service B/); assert.match(fallback, /Service A/); assert.match(fallback, /Feature/);
     assert.ok(!fallback.includes("href="));

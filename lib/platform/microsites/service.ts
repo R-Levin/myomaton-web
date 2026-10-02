@@ -12,6 +12,7 @@ import { webPresences } from "@/lib/platform/db/schema/web-presences";
 import { getActionsByIds } from "@/lib/platform/actions/service";
 import { sectionActionId, type Action } from "@/lib/platform/actions/model";
 import { normalizeSection } from "./sections";
+import { normalizePagePath } from "./paths";
 import { presentCollection, type CollectionItem } from "./collections";
 import { getPresentedSubjectsByIds } from "@/lib/platform/subjects/presentation-service";
 import { getNavigationByName } from "@/lib/platform/navigations/service";
@@ -41,34 +42,37 @@ export type MicrositePage = {
   navigation?: Navigation | null;
 };
 
-export async function getMicrositePageByDomain(
-  domain: string,
-  slug: string,
+export type MicrositeSelection = { domain: string; micrositeName: string };
+
+export async function getMicrositePage(
+  selection: MicrositeSelection,
+  path: string,
 ): Promise<MicrositePage | null> {
-  const matches = await db
+  const slug = normalizePagePath(path);
+  if (!slug || !selection.domain || !selection.micrositeName) return null;
+  const sites = await db
     .select({
       webPresenceId: webPresences.id,
       microsite: { id: microsites.id, name: microsites.name },
-      page: { id: pages.id, name: pages.name, title: pages.title, slug: pages.slug },
     })
     .from(webPresences)
     .innerJoin(microsites, eq(microsites.webPresenceId, webPresences.id))
-    .innerJoin(pages, eq(pages.micrositeId, microsites.id))
     .where(and(
-      eq(webPresences.primaryDomain, domain),
-      eq(pages.slug, slug),
+      eq(webPresences.primaryDomain, selection.domain),
+      eq(microsites.name, selection.micrositeName),
       eq(webPresences.status, "active"),
       eq(microsites.status, "active"),
-      eq(pages.status, "active"),
     ))
     .limit(2);
 
-  if (matches.length > 1) {
-    throw new Error("Multiple active microsite pages match the domain and slug.");
-  }
-
-  const match = matches[0];
-  if (!match) return null;
+  if (sites.length !== 1) return null;
+  const site = sites[0];
+  const matches = await db.select({ id: pages.id, name: pages.name, title: pages.title, slug: pages.slug })
+    .from(pages)
+    .where(and(eq(pages.micrositeId, site.microsite.id), eq(pages.slug, slug), eq(pages.status, "active")))
+    .limit(2);
+  if (matches.length !== 1) return null;
+  const match = { ...site, page: matches[0] };
 
   const orderedSections = await db
     .select({

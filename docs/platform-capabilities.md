@@ -123,10 +123,12 @@ require a reusable FAQ entity.
 **Core planned archetypes:** Home, About, Contact, Listing / Index, Detail,
 Campaign / Landing, and Flex / Generic.
 
-The current Page/Section foundation and Myomaton Home are **Implemented**. The
-archetype catalog, automated composition and general multi-page delivery are not
-therefore implemented. Archetypes describe page purpose and sensible composition,
-not a requirement to create one of every kind.
+The current Page/Section foundation, Myomaton Home and active multi-page serving
+within an explicitly selected Microsite are **Implemented**. See
+[Microsite routing](microsite-routing.md). Archetype automation, secondary customer
+content and production host/domain routing are not thereby implemented.
+Archetypes describe page purpose and sensible composition, not a requirement to
+create one of every kind.
 
 The **Flex Page** is an operator/admin escape hatch. It may combine any supported
 Section capabilities in a sensible order without normal archetype automation
@@ -157,7 +159,7 @@ No architectural page-count limit exists; Microsites remain structurally
 multi-page. Product/service quantities are not arbitrarily capped in the intended
 product envelope. The platform remains optimized for manageable lead-generation
 catalogs rather than giant commerce catalogs. This is not a claim of unbounded
-operational capacity or completed multi-page routing.
+operational capacity or completed production host/domain routing.
 
 ## 4. Navigation hierarchy
 

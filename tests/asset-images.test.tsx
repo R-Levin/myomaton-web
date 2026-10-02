@@ -102,6 +102,7 @@ test("media route binds delivery to the configured Myomaton domain, never the re
   const { loadService } = await import("./helpers/load-service");
   const response = new Response("JPEG fixture");
   const route = loadService("app/media/assets/[assetId]/route.ts", {
+    "@/lib/platform/microsites/deployment": await import("../lib/platform/microsites/deployment"),
     "@/lib/platform/assets/presentation-service": { getPublicAsset: async (domain: string, assetId: string) => {
       assert.equal(domain, "myomaton.com"); assert.equal(assetId, uuid); return null;
     } },

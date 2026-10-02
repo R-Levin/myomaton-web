@@ -10,6 +10,7 @@ import * as sections from "../lib/platform/db/schema/sections";
 import * as presences from "../lib/platform/db/schema/web-presences";
 import * as actions from "../lib/platform/actions/model";
 import * as collections from "../lib/platform/microsites/collections";
+import * as paths from "../lib/platform/microsites/paths";
 import * as sectionModel from "../lib/platform/microsites/sections";
 import { myomatonDesignConfiguration } from "../scripts/customer-bootstrap/myomaton-design-system";
 import { MicrositePageView } from "../components/microsites/microsite-page";
@@ -19,13 +20,15 @@ const id = (n: number) => `11111111-1111-4111-8111-${String(n).padStart(12, "0")
 
 test("microsite resolves intro images through the Asset service and renders optional image without content URLs", async () => {
   const client = { async query(query: { text: string }) {
-    if (query.text.includes('from "web_presences"')) return { rows: [[id(1), id(2), "Myomaton", id(3), "Home", "Myomaton", "/"]] };
+    if (query.text.includes('from "web_presences"')) return { rows: [[id(1), id(2), "Myomaton"]] };
+    if (query.text.includes('from "pages"')) return { rows: [[id(3), "Home", "Myomaton", "/"]] };
     if (query.text.includes('from "sections"')) return { rows: [[id(4), "intro", "split-image-first", "Introduction", { heading: "Robots", text: "Keep text", imageUrl: "https://ignored.example", assetId: id(99) }, { anchor: "about", width: "wide" }]] };
     throw new Error("Unexpected SQL");
   } };
   let hasImage = true;
   const image = { assetId: id(5), src: `/media/assets/${id(5)}`, width: 640, height: 480, alt: "A real robot" };
   const service = loadService("lib/platform/microsites/service.ts", {
+    "./paths": paths,
     "./sections": sectionModel,
     "./collections": collections,
     "@/lib/platform/subjects/presentation-service": { getPresentedSubjectsByIds: async () => new Map() },
@@ -42,7 +45,7 @@ test("microsite resolves intro images through the Asset service and renders opti
       return new Map(hasImage ? [[id(4), image]] : []);
     } },
   }) as typeof import("../lib/platform/microsites/service");
-  const page = await service.getMicrositePageByDomain("myomaton.com", "/");
+  const page = await service.getMicrositePage({ domain: "myomaton.com", micrositeName: "Myomaton" }, "/");
   assert.ok(page); assert.deepEqual(page.sections[0].image, image);
   assert.equal(page.sections[0].id, id(4));
   assert.equal(page.sections[0].name, "Introduction");
@@ -51,7 +54,7 @@ test("microsite resolves intro images through the Asset service and renders opti
   assert.deepEqual(page.sections[0].content, { heading: "Robots", text: "Keep text" });
   assert.ok(renderToStaticMarkup(<MicrositePageView page={page} />).includes(image.src));
   hasImage = false;
-  const absent = await service.getMicrositePageByDomain("myomaton.com", "/"); assert.ok(absent);
+  const absent = await service.getMicrositePage({ domain: "myomaton.com", micrositeName: "Myomaton" }, "/"); assert.ok(absent);
   assert.equal(absent.sections[0].image, null);
   const html = renderToStaticMarkup(<MicrositePageView page={absent} />);
   assert.ok(!html.includes("<img")); assert.ok(html.includes("Keep text"));

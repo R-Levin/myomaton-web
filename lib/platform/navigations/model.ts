@@ -1,4 +1,5 @@
 import { actionId as uuid, normalizeDestination } from "../actions/model";
+import { canonicalPagePath } from "../microsites/paths";
 
 export type NavigationSurface = "microsite" | "content";
 export type NavigationTargetType = "page" | "section" | "action" | "link";
@@ -73,9 +74,7 @@ export function navigationDestination(destination: unknown): string | null {
 
 export function pageDestination(page: { micrositeId: string; slug: unknown }, context?: NavigationContext): string | null {
   if (!context || !uuid(context.micrositeId) || uuid(page.micrositeId) !== uuid(context.micrositeId)) return null;
-  const slug = page.slug;
-  if (typeof slug !== "string" || !slug.startsWith("/") || /[?#]/.test(slug)) return null;
-  return normalizeDestination("link", slug);
+  return canonicalPagePath(page.slug);
 }
 
 export function sectionAnchor(configuration: unknown): string | null {
