@@ -1,4 +1,5 @@
 import "server-only";
+import { getSiteGlobals, type SiteGlobals } from "../site-globals/service";
 
 import { and, asc, eq } from "drizzle-orm";
 import { getSectionImages } from "@/lib/platform/assets/presentation-service";
@@ -40,6 +41,7 @@ export type ManagedSitePage = {
   sections: ManagedSiteSection[];
   designSystem: ResolvedDesignSystem;
   navigation?: Navigation | null;
+  globals?: SiteGlobals;
 };
 
 export type ManagedSiteSelection = { domain: string; managedSiteName: string };
@@ -54,6 +56,9 @@ export async function getManagedSitePage(
     .select({
       webPresenceId: webPresences.id,
       managedSite: { id: managedSites.id, name: managedSites.name },
+      presenceName: webPresences.name,
+      presenceConfiguration: webPresences.configuration,
+      siteConfiguration: managedSites.configuration,
     })
     .from(webPresences)
     .innerJoin(managedSites, eq(managedSites.webPresenceId, webPresences.id))
@@ -108,6 +113,9 @@ export async function getManagedSitePage(
   });
 
   return {
+    globals: await getSiteGlobals({ webPresenceId: match.webPresenceId, presenceName: match.presenceName,
+      presenceConfiguration: match.presenceConfiguration, managedSiteId: match.managedSite.id,
+      siteName: match.managedSite.name, siteConfiguration: match.siteConfiguration, pageId: match.page.id }),
     managedSite: match.managedSite,
     page: match.page,
     sections: supportedSections.map((section) => ({

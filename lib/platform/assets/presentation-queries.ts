@@ -50,5 +50,33 @@ export async function publicAsset(db: NodePgDatabase, domain: string, assetId: s
   if (presences.length > 1) throw new Error("Ambiguous public Web Presence.");
   if (!presences.length) return null;
   const eligible = await eligibleSectionAssets(db, presences[0].id);
-  return [...eligible.values()].find(({ asset }) => asset.id === id)?.asset ?? null;
+  const sectionAsset = [...eligible.values()].find(({ asset }) => asset.id === id)?.asset;
+  if (sectionAsset) return sectionAsset;
+  const logo = await eligibleLogo(db, presences[0].id);
+  return logo?.asset.id === id ? logo.asset : null;
+}
+
+// AssetUsage is the single logo reference. Never duplicate its Asset UUID in
+// configuration. Inspect all usages for the target, including foreign ownership,
+// so malformed or ambiguous associations cannot expose an image.
+async function eligibleLogo(db: NodePgDatabase, webPresenceId: string): Promise<EligibleUsage | null> {
+  const id = requireAssetUuid(webPresenceId);
+  const rows = await db.select({ usagePresenceId: assetUsages.webPresenceId, asset: getTableColumns(assets), configuration: assetUsages.configuration })
+    .from(webPresences)
+    .innerJoin(assetUsages, and(eq(assetUsages.entityId, webPresences.id), eq(assetUsages.entityType, "web_presence"), eq(assetUsages.role, "logo")))
+    .innerJoin(assets, eq(assets.id, assetUsages.assetId))
+    .where(and(eq(webPresences.id, id), eq(webPresences.status, "active")));
+  if (rows.length !== 1) return null;
+  const row = rows[0];
+  if (row.usagePresenceId !== id || row.asset.webPresenceId !== id || !presentImage(row.asset, row.configuration)) return null;
+  // Delivery requires an active Managed Site; inactive-only presences do not
+  // expose a logo merely because the presence record remains active.
+  const sites = await db.select({ id: managedSites.id }).from(managedSites)
+    .where(and(eq(managedSites.webPresenceId, id), eq(managedSites.status, "active"))).limit(1);
+  return sites.length ? { asset: row.asset, configuration: row.configuration } : null;
+}
+
+export async function logoImage(db: NodePgDatabase, webPresenceId: string): Promise<SectionImage | null> {
+  const logo = await eligibleLogo(db, webPresenceId);
+  return logo ? presentImage(logo.asset, logo.configuration) : null;
 }

@@ -22,7 +22,7 @@ import { sections } from "../../lib/platform/db/schema/sections";
 import { assets } from "../../lib/platform/db/schema/assets";
 import { assetUsages } from "../../lib/platform/db/schema/asset-usages";
 import { attachSectionAsset } from "../../lib/platform/assets/writes";
-import { publicAsset, sectionImages } from "../../lib/platform/assets/presentation-queries";
+import { publicAsset, sectionImages, logoImage } from "../../lib/platform/assets/presentation-queries";
 import { bootstrapMyomatonPhoto } from "../../scripts/customer-bootstrap/myomaton-photo";
 import { deliverPublicAsset } from "../../lib/platform/assets/delivery";
 
@@ -150,6 +150,53 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
     });
     const input = (f = first, id = randomUUID()) => ({ webPresenceId: f.presence.id, sectionId: f.section.id, assetId: id, type: "image" as const, mimeType: "image/jpeg", role: "image" as const, name: "Photo", altText: "Approved photo", width: 8, height: 6, sourceReference: `objects/${"a".repeat(64)}` });
     const firstInput = input();
+    await t.test("presence logo presentation and delivery require a unique owned active usage; globals render through production", async () => {
+      const f = await fixture();
+      const prepared = await prepareManagedBytes(await sharp({ create: { width: 40, height: 20, channels: 3, background: "blue" } }).png().toBuffer());
+      const [logo] = await db.insert(assets).values({ webPresenceId: f.presence.id, name: "Logo", type: "image", sourceType: "managed",
+        sourceReference: prepared.sourceReference, mimeType: prepared.mimeType, width: prepared.width, height: prepared.height, altText: "Business logo" }).returning();
+      await provisionManagedObject(temp, f.presence.id, prepared.sourceReference, prepared.bytes);
+      assert.equal(await logoImage(db, f.presence.id), null);
+      assert.equal(await publicAsset(db, f.presence.primaryDomain!, logo.id), null);
+      const [usage] = await db.insert(assetUsages).values({ webPresenceId: f.presence.id, assetId: logo.id, entityType: "web_presence", entityId: f.presence.id, role: "logo" }).returning();
+      assert.equal((await logoImage(db, f.presence.id))?.assetId, logo.id);
+      assert.equal((await publicAsset(db, f.presence.primaryDomain!, logo.id))?.id, logo.id);
+      for (const [table, rowId] of [[assets, logo.id], [managedSites, f.site.id], [webPresences, f.presence.id]] as const) {
+        await db.update(table).set({ status: "inactive" }).where(eq(table.id, rowId));
+        assert.equal(await logoImage(db, f.presence.id), null);
+        assert.equal(await publicAsset(db, f.presence.primaryDomain!, logo.id), null);
+        await db.update(table).set({ status: "active" }).where(eq(table.id, rowId));
+      }
+      const [foreign] = await db.insert(assets).values({ webPresenceId: second.presence.id, name: "Foreign", type: "image", sourceType: "managed", sourceReference: prepared.sourceReference, mimeType: prepared.mimeType, width: 40, height: 20, altText: "Foreign logo" }).returning();
+      const [badUsage] = await db.insert(assetUsages).values({ webPresenceId: second.presence.id, assetId: foreign.id, entityType: "web_presence", entityId: f.presence.id, role: "logo" }).returning();
+      assert.equal(await logoImage(db, f.presence.id), null, "ambiguous role fails closed even when one candidate is owned");
+      await db.delete(assetUsages).where(eq(assetUsages.id, usage.id));
+      assert.equal(await logoImage(db, f.presence.id), null, "foreign association cannot be used alone");
+      assert.equal(await publicAsset(db, f.presence.primaryDomain!, foreign.id), null);
+      await db.delete(assetUsages).where(eq(assetUsages.id, badUsage.id));
+      await db.insert(assetUsages).values(usage);
+      await db.update(assetUsages).set({ configuration: { image: { altText: 42 } } }).where(eq(assetUsages.id, usage.id));
+      assert.equal(await logoImage(db, f.presence.id), null);
+      await db.update(assetUsages).set({ configuration: {} }).where(eq(assetUsages.id, usage.id));
+      if (process.env.ASSET_TEST_PRODUCTION === "1") {
+        await db.update(webPresences).set({ primaryDomain: "myomaton.com", configuration: { business: { displayName: "Fixture brand", phone: "+12125550100", email: "hello@example.test", socials: { github: "https://github.com/example" } } } }).where(eq(webPresences.id, f.presence.id));
+        await db.update(managedSites).set({ configuration: { globals: { header: { showPhone: true }, footer: { showPhone: true, showEmail: true, showSocials: true } } } }).where(eq(managedSites.id, f.site.id));
+        const server = await startProductionFixture(adminUrl, name, temp);
+        try {
+          const response = await fetch(server.base); assert.equal(response.status, 200);
+          const html = await response.text();
+          assert.equal((html.match(/href="tel:\+12125550100"/g) ?? []).length, 2);
+          assert.ok(html.includes('href="mailto:hello@example.test"')); assert.ok(html.includes('href="https://github.com/example"'));
+          assert.ok(html.includes('alt="Fixture brand"'));
+          const media = await fetch(`${server.base}/media/assets/${logo.id}`); assert.equal(media.status, 200);
+          assert.deepEqual(Buffer.from(await media.arrayBuffer()), prepared.bytes);
+        } finally {
+          await server.stop();
+          await db.update(webPresences).set({ primaryDomain: f.presence.primaryDomain }).where(eq(webPresences.id, f.presence.id));
+        }
+      }
+      assert.deepEqual((await db.select().from(assets).where(eq(assets.id, logo.id)))[0], logo, "presentation never writes Asset defaults");
+    });
     await t.test("one reusable Asset resolves three usage-specific accessibility contexts and preserves delivery/identity", async () => {
       const target = await fixture();
       const candidate = input(target);

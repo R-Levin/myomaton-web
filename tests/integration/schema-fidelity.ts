@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readMigrationFiles } from "drizzle-orm/migrator";
 import type { Client } from "pg";
 
-export const fixtureTables = ["organizations", "web_presences", "managed_sites", "pages", "sections", "assets", "asset_usages"];
+export const fixtureTables = ["organizations", "web_presences", "managed_sites", "pages", "sections", "assets", "asset_usages", "design_systems", "actions", "navigations", "navigation_items"];
 
 // Use PostgreSQL itself to interpret the checked-in SQL, not another handwritten
 // Asset schema. Only schema qualification changes during disposable replay.

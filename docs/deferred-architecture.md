@@ -74,6 +74,15 @@ Asset enhancements.
 
 ## REQUIRED: Platform
 
+The [site-global foundation](site-globals.md) implements shared read-only business
+identity, controlled Header/Footer, optional Utility Navigation and a single typed
+policy flag with trusted override permissions. P15 is satisfied for this bounded
+resolver, not a policy UI or new customer writer. P14's shared presentation identity
+is established; production Contact/forms, SMTP/delivery, spam and privacy work remain
+gated. Logo read/delivery adds no attachment writer: A1/A2/A6 must be satisfied
+before a logo writer is introduced. Search, onboarding, analytics, legal content
+authoring and publishing are not implemented by this slice.
+
 The seed/customer-initialization part of P1 is implemented: generic seed contains
 only reference data; explicit Myomaton initialization creates a fresh customer
 graph atomically and performs no child repair or updates once the Web Presence

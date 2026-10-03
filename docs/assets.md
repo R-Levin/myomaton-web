@@ -197,6 +197,11 @@ future usage writers must preserve this contract and A1/A2 attachment integrity.
 
 ### Eligibility and bytes
 
+The [site-global foundation](site-globals.md#asset-backed-primary-logo) also reads
+the singular Web Presence `logo` AssetUsage role and permits its eligible image
+through the same media route. It adds no logo writer, storage copy or customer
+association. Other Section media eligibility below is unchanged.
+
 Canonical Asset reads still include all statuses. Separate presentation reads batch
 resolve images and require active Assets and active Section/Page/Managed Site/Web
 Presence ancestors, matching ownership, `intro` section type and the applicable `image` or `attachment` role.

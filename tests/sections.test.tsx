@@ -60,12 +60,21 @@ test("all section types render one resolved Action and escaped text; unsafe or u
   }
 });
 
-test("Intro layouts use associated images, text-first reading order, and clean text-only fallback", () => {
+test("Intro layouts use one image and heading/media/body/Action split source order with clean text-only fallback", () => {
   for (const variant of ["stack", "split-text-first", "split-image-first"]) {
     const html = render({ variant, image, action });
     assert.ok(html.includes(`data-layout="${variant}"`));
     assert.ok(html.includes(image.src));
     assert.ok(html.indexOf("Heading") < html.indexOf("<img"));
+    assert.equal((html.match(/<h2/g) ?? []).length, 1);
+    assert.equal((html.match(/<img/g) ?? []).length, 1);
+    if (variant !== "stack") {
+      assert.ok(html.indexOf("<img") < html.indexOf("Body"));
+      assert.ok(html.indexOf("Body") < html.indexOf("Read more"));
+      const withoutAction = render({ variant, image, action: null });
+      assert.ok(withoutAction.includes("Heading") && withoutAction.includes("Body") && withoutAction.includes("<img"));
+      assert.ok(!withoutAction.includes("href="));
+    }
     assert.match(html, /width="640" height="480"/);
     const absent = render({ variant, image: null, content: { heading: "Heading", imageUrl: "https://bad.example", assetId: id } });
     assert.match(absent, /data-layout="stack"/);
@@ -89,7 +98,11 @@ test("platform CSS owns responsive geometry and maps presentation to existing De
   const css = readFileSync("app/globals.css", "utf8");
   assert.match(css, /@media \(min-width: 48rem\)/);
   assert.match(css, /grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\)/);
-  assert.match(css, /split-image-first"\] \.managed-site-section-media \{ grid-column: 1; grid-row: 1;/);
+  assert.match(css, /split-image-first"\] \.managed-site-section-media \{ grid-column: 1; grid-row: 1 \/ 5;/);
+  assert.match(css, /data-layout\^="split-"\] \.managed-site-section-heading \{ grid-column: 1; grid-row: 2;/);
+  assert.match(css, /data-layout\^="split-"\] \.managed-site-section-copy \{ grid-column: 1; grid-row: 3;/);
+  assert.match(css, /data-layout\^="split-"\] \.managed-site-section-media \{ grid-column: 2;/);
+  assert.match(css, /split-image-first"\] :is\(\.managed-site-section-heading, \.managed-site-section-copy\) \{ grid-column: 2;/);
   assert.match(css, /height: auto/);
   assert.match(css, /object-fit: contain/);
   assert.match(css, /object-fit: cover/);

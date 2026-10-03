@@ -94,6 +94,7 @@ test("managedSite batches Subject and item Action dependencies, preserves curate
     "drizzle-orm": orm, "@/lib/platform/db/connection": connection, "@/lib/platform/db/schema/actions": actions, "./model": actionModel,
   });
   const service = loadService("lib/platform/managed-sites/service.ts", {
+    "../site-globals/service": { getSiteGlobals: async () => undefined },
     "./paths": paths,
     "drizzle-orm": orm, "@/lib/platform/db/connection": connection,
     "@/lib/platform/db/schema/managed-sites": sites, "@/lib/platform/db/schema/pages": pages,

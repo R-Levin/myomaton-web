@@ -337,7 +337,14 @@ unresolved implementation requirements.
 
 ## 11. Managed Site global capabilities
 
-**Core planned:** a bounded site-wide layer above Pages/Sections for branding/logo,
+**Implemented foundation:** Web Presence-owned public display name, phone/email
+and bounded social destinations; AssetUsage-backed logo read/delivery with name
+fallback; controlled responsive Header/Footer; existing Primary and optional
+separate Utility Navigation; optional configured Header Action and generated
+copyright. See [site globals](site-globals.md). No customer-state writer or editor
+is included; the full Business / Contact Identity domain remains planned.
+
+**Core planned beyond this foundation:** a bounded site-wide layer above Pages/Sections for branding/logo,
 Header, Footer, primary and utility Navigation, a shared Contact experience,
 social profiles, Search where useful, site-wide conversion behavior and
 analytics/integration configuration. Existing canonical Navigation is implemented;
@@ -379,7 +386,10 @@ technology, economics, safety/abuse or service constraints justify them.
 Examples include Gallery recommended item count/soft maximum, upload limits,
 Navigation depth, Search policy, managed-video availability, revision retention,
 client Flex Page access and automation/approval defaults. These are not arbitrary
-CSS/design controls. The policy layer and UI are not implemented; current code
+CSS/design controls. A minimal typed precedence foundation is implemented for
+the social-link capability flag with trusted service-level override permissions;
+see [site policy](site-globals.md#bounded-platform-policy). The broader policy
+settings and UI are not implemented; current code
 limits (such as managed-object size limits) still apply. Allowed overrides must
 respect enforced safety/service boundaries and protected business truth.
 

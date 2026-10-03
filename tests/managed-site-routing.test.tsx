@@ -68,6 +68,7 @@ function fixture() {
     throw new Error(`Unexpected query: ${query.text}`);
   } };
   const service = loadService("lib/platform/managed-sites/service.ts", {
+    "../site-globals/service": { getSiteGlobals: async () => undefined },
     "./paths": paths, "./sections": sectionModel, "./collections": collections,
     "drizzle-orm": orm, "@/lib/platform/db/connection": { db: drizzle({ client: client as unknown as Pool }) },
     "@/lib/platform/db/schema/managed-sites": sites, "@/lib/platform/db/schema/pages": pages,

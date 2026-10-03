@@ -23,6 +23,11 @@ export function SectionRenderer({ section }: { section: ManagedSiteSection }) {
   const Heading = type === "hero" ? "h1" : "h2";
   const image = type === "intro" ? section.image : null;
   const layout = image ? variant : type === "intro" ? "stack" : variant;
+  const split = image && (layout === "split-text-first" || layout === "split-image-first");
+  const media = image && <div className="managed-site-section-media">
+    <Image className="managed-site-photo" src={image.src} alt={image.alt}
+      width={image.width} height={image.height} unoptimized />
+  </div>;
 
   return (
     <section
@@ -38,16 +43,17 @@ export function SectionRenderer({ section }: { section: ManagedSiteSection }) {
       data-columns={normalized.type === "collection" ? normalized.configuration.columns : undefined}
     >
       <div className="managed-site-section-inner">
+        {split && <>
+          <div className="managed-site-section-heading">{heading && <Heading>{heading}</Heading>}</div>
+          {media}
+        </>}
         <div className="managed-site-section-copy">
           {normalized.type === "hero" && normalized.content.eyebrow && <p className="managed-site-eyebrow">{normalized.content.eyebrow}</p>}
-          {heading && <Heading>{heading}</Heading>}
+          {!split && heading && <Heading>{heading}</Heading>}
           <PlainTextParagraphs text={text} />
           <SectionAction action={action} />
         </div>
-        {image && <div className="managed-site-section-media">
-          <Image className="managed-site-photo" src={image.src} alt={image.alt}
-            width={image.width} height={image.height} unoptimized />
-        </div>}
+        {!split && media}
         {items.length > 0 && <ul className="managed-site-collection" role="list">
           {items.map((item) => <li key={item.id} className="managed-site-collection-item">
             <h3>{item.heading}</h3>

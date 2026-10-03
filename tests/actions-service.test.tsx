@@ -71,6 +71,7 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
   assert.equal(actionQueries, 1);
 
   const managedSiteService = loadService("lib/platform/managed-sites/service.ts", {
+    "../site-globals/service": { getSiteGlobals: async () => undefined },
     "./paths": paths,
     "./sections": sectionModel,
     "./collections": collections,
@@ -120,6 +121,6 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
     assert.ok(fallback.includes("First"));
     assert.ok(fallback.includes("Second"));
     assert.ok(fallback.includes("Third"));
-    assert.ok(!fallback.includes("href="));
+    assert.ok(!fallback.split("<main>")[1].split("</main>")[0].includes("href="), "unresolved Section Actions are omitted; branding may still link Home");
   }
 });

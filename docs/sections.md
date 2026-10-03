@@ -22,9 +22,12 @@ their existing semantics.
 Hero and CTA use the `default` variant. Intro supports `stack`, `split-text-first`
 and `split-image-first`; null, `default`, and unsupported variants fall back to
 stack. Images come exclusively from AssetUsage via the existing presentation
-service. Absent images render text-only stacked structure. Text and Action lead
-in DOM/mobile reading order; the image-first variant moves the image left only
-at the platform's desktop breakpoint (48rem).
+service. Absent images render text-only stacked structure. Both split variants
+use heading → image → body → Action in source/mobile reading order, without
+duplicate content. At the platform's desktop breakpoint (48rem), grid placement
+groups heading/body/Action in the text column: left for split-text-first, right
+for split-image-first, with media in the opposite column. Stack remains unchanged.
+There is no customer-configurable mobile order or breakpoint.
 
 Validated `Section.configuration` options:
 
