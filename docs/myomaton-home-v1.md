@@ -140,6 +140,11 @@ order, configuration and metadata remain unchanged. All other Navigation stays i
 
 ## Verification and architecture assessment
 
+The later [secondary Pages transition](myomaton-secondary-pages-v1.md) deliberately
+changes Navigation. After it is applied, this historical Home v1 updater is
+expected to refuse the evolved state. Its original guards and baseline remain
+frozen; do not broaden them to accept subsequent customer transitions.
+
 `tests/myomaton-home-v1.test.tsx` executes the real planner and SQL writer against
 an isolated in-memory SQL fixture. It covers all conflict/preservation cases,
 Subject/Action reuse, rendering normalization, exact no-op, and forced rollback

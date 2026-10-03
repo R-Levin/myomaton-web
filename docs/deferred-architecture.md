@@ -45,6 +45,14 @@ accessibility](assets.md#usage-specific-image-accessibility). This does not comp
 usage editing, captions, cropping, focal points or renditions. Future usage writers
 must preserve these semantics and the existing A1/A2/A6 gates.
 
+The applied [Myomaton secondary Pages transition](myomaton-secondary-pages-v1.md)
+applies these gates to two additional intro image usages: ownership-chain locking,
+transactional attachment, contextual alt fallback and disposable PostgreSQL
+rollback/rendering coverage. This is a bounded customer-state operation, not
+general Asset lifecycle management or a new platform capability. Its frozen
+baseline/complete-result guards also satisfy the ongoing P1 gate for this writer;
+customer editing, revisions, publishing, P9 and P10 remain deferred.
+
 | ID | Deferred requirement | Implementation trigger / reason |
 | --- | --- | --- |
 | A1 | Validate AssetUsage target existence and Web Presence ownership, following Page/Section ownership through their parents. | Before each additional target writer or operation. Section intro image/document attachment is covered; the composite FK still does not validate generic targets. |
