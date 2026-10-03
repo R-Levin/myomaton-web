@@ -3,7 +3,7 @@
 ## Purpose
 
 This document defines the intended capability envelope of the managed Web Presence
-platform: a data-driven lead-generation and business-presence system, not a
+platform: a managed traffic/lead-generation and business-presence system, not a
 free-form page builder or general-purpose CMS.
 
 **Web Presence** is the broader customer-owned managed presence. A **Managed
@@ -11,6 +11,10 @@ Site** is one concrete rendered/deployable multi-page site within it; a **Page**
 is addressable content within that site. “Conversion Site” may be product-facing
 wording, but is not an internal/domain type. Historical “Microsite” terminology
 refers to the current Managed Site concept; see the [rename deployment note](managed-site-rename.md).
+
+The Managed Site is the public conversion-focused surface / tip of the funnel.
+Structured customer/business knowledge is canonical and reusable. Pages and
+Sections consume that knowledge rather than owning duplicated global facts.
 
 The platform aims to:
 
@@ -20,10 +24,15 @@ The platform aims to:
   site-builder complexity.
 - Favor controlled semantic choices and platform-owned responsive behavior.
 - Keep customer/business state structured, reusable, and manageable as a service.
+- Make onboarding, first-party measurement and continuous optimization core
+  product functions, with explicit approval policy and protected business truth.
 
 Myomaton is Customer #1 and the proving ground for these capabilities. Its content
 is canonical customer state, not a permanent platform template. See the
 [customer-state and bootstrap boundaries](bootstrap.md).
+Customer 0 is the concept for the product's own Web Presence; it does not imply
+an existing customer record. The [onboarding and optimization operating model](onboarding-optimization.md)
+records the core planned workflow and its trust/provider boundaries.
 
 ## Status vocabulary
 
@@ -133,8 +142,10 @@ Campaign / Landing, and Flex / Generic.
 
 The current Page/Section foundation, Myomaton Home and active multi-page serving
 within an explicitly selected Managed Site are **Implemented**. See
-[Managed Site routing](managed-site-routing.md). Archetype automation, secondary customer
-content and production host/domain routing are not thereby implemented.
+[Managed Site routing](managed-site-routing.md). Myomaton's Home, About, Projects
+and Principles are accepted canonical customer state; see the
+[secondary Pages transition](myomaton-secondary-pages-v1.md). This does not
+implement general archetype automation or production host/domain routing.
 Archetypes describe page purpose and sensible composition, not a requirement to
 create one of every kind.
 
@@ -205,9 +216,21 @@ Classify content by its primary purpose, not merely by length or format.
 | Convert/contact and find locations/people. | Thought leadership and long-form education. |
 | See persuasive projects, testimonials, galleries or proof. | Editorial archive/history. |
 
-WordPress is the initial Content Engine provider, not a platform assumption.
-Content Engine integration and its canonical-state, editing and publishing
-requirements are **Deferred** at the triggers in the architecture register.
+**Core planned:** a minimal native Article/Update publishing capability: title,
+slug, featured image, excerpt/summary, publish state/date, optional author, one
+coherent constrained rich-text body, standard listing/archive and article
+presentation, internal analytics, and SEO/discovery metadata when that capability
+exists. The body is similar in spirit to the classic WordPress editor; it is not
+arbitrary Section composition or a Gutenberg/Divi-style builder. General design
+and rendering capabilities may be reused without changing that boundary.
+
+Articles can carry much of the ongoing discovery/content optimization work, with
+deliberate internal links into conversion-oriented Managed Site Pages.
+**Optional/later:** WordPress or another external Content Engine for publishing
+needs beyond the native capability. Neither is a baseline dependency.
+This supersedes the earlier decision naming WordPress as the initial provider;
+the provider boundary and canonical-state/approval safeguards remain. Concrete
+publishing and integration requirements are **Deferred** at register triggers.
 Editorial archive/history does not imply indefinite retention of platform
 revisions, logs or backups; the register's retention constraints still apply.
 
@@ -227,6 +250,15 @@ These are deployment/adoption modes, not separate architectures. They share
 structured customer state, supported capabilities and the same product boundaries;
 listing the modes does not claim their deployment workflows are complete.
 
+“Keep what you have” means coexistence/integration, not ingestion, reconstruction
+or migration of an existing Web Presence into the Managed Site model. A Managed
+Site may become the conversion-focused face/front-end while an existing site,
+Content Engine or infrastructure remains in place. Initially this is an
+operator-assisted/custom integration mode: URL ownership, routing, SEO/canonical
+behavior, forms and analytics need explicit coordination. Standardize only when
+repeatable patterns justify it. Full Presence and Campaign are the easier modes
+to standardize, not claims of already completed deployment workflows.
+
 ## 7. Capability-growth rule
 
 For a client request:
@@ -236,10 +268,10 @@ For a client request:
    need consistent with the product mission.
 3. **Flex Page:** use existing capabilities in an unusual combination when normal
    Page archetypes are too restrictive.
-4. **Content Engine / external system:** use when the requirement is fundamentally
+4. **Native Content Engine / external system:** use when the requirement is fundamentally
    publishing-heavy, operational, transactional, or outside the Web Presence
-   mission. Publishing fits the Content Engine; other systems own operational
-   and transactional behavior.
+   mission. Simple publishing fits native Articles; heavier publishing may justify
+   an external Content Engine. Other systems own operational and transactional behavior.
 5. **Outside product fit:** some requirements, particularly exhaustive pixel-level
    design control, may simply be incompatible with the service.
 
@@ -263,7 +295,7 @@ and operational verification:
 - SMTP/outbound email.
 - Email deliverability/sender-domain setup.
 - Spam protection.
-- Analytics/conversion measurement.
+- First-party analytics/conversion measurement, independent of optional GA4/Search Console integration.
 - SEO metadata.
 - Sitemap/robots/canonical URLs.
 - Structured data.
@@ -302,3 +334,65 @@ Before each implementation slice:
 The catalog is not an implementation plan, schema specification, or completion
 log. The active register remains the place to record concrete triggers and
 unresolved implementation requirements.
+
+## 11. Managed Site global capabilities
+
+**Core planned:** a bounded site-wide layer above Pages/Sections for branding/logo,
+Header, Footer, primary and utility Navigation, a shared Contact experience,
+social profiles, Search where useful, site-wide conversion behavior and
+analytics/integration configuration. Existing canonical Navigation is implemented;
+this list does not claim a complete global capability layer or its authoring UI.
+
+Header/Footer are controlled semantic capabilities, not arbitrary builders.
+Logo belongs in structured onboarding/business data with a sensible business-name
+fallback when absent. Search is conditional on usefulness and content scale.
+Shared canonical contact information should support a Contact Page, Contact
+Section, overlay/drawer/modal experience and clickable phone/email Actions without
+duplicating global facts in each presentation.
+
+## 12. Onboarding, measurement and optimization
+
+**Core planned:** conditional guided onboarding, ongoing direct updates to global
+business knowledge, canonical first-party analytics and a continuous
+measure → analyze → recommend → approve/implement → measure-again loop.
+Operator-assisted intake can support initial production sales before full
+customer self-service automation. GA4 and Google Search Console are optional
+structured integrations, never dependencies of measurement or optimization.
+
+AI/API assistance belongs behind a provider-neutral intelligence boundary for
+intake interpretation, analytics summaries, opportunity detection, content/Article
+recommendations and drafting, metadata, internal links and controlled proposals.
+Approval is first-class customer/service policy and can vary by operation.
+Canonical business facts must never be autonomously invented or silently changed.
+See the [operating model](onboarding-optimization.md) for protected facts, event
+scope, approval examples and the native publishing workflow. None of these
+planned workflows is claimed as implemented by current operator tooling.
+
+## 13. Bounded platform/service policy
+
+**Core planned:** validated operational/product settings with conceptual layers
+of platform default, operator/service policy, and Web Presence / Managed Site
+override where allowed. Distinguish a capability from its current recommendation,
+default, soft maximum or enforced limit. Avoid arbitrary hard limits unless
+technology, economics, safety/abuse or service constraints justify them.
+
+Examples include Gallery recommended item count/soft maximum, upload limits,
+Navigation depth, Search policy, managed-video availability, revision retention,
+client Flex Page access and automation/approval defaults. These are not arbitrary
+CSS/design controls. The policy layer and UI are not implemented; current code
+limits (such as managed-object size limits) still apply. Allowed overrides must
+respect enforced safety/service boundaries and protected business truth.
+
+## 14. Ownership and operating principles
+
+Customer ownership, usable export and easy exit/no lock-in remain product
+principles, subject to explicit retention and offboarding policies. Export is
+still gated by P5, not claimed as implemented. Full Presence, Adjunct and Campaign
+share the same architecture; Customer 0 and Myomaton Customer #1 are proving
+contexts, not separate product architectures.
+
+Measure infrastructure and AI usage per customer. Human service minutes per
+customer are a critical scalability metric, alongside business outcomes. Guided
+operator-assisted onboarding allows selling before complete self-service.
+Final pricing, 90-day promotion terms, Kickstarter plans and revenue forecasts
+remain business/marketing experiments, not architectural requirements.

@@ -1,5 +1,11 @@
 # Local homepage workflow
 
+> Historical: this describes the superseded local-file/Puck prototype, not the
+> active PostgreSQL-backed Managed Site or an implemented customer editor/publisher.
+> Its routes, storage and commands below are retained as historical context.
+> Current intended workflows are in [onboarding and optimization](onboarding-optimization.md),
+> with implementation gates in [deferred architecture](deferred-architecture.md).
+
 Run `npm.cmd run dev` and open `/editor`.
 
 - **Working copy:** Puck page data and the separate SiteTheme in React state.

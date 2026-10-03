@@ -10,6 +10,11 @@ product envelope; this register owns active implementation state, triggers and
 deferred requirements. A capability's inclusion there does not by itself create
 a backlog item here.
 
+The [onboarding and optimization operating model](onboarding-optimization.md)
+records foundational knowledge, measurement, approval and publishing decisions.
+Review it when applying the related gates below; its planned capabilities are
+not claims of implementation.
+
 ## Classifications and status
 
 - **REQUIRED**: established requirement; implementation is pending until its trigger. Do not silently omit it when triggered.
@@ -101,18 +106,29 @@ adds no customer Pages or authoring workflow; P9 and P10 remain deferred.
 | P8 | Preserve structurally multi-page Managed Sites; any page-count restriction is product policy, not a schema limitation. | Whenever page management, product limits, or Managed Site schema changes are introduced. |
 | P9 | Implement robust request-host/domain-to-Web-Presence / Managed Site resolution. | Before production multi-presence/tenant routing depends on request domains. |
 | P10 | Define a validated canonical Page/Web Presence SEO metadata contract, including description and public canonical-URL rules. Do not treat untyped metadata JSON or Section copy as that contract. | Before SEO metadata authoring or production indexing/launch. Multi-page routing currently uses Page title with name fallback; the schema has no defined description contract. See [routing metadata](managed-site-routing.md#metadata-and-not-found-behavior). |
+| P11 | Define conditional guided intake, trusted fact confirmation and direct subsequent updates to canonical/global business knowledge; preserve shared consumers rather than copying facts into Pages. Apply P1/P2/P3/P7 to the writer and customer access. | Before production onboarding writes, including operator-assisted intake; authorization and complete review/update paths before customer self-service onboarding. |
+| P12 | Establish canonical first-party event semantics, conversion/outcome distinctions, tenant/site scope, privacy/consent, minimization, access and bounded retention. Optional GA4/Search Console configuration must not be required for internal measurement. | Before production analytics collection or analytics-driven optimization. |
+| P13 | Define a provider-neutral intelligence boundary and per-customer usage attribution. Enforce operation-scoped approval, protected business truth, current-state validation and bounded change provenance; pricing/offers require explicit approval. | Provider/data-access boundary before the first intelligence/API integration; approval and change safeguards before automated optimization can write or publish. Reuse P1/P2/P3/P7 and C3. |
+| P14 | Define shared canonical contact data and its Page/Section/global consumers, accessible Contact interactions, submission validation/delivery, spam protection, privacy/access/retention and measurement integration. | Before production Contact/forms; apply P7 to management and P12 to collected events. Existing contact Actions do not complete this requirement. |
+| P15 | Define typed policy scopes, precedence, permitted overrides, enforced boundaries and operator/customer authorization; distinguish recommendations/soft maxima from hard limits. | Before introducing configurable layered service policy or a generalized Platform Policy UI. Reuse A7/P4/P7 for video, retention and access constraints. |
+| P16 | Establish URL ownership/routing, canonical/SEO responsibility, forms and analytics ownership for coexistence deployments; do not ingest/reconstruct the existing presence. | Before each custom “keep what you have” integration; require demonstrated repeatable patterns and a supported contract before standardizing the mode. Reuse P9/P10/P12/P14 where triggered. |
 
 ## REQUIRED: Content Engine
 
+The native Article baseline and optional external-engine direction supersede the
+earlier WordPress-first decision. C1/C7 reflect that explicit change; existing
+canonical-state, approval and external-edit divergence safeguards remain.
+See the [native publishing model](onboarding-optimization.md#native-articles-and-optional-external-engines).
+
 | ID | Requirement to implement or preserve | Implementation trigger / reason |
 | --- | --- | --- |
-| C1 | Keep ContentEngine a provider boundary. WordPress is the initial provider, not a core platform assumption. | At Content Engine integration and subsequent provider/domain changes. |
-| C2 | Maintain canonical platform state for platform-managed articles; WordPress must not be their only authoritative copy. | Before creating or managing articles through the platform. |
+| C1 | Keep external Content Engines behind a provider boundary. Native Articles are the intended baseline; WordPress or another external engine is optional for heavier needs, never a platform dependency. | At native publishing and external Content Engine integration or provider/domain changes. |
+| C2 | Maintain canonical platform state for platform-managed Articles; an external engine must not be their only authoritative copy. | Before creating or managing Articles through the platform. |
 | C3 | Let customers preview and approve managed content before publication unless an explicit autonomy policy authorizes automatic publishing. Make publishing autonomy explicit, such as approval-required versus automatic. | Preview/approval: before managed publication. Autonomy policy: before automated publishing. |
-| C4 | Support editing managed Content Engine content through the platform rather than requiring WordPress Admin. | When the managed-content editing workflow is introduced. |
+| C4 | Support editing managed Content Engine content through the platform rather than requiring an external CMS administration interface. | When the managed-content editing workflow is introduced. |
 | C5 | Detect and reconcile divergence; direct CMS edits must not be silently overwritten. | When two-way/direct CMS editing becomes possible, including integrations where direct editing is already available. |
 | C6 | Distinguish platform-managed content from external/unmanaged CMS content. | When integrating existing Content Engine content. |
-| C7 | Constrain the initial WordPress/content model to title, one featured image, and one coherent article body; add structured discovery/SEO/social/taxonomy metadata only when publishing/discovery/optimization needs justify it. | At initial content modeling and each field/model expansion. |
+| C7 | Implement the bounded native Article contract in the capability catalog, including safe constrained-body validation/rendering, publication state/date, listing/article routes, Asset usage and approval. Bodies are not arbitrary Sections. Reuse C2/C3, A1/A2/A6, P2/P7/P10/P12 for canonical state, publishing, media, access, SEO and analytics. | Before native Article publishing; recheck scope at each model expansion. No general block/page builder is implied. |
 | C8 | Do not expand into general remote WordPress administration without a concrete requirement. Drive Content Engine complexity by discovery, publishing, syndication, attribution, or optimization utility. | At every proposed Content Engine capability expansion. |
 
 ## OPEN
@@ -130,3 +146,5 @@ adds no customer Pages or authoring workflow; P9 and P10 remain deferred.
 | D2 | Backup is not archive; backup retention must also be bounded. Long-term archival history beyond the stated retention/export policy is not implicitly the platform's responsibility. | Designing backup, archival, retention, and customer-facing service policies. |
 | D3 | Lightweight audit/provenance may outlive full historical content. For stored information, architecture must be able to explain why it is retained and when it can be deleted. | Adding stored information or defining its retention policy; this is not a permanent-audit mandate. |
 | D4 | Exportability is an architecture check: new domains must keep customer-owned canonical state clearly separable from platform machinery and capable of eventual export where applicable. | Reviewing every new customer-data domain; implementing export is gated by P5. |
+| D5 | Preserve canonical first-party measurement, trusted business knowledge and operation-scoped approval across onboarding and optimization; provider output is not business truth. | Designing intake, intelligence, measurement or automated changes; see P11-P13 and the operating model. |
+| D6 | Keep service economics observable per customer: infrastructure/AI usage and human service minutes. Do not encode experimental pricing, promotion terms, crowdfunding plans or forecasts as invariants. | Adding metered integrations, service workflows and operating reports. |
