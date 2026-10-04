@@ -22,6 +22,7 @@ export type NormalizedSection = { configuration: SectionPresentation } & (
   | { type: "hero"; variant: "default"; content: SectionContent & { eyebrow?: string } }
   | { type: "intro"; variant: "stack" | "split-text-first" | "split-image-first"; content: SectionContent }
   | { type: "cta"; variant: "default"; content: SectionContent }
+  | { type: "contact"; variant: "default"; content: SectionContent & { contact_definition_id: string } }
   | { type: "collection"; variant: "grid"; content: CollectionContent; configuration: { columns: 2 | 3 } }
 );
 
@@ -68,7 +69,7 @@ function collectionContent(input: Record<string, unknown>): CollectionContent | 
 export function normalizeSection(value: unknown): NormalizedSection | null {
   const section = record(value);
   const type = section.type;
-  if (type !== "hero" && type !== "intro" && type !== "cta" && type !== "collection") return null;
+  if (type !== "hero" && type !== "intro" && type !== "cta" && type !== "collection" && type !== "contact") return null;
   const input = record(section.content);
   const config = record(section.configuration);
   const content: SectionContent & { eyebrow?: string } = {};
@@ -92,6 +93,10 @@ export function normalizeSection(value: unknown): NormalizedSection | null {
     const collection = collectionContent(input);
     return collection ? { type, variant: "grid", content: collection,
       configuration: { ...configuration, columns: config.columns === 3 ? 3 : 2 } } : null;
+  }
+  if (type === "contact") {
+    const definitionId = actionId(input.contact_definition_id);
+    return definitionId ? { type, variant: "default", content: { ...content, contact_definition_id: definitionId }, configuration } : null;
   }
   return type === "intro"
     ? { type, variant: choice(section.variant, ["stack", "split-text-first", "split-image-first"], "stack"), content, configuration }

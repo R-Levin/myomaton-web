@@ -62,6 +62,9 @@ classifications serve a different purpose from the capability statuses above.
 - **Action:** first-class labels and destinations referenced by Sections and
   Navigation, including stable Page UUID targets resolved within the selected
   Managed Site at presentation time. See [Actions](actions.md).
+- **Contact Definition:** multiple reusable finite form contracts per Web Presence,
+  with versioned acceptance and expiring submissions. This is a bounded foundation,
+  not a CRM or public-production activation. See [Contact/forms](contact-forms.md).
 
 **Core planned:**
 
@@ -101,6 +104,7 @@ complex SKU/variant systems. Those belong to external systems/integrations.
 | Implemented | Editorial | Current stored type `intro`: stack and text/media split, with controlled semantic presentation variants. Current rendered media support is associated images. |
 | Implemented | Collection | Inline editorial items or Subject-backed items; controlled 2/3-column grids. |
 | Implemented | CTA | Structured heading, plain text and optional Action. |
+| Implemented foundation | Contact | References one reusable Contact Definition, canonical phone/email and an accessible finite form. Public-production submission activation remains gated. |
 
 See [Section presentation](sections.md) for the implemented variants, safe
 plain-text paragraphs, validation and finite configuration choices.
@@ -110,8 +114,8 @@ plain-text paragraphs, validation and finite configuration choices.
 - Gallery.
 - Testimonials.
 - Locations.
-- Contact Information.
-- Lead / Contact Form.
+- Broader Contact experiences beyond the implemented Section, including overlay
+  and production lead-form delivery/abuse/retention operations.
 - Metrics / Statistics.
 - Logo / Client Strip.
 - FAQ.

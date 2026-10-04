@@ -42,6 +42,11 @@ directly without repeating the interview or editing every consuming Page.
 Authenticated, authorized editing, validation, provenance and publication effects
 must be designed at the existing P1/P2/P3/P7 gates; they are not currently complete.
 
+The [Contact foundation](contact-forms.md) adds reusable finite definitions and
+private, expiring submissions. Inquiry fields are visitor input, not automatically
+canonical business truth. Its accepted-submission hook is not the analytics
+collection/reporting system described below.
+
 ## Canonical first-party measurement
 
 First-party/internal analytics is the canonical product measurement system.

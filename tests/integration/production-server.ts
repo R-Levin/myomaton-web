@@ -7,7 +7,7 @@ export async function startProductionFixture(databaseUrl: string, schema: string
   const reservation = createServer(); reservation.listen(0, "127.0.0.1"); await once(reservation, "listening");
   const port = (reservation.address() as { port: number }).port;
   await new Promise<void>((resolve, reject) => reservation.close(error => error ? reject(error) : resolve()));
-  if (!/^myomaton_(?:asset_test|rename_test)_[a-f0-9]{32}(?:_\w+)?$/.test(schema)) throw new Error("Disposable schema required");
+  if (!/^myomaton_(?:asset_test|rename_test|contact_test)_[a-f0-9]{32}(?:_\w+)?$/.test(schema)) throw new Error("Disposable schema required");
   const url = new URL(databaseUrl); url.searchParams.set("options", `-c search_path=${schema} -c default_transaction_read_only=on`);
   const child = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port)], {
     env: { ...process.env, DATABASE_URL: url.toString(), MYOMATON_ASSET_ROOT: root }, windowsHide: true, stdio: "ignore",

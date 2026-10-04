@@ -10,6 +10,8 @@ import { baseline } from "../scripts/customer-updates/myomaton-home-v1";
 
 // Immutable historical evidence: old terminology here is intentional.
 const historicalHashes = {
+  "lib/platform/db/migrations/meta/0006_snapshot.json": "a6fd0151ebd742d05b947f9f857716c84f5d17b42266f926438c7c5300005142",
+  "lib/platform/db/migrations/0006_managed-site-terminology.sql": "916b37ef27eba28149f1093a170993026f080a5258276d59c30180d1c2a83180",
   "scripts/customer-updates/myomaton-home-v1-baseline.json": "dc80495e2360624250750dd0eea24f355c361b578cdecb8731de17543c780c44",
   "lib/platform/db/migrations/0000_initial-foundation.sql": "44f936f11b8d7498c653af3b6e83fe068d4dd756d0ba83c091bb6dffd117b924",
   "lib/platform/db/migrations/0001_microsite-foundation.sql": "6f0c72eb9c90c40a28bcf351bb6ff8d0c8c8b3578a3a0d11e647aae9d113f271",
@@ -74,7 +76,8 @@ test("historical migrations, snapshots, journal entries and frozen Home v1 evide
     assert.equal(createHash("sha256").update(readFileSync(file)).digest("hex"), hash, file);
   }
   const journal = JSON.parse(readFileSync("lib/platform/db/migrations/meta/_journal.json", "utf8"));
-  assert.deepEqual(journal.entries.slice(0, 6), historicalJournal); assert.equal(journal.entries.length, 7);
+  assert.deepEqual(journal.entries.slice(0, 6), historicalJournal); assert.equal(journal.entries.length, 8);
+  assert.deepEqual(journal.entries[6], { idx: 6, version: "7", when: 1790959692569, tag: "0006_managed-site-terminology", breakpoints: true });
   const old = JSON.parse(readFileSync("scripts/customer-updates/myomaton-home-v1-baseline.json", "utf8"));
   const { microsites, ...rest } = old;
   assert.deepEqual(baseline, { ...rest, managed_sites: microsites,
@@ -82,16 +85,19 @@ test("historical migrations, snapshots, journal entries and frozen Home v1 evide
   });
 });
 
-test("new Drizzle snapshot exactly matches the renamed active schema and links to 0005", async () => {
+test("Contact Drizzle snapshot matches active schema and adds only the two tables to 0006", async () => {
   const imports: Record<string, unknown> = {};
   for (const file of readdirSync("lib/platform/db/schema").filter(f => f.endsWith(".ts"))) {
     Object.assign(imports, await import(pathToFileURL(resolve("lib/platform/db/schema", file)).href));
   }
-  const previous = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0005_snapshot.json", "utf8"));
-  const snapshot = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0006_snapshot.json", "utf8"));
+  const previous = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0006_snapshot.json", "utf8"));
+  const snapshot = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0007_snapshot.json", "utf8"));
   const generated = generateDrizzleJson(imports, previous.id);
   assert.deepEqual(JSON.parse(JSON.stringify({ ...generated, id: snapshot.id })), snapshot);
   assert.equal(snapshot.prevId, previous.id);
+  const existing = { ...snapshot.tables };
+  delete existing["public.contact_definitions"]; delete existing["public.contact_submissions"];
+  assert.deepEqual(existing, previous.tables);
   assert.ok(snapshot.tables["public.managed_sites"]);
   assert.ok(snapshot.tables["public.pages"].columns.managed_site_id);
   assert.ok(!JSON.stringify(snapshot).includes("microsite"));

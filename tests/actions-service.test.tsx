@@ -72,6 +72,7 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
 
   const managedSiteService = loadService("lib/platform/managed-sites/service.ts", {
     "../site-globals/service": { getSiteGlobals: async () => undefined },
+    "../contact/presentation": { contactPresentations: async () => new Map() },
     "./paths": paths,
     "./sections": sectionModel,
     "./collections": collections,

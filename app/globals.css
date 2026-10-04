@@ -212,6 +212,15 @@ body {
   border-radius: var(--design-radius);
 }
 
+.managed-site-contact-form { display: grid; gap: calc(var(--design-space) * 2); max-width: 40rem; }
+.managed-site-contact-form label { display: block; font-weight: 600; margin-bottom: var(--design-space); }
+.managed-site-contact-form :is(input, textarea) { width: 100%; border: 1px solid var(--design-border); border-radius: var(--design-radius); padding: var(--design-space); background: var(--design-background); color: var(--design-text); font: inherit; }
+.managed-site-contact-form textarea { min-height: 10rem; }
+.managed-site-contact-form button { justify-self: start; padding: var(--design-space) calc(var(--design-space) * 2); border: 1px solid var(--design-accent); border-radius: var(--design-radius); background: var(--design-accent); color: var(--design-on-accent); font: inherit; cursor: pointer; }
+.managed-site-contact-form :focus-visible { outline: 2px solid var(--design-accent); outline-offset: 3px; }
+.managed-site-contact-form [aria-invalid="true"] { border-width: 2px; }
+.managed-site-contact-form :disabled { cursor: default; opacity: 0.7; }
+
 /* Explicit framed modes use one platform-owned ratio; natural never crops. */
 .managed-site-section[data-media-fit="contain"] .managed-site-photo,
 .managed-site-section[data-media-fit="cover"] .managed-site-photo {

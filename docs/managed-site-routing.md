@@ -50,7 +50,8 @@ remain root-relative. Section targets on the current Page remain `#anchor`; targ
 on another Page use `/path#anchor` (or `/#anchor`). Bare Action/link anchors retain
 their existing document-local meaning; routing does not retarget Actions.
 
-`/media` and its descendants are reserved for managed media; `/_next`, `/_not-found`
+`/media` and its descendants are reserved for managed media; `/api` for application
+endpoints including Contact submission; `/_next`, `/_not-found`
 and `/_global-error` and their descendants are reserved for framework infrastructure
 and the generated error entries found in the production route manifest. Content lookup and
 entity-backed Navigation reject these paths. The existing static media route

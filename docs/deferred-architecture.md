@@ -88,6 +88,17 @@ gated. Logo read/delivery adds no attachment writer: A1/A2/A6 must be satisfied
 before a logo writer is introduced. Search, onboarding, analytics, legal content
 authoring and publishing are not implemented by this slice.
 
+The [Contact foundation](contact-forms.md) implements multiple reusable definitions,
+shared Section presentation, transactional scoped/idempotent submissions, persisted
+expiration and provider-neutral delivery/accepted-event hooks. P14/P15 are covered
+for this bounded development contract only. **Before public form activation**, P14
+still requires distributed abuse/rate limiting and spam controls, trusted delivery
+routes/provider deployment, privacy policy and usable retention/export/purge plus
+uncertain-delivery reconciliation. The HTTP endpoint is gated outside development.
+P7 management, P12 analytics and P18/P19/P20 production/recovery gates remain open;
+no overlay, CRM or full analytics is implied. Definition contract writers must
+increment version and preserve historical submissions under P1/P2.
+
 The seed/customer-initialization part of P1 is implemented: generic seed contains
 only reference data; explicit Myomaton initialization creates a fresh customer
 graph atomically and performs no child repair or updates once the Web Presence
@@ -155,6 +166,7 @@ See the [native publishing model](onboarding-optimization.md#native-articles-and
 | --- | --- | --- |
 | O1 | Exact bounded-retention periods, superseded-asset handling, and archive timing. | When real retention behavior is implemented; resolve before enabling it. |
 | O2 | Should retired assets be periodically packaged for customer archival before purge? | When defining customer archival/purge policy, before enabling the affected purge behavior. Packaging is not yet a commitment. |
+| O3 | Shared link color/decoration, hover/focus, inline/help/privacy/validation-link semantics and broader form-state Design System tokens. | Planned post-Contact design review, before expanding link/form presentation; current Contact uses existing tokens and plain privacy text, not one-off link colors. |
 
 ## DECISION: Ongoing architecture constraints
 

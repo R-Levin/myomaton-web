@@ -29,6 +29,7 @@ test("managedSite resolves intro images through the Asset service and renders op
   const image = { assetId: id(5), src: `/media/assets/${id(5)}`, width: 640, height: 480, alt: "A real robot" };
   const service = loadService("lib/platform/managed-sites/service.ts", {
     "../site-globals/service": { getSiteGlobals: async () => undefined },
+    "../contact/presentation": { contactPresentations: async () => new Map() },
     "./paths": paths,
     "./sections": sectionModel,
     "./collections": collections,

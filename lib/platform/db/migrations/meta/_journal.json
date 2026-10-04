@@ -50,6 +50,13 @@
       "when": 1790959692569,
       "tag": "0006_managed-site-terminology",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791067838170,
+      "tag": "0007_contact-foundation",
+      "breakpoints": true
     }
   ]
 }

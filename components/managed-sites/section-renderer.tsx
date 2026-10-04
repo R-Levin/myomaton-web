@@ -4,6 +4,7 @@ import { normalizeDestination, type Action } from "../../lib/platform/actions/mo
 import { normalizeSection } from "../../lib/platform/managed-sites/sections";
 import { presentCollection } from "../../lib/platform/managed-sites/collections";
 import { PlainTextParagraphs } from "./plain-text-paragraphs";
+import { ContactContent } from "./contact-content";
 
 function SectionAction({ action }: { action?: Action | null }) {
   const href = action && typeof action.label === "string" && action.label.trim()
@@ -54,6 +55,7 @@ export function SectionRenderer({ section }: { section: ManagedSiteSection }) {
           <SectionAction action={action} />
         </div>
         {!split && media}
+        {type === "contact" && section.contact && <ContactContent contact={section.contact} />}
         {items.length > 0 && <ul className="managed-site-collection" role="list">
           {items.map((item) => <li key={item.id} className="managed-site-collection-item">
             <h3>{item.heading}</h3>

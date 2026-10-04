@@ -31,3 +31,12 @@ resolved destination without changing its Action's stored UUID.
 This is a read/presentation capability, not an Action editor or target-management
 API. Future writers must validate stable target identity and ownership. No
 Myomaton Page, Action or Navigation record is created by installing this code.
+
+## Contact foundation
+
+The [shared Contact Section](contact-forms.md) does not need another Action type:
+existing `contact` internal paths/anchors can reach a configured Contact Section
+or Page. Their existing URL semantics remain unchanged; stable Page destinations
+can continue to use `page` Actions. No overlay invocation or automatic lookup by
+definition name is implied. The form definition belongs to the referenced Contact
+capability, never the Action, and no delivery recipient is stored in Action content.

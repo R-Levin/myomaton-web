@@ -147,10 +147,15 @@ Navigation and generated copyright on all four Pages. There is no stored formal
 logo, phone, email, social profile or Utility Navigation, so none is invented.
 No customer-state writer or configuration update is needed for this initial proof.
 
+The [Contact foundation](contact-forms.md) reuses this identity in Contact Sections
+and adds one bounded `contactRetentionDays` policy resolver with the same trusted
+scope permissions. It does not duplicate contact facts, configure Myomaton, add
+an overlay or complete production Contact activation.
+
 P15's initial typed precedence is covered; generalized policy UI/authorization and
-additional settings remain gated. P14 covers the shared read identity only;
-production Contact interactions/forms, delivery/SMTP, spam, privacy and retention
-are still deferred. P11 onboarding, P12 first-party analytics, P13 intelligence,
+additional settings remain gated. P14 now includes the bounded Contact foundation;
+public-production activation, delivery/SMTP, distributed spam/rate limiting,
+privacy and retention operations remain deferred. P11 onboarding, P12 first-party analytics, P13 intelligence,
 Search, native publishing, and P9/P10 remain deferred. Utility rendering does not
 complete legal content, authoring or publishing workflows.
 

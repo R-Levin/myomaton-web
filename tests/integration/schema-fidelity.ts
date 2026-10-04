@@ -30,9 +30,9 @@ export async function schemaSignature(client: Client, schema: string, tableNames
 export async function assertMigrationFidelity(client: Client, fixtureSchema: string) {
   const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" });
   const installed = await client.query("SELECT hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at,id");
-  // The live database may deliberately await 0006. Verify its exact installed
+  // The live database may deliberately await 0006 or 0007. Verify its exact installed
   // prefix and schema, then apply pending SQL only to the disposable reference.
-  assert.ok(installed.rows.length === 6 || installed.rows.length === migrations.length);
+  assert.ok(installed.rows.length === 6 || installed.rows.length === 7 || installed.rows.length === migrations.length);
   assert.deepEqual(installed.rows, migrations.slice(0, installed.rows.length).map(m => ({ hash: m.hash, created_at: String(m.folderMillis) })), "Installed migration journal differs from checked-in migration prefix");
   const expectedSchema = `${fixtureSchema}_expected`;
   assert.match(expectedSchema, /^myomaton_asset_test_[a-f0-9]{32}_expected$/);

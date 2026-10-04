@@ -8,7 +8,7 @@ export function normalizePagePath(value: unknown): string | null {
   if (segments.some((segment) => !/^[A-Za-z0-9._~-]+$/.test(segment) || segment === "." || segment === "..")) return null;
   // Managed media, Next infrastructure, and the framework's generated error
   // entries own these namespaces (also present in the production route manifest).
-  if (["media", "_next", "_not-found", "_global-error"].includes(segments[0])) return null;
+  if (["media", "api", "_next", "_not-found", "_global-error"].includes(segments[0])) return null;
   return path;
 }
 

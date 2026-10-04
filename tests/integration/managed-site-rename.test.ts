@@ -39,7 +39,7 @@ test("0006 preserves a customer graph on upgrade and matches fresh replay withou
   const prefix = `myomaton_rename_test_${randomUUID().replaceAll("-", "")}`;
   const upgrade = `${prefix}_upgrade`, fresh = `${prefix}_fresh`;
   const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" });
-  assert.equal(migrations.length, 7);
+  assert.ok(migrations.length >= 7); // This historical rehearsal covers the first seven migrations.
   const replay = async (schema: string, from: number, to: number) => {
     disposable(schema);
     await client.query("BEGIN");
@@ -56,7 +56,7 @@ test("0006 preserves a customer graph on upgrade and matches fresh replay withou
     // mutation is possible here; copied data is inserted only into the fixture.
     await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
     const journal = (await client.query("SELECT * FROM drizzle.__drizzle_migrations ORDER BY id")).rows;
-    assert.ok(journal.length === 6 || journal.length === 7);
+    assert.ok(journal.length === 6 || journal.length === 7 || journal.length === 8);
     assert.deepEqual(journal.map(r => ({ hash: r.hash, created_at: r.created_at })),
       migrations.slice(0, journal.length).map(m => ({ hash: m.hash, created_at: String(m.folderMillis) })));
     const live = await readRows(client, "public", journal.length === 6 ? oldTables : newTables);
@@ -137,6 +137,19 @@ test("0006 preserves a customer graph on upgrade and matches fresh replay withou
     await client.query(`UPDATE ${disposable(upgrade)}.sections SET content=$1 WHERE id=$2`, [section.content, section.id]);
     assert.deepEqual(await readRows(client, upgrade, newTables), renamed(before));
 
+    // The live site can have evolved to Page Navigation. Establish the historical
+    // anchor cases explicitly in this fixture instead of requiring old customer data.
+    const aboutSection = before.sections.find(s => (s.configuration as { anchor?: string })?.anchor === "about")!;
+    const aboutAction = before.actions.find(a => a.destination === "#about")!;
+    const primary = before.navigations.find(n => n.name === "Primary Navigation")!;
+    assert.ok(aboutSection && aboutAction && primary);
+    for (const [type, reference] of [["section", aboutSection.id], ["action", aboutAction.id]]) {
+      if (!before.navigation_items.some(i => i.navigation_id === primary.id && i.target_type === type && i.target_reference === reference)) {
+        await client.query(`INSERT INTO ${disposable(upgrade)}.navigation_items
+          (navigation_id,name,label,target_type,target_reference,sort_order) VALUES ($1,$2,$2,$3,$4,100)`,
+          [primary.id, `Rehearsal ${type}`, type, reference]);
+      }
+    }
     const server = await startProductionFixture(url, upgrade, assetRoot());
     try {
       const home = await fetch(server.base); assert.equal(home.status, 200);

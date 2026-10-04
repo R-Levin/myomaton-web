@@ -1,5 +1,7 @@
 import "server-only";
 import { getSiteGlobals, type SiteGlobals } from "../site-globals/service";
+import { contactPresentations } from "../contact/presentation";
+import type { ContactPresentation } from "../contact/model";
 
 import { and, asc, eq } from "drizzle-orm";
 import { getSectionImages } from "@/lib/platform/assets/presentation-service";
@@ -33,6 +35,7 @@ export type ManagedSiteSection = {
   action?: Action | null;
   image?: SectionImage | null;
   collectionItems?: CollectionItem[];
+  contact?: ContactPresentation;
 };
 
 export type ManagedSitePage = {
@@ -112,6 +115,8 @@ export async function getManagedSitePage(
     pageId: match.page.id,
   });
 
+  const contacts = supportedSections.some(s => s.type === "contact") ? await contactPresentations(db,
+    { id: match.webPresenceId, name: match.presenceName, configuration: match.presenceConfiguration }, supportedSections) : new Map<string, ContactPresentation>();
   return {
     globals: await getSiteGlobals({ webPresenceId: match.webPresenceId, presenceName: match.presenceName,
       presenceConfiguration: match.presenceConfiguration, managedSiteId: match.managedSite.id,
@@ -120,6 +125,7 @@ export async function getManagedSitePage(
     page: match.page,
     sections: supportedSections.map((section) => ({
       ...section,
+      contact: contacts.get(section.id),
       image: images.get(section.id) ?? null,
       action: resolvedActions.get(sectionActionId(section.content) ?? "") ?? null,
       ...(section.type === "collection" ? { collectionItems: presentCollection(section.content, resolvedSubjects, resolvedActions) } : {}),

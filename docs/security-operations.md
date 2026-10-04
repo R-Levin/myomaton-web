@@ -106,6 +106,12 @@ identity; current phone/email links and Contact Actions do not implement forms.
 First-party analytics is canonical, but event endpoints are also untrusted input
 and need bounded collection, abuse protection and privacy controls (P12).
 
+The [Contact foundation](contact-forms.md) implements bounded validation, scoped
+submission persistence, a development abuse guard and provider boundaries. Its
+HTTP writer remains disabled outside development pending production review;
+it does not satisfy distributed spam/rate limiting, real delivery, retention
+operations or general management authorization by itself.
+
 ## Secrets and repeatable deployment
 
 Secrets/API keys must never enter Git or client-rendered data/bundles. Manage them

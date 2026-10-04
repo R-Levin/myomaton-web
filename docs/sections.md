@@ -29,6 +29,12 @@ groups heading/body/Action in the text column: left for split-text-first, right
 for split-image-first, with media in the opposite column. Stack remains unchanged.
 There is no customer-configurable mobile order or breakpoint.
 
+Contact uses `type = contact`, `variant = default` and
+`content.contact_definition_id` referencing a reusable Web Presence-owned Contact
+Definition. Optional heading/text stay plain Section copy; fields and accepted
+contract live in the definition, phone/email in canonical business identity.
+See [Contact/forms](contact-forms.md) for validation and activation gates.
+
 Validated `Section.configuration` options:
 
 | Key | Values | Default / meaning |
