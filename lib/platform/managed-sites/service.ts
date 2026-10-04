@@ -1,4 +1,7 @@
 import "server-only";
+import { resolveVisualDirection, type VisualResolution } from "../visual-direction/model";
+import { resolveVisualPolicy, servicePolicyFromEnvironment } from "../policy/site-policy";
+import { object } from "../site-globals/model";
 import { getSiteGlobals, type SiteGlobals } from "../site-globals/service";
 import { contactPresentations } from "../contact/presentation";
 import type { ContactPresentation } from "../contact/model";
@@ -32,6 +35,7 @@ export type ManagedSiteSection = {
   name: string | null;
   content: unknown;
   configuration: unknown;
+  rawConfiguration?: unknown;
   action?: Action | null;
   image?: SectionImage | null;
   collectionItems?: CollectionItem[];
@@ -45,6 +49,7 @@ export type ManagedSitePage = {
   designSystem: ResolvedDesignSystem;
   navigation?: Navigation | null;
   globals?: SiteGlobals;
+  visual?: VisualResolution;
 };
 
 export type ManagedSiteSelection = { domain: string; managedSiteName: string };
@@ -97,7 +102,7 @@ export async function getManagedSitePage(
 
   const supportedSections = orderedSections.flatMap((section) => {
     const normalized = normalizeSection(section);
-    return normalized ? [{ ...section, ...normalized }] : [];
+    return normalized ? [{ ...section, ...normalized, rawConfiguration: section.configuration }] : [];
   });
   const images = await getSectionImages(match.webPresenceId, supportedSections.filter((section) => section.type === "intro").map((section) => section.id));
   const designSystem = await getDesignSystemByWebPresenceId(match.webPresenceId);
@@ -118,6 +123,9 @@ export async function getManagedSitePage(
   const contacts = supportedSections.some(s => s.type === "contact") ? await contactPresentations(db,
     { id: match.webPresenceId, name: match.presenceName, configuration: match.presenceConfiguration }, supportedSections) : new Map<string, ContactPresentation>();
   return {
+    visual: resolveVisualDirection(match.siteConfiguration, resolveVisualPolicy(
+      servicePolicyFromEnvironment(process.env.WEB_PRESENCE_SERVICE_POLICY),
+      object(match.presenceConfiguration).policy, object(match.siteConfiguration).policy)),
     globals: await getSiteGlobals({ webPresenceId: match.webPresenceId, presenceName: match.presenceName,
       presenceConfiguration: match.presenceConfiguration, managedSiteId: match.managedSite.id,
       siteName: match.managedSite.name, siteConfiguration: match.siteConfiguration, pageId: match.page.id }),

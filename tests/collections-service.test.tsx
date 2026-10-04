@@ -1,3 +1,6 @@
+import * as visualModel from "../lib/platform/visual-direction/model";
+import * as visualPolicy from "../lib/platform/policy/site-policy";
+import * as globalModel from "../lib/platform/site-globals/model";
 import * as pageDestinations from "../lib/platform/managed-sites/page-destinations";
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -94,6 +97,7 @@ test("managedSite batches Subject and item Action dependencies, preserves curate
     "drizzle-orm": orm, "@/lib/platform/db/connection": connection, "@/lib/platform/db/schema/actions": actions, "./model": actionModel,
   });
   const service = loadService("lib/platform/managed-sites/service.ts", {
+    "../visual-direction/model": visualModel, "../policy/site-policy": visualPolicy, "../site-globals/model": globalModel,
     "../site-globals/service": { getSiteGlobals: async () => undefined },
     "../contact/presentation": { contactPresentations: async () => new Map() },
     "./paths": paths,

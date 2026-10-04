@@ -36,12 +36,12 @@ export function ContactForm({ definition, sectionId }: { definition: ContactDefi
         : <input id={`${id}-${f.key}`} name={f.key} type={f.key === "email" ? "email" : f.key === "phone" ? "tel" : "text"}
           autoComplete={f.key === "phone" ? "tel" : f.key} required={f.required} maxLength={fieldLimits[f.key]} disabled={success}
           aria-invalid={!!errors[f.key]} aria-describedby={errors[f.key] ? `${id}-${f.key}-error` : undefined} />}
-      {errors[f.key] && <p id={`${id}-${f.key}-error`}>Error: {errors[f.key]}</p>}
+      {errors[f.key] && <p className="managed-site-form-error" id={`${id}-${f.key}-error`}>Error: {errors[f.key]}</p>}
     </div>)}
     <div hidden aria-hidden="true"><label htmlFor={`${id}-website`}>Leave empty</label><input id={`${id}-website`} name="website" tabIndex={-1} autoComplete="off" /></div>
-    {definition.privacyText && <p id={`${id}-privacy`}>{definition.privacyText}</p>}
+    {definition.privacyText && <p className="managed-site-form-help" id={`${id}-privacy`}>{definition.privacyText}</p>}
     <button type="submit" disabled={busy || success}>{busy ? "Sending…" : "Send message"}</button>
-    <div ref={feedback} tabIndex={-1} role="status" aria-live="polite">{message}</div>
+    <div ref={feedback} tabIndex={-1} role="status" aria-live="polite" data-form-state={success ? "success" : message ? "error" : undefined}>{message}</div>
     <noscript>JavaScript is required to submit this form. Use an available contact method instead.</noscript>
   </form>;
 }

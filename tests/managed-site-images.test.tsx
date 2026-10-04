@@ -1,3 +1,6 @@
+import * as visualModel from "../lib/platform/visual-direction/model";
+import * as visualPolicy from "../lib/platform/policy/site-policy";
+import * as globalModel from "../lib/platform/site-globals/model";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -28,6 +31,7 @@ test("managedSite resolves intro images through the Asset service and renders op
   let hasImage = true;
   const image = { assetId: id(5), src: `/media/assets/${id(5)}`, width: 640, height: 480, alt: "A real robot" };
   const service = loadService("lib/platform/managed-sites/service.ts", {
+    "../visual-direction/model": visualModel, "../policy/site-policy": visualPolicy, "../site-globals/model": globalModel,
     "../site-globals/service": { getSiteGlobals: async () => undefined },
     "../contact/presentation": { contactPresentations: async () => new Map() },
     "./paths": paths,

@@ -288,11 +288,13 @@ pixel-perfect art direction.
 
 Design quality is part of product value, onboarding, acquisition, customer
 confidence and retention. Sites should feel authored and intentional through a
-finite curated vocabulary. **Core planned:** [Visual Direction](visual-direction.md)
+finite curated vocabulary. **Implemented foundation:** [Visual Direction](visual-direction.md)
 combines shared Design System primitives into bounded profiles and semantic
 preferences, with platform-owned accessibility, responsive behavior and motion
 ceilings. It is not an unlimited theme system, CSS editor or bespoke design service.
-The documented Myomaton reference direction is proposed, not implemented.
+Two generic versioned runtime profiles support opt-in semantic presentation and
+bounded Page-level motion. Customer visual selection/editing and icon expansion
+remain planned. The documented Myomaton direction is proposed, not applied.
 
 ## 9. Production readiness track
 

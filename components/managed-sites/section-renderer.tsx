@@ -5,6 +5,7 @@ import { normalizeSection } from "../../lib/platform/managed-sites/sections";
 import { presentCollection } from "../../lib/platform/managed-sites/collections";
 import { PlainTextParagraphs } from "./plain-text-paragraphs";
 import { ContactContent } from "./contact-content";
+import { sectionPresentation, type VisualDirection } from "../../lib/platform/visual-direction/model";
 
 function SectionAction({ action }: { action?: Action | null }) {
   const href = action && typeof action.label === "string" && action.label.trim()
@@ -12,10 +13,11 @@ function SectionAction({ action }: { action?: Action | null }) {
   return action && href ? <a href={href} className="managed-site-action">{action.label}</a> : null;
 }
 
-export function SectionRenderer({ section }: { section: ManagedSiteSection }) {
+export function SectionRenderer({ section, direction, index = 0, motionSlot }: { section: ManagedSiteSection; direction?: VisualDirection | null; index?: number; motionSlot?: number }) {
   const normalized = normalizeSection(section);
   if (!normalized) return null;
-  const { type, variant, content, configuration: config } = normalized;
+  const { type, variant, content } = normalized;
+  const config = sectionPresentation(normalized.configuration, section.rawConfiguration ?? section.configuration, type, index, direction);
   const { heading, text } = content;
   const actionId = normalized.type !== "collection" ? normalized.content.actionId : undefined;
   const action = actionId && section.action?.id === actionId ? section.action : null;
@@ -35,6 +37,9 @@ export function SectionRenderer({ section }: { section: ManagedSiteSection }) {
       id={config.anchor}
       className={`managed-site-section managed-site-section-${type}`}
       data-layout={layout}
+      data-hero-treatment={type === "hero" ? direction?.hero : undefined}
+      data-image-treatment={image ? direction?.image : undefined}
+      data-motion-slot={motionSlot}
       data-width={config.width}
       data-spacing={config.spacing}
       data-alignment={config.alignment}

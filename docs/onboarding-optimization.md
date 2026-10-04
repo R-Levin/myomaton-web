@@ -64,7 +64,9 @@ self-service. Customer-visible language and internal design settings stay distin
 Visual approval does not authorize changing canonical business facts. Subsequent
 direction changes remain reviewed customer-state operations under existing policy;
 they must not silently overwrite content or explicit presentation choices. Curated
-profiles, selection UI and the complete semantic visual contract remain planned.
+selection UI and broader visual capabilities remain planned. Two generic curated
+profiles now have an opt-in runtime resolver; that does not implement the intake,
+preview, approval or customer-state writing workflow described here.
 
 ## Canonical first-party measurement
 

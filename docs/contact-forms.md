@@ -165,9 +165,10 @@ Design System tokens. JavaScript is required for submission; a noscript message
 points to available canonical contact methods without inventing any.
 
 The [Visual Direction contract](visual-direction.md#links-and-text-decoration)
-defines shared link/decoration and form-state semantics. Their complete token and
-rendering implementation remains pending; current Contact uses existing tokens
-without arbitrary styling or special link colors. Privacy text remains plain text,
+defines shared link/decoration and form-state semantics. Opt-in profiles now derive
+shared label/help/error, readable surface/focus and non-color error/success roles
+from Design System primitives. Sites without a direction retain existing styling.
+No arbitrary styling or special link colors are accepted. Privacy text remains plain text,
 not a new link/rich-text contract.
 
 The additive migration creates only the two Contact tables, constraints and

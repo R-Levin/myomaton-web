@@ -26,3 +26,29 @@ export function contactRetentionDays(service: unknown, presence: unknown, site: 
   if (rule.allowSiteOverride === true && valid(s)) days = s;
   return days;
 }
+
+export const motionLevels = ["off", "minimal", "light"] as const;
+export type MotionLevel = typeof motionLevels[number];
+export const visualPreferenceKeys = ["density", "hero", "image", "elevation", "motion", "backdrop"] as const;
+export type VisualPreferenceKey = typeof visualPreferenceKeys[number];
+
+// Only trusted service policy grants preference permissions. Scoped values cannot
+// expand that list. Visual settings are capabilities/ceilings, never CSS input.
+export function resolveVisualPolicy(service: unknown = {}, presence: unknown = {}, site: unknown = {}) {
+  function layered<T>(key: string, fallback: T, valid: (v: unknown) => v is T): T {
+    const rule = object(object(service)[key]);
+    let value = valid(rule.value) ? rule.value : fallback;
+    const p = object(presence)[key], s = object(site)[key];
+    if (rule.allowPresenceOverride === true && valid(p)) value = p;
+    if (rule.allowSiteOverride === true && valid(s)) value = s;
+    return value;
+  }
+  const allowed = object(service).visualPreferences;
+  return {
+    maxMotion: layered<MotionLevel>("visualMaxMotion", "minimal", (v): v is MotionLevel => motionLevels.includes(v as MotionLevel)),
+    translucency: layered("visualTranslucency", false, (v): v is boolean => typeof v === "boolean"),
+    allowedPreferences: Array.isArray(allowed)
+      ? visualPreferenceKeys.filter(key => allowed.includes(key))
+      : ["density", "hero", "motion"] as readonly VisualPreferenceKey[],
+  };
+}

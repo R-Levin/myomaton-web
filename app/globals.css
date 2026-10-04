@@ -264,3 +264,108 @@ body {
 @container (min-width: 60rem) {
   .managed-site-section[data-columns="3"] .managed-site-collection { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* Opt-in semantic presentation. No selector here changes legacy sites. */
+.managed-site[data-visual-direction] {
+  --visual-local-text: var(--visual-base-text);
+  --visual-local-link: var(--visual-base-link);
+  --visual-elevation: var(--visual-shadow-none);
+  color: var(--visual-local-text);
+  font-size: var(--visual-body);
+}
+.managed-site[data-visual-direction][data-elevation="subtle"] { --visual-elevation: var(--visual-shadow-subtle); }
+.managed-site[data-visual-direction][data-elevation="prominent"] { --visual-elevation: var(--visual-shadow-prominent); }
+.managed-site[data-visual-direction] .managed-site-section {
+  --section-heading: var(--visual-base-link);
+  --section-copy: var(--visual-base-muted);
+  --section-action-text: var(--visual-button-text);
+  --visual-local-text: var(--visual-base-text);
+  --visual-local-link: var(--visual-base-link);
+  color: var(--visual-local-text);
+}
+.managed-site[data-visual-direction] .managed-site-section[data-surface="subtle"],
+.managed-site[data-visual-direction] .managed-site-footer,
+.managed-site[data-visual-direction] .managed-site-collection-item {
+  --section-heading: var(--visual-alternate-link);
+  --section-copy: var(--visual-alternate-muted);
+  --visual-local-text: var(--visual-alternate-text);
+  --visual-local-link: var(--visual-alternate-link);
+  color: var(--visual-local-text);
+}
+.managed-site[data-visual-direction] .managed-site-section[data-surface="accent"] {
+  --section-heading: var(--visual-emphasized-text);
+  --section-copy: var(--visual-emphasized-text);
+  --section-action-background: var(--visual-emphasized-text);
+  --section-action-text: var(--design-accent);
+  --visual-local-text: var(--visual-emphasized-text);
+  --visual-local-link: var(--visual-emphasized-link);
+}
+.managed-site[data-visual-direction] .managed-site-collection-item {
+  --section-action-background: var(--design-accent);
+  --section-action-text: var(--visual-button-text);
+  box-shadow: var(--visual-elevation);
+}
+.managed-site[data-visual-direction] h1 { font-size: clamp(2rem, 6vw, var(--visual-page-title)); }
+.managed-site[data-visual-direction] [data-hero-treatment="graphic"] h1,
+.managed-site[data-visual-direction] [data-hero-treatment="statement"] h1 { font-size: clamp(2rem, 7vw, var(--visual-display)); }
+.managed-site[data-visual-direction] h2 { font-size: var(--visual-section-heading); }
+.managed-site[data-visual-direction] small { font-size: var(--visual-meta); color: var(--visual-local-text); }
+
+/* Underline is the default textual affordance, including future structured
+   privacy/help links. Navigation and shaped Actions deliberately differ. */
+.managed-site[data-visual-direction] :where(a:not(.managed-site-action):not(.managed-site-contact-action)) {
+  color: var(--visual-local-link); text-decoration: underline; text-underline-offset: .2em;
+}
+.managed-site[data-visual-direction] a:hover { text-decoration-thickness: .15em; }
+.managed-site[data-visual-direction] nav a:not(.managed-site-action),
+.managed-site[data-visual-direction] .managed-site-action,
+.managed-site[data-visual-direction] .managed-site-contact-action { text-decoration: none; }
+.managed-site[data-visual-direction] nav a:hover,
+.managed-site[data-visual-direction] nav a[aria-current] { text-decoration: underline; text-decoration-thickness: .15em; }
+.managed-site[data-visual-direction] :is(a, button, input, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--visual-local-text); outline-offset: 4px;
+}
+.managed-site[data-visual-direction] .managed-site-contact-action { color: var(--visual-base-link); border-color: var(--visual-base-link); }
+.managed-site[data-visual-direction] .managed-site-header { box-shadow: var(--visual-elevation); }
+.managed-site[data-visual-direction][data-density="airy"] .managed-site-header { padding-block: calc(var(--design-space) * 4); }
+/* Opaque by default. The bounded optional effect is only on Header, not a
+   whole-site glass layer, and is conditional on browser support. */
+@supports (backdrop-filter: blur(8px)) and (background: color-mix(in srgb, white 95%, transparent)) {
+  .managed-site[data-visual-direction][data-backdrop="translucent"] .managed-site-header {
+    background: color-mix(in srgb, var(--design-background) 95%, transparent);
+    backdrop-filter: blur(var(--visual-blur));
+  }
+  .managed-site[data-visual-direction][data-backdrop="translucent"] .managed-site-header .managed-site-global-inner {
+    background: var(--design-background);
+  }
+}
+.managed-site[data-visual-direction] [data-image-treatment="framed"] .managed-site-section-media {
+  padding: var(--design-space); border: 1px solid var(--visual-local-text); border-radius: var(--design-radius);
+}
+.managed-site[data-visual-direction] [data-image-treatment="bordered"] .managed-site-photo { border: 1px solid var(--visual-local-text); }
+.managed-site[data-visual-direction] [data-image-treatment="elevated"] .managed-site-photo { box-shadow: var(--visual-shadow-subtle); }
+
+.managed-site[data-visual-direction] .managed-site-contact-form label { font-size: var(--visual-label); }
+.managed-site[data-visual-direction] .managed-site-contact-form :is(input, textarea) {
+  --visual-local-text: var(--visual-base-text);
+  color: var(--visual-base-text); border-color: var(--visual-base-muted);
+}
+.managed-site[data-visual-direction] .managed-site-form-help { font-size: var(--visual-help); }
+.managed-site[data-visual-direction] .managed-site-form-error,
+.managed-site[data-visual-direction] [data-form-state="error"] { font-size: var(--visual-error); font-weight: 600; border-inline-start: 3px solid currentColor; padding-inline-start: var(--design-space); }
+.managed-site[data-visual-direction] [data-form-state="success"] { border: 1px solid currentColor; padding: var(--design-space); }
+.managed-site[data-visual-direction] .managed-site-contact-form button { color: var(--visual-button-text); }
+
+/* Short, serialized, once-on-mount transform only. Content is never hidden,
+   and all visual motion is absent by default/reduced-motion. No JS observer. */
+@media (prefers-reduced-motion: no-preference) {
+  .managed-site[data-visual-direction] [data-motion-slot] > .managed-site-section-inner {
+    animation: visual-settle 180ms ease-out 1 backwards;
+  }
+  .managed-site[data-visual-direction] [data-motion-slot="1"] > .managed-site-section-inner { animation-delay: 180ms; }
+  .managed-site[data-visual-direction] [data-motion-slot="2"] > .managed-site-section-inner { animation-delay: 360ms; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .managed-site[data-visual-direction] [data-motion-slot] > .managed-site-section-inner { animation: none; }
+}
+@keyframes visual-settle { from { transform: translateY(3px); } to { transform: translateY(0); } }

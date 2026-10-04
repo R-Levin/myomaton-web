@@ -11,8 +11,9 @@ experience should demonstrate quality, professionalism and flexibility within
 bounds. Myomaton remains Customer #1 and the proving ground. No pricing or visual
 outcome guarantee follows from this architecture.
 
-This document defines **Core planned** visual contracts. It does not implement
-profiles, new tokens, motion, icons or a Myomaton redesign. The
+This document defines the visual contract and its **Implemented** opt-in runtime
+foundation described below. Customer selection/editing UI, shared icon expansion,
+additional treatments and a Myomaton redesign remain planned. The
 [capability catalog](platform-capabilities.md) defines product scope;
 [implementation gates](deferred-architecture.md) govern delivery. Business
 knowledge remains foundational; customers manage their business more than pixels.
@@ -45,7 +46,8 @@ Operator presentation approval cannot bypass them.
 
 Explicit validated Section choices retain their meaning; direction supplies
 defaults for unspecified choices, not an automatic rewrite of stored Sections.
-Future implementation must distinguish explicit values from normalization defaults.
+The read model carries raw configuration alongside normalization to distinguish
+explicit values from defaults; direction never modifies either stored representation.
 Changing a profile must not silently overwrite customer choices, Section order,
 copy or business facts. Profile upgrades require review of their visual effect;
 versioning identifies the recipe, not a new publishing/revision system.
@@ -92,7 +94,8 @@ heading rank: retain a sensible document outline, labels and readable body text.
 Avoid oversized display text that overwhelms small screens or truncates content.
 
 Current implementation offers platform-owned sans/serif/mono stacks, base size,
-heading scale and line height. A richer role scale is planned, not already exposed.
+heading scale and line height. Opt-in semantic roles derive display/Page/Section
+scales and body/meta/label/help/error sizing from those primitives.
 Keep family selection curated; any future font addition needs licensing, loading,
 fallback and performance review, not arbitrary remote font URLs.
 
@@ -137,9 +140,9 @@ Use the same spacing, typography, shape, Action and link relationships as the si
 | Success | Meaningful textual status and accessible announcement/focus behavior, not only a green surface. |
 
 The [Contact foundation](contact-forms.md) already implements labels, required/error
-semantics and status feedback with existing tokens. Complete semantic state tokens
-and cross-surface styling remain future implementation. This decision resolves the
-design contract, not that implementation or the production forms gates.
+semantics and status feedback. Opt-in Visual Direction now adds shared semantic
+state sizing, focus and non-color error/success treatment. This does not complete
+production forms gates or add structured links to plain privacy text.
 
 ## Elevation, backdrops and icons
 
@@ -165,7 +168,7 @@ Asset security and accessibility rules continue to apply.
 ## Page-level motion budget
 
 Motion is an accent, not a background condition. Use **Off**, **Minimal**, **Light**;
-there is no Medium/High tier. The initial proposed automatic-reveal ceilings are:
+there is no Medium/High tier. The implemented automatic-reveal ceilings are:
 
 | Level | Whole-Page ceiling |
 | --- | --- |
@@ -181,12 +184,18 @@ card cascade cannot count as one effect. Scrolling away/back does not reset budg
 
 Restrained hover feedback and brief future dialog transitions are interaction
 responses, not extra automatic reveals; they still obey the selected intensity,
-platform duration/distance bounds and reduced-motion behavior. `prefers-reduced-motion`
+platform duration/distance bounds and reduced-motion behavior. The current runtime
+implements only the automatic effect, not animated hover/dialog responses. `prefers-reduced-motion`
 forces nonessential motion Off. Content must remain readable without JavaScript or
 animation completion. Use no layout-shifting reveals, looping decoration, dramatic
 parallax, scroll-jacking or motion-dependent comprehension. Effects normally run
 once per Page visit. Verify performance, allocation across all Sections, interruption
-and reduced-motion behavior before enabling motion. No runtime allocator exists yet.
+and reduced-motion behavior before expanding motion. The current allocator selects
+populated Hero/CTA Sections, Hero-first then content order, and emits at most three
+slots. Each performs one 180ms, 3px transform-only settle on mount, serialized by
+slot delay. There is no scroll observer, card cascade, opacity hiding or animation
+library. CSS enables effects only for `no-preference` and disables them for `reduce`.
+Effects can replay on a new Page mount; scrolling does not remount or replenish them.
 
 ## Images, Hero and global chrome
 
@@ -198,11 +207,10 @@ decorative/informative semantics; they must not turn informative content into an
 inaccessible decoration. Preserve Asset identity and AssetUsage accessibility
 overrides; styling never supplies or changes alt text.
 
-The proposed small Hero vocabulary is quiet/editorial, strong/graphic, split-media
-and centered statement. These are semantic treatments of validated content, not
-builders. Current Hero supports its existing structured fields/default variant;
-new treatments, particularly Hero media support, require implementation before
-selection. A strong text-only Hero must work without manufacturing imagery.
+The runtime Hero vocabulary is editorial, graphic and statement, retaining the
+existing structured fields/default Section variant. These are presentation recipes,
+not builders. Split-media Hero remains planned because the current Hero has no
+media contract. A strong text-only Hero works without manufacturing imagery.
 
 Header/Footer retain their controlled structure and canonical identity consumers.
 Direction may influence density, typography emphasis, active-link treatment, CTA
@@ -215,19 +223,77 @@ collapse remains platform-owned. See [site globals](site-globals.md).
 No schema change is required. `design_systems.configuration` already holds tokens;
 `managed_sites.configuration` can hold a validated presentation-level
 `visualDirection` object with profile identity/version and permitted preferences.
-This is a proposed contract, not a field currently consumed by rendering. Keep
+This contract is consumed at presentation time by the Managed Site service. Keep
 profile recipes in platform code and customer selection in canonical PostgreSQL.
 Do not store duplicate token values, arbitrary styles or executable recipes there.
 Business/logo facts remain Web Presence-owned and Assets remain reusable.
 
-Extend typed normalization deliberately when implementing semantic tokens and
-direction resolution; existing JSON storage alone is not validation or support.
+Typed normalization validates direction resolution; JSON storage alone does not
+authorize arbitrary settings or new capabilities.
 Unknown/invalid choices need safe defaults. A missing direction must preserve the
 current rendering path; activation is explicit, not an implicit redesign on deploy.
 Unknown profile versions must fail safely to a documented neutral treatment and
 surface an operator review need without rewriting canonical state. Reuse the
 existing policy resolver rather than adding competing override precedence.
 No generalized policy UI, customer writer or theme marketplace is introduced.
+
+## Runtime contract
+
+Managed Site `configuration.visualDirection` accepts only `profileId`,
+`profileVersion` and optional `preferences`. Both `editorial` and `reference` have
+version `1`; unknown identity/version returns legacy rendering with an internal
+`unsupported` reason. Missing configuration returns `missing`; malformed objects,
+unknown preference keys or invalid values return `invalid`. The whole direction
+falls back, not a partially applied unsafe preference set. No stored values change.
+
+```json
+{"visualDirection":{"profileId":"reference","profileVersion":1,"preferences":{"hero":"statement","motion":"minimal"}}}
+```
+
+This is a generic example, not Myomaton configuration. `editorial` is comfortable,
+quiet, balanced, plain imagery, no elevation or motion. `reference` is airy,
+alternating, confident, graphic Hero, framed imagery, subtle elevation and requests
+Light motion. Both use opaque backdrops and functional icon intent. They share one
+renderer and the assigned Design System; neither owns customer colors or fonts.
+
+| Preference | Finite values |
+| --- | --- |
+| density | comfortable, airy |
+| hero | editorial, graphic, statement |
+| image | plain, framed, elevated, bordered |
+| elevation | none, subtle, prominent |
+| motion | off, minimal, light |
+| backdrop | opaque, translucent |
+
+The existing trusted `WEB_PRESENCE_SERVICE_POLICY` supports `visualMaxMotion`
+(default minimal) and `visualTranslucency` (default false), each with the existing
+`value`/`allowPresenceOverride`/`allowSiteOverride` contract. Scoped policy values
+live under existing presence/site `configuration.policy`. Trusted service-only
+`visualPreferences` is a list of permitted keys; default permissions are density,
+hero and motion. Other valid preferences are ignored unless explicitly permitted.
+Customer configuration cannot grant itself permissions. No policy UI is added.
+
+Profiles supply only missing surface, divider, spacing and Hero width/alignment
+defaults. Even a malformed explicitly present Section key retains its existing
+normalizer fallback. Variants, columns, media fit, Actions and content remain intact.
+Alternation is based on supported ordered Sections. Icon intent is resolved but
+does not create new icons; P23 still applies. Optional translucency affects only the
+existing Header, with opaque fallback; it does not make the Header sticky.
+
+All new CSS is scoped to an active `data-visual-direction`. Legacy sites retain
+their token/markup path. Derived semantic colors retain the preferred Design System
+color when readable against its surface, otherwise use black/white for text/link
+roles without changing canonical tokens. Focus uses the local readable foreground;
+inline links remain underlined. Navigation has separate hover/current treatment and
+`aria-current` for exact Page routes. Shadows and blur are platform-owned constants.
+Form privacy remains escaped text; the shared anchor rule covers future supported
+help/privacy links without enabling arbitrary markup.
+
+The Myomaton proposal is expressible for hierarchy, rhythm, grouping, framing,
+existing split asymmetry, restrained elevation, functional icons and Light motion
+under policy. A distinct second blue/green accent needs a future shared token
+contract; no customer-specific CSS is added to imitate it. Shared icon expansion,
+split-media Hero and customer preview/approval tooling remain separate work.
 
 ## Proposed Myomaton reference direction
 

@@ -1,3 +1,6 @@
+import * as visualModel from "../lib/platform/visual-direction/model";
+import * as visualPolicy from "../lib/platform/policy/site-policy";
+import * as globalModel from "../lib/platform/site-globals/model";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -34,6 +37,7 @@ function fixture() {
       { id: id(7), managedSiteId: id(2), slug: "/trailing/", name: "Noncanonical", title: "Hidden", status: "active" },
     ],
     queries: 0, renderedPageIds: [] as string[], navigationContexts: [] as unknown[],
+    configuration: {} as Record<string, unknown>, sectionConfiguration: { anchor: "story" } as Record<string, unknown>,
   };
   const client = { async query(query: { text: string }, params: unknown[]) {
     state.queries++;
@@ -45,7 +49,7 @@ function fixture() {
       assert.match(query.text, /"managed_sites"\."status" = \$4/);
       assert.deepEqual(params, [selection.domain, selection.managedSiteName, "active", "active", 2]);
       if (state.siteStatus !== "active" || state.presenceStatus !== "active") return { rows: [] };
-      const rows = [[id(1), id(2), selection.managedSiteName]];
+      const rows = [[id(1), id(2), selection.managedSiteName, "Example", {}, state.configuration]];
       return { rows: state.ambiguousSite ? [...rows, [id(1), id(98), selection.managedSiteName]] : rows };
     }
     if (query.text.includes('from "pages"')) {
@@ -63,11 +67,12 @@ function fixture() {
       assert.match(query.text, /order by "sections"\."sort_order" asc, "sections"\."id" asc/);
       assert.equal(params[1], "active");
       state.renderedPageIds.push(params[0] as string);
-      return { rows: [[id(8), "intro", "stack", "Story", { heading: "Team story", text: "First paragraph.\n\nSecond paragraph." }, { anchor: "story" }]] };
+      return { rows: [[id(8), "intro", "stack", "Story", { heading: "Team story", text: "First paragraph.\n\nSecond paragraph." }, state.sectionConfiguration]] };
     }
     throw new Error(`Unexpected query: ${query.text}`);
   } };
   const service = loadService("lib/platform/managed-sites/service.ts", {
+    "../visual-direction/model": visualModel, "../policy/site-policy": visualPolicy, "../site-globals/model": globalModel,
     "../site-globals/service": { getSiteGlobals: async () => undefined },
     "../contact/presentation": { contactPresentations: async () => new Map() },
     "./paths": paths, "./sections": sectionModel, "./collections": collections,
@@ -88,6 +93,18 @@ function fixture() {
   }) as typeof import("../lib/platform/managed-sites/service");
   return { state, service };
 }
+
+test("service carries Visual Direction and raw explicit Section choices without losing normalization provenance", async () => {
+  const { service, state } = fixture();
+  state.configuration = { visualDirection: { profileId: "reference", profileVersion: 1 } };
+  const page = await service.getManagedSitePage(selection, "/"); assert.ok(page);
+  assert.equal(page.visual?.direction?.profileId, "reference");
+  assert.deepEqual(page.sections[0].rawConfiguration, { anchor: "story" });
+  assert.match(renderToStaticMarkup(<ManagedSitePageView page={page} />), /data-divider="none"/);
+  state.sectionConfiguration.divider = "rule";
+  const explicit = await service.getManagedSitePage(selection, "/"); assert.ok(explicit);
+  assert.match(renderToStaticMarkup(<ManagedSitePageView page={explicit} />), /data-divider="rule"/);
+});
 
 test("path contract shares canonical root-relative, case-sensitive nested paths with Navigation", () => {
   assert.equal(paths.pagePathFromSegments(undefined), "/");

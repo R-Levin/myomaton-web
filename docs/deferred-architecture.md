@@ -171,9 +171,15 @@ See the [native publishing model](onboarding-optimization.md#native-articles-and
 | O2 | Should retired assets be periodically packaged for customer archival before purge? | When defining customer archival/purge policy, before enabling the affected purge behavior. Packaging is not yet a commitment. |
 
 O3's link/form visual-policy question is resolved by the
-[Visual Direction contract](visual-direction.md). Runtime semantic tokens and
-consistent rendering remain pending under P21; this documentation decision does
-not mark the implementation complete. The catalog owns the capability envelope,
+[Visual Direction contract](visual-direction.md). P21 is implemented for the bounded
+opt-in runtime: two versioned profiles, validated preferences, semantic roles and
+preservation of explicit Section choices. Customer visual self-service, supported
+example selection and authorized preview/approval writers remain gated. P22 is
+satisfied for the current capped, serialized Hero/CTA settle effect with reduced-motion
+enforcement; reassess before adding new motion consumers or scroll-trigger behavior.
+P23 remains deferred: functional icon intent is resolved but no shared icon registry
+or expanded icon rendering is implemented. Myomaton has no direction applied.
+The catalog owns the capability envelope,
 the visual document owns the design contract, and this register owns its gates.
 
 ## DECISION: Ongoing architecture constraints
