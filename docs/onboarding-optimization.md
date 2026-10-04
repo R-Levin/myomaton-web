@@ -47,6 +47,25 @@ private, expiring submissions. Inquiry fields are visitor input, not automatical
 canonical business truth. Its accepted-submission hook is not the analytics
 collection/reporting system described below.
 
+## Visual preference and design selection
+
+Design selection is part of onboarding and product confidence, including Customer
+0's own sales experience and Myomaton as Customer #1. Use curated examples and a
+few comparisons about tone, density, imagery, boldness and motion, plus brand/logo
+Assets. Customers choose what feels appropriate, not pixel sizes or CSS settings.
+
+Translate those preferences into a proposed [Visual Direction](visual-direction.md)
+profile and permitted semantic choices. Preview representative content at desktop
+and mobile sizes, then approve or request bounded changes. Examples must map to
+supported capabilities; external inspiration does not promise copied layouts,
+site reconstruction or bespoke control. Operator-assisted selection can precede
+self-service. Customer-visible language and internal design settings stay distinct.
+
+Visual approval does not authorize changing canonical business facts. Subsequent
+direction changes remain reviewed customer-state operations under existing policy;
+they must not silently overwrite content or explicit presentation choices. Curated
+profiles, selection UI and the complete semantic visual contract remain planned.
+
 ## Canonical first-party measurement
 
 First-party/internal analytics is the canonical product measurement system.

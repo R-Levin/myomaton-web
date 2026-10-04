@@ -286,6 +286,14 @@ clarity, trust, usability, accessibility, performance, discovery, conversion, an
 appropriate visual quality. It is not intended for clients requiring exhaustive
 pixel-perfect art direction.
 
+Design quality is part of product value, onboarding, acquisition, customer
+confidence and retention. Sites should feel authored and intentional through a
+finite curated vocabulary. **Core planned:** [Visual Direction](visual-direction.md)
+combines shared Design System primitives into bounded profiles and semantic
+preferences, with platform-owned accessibility, responsive behavior and motion
+ceilings. It is not an unlimited theme system, CSS editor or bespoke design service.
+The documented Myomaton reference direction is proposed, not implemented.
+
 ## 9. Production readiness track
 
 Launching Myomaton should drive the following from theory into implementation

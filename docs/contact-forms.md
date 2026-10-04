@@ -164,10 +164,11 @@ response. Keyboard operation, visible focus and bounded controls use existing
 Design System tokens. JavaScript is required for submission; a noscript message
 points to available canonical contact methods without inventing any.
 
-Global link color, underline/text-decoration, hover/focus and inline/help/privacy/
-validation-link policy, plus broader form-state tokens, remain open for the planned
-Design System review. This slice adds no arbitrary styling or special link colors;
-privacy text is plain text, not a new link/rich-text contract.
+The [Visual Direction contract](visual-direction.md#links-and-text-decoration)
+defines shared link/decoration and form-state semantics. Their complete token and
+rendering implementation remains pending; current Contact uses existing tokens
+without arbitrary styling or special link colors. Privacy text remains plain text,
+not a new link/rich-text contract.
 
 The additive migration creates only the two Contact tables, constraints and
 indexes; no customer definitions, Sections, Actions or facts are inserted. Existing

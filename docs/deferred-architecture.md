@@ -141,6 +141,9 @@ adds no customer Pages or authoring workflow; P9 and P10 remain deferred.
 | P18 | Establish scoped runtime/migration/operational credentials, secrets management/rotation, appropriate security headers, repeatable deployment and compatible rollback, centralized patching, actionable monitoring and a bounded backup/restore plan. | Before production launch; reassess when deployment or exposed surfaces materially change. Define recovery objectives, alert ownership and configuration recovery. Reuse A3/P4 and [deployment/recovery posture](security-operations.md#secrets-and-repeatable-deployment). |
 | P19 | Perform an explicit tenant-boundary and shared-platform blast-radius review, with verification of foreign/ambiguous reference refusal across exposed data, media and management paths. | Before multi-customer production, and when expanding tenant boundaries. P7 caller authorization and P9 host resolution remain separate required gates where triggered. |
 | P20 | Demonstrate an isolated restore of PostgreSQL plus matching managed Assets and deployment/configuration, including usable application/media serving and secrets recovery/rotation procedures; record results and resolve gaps. | Before claiming disaster recovery readiness, periodically thereafter and after material recovery-path changes. Reuse P4/O1/D2 for retention; backup-job success alone is insufficient. See [recovery verification](security-operations.md#backups-and-disaster-recovery). |
+| P21 | Implement validated Visual Direction/profile resolution and shared semantic link, typography and form-state roles with accessible surface pairings, compatibility fallback and explicit-choice preservation. Define permitted preference/override scope; examples must map to supported capabilities. | Before activating a Visual Direction; verify supported examples before using them in onboarding and enforce authorized bounded choices before customer visual self-service. Reuse P1/P2/P7/P15 and the [visual contract](visual-direction.md). |
+| P22 | Enforce cumulative Page-level motion allocation, policy ceilings, reduced-motion override, content visibility and performance. | Before enabling motion; a Section-local allowance is insufficient. See [motion budget](visual-direction.md#page-level-motion-budget). |
+| P23 | Establish an approved bounded icon source, licensing and shared accessible rendering policy without uploaded executable code. | Before expanding beyond current local functional icons/text links into a shared icon system. See [icon boundaries](visual-direction.md#elevation-backdrops-and-icons). |
 
 ## REQUIRED: Content Engine
 
@@ -166,7 +169,12 @@ See the [native publishing model](onboarding-optimization.md#native-articles-and
 | --- | --- | --- |
 | O1 | Exact bounded-retention periods, superseded-asset handling, and archive timing. | When real retention behavior is implemented; resolve before enabling it. |
 | O2 | Should retired assets be periodically packaged for customer archival before purge? | When defining customer archival/purge policy, before enabling the affected purge behavior. Packaging is not yet a commitment. |
-| O3 | Shared link color/decoration, hover/focus, inline/help/privacy/validation-link semantics and broader form-state Design System tokens. | Planned post-Contact design review, before expanding link/form presentation; current Contact uses existing tokens and plain privacy text, not one-off link colors. |
+
+O3's link/form visual-policy question is resolved by the
+[Visual Direction contract](visual-direction.md). Runtime semantic tokens and
+consistent rendering remain pending under P21; this documentation decision does
+not mark the implementation complete. The catalog owns the capability envelope,
+the visual document owns the design contract, and this register owns its gates.
 
 ## DECISION: Ongoing architecture constraints
 
