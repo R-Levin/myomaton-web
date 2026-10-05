@@ -1,0 +1,1123 @@
+{
+  "organizations": [
+    {
+      "id": "af4ed9b8-713e-49b3-859e-f941d6fc168c",
+      "name": "Open Practical Robotics",
+      "type": "standard",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-09-27T15:34:00.678435+00:00",
+      "updated_at": "2026-09-27T15:34:00.678435+00:00",
+      "configuration": {}
+    }
+  ],
+  "web_presences": [
+    {
+      "id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "name": "Myomaton",
+      "locale": "en-US",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "timezone": "America/New_York",
+      "created_at": "2026-09-27T15:34:30.554178+00:00",
+      "updated_at": "2026-09-27T15:34:30.554178+00:00",
+      "configuration": {},
+      "primary_domain": "myomaton.com",
+      "organization_id": "af4ed9b8-713e-49b3-859e-f941d6fc168c"
+    }
+  ],
+  "managed_sites": [
+    {
+      "id": "7fd60824-a933-401d-8099-7b64f24cc408",
+      "name": "Myomaton",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-09-27T16:30:06.758769+00:00",
+      "updated_at": "2026-09-27T16:30:06.758769+00:00",
+      "configuration": {
+        "visualDirection": {
+          "profileId": "reference",
+          "preferences": {
+            "hero": "graphic",
+            "motion": "light",
+            "density": "airy"
+          },
+          "profileVersion": 1
+        }
+      },
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    }
+  ],
+  "pages": [
+    {
+      "id": "5cdc56f1-d2f4-4d66-a0f8-d3871a612176",
+      "name": "Principles",
+      "slug": "/principles",
+      "title": "Principles",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 20,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {},
+      "managed_site_id": "7fd60824-a933-401d-8099-7b64f24cc408"
+    },
+    {
+      "id": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85",
+      "name": "Projects",
+      "slug": "/projects",
+      "title": "Projects",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 10,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {},
+      "managed_site_id": "7fd60824-a933-401d-8099-7b64f24cc408"
+    },
+    {
+      "id": "de8728f0-3bfe-40b4-a721-37f7779634d2",
+      "name": "About",
+      "slug": "/about",
+      "title": "About Myomaton",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 30,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {},
+      "managed_site_id": "7fd60824-a933-401d-8099-7b64f24cc408"
+    },
+    {
+      "id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "name": "Home",
+      "slug": "/",
+      "title": "Myomaton",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-09-27T16:30:06.758769+00:00",
+      "sort_order": 0,
+      "updated_at": "2026-09-27T16:30:06.758769+00:00",
+      "configuration": {},
+      "managed_site_id": "7fd60824-a933-401d-8099-7b64f24cc408"
+    }
+  ],
+  "sections": [
+    {
+      "id": "07d7c37b-4345-4721-9f70-4a8c8b935d53",
+      "name": "Physical Experimentation",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Floors have thresholds. Rooms have awkward corners. Wireless connections fail. Batteries run down. People walk through the path you carefully planned.\n\nReal environments have an efficient way of exposing assumptions.\n\nThat is why Myomaton is built around physical experimentation rather than demonstrations that work only under ideal conditions.",
+        "heading": "Reality is an excellent design review"
+      },
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-02T03:09:49.561431+00:00",
+      "sort_order": 60,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "1d8815d4-147a-4f27-8e2b-65ca703e024e",
+      "name": "Principles",
+      "type": "collection",
+      "status": "active",
+      "content": {
+        "items": [
+          {
+            "id": "principle-001",
+            "text": "Practical robotics becomes much more interesting when ordinary hardware can participate.",
+            "heading": "Affordable"
+          },
+          {
+            "id": "principle-002",
+            "text": "The system should be possible to inspect, explain, modify, and repair.",
+            "heading": "Understandable"
+          },
+          {
+            "id": "principle-003",
+            "text": "Useful machines should not become disposable because one component or service disappears.",
+            "heading": "Repairable"
+          },
+          {
+            "id": "principle-004",
+            "text": "Core behavior and safety should remain close to the robot rather than depending unnecessarily on remote services.",
+            "heading": "Local-first"
+          },
+          {
+            "id": "principle-005",
+            "text": "Cloud and AI services can add capability, but basic ownership and usefulness should not depend on continuing payments or Internet access.",
+            "heading": "No mandatory cloud or subscription"
+          }
+        ],
+        "heading": "What makes something Myomaton?",
+        "itemSource": "inline"
+      },
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "variant": "grid",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-02T03:09:49.561431+00:00",
+      "sort_order": 50,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "configuration": {
+        "columns": 3
+      }
+    },
+    {
+      "id": "1fb0bdd2-c451-4ca9-ab05-9c525685a768",
+      "name": "More Than One Robot",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "A useful robot may not need to do everything.\n\nA household can make more sense as a small ecosystem: different robots with different capabilities, sharing information and helping one another where useful.",
+        "heading": "More Than One Robot"
+      },
+      "page_id": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 50,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "211ff9f7-07fc-43df-9780-1f0ea771c047",
+      "name": "TaBot",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "TaBot is a practical rolling robot exploring useful household behavior — following, approaching when called, navigating real spaces, managing its own power, and eventually working alongside other robots.\n\nIt is where many Myomaton ideas meet physical reality: navigation, sensing, charging, safety, mechanical design, and the question of what behavior is actually useful around people.",
+        "heading": "TaBot"
+      },
+      "page_id": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85",
+      "variant": "split-text-first",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 20,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {
+        "mediaFit": "natural"
+      }
+    },
+    {
+      "id": "2f42e897-8507-4345-a743-18a4a6bbf96e",
+      "name": "Reality is an excellent design review",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Floors have thresholds. Rooms have awkward corners. Wireless connections fail. Batteries run down. People walk through carefully planned routes.\n\nReal environments expose assumptions quickly. That is why Myomaton is built around physical experimentation rather than demonstrations that work only under ideal conditions.",
+        "heading": "Reality is an excellent design review"
+      },
+      "page_id": "de8728f0-3bfe-40b4-a721-37f7779634d2",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 20,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "33113b1e-3a54-49d7-81f0-3f9ebe36a150",
+      "name": "One person, amplified",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Myomaton is being developed by one person working extensively with AI.\n\nAI contributes synthesis, code assistance, documentation, structural reasoning, exploration, and coordination. Human judgment provides continuity of purpose, physical-world experience, priorities, values, and ultimate responsibility.\n\nThe goal is not to blur those roles. It is to use each where it is strongest and keep important project state externalized so the work remains understandable and correctable.",
+        "heading": "One person, amplified"
+      },
+      "page_id": "de8728f0-3bfe-40b4-a721-37f7779634d2",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 30,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "46dc2e85-4b5a-4524-aebf-a9e2614fe45d",
+      "name": "See what we’re building",
+      "type": "cta",
+      "status": "active",
+      "content": {
+        "heading": "See what we’re building",
+        "actionId": "289247dc-d4d0-4cdc-aabb-46c2b4b38940"
+      },
+      "page_id": "de8728f0-3bfe-40b4-a721-37f7779634d2",
+      "variant": "default",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 50,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "49547304-277d-4a19-aa56-2bc19380feb4",
+      "name": "Complexity has a cost",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Sophistication is useful when it earns its keep.\n\nMyomaton favors systems that can be understood, repaired, and reasoned about. More complexity should be added when it produces clear practical value, not simply because it is technically possible.",
+        "heading": "Complexity has a cost"
+      },
+      "page_id": "5cdc56f1-d2f4-4d66-a0f8-d3871a612176",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 30,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "4fd4e176-26a4-4c5a-b3dd-d626d80b3c29",
+      "name": "Small robot experiments",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Not every experiment needs to become a permanent project.\n\nSmaller platforms such as Q-Scout, Root, and other inexpensive robots let us test specific ideas quickly — charging, communication, shared control, sensing, and the division of work between simple and more capable machines.\n\nWhen an experiment develops durable identity and value, it can become a first-class Project Subject later.",
+        "heading": "Small robot experiments"
+      },
+      "page_id": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 40,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "541bed47-e1e4-43d0-8229-b78c8ec91d8f",
+      "name": "Projects",
+      "type": "hero",
+      "status": "active",
+      "content": {
+        "text": "Working robots, experiments, and systems built to answer practical questions.",
+        "heading": "Projects"
+      },
+      "page_id": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85",
+      "variant": "default",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 0,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "680318d0-a606-4d70-af92-1b5a69735ca6",
+      "name": "Introduction",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Useful robots have to work in the physical world.\n\nSo we build things, run them, find out what fails, change them, and try again. Navigation, sensing, charging, mechanical design, software, and interaction all look a little different once the robot leaves the workbench.\n\nThe machines shown here are working experiments. The point is not to make every prototype look finished. The point is to learn what actually works.",
+        "heading": "Build. Test. Learn. Repeat."
+      },
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "variant": "split-text-first",
+      "version": 2,
+      "metadata": {},
+      "created_at": "2026-09-27T16:30:06.758769+00:00",
+      "sort_order": 20,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "6c763a29-4404-4fe7-be6f-ab60de3bfcbe",
+      "name": "Hero",
+      "type": "hero",
+      "status": "active",
+      "content": {
+        "text": "What should a useful personal robot actually be?\n\nMyomaton explores practical robots that are affordable, understandable, repairable, and genuinely useful — machines people can adapt, maintain, and keep using on their own terms.",
+        "eyebrow": "My Own Robot",
+        "heading": "Myomaton",
+        "actionId": "af558c75-18b1-44b5-9c79-d14a7a66e13f"
+      },
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "variant": "default",
+      "version": 2,
+      "metadata": {},
+      "created_at": "2026-09-27T16:30:06.758769+00:00",
+      "sort_order": 0,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "7cb671bc-8d5b-423e-bd17-87922bd5f9b0",
+      "name": "Ownership",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "A robot you can actually call your own.\n\nA useful personal robot should not stop being yours because a subscription expires, a cloud service disappears, or the manufacturer decides the hardware is finished.\n\nMyomaton explores robots that can be understood, repaired, modified, and kept useful over time. Cloud services and AI can add capability, but ownership should not depend on them.",
+        "heading": "What does \"My Own Robot\" mean?"
+      },
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-02T03:09:49.561431+00:00",
+      "sort_order": 10,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "configuration": {
+        "anchor": "about"
+      }
+    },
+    {
+      "id": "7cbb70b2-ac0c-49b6-a269-3b3acdaf2be4",
+      "name": "Use what works",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Local-first does not mean rejecting cloud services, commercial technology, or AI.\n\nThe question is whether a technology improves the system without unnecessarily taking ownership, reliability, or understanding away from the person using it.",
+        "heading": "Use what works"
+      },
+      "page_id": "5cdc56f1-d2f4-4d66-a0f8-d3871a612176",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 40,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "9d7472fd-f453-4690-8596-fd3e57c9ddca",
+      "name": "Robot Ecosystem",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "A useful robot may not need to do everything.\n\nA household can make more sense as a small ecosystem: different robots with different capabilities, sharing information and helping one another where useful.\n\nMyomaton is exploring both the individual machines and the common system that lets simpler and more capable robots work together.",
+        "heading": "More Than One Robot"
+      },
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-02T03:09:49.561431+00:00",
+      "sort_order": 40,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "a0afbe15-927b-46f6-bb2b-474523124934",
+      "name": "Primary Call to Action",
+      "type": "cta",
+      "status": "active",
+      "content": {
+        "text": "Follow the builds, experiments, failures, fixes, and occasional moments when the robot actually does what we hoped it would.",
+        "heading": "See what happens next."
+      },
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "variant": "default",
+      "version": 3,
+      "metadata": {},
+      "created_at": "2026-09-27T16:30:06.758769+00:00",
+      "sort_order": 80,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "a6251ba4-01e7-41b4-87bf-288a864f5454",
+      "name": "Why this exists",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Myomaton starts with a simple question: what should a useful personal robot actually be?\n\nThe answer should not depend on novelty alone. A useful robot should be affordable enough to matter, understandable enough to own, repairable enough to keep, and practical enough to earn a place in everyday life.",
+        "heading": "Why this exists"
+      },
+      "page_id": "de8728f0-3bfe-40b4-a721-37f7779634d2",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 10,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "a7d9b1ba-456f-4936-bc49-bfe861638bbf",
+      "name": "What makes something Myomaton?",
+      "type": "cta",
+      "status": "active",
+      "content": {
+        "heading": "What makes something Myomaton?",
+        "actionId": "60eeae6f-ae85-433b-9fea-19548b556a7f"
+      },
+      "page_id": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85",
+      "variant": "default",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 60,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "b6142d7e-b8e1-41a7-9ade-ec96a5f37bc9",
+      "name": "About Myomaton",
+      "type": "hero",
+      "status": "active",
+      "content": {
+        "text": "Practical personal robotics, built and tested in the real world.",
+        "heading": "About Myomaton"
+      },
+      "page_id": "de8728f0-3bfe-40b4-a721-37f7779634d2",
+      "variant": "default",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 0,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "c1949ff0-f02f-4474-90e3-53ad7e7e74af",
+      "name": "Core principles",
+      "type": "collection",
+      "status": "active",
+      "content": {
+        "items": [
+          {
+            "id": "principle-001",
+            "text": "Practical robotics becomes much more interesting when ordinary hardware can participate.",
+            "heading": "Affordable"
+          },
+          {
+            "id": "principle-002",
+            "text": "The system should be possible to inspect, explain, modify, and repair.",
+            "heading": "Understandable"
+          },
+          {
+            "id": "principle-003",
+            "text": "Useful machines should not become disposable because one component or service disappears.",
+            "heading": "Repairable"
+          },
+          {
+            "id": "principle-004",
+            "text": "Core behavior and safety should remain close to the robot rather than depending unnecessarily on remote services.",
+            "heading": "Local-first"
+          },
+          {
+            "id": "principle-005",
+            "text": "Cloud and AI services can add capability, but basic ownership and usefulness should not depend on continuing payments or Internet access.",
+            "heading": "No mandatory cloud or subscription"
+          }
+        ],
+        "heading": "Core principles",
+        "itemSource": "inline"
+      },
+      "page_id": "5cdc56f1-d2f4-4d66-a0f8-d3871a612176",
+      "variant": "grid",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 10,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {
+        "columns": 3
+      }
+    },
+    {
+      "id": "c4edd287-d942-4fb0-868f-cc77fbeb614b",
+      "name": "Principles",
+      "type": "hero",
+      "status": "active",
+      "content": {
+        "text": "Practical robotics should remain useful, understandable, and yours.",
+        "heading": "Principles"
+      },
+      "page_id": "5cdc56f1-d2f4-4d66-a0f8-d3871a612176",
+      "variant": "default",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 0,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "c6cf2724-3fc4-49ab-9ccd-134ab614c423",
+      "name": "Current Projects",
+      "type": "collection",
+      "status": "active",
+      "content": {
+        "items": [
+          {
+            "id": "project-001",
+            "subjectId": "5a07b8d7-a388-48c4-9bc5-9b4b575d33cd"
+          },
+          {
+            "id": "project-002",
+            "subjectId": "845c03b7-cd6d-4cc4-b6a5-de98893cc057"
+          }
+        ],
+        "heading": "Current Projects",
+        "itemSource": "subjects"
+      },
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "variant": "grid",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-02T03:09:49.561431+00:00",
+      "sort_order": 30,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "configuration": {
+        "anchor": "current-projects",
+        "columns": 2
+      }
+    },
+    {
+      "id": "c984b810-387c-4b39-99b8-25ee6f23cd9b",
+      "name": "Current Projects",
+      "type": "collection",
+      "status": "active",
+      "content": {
+        "items": [
+          {
+            "id": "project-tabot",
+            "subjectId": "5a07b8d7-a388-48c4-9bc5-9b4b575d33cd"
+          },
+          {
+            "id": "project-abot",
+            "subjectId": "845c03b7-cd6d-4cc4-b6a5-de98893cc057"
+          }
+        ],
+        "heading": "Current Projects",
+        "itemSource": "subjects"
+      },
+      "page_id": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85",
+      "variant": "grid",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 10,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {
+        "columns": 2
+      }
+    },
+    {
+      "id": "ca7d2a60-d54f-40b1-87fa-0673fe9e510a",
+      "name": "A-Bot",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "A-Bot explores a different problem: how one robot might help other robots remain useful.\n\nThe first role is practical and deliberately narrow — connecting, charging, and servicing smaller resident robots. That makes A-Bot both a robot in its own right and part of the larger household ecosystem Myomaton is exploring.",
+        "heading": "A-Bot"
+      },
+      "page_id": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85",
+      "variant": "split-image-first",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 30,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {
+        "mediaFit": "natural"
+      }
+    },
+    {
+      "id": "d0f519e2-27a9-4f67-9d67-118798c67543",
+      "name": "See the projects",
+      "type": "cta",
+      "status": "active",
+      "content": {
+        "heading": "See the projects",
+        "actionId": "ec47c6b5-e75d-4dd7-a59a-dac14a8737d3"
+      },
+      "page_id": "5cdc56f1-d2f4-4d66-a0f8-d3871a612176",
+      "variant": "default",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 60,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "d1833556-8d59-4b41-a594-7a2c4fe7067c",
+      "name": "Ownership matters",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "A personal robot should remain useful because you own it, not because a subscription remains active or somebody else’s service keeps granting permission.\n\nCloud systems and AI can add capability, but basic ownership and usefulness should not depend on them.",
+        "heading": "Ownership matters"
+      },
+      "page_id": "5cdc56f1-d2f4-4d66-a0f8-d3871a612176",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 20,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "d7928e1a-1a50-4068-b635-841b90e1c96d",
+      "name": "Share what proves useful",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Useful ideas should be documented clearly enough that other people can understand them, reproduce them, improve them, or adapt them.\n\nOpen work is most valuable when it is practical, honest about its limits, and grounded in what has actually been demonstrated.",
+        "heading": "Share what proves useful"
+      },
+      "page_id": "5cdc56f1-d2f4-4d66-a0f8-d3871a612176",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 50,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "e79a7b8f-a8f9-4da7-9c7a-a8424464d4e3",
+      "name": "Sharing",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Not every experiment deserves to become a project.\n\nThe things that do prove useful should be explained well enough that other people can understand them, reproduce them, improve them, or take them somewhere we didn't.\n\nMyomaton is being developed in that spirit: document the work, share the useful parts, and be clear about what has actually been demonstrated.",
+        "heading": "Share what proves useful"
+      },
+      "page_id": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-02T03:09:49.561431+00:00",
+      "sort_order": 70,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "configuration": {}
+    },
+    {
+      "id": "e8290a76-95db-4da8-a815-a010cface1ff",
+      "name": "Open Practical Robotics",
+      "type": "intro",
+      "status": "active",
+      "content": {
+        "text": "Useful work should be shared clearly enough that other people can understand it, reproduce it, improve it, or take it somewhere new.\n\nMyomaton is developed in that spirit: document what proves useful, keep unnecessary barriers low, and be clear about what has actually been demonstrated.",
+        "heading": "Open Practical Robotics"
+      },
+      "page_id": "de8728f0-3bfe-40b4-a721-37f7779634d2",
+      "variant": "stack",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 40,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "configuration": {}
+    }
+  ],
+  "actions": [
+    {
+      "id": "289247dc-d4d0-4cdc-aabb-46c2b4b38940",
+      "name": "Projects Page CTA",
+      "type": "page",
+      "label": "See what we’re building",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "destination": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85",
+      "configuration": {},
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    },
+    {
+      "id": "60eeae6f-ae85-433b-9fea-19548b556a7f",
+      "name": "Principles Page CTA",
+      "type": "page",
+      "label": "What makes something Myomaton?",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "destination": "5cdc56f1-d2f4-4d66-a0f8-d3871a612176",
+      "configuration": {},
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    },
+    {
+      "id": "af558c75-18b1-44b5-9c79-d14a7a66e13f",
+      "name": "See what we're building",
+      "type": "section",
+      "label": "See what we're building",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-02T03:09:49.561431+00:00",
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "destination": "#current-projects",
+      "configuration": {},
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    },
+    {
+      "id": "d8a3924b-52af-41c7-b6c9-c4b3b41f035f",
+      "name": "Learn about Myomaton",
+      "type": "section",
+      "label": "Learn more",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-09-28T12:47:23.167202+00:00",
+      "updated_at": "2026-09-28T12:47:23.167202+00:00",
+      "destination": "#about",
+      "configuration": {},
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    },
+    {
+      "id": "ec47c6b5-e75d-4dd7-a59a-dac14a8737d3",
+      "name": "Projects Return CTA",
+      "type": "page",
+      "label": "See the projects",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "destination": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85",
+      "configuration": {},
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "5a07b8d7-a388-48c4-9bc5-9b4b575d33cd",
+      "name": "TaBot",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-02T03:09:49.561431+00:00",
+      "legal_name": null,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "description": "A practical rolling robot exploring useful household behavior — following, approaching when called, navigating real spaces, managing its own power, and eventually working alongside other robots.",
+      "configuration": {},
+      "subject_type_id": "4a1cf484-bfc3-4e3d-baee-0882353a6590",
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    },
+    {
+      "id": "845c03b7-cd6d-4cc4-b6a5-de98893cc057",
+      "name": "A-Bot",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-10-02T03:09:49.561431+00:00",
+      "legal_name": null,
+      "updated_at": "2026-10-02T03:09:49.561431+00:00",
+      "description": "An attendant robot concept that helps other robots stay useful — beginning with the practical problem of connecting, charging, and servicing smaller resident robots.",
+      "configuration": {},
+      "subject_type_id": "4a1cf484-bfc3-4e3d-baee-0882353a6590",
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    },
+    {
+      "id": "abfcc180-4bcd-478b-8c3b-1f0fd3664ac3",
+      "name": "Myomaton",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-09-27T15:34:53.982063+00:00",
+      "legal_name": null,
+      "updated_at": "2026-09-27T15:34:53.982063+00:00",
+      "description": "An open practical robotics project.",
+      "configuration": {},
+      "subject_type_id": "4a1cf484-bfc3-4e3d-baee-0882353a6590",
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    }
+  ],
+  "subject_types": [
+    {
+      "id": "4a1cf484-bfc3-4e3d-baee-0882353a6590",
+      "key": "project",
+      "name": "Project",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "parent_id": null,
+      "created_at": "2026-09-27T15:33:26.763081+00:00",
+      "updated_at": "2026-09-27T15:33:26.763081+00:00",
+      "description": "A project, initiative, or undertaking represented by a web presence.",
+      "configuration": {}
+    }
+  ],
+  "design_systems": [
+    {
+      "id": "63b6d353-fa10-47a0-850a-70a0af311388",
+      "name": "Myomaton",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-09-27T19:52:50.764407+00:00",
+      "updated_at": "2026-09-27T19:52:50.764407+00:00",
+      "configuration": {
+        "shape": {
+          "radius": 12
+        },
+        "colors": {
+          "text": "#202b27",
+          "muted": "#526159",
+          "accent": "#214e43",
+          "border": "#cbd3c9",
+          "surface": "#e9ede6",
+          "onAccent": "#ffffff",
+          "background": "#f6f5f0"
+        },
+        "spacing": {
+          "unit": 8,
+          "section": 72
+        },
+        "typography": {
+          "baseSize": 18,
+          "bodyFont": "sans",
+          "lineHeight": 1.65,
+          "headingFont": "sans",
+          "headingScale": 3
+        }
+      },
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "9dfdb35b-ef37-4656-b56e-1468b5ba9690",
+      "name": "Primary Navigation",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "created_at": "2026-09-28T13:41:21.180078+00:00",
+      "updated_at": "2026-09-28T13:41:21.180078+00:00",
+      "configuration": {},
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    }
+  ],
+  "navigation_items": [
+    {
+      "id": "46fa0ce2-1bca-4b59-8760-67fd758abdc1",
+      "name": "Projects",
+      "label": "Projects",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "parent_id": null,
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 10,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "target_type": "page",
+      "configuration": {},
+      "navigation_id": "9dfdb35b-ef37-4656-b56e-1468b5ba9690",
+      "target_reference": "c4bcb2b1-84e0-4ef5-a374-383563ed7c85"
+    },
+    {
+      "id": "48e12793-6035-48a5-b722-054e84144c6a",
+      "name": "Home",
+      "label": "Home",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "parent_id": null,
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 0,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "target_type": "page",
+      "configuration": {},
+      "navigation_id": "9dfdb35b-ef37-4656-b56e-1468b5ba9690",
+      "target_reference": "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee"
+    },
+    {
+      "id": "79a0b953-ce40-4e6e-b258-8132c64f7359",
+      "name": "About",
+      "label": "About",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "parent_id": null,
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 30,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "target_type": "page",
+      "configuration": {},
+      "navigation_id": "9dfdb35b-ef37-4656-b56e-1468b5ba9690",
+      "target_reference": "de8728f0-3bfe-40b4-a721-37f7779634d2"
+    },
+    {
+      "id": "8ff82bd1-d3c2-4e67-baa1-a22bd4e45487",
+      "name": "Principles",
+      "label": "Principles",
+      "status": "active",
+      "version": 1,
+      "metadata": {},
+      "parent_id": null,
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "sort_order": 20,
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "target_type": "page",
+      "configuration": {},
+      "navigation_id": "9dfdb35b-ef37-4656-b56e-1468b5ba9690",
+      "target_reference": "5cdc56f1-d2f4-4d66-a0f8-d3871a612176"
+    }
+  ],
+  "assets": [
+    {
+      "id": "2cd65369-3c6f-4017-a51d-71759d6115db",
+      "name": "A-Bot product angle",
+      "type": "image",
+      "width": 1448,
+      "height": 1086,
+      "status": "active",
+      "version": 1,
+      "alt_text": "Angled product photo of the A-Bot prototype showing the micro:bit controller, wheel, chassis, and front sensor hardware on a black background.",
+      "metadata": {},
+      "mime_type": "image/png",
+      "created_at": "2026-10-02T14:06:05.136092+00:00",
+      "updated_at": "2026-10-02T14:06:05.136092+00:00",
+      "source_type": "managed",
+      "configuration": {},
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "source_reference": "objects/10fde8a87727893f5757f22c738ee70daf5101c9334d9565edb6d24b35a58e48"
+    },
+    {
+      "id": "e1a699d7-19ca-43a1-9dbe-3d7d523381ef",
+      "name": "A-Bot product close-up",
+      "type": "image",
+      "width": 1448,
+      "height": 1086,
+      "status": "active",
+      "version": 1,
+      "alt_text": "Close-up product photo of the A-Bot prototype showing the micro:bit controller, wheel, and front hardware on a black background.",
+      "metadata": {},
+      "mime_type": "image/png",
+      "created_at": "2026-10-02T14:06:05.136092+00:00",
+      "updated_at": "2026-10-02T14:06:05.136092+00:00",
+      "source_type": "managed",
+      "configuration": {},
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "source_reference": "objects/918c1a9419d0a9752b1cdb603b99bd2329d10a70be1d1c0068026eb98f8c30ad"
+    },
+    {
+      "id": "eb1ea754-2f6d-4514-bf42-f4781f5f1d80",
+      "name": "Tabot robotics hardware",
+      "type": "image",
+      "width": 1448,
+      "height": 1086,
+      "status": "active",
+      "version": 1,
+      "alt_text": "Close-up of Tabot robotics hardware with a Makerfabs AOA display, circuit boards, antenna, and connected cables.",
+      "metadata": {},
+      "mime_type": "image/png",
+      "created_at": "2026-09-29T20:00:18.979088+00:00",
+      "updated_at": "2026-09-29T20:00:18.979088+00:00",
+      "source_type": "managed",
+      "configuration": {},
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af",
+      "source_reference": "objects/b3388ddf50a8fdb7630098314ec29f74306aefe948607e67fe78fef53189681c"
+    }
+  ],
+  "asset_usages": [
+    {
+      "id": "3cc28c9c-cbc8-4bae-b733-2ff77192e3e2",
+      "role": "image",
+      "version": 1,
+      "asset_id": "2cd65369-3c6f-4017-a51d-71759d6115db",
+      "metadata": {},
+      "entity_id": "ca7d2a60-d54f-40b1-87fa-0673fe9e510a",
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "entity_type": "section",
+      "configuration": {
+        "image": {
+          "decorative": false
+        }
+      },
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    },
+    {
+      "id": "5172857b-99ec-4b70-bf36-4b1785f5637e",
+      "role": "image",
+      "version": 1,
+      "asset_id": "eb1ea754-2f6d-4514-bf42-f4781f5f1d80",
+      "metadata": {},
+      "entity_id": "211ff9f7-07fc-43df-9780-1f0ea771c047",
+      "created_at": "2026-10-03T13:56:01.392948+00:00",
+      "updated_at": "2026-10-03T13:56:01.392948+00:00",
+      "entity_type": "section",
+      "configuration": {
+        "image": {
+          "decorative": false
+        }
+      },
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    },
+    {
+      "id": "9475a91c-e0ad-4373-b5e9-65ca6fe649e7",
+      "role": "image",
+      "version": 1,
+      "asset_id": "eb1ea754-2f6d-4514-bf42-f4781f5f1d80",
+      "metadata": {},
+      "entity_id": "680318d0-a606-4d70-af92-1b5a69735ca6",
+      "created_at": "2026-09-29T20:00:18.979088+00:00",
+      "updated_at": "2026-09-29T20:00:18.979088+00:00",
+      "entity_type": "section",
+      "configuration": {},
+      "web_presence_id": "1b72cd7d-92b9-4f55-aba6-825d69d493af"
+    }
+  ],
+  "contact_definitions": [],
+  "contact_submissions": [],
+  "migrations": [
+    {
+      "id": 1,
+      "hash": "44f936f11b8d7498c653af3b6e83fe068d4dd756d0ba83c091bb6dffd117b924",
+      "created_at": 1790522828994
+    },
+    {
+      "id": 2,
+      "hash": "6f0c72eb9c90c40a28bcf351bb6ff8d0c8c8b3578a3a0d11e647aae9d113f271",
+      "created_at": 1790525683157
+    },
+    {
+      "id": 3,
+      "hash": "2b06b4efc9758157bafd963bf4eec625eaa7d22eb967b83fa85b80a5ba7c32e3",
+      "created_at": 1790537698702
+    },
+    {
+      "id": 4,
+      "hash": "31ad42ead532fbbd0eec60c265c535df069509710c8e6f28e6aff1137fa29a01",
+      "created_at": 1790558322905
+    },
+    {
+      "id": 5,
+      "hash": "9b7da026fdcdb6e1c8d0f88072da44b5424d5184ec7204744f77cd0fe80f444d",
+      "created_at": 1790600904099
+    },
+    {
+      "id": 6,
+      "hash": "69f0886e36a64ede3f4ad5fd00e2477d779215b57e447712d7f8ddc2b0a20b8c",
+      "created_at": 1790641266624
+    },
+    {
+      "id": 7,
+      "hash": "916b37ef27eba28149f1093a170993026f080a5258276d59c30180d1c2a83180",
+      "created_at": 1790959692569
+    },
+    {
+      "id": 8,
+      "hash": "5a06eab60dd5494c1c7506e60b7902b08f91f8c63df50cc97788a9fd7e6a0108",
+      "created_at": 1791067838170
+    }
+  ]
+}

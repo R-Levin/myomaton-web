@@ -11,6 +11,8 @@
     "bootstrap:myomaton": "tsx --env-file=.env.local scripts/bootstrap-myomaton.ts",
     "update:myomaton-home-v1": "tsx --env-file=.env.local scripts/update-myomaton-home-v1.ts",
     "update:myomaton-secondary-pages-v1": "tsx --env-file=.env.local scripts/update-myomaton-secondary-pages-v1.ts",
+    "update:myomaton-visual-direction-v1": "tsx --env-file=.env.local scripts/update-myomaton-visual-direction-v1.ts",
+    "update:myomaton-visual-direction-v2": "tsx --env-file=.env.local scripts/update-myomaton-visual-direction-v2.ts",
     "db:bootstrap-photo": "tsx --env-file=.env.local scripts/bootstrap-myomaton-photo.ts",
     "assets:import": "tsx --env-file=.env.local scripts/import-managed-assets.ts",
     "test": "tsx --test tests/*.test.tsx",

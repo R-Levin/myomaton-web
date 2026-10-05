@@ -1,0 +1,299 @@
+{
+  "colors": {
+    "background": "#f7f6f0",
+    "surface": "#e8ede6",
+    "text": "#132b30",
+    "muted": "#455c5b",
+    "accent": "#176b4f",
+    "onAccent": "#ffffff",
+    "border": "#c7d3cb",
+    "secondaryAccent": "#315dc4",
+    "onSecondaryAccent": "#ffffff"
+  },
+  "sections": {
+    "07d7c37b-4345-4721-9f70-4a8c8b935d53": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "treatment": "statement",
+      "composition": "statement-break",
+      "spacing": "normal"
+    },
+    "1d8815d4-147a-4f27-8e2b-65ca703e024e": {
+      "width": "standard",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "grouped-field",
+      "surface": "default",
+      "spacing": "compact",
+      "columns": 2
+    },
+    "1fb0bdd2-c451-4ca9-ab05-9c525685a768": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "editorial-row",
+      "surface": "default",
+      "spacing": "normal"
+    },
+    "211ff9f7-07fc-43df-9780-1f0ea771c047": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "image-evidence",
+      "surface": "default",
+      "spacing": "normal"
+    },
+    "2f42e897-8507-4345-a743-18a4a6bbf96e": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "treatment": "statement",
+      "composition": "statement-break",
+      "spacing": "normal"
+    },
+    "33113b1e-3a54-49d7-81f0-3f9ebe36a150": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "editorial-row",
+      "surface": "default",
+      "spacing": "normal"
+    },
+    "46dc2e85-4b5a-4524-aebf-a9e2614fe45d": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "conversion-band",
+      "surface": "contrast",
+      "spacing": "normal"
+    },
+    "49547304-277d-4a19-aa56-2bc19380feb4": {
+      "width": "reading",
+      "alignment": "left",
+      "divider": "none",
+      "surface": "default",
+      "spacing": "compact"
+    },
+    "4fd4e176-26a4-4c5a-b3dd-d626d80b3c29": {
+      "width": "reading",
+      "alignment": "left",
+      "divider": "none",
+      "surface": "default",
+      "spacing": "compact"
+    },
+    "541bed47-e1e4-43d0-8229-b78c8ec91d8f": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "asymmetric-field",
+      "surface": "contrast",
+      "spacing": "normal"
+    },
+    "680318d0-a606-4d70-af92-1b5a69735ca6": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "image-evidence",
+      "surface": "default",
+      "spacing": "normal"
+    },
+    "6c763a29-4404-4fe7-be6f-ab60de3bfcbe": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "asymmetric-field",
+      "surface": "contrast",
+      "spacing": "compact"
+    },
+    "7cb671bc-8d5b-423e-bd17-87922bd5f9b0": {
+      "width": "reading",
+      "alignment": "left",
+      "divider": "none",
+      "surface": "default",
+      "spacing": "compact"
+    },
+    "7cbb70b2-ac0c-49b6-a269-3b3acdaf2be4": {
+      "width": "reading",
+      "alignment": "left",
+      "divider": "none",
+      "surface": "default",
+      "spacing": "compact"
+    },
+    "9d7472fd-f453-4690-8596-fd3e57c9ddca": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "editorial-row",
+      "surface": "default",
+      "spacing": "compact"
+    },
+    "a0afbe15-927b-46f6-bb2b-474523124934": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "conversion-band",
+      "surface": "contrast",
+      "spacing": "normal"
+    },
+    "a6251ba4-01e7-41b4-87bf-288a864f5454": {
+      "width": "reading",
+      "alignment": "left",
+      "divider": "none",
+      "surface": "default",
+      "spacing": "compact"
+    },
+    "a7d9b1ba-456f-4936-bc49-bfe861638bbf": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "conversion-band",
+      "surface": "contrast",
+      "spacing": "normal"
+    },
+    "b6142d7e-b8e1-41a7-9ade-ec96a5f37bc9": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "asymmetric-field",
+      "surface": "contrast",
+      "spacing": "normal"
+    },
+    "c1949ff0-f02f-4474-90e3-53ad7e7e74af": {
+      "width": "standard",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "grouped-field",
+      "surface": "default",
+      "spacing": "compact",
+      "columns": 2
+    },
+    "c4edd287-d942-4fb0-868f-cc77fbeb614b": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "asymmetric-field",
+      "surface": "contrast",
+      "spacing": "normal"
+    },
+    "c6cf2724-3fc4-49ab-9ccd-134ab614c423": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "grouped-field",
+      "surface": "subtle",
+      "spacing": "normal"
+    },
+    "c984b810-387c-4b39-99b8-25ee6f23cd9b": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "grouped-field",
+      "surface": "subtle",
+      "spacing": "normal"
+    },
+    "ca7d2a60-d54f-40b1-87fa-0673fe9e510a": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "image-evidence",
+      "surface": "default",
+      "spacing": "normal"
+    },
+    "d0f519e2-27a9-4f67-9d67-118798c67543": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "composition": "conversion-band",
+      "surface": "contrast",
+      "spacing": "normal"
+    },
+    "d1833556-8d59-4b41-a594-7a2c4fe7067c": {
+      "width": "wide",
+      "alignment": "left",
+      "divider": "none",
+      "treatment": "statement",
+      "composition": "statement-break",
+      "surface": "editorial",
+      "spacing": "normal"
+    },
+    "d7928e1a-1a50-4068-b635-841b90e1c96d": {
+      "width": "reading",
+      "alignment": "left",
+      "divider": "none",
+      "surface": "default",
+      "spacing": "compact"
+    },
+    "e79a7b8f-a8f9-4da7-9c7a-a8424464d4e3": {
+      "width": "reading",
+      "alignment": "left",
+      "divider": "none",
+      "surface": "default",
+      "spacing": "compact"
+    },
+    "e8290a76-95db-4da8-a815-a010cface1ff": {
+      "width": "reading",
+      "alignment": "left",
+      "divider": "none",
+      "surface": "default",
+      "spacing": "compact"
+    }
+  },
+  "pageOrder": {
+    "fd7bdc57-c9b7-4274-b871-43cf2e9b09ee": [
+      "6c763a29-4404-4fe7-be6f-ab60de3bfcbe",
+      "680318d0-a606-4d70-af92-1b5a69735ca6",
+      "7cb671bc-8d5b-423e-bd17-87922bd5f9b0",
+      "c6cf2724-3fc4-49ab-9ccd-134ab614c423",
+      "9d7472fd-f453-4690-8596-fd3e57c9ddca",
+      "07d7c37b-4345-4721-9f70-4a8c8b935d53",
+      "1d8815d4-147a-4f27-8e2b-65ca703e024e",
+      "e79a7b8f-a8f9-4da7-9c7a-a8424464d4e3",
+      "a0afbe15-927b-46f6-bb2b-474523124934"
+    ],
+    "c4bcb2b1-84e0-4ef5-a374-383563ed7c85": [
+      "541bed47-e1e4-43d0-8229-b78c8ec91d8f",
+      "211ff9f7-07fc-43df-9780-1f0ea771c047",
+      "ca7d2a60-d54f-40b1-87fa-0673fe9e510a",
+      "c984b810-387c-4b39-99b8-25ee6f23cd9b",
+      "4fd4e176-26a4-4c5a-b3dd-d626d80b3c29",
+      "1fb0bdd2-c451-4ca9-ab05-9c525685a768",
+      "a7d9b1ba-456f-4936-bc49-bfe861638bbf"
+    ],
+    "de8728f0-3bfe-40b4-a721-37f7779634d2": [
+      "b6142d7e-b8e1-41a7-9ade-ec96a5f37bc9",
+      "a6251ba4-01e7-41b4-87bf-288a864f5454",
+      "2f42e897-8507-4345-a743-18a4a6bbf96e",
+      "33113b1e-3a54-49d7-81f0-3f9ebe36a150",
+      "e8290a76-95db-4da8-a815-a010cface1ff",
+      "46dc2e85-4b5a-4524-aebf-a9e2614fe45d"
+    ],
+    "5cdc56f1-d2f4-4d66-a0f8-d3871a612176": [
+      "c4edd287-d942-4fb0-868f-cc77fbeb614b",
+      "d1833556-8d59-4b41-a594-7a2c4fe7067c",
+      "c1949ff0-f02f-4474-90e3-53ad7e7e74af",
+      "49547304-277d-4a19-aa56-2bc19380feb4",
+      "7cbb70b2-ac0c-49b6-a269-3b3acdaf2be4",
+      "d7928e1a-1a50-4068-b635-841b90e1c96d",
+      "d0f519e2-27a9-4f67-9d67-118798c67543"
+    ]
+  },
+  "actions": {
+    "6c763a29-4404-4fe7-be6f-ab60de3bfcbe": "289247dc-d4d0-4cdc-aabb-46c2b4b38940",
+    "a0afbe15-927b-46f6-bb2b-474523124934": "ec47c6b5-e75d-4dd7-a59a-dac14a8737d3"
+  },
+  "promoteLead": [
+    "6c763a29-4404-4fe7-be6f-ab60de3bfcbe"
+  ],
+  "inactiveSections": [
+    "c984b810-387c-4b39-99b8-25ee6f23cd9b"
+  ],
+  "imageSelections": {
+    "9475a91c-e0ad-4373-b5e9-65ca6fe649e7": "2cd65369-3c6f-4017-a51d-71759d6115db"
+  },
+  "actionLabels": {
+    "289247dc-d4d0-4cdc-aabb-46c2b4b38940": "Explore projects",
+    "ec47c6b5-e75d-4dd7-a59a-dac14a8737d3": "Explore projects",
+    "60eeae6f-ae85-433b-9fea-19548b556a7f": "Read the principles"
+  }
+}
