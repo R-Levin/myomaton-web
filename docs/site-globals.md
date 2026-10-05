@@ -163,3 +163,14 @@ Unit tests cover facts, omission, safe links, semantics, policy and service cont
 Disposable PostgreSQL tests cover logo ownership/eligibility and actual production
 rendering/media bytes. The real database is inspected read-only before/after;
 automated mutation fixtures never target real customer tables.
+
+
+### Mobile Primary Navigation refinement
+
+Below the platform-owned 64rem breakpoint, the disclosure uses a padded, elevated
+panel with 48px link targets, stronger top-level type, nested child grouping and
+current-Page treatment. Menu changes to Close with safe local SVG paths. Escape
+returns focus to the button; Arrow Down opens and focuses the first link; selection
+or outside pointer interaction closes it. This is a non-modal disclosure with
+ordinary Tab order, not a focus-trapping drawer. Desktop Navigation and the
+server-rendered hierarchy remain unchanged. No new configurable variant is exposed.

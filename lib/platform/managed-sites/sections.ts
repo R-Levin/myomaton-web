@@ -10,11 +10,13 @@ export type CollectionContent = { heading?: string; text?: string } & (
 
 export type SectionContent = { heading?: string; text?: string; actionId?: string };
 export type SectionPresentation = {
+  treatment?: "statement";
+  composition?: "asymmetric-field" | "editorial-row" | "statement-break" | "image-evidence" | "grouped-field" | "conversion-band";
   anchor?: string;
   width: "reading" | "standard" | "wide";
   spacing: "compact" | "normal" | "spacious";
   alignment: "left" | "center";
-  surface: "default" | "subtle" | "accent";
+  surface: "default" | "subtle" | "accent" | "contrast" | "editorial";
   divider: "none" | "rule" | "spacing";
   mediaFit: "natural" | "contain" | "cover";
 };
@@ -81,11 +83,14 @@ export function normalizeSection(value: unknown): NormalizedSection | null {
   if (id) content.actionId = id;
   const anchor = typeof config.anchor === "string" ? normalizeDestination("section", `#${config.anchor}`)?.slice(1) : undefined;
   const configuration: SectionPresentation = {
+    ...(typeof config.composition === "string" && ({ hero: ["asymmetric-field"], intro: ["editorial-row", "statement-break", "image-evidence"], collection: ["grouped-field"], cta: ["conversion-band"], contact: [] }[type] as readonly string[]).includes(config.composition)
+      ? { composition: config.composition as SectionPresentation["composition"] } : {}),
+    ...(type === "intro" && config.treatment === "statement" ? { treatment: "statement" as const } : {}),
     ...(anchor ? { anchor } : {}),
     width: choice(config.width, ["reading", "standard", "wide"], "standard"),
     spacing: choice(config.spacing, ["compact", "normal", "spacious"], "normal"),
     alignment: choice(config.alignment, ["left", "center"], "left"),
-    surface: choice(config.surface, ["default", "subtle", "accent"], type === "cta" ? "subtle" : "default"),
+    surface: choice(config.surface, ["default", "subtle", "accent", "contrast", "editorial"], type === "cta" ? "subtle" : "default"),
     divider: choice(config.divider, ["none", "rule", "spacing"], "rule"),
     mediaFit: type === "intro" ? choice(config.mediaFit, ["natural", "contain", "cover"], "natural") : "natural",
   };

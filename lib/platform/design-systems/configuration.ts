@@ -16,6 +16,8 @@ export type DesignConfiguration = {
     accent: string;
     onAccent: string;
     border: string;
+    secondaryAccent?: string;
+    onSecondaryAccent?: string;
   };
   spacing: { unit: number; section: number };
   shape: { radius: number };
@@ -88,6 +90,10 @@ export function resolveDesignConfiguration(value: unknown): DesignConfiguration 
       accent: color(colors.accent, defaults.colors.accent),
       onAccent: color(colors.onAccent, defaults.colors.onAccent),
       border: color(colors.border, defaults.colors.border),
+      ...(color(colors.secondaryAccent, "") ? {
+        secondaryAccent: color(colors.secondaryAccent, ""),
+        onSecondaryAccent: color(colors.onSecondaryAccent, defaults.colors.onAccent),
+      } : {}),
     },
     spacing: {
       unit: number(spacing.unit, defaults.spacing.unit, 4, 12),

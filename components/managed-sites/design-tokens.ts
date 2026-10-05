@@ -27,5 +27,9 @@ export function designTokens(configuration: unknown): CSSProperties {
     "--design-section-space": `${spacing.section}px`,
     "--design-radius": `${shape.radius}px`,
   };
+  if (colors.secondaryAccent) {
+    tokens["--design-secondary-accent"] = colors.secondaryAccent;
+    tokens["--design-on-secondary-accent"] = colors.onSecondaryAccent!;
+  }
   return tokens;
 }

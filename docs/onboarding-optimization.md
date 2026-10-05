@@ -68,6 +68,34 @@ selection UI and broader visual capabilities remain planned. Two generic curated
 profiles now have an opt-in runtime resolver; that does not implement the intake,
 preview, approval or customer-state writing workflow described here.
 
+### External reference intake
+
+**Core planned, initially operator-assisted.** Distinguish curated platform
+examples, which demonstrate reproducible supported capabilities, from
+customer/operator-provided external references: competitors or unrelated sites
+used to communicate preferences. External sites are not selectable templates.
+
+Record the reference URL, category, review date/context, what is liked/disliked,
+which traits matter most and why. Separate observable traits from interpretation;
+unverified motion or responsive behavior remains unknown. Capture disagreements
+and priorities instead of averaging incompatible examples into an incoherent style.
+
+Map the reviewed traits into supported versioned profiles, permitted semantic
+preferences and Design System roles. Record unsupported traits as capability gaps,
+then preview representative real content and obtain bounded visual review. A
+reference must never authorize bespoke CSS, invented facts or a customer-state
+write. References influence art direction; they do not define implementation.
+Do not copy/clone layouts, wording, proprietary artwork, branded motifs or
+distinctive compositions, or promise reconstruction of a referenced site.
+
+AI may later assist trait extraction through the existing provider-neutral
+intelligence boundary. Operator/customer review establishes preference intent;
+model output is a proposal, not approval. Initial records can be a reviewed brief;
+no intake schema, scraper/importer, UI or approval writer is implemented here.
+The implemented [Visual Direction contract](visual-direction.md) defines the
+current mapping target. Customer-specific briefs and disposable selections remain
+separate from this planned intake capability.
+
 ## Canonical first-party measurement
 
 First-party/internal analytics is the canonical product measurement system.

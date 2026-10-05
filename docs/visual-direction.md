@@ -12,8 +12,11 @@ bounds. Myomaton remains Customer #1 and the proving ground. No pricing or visua
 outcome guarantee follows from this architecture.
 
 This document defines the visual contract and its **Implemented** opt-in runtime
-foundation described below. Customer selection/editing UI, shared icon expansion,
-additional treatments and a Myomaton redesign remain planned. The
+foundation and reference-v2 composition system described below. Reusable v2
+capabilities received human desktop/tablet/mobile visual acceptance for this
+checkpoint. Customer selection/editing UI and shared icon expansion remain planned.
+Real Myomaton uses reference v1; its accepted disposable v2 presentation has not
+been applied to customer state. The
 [capability catalog](platform-capabilities.md) defines product scope;
 [implementation gates](deferred-architecture.md) govern delivery. Business
 knowledge remains foundational; customers manage their business more than pixels.
@@ -66,6 +69,11 @@ Translate customer language into a proposed profile and allowed preferences,
 preview representative desktop/mobile content, and obtain approval or a bounded
 revision. Do not present every internal semantic choice as a customer control.
 See [onboarding and optimization](onboarding-optimization.md).
+
+The planned [external-reference intake](onboarding-optimization.md#external-reference-intake)
+records liked/disliked traits, priorities and supported mappings. Curated examples
+demonstrate reproducible platform results; customer-provided competitor/unrelated
+sites communicate intent and never become copied templates.
 
 ## Composition and rhythm
 
@@ -192,9 +200,9 @@ parallax, scroll-jacking or motion-dependent comprehension. Effects normally run
 once per Page visit. Verify performance, allocation across all Sections, interruption
 and reduced-motion behavior before expanding motion. The current allocator selects
 populated Hero/CTA Sections, Hero-first then content order, and emits at most three
-slots. Each performs one 180ms, 3px transform-only settle on mount, serialized by
-slot delay. There is no scroll observer, card cascade, opacity hiding or animation
-library. CSS enables effects only for `no-preference` and disables them for `reduce`.
+slots. Version 1 performs one 180ms, 3px transform-only settle on mount, serialized by
+slot delay. Version 2 uses the initial-load Hero contract below. Neither uses an animation
+library. CSS and the optional non-Hero coordinator enforce reduced-motion preference.
 Effects can replay on a new Page mount; scrolling does not remount or replenish them.
 
 ## Images, Hero and global chrome
@@ -241,7 +249,7 @@ No generalized policy UI, customer writer or theme marketplace is introduced.
 
 Managed Site `configuration.visualDirection` accepts only `profileId`,
 `profileVersion` and optional `preferences`. Both `editorial` and `reference` have
-version `1`; unknown identity/version returns legacy rendering with an internal
+version `1`, plus `reference` version `2`; unknown identity/version returns legacy rendering with an internal
 `unsupported` reason. Missing configuration returns `missing`; malformed objects,
 unknown preference keys or invalid values return `invalid`. The whole direction
 falls back, not a partially applied unsafe preference set. No stored values change.
@@ -289,35 +297,168 @@ inline links remain underlined. Navigation has separate hover/current treatment 
 Form privacy remains escaped text; the shared anchor rule covers future supported
 help/privacy links without enabling arbitrary markup.
 
-The Myomaton proposal is expressible for hierarchy, rhythm, grouping, framing,
-existing split asymmetry, restrained elevation, functional icons and Light motion
-under policy. A distinct second blue/green accent needs a future shared token
-contract; no customer-specific CSS is added to imitate it. Shared icon expansion,
-split-media Hero and customer preview/approval tooling remain separate work.
+## Presentation intent and checkpoint boundary
 
-## Proposed Myomaton reference direction
+Bounded does not mean visually conservative. Design quality is a core product
+value: finite semantic recipes should support confident whole-page composition,
+not preserve a provisional stub merely because it already exists. Preserve content
+meaning and explicit human choices. Missing/default presentation can be recomposed
+within supported roles; raw explicit fields remain authoritative, including safe
+fallback for invalid values. The runtime does not guess whether a stored field was
+bootstrap intent. Operators make any reviewed presentation changes explicitly in
+isolated state before a separately authorized customer transition.
 
-Working direction: **technical curiosity / serious fun**. Technical, human, curious,
-lightly playful and non-hyped; avoid both sterile documentation and futuristic hype.
-This is a proposal for later review/implementation, not current customer state.
+The product remains outside the Gutenberg/Divi editing model: no arbitrary HTML,
+CSS, grids, pixel mechanics or drag/drop canvas. External references influence
+traits and art direction without copying layouts or branded assets. Customers and
+operators approve outcomes rather than author animation or spacing mechanics.
+External-reference intake and automated approval/writing workflows remain planned.
 
-- A stronger text-led graphic Hero and confident display/heading hierarchy; keep
-  plain-language content and a clear primary Action.
-- Restrained blue/green accents with readable neutral surfaces. Any second accent
-  role needs a shared token extension and contrast review; the current single-accent
-  model must not be bypassed with one-off colors.
-- Alternate quiet surfaces selectively; group projects and principles intentionally,
-  emphasize a few moments and reduce reliance on repeated thin rules.
-- Use existing split variants for selective asymmetry. Frame prototype/product
-  photographs consistently with borders or subtle elevation and suitable fit.
-- Use deliberate whitespace and restrained cards; avoid an icon for every concept.
-- Request Light motion only after the whole-Page budget is implemented and tested;
-  until then use no new motion. Reduced-motion presentation is equally complete.
-- Keep Header/Footer restrained and readable with current name fallback. Do not
-  invent a logo, contact facts, social profiles or new imagery.
+## Reference v2 expression contract
 
-Later implementation must preserve the accepted Home/About/Projects/Principles
-structure, Section order and copy unless a separate customer-state change is
-authorized. Preview all four Pages at phone, tablet and desktop widths with real
-content, sparse imagery, keyboard focus and reduced motion. Customer approval of
-direction is not approval of arbitrary subsequent content changes.
+Reference v2 is implemented and human visually accepted for this reusable
+checkpoint, using the accepted four-Page disposable proving preview. It evolved
+in place before approval rather than introducing v3. V1 rendering remains intact.
+The real development customer is still stored as reference v1. Selecting v2,
+colors, compositions, order, images or Action labels in customer state requires a
+separate authorized transition; disposable choices are not platform defaults.
+
+### Finite semantic compositions
+
+Section configuration may select one type-specific composition:
+
+| Type / role | Composition | Reusable behavior |
+| --- | --- | --- |
+| Hero | asymmetric-field | Wide left display beside readable support and primary Action; optional supplied eyebrow above both. |
+| Intro / explanation | editorial-row | Shared left edge, heading and readable body in disciplined columns. |
+| Intro / statement | statement-break | Large h2 assertion followed by offset reading-scale support. Requires explicit statement treatment. |
+| Intro / image | image-evidence | Large clean image alongside heading/body; mobile heading, image, body order. Requires resolved AssetUsage. |
+| Collection | grouped-field | Group-level framing with equal text-led peers; existing two/three-column vocabulary. |
+| CTA | conversion-band | Strong next-step heading beside support and existing Action. |
+
+These are authored recipes, not grids, HTML/CSS, pixel controls or breakpoints.
+Unsupported values and type/role mismatches fail to ordinary presentation. V1
+ignores compositions. Explicit alignment remains authoritative: these compositions
+require left alignment; asymmetric Hero also requires wide width, and editorial/
+image rows require standard or wide width. Reading/center choices fall back rather
+than being overridden. No provenance guess is needed: the disposable preview
+explicitly selects its presentations; canonical choices are untouched.
+
+Display maximum derives from 2 times Design System heading size, bounded to
+56 to 112px; statement derives from 1.3 times, bounded to 40 to 72px; ordinary Section
+heading derives from 1.85 times body size, bounded to 24 to 40px. Responsive clamps and
+measure are platform-owned. Strong contrast comes from roles rather than enlarging
+all headings. Primary Actions are shaped next steps; supporting Actions are text
+links. Destinations and labels remain canonical.
+
+### Explicit statement and accent roles
+
+See [statement treatment](sections.md#explicit-editorial-statement-treatment).
+Compact statement bounds remain 120 heading characters / 18 words and 360 support
+characters / two paragraphs. Explicit statement-break permits up to 900 support
+characters / five paragraphs because support stays separate at reading scale.
+Image-backed, absent-heading or overlong content falls back without clipping copy.
+The composition alone never grants statement meaning; treatment is required.
+
+Two finite surfaces extend the existing vocabulary: contrast uses Design System
+text as structural background with readable inverse foregrounds; editorial uses
+secondary accent with a contrast-paired foreground, falling back to primary.
+Primary stays navigation/conversion identity. The optional implicit statement wash
+remains policy-gated; explicit surfaces suppress it. Explicit editorial surface is
+semantic composition, not a decoration-policy workaround. No automatic bar or
+other ornament is allocated. Collections never consume positional accents.
+Clean imagery has no default border, frame or shadow; existing explicitly selected
+elevated/bordered profile treatments remain distinct.
+
+### Staged Hero and Page motion contract
+
+The initial stylesheet prepares allocated semantic Hero parts before their first
+paint, without an initial waiting phase, using the fixed stages below. Final grid, widths,
+measures and typography exist immediately; no hydration state changes geometry.
+Only opacity and transform animate. The earlier post-paint WAAPI reset caused a
+visible snap from already-visible content and has been removed. CSS completes the
+entrance without JavaScript; unsupported CSS animations leave visible base content.
+No observer or scroll dependency controls Hero.
+
+| Semantic part | Start after activation | Duration | Upward travel / opacity |
+| --- | --- | --- | --- |
+| Supplied eyebrow | 0ms | 360ms | 8px; .35 to 1 |
+| Heading | 0ms | 1150ms | 96px desktop / 56px narrow; .35 to 1 |
+| Support | 100ms | 650ms | 24px; .35 to 1 |
+| Action | 260ms | 450ms | 18px; .35 to 1 |
+
+Ease-out: cubic-bezier(.22,.6,.35,1). The composite lasts 1150ms without an initial
+starting delay, approximately 1.15 seconds total. Missing support collapses Action
+start to 160ms; missing heading starts support immediately; a lone Action starts
+immediately. Eyebrow is a named role, not heading wrapper or DOM-position guess.
+No arbitrary hooks, timeline settings, bounce, loops or large dependencies.
+
+The composite counts as ONE event. Off/Minimal/Light ceilings remain 0/1/3;
+effective Minimal uses one Hero and no downstream reveal. Optional Light CTA
+entries queue behind Hero completion and each other, once, at 460ms/14px.
+Reduced motion starts no animations and cancels active/queued work immediately;
+focus within Hero cancels motion to make its Action visible. The client boundary only queues optional downstream entries behind actual CSS
+Hero completion; cleanup cancels its fallback timer, observer and active animations. Unsupported APIs retain readable content.
+V1 keeps its prior settle. Service policy is unchanged.
+
+## Art-direction implementation and review boundary
+
+Human visual acceptance has been received for the reusable checkpoint. Automated
+contract/HTTP/image-byte tests establish correctness, not visual taste. Future
+profile changes still need outcome review. No customer-state transition, schema
+migration, reference intake UI, Contact activation or production approval follows
+from acceptance of this development preview.
+
+Disposable operator scripts and presentation records remain separate, uncommitted
+customer work. They exercise existing structured fields in random isolated schemas;
+serving connections are read-only and before/after snapshots protect canonical
+state. They are not a reusable self-service preview/approval product. Real Myomaton
+continues to use reference v1 until a separately authorized guarded transition.
+
+## Rendered-review correction pass
+
+The existing vocabulary remains sufficient. Under 60rem, compact/normal/spacious
+Section padding stays distinct but caps at 20/28/40px per side. Paragraph margins
+and inner gaps avoid compounded empty intervals. Narrow display, statement,
+Section and peer scales remain distinct; equal peers use restrained group-level
+surfaces and text-led treatment rather than oversized feature boxes.
+
+Disposable operator files may select existing Section sort order and existing
+Action references, validated against the frozen copied Page/Section/Action graph.
+This uses existing structured fields in isolated state, not a new platform layout
+capability or customer editing control. Canonical copy, Actions, assets, Navigation
+and state remain intact. No CSS selects a customer, Page, UUID or heading.
+
+
+### Verified responsive expression
+
+Hero opacity starts at .35 and reaches .9 at 20% of each stage, so the message
+becomes readable while substantial travel settles. No layout property animates.
+Grouped two-column peers wrap at equal widths and center an incomplete final row;
+no item receives positional styling. Narrow grouped gaps are .5rem and mobile
+statement display remains 40 to 56px with a short measure and nearby support.
+Ink surfaces use a shared high-contrast neutral Action fill, with a foreground
+computed against that fill. Palette settings and destinations remain authoritative.
+These are reusable refinements, not customer editing controls.
+
+
+Finishing refinements preserve the current composition: a gentler Hero ease-out
+keeps substantial upward movement visible while opacity becomes readable early.
+Below 480px, only Hero internal gaps (14px) and eyebrow margins tighten; typography,
+Section spacing and touch targets remain unchanged. Tablet statement headings use
+up to 22ch, bounded by their container, while narrow phones retain 13ch and desktop
+statement asymmetry remains unchanged. These shared rules require no new capability.
+The reusable expression is accepted for this checkpoint; applying customer state remains separate.
+
+
+### Major Section outer rhythm
+
+Collections and editorial-row intros have asymmetric outer rhythm: slightly more
+padding above their heading, with existing bottom padding and internal gaps intact.
+Compact/normal/spacious remain distinct. Below 960px their top padding is bounded
+at 28 to 32px / 32 to 40px / 40 to 48px respectively; ordinary reading sections retain the
+previous compact rhythm. Desktop uses bounded top padding derived from the existing
+Design System section spacing. Hero, statement, evidence and conversion compositions
+retain their own rhythm. There are no Page-specific spacing controls or selectors.
+This rhythm is part of the human-accepted reusable checkpoint. Customer transition
+choices remain separate from the shared contract.

@@ -46,6 +46,7 @@ export function resolveVisualPolicy(service: unknown = {}, presence: unknown = {
   const allowed = object(service).visualPreferences;
   return {
     maxMotion: layered<MotionLevel>("visualMaxMotion", "minimal", (v): v is MotionLevel => motionLevels.includes(v as MotionLevel)),
+    decoration: layered("visualDecoration", true, (v): v is boolean => typeof v === "boolean"),
     translucency: layered("visualTranslucency", false, (v): v is boolean => typeof v === "boolean"),
     allowedPreferences: Array.isArray(allowed)
       ? visualPreferenceKeys.filter(key => allowed.includes(key))

@@ -23,7 +23,7 @@ const render = (p: ManagedSitePage) => renderToStaticMarkup(<ManagedSitePageView
 
 test("versioned profiles fail closed to byte-identical legacy markup on invalid configuration", () => {
   const legacy = render(page);
-  for (const c of [{}, { visualDirection: null }, { visualDirection: [] }, config({}, "unknown"), config({}, "__proto__"), { visualDirection: { profileId: "reference", profileVersion: 2 } }, config({ motion: "high" }), config({ css: "position:absolute" }), { visualDirection: { ...config().visualDirection, preferences: [] } }]) {
+  for (const c of [{}, { visualDirection: null }, { visualDirection: [] }, config({}, "unknown"), config({}, "__proto__"), { visualDirection: { profileId: "reference", profileVersion: 99 } }, config({ motion: "high" }), config({ css: "position:absolute" }), { visualDirection: { ...config().visualDirection, preferences: [] } }]) {
     assert.equal(resolveVisualDirection(c).direction, null);
     assert.equal(render({ ...page, visual: resolveVisualDirection(c) }), legacy);
   }
@@ -96,7 +96,9 @@ test("semantic contrast roles and scoped CSS provide links, forms, focus and red
   assert.match(css, /:focus-visible[^}]+outline: 2px solid/);
   assert.match(css, /prefers-reduced-motion: reduce[^}]+animation: none/);
   assert.match(css, /prefers-reduced-motion: no-preference/);
-  assert.doesNotMatch(css, /opacity:\s*0|infinite|visibility:\s*hidden/);
+  assert.doesNotMatch(css, /infinite|visibility:\s*hidden/);
+  // v2 opacity lives only in the finite no-preference entrance, never base content.
+  assert.match(css, /@keyframes visual-hero-enter/);
   assert.match(css, /managed-site-form-help/); assert.match(css, /data-form-state="error"/); assert.match(css, /data-form-state="success"/);
   const id = "11111111-1111-4111-8111-111111111111";
   const definition = normalizeDefinition({ id, version: 1, status: "active", configuration: { fields: [{ key: "email", label: "Email", required: true }], privacyText: "Private inquiry" } });

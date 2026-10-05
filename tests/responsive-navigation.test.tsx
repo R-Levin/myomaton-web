@@ -32,7 +32,8 @@ test("one server-rendered Navigation tree and accessible closed mobile control; 
 
 test("hydrated menu toggles expanded state, closes on selection and Escape restores button focus", async () => {
   const dom = new JSDOM(`<div id="root">${renderToString(tree)}</div>`, { url: "http://localhost" });
-  const replacements = { window: dom.window, document: dom.window.document, IS_REACT_ACT_ENVIRONMENT: true };
+  let frame: FrameRequestCallback | undefined;
+  const replacements = { requestAnimationFrame: (callback: FrameRequestCallback) => { frame = callback; return 1; }, window: dom.window, document: dom.window.document, IS_REACT_ACT_ENVIRONMENT: true };
   const descriptors = Object.fromEntries(Object.keys(replacements).map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
   for (const [key, value] of Object.entries(replacements)) Object.defineProperty(globalThis, key, { value, configurable: true, writable: true });
   let root: ReturnType<typeof hydrateRoot> | undefined;
@@ -41,7 +42,13 @@ test("hydrated menu toggles expanded state, closes on selection and Escape resto
     const button = dom.window.document.querySelector("button")!;
     await act(async () => { button.click(); });
     assert.equal(button.getAttribute("aria-expanded"), "true");
+    assert.equal(button.textContent, "Close");
+    assert.equal(button.getAttribute("aria-label"), "Close primary navigation menu");
+    assert.equal(button.querySelector("path")?.getAttribute("d"), "M6 6l12 12M6 18L18 6");
     assert.equal(dom.window.document.querySelector(".managed-site-primary-menu")?.getAttribute("data-open"), "true");
+    await act(async () => { dom.window.document.body.dispatchEvent(new dom.window.Event("pointerdown", { bubbles: true })); });
+    assert.equal(button.getAttribute("aria-expanded"), "false");
+    await act(async () => { button.click(); });
     const link = dom.window.document.querySelector("nav a") as HTMLAnchorElement;
     link.focus();
     await act(async () => { link.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); });
@@ -51,6 +58,11 @@ test("hydrated menu toggles expanded state, closes on selection and Escape resto
     await act(async () => { link.click(); });
     assert.equal(button.getAttribute("aria-expanded"), "false");
     assert.equal(dom.window.document.querySelectorAll("nav a").length, 3);
+    assert.equal(dom.window.document.activeElement, button);
+    await act(async () => { button.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })); });
+    frame!(0);
+    assert.equal(dom.window.document.activeElement, link);
+    assert.equal(button.getAttribute("aria-expanded"), "true");
   } finally {
     if (root) await act(async () => { root!.unmount(); });
     dom.window.close();

@@ -294,7 +294,20 @@ preferences, with platform-owned accessibility, responsive behavior and motion
 ceilings. It is not an unlimited theme system, CSS editor or bespoke design service.
 Two generic versioned runtime profiles support opt-in semantic presentation and
 bounded Page-level motion. Customer visual selection/editing and icon expansion
-remain planned. The documented Myomaton direction is proposed, not applied.
+remain planned. Myomaton is stored as reference v1. Reusable reference-v2
+capabilities are implemented and human visually accepted for checkpoint purposes;
+the accepted disposable customer presentation has not been applied.
+
+[Reference v2](visual-direction.md#reference-v2-expression-contract) implements
+explicit bounded Editorial statement treatment with readability fallback, six
+finite compositions, responsive hierarchy/rhythm/wrapping, primary/supporting
+Actions, readable primary/secondary accents and one reserved staged Hero event.
+Peer collections remain equal. Clean image presentation and the accessible mobile
+Navigation panel are shared behavior. Primitive palette values and disposable
+Page/Section/Action/image selections remain customer choices, not profile defaults.
+Customer self-service, broad icons, split-media Heroes and real testimonial/proof
+semantics remain separate planned capabilities. No proof domain is invented by the
+visual system. Applying a new customer profile/version requires its own authorization.
 
 ## 9. Production readiness track
 
@@ -420,3 +433,13 @@ customer are a critical scalability metric, alongside business outcomes. Guided
 operator-assisted onboarding allows selling before complete self-service.
 Final pricing, 90-day promotion terms, Kickstarter plans and revenue forecasts
 remain business/marketing experiments, not architectural requirements.
+
+## Reusable v2 composition refinement
+
+Implemented and accepted for the reusable checkpoint: six type-specific semantic compositions,
+explicit statement-break with separate readable support, structural contrast and
+secondary editorial surfaces, and initial-style staged Hero entrance. See the
+[finite contract](visual-direction.md#finite-semantic-compositions). The disposable
+operator presentation file uses existing structured content and palette primitives;
+no customer-specific CSS, schema, arbitrary canvas or state transition is added.
+The specific Myomaton v2 transition remains unapplied.

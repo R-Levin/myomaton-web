@@ -173,12 +173,24 @@ See the [native publishing model](onboarding-optimization.md#native-articles-and
 O3's link/form visual-policy question is resolved by the
 [Visual Direction contract](visual-direction.md). P21 is implemented for the bounded
 opt-in runtime: two versioned profiles, validated preferences, semantic roles and
-preservation of explicit Section choices. Customer visual self-service, supported
+preservation of explicit Section choices. [Reference v2](visual-direction.md#reference-v2-expression-contract)
+adds stronger expression, optional contrast-paired secondary accent and bounded
+decoration policy. Customer visual self-service, supported
 example selection and authorized preview/approval writers remain gated. P22 is
-satisfied for the current capped, serialized Hero/CTA settle effect with reduced-motion
-enforcement; reassess before adding new motion consumers or scroll-trigger behavior.
+satisfied for capped Hero/CTA effects: v1 serialized settle and v2 fixed staged
+CSS Hero. P22 has been reassessed: heading/support/Action are one reserved Hero
+event, with bounded overlapping child timing, not three independent consumers.
+Separate Hero events serialize by reservation, and the optional non-Hero observer
+queues allocated downstream events after Hero completion and one another.
+Reduced-motion/focus overrides, content visibility and 0/1/3 allocation remain.
+No card-cascade exemption or new automatic consumer type is introduced. Reassess
+before adding consumers or extending the fixed recipe. Explicit Intro statement
+presentation uses the existing content/JSON boundary and adds no writer/migration.
 P23 remains deferred: functional icon intent is resolved but no shared icon registry
-or expanded icon rendering is implemented. Myomaton has no direction applied.
+or expanded icon rendering is implemented. Reusable v2 compositions and responsive
+expression are implemented and human visually accepted for this checkpoint.
+Myomaton remains stored as reference v1; its accepted disposable v2 choices require
+a separate guarded customer-state transition.
 The catalog owns the capability envelope,
 the visual document owns the design contract, and this register owns its gates.
 

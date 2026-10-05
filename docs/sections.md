@@ -43,9 +43,11 @@ Validated `Section.configuration` options:
 | width | reading, standard, wide | standard; platform inner limits of 42, 64, 80rem |
 | spacing | compact, normal, spacious | normal; 0.5, 1, 1.5 times Design System section spacing |
 | alignment | left, center | left; copy/headings/action only, never media placement |
-| surface | default, subtle, accent | default (CTA: subtle); background, surface, accent tokens |
+| surface | default, subtle, accent, contrast, editorial | default (CTA: subtle); background, surface, accent tokens |
 | divider | none, rule, spacing | rule preserves existing separation between adjacent sections; spacing adds token-based separation, none adds no separator |
 | mediaFit | natural, contain, cover | Intro only; natural preserves intrinsic ratio without cropping |
+| composition | asymmetric-field, editorial-row, statement-break, image-evidence, grouped-field, conversion-band | reference v2; validated by Section type and resolved semantic role; see finite vocabulary below |
+| treatment | statement | Intro only; explicit editorial emphasis in reference v2, with readability fallback; absent/invalid stays ordinary Editorial |
 
 Every outer section spans its container; width constrains the inner content.
 No separate full-width flag is needed. Explicit contain/cover modes use a single
@@ -130,3 +132,54 @@ This foundation adds no content, seed writes, card images, Subject hierarchy,
 automatic selection/query UI, taxonomy, page routing, nested collections, custom
 CSS or free-form grid controls. No schema/migration or new deferred-register
 trigger is required; Asset write/integrity behavior is unchanged.
+
+
+### Explicit Editorial statement treatment
+
+`configuration.treatment: "statement"` is an explicit finite presentation value.
+It is validated only for `intro` and consumed by reference v2. There is no new
+Section type, schema or migration. Missing/invalid treatment, v1/legacy direction,
+associated image, absent/blank heading, heading over 120 characters or 18 words,
+support over 360 characters or over two nonempty paragraphs all retain ordinary
+Intro/image-led presentation. No content is removed, truncated, inferred or rewritten.
+The bounds permit a compact support block rather than requiring copy changes.
+The explicit `composition: "statement-break"` additionally permits support up to
+900 characters / five paragraphs, rendered separately at reading scale. Above
+those bounds, the complete copy remains ordinary Intro. Composition alone never
+selects statement meaning.
+
+Eligible statements retain h2 and plain escaped paragraphs, use a bounded larger
+scale/shorter measure, spacious default, and an optional secondary-accent wash.
+Explicit width/spacing/alignment/surface/divider choices remain authoritative;
+even an invalid explicitly present surface suppresses the automatic wash. Trusted
+decoration policy disables the wash. Selection is explicit, never based on text,
+position or data source. One per Page is an authoring recommendation, not an
+ordering-dependent renderer cutoff. Image-backed Intros preserve their existing
+layout/alt/source-order contract.
+
+### Versioned visual expression
+
+[Reference v2](visual-direction.md#reference-v2-expression-contract) strengthens
+Hero typography/composition, role-led rhythm and CTA emphasis. Hero is neutral by
+default, collections subtle, explanations neutral and CTA accent; spacing is
+spacious for airy arrival/statement/CTA and normal for explanation/groups/images.
+Explicit Section choices
+remain authoritative. Hero eyebrow uses the existing content field; no decorative
+text is generated. Desktop split variants and mobile heading/image/body/Action
+source order remain unchanged. Framed images have no outline; v2 keeps the normal image presentation clean
+without a forced frame or shadow. Explicit elevated treatment is still available. Explicit bordered remains distinct.
+Asset/AssetUsage identity and alt semantics do not change.
+
+Hero/CTA Actions expose the bounded `primary` role, other Section/card Actions
+`supporting`; labels/destinations remain first-class Action data. Hero emits named
+eyebrow/heading/support/action parts only when present; no automatic ornament.
+See the [staged Hero contract](visual-direction.md#staged-hero-and-page-motion-contract).
+
+### Finite composition vocabulary
+
+Reference v2 additionally consumes validated type-specific composition choices:
+Hero asymmetric-field; Intro editorial-row, statement-break or image-evidence;
+Collection grouped-field; CTA conversion-band. There are no arbitrary columns,
+spans, pixels, breakpoints, HTML or CSS. Incompatible role/alignment/width choices
+fall back safely. Contrast and editorial are finite Design System-derived surfaces.
+See the [composition contract](visual-direction.md#finite-semantic-compositions).
