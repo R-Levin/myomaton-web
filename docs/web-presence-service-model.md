@@ -99,8 +99,10 @@ available. First-party measurement must not depend on optional external provider
 Unknown or likely attribution stays explicitly uncertain. A click is not a
 qualified lead, and correlation is not proof of causal improvement. The objective
 is useful decision support, not a giant marketing analytics suite or perfect
-cross-channel attribution. [Measurement contracts](content-growth-loop.md#observation-measurement-and-uncertain-attribution)
-and P12 govern privacy, event semantics, access and retention before collection.
+cross-channel attribution. The [measurement architecture](measurement-and-analytics.md)
+defines the independent core plus preferred optional GA4/Search Console intelligence,
+normalized signals and degraded-mode reporting. P12 governs collection/ingestion;
+service-account onboarding is unproven and GBP reporting remains future optional scope.
 
 ## 20i and infrastructure boundary
 

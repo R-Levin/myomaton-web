@@ -170,8 +170,12 @@ quality checks are planned workflow safeguards, not implemented detector claims.
 ## Observation, measurement and uncertain attribution
 
 First-party measurement is the canonical product measurement system and must work
-without GA4 or Search Console. Optional integrations can supplement it where
-configured. Future recommendations may use:
+without GA4 or Search Console. Those preferred optional intelligence sources
+supplement it where configured and authorized. The
+[measurement architecture](measurement-and-analytics.md) owns the minimal core,
+normalized ingestion, provider-access spikes and unavailable/stale-source behavior.
+GBP reporting is future optional scope, not an initial measurement dependency.
+Future recommendations may use:
 
 - Page traffic, landing Pages, referrers and known campaign source/medium.
 - Search/query signals, including Search Console where configured and available.

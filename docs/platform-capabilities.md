@@ -395,8 +395,11 @@ duplicating global facts in each presentation.
 business knowledge, canonical first-party analytics and a continuous
 measure → analyze → recommend → approve/implement → measure-again loop.
 Operator-assisted intake can support initial production sales before full
-customer self-service automation. GA4 and Google Search Console are optional
-structured integrations, never dependencies of measurement or optimization.
+customer self-service automation. GA4 and Google Search Console are preferred
+optional external intelligence sources, never dependencies of core measurement or
+optimization. The [measurement architecture](measurement-and-analytics.md) defines
+the minimal independent core, normalized signals and degraded reporting. Service-account
+access is an unproven near-term spike; GBP reporting remains future optional scope.
 
 AI/API assistance belongs behind a provider-neutral intelligence boundary for
 intake interpretation, analytics summaries, opportunity detection, content/Article

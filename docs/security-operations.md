@@ -105,6 +105,9 @@ capture must not expose secrets. Future forms consume shared canonical contact
 identity; current phone/email links and Contact Actions do not implement forms.
 First-party analytics is canonical, but event endpoints are also untrusted input
 and need bounded collection, abuse protection and privacy controls (P12).
+The [measurement architecture](measurement-and-analytics.md) distinguishes the
+independent core from optional provider intelligence; it retains scoped access,
+protected credentials, source provenance and degraded-mode reporting requirements.
 
 The [Contact foundation](contact-forms.md) implements bounded validation, scoped
 submission persistence, a development abuse guard and provider boundaries. Its

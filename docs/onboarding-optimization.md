@@ -105,9 +105,12 @@ separate from this planned intake capability.
 
 First-party/internal analytics is the canonical product measurement system.
 Collection, reporting and optimization must work without GA4 or Google Search
-Console. Those services may be supported through structured integration
-configuration for compatibility/customer preference; their presence must not
-determine whether the platform can measure its own conversion outcomes.
+Console. Those services are preferred optional external intelligence sources;
+their presence must not determine whether the platform can measure its own
+conversion outcomes. The [measurement architecture](measurement-and-analytics.md)
+owns source roles, normalized signals, service-account validation and graceful
+degradation. The platform does not aim to recreate GA4/Search Console; GBP reporting
+is outside initial measurement scope.
 
 The intended useful event scope includes page views, CTA clicks, phone/email
 clicks, contact opens, form starts/submissions, source/referrer/landing page,
