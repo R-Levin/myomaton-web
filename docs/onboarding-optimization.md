@@ -5,6 +5,11 @@ boundary is explicitly identified. It adds no runtime capability. The
 [capability catalog](platform-capabilities.md) owns the product envelope;
 [deferred architecture](deferred-architecture.md) owns implementation gates.
 
+The [service model](web-presence-service-model.md) defines reusable launch and
+ongoing customer outcomes. [MioPages C0](miopages-c0-product-model.md) is a
+commercial proving context; the [content-growth loop](content-growth-loop.md)
+owns the detailed opportunity, drafting, approval and distribution lifecycle.
+
 ## Canonical knowledge comes first
 
 The Web Presence is a managed traffic/lead-generation system. Its Managed Site

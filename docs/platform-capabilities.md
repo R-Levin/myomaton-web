@@ -34,6 +34,10 @@ Customer 0 is the concept for the product's own Web Presence; it does not imply
 an existing customer record. The [onboarding and optimization operating model](onboarding-optimization.md)
 records the core planned workflow and its trust/provider boundaries.
 
+The [Web Presence service model](web-presence-service-model.md) defines launch and
+ongoing service intent; the [MioPages C0 model](miopages-c0-product-model.md) records
+the commercial/generalization proving context. Neither changes capability status.
+
 ## Status vocabulary
 
 | Status | Meaning |
@@ -294,9 +298,10 @@ preferences, with platform-owned accessibility, responsive behavior and motion
 ceilings. It is not an unlimited theme system, CSS editor or bespoke design service.
 Two generic versioned runtime profiles support opt-in semantic presentation and
 bounded Page-level motion. Customer visual selection/editing and icon expansion
-remain planned. Myomaton is stored as reference v1. Reusable reference-v2
+remain planned. Myomaton is stored as reference v2 following its applied and
+verified [guarded customer transition](myomaton-visual-direction-v2.md). Reusable reference-v2
 capabilities are implemented and human visually accepted for checkpoint purposes;
-the accepted disposable customer presentation has not been applied.
+the accepted customer presentation is now canonical development state.
 
 [Reference v2](visual-direction.md#reference-v2-expression-contract) implements
 explicit bounded Editorial statement treatment with readability fallback, six
@@ -442,4 +447,5 @@ secondary editorial surfaces, and initial-style staged Hero entrance. See the
 [finite contract](visual-direction.md#finite-semantic-compositions). The disposable
 operator presentation file uses existing structured content and palette primitives;
 no customer-specific CSS, schema, arbitrary canvas or state transition is added.
-The specific Myomaton v2 transition remains unapplied.
+The specific Myomaton v2 transition is applied and verified in development;
+its customer choices remain separate from reusable profile defaults.

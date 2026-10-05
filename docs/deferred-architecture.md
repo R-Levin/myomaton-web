@@ -189,8 +189,9 @@ presentation uses the existing content/JSON boundary and adds no writer/migratio
 P23 remains deferred: functional icon intent is resolved but no shared icon registry
 or expanded icon rendering is implemented. Reusable v2 compositions and responsive
 expression are implemented and human visually accepted for this checkpoint.
-Myomaton remains stored as reference v1; its accepted disposable v2 choices require
-a separate guarded customer-state transition.
+Myomaton is stored as reference v2 after its separately authorized, applied and
+verified [guarded customer-state transition](myomaton-visual-direction-v2.md).
+That application does not implement general customer authoring or approval workflows.
 The catalog owns the capability envelope,
 the visual document owns the design contract, and this register owns its gates.
 

@@ -10,7 +10,8 @@ generic SaaS, corporate blue templates, toy-brand exuberance and maker-site clut
 
 The reusable reference-v2 composition system is implemented and has received
 human visual acceptance for this checkpoint. This brief records the accepted
-Myomaton proving preview, not a customer-state transition. References influence
+Myomaton proving preview, now reproduced by the separately applied guarded v2
+customer transition. References influence
 traits, not layouts, artwork, wording or branded motifs to copy.
 
 ## Evidence and current state
@@ -20,14 +21,16 @@ four-Page desktop/tablet/narrow-mobile reviews. Those findings are authoritative
 the earlier text-only analysis does not establish rendered observations. No
 conversion-performance claim follows from visual acceptance.
 
-- Real development customer: reference v1, graphic/airy/light intent, effective
-  Minimal; eight migrations, four Pages and 29 Sections. Navigation, Actions,
-  Subjects, Assets/AssetUsage, Contact and stored Design System are unchanged.
+- Real development customer: reference v2, graphic/airy/light intent, effective
+  Minimal; eight migrations, four Pages and 29 stored Sections. The separately
+  authorized transition applied the accepted palette, Section presentation/order,
+  three Action labels and one image association; protected state was verified unchanged.
 - Reusable v2 runtime, statements, motion, accents and finite compositions are
   implemented and human accepted for checkpoint purposes.
-- Disposable preview uses explicit Section/composition/palette/content-presentation
-  selections. Those choices are not platform defaults and are not applied to real
-  Myomaton. The guarded v1 writer remains a frozen historical transition.
+- The accepted preview's explicit Section/composition/palette/content-presentation
+  selections are now canonical Myomaton development state, not platform defaults.
+  The preview server/schema were removed after verification. The guarded v1 writer
+  remains a frozen historical transition.
 - External-reference intake, customer self-service and automatic approval/writing
   workflows remain planned. Real testimonial/proof semantics remain separate work.
 
@@ -232,8 +235,9 @@ of visual implementation. The five existing Actions and Navigation remain author
 | `/projects` | Projects; Current Projects; TaBot; A-Bot; Small robot experiments; More Than One Robot; What makes something Myomaton? | Projects; TaBot; A-Bot; Small robot experiments; More Than One Robot; What makes something Myomaton? |
 | `/principles` | Principles; Core principles; Ownership matters; Complexity has a cost; Use what works; Share what proves useful; See the projects | Principles; Ownership matters; Core principles; Complexity has a cost; Use what works; Share what proves useful; See the projects |
 
-Home and Projects reuse the TaBot photo; Projects also uses A-Bot angle. Three
-Assets exist, three usages exist; the A-Bot close-up remains unattached. No automatic
+In pre-v2 state Home and Projects reused the TaBot photo. Applied v2 uses whole
+A-Bot evidence on Home; Projects retains TaBot and A-Bot. Three Assets and three
+usages remain; the A-Bot close-up remains unattached. No automatic
 new image attachment, reordering, short-copy extraction or Action assignment follows.
 
 ## Capability comparison
@@ -288,7 +292,7 @@ A-Bot evidence, compact ownership explanation and project discovery; ecosystem
 explanation, Reality statement, equal peer principles, sharing and conversion follow.
 Projects introduces TaBot and A-Bot once, then smaller experiments and the broader
 ecosystem. Its duplicate Current Projects summary remains stored but is inactive
-only in disposable state. About is a concise narrative with Reality and one
+in applied development v2 state as well. About is a concise narrative with Reality and one
 editorial row. Principles leads with Ownership and equally weighted principles.
 
 [Disposable presentation selections](../scripts/previews/myomaton-composition.json)
@@ -296,7 +300,8 @@ include promotion of the existing Home lead question into the Hero heading,
 selection of the existing whole-robot Asset, the summary visibility choice,
 Section order/compositions, warm ink/green/blue palette, statements and concise
 labels for existing Page Actions. Asset identities/files and Action destinations
-are preserved. None of these choices is a profile default or real-customer write.
+are preserved. These approved choices became real customer state only through the
+separately authorized guarded transition; none is a reusable profile default.
 
 Shared runtime refinements include controlled two-column peer wrapping with an
 equal centered final row, short mobile statement measure and wider tablet measure,
@@ -304,14 +309,16 @@ compact phone Hero gaps and asymmetric top-side major Section rhythm. The curren
 accepted implementation supersedes rejected ornaments, first-item emphasis,
 framing and timid motion experiments; those are not product direction.
 
-Human visual acceptance has been received for the checkpoint preview at
-http://127.0.0.1:53866. Its schema/URL are disposable session artifacts; the active
-report remains in ignored runtime-content/reference-v2-preview.json. Real Myomaton
-at http://localhost:3000 remains reference v1. No v2 transition or production
-approval follows from this acceptance. Checkpoint only reusable runtime/tests/docs;
-keep customer transition/presentation files uncommitted for the next authorized step.
-The historical v1 writer must not become a synchronization tool.
+Human visual acceptance was received for the checkpoint preview at
+http://127.0.0.1:53866. The reusable checkpoint `59223b8` and customer-transition
+checkpoint `54d2b76` were separately committed and pushed. After separate application
+authorization, the [guarded v2 customer transition](myomaton-visual-direction-v2.md)
+reproduced those accepted choices on real development Myomaton at
+http://localhost:3000. The complete intended state, four-Page presentation, asset
+bytes and exact zero-write rerun were verified on 2026-10-05.
 
-The [guarded v2 customer transition](myomaton-visual-direction-v2.md) is now prepared
-from frozen real-v1 and accepted-preview snapshots, but remains unapplied. It
-reproduces the accepted choices using existing canonical fields only.
+The accepted preview server and its disposable schema were then removed. Its URL
+is historical acceptance evidence, not a running service. No production deployment
+approval follows from this development application. The historical v1 writer must
+not become a synchronization tool; the frozen snapshots remain transition artifacts,
+not ongoing authority competing with PostgreSQL.

@@ -1,7 +1,9 @@
 # Myomaton reference-v2 customer transition
 
-**Prepared, not applied.** Real development Myomaton remains reference v1. Do not
-execute the operator command until the separate customer-state application is authorized.
+**Applied and verified in the real development database on 2026-10-05.** Myomaton
+now uses reference v2. The separately authorized operator run performed 35 updates,
+zero inserts and zero deletes; the exact rerun performed zero writes. This is not
+production deployment approval or a general permission to change customer state.
 
 ## Acceptance and ownership
 
@@ -17,7 +19,7 @@ reference-v1 state, also read-only, and checked against the applied historical v
 
 ## Frozen contract and guards
 
-- [Current real-v1 baseline](../scripts/customer-updates/myomaton-visual-direction-v2-baseline.json)
+- [Frozen pre-v2 real-v1 baseline](../scripts/customer-updates/myomaton-visual-direction-v2-baseline.json)
 - [Accepted intended-v2 state](../scripts/customer-updates/myomaton-visual-direction-v2-intended.json)
 - [Guard and updater](../scripts/customer-updates/myomaton-visual-direction-v2.ts)
 - [Explicit operator wrapper](../scripts/update-myomaton-visual-direction-v2.ts)
@@ -44,13 +46,13 @@ command is provided; an after-application rollback would need separate review.
 
 ## Profile and Design System
 
-`reference` version 2 becomes stored intent. Existing preferences remain exactly
+`reference` version 2 is now stored intent. Existing preferences remain exactly
 `hero: graphic`, `density: airy`, `motion: light`. Service policy is unchanged:
 effective Minimal reserves one staged Hero per Page and no downstream reveal.
 The shared runtime owns motion, responsiveness, contrast fallback, Navigation and
 semantic composition rules; customer state does not store pixel/animation controls.
 
-Every approved preview color is proposed as canonical because each participates
+Every approved preview color is now canonical because each participates
 in the accepted composition. No diagnostic-only color was found. Other Design
 System fields (fonts, type primitives, spacing, shape) stay unchanged.
 
@@ -68,7 +70,7 @@ System fields (fonts, type primitives, spacing, shape) stay unchanged.
 
 ## Section presentation and order
 
-All 29 Section UUIDs remain stored. Active visible counts become Home 9, About 6,
+All 29 Section UUIDs remain stored. Active visible counts are Home 9, About 6,
 Projects 6, Principles 7; Projects summary remains present but inactive. Page IDs,
 slugs, status and Page sort order do not change. Section sort orders use the exact
 accepted 10-step sequence, including its inactive summary.
@@ -162,5 +164,23 @@ four-Page rendering, responsive semantic markers, one Hero reservation and exact
 managed media bytes. The reproduction fingerprint is compared with the accepted
 preview during preparation; generic runtime tests remain in the reusable checkpoint.
 
-Real public state is read-only before/after. Preparing and testing this transition
-does not apply v2, commit customer artifacts, push or authorize production deployment.
+Preparation/tests inspect real public state read-only; their writes use disposable
+fixtures. Customer artifacts were checkpointed as `54d2b76` and pushed before the
+separately authorized real application. Preparation alone never authorizes application.
+
+### Application verification
+
+The real preflight matched the complete frozen v1 baseline. After the guarded
+35-update application, the complete real state matched the intended v2 snapshot.
+The exact rerun reported zero inserts/updates/deletes and retained the full database
+fingerprint. Eight migrations, four Pages and 29 stored Sections remain. UUIDs,
+protected copy, Action destinations, Navigation, Subjects, Assets/bytes and Contact
+were preserved apart from the explicitly documented approved presentation changes.
+
+All four real Pages reproduced the accepted preview contract: text, order,
+compositions, surfaces, Actions, image associations, palette, profile/version and
+one Hero motion consumer per Page. Managed image responses matched stored bytes;
+an unknown route returned 404. Standard and focused transition tests passed.
+The accepted preview at `53866` was then stopped and only its disposable schema
+removed; unrelated disposable schemas were preserved. `localhost:3000` remained
+running. No runtime, schema or migration changes were needed for application.

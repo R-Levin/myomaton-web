@@ -15,8 +15,8 @@ This document defines the visual contract and its **Implemented** opt-in runtime
 foundation and reference-v2 composition system described below. Reusable v2
 capabilities received human desktop/tablet/mobile visual acceptance for this
 checkpoint. Customer selection/editing UI and shared icon expansion remain planned.
-Real Myomaton uses reference v1; its accepted disposable v2 presentation has not
-been applied to customer state. The
+Real development Myomaton uses reference v2 after its applied and verified
+[guarded customer transition](myomaton-visual-direction-v2.md). The
 [capability catalog](platform-capabilities.md) defines product scope;
 [implementation gates](deferred-architecture.md) govern delivery. Business
 knowledge remains foundational; customers manage their business more than pixels.
@@ -319,9 +319,10 @@ External-reference intake and automated approval/writing workflows remain planne
 Reference v2 is implemented and human visually accepted for this reusable
 checkpoint, using the accepted four-Page disposable proving preview. It evolved
 in place before approval rather than introducing v3. V1 rendering remains intact.
-The real development customer is still stored as reference v1. Selecting v2,
-colors, compositions, order, images or Action labels in customer state requires a
-separate authorized transition; disposable choices are not platform defaults.
+The real development customer is stored as reference v2 after a separately
+authorized guarded transition. Selecting profiles, colors, compositions, order,
+images or Action labels remains a reviewed customer-state operation; the accepted
+Myomaton choices are not platform defaults.
 
 ### Finite semantic compositions
 
@@ -409,11 +410,12 @@ profile changes still need outcome review. No customer-state transition, schema
 migration, reference intake UI, Contact activation or production approval follows
 from acceptance of this development preview.
 
-Disposable operator scripts and presentation records remain separate, uncommitted
-customer work. They exercise existing structured fields in random isolated schemas;
+Disposable operator scripts and presentation records were checkpointed separately
+as customer/operator artifacts, not reusable profile defaults. They exercise
+existing structured fields in random isolated schemas;
 serving connections are read-only and before/after snapshots protect canonical
 state. They are not a reusable self-service preview/approval product. Real Myomaton
-continues to use reference v1 until a separately authorized guarded transition.
+now uses reference v2 after its separately authorized guarded transition.
 
 ## Rendered-review correction pass
 

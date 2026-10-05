@@ -1,9 +1,10 @@
 # Myomaton Visual Direction v1
 
-Customer #1 transition **applied to the real development database**. Read-only
-verification confirms reference v1, eight migrations, four Pages and 29 Sections.
-PostgreSQL remains canonical. This applied state is the frozen pre-v2 baseline. The accepted disposable v2
-presentation is not applied; see the [prepared v2 transition](myomaton-visual-direction-v2.md).
+Customer #1 transition **historically applied to the real development database**.
+Its reference-v1 result is the frozen pre-v2 baseline, with eight migrations, four
+Pages and 29 Sections. The real development customer now uses reference v2 after
+the [applied and verified v2 transition](myomaton-visual-direction-v2.md).
+PostgreSQL remains canonical; this document preserves the historical v1 contract.
 This is an application of the [existing runtime](visual-direction.md#runtime-contract),
 not a template, seed/bootstrap change or Myomaton-specific platform profile.
 
