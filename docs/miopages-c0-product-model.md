@@ -123,6 +123,11 @@ improvement; technical lock-in is not a retention strategy.
 
 ## What Customer 0 must prove
 
+Also test the [Launch/Ongoing operating model](service-operations-model.md#miopages-c0-proving-work):
+progressive intake, handoff, attention ownership, value/outcome reporting, role
+simulation and actual service minutes. C0 must not receive bespoke exceptions
+that hide the repeatable service burden.
+
 | Proving area | Reusable question |
 | --- | --- |
 | Commercial positioning | Can the platform explain a service business and its value without robotics-specific assumptions? |

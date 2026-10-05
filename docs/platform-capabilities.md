@@ -262,7 +262,8 @@ listing the modes does not claim their deployment workflows are complete.
 or migration of an existing Web Presence into the Managed Site model. A Managed
 Site may become the conversion-focused face/front-end while an existing site,
 Content Engine or infrastructure remains in place. Initially this is an
-operator-assisted/custom integration mode: URL ownership, routing, SEO/canonical
+operator-assisted mode using supported integration/configuration patterns, not
+bespoke customer software: URL ownership, routing, SEO/canonical
 behavior, forms and analytics need explicit coordination. Standardize only when
 repeatable patterns justify it. Full Presence and Campaign are the easier modes
 to standardize, not claims of already completed deployment workflows.
@@ -429,6 +430,12 @@ limits (such as managed-object size limits) still apply. Allowed overrides must
 respect enforced safety/service boundaries and protected business truth.
 
 ## 14. Ownership and operating principles
+
+The [service operations model](service-operations-model.md) defines Standard/Expanded
+Launch, continuous Ongoing, integration classification and attention-driven human
+work. Complexity can scale within supported capabilities; customization is not
+an Expanded Launch entitlement. Its scope/time ranges are planning guidance, not
+platform limits or customer promises.
 
 Customer ownership, usable export and easy exit/no lock-in remain product
 principles, subject to explicit retention and offboarding policies. Export is

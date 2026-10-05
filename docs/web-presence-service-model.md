@@ -19,6 +19,10 @@ owns the product envelope and current capability status;
 [deferred architecture](deferred-architecture.md) owns implementation gates.
 This document defines intent, not a completed launch offer or a service-level guarantee.
 
+The [Launch and Ongoing operations model](service-operations-model.md) owns supported
+Launch envelopes, continuous handoff, cadence, attention routing, responsibility
+and non-canonical service-time hypotheses. It does not expand implemented scope.
+
 ## Launch-stage customer outcome
 
 The likely launch offer combines the following, conditional on customer need and

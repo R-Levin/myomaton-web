@@ -9,6 +9,8 @@ The [service model](web-presence-service-model.md) defines reusable launch and
 ongoing customer outcomes. [MioPages C0](miopages-c0-product-model.md) is a
 commercial proving context; the [content-growth loop](content-growth-loop.md)
 owns the detailed opportunity, drafting, approval and distribution lifecycle.
+The [service operations model](service-operations-model.md) owns Launch/Ongoing
+scope, cadence, progressive intake and selective customer effort.
 
 ## Canonical knowledge comes first
 
@@ -29,6 +31,9 @@ Onboarding is a core product function that should be both easy and complete.
 Initial production can use operator-assisted guided intake; sales need not wait
 for fully automated customer self-service. Questions are conditional on business
 type, known answers and goals, rather than a mandatory form for every capability.
+That early implementation bridge is distinct from extra customer handholding:
+the target is minimum viable onboarding plus progressive enrichment, with
+additional operator assistance an exception rather than routine large discovery.
 
 The interview builds structured knowledge covering:
 
@@ -209,7 +214,8 @@ it. External engines are not dumping grounds for missing Managed Site features.
 migration of an existing Web Presence into the Managed Site model. The Managed
 Site can be the conversion-focused face/front-end while existing content engines,
 sites or infrastructure remain where appropriate. Initially treat this as
-operator-assisted/custom integration. Explicitly establish URL ownership, routing,
+operator-assisted configuration of supported integration patterns, not bespoke
+customer software. Explicitly establish URL ownership, routing,
 canonical/SEO behavior, forms and analytics responsibilities for each deployment;
 standardize only when repeated patterns justify it. Full Presence and Campaign
 are easier standardization paths, within the same architecture as Adjunct.
