@@ -206,6 +206,10 @@ publication permission or operational/legal readiness before commercial launch.
 
 ## Next-phase readiness and limits
 
+The approved [C0 implementation plan](miopages-c0-implementation-plan.md) is the
+development handoff preserving the IA/content model, capability gaps and phased
+roadmap. It does not expand this brief's publication or customer-state authority.
+
 **READY FOR IA / CONTENT MODEL.** The next phase can determine information
 architecture, content/entity modeling, Page archetypes, conversion/Action structure,
 content priorities and Visual Direction intake requirements from this brief.
