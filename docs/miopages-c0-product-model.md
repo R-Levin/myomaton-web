@@ -21,6 +21,11 @@ and [implementation register](deferred-architecture.md) own implementation statu
 and gates. MioPages requirements should expose reusable needs rather than create
 another manually crafted one-off website.
 
+The [approved provisional C0 business brief](miopages-c0-business-brief.md) is the
+completed discovery output and canonical input for the next IA/content-model phase.
+It refines this document's broader hypotheses; reopen discovery only for a genuine
+contradiction or missing business fact. It authorizes no publication or state writes.
+
 ## Historical and operational context
 
 The following is operator-supplied context, not a platform invariant:
@@ -120,6 +125,99 @@ knowledge-gathering, approval, distribution and measurement contracts. MioPages
 should prove that loop with commercial topics and lead-generation intent. Continued
 service must earn its place through understandable work and measurable learning or
 improvement; technical lock-in is not a retention strategy.
+
+## Launch and Ongoing customer deliverable summary
+
+This is current product-definition guidance for later customer-facing product-detail
+and marketing material, not final public copy or a contractual service specification.
+It describes the intended offer, conditional on supported capabilities and operational
+readiness; it does not claim that planned workflows or integrations already exist.
+Detailed scope, cadence, responsibilities and service economics remain in the
+[operations model](service-operations-model.md).
+
+### One primary managed service
+
+MioPages sells one primary managed Web Presence service: establish the presence,
+then continuously improve it. Hosting, domains and email may be supplied or
+coordinated where needed, but they do not define the product. The customer is
+buying a managed outcome rather than a page builder or bespoke website development.
+
+The service should help the right prospects find the business, understand its offer,
+see its relevance/difference, trust it and take the next useful step. Business
+understanding and useful conversion are the intended outcome; the product is more
+than a website. A provisional explanatory sentence is: “We establish and then
+continuously improve your managed Web Presence.” Preserve the concept without
+treating that wording as a final slogan.
+
+### Standard Launch: intended customer deliverables
+
+A normal good-fit customer may receive:
+
+- Structured onboarding and business-knowledge capture; review/inventory of an
+  existing web presence where one exists.
+- Identification of core services/products/offers, audience/customer needs,
+  differentiators and proof where available, business goals and desired visitor Actions.
+- A professionally designed Managed Site using bounded Visual Direction/composition,
+  appropriate core Pages/Navigation and a clear Contact/lead/conversion path.
+- Migration/normalization of a modest amount of useful existing content where
+  applicable and a supported path exists; no automatic site cloning/import promise.
+- Domain/hosting/deployment handling where needed and external-presence inventory.
+- Baseline first-party measurement and GA4/Search Console setup or connection
+  where practical, authorized and proven; Google access remains an unproven spike.
+- Customer review/approval and Launch directly into the Ongoing managed service.
+
+The customer need not arrive with a sitemap, wireframes, design specification,
+page-builder plan or pixel instructions. They supply business truth, goals,
+preferences, Assets, existing systems/accounts and useful examples where relevant.
+The platform/operator determines the supported bounded implementation for review;
+it does not invent missing business facts or require the customer to become a webmaster.
+
+### Ongoing: intended continuing value
+
+After Launch, service activities may include operation/maintenance, first-party
+traffic/Action/lead measurement, plain-language progress/value reports, content and
+optimization recommendations, targeted questions for missing knowledge, AI-assisted
+drafts with human/customer approval, business-information updates, improved service/
+product representation, conversion-path refinement and periodic review of what is
+working and what should happen next.
+
+Ongoing is not primarily “pay us to keep your website from breaking.” Its value is
+“the system keeps helping your presence get better.” Reliable operation supports
+that work, but retention should come from useful progress rather than lock-in.
+The [growth loop](content-growth-loop.md) owns detailed content/approval behavior;
+the [measurement architecture](measurement-and-analytics.md) owns evidence and
+attribution limits. These activities remain subject to their implementation status.
+
+### Expanded Launch and initial non-promises
+
+Expanded Launch means **more supported complexity, not customization**: substantial
+content migration where supported, more locations, larger service/product catalogs,
+larger teams/resource libraries, more redirect/SEO-continuity work, more supported
+integrations or a larger approval surface. It still uses the same bounded system.
+**Complexity may scale. Customization does not.**
+
+It does not authorize bespoke design/development, customer-specific CSS, arbitrary
+components, custom applications, unlimited revision or customer-only integrations
+without reusable support value. Initial exclusions/non-promises also include:
+
+- Arbitrary custom integrations, full CRM replacement or full marketing-automation
+  replacement.
+- Broad social-media management, automated social publishing unless separately
+  implemented, or managed Google Business Profile operation.
+- Guaranteed rankings, traffic, leads or revenue, or perfect/full-funnel attribution.
+- Advanced team workflows that have not been implemented.
+
+Planned measurement, publishing, intake and inventory must not be advertised as
+already working. Current foundations, planned core and future extensions retain
+their boundaries in the [capability catalog](platform-capabilities.md) and the
+related operating contracts.
+
+### Marketing-preservation note
+
+This section is source material for later MioPages website copy, product-detail
+pages, sales explanations, pricing/package presentation, onboarding explanations
+and customer FAQs. Preserve its substance and boundaries even when marketing
+wording changes. It establishes neither final prices nor contractual entitlements.
 
 ## What Customer 0 must prove
 

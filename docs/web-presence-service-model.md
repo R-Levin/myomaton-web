@@ -19,6 +19,10 @@ owns the product envelope and current capability status;
 [deferred architecture](deferred-architecture.md) owns implementation gates.
 This document defines intent, not a completed launch offer or a service-level guarantee.
 
+The [MioPages Launch/Ongoing deliverable summary](miopages-c0-product-model.md#launch-and-ongoing-customer-deliverable-summary)
+is the C0/commercial expression of this reusable service, preserved as guidance
+for later product-detail and marketing work rather than final public copy or terms.
+
 The [Launch and Ongoing operations model](service-operations-model.md) owns supported
 Launch envelopes, continuous handoff, cadence, attention routing, responsibility
 and non-canonical service-time hypotheses. It does not expand implemented scope.
