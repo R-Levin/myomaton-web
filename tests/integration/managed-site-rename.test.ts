@@ -141,7 +141,7 @@ test("0006 preserves a customer graph on upgrade and matches fresh replay withou
     // anchor cases explicitly in this fixture instead of requiring old customer data.
     const aboutSection = before.sections.find(s => (s.configuration as { anchor?: string })?.anchor === "about")!;
     const aboutAction = before.actions.find(a => a.destination === "#about")!;
-    const primary = before.navigations.find(n => n.name === "Primary Navigation")!;
+    const primary = before.navigations.find(n => n.name === "Primary Navigation" && n.web_presence_id === "1b72cd7d-92b9-4f55-aba6-825d69d493af")!;
     assert.ok(aboutSection && aboutAction && primary);
     for (const [type, reference] of [["section", aboutSection.id], ["action", aboutAction.id]]) {
       if (!before.navigation_items.some(i => i.navigation_id === primary.id && i.target_type === type && i.target_reference === reference)) {
@@ -163,7 +163,7 @@ test("0006 preserves a customer graph on upgrade and matches fresh replay withou
       assert.deepEqual(Buffer.from(await media.arrayBuffer()), await readManagedObject(assetRoot(), String(asset.web_presence_id), String(asset.source_reference)));
       for (const path of ["/unknown", "/teams/northeast", "/media/unknown", "/a%2Fb"]) assert.equal((await fetch(server.base + path)).status, 404);
       // Secondary content is created only in this disposable schema.
-      const secondary = (await client.query(`INSERT INTO ${disposable(upgrade)}.pages (managed_site_id,slug,name,title) VALUES ($1,'/teams/northeast','Northeast','Northeast team') RETURNING id`, [before.microsites[0].id])).rows[0];
+      const secondary = (await client.query(`INSERT INTO ${disposable(upgrade)}.pages (managed_site_id,slug,name,title) VALUES ($1,'/teams/northeast','Northeast','Northeast team') RETURNING id`, ["7fd60824-a933-401d-8099-7b64f24cc408"])).rows[0];
       await client.query(`INSERT INTO ${disposable(upgrade)}.sections (page_id,type,content) VALUES ($1,'intro',$2)`, [secondary.id, { heading: "Team", text: "First.\n\nSecond." }]);
       const response = await fetch(server.base + "/teams/northeast"); assert.equal(response.status, 200);
       const secondaryDoc = new JSDOM(await response.text()).window.document;

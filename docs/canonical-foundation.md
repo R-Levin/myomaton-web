@@ -7,6 +7,10 @@ bounded revisions and read-time projections. It creates no customer records and
 does not implement onboarding, Review, AI, analytics, billing or production management.
 See the [C0 handoff](miopages-c0-implementation-plan.md) and [gates](deferred-architecture.md).
 
+The [MioPages customer slice](miopages-c0-canonical-state.md) separately exercises
+these generic contracts through a guarded operator initializer. Its provisional
+customer choices are not platform defaults; no publication workflow is implied.
+
 ## Knowledge and identity
 
 One `business_knowledge` current record per Web Presence accepts a closed version-1

@@ -198,6 +198,10 @@ for canonical native content and approved publishing. Apply each at its trigger.
 
 ## Phased development roadmap
 
+The separately authorized [first canonical C0 slice](miopages-c0-canonical-state.md)
+records the reviewed customer graph and provisional IA. This does not authorize
+final copy, visual selection, operational workflows or commercial publication.
+
 Phase 1's reusable contracts are now implemented in the
 [canonical foundation](canonical-foundation.md). The roadmap below preserves the
 approved scope; it does not claim dataset creation, final visual selection or production readiness.

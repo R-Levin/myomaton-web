@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "initialize:miopages-c0": "tsx --env-file=.env.local scripts/initialize-miopages-c0.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

@@ -30,8 +30,10 @@ The platform aims to:
 Myomaton is Customer #1 and the proving ground for these capabilities. Its content
 is canonical customer state, not a permanent platform template. See the
 [customer-state and bootstrap boundaries](bootstrap.md).
-Customer 0 is the concept for the product's own Web Presence; it does not imply
-an existing customer record. The [onboarding and optimization operating model](onboarding-optimization.md)
+Customer 0 is the product's own proving presence. MioPages now has a separately
+authorized [canonical C0 graph](miopages-c0-canonical-state.md) in development,
+with provisional copy/presentation and no commercial publication authority.
+The [onboarding and optimization operating model](onboarding-optimization.md)
 records the core planned workflow and its trust/provider boundaries.
 
 The [Web Presence service model](web-presence-service-model.md) defines launch and

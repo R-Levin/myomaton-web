@@ -57,7 +57,9 @@ test("guarded v2 PostgreSQL rollback/no-op reproduces the accepted four-Page pre
     const installed = readMigrationFiles({migrationsFolder:"lib/platform/db/migrations"});
     assert.ok(realBefore.migrations.length === 8 || realBefore.migrations.length === installed.length);
     for (const [index, row] of realBefore.migrations.entries()) assert.equal(row.hash,installed[index].hash,"Installed migration prefix remains exact");
-    assert.doesNotThrow(() => planVisualDirectionV2({...realBefore,migrations:realBefore.migrations.slice(0,8)}), "Historical customer state remains exact; the fixture always starts from the frozen eight-migration v1 baseline");
+    const historical = Object.fromEntries(tables.map(table => [table,realBefore[table].filter(row=>baseline[table].some(original=>original.id===row.id))])) as State;
+    historical.migrations=realBefore.migrations.slice(0,8);
+    assert.doesNotThrow(() => planVisualDirectionV2(historical), "Historical Myomaton rows remain exact; other customers are preserved by the complete before/after comparison");
     await c.query(`CREATE SCHEMA ${quoted}`);
     for (const t of tables) {
       await c.query(`CREATE TABLE ${quoted}.${t} (LIKE public.${t} INCLUDING ALL)`);
