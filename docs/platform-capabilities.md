@@ -70,7 +70,7 @@ classifications serve a different purpose from the capability statuses above.
   with versioned acceptance and expiring submissions. This is a bounded foundation,
   not a CRM or public-production activation. See [Contact/forms](contact-forms.md).
 
-**Core planned:**
+**Phase 1 implemented:**
 
 - **Offering**, with intended structured information:
   - Type: `product | service`.
@@ -78,10 +78,17 @@ classifications serve a different purpose from the capability statuses above.
   - Short description.
   - Substantial/detail description.
   - Status.
-  - Primary Asset and additional Assets.
-  - Optional grouping/category.
+  - One canonical image AssetUsage in Phase 1; additional Assets remain planned.
+  - Optional grouping/category remains planned.
   - Relevant Actions.
-  - Structured discovery metadata where justified.
+  - Structured discovery metadata remains planned where justified.
+
+The implemented subset is the strict [canonical foundation](canonical-foundation.md):
+Business Knowledge, Offering/components/pricing, bounded revisions, local scoped writers
+and finite projections. Category/discovery extensions remain planned.
+
+**Core planned:**
+
 - **Location**.
 - **Person / Team Member**.
 - **Testimonial**.

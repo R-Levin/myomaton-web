@@ -18,7 +18,7 @@ test("Contact upgrade/fresh replay preserves public state; isolated submission o
   const prefix = `myomaton_contact_test_${randomUUID().replaceAll("-", "")}`;
   const upgrade = `${prefix}_upgrade`, fresh = `${prefix}_fresh`;
   const quote = (name: string) => { assert.match(name, /^myomaton_contact_test_[a-f0-9]{32}_(upgrade|fresh)$/); return `"${name}"`; };
-  const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.equal(migrations.length, 8);
+  const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.equal(migrations.length, 9);
   const read = async (schema: string) => {
     assert.ok(schema === "public" || quote(schema));
     const rows: Record<string, unknown[]> = {};
@@ -37,7 +37,7 @@ test("Contact upgrade/fresh replay preserves public state; isolated submission o
   try {
     await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
     const journal = (await client.query("SELECT hash,created_at FROM drizzle.__drizzle_migrations ORDER BY id")).rows;
-    assert.ok(journal.length === 7 || journal.length === 8);
+    assert.ok(journal.length >= 7 && journal.length <= 9);
     assert.deepEqual(journal, migrations.slice(0,journal.length).map(m => ({ hash: m.hash, created_at: String(m.folderMillis) })));
     const before = await read("public"); await client.query("ROLLBACK");
     for (const schema of [upgrade, fresh]) await client.query(`CREATE SCHEMA ${quote(schema)}`);
@@ -88,7 +88,7 @@ test("Contact upgrade/fresh replay preserves public state; isolated submission o
       if (process.env.ASSET_TEST_PRODUCTION === "1") {
         await p.query("UPDATE web_presences SET primary_domain='myomaton.com',configuration=$1 WHERE id=$2", [{ business: { email: "hello@example.test" } }, first.wp]);
         await p.query("UPDATE managed_sites SET name='Myomaton' WHERE id=$1", [first.site]);
-        const server = await startProductionFixture(url, fresh, assetRoot());
+        const server = await startProductionFixture(url, fresh, assetRoot(),{webPresenceId:first.wp,managedSiteId:first.site});
         try {
           const response = await fetch(`${server.base}/contact`); assert.equal(response.status, 200);
           const html = await response.text(), doc = new JSDOM(html).window.document;

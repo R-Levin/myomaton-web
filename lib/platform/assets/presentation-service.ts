@@ -1,6 +1,7 @@
 import "server-only";
 import { db } from "../db/connection";
-import { publicAsset, sectionImages } from "./presentation-queries";
+import { publicAsset, sectionImages, eligibleSectionAssets, eligibleLogo } from "./presentation-queries";
+import { offeringImages } from "../canonical/media";
 
 export function getSectionImages(webPresenceId: string, sectionIds: readonly string[]) {
   return sectionImages(db, webPresenceId, sectionIds);
@@ -8,4 +9,15 @@ export function getSectionImages(webPresenceId: string, sectionIds: readonly str
 
 export function getPublicAsset(domain: string, assetId: string) {
   return publicAsset(db, domain, assetId);
+}
+
+export async function getDeploymentAsset(selection: {webPresenceId:string;managedSiteId:string;domain:string}, assetId: string) {
+  const usages=await eligibleSectionAssets(db,selection.webPresenceId,undefined,selection.managedSiteId);
+  const asset=[...usages.values()].find(u=>u.asset.id===assetId)?.asset;
+  if(asset)return asset;
+  const canonical=await offeringImages(db.$client,selection.webPresenceId,selection.managedSiteId);
+  const offering=[...canonical.values()].find(u=>u.asset.id===assetId)?.asset;
+  if(offering)return offering;
+  const logo=await eligibleLogo(db,selection.webPresenceId);
+  return logo?.asset.id===assetId ? logo.asset : null;
 }

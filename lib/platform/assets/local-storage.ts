@@ -6,7 +6,7 @@ import { MAX_MANAGED_BYTES, requireManagedKey } from "./source";
 
 // Runtime customer bytes are supplied by a volume, never traced into the build.
 export function assetRoot(): string {
-  return path.resolve(/* turbopackIgnore: true */ process.env.MYOMATON_ASSET_ROOT || "runtime-assets");
+  return path.resolve(/* turbopackIgnore: true */ process.env.MANAGED_ASSET_ROOT || process.env.MYOMATON_ASSET_ROOT || "runtime-assets");
 }
 
 export function managedKey(bytes: Buffer): string {

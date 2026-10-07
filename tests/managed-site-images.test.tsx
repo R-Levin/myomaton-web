@@ -31,6 +31,8 @@ test("managedSite resolves intro images through the Asset service and renders op
   let hasImage = true;
   const image = { assetId: id(5), src: `/media/assets/${id(5)}`, width: 640, height: 480, alt: "A real robot" };
   const service = loadService("lib/platform/managed-sites/service.ts", {
+    "../canonical/projections": { projectCanonicalSections: async (_pool: unknown,_owner: unknown,rows: unknown) => rows },
+    "../canonical/media": { offeringImages: async () => new Map() },
     "../visual-direction/model": visualModel, "../policy/site-policy": visualPolicy, "../site-globals/model": globalModel,
     "../site-globals/service": { getSiteGlobals: async () => undefined },
     "../contact/presentation": { contactPresentations: async () => new Map() },

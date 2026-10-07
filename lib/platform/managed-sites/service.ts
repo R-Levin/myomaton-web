@@ -1,4 +1,6 @@
 import "server-only";
+import { projectCanonicalSections } from "../canonical/projections";
+import { offeringImages } from "../canonical/media";
 import { resolveVisualDirection, type VisualResolution } from "../visual-direction/model";
 import { resolveVisualPolicy, servicePolicyFromEnvironment } from "../policy/site-policy";
 import { object } from "../site-globals/model";
@@ -52,14 +54,14 @@ export type ManagedSitePage = {
   visual?: VisualResolution;
 };
 
-export type ManagedSiteSelection = { domain: string; managedSiteName: string };
+export type ManagedSiteSelection = { domain: string; managedSiteName: string } | { webPresenceId: string; managedSiteId: string };
 
 export async function getManagedSitePage(
   selection: ManagedSiteSelection,
   path: string,
 ): Promise<ManagedSitePage | null> {
   const slug = normalizePagePath(path);
-  if (!slug || !selection.domain || !selection.managedSiteName) return null;
+  if (!slug) return null;
   const sites = await db
     .select({
       webPresenceId: webPresences.id,
@@ -71,8 +73,9 @@ export async function getManagedSitePage(
     .from(webPresences)
     .innerJoin(managedSites, eq(managedSites.webPresenceId, webPresences.id))
     .where(and(
-      eq(webPresences.primaryDomain, selection.domain),
-      eq(managedSites.name, selection.managedSiteName),
+      ...("webPresenceId" in selection
+        ? [eq(webPresences.id, selection.webPresenceId), eq(managedSites.id, selection.managedSiteId)]
+        : [eq(webPresences.primaryDomain, selection.domain), eq(managedSites.name, selection.managedSiteName)]),
       eq(webPresences.status, "active"),
       eq(managedSites.status, "active"),
     ))
@@ -100,11 +103,15 @@ export async function getManagedSitePage(
     .where(and(eq(sections.pageId, match.page.id), eq(sections.status, "active")))
     .orderBy(asc(sections.sortOrder), asc(sections.id));
 
-  const supportedSections = orderedSections.flatMap((section) => {
+  const boundIds=new Set(orderedSections.filter(s=>s.content && typeof s.content==="object" && Object.hasOwn(s.content,"source")).map(s=>s.id));
+  const projectedSections = await projectCanonicalSections(db.$client, match.webPresenceId, orderedSections);
+  const supportedSections = projectedSections.flatMap((section) => {
     const normalized = normalizeSection(section);
     return normalized ? [{ ...section, ...normalized, rawConfiguration: section.configuration }] : [];
   });
-  const images = await getSectionImages(match.webPresenceId, supportedSections.filter((section) => section.type === "intro").map((section) => section.id));
+  const images = await getSectionImages(match.webPresenceId, supportedSections.filter((section) => section.type === "intro" && !boundIds.has(section.id)).map((section) => section.id));
+  const canonicalImages = orderedSections.some(s => s.content && typeof s.content === "object" && Object.hasOwn(s.content,"source"))
+    ? await offeringImages(db.$client,match.webPresenceId,match.managedSite.id) : new Map();
   const designSystem = await getDesignSystemByWebPresenceId(match.webPresenceId);
   const actionIds = supportedSections
     .flatMap((section) => section.type === "collection"
@@ -134,7 +141,7 @@ export async function getManagedSitePage(
     sections: supportedSections.map((section) => ({
       ...section,
       contact: contacts.get(section.id),
-      image: images.get(section.id) ?? null,
+      image: boundIds.has(section.id) ? canonicalImages.get(section.id)?.image ?? null : images.get(section.id) ?? null,
       action: resolvedActions.get(sectionActionId(section.content) ?? "") ?? null,
       ...(section.type === "collection" ? { collectionItems: presentCollection(section.content, resolvedSubjects, resolvedActions) } : {}),
     })),

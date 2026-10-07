@@ -56,7 +56,7 @@ test("0006 preserves a customer graph on upgrade and matches fresh replay withou
     // mutation is possible here; copied data is inserted only into the fixture.
     await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
     const journal = (await client.query("SELECT * FROM drizzle.__drizzle_migrations ORDER BY id")).rows;
-    assert.ok(journal.length === 6 || journal.length === 7 || journal.length === 8);
+    assert.ok(journal.length >= 6 && journal.length <= 9);
     assert.deepEqual(journal.map(r => ({ hash: r.hash, created_at: r.created_at })),
       migrations.slice(0, journal.length).map(m => ({ hash: m.hash, created_at: String(m.folderMillis) })));
     const live = await readRows(client, "public", journal.length === 6 ? oldTables : newTables);
@@ -150,7 +150,7 @@ test("0006 preserves a customer graph on upgrade and matches fresh replay withou
           [primary.id, `Rehearsal ${type}`, type, reference]);
       }
     }
-    const server = await startProductionFixture(url, upgrade, assetRoot());
+    const server = await startProductionFixture(url, upgrade, assetRoot(), { webPresenceId: "1b72cd7d-92b9-4f55-aba6-825d69d493af", managedSiteId: "7fd60824-a933-401d-8099-7b64f24cc408" });
     try {
       const home = await fetch(server.base); assert.equal(home.status, 200);
       const document = new JSDOM(await home.text()).window.document;

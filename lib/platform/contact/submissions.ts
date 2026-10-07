@@ -5,7 +5,7 @@ import { object } from "../site-globals/model";
 import { canonicalPagePath } from "../managed-sites/paths";
 import type { ContactAbuseGuard, ContactDeliveryProvider, ContactEvents } from "./boundaries";
 
-export async function acceptContactSubmission(pool: Pool, selection: { domain: string; managedSiteName: string }, value: unknown,
+export async function acceptContactSubmission(pool: Pool, selection: { domain: string; managedSiteName: string; webPresenceId?: string; managedSiteId?: string }, value: unknown,
   options: { abuse: ContactAbuseGuard; provider?: ContactDeliveryProvider; events?: ContactEvents; servicePolicy?: unknown; now?: Date }) {
   const input = submissionInput(value);
   // Bound direct service use as well as HTTP streaming.
@@ -15,8 +15,10 @@ export async function acceptContactSubmission(pool: Pool, selection: { domain: s
   let accepted: { id: string; webPresenceId: string; route: string | null; fields: ReturnType<typeof normalizeFields>; created: boolean; successText: string };
   try {
     await client.query("BEGIN");
+    if (!!selection.webPresenceId !== !!selection.managedSiteId) throw new ContactError("unavailable",404);
     const sites = await client.query(`SELECT m.id FROM managed_sites m JOIN web_presences w ON w.id=m.web_presence_id
-      WHERE w.primary_domain=$1 AND m.name=$2 AND w.status='active' AND m.status='active' FOR SHARE OF m,w`, [selection.domain, selection.managedSiteName]);
+      WHERE ${selection.webPresenceId ? "w.id=$1::uuid AND m.id=$2::uuid" : "w.primary_domain=$1 AND m.name=$2"} AND w.status='active' AND m.status='active' FOR SHARE OF m,w`,
+      selection.webPresenceId ? [selection.webPresenceId,selection.managedSiteId] : [selection.domain, selection.managedSiteName]);
     if (sites.rows.length !== 1) throw new ContactError("unavailable", 404);
     const rows = await client.query(`SELECT d.id,d.version,d.status,d.configuration,d.delivery_route_key,
       w.id AS web_presence_id,m.id AS managed_site_id,p.id AS page_id,p.slug,s.id AS section_id,

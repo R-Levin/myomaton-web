@@ -94,7 +94,7 @@ async function main() {
     } catch (error) { await c.query("ROLLBACK"); throw error; }
     const policy = resolveVisualPolicy(servicePolicyFromEnvironment(process.env.WEB_PRESENCE_SERVICE_POLICY));
     const effective = resolveVisualDirection({ visualDirection: { profileId: "reference", profileVersion: 2, preferences: { hero: "graphic", density: "airy", motion: "light" } } }, policy).direction!;
-    server = await startProductionFixture(url, schema, assetRoot());
+    server = await startProductionFixture(url, schema, assetRoot(), { webPresenceId: "1b72cd7d-92b9-4f55-aba6-825d69d493af", managedSiteId: "7fd60824-a933-401d-8099-7b64f24cc408" });
     const routes = [];
     for (const page of before.pages) {
       const response = await fetch(server.base + page.slug); if (response.status !== 200) throw Error(`Route ${page.slug} failed`);

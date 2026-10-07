@@ -74,6 +74,8 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
   assert.equal(actionQueries, 1);
 
   const managedSiteService = loadService("lib/platform/managed-sites/service.ts", {
+    "../canonical/projections": { projectCanonicalSections: async (_pool: unknown,_owner: unknown,rows: unknown) => rows },
+    "../canonical/media": { offeringImages: async () => new Map() },
     "../visual-direction/model": visualModel, "../policy/site-policy": visualPolicy, "../site-globals/model": globalModel,
     "../site-globals/service": { getSiteGlobals: async () => undefined },
     "../contact/presentation": { contactPresentations: async () => new Map() },

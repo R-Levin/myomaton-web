@@ -57,6 +57,13 @@
       "when": 1791067838170,
       "tag": "0007_contact-foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791330177661,
+      "tag": "0008_canonical-foundation",
+      "breakpoints": true
     }
   ]
 }

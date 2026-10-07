@@ -181,7 +181,7 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
       if (process.env.ASSET_TEST_PRODUCTION === "1") {
         await db.update(webPresences).set({ primaryDomain: "myomaton.com", configuration: { business: { displayName: "Fixture brand", phone: "+12125550100", email: "hello@example.test", socials: { github: "https://github.com/example" } } } }).where(eq(webPresences.id, f.presence.id));
         await db.update(managedSites).set({ configuration: { globals: { header: { showPhone: true }, footer: { showPhone: true, showEmail: true, showSocials: true } } } }).where(eq(managedSites.id, f.site.id));
-        const server = await startProductionFixture(adminUrl, name, temp);
+        const server = await startProductionFixture(adminUrl, name, temp,{webPresenceId:f.presence.id,managedSiteId:f.site.id});
         try {
           const response = await fetch(server.base); assert.equal(response.status, 200);
           const html = await response.text();
@@ -289,13 +289,14 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
       await assert.rejects(attachSectionAsset(db, input(target)), /occupied/);
     });
     await t.test("all supported representations persist and deliver with ownership and usage eligibility", async () => {
-      const server = process.env.ASSET_TEST_PRODUCTION === "1" ? await startProductionFixture(adminUrl, name, temp) : null;
+      let server: Awaited<ReturnType<typeof startProductionFixture>> | null = null;
       try { for (const bytes of await mediaFixtures()) {
         const f = await fixture();
         await db.update(webPresences).set({ primaryDomain: "myomaton.com" }).where(eq(webPresences.id, f.presence.id));
         const prepared = await prepareManagedBytes(bytes);
         const candidate = { ...input(f), ...prepared, role: prepared.type === "image" ? "image" as const : "attachment" as const };
         await attachSectionAsset(db, candidate, () => provisionManagedObject(temp, f.presence.id, prepared.sourceReference, prepared.bytes));
+        server = process.env.ASSET_TEST_PRODUCTION === "1" ? await startProductionFixture(adminUrl,name,temp,{webPresenceId:f.presence.id,managedSiteId:f.site.id}) : null;
         const [stored] = await db.select().from(assets).where(eq(assets.id, candidate.assetId));
         assert.equal(stored.mimeType, prepared.mimeType); assert.equal(stored.type, prepared.type);
         assert.equal(stored.width, prepared.width); assert.equal(stored.height, prepared.height);
@@ -303,7 +304,7 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
         const response = await deliverPublicAsset(candidate.assetId, lookup, temp);
         assert.equal(response.status, 200); assert.equal(response.headers.get("content-type"), prepared.mimeType);
         if (server) {
-          const live = await fetch(`${server.base}/media/assets/${candidate.assetId}`);
+          const live: Response = await fetch(`${server.base}/media/assets/${candidate.assetId}`);
           assert.equal(live.status, 200, `Production ${prepared.mimeType}`);
           assert.equal(live.headers.get("content-type"), prepared.mimeType);
           assert.deepEqual(Buffer.from(await live.arrayBuffer()), prepared.bytes);
@@ -312,6 +313,7 @@ test("live PostgreSQL Asset write, presentation, delivery and operator integrity
         await db.delete(assetUsages).where(eq(assetUsages.assetId, candidate.assetId));
         assert.equal((await deliverPublicAsset(candidate.assetId, lookup, temp)).status, 404);
         if (server) assert.equal((await fetch(`${server.base}/media/assets/${candidate.assetId}`)).status, 404);
+        await server?.stop(); server=null;
         await db.update(webPresences).set({ primaryDomain: f.presence.primaryDomain }).where(eq(webPresences.id, f.presence.id));
       } } finally { await server?.stop(); }
     });

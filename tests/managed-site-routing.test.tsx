@@ -18,7 +18,7 @@ import * as collections from "../lib/platform/managed-sites/collections";
 import * as sectionModel from "../lib/platform/managed-sites/sections";
 import * as paths from "../lib/platform/managed-sites/paths";
 import { pageDestination } from "../lib/platform/navigations/model";
-import { managedSiteDeployment } from "../lib/platform/managed-sites/deployment";
+import { deploymentSelection } from "../lib/platform/managed-sites/deployment";
 import { ManagedSitePageView } from "../components/managed-sites/managed-site-page";
 import { myomatonDesignConfiguration } from "../scripts/customer-bootstrap/myomaton-design-system";
 import { loadService } from "./helpers/load-service";
@@ -72,6 +72,8 @@ function fixture() {
     throw new Error(`Unexpected query: ${query.text}`);
   } };
   const service = loadService("lib/platform/managed-sites/service.ts", {
+    "../canonical/projections": { projectCanonicalSections: async (_pool: unknown,_owner: unknown,rows: unknown) => rows },
+    "../canonical/media": { offeringImages: async () => new Map() },
     "../visual-direction/model": visualModel, "../policy/site-policy": visualPolicy, "../site-globals/model": globalModel,
     "../site-globals/service": { getSiteGlobals: async () => undefined },
     "../contact/presentation": { contactPresentations: async () => new Map() },
@@ -170,9 +172,9 @@ test("App Router shares metadata/render lookup, preserves Home title and throws 
     "next/navigation": { notFound }, "next/server": { connection: async () => {} },
     "@/components/managed-sites/managed-site-page": { ManagedSitePageView },
     "@/lib/platform/managed-sites/paths": paths,
-    "@/lib/platform/managed-sites/deployment": { managedSiteDeployment },
+    "@/lib/platform/managed-sites/deployment": { deploymentSelection: () => deploymentSelection({WEB_PRESENCE_ID:id(1),MANAGED_SITE_ID:id(2)}) },
     "@/lib/platform/managed-sites/service": { getManagedSitePage: async (selected: unknown, path: string) => {
-      calls++; assert.deepEqual(selected, managedSiteDeployment);
+      calls++; assert.deepEqual(selected, {webPresenceId:id(1),managedSiteId:id(2)});
       return service.getManagedSitePage(selection, path);
     } },
   }) as typeof import("../app/[[...path]]/page");

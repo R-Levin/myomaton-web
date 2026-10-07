@@ -1,4 +1,4 @@
-import { and, eq, getTableColumns, inArray, or } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray, or, sql } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { assets } from "../db/schema/assets";
 import { assetUsages } from "../db/schema/asset-usages";
@@ -13,7 +13,7 @@ type EligibleUsage = { asset: Asset; configuration: unknown };
 
 // The current site has active content, not a draft/published workflow. Only
 // active intro image/document associations are public in this slice.
-export async function eligibleSectionAssets(db: NodePgDatabase, webPresenceId: string, sectionIds?: readonly string[]) {
+export async function eligibleSectionAssets(db: NodePgDatabase, webPresenceId: string, sectionIds?: readonly string[], managedSiteId?: string) {
   const presenceId = requireAssetUuid(webPresenceId);
   const ids = sectionIds?.map(requireAssetUuid);
   if (ids?.length === 0) return new Map<string, EligibleUsage>();
@@ -26,7 +26,8 @@ export async function eligibleSectionAssets(db: NodePgDatabase, webPresenceId: s
     .innerJoin(assets, eq(assets.id, assetUsages.assetId))
     .where(and(eq(webPresences.id, presenceId), eq(webPresences.status, "active"),
       eq(managedSites.status, "active"), eq(pages.status, "active"), eq(sections.status, "active"), eq(sections.type, "intro"),
-      ids ? inArray(sections.id, ids) : undefined));
+      ids ? inArray(sections.id, ids) : undefined, managedSiteId ? eq(managedSites.id,managedSiteId) : undefined,
+      sql`NOT (${sections.content} ? 'source')`));
   const groups = new Map<string, typeof rows>();
   for (const row of rows) groups.set(`${row.sectionId}:${row.role}`, [...(groups.get(`${row.sectionId}:${row.role}`) ?? []), row]);
   const result = new Map<string, EligibleUsage>();
@@ -59,7 +60,7 @@ export async function publicAsset(db: NodePgDatabase, domain: string, assetId: s
 // AssetUsage is the single logo reference. Never duplicate its Asset UUID in
 // configuration. Inspect all usages for the target, including foreign ownership,
 // so malformed or ambiguous associations cannot expose an image.
-async function eligibleLogo(db: NodePgDatabase, webPresenceId: string): Promise<EligibleUsage | null> {
+export async function eligibleLogo(db: NodePgDatabase, webPresenceId: string): Promise<EligibleUsage | null> {
   const id = requireAssetUuid(webPresenceId);
   const rows = await db.select({ usagePresenceId: assetUsages.webPresenceId, asset: getTableColumns(assets), configuration: assetUsages.configuration })
     .from(webPresences)

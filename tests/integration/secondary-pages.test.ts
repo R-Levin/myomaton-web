@@ -59,7 +59,7 @@ test("secondary Pages transition, rollback, Asset reuse and production rendering
     }
     assert.equal(applied.assets.length, 3); assert.equal(applied.asset_usages.length, 3);
     assert.equal(applied.asset_usages.filter(r => r.asset_id === "e1a699d7-19ca-43a1-9dbe-3d7d523381ef").length, 0);
-    const server = await startProductionFixture(url, name, assetRoot());
+    const server = await startProductionFixture(url, name, assetRoot(), { webPresenceId: "1b72cd7d-92b9-4f55-aba6-825d69d493af", managedSiteId: "7fd60824-a933-401d-8099-7b64f24cc408" });
     try {
       for (const [path, title, count] of [["/", "Myomaton", 9], ["/about", "About Myomaton", 6], ["/projects", "Projects", 7], ["/principles", "Principles", 7]] as const) {
         const response = await fetch(server.base + path); assert.equal(response.status, 200);

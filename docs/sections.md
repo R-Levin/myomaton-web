@@ -1,5 +1,9 @@
 # Editorial Section presentation
 
+Finite [canonical source bindings](canonical-foundation.md#finite-section-sources)
+now project confirmed public knowledge and approved Offering/component/pricing values
+into existing Section DTOs before normalization. Unbound Sections are unchanged.
+
 Sections remain structured content, not a free-form page builder. `normalizeSection`
 is a read-time projection shared by the managed site service and renderer. Unknown
 Section types are omitted; malformed fields and unknown configuration keys are

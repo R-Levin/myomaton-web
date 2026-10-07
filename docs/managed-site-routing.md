@@ -9,12 +9,11 @@ The terminology/schema transition is documented in the
 
 ## Explicit deployment selection
 
-`lib/platform/managed-sites/deployment.ts` selects the current deployment by exact
-Web Presence primary domain and Managed Site name. It currently selects Customer #1:
-`myomaton.com` / `Myomaton`. The domain is configuration, never the request Host.
-Exactly one active pair must match before any Page is loaded; missing or duplicate
-matches fail closed. Renaming that Managed Site requires updating the explicit
-deployment selection. Managed media uses the same configured Web Presence domain.
+`lib/platform/managed-sites/deployment.ts` requires `WEB_PRESENCE_ID` and
+`MANAGED_SITE_ID` together. They select an exact active ownership relationship,
+never the request Host, a name search or an implicit customer. Renaming does not
+change selection. Contact and media use the same deployment context.
+See [canonical deployment boundaries](canonical-foundation.md#deployment-and-remaining-boundaries).
 
 Page queries then use the resolved Managed Site UUID, exact slug and `active` status.
 The existing model has no separate published state; this does not implement a

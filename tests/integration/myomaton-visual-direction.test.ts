@@ -20,7 +20,8 @@ test("disposable PostgreSQL operator rollback/no-op and all four production prev
     assert.ok(scope === "public" || scope === schema);
     const state = {} as State;
     for (const t of tables) state[t] = (await c.query(`SELECT to_jsonb(t) AS row FROM "${scope}".${t} t ORDER BY id`)).rows.map(r => r.row);
-    state.migrations = (await c.query("SELECT to_jsonb(t) AS row FROM drizzle.__drizzle_migrations t ORDER BY id")).rows.map(r => r.row);
+    const journal = scope === "public" ? "drizzle.__drizzle_migrations" : `${quoted}.migration_fixture`;
+    state.migrations = (await c.query(`SELECT to_jsonb(t) AS row FROM ${journal} t ORDER BY id`)).rows.map(r => r.row);
     return state;
   };
   try {
@@ -34,11 +35,13 @@ test("disposable PostgreSQL operator rollback/no-op and all four production prev
       await c.query(`CREATE TABLE ${quoted}.${t} (LIKE public.${t} INCLUDING ALL)`);
       for (const row of baseline[t]) await c.query(`INSERT INTO ${quoted}.${t} SELECT * FROM jsonb_populate_record(NULL::${quoted}.${t},$1::jsonb)`, [JSON.stringify(row)]);
     }
+    await c.query(`CREATE TABLE ${quoted}.migration_fixture (LIKE drizzle.__drizzle_migrations INCLUDING ALL)`);
+    for (const row of baseline.migrations) await c.query(`INSERT INTO ${quoted}.migration_fixture SELECT * FROM jsonb_populate_record(NULL::${quoted}.migration_fixture,$1::jsonb)`,[JSON.stringify(row)]);
     const fixturePool = (fail: boolean) => ({ connect: async () => ({ release() {}, query: async (sql: string, values?: unknown[]) => {
       // Production updater hardcodes public intentionally. Only this isolated
       // test adapter rewrites that qualifier, never the real CLI or implementation.
-      const scoped = sql.replaceAll("public.", `${quoted}.`);
-      assert.ok(!scoped.includes("public."));
+      const scoped = sql.replaceAll("public.", `${quoted}.`).replaceAll("drizzle.__drizzle_migrations",`${quoted}.migration_fixture`);
+      assert.ok(!scoped.includes("public.") && !scoped.includes("drizzle."));
       const result = await c.query(scoped, values);
       if (fail && sql.startsWith("UPDATE")) throw Error("forced after PostgreSQL write");
       return result;
@@ -52,7 +55,7 @@ test("disposable PostgreSQL operator rollback/no-op and all four production prev
     const config = applied.managed_sites.find(s => s.id === siteId)!.configuration;
     assert.deepEqual({ ...applied, managed_sites: baseline.managed_sites }, baseline);
     assert.ok(config);
-    server = await startProductionFixture(url, schema, assetRoot());
+    server = await startProductionFixture(url, schema, assetRoot(), { webPresenceId: "1b72cd7d-92b9-4f55-aba6-825d69d493af", managedSiteId: "7fd60824-a933-401d-8099-7b64f24cc408" });
     for (const page of baseline.pages) {
       const response: Response = await fetch(server.base + page.slug); assert.equal(response.status, 200);
       const doc = new JSDOM(await response.text()).window.document;

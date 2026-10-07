@@ -11,6 +11,7 @@ import { resolveVisualDirection, sectionRole, sectionComposition, sectionPresent
 import { visualTokens } from "../../components/managed-sites/visual-tokens";
 import { startProductionFixture } from "./production-server";
 import { assetRoot } from "../../lib/platform/assets/local-storage";
+import { readMigrationFiles } from "drizzle-orm/migrator";
 
 function contract(doc: Document) {
   return {
@@ -53,7 +54,10 @@ test("guarded v2 PostgreSQL rollback/no-op reproduces the accepted four-Page pre
   try {
     await c.query("SET TIME ZONE 'UTC'");
     await c.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY"); const realBefore = await read("public"); await c.query("ROLLBACK");
-    assert.doesNotThrow(() => planVisualDirectionV2(realBefore), "Real state must match an exact guarded state; the fixture always starts from frozen v1");
+    const installed = readMigrationFiles({migrationsFolder:"lib/platform/db/migrations"});
+    assert.ok(realBefore.migrations.length === 8 || realBefore.migrations.length === installed.length);
+    for (const [index, row] of realBefore.migrations.entries()) assert.equal(row.hash,installed[index].hash,"Installed migration prefix remains exact");
+    assert.doesNotThrow(() => planVisualDirectionV2({...realBefore,migrations:realBefore.migrations.slice(0,8)}), "Historical customer state remains exact; the fixture always starts from the frozen eight-migration v1 baseline");
     await c.query(`CREATE SCHEMA ${quoted}`);
     for (const t of tables) {
       await c.query(`CREATE TABLE ${quoted}.${t} (LIKE public.${t} INCLUDING ALL)`);
@@ -72,7 +76,7 @@ test("guarded v2 PostgreSQL rollback/no-op reproduces the accepted four-Page pre
     assert.deepEqual(await read(schema), intended);
     const rerun = pool(); assert.deepEqual(await updateVisualDirectionV2(rerun.value), { changed: false, inserted: 0, updated: 0, deleted: 0 }); assert.equal(rerun.writes, 0);
     assert.deepEqual(await read(schema), intended);
-    server = await startProductionFixture(url, schema, assetRoot());
+    server = await startProductionFixture(url, schema, assetRoot(), { webPresenceId: "1b72cd7d-92b9-4f55-aba6-825d69d493af", managedSiteId: "7fd60824-a933-401d-8099-7b64f24cc408" });
     const direction = resolveVisualDirection(intended.managed_sites[0].configuration).direction!;
     assert.equal(direction.motion,"minimal");
     const contracts: Record<string, ReturnType<typeof contract>> = {};

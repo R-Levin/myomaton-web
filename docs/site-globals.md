@@ -1,5 +1,9 @@
 # Managed Site global foundation
 
+Phase 1 adds [canonical knowledge evidence](canonical-foundation.md#knowledge-and-identity)
+without duplicating `configuration.business` as another identity authority. Explicit
+UUID deployment selection now scopes shared consumers; public production gates remain open.
+
 This is a bounded read/presentation capability, not a Header/Footer builder or
 customer editing surface. Existing JSON configuration and AssetUsage fields are
 sufficient; no migration or customer-state update is required.

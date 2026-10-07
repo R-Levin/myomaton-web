@@ -22,7 +22,7 @@ test("reference v2 four-Page production preview uses disposable state and unchan
       const state: Record<string, Record<string, unknown>[]> = {};
       for (const table of tables) {
         assert.match(table, /^[a-z_]+$/);
-        state[table] = (await c.query(`SELECT to_jsonb(t) AS row FROM public.${table} t ORDER BY id`)).rows.map(r => r.row);
+        state[table] = (await c.query(`SELECT to_jsonb(t) AS row FROM public.${table} t ORDER BY to_jsonb(t)::text`)).rows.map(r => r.row);
       }
       state.migrations = (await c.query("SELECT to_jsonb(t) AS row FROM drizzle.__drizzle_migrations t ORDER BY id")).rows.map(r => r.row);
       return state;
@@ -56,7 +56,7 @@ test("reference v2 four-Page production preview uses disposable state and unchan
       for (const [id, assetId] of Object.entries(presentation.imageSelections ?? {})) await c.query(`UPDATE ${quoted}.asset_usages SET asset_id=$2 WHERE id=$1`, [id, assetId]);
       for (const [id, label] of Object.entries(presentation.actionLabels ?? {})) await c.query(`UPDATE ${quoted}.actions SET label=$2 WHERE id=$1`, [id, label]);
     for (const [id, actionId] of Object.entries(presentation.actions)) await c.query(`UPDATE ${quoted}.sections SET content=jsonb_set(content,'{actionId}',$2::jsonb) WHERE id=$1`, [id, JSON.stringify(actionId)]);
-    server = await startProductionFixture(url, schema, assetRoot());
+    server = await startProductionFixture(url, schema, assetRoot(), { webPresenceId: "1b72cd7d-92b9-4f55-aba6-825d69d493af", managedSiteId: "7fd60824-a933-401d-8099-7b64f24cc408" });
     for (const page of before.pages) {
       const response: Response = await fetch(server.base + page.slug); assert.equal(response.status, 200);
       const doc = new JSDOM(await response.text()).window.document;

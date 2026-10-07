@@ -98,13 +98,14 @@ test("delivery hides unavailable assets and filesystem failures, serves JPEG wit
   } finally { await rm(temp, { recursive: true, force: true }); }
 });
 
-test("media route binds delivery to the configured Myomaton domain, never the request Host", async () => {
+test("media route binds delivery to explicit deployment context, never request Host", async () => {
   const { loadService } = await import("./helpers/load-service");
   const response = new Response("JPEG fixture");
   const route = loadService("app/media/assets/[assetId]/route.ts", {
-    "@/lib/platform/managed-sites/deployment": await import("../lib/platform/managed-sites/deployment"),
-    "@/lib/platform/assets/presentation-service": { getPublicAsset: async (domain: string, assetId: string) => {
-      assert.equal(domain, "myomaton.com"); assert.equal(assetId, uuid); return null;
+    "@/lib/platform/actions/model": await import("../lib/platform/actions/model"),
+    "@/lib/platform/managed-sites/context": {deploymentContext:async()=>({domain:"myomaton.com",webPresenceId:uuid,managedSiteId:uuid})},
+    "@/lib/platform/assets/presentation-service": { getDeploymentAsset: async (selected: {domain:string}, assetId: string) => {
+      assert.equal(selected.domain, "myomaton.com"); assert.equal(assetId, uuid); return null;
     } },
     "@/lib/platform/assets/local-storage": { assetRoot: () => "operator-root" },
     "@/lib/platform/assets/delivery": { deliverPublicAsset: async (assetId: string, lookup: (id: string) => Promise<unknown>, root: string) => {

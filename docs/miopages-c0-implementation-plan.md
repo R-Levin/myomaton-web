@@ -198,6 +198,10 @@ for canonical native content and approved publishing. Apply each at its trigger.
 
 ## Phased development roadmap
 
+Phase 1's reusable contracts are now implemented in the
+[canonical foundation](canonical-foundation.md). The roadmap below preserves the
+approved scope; it does not claim dataset creation, final visual selection or production readiness.
+
 ### Phase 1 — Canonical C0 content foundation
 
 **Objective:** represent MioPages cleanly without one-off conventions.

@@ -1,5 +1,12 @@
 # Deferred architecture requirements and decisions
 
+Phase 1's [canonical foundation](canonical-foundation.md) implements local scoped
+knowledge/Offering writers, bounded immutable revisions, finite projections and explicit
+UUID deployment selection. This partially satisfies P1/P2 for these domains only;
+it does not close P7 authorization, P9 host routing, P11 onboarding, P12 measurement,
+P13 intelligence or P14 production Contact. Retention beyond the revision capacity
+guard remains gated; no customer data is backfilled.
+
 This is an active architecture register, not a general TODO list or delivery plan.
 Items come from established platform requirements and the [Asset foundation](assets.md).
 Content Engine entries are commitments for future implementation, not claims that

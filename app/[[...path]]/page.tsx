@@ -4,7 +4,7 @@ import { connection } from "next/server";
 
 import { ManagedSitePageView } from "@/components/managed-sites/managed-site-page";
 import { getManagedSitePage } from "@/lib/platform/managed-sites/service";
-import { managedSiteDeployment } from "@/lib/platform/managed-sites/deployment";
+import { deploymentSelection } from "@/lib/platform/managed-sites/deployment";
 import { pagePathFromSegments } from "@/lib/platform/managed-sites/paths";
 
 type Props = { params: Promise<{ path?: string[] }> };
@@ -12,7 +12,7 @@ type Props = { params: Promise<{ path?: string[] }> };
 const getPage = cache(async (path: string | null) => {
   if (path === null) notFound();
   await connection();
-  const result = await getManagedSitePage(managedSiteDeployment, path);
+  const result = await getManagedSitePage(deploymentSelection(), path);
   if (!result) notFound();
   return result;
 });
