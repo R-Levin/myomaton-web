@@ -1,0 +1,4500 @@
+{
+  "contractVersion": 1,
+  "target": {
+    "organizationId": "152aebd3-00b3-4296-a64e-e281522e64f0",
+    "webPresenceId": "926cb772-7507-4542-8acd-e7e57ce71324",
+    "managedSiteId": "312b8081-4582-47fa-bedb-a551fd6e2b36"
+  },
+  "at": "2026-10-08T17:01:42.582+00:00",
+  "sourceDigest": "ee37b5f1298c0ff3a68db66757f451139b85280f1a41a967bd4b9f5f62592228",
+  "completeBefore": "85f900ac2af0086690955e59517ea07473ea5a7e17c4133fb1cd34e9354f5a30",
+  "completeAfter": "4758d79cea7a0ecb9019cc59b4fd8d824c2c8bdb845c37552e1b019c491cb980",
+  "otherFingerprint": "3a41fe0a7d7c2658bdf88746ffcbbc12df1e358fd378db0b7b41e396c65dac8e",
+  "migrationFingerprint": "884bdee7d11e59106f6333669afe89baa21143268e67119e517f47ef8843e6e3",
+  "before": {
+    "organizations": [
+      {
+        "id": "152aebd3-00b3-4296-a64e-e281522e64f0",
+        "name": "MioPages",
+        "type": "standard",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true,
+          "initialization": {
+            "stateDigest": "1eebac36a0cd5d0fc991a5422f12b867c36963ca2bcac3bfe696331ef6eed7ab",
+            "manifestDigest": "ef2493a5f84d1de5c9b81748eff5ca08f295537dd6a06662d1f724395dabf69c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {}
+      }
+    ],
+    "web_presences": [
+      {
+        "id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "name": "MioPages",
+        "locale": "en-US",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "timezone": "UTC",
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "business": {
+            "displayName": "MioPages"
+          }
+        },
+        "primary_domain": "miopages.com",
+        "organization_id": "152aebd3-00b3-4296-a64e-e281522e64f0"
+      }
+    ],
+    "managed_sites": [
+      {
+        "id": "312b8081-4582-47fa-bedb-a551fd6e2b36",
+        "name": "MioPages",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "copyStatus": "skeleton",
+          "provisional": true,
+          "visualDirectionStatus": "pending"
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {},
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      }
+    ],
+    "design_systems": [
+      {
+        "id": "4e047506-49e0-45ea-b161-b96d54d27dc2",
+        "name": "Provisional platform defaults",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {},
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      }
+    ],
+    "pages": [
+      {
+        "id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "name": "Service",
+        "slug": "/service",
+        "title": "Service | MioPages",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {},
+        "managed_site_id": "312b8081-4582-47fa-bedb-a551fd6e2b36"
+      },
+      {
+        "id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "name": "Review",
+        "slug": "/review",
+        "title": "Review | MioPages",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 30,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {},
+        "managed_site_id": "312b8081-4582-47fa-bedb-a551fd6e2b36"
+      },
+      {
+        "id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "name": "Experience",
+        "slug": "/experience",
+        "title": "Experience | MioPages",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {},
+        "managed_site_id": "312b8081-4582-47fa-bedb-a551fd6e2b36"
+      },
+      {
+        "id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "name": "Home",
+        "slug": "/",
+        "title": "MioPages",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {},
+        "managed_site_id": "312b8081-4582-47fa-bedb-a551fd6e2b36"
+      }
+    ],
+    "sections": [
+      {
+        "id": "07ce2622-c610-405c-bc63-bde141651795",
+        "name": "Experience next step",
+        "type": "cta",
+        "status": "active",
+        "content": {
+          "text": "Planning explanation only; Review requests and Launch confirmation workflows are not operational.",
+          "heading": "Web Presence Review",
+          "actionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f"
+        },
+        "page_id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 30,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "1d156d4e-27d1-4f2b-89e3-17ac2721f21c",
+        "name": "Service next step",
+        "type": "cta",
+        "status": "active",
+        "content": {
+          "text": "Planning explanation only; Review requests and Launch confirmation workflows are not operational.",
+          "heading": "Web Presence Review",
+          "actionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f"
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 60,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "1d5f4429-d66b-4229-a53a-bcbb633afafe",
+        "name": "Pending evidence",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "text": "No case studies, testimonials, customer outcomes or permission-cleared imagery are asserted by this provisional skeleton.",
+          "heading": "Platform proof is pending"
+        },
+        "page_id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "1f27f21c-9ed9-4c46-a154-6987cc93e31c",
+        "name": "Standard Launch",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "offering-component",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c",
+            "componentKey": "standard-launch"
+          }
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "4029e8f7-69c2-4808-9cd9-3f875eb445b3",
+        "name": "Ongoing",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "offering-component",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c",
+            "componentKey": "ongoing"
+          }
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 40,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "4af04629-9b7a-4ffd-b6b3-322af962ee5d",
+        "name": "Review orientation",
+        "type": "hero",
+        "status": "active",
+        "content": {
+          "text": "This Page explains a planned acquisition path. No Review request form or operational Review workflow is available here.",
+          "eyebrow": "Provisional C0 skeleton",
+          "heading": "Web Presence Review",
+          "actionId": "d6f20426-e80f-4f50-b838-9b7b144cf81b"
+        },
+        "page_id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "4d95d0d8-0a1b-4202-90ed-f8870b6355aa",
+        "name": "Review continuation",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "text": "Conversation, continued intake and confirmed Launch scope are intended paths. Contact details, self-service intake and confirmation workflows require separate implementation and approval.",
+          "heading": "Continuation paths are pending"
+        },
+        "page_id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "8052f100-3265-4e63-b3a2-d4f4b69642e4",
+        "name": "Home next step",
+        "type": "cta",
+        "status": "active",
+        "content": {
+          "text": "Planning explanation only; Review requests and Launch confirmation workflows are not operational.",
+          "heading": "Web Presence Review",
+          "actionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f"
+        },
+        "page_id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 30,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "831fd96b-52cc-41ac-91b3-0c9472cbeda5",
+        "name": "Review purpose",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "text": "What MioPages understands, apparent obstacles, roughly three useful priorities and a recommended next path. The Review may conclude that MioPages is not a fit.",
+          "heading": "Planned Review scope"
+        },
+        "page_id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "c18776da-f19a-481a-a239-6644eda51f94",
+        "name": "Offering orientation",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "offering-overview",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "page_id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "cce9affd-4875-477e-9848-da52eec40826",
+        "name": "Home orientation",
+        "type": "hero",
+        "status": "active",
+        "content": {
+          "text": "MioPages C0 route skeleton. Final public copy and Visual Direction are pending.",
+          "eyebrow": "Provisional C0 skeleton",
+          "heading": "Managed Web Presence",
+          "actionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f"
+        },
+        "page_id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "d67c9c6b-b15e-4e8b-9e76-015701386fdb",
+        "name": "Audience and outcomes",
+        "type": "collection",
+        "status": "active",
+        "content": {
+          "source": {
+            "keys": [
+              "audience",
+              "clarity",
+              "trust",
+              "conversion"
+            ],
+            "role": "knowledge",
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116"
+          },
+          "contextHeading": "Fit and intended outcomes"
+        },
+        "page_id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "variant": "grid",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "e00562b2-9ef8-4ff5-8857-5cd3631f2200",
+        "name": "Service orientation",
+        "type": "hero",
+        "status": "active",
+        "content": {
+          "text": "Provisional service definition. Responsibilities, boundaries and pricing will be reviewed before commercial launch.",
+          "eyebrow": "Provisional C0 skeleton",
+          "heading": "Launch and Ongoing",
+          "actionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f"
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "e4de122b-13f4-47c0-ad16-cb6c7f6f6655",
+        "name": "Review next step",
+        "type": "cta",
+        "status": "active",
+        "content": {
+          "text": "Planning explanation only; Review requests and Launch confirmation workflows are not operational.",
+          "heading": "Service scope",
+          "actionId": "d6f20426-e80f-4f50-b838-9b7b144cf81b"
+        },
+        "page_id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 30,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "e5b72ca3-6deb-427e-8fde-a1700f9e388d",
+        "name": "Offering overview",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "offering-overview",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "e7d1b2aa-1257-4a47-9cdc-0d79da12f6e8",
+        "name": "Experience orientation",
+        "type": "hero",
+        "status": "active",
+        "content": {
+          "text": "Historical operator experience and future platform evidence must remain distinct.",
+          "eyebrow": "Provisional C0 skeleton",
+          "heading": "Experience and proof",
+          "actionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f"
+        },
+        "page_id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "ea8920d3-c629-4f1e-9cd3-a8c4d4dec113",
+        "name": "Expanded Launch",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "offering-component",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c",
+            "componentKey": "expanded-launch"
+          }
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 30,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "fb79e5af-9199-440b-95c6-d13467c94742",
+        "name": "Pricing summary",
+        "type": "collection",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "offering-pricing",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          },
+          "contextHeading": "Pricing under review"
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "grid",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 50,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      },
+      {
+        "id": "fd416786-38fb-46f4-9b96-104a4f5527f7",
+        "name": "Evidence standards",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "text": "Contribution, date/version, permissions and substantiated outcomes must be verified before publishing experience snapshots.",
+          "heading": "Historical operator experience"
+        },
+        "page_id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "variant": "default",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "divider": "none",
+          "spacing": "normal"
+        }
+      }
+    ],
+    "actions": [
+      {
+        "id": "19aaf955-92fe-47cc-870e-01465f9eab09",
+        "name": "see-experience",
+        "type": "page",
+        "label": "See Our Experience",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "destination": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "configuration": {},
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      },
+      {
+        "id": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f",
+        "name": "request-review",
+        "type": "page",
+        "label": "Request a Web Presence Review",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "destination": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "configuration": {},
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      },
+      {
+        "id": "d6f20426-e80f-4f50-b838-9b7b144cf81b",
+        "name": "understand-service",
+        "type": "page",
+        "label": "See How the Service Works",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "destination": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "configuration": {},
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      }
+    ],
+    "navigations": [
+      {
+        "id": "1a398908-7e8d-4052-a966-fa8f0e35c7ee",
+        "name": "Primary Navigation",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {},
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      }
+    ],
+    "navigation_items": [
+      {
+        "id": "5a84f6c4-7fd7-4f85-9642-86d29d5bd340",
+        "name": "Review",
+        "label": "Review",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "parent_id": null,
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "target_type": "page",
+        "configuration": {},
+        "navigation_id": "1a398908-7e8d-4052-a966-fa8f0e35c7ee",
+        "target_reference": "56e8802d-f643-4a95-93db-e683a27e8186"
+      },
+      {
+        "id": "cd92fb3c-0e28-4758-8e4c-8b54476c3c8e",
+        "name": "Service",
+        "label": "Service",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "parent_id": null,
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "target_type": "page",
+        "configuration": {},
+        "navigation_id": "1a398908-7e8d-4052-a966-fa8f0e35c7ee",
+        "target_reference": "16a9ec53-f447-4dac-a968-b165f0dc1531"
+      },
+      {
+        "id": "f21c42e0-7c82-4ffd-b8ac-5e3471cdfe9e",
+        "name": "Experience",
+        "label": "Experience",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "parent_id": null,
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "target_type": "page",
+        "configuration": {},
+        "navigation_id": "1a398908-7e8d-4052-a966-fa8f0e35c7ee",
+        "target_reference": "5c147663-3a34-4708-943f-bf34b3d3ea14"
+      }
+    ],
+    "subjects": [],
+    "subject_types": [],
+    "assets": [],
+    "asset_usages": [],
+    "contact_definitions": [],
+    "contact_submissions": [],
+    "business_knowledge": [
+      {
+        "id": "3b233b77-a935-4d7c-9133-949760cb3116",
+        "payload": {
+          "entries": [
+            {
+              "key": "audience",
+              "kind": "audience",
+              "value": "Established expertise-led small service or technical businesses with real expertise and customers.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "size",
+              "kind": "audience",
+              "value": "Approximately 3-25 people is a planning profile, not an eligibility limit.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "capacity",
+              "kind": "audience",
+              "value": "Limited appetite for DIY web management or an unsuitable bloated or opaque agency engagement.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "initial-geography",
+              "kind": "service-area",
+              "value": "Remote/national United States initially; international work requires deliberate later evaluation.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "clarity",
+              "kind": "goal",
+              "value": "Improve business and service explanation.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "trust",
+              "kind": "goal",
+              "value": "Improve credibility and trust.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "discoverability",
+              "kind": "goal",
+              "value": "Improve discoverability.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "conversion",
+              "kind": "goal",
+              "value": "Improve useful lead and conversion paths.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "continuity",
+              "kind": "goal",
+              "value": "Provide continuing attention and improvement.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "burden",
+              "kind": "goal",
+              "value": "Reduce customer technical and administrative burden.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "one-service",
+              "kind": "differentiator",
+              "value": "One managed Web Presence service.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "launch-ongoing",
+              "kind": "differentiator",
+              "value": "Launch establishes the presence; Ongoing carries knowledge and priorities into continuing improvement.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "bounded-complexity",
+              "kind": "differentiator",
+              "value": "Complexity may scale; customization does not.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "outcome-design",
+              "kind": "differentiator",
+              "value": "Customers approve outcomes; no arbitrary page building or pixel-level implementation control.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "pricing-direction",
+              "kind": "differentiator",
+              "value": "Clear public pricing is the intended direction; current amounts remain provisional.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "ownership",
+              "kind": "differentiator",
+              "value": "Customer ownership and a clean exit; retention through value rather than lock-in.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "infrastructure",
+              "kind": "differentiator",
+              "value": "Supporting infrastructure is subordinate to the managed service.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "human-authority",
+              "kind": "differentiator",
+              "value": "Human review and customer approval retain authority over business truth and publication.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "real-functions",
+              "kind": "differentiator",
+              "value": "No artifice: real service functions, not fabricated headcount.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "supported-integrations",
+              "kind": "constraint",
+              "value": "External integrations use reusable bounded supported patterns; no bespoke customer-only development by default.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "initial-scope",
+              "kind": "constraint",
+              "value": "United States commercial scope initially; no bespoke development in normal service.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "first-cohort",
+              "kind": "constraint",
+              "value": "An approximately 5-10 customer first cohort tests delivery and service economics.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "internal",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "service-posture",
+              "kind": "preference",
+              "value": "Purposeful professional design, plain-language explanation and human review.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "avoid-reseller-identity",
+              "kind": "preference",
+              "value": "Avoid making hosting/reseller infrastructure the product identity.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "avoid-ai-hype",
+              "kind": "preference",
+              "value": "AI provides leverage; unsupported claims and autonomous business responsibility are not the model.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            }
+          ],
+          "approval": {
+            "at": "2026-10-07T01:06:33.315Z",
+            "by": "operator:approved-c0-discovery",
+            "scope": "public"
+          },
+          "identityEvidence": [
+            {
+              "field": "displayName",
+              "digest": "dc3a8cabe0b863aad79757a398e690d936ef74cae036706d46700db6f5b193f3",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            }
+          ]
+        },
+        "version": 1,
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "contract_version": 1
+      }
+    ],
+    "business_knowledge_revisions": [
+      {
+        "snapshot": {
+          "id": "3b233b77-a935-4d7c-9133-949760cb3116",
+          "payload": {
+            "entries": [
+              {
+                "key": "audience",
+                "kind": "audience",
+                "value": "Established expertise-led small service or technical businesses with real expertise and customers.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "size",
+                "kind": "audience",
+                "value": "Approximately 3-25 people is a planning profile, not an eligibility limit.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "capacity",
+                "kind": "audience",
+                "value": "Limited appetite for DIY web management or an unsuitable bloated or opaque agency engagement.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "initial-geography",
+                "kind": "service-area",
+                "value": "Remote/national United States initially; international work requires deliberate later evaluation.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "clarity",
+                "kind": "goal",
+                "value": "Improve business and service explanation.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "trust",
+                "kind": "goal",
+                "value": "Improve credibility and trust.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "discoverability",
+                "kind": "goal",
+                "value": "Improve discoverability.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "conversion",
+                "kind": "goal",
+                "value": "Improve useful lead and conversion paths.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "continuity",
+                "kind": "goal",
+                "value": "Provide continuing attention and improvement.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "burden",
+                "kind": "goal",
+                "value": "Reduce customer technical and administrative burden.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "one-service",
+                "kind": "differentiator",
+                "value": "One managed Web Presence service.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "launch-ongoing",
+                "kind": "differentiator",
+                "value": "Launch establishes the presence; Ongoing carries knowledge and priorities into continuing improvement.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "bounded-complexity",
+                "kind": "differentiator",
+                "value": "Complexity may scale; customization does not.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "outcome-design",
+                "kind": "differentiator",
+                "value": "Customers approve outcomes; no arbitrary page building or pixel-level implementation control.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "pricing-direction",
+                "kind": "differentiator",
+                "value": "Clear public pricing is the intended direction; current amounts remain provisional.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "ownership",
+                "kind": "differentiator",
+                "value": "Customer ownership and a clean exit; retention through value rather than lock-in.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "infrastructure",
+                "kind": "differentiator",
+                "value": "Supporting infrastructure is subordinate to the managed service.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "human-authority",
+                "kind": "differentiator",
+                "value": "Human review and customer approval retain authority over business truth and publication.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "real-functions",
+                "kind": "differentiator",
+                "value": "No artifice: real service functions, not fabricated headcount.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "supported-integrations",
+                "kind": "constraint",
+                "value": "External integrations use reusable bounded supported patterns; no bespoke customer-only development by default.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "initial-scope",
+                "kind": "constraint",
+                "value": "United States commercial scope initially; no bespoke development in normal service.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "first-cohort",
+                "kind": "constraint",
+                "value": "An approximately 5-10 customer first cohort tests delivery and service economics.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "internal",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "service-posture",
+                "kind": "preference",
+                "value": "Purposeful professional design, plain-language explanation and human review.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "avoid-reseller-identity",
+                "kind": "preference",
+                "value": "Avoid making hosting/reseller infrastructure the product identity.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "avoid-ai-hype",
+                "kind": "preference",
+                "value": "AI provides leverage; unsupported claims and autonomous business responsibility are not the model.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              }
+            ],
+            "approval": {
+              "at": "2026-10-07T01:06:33.315Z",
+              "by": "operator:approved-c0-discovery",
+              "scope": "public"
+            },
+            "identityEvidence": [
+              {
+                "field": "displayName",
+                "digest": "dc3a8cabe0b863aad79757a398e690d936ef74cae036706d46700db6f5b193f3",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              }
+            ]
+          },
+          "version": 1,
+          "created_at": "2026-10-07T01:14:42.571Z",
+          "updated_at": "2026-10-07T01:14:42.571Z",
+          "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+          "contract_version": 1
+        },
+        "recorded_at": "2026-10-07T01:14:42.571049+00:00",
+        "knowledge_id": "3b233b77-a935-4d7c-9133-949760cb3116",
+        "change_reason": "Approved first MioPages C0 canonical slice; local provisional rendering only.",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "revision_version": 1,
+        "responsible_identity": "operator:approved-c0-discovery"
+      }
+    ],
+    "offerings": [
+      {
+        "id": "ad9aa219-0cd2-4d8c-b707-739eee07d60c",
+        "key": "managed-web-presence",
+        "name": "Managed Web Presence",
+        "type": "service",
+        "status": "active",
+        "payload": {
+          "detail": "Supporting infrastructure may be coordinated but is not the product. Customers supply business truth, goals, preferences, assets and approval; the platform/operator determines the bounded implementation. This is provisional product-definition state, not final marketing copy or an operational service promise.",
+          "summary": "Establish a professional managed Web Presence and continue improving it through Ongoing service.",
+          "approval": {
+            "at": "2026-10-07T01:06:33.315Z",
+            "by": "operator:approved-c0-discovery",
+            "scope": "public"
+          },
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          },
+          "outcomes": [
+            "Clarity",
+            "Trust",
+            "Discoverability",
+            "Useful conversion",
+            "Continuing improvement",
+            "Reduced technical burden"
+          ],
+          "actionIds": [
+            "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f",
+            "d6f20426-e80f-4f50-b838-9b7b144cf81b",
+            "19aaf955-92fe-47cc-870e-01465f9eab09"
+          ],
+          "audiences": [
+            "Established expertise-led small service or technical businesses with real expertise and customers."
+          ],
+          "components": [
+            {
+              "key": "standard-launch",
+              "kind": "establishment",
+              "name": "Standard Launch",
+              "pricing": {
+                "mode": "fixed",
+                "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                "basis": "one-time",
+                "amount": 109500,
+                "approval": {
+                  "at": "2026-10-07T01:06:33.315Z",
+                  "by": "operator:approved-c0-discovery",
+                  "scope": "internal"
+                },
+                "currency": "USD",
+                "applicability": "component",
+                "commercialStatus": "provisional-hypothesis"
+              },
+              "summary": "Normal good-fit establishment of the managed Web Presence.",
+              "boundaries": [
+                "Supported capabilities only; not all intended operating workflows are implemented.",
+                "No bespoke development or arbitrary page-builder control."
+              ],
+              "inclusions": [
+                "Structured intake and business-knowledge capture",
+                "Existing-presence review",
+                "Audience and offering organization",
+                "Bounded Visual Direction",
+                "Managed Site and essential Pages/Navigation",
+                "Contact and lead path",
+                "Modest supported migration",
+                "Deployment/infrastructure coordination",
+                "External-presence inventory",
+                "First-party measurement baseline",
+                "GA4/Search Console support where practical and proven",
+                "Customer review/approval and go-live"
+              ],
+              "timingGuidance": "Approximately 2-4 weeks after required information and approvals are available; planning guidance, not a contractual promise.",
+              "complexityNotes": [],
+              "commercialRelationship": "Establishes the presence before Ongoing."
+            },
+            {
+              "key": "expanded-launch",
+              "kind": "supported-complexity",
+              "name": "Expanded Launch",
+              "pricing": {
+                "mode": "scope-confirmed",
+                "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                "basis": "one-time",
+                "approval": {
+                  "at": "2026-10-07T01:06:33.315Z",
+                  "by": "operator:approved-c0-discovery",
+                  "scope": "internal"
+                },
+                "currency": "USD",
+                "applicability": "component",
+                "commercialStatus": "provisional-hypothesis"
+              },
+              "summary": "Additional supported complexity, not custom development.",
+              "boundaries": [
+                "Does not authorize bespoke development."
+              ],
+              "inclusions": [
+                "Larger supported catalogs",
+                "Multiple locations",
+                "Larger migrations and continuity work",
+                "More supported integrations",
+                "Larger approval surface"
+              ],
+              "complexityNotes": [
+                "Scope must be reviewed before a fixed price is confirmed."
+              ],
+              "commercialRelationship": "Establishes the presence before Ongoing."
+            },
+            {
+              "key": "ongoing",
+              "kind": "ongoing",
+              "name": "Ongoing",
+              "pricing": {
+                "mode": "fixed",
+                "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                "basis": "recurring",
+                "amount": 24900,
+                "approval": {
+                  "at": "2026-10-07T01:06:33.315Z",
+                  "by": "operator:approved-c0-discovery",
+                  "scope": "internal"
+                },
+                "currency": "USD",
+                "interval": "month",
+                "applicability": "component",
+                "commercialStatus": "provisional-hypothesis"
+              },
+              "summary": "Continuing managed service after Launch.",
+              "boundaries": [
+                "As supported; analytics, drafting and workflow capabilities remain deferred."
+              ],
+              "inclusions": [
+                "Operation and maintenance",
+                "Business updates",
+                "First-party measurement",
+                "Concise value/progress reporting",
+                "Prioritized recommendations",
+                "Grounded AI-assisted drafting",
+                "Human/customer approval",
+                "Supported content/optimization activity",
+                "Conversion refinement",
+                "Periodic next-action review"
+              ],
+              "complexityNotes": [],
+              "commercialRelationship": "Begins at go-live after Launch."
+            }
+          ],
+          "exclusions": [
+            "Bespoke custom development",
+            "Arbitrary page-builder control",
+            "Full CRM or marketing-automation replacement",
+            "Broad social-media management",
+            "Managed Google Business Profile",
+            "Guaranteed rankings, traffic, leads or revenue",
+            "Perfect full-funnel attribution"
+          ],
+          "inclusions": [
+            "Structured business knowledge",
+            "Bounded professional presentation",
+            "Launch-to-Ongoing continuity"
+          ],
+          "thirdPartyCosts": [
+            "Third-party costs remain separate and must be disclosed when applicable."
+          ]
+        },
+        "version": 1,
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "contract_version": 1
+      }
+    ],
+    "offering_revisions": [
+      {
+        "snapshot": {
+          "id": "ad9aa219-0cd2-4d8c-b707-739eee07d60c",
+          "key": "managed-web-presence",
+          "name": "Managed Web Presence",
+          "type": "service",
+          "status": "active",
+          "payload": {
+            "detail": "Supporting infrastructure may be coordinated but is not the product. Customers supply business truth, goals, preferences, assets and approval; the platform/operator determines the bounded implementation. This is provisional product-definition state, not final marketing copy or an operational service promise.",
+            "summary": "Establish a professional managed Web Presence and continue improving it through Ongoing service.",
+            "approval": {
+              "at": "2026-10-07T01:06:33.315Z",
+              "by": "operator:approved-c0-discovery",
+              "scope": "public"
+            },
+            "evidence": {
+              "sourceKind": "operator",
+              "visibility": "public",
+              "confirmedAt": "2026-10-07T01:06:33.315Z",
+              "confirmedBy": "operator:approved-c0-discovery",
+              "confirmation": "confirmed",
+              "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+            },
+            "outcomes": [
+              "Clarity",
+              "Trust",
+              "Discoverability",
+              "Useful conversion",
+              "Continuing improvement",
+              "Reduced technical burden"
+            ],
+            "actionIds": [
+              "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f",
+              "d6f20426-e80f-4f50-b838-9b7b144cf81b",
+              "19aaf955-92fe-47cc-870e-01465f9eab09"
+            ],
+            "audiences": [
+              "Established expertise-led small service or technical businesses with real expertise and customers."
+            ],
+            "components": [
+              {
+                "key": "standard-launch",
+                "kind": "establishment",
+                "name": "Standard Launch",
+                "pricing": {
+                  "mode": "fixed",
+                  "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                  "basis": "one-time",
+                  "amount": 109500,
+                  "approval": {
+                    "at": "2026-10-07T01:06:33.315Z",
+                    "by": "operator:approved-c0-discovery",
+                    "scope": "internal"
+                  },
+                  "currency": "USD",
+                  "applicability": "component",
+                  "commercialStatus": "provisional-hypothesis"
+                },
+                "summary": "Normal good-fit establishment of the managed Web Presence.",
+                "boundaries": [
+                  "Supported capabilities only; not all intended operating workflows are implemented.",
+                  "No bespoke development or arbitrary page-builder control."
+                ],
+                "inclusions": [
+                  "Structured intake and business-knowledge capture",
+                  "Existing-presence review",
+                  "Audience and offering organization",
+                  "Bounded Visual Direction",
+                  "Managed Site and essential Pages/Navigation",
+                  "Contact and lead path",
+                  "Modest supported migration",
+                  "Deployment/infrastructure coordination",
+                  "External-presence inventory",
+                  "First-party measurement baseline",
+                  "GA4/Search Console support where practical and proven",
+                  "Customer review/approval and go-live"
+                ],
+                "timingGuidance": "Approximately 2-4 weeks after required information and approvals are available; planning guidance, not a contractual promise.",
+                "complexityNotes": [],
+                "commercialRelationship": "Establishes the presence before Ongoing."
+              },
+              {
+                "key": "expanded-launch",
+                "kind": "supported-complexity",
+                "name": "Expanded Launch",
+                "pricing": {
+                  "mode": "scope-confirmed",
+                  "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                  "basis": "one-time",
+                  "approval": {
+                    "at": "2026-10-07T01:06:33.315Z",
+                    "by": "operator:approved-c0-discovery",
+                    "scope": "internal"
+                  },
+                  "currency": "USD",
+                  "applicability": "component",
+                  "commercialStatus": "provisional-hypothesis"
+                },
+                "summary": "Additional supported complexity, not custom development.",
+                "boundaries": [
+                  "Does not authorize bespoke development."
+                ],
+                "inclusions": [
+                  "Larger supported catalogs",
+                  "Multiple locations",
+                  "Larger migrations and continuity work",
+                  "More supported integrations",
+                  "Larger approval surface"
+                ],
+                "complexityNotes": [
+                  "Scope must be reviewed before a fixed price is confirmed."
+                ],
+                "commercialRelationship": "Establishes the presence before Ongoing."
+              },
+              {
+                "key": "ongoing",
+                "kind": "ongoing",
+                "name": "Ongoing",
+                "pricing": {
+                  "mode": "fixed",
+                  "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                  "basis": "recurring",
+                  "amount": 24900,
+                  "approval": {
+                    "at": "2026-10-07T01:06:33.315Z",
+                    "by": "operator:approved-c0-discovery",
+                    "scope": "internal"
+                  },
+                  "currency": "USD",
+                  "interval": "month",
+                  "applicability": "component",
+                  "commercialStatus": "provisional-hypothesis"
+                },
+                "summary": "Continuing managed service after Launch.",
+                "boundaries": [
+                  "As supported; analytics, drafting and workflow capabilities remain deferred."
+                ],
+                "inclusions": [
+                  "Operation and maintenance",
+                  "Business updates",
+                  "First-party measurement",
+                  "Concise value/progress reporting",
+                  "Prioritized recommendations",
+                  "Grounded AI-assisted drafting",
+                  "Human/customer approval",
+                  "Supported content/optimization activity",
+                  "Conversion refinement",
+                  "Periodic next-action review"
+                ],
+                "complexityNotes": [],
+                "commercialRelationship": "Begins at go-live after Launch."
+              }
+            ],
+            "exclusions": [
+              "Bespoke custom development",
+              "Arbitrary page-builder control",
+              "Full CRM or marketing-automation replacement",
+              "Broad social-media management",
+              "Managed Google Business Profile",
+              "Guaranteed rankings, traffic, leads or revenue",
+              "Perfect full-funnel attribution"
+            ],
+            "inclusions": [
+              "Structured business knowledge",
+              "Bounded professional presentation",
+              "Launch-to-Ongoing continuity"
+            ],
+            "thirdPartyCosts": [
+              "Third-party costs remain separate and must be disclosed when applicable."
+            ]
+          },
+          "version": 1,
+          "created_at": "2026-10-07T01:14:42.571Z",
+          "updated_at": "2026-10-07T01:14:42.571Z",
+          "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+          "contract_version": 1,
+          "relatedAssetUsages": []
+        },
+        "offering_id": "ad9aa219-0cd2-4d8c-b707-739eee07d60c",
+        "recorded_at": "2026-10-07T01:14:42.571049+00:00",
+        "change_reason": "Approved first MioPages C0 canonical slice; local provisional rendering only.",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "revision_version": 1,
+        "responsible_identity": "operator:approved-c0-discovery"
+      }
+    ]
+  },
+  "after": {
+    "organizations": [
+      {
+        "id": "152aebd3-00b3-4296-a64e-e281522e64f0",
+        "name": "MioPages",
+        "type": "standard",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true,
+          "initialization": {
+            "stateDigest": "1eebac36a0cd5d0fc991a5422f12b867c36963ca2bcac3bfe696331ef6eed7ab",
+            "manifestDigest": "ef2493a5f84d1de5c9b81748eff5ca08f295537dd6a06662d1f724395dabf69c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {}
+      }
+    ],
+    "web_presences": [
+      {
+        "id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "name": "MioPages",
+        "locale": "en-US",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "timezone": "UTC",
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {
+          "business": {
+            "displayName": "MioPages"
+          }
+        },
+        "primary_domain": "miopages.com",
+        "organization_id": "152aebd3-00b3-4296-a64e-e281522e64f0"
+      }
+    ],
+    "managed_sites": [
+      {
+        "id": "312b8081-4582-47fa-bedb-a551fd6e2b36",
+        "name": "MioPages",
+        "status": "active",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "provisional": true,
+          "visualDirectionStatus": "accepted-canonical",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "visualDirection": {
+            "contractVersion": 2,
+            "grammar": {
+              "id": "service-led",
+              "version": 3
+            },
+            "preferences": {
+              "motion": "off"
+            }
+          },
+          "globals": {
+            "header": {
+              "contactActionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f"
+            }
+          }
+        },
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      }
+    ],
+    "design_systems": [
+      {
+        "id": "4e047506-49e0-45ea-b161-b96d54d27dc2",
+        "name": "A Business in Focus",
+        "status": "active",
+        "version": 2,
+        "metadata": {
+          "provisional": true,
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "colors": {
+            "background": "#fbf7ef",
+            "surface": "#e8e2f2",
+            "text": "#26212d",
+            "muted": "#62586a",
+            "accent": "#322f7e",
+            "onAccent": "#fbf7ef",
+            "border": "#9b8ea7"
+          },
+          "typography": {
+            "bodyFont": "sans",
+            "headingFont": "sans",
+            "baseSize": 18,
+            "headingScale": 2.5,
+            "lineHeight": 1.55
+          },
+          "spacing": {
+            "unit": 8,
+            "section": 40
+          },
+          "shape": {
+            "radius": 6
+          },
+          "palette": {
+            "version": 1,
+            "light": {
+              "background": "#fbf7ef",
+              "text": "#26212d"
+            },
+            "strong": {
+              "background": "#e9ba8e",
+              "text": "#26212d"
+            },
+            "tonal": {
+              "background": "#e8e2f2",
+              "text": "#322f7e"
+            },
+            "brand": {
+              "background": "#322f7e",
+              "text": "#fbf7ef"
+            },
+            "supporting": {
+              "background": "#555ccc",
+              "text": "#ffffff"
+            },
+            "contrast": {
+              "background": "#241d35",
+              "text": "#fbf7ef"
+            },
+            "border": "#9b8ea7",
+            "muted": "#62586a"
+          }
+        },
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      }
+    ],
+    "pages": [
+      {
+        "id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "name": "Service",
+        "slug": "/service",
+        "title": "Service | MioPages",
+        "status": "active",
+        "version": 2,
+        "metadata": {
+          "provisional": true,
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "recipe": {
+              "id": "service",
+              "version": 1
+            }
+          }
+        },
+        "managed_site_id": "312b8081-4582-47fa-bedb-a551fd6e2b36"
+      },
+      {
+        "id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "name": "Review",
+        "slug": "/review",
+        "title": "Review | MioPages",
+        "status": "active",
+        "version": 2,
+        "metadata": {
+          "provisional": true,
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 30,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "recipe": {
+              "id": "assessment",
+              "version": 1
+            }
+          }
+        },
+        "managed_site_id": "312b8081-4582-47fa-bedb-a551fd6e2b36"
+      },
+      {
+        "id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "name": "Experience",
+        "slug": "/experience",
+        "title": "Experience | MioPages",
+        "status": "active",
+        "version": 2,
+        "metadata": {
+          "provisional": true,
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "recipe": {
+              "id": "evidence",
+              "version": 1
+            }
+          }
+        },
+        "managed_site_id": "312b8081-4582-47fa-bedb-a551fd6e2b36"
+      },
+      {
+        "id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "name": "Home",
+        "slug": "/",
+        "title": "MioPages",
+        "status": "active",
+        "version": 2,
+        "metadata": {
+          "provisional": true,
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "recipe": {
+              "id": "arrival",
+              "version": 1
+            }
+          }
+        },
+        "managed_site_id": "312b8081-4582-47fa-bedb-a551fd6e2b36"
+      }
+    ],
+    "sections": [
+      {
+        "id": "e00562b2-9ef8-4ff5-8857-5cd3631f2200",
+        "name": "reviewed-focus-0",
+        "type": "hero",
+        "status": "active",
+        "content": {
+          "eyebrow": "The MioPages service",
+          "heading": "One managed service, from Launch onward.",
+          "text": "A focused Launch establishes your presence. Ongoing gives it continuing attention. You bring the knowledge of your business; MioPages takes care of turning it into a useful web presence.",
+          "actionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f"
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "surface": "brand",
+            "region": "emphasized"
+          }
+        }
+      },
+      {
+        "id": "e5b72ca3-6deb-427e-8fde-a1700f9e388d",
+        "name": "reviewed-focus-1",
+        "type": "relationship",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "offering-continuity",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          },
+          "contextHeading": "One relationship, from Launch onward."
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "relationship": "connected-service",
+            "region": "emphasized"
+          }
+        }
+      },
+      {
+        "id": "1f27f21c-9ed9-4c46-a154-6987cc93e31c",
+        "name": "reviewed-focus-2",
+        "type": "relationship",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "offering-relationship",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c",
+            "kind": "scope",
+            "componentKeys": [
+              "standard-launch",
+              "expanded-launch",
+              "ongoing"
+            ]
+          },
+          "contextHeading": "The right scope. A clear boundary."
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "region": "connected",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "ea8920d3-c629-4f1e-9cd3-a8c4d4dec113",
+        "name": "reviewed-focus-3",
+        "type": "collection",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "offering-commercial-structure",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          },
+          "contextHeading": "Clear pricing. Agreed scope."
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "grid",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 30,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "region": "connected",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "4029e8f7-69c2-4808-9cd9-3f875eb445b3",
+        "name": "reviewed-focus-4",
+        "type": "relationship",
+        "status": "active",
+        "content": {
+          "contractVersion": 1,
+          "kind": "responsibilities",
+          "heading": "You know the business. We handle the web work.",
+          "parties": [
+            {
+              "id": "customer",
+              "label": "Your part"
+            },
+            {
+              "id": "miopages",
+              "label": "MioPages' part"
+            }
+          ],
+          "rows": [
+            {
+              "id": "understand",
+              "label": "Understand the business",
+              "cells": [
+                {
+                  "partyId": "customer",
+                  "text": "Supply accurate information, priorities and existing assets."
+                },
+                {
+                  "partyId": "miopages",
+                  "text": "Organize the offer, audience and information into a clear presence."
+                }
+              ]
+            },
+            {
+              "id": "approve",
+              "label": "Review and approve",
+              "cells": [
+                {
+                  "partyId": "customer",
+                  "text": "Approve business claims, presentation and material changes."
+                },
+                {
+                  "partyId": "miopages",
+                  "text": "Prepare a professional result you can review without specifying layouts or technical instructions."
+                }
+              ]
+            },
+            {
+              "id": "continue",
+              "label": "Keep the relationship useful",
+              "cells": [
+                {
+                  "partyId": "customer",
+                  "text": "Share business changes and provide necessary account access for agreed work."
+                },
+                {
+                  "partyId": "miopages",
+                  "text": "Coordinate agreed setup and carry your business knowledge into ongoing care."
+                }
+              ]
+            }
+          ]
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 40,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "region": "connected",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "fb79e5af-9199-440b-95c6-d13467c94742",
+        "name": "reviewed-focus-5",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "heading": "Keep useful connections. Keep the scope clear.",
+          "text": "Booking, contact, publishing, and other external services can be connected where a supported approach exists. Hosting, domains, and email can be coordinated where needed; they support the service rather than define it.\n\nMioPages is a good fit if you want a clear professional presence and continuing care. Bespoke applications, unlimited redesign, full CRM replacement, and broad social-media management are outside the service."
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 50,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "region": "connected",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "1d156d4e-27d1-4f2b-89e3-17ac2721f21c",
+        "name": "reviewed-focus-6",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "knowledge",
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "keys": [
+              "ownership"
+            ]
+          },
+          "contextHeading": "Your business stays yours"
+        },
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 60,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "region": "connected",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "e09e1f2f-96bb-4e44-8d9b-324dbae2a386",
+        "page_id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "created_at": "2026-10-08T17:01:42.582+00:00",
+        "version": 1,
+        "type": "cta",
+        "variant": "default",
+        "name": "reviewed-focus-7",
+        "sort_order": 70,
+        "content": {
+          "heading": "Find the right scope before you commit",
+          "text": "Start with the free Review. Understand the priorities, check the fit, and decide whether Standard or Expanded Launch makes sense.\n\nPreview only · MioPages is not open for service or Review requests. This page describes the service model; no information can be submitted here.",
+          "actionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f"
+        },
+        "configuration": {
+          "presentation": {
+            "surface": "tonal",
+            "region": "closing"
+          }
+        },
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "status": "active",
+        "updated_at": "2026-10-08T17:01:42.582+00:00"
+      },
+      {
+        "id": "4af04629-9b7a-4ffd-b6b3-322af962ee5d",
+        "name": "reviewed-focus-0",
+        "type": "hero",
+        "status": "active",
+        "content": {
+          "eyebrow": "Free Web Presence Review",
+          "heading": "Find the next useful step for your web presence.",
+          "text": "Get a practical view of what your presence explains well, what may be getting in the way, and roughly three priorities worth addressing. Useful clarity before you decide whether MioPages is right for you."
+        },
+        "page_id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "surface": "brand",
+            "region": "emphasized"
+          }
+        }
+      },
+      {
+        "id": "831fd96b-52cc-41ac-91b3-0c9472cbeda5",
+        "name": "reviewed-focus-1",
+        "type": "collection",
+        "status": "active",
+        "content": {
+          "heading": "What we look at. What you take away.",
+          "itemSource": "inline",
+          "items": [
+            {
+              "id": "look",
+              "heading": "Your business and current presence",
+              "text": "What you offer, who you serve, your website and public profiles, the next step you want visitors to take, and the problem that matters most to you."
+            },
+            {
+              "id": "return",
+              "heading": "A short, useful assessment",
+              "text": "What we understand about the business, apparent obstacles, roughly three useful priorities, and a recommended next path. The Review can also conclude that MioPages is not a fit."
+            }
+          ]
+        },
+        "page_id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "variant": "grid",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          },
+          "visualNeed": {
+            "version": 1,
+            "role": "review-artifact",
+            "purpose": "Report outline with explanation fragments, not a real customer assessment",
+            "importance": "important",
+            "aspect": "portrait-4:5",
+            "source": "customer-owned",
+            "permission": "unresolved"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "surface": "brand",
+            "layer": "artifact-bridge",
+            "region": "emphasized"
+          }
+        }
+      },
+      {
+        "id": "4d95d0d8-0a1b-4202-90ed-f8870b6355aa",
+        "name": "reviewed-focus-2",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "heading": "Enough information to make it useful",
+          "text": "Share your name and contact details, a brief explanation of the business, existing website or profile links, and your main concern. Mention any important account or system constraints.\n\nThe target is about two business days once the minimum information is available. The Review is a concise assessment, not a full strategy or custom consulting engagement."
+        },
+        "page_id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "region": "connected",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "e4de122b-13f4-47c0-ad16-cb6c7f6f6655",
+        "name": "reviewed-focus-3",
+        "type": "collection",
+        "status": "active",
+        "content": {
+          "heading": "Choose the next step with a clearer view",
+          "itemSource": "inline",
+          "items": [
+            {
+              "id": "conversation",
+              "heading": "A short conversation",
+              "text": "Talk through a priority or an unanswered question before deciding what to do."
+            },
+            {
+              "id": "onboarding",
+              "heading": "Continue onboarding",
+              "text": "Add the business information needed to shape and review a proposal. Self-service is the secondary path once available."
+            },
+            {
+              "id": "launch",
+              "heading": "Confirm the Launch scope",
+              "text": "Establish whether Standard or Expanded Launch fits, and confirm the scope and price before proceeding."
+            }
+          ]
+        },
+        "page_id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "variant": "grid",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 30,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "region": "connected",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "9944bdd0-58a2-431a-8bda-bca8cec181c3",
+        "page_id": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "created_at": "2026-10-08T17:01:42.582+00:00",
+        "version": 1,
+        "type": "cta",
+        "variant": "default",
+        "name": "reviewed-focus-4",
+        "sort_order": 40,
+        "content": {
+          "heading": "A useful first step, without a commitment",
+          "text": "The Review is designed to be useful whether or not you choose MioPages.\n\nPreview only · MioPages is not open for service or Review requests. This page describes the service model; no information can be submitted here.",
+          "actionId": "d6f20426-e80f-4f50-b838-9b7b144cf81b"
+        },
+        "configuration": {
+          "presentation": {
+            "surface": "tonal",
+            "region": "closing"
+          }
+        },
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "status": "active",
+        "updated_at": "2026-10-08T17:01:42.582+00:00"
+      },
+      {
+        "id": "e7d1b2aa-1257-4a47-9cdc-0d79da12f6e8",
+        "name": "reviewed-focus-0",
+        "type": "hero",
+        "status": "active",
+        "content": {
+          "eyebrow": "Experience and judgment",
+          "heading": "Experience that starts with understanding the business.",
+          "text": "MioPages draws on historical business-site experience across technical, consulting, professional, and service organizations. That experience informs how we explain an offer, organize useful information, and help visitors find their next step."
+        },
+        "page_id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "surface": "brand",
+            "region": "emphasized"
+          }
+        }
+      },
+      {
+        "id": "fd416786-38fb-46f4-9b96-104a4f5527f7",
+        "name": "reviewed-focus-1",
+        "type": "collection",
+        "status": "active",
+        "content": {
+          "heading": "What that experience brings to the service",
+          "itemSource": "inline",
+          "items": [
+            {
+              "id": "clarity",
+              "heading": "Respect for the subject",
+              "text": "Complex services need accurate explanation. The work starts with understanding what the business does, who it serves, and what a prospective customer needs to know."
+            },
+            {
+              "id": "judgment",
+              "heading": "Practical presentation",
+              "text": "Content, design, and navigation should help someone make sense of the business. The aim is a clear, credible presence rather than design complexity for its own sake."
+            }
+          ]
+        },
+        "page_id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "variant": "grid",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          },
+          "visualNeed": {
+            "version": 1,
+            "role": "evidence-project",
+            "purpose": "Featured historical work, subject to verified contribution and permission",
+            "importance": "important",
+            "aspect": "wide-5:2",
+            "source": "existing-site-reuse",
+            "permission": "unresolved"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "surface": "light",
+            "region": "emphasized"
+          }
+        }
+      },
+      {
+        "id": "1d5f4429-d66b-4229-a53a-bcbb633afafe",
+        "name": "reviewed-focus-2",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "heading": "Selected historical work",
+          "text": "Supporting examples will explain the business context and the operator’s verified contribution. Selection and permission remain unresolved. No client imagery, results or endorsements are presented here."
+        },
+        "page_id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          },
+          "visualNeed": {
+            "version": 1,
+            "role": "evidence-project",
+            "purpose": "Supporting project or application evidence; identity withheld",
+            "importance": "optional",
+            "aspect": "landscape-3:2",
+            "source": "existing-site-reuse",
+            "permission": "unresolved"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "surface": "tonal"
+          }
+        }
+      },
+      {
+        "id": "07ce2622-c610-405c-bc63-bde141651795",
+        "name": "reviewed-focus-3",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "heading": "MioPages puts the approach into practice",
+          "text": "This presence is an early example of the managed approach. Historical experience informs the judgment behind it; it is separate from results produced by the new MioPages service.",
+          "actionId": "d6f20426-e80f-4f50-b838-9b7b144cf81b"
+        },
+        "page_id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 30,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "region": "connected",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "a66098d7-b693-4fd1-8bfb-c834da1d226f",
+        "page_id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "created_at": "2026-10-08T17:01:42.582+00:00",
+        "version": 1,
+        "type": "cta",
+        "variant": "default",
+        "name": "reviewed-focus-4",
+        "sort_order": 40,
+        "content": {
+          "heading": "Put the attention on your business",
+          "text": "See how the service brings your business knowledge, a focused Launch, and continuing care together.\n\nPreview only · MioPages is not open for service or Review requests. This page describes the service model; no information can be submitted here.",
+          "actionId": "d6f20426-e80f-4f50-b838-9b7b144cf81b"
+        },
+        "configuration": {
+          "presentation": {
+            "surface": "light",
+            "region": "closing"
+          }
+        },
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "status": "active",
+        "updated_at": "2026-10-08T17:01:42.582+00:00"
+      },
+      {
+        "id": "cce9affd-4875-477e-9848-da52eec40826",
+        "name": "reviewed-focus-0",
+        "type": "hero",
+        "status": "active",
+        "content": {
+          "heading": "A clearer web presence. Less to manage.",
+          "eyebrow": "Managed Web Presence",
+          "text": "MioPages helps established service and technical businesses explain what they do and keep their web presence current. One focused Launch, followed by continuing care.",
+          "actionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f",
+          "secondaryActionId": "d6f20426-e80f-4f50-b838-9b7b144cf81b"
+        },
+        "page_id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          },
+          "visualNeed": {
+            "version": 1,
+            "role": "service-illustration",
+            "purpose": "Business understanding → clear public presence → continuing attention",
+            "importance": "important",
+            "aspect": "landscape-3:2",
+            "source": "customer-owned",
+            "permission": "unresolved"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "hero": "service-illustrated",
+            "surface": "brand",
+            "layer": "field-bridge",
+            "region": "emphasized"
+          }
+        }
+      },
+      {
+        "id": "c18776da-f19a-481a-a239-6644eda51f94",
+        "name": "reviewed-focus-1",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "heading": "Good at your work. Ready to hand over the web work.",
+          "text": "Your business has expertise worth explaining. But keeping the website useful competes with serving customers and running the business.\n\nMioPages is for established businesses that want a clear, professional presence and a sensible continuing relationship—without becoming website administrators."
+        },
+        "page_id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "region": "connected",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "d67c9c6b-b15e-4e8b-9e76-015701386fdb",
+        "name": "reviewed-focus-2",
+        "type": "relationship",
+        "status": "active",
+        "content": {
+          "source": {
+            "role": "offering-continuity",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          },
+          "contextHeading": "Clear work at the start. Continuing care after."
+        },
+        "page_id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "relationship": "connected-service",
+            "region": "emphasized",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "8052f100-3265-4e63-b3a2-d4f4b69642e4",
+        "name": "reviewed-focus-3",
+        "type": "intro",
+        "status": "active",
+        "content": {
+          "heading": "Your business judgment. Our web responsibility.",
+          "text": "You supply the knowledge and approve what the presence says about your business. MioPages shapes the content, presentation and agreed web work around it.\n\nRelevant experience across technical, consulting, professional and service businesses supports that work. The aim is useful clarity, with less administration for you.",
+          "actionId": "19aaf955-92fe-47cc-870e-01465f9eab09"
+        },
+        "page_id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "variant": "default",
+        "version": 2,
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          }
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 30,
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "configuration": {
+          "presentation": {
+            "region": "connected",
+            "surface": "light"
+          }
+        }
+      },
+      {
+        "id": "7e089212-fae6-4090-8986-e5f30c803e1c",
+        "page_id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+        "created_at": "2026-10-08T17:01:42.582+00:00",
+        "version": 1,
+        "type": "cta",
+        "variant": "default",
+        "name": "reviewed-focus-4",
+        "sort_order": 40,
+        "content": {
+          "heading": "Start with the next useful step.",
+          "text": "The free Web Presence Review offers a practical view of your current presence and roughly three useful priorities. Clarity before you decide on a service.\n\nPreview only · MioPages is not open for service or Review requests. No information can be submitted here.",
+          "actionId": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f"
+        },
+        "configuration": {
+          "presentation": {
+            "surface": "brand",
+            "layer": "artifact-bridge",
+            "region": "closing"
+          }
+        },
+        "metadata": {
+          "copyStatus": "reviewed-development",
+          "promotion": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "canonicalContext": {
+            "knowledgeId": "3b233b77-a935-4d7c-9133-949760cb3116",
+            "offeringId": "ad9aa219-0cd2-4d8c-b707-739eee07d60c"
+          },
+          "visualNeed": {
+            "version": 1,
+            "role": "review-artifact",
+            "purpose": "Illustrative Review deliverable; no findings or customer data",
+            "importance": "important",
+            "aspect": "portrait-4:5",
+            "source": "customer-owned",
+            "permission": "unresolved"
+          }
+        },
+        "status": "active",
+        "updated_at": "2026-10-08T17:01:42.582+00:00"
+      }
+    ],
+    "actions": [
+      {
+        "id": "19aaf955-92fe-47cc-870e-01465f9eab09",
+        "name": "see-experience",
+        "type": "page",
+        "label": "See the Experience",
+        "status": "active",
+        "version": 2,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "destination": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+        "configuration": {},
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      },
+      {
+        "id": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f",
+        "name": "request-review",
+        "type": "page",
+        "label": "Explore the free Review",
+        "status": "active",
+        "version": 2,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "destination": "56e8802d-f643-4a95-93db-e683a27e8186",
+        "configuration": {},
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      },
+      {
+        "id": "d6f20426-e80f-4f50-b838-9b7b144cf81b",
+        "name": "understand-service",
+        "type": "page",
+        "label": "Understand the Service",
+        "status": "active",
+        "version": 2,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-08T17:01:42.582+00:00",
+        "destination": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+        "configuration": {},
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      }
+    ],
+    "navigations": [
+      {
+        "id": "1a398908-7e8d-4052-a966-fa8f0e35c7ee",
+        "name": "Primary Navigation",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "configuration": {},
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324"
+      }
+    ],
+    "navigation_items": [
+      {
+        "id": "5a84f6c4-7fd7-4f85-9642-86d29d5bd340",
+        "name": "Review",
+        "label": "Review",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "parent_id": null,
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 20,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "target_type": "page",
+        "configuration": {},
+        "navigation_id": "1a398908-7e8d-4052-a966-fa8f0e35c7ee",
+        "target_reference": "56e8802d-f643-4a95-93db-e683a27e8186"
+      },
+      {
+        "id": "cd92fb3c-0e28-4758-8e4c-8b54476c3c8e",
+        "name": "Service",
+        "label": "Service",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "parent_id": null,
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 0,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "target_type": "page",
+        "configuration": {},
+        "navigation_id": "1a398908-7e8d-4052-a966-fa8f0e35c7ee",
+        "target_reference": "16a9ec53-f447-4dac-a968-b165f0dc1531"
+      },
+      {
+        "id": "f21c42e0-7c82-4ffd-b8ac-5e3471cdfe9e",
+        "name": "Experience",
+        "label": "Experience",
+        "status": "active",
+        "version": 1,
+        "metadata": {
+          "provisional": true
+        },
+        "parent_id": null,
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "sort_order": 10,
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "target_type": "page",
+        "configuration": {},
+        "navigation_id": "1a398908-7e8d-4052-a966-fa8f0e35c7ee",
+        "target_reference": "5c147663-3a34-4708-943f-bf34b3d3ea14"
+      }
+    ],
+    "subjects": [],
+    "subject_types": [],
+    "assets": [
+      {
+        "id": "7be912cd-02f2-41f1-8499-fee93819b74e",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "name": "MioPages approved logo",
+        "type": "image",
+        "mime_type": "image/png",
+        "width": 395,
+        "height": 107,
+        "alt_text": "MioPages",
+        "status": "active",
+        "source_type": "managed",
+        "source_reference": "objects/faa19c8d5b35e4a216b218b76b91a48598360f98da8f197b36bb6078aec47833",
+        "configuration": {},
+        "metadata": {
+          "approval": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "source": "brand/miopages/MioPagesDV.png"
+        },
+        "version": 1,
+        "created_at": "2026-10-08T17:01:42.582+00:00",
+        "updated_at": "2026-10-08T17:01:42.582+00:00"
+      },
+      {
+        "id": "2ee36bbb-8c8c-486e-8f9b-812380f712d7",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "name": "MioPages approved logo-light",
+        "type": "image",
+        "mime_type": "image/png",
+        "width": 488,
+        "height": 132,
+        "alt_text": "MioPages",
+        "status": "active",
+        "source_type": "managed",
+        "source_reference": "objects/36cd6386802c0430796485ccd517d31676dab7200bb008133fb97ae9da81ef75",
+        "configuration": {},
+        "metadata": {
+          "approval": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          },
+          "source": "brand/miopages/MioPagesDVw.png"
+        },
+        "version": 1,
+        "created_at": "2026-10-08T17:01:42.582+00:00",
+        "updated_at": "2026-10-08T17:01:42.582+00:00"
+      }
+    ],
+    "asset_usages": [
+      {
+        "id": "7537f3bc-a9c9-40e8-806b-fd62f221b22c",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "asset_id": "7be912cd-02f2-41f1-8499-fee93819b74e",
+        "entity_type": "web_presence",
+        "entity_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "role": "logo",
+        "configuration": {
+          "image": {
+            "altText": "MioPages",
+            "decorative": false
+          }
+        },
+        "metadata": {
+          "approval": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          }
+        },
+        "version": 1,
+        "created_at": "2026-10-08T17:01:42.582+00:00",
+        "updated_at": "2026-10-08T17:01:42.582+00:00"
+      },
+      {
+        "id": "0d09f932-73ea-497a-86e1-e6833fe8cfcb",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "asset_id": "2ee36bbb-8c8c-486e-8f9b-812380f712d7",
+        "entity_type": "web_presence",
+        "entity_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "role": "logo-light",
+        "configuration": {
+          "image": {
+            "altText": "MioPages",
+            "decorative": false
+          }
+        },
+        "metadata": {
+          "approval": {
+            "by": "operator:accepted-miopages-focus",
+            "at": "2026-10-08T17:01:42.582+00:00",
+            "sourceCommit": "6c782aa1b9352e510ebab633b0e931d854216cc6",
+            "source": "docs/miopages-business-focus.md",
+            "reviewStatus": "reviewed",
+            "publicationAuthorized": false
+          }
+        },
+        "version": 1,
+        "created_at": "2026-10-08T17:01:42.582+00:00",
+        "updated_at": "2026-10-08T17:01:42.582+00:00"
+      }
+    ],
+    "contact_definitions": [],
+    "contact_submissions": [],
+    "business_knowledge": [
+      {
+        "id": "3b233b77-a935-4d7c-9133-949760cb3116",
+        "payload": {
+          "entries": [
+            {
+              "key": "audience",
+              "kind": "audience",
+              "value": "Established expertise-led small service or technical businesses with real expertise and customers.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "size",
+              "kind": "audience",
+              "value": "Approximately 3-25 people is a planning profile, not an eligibility limit.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "capacity",
+              "kind": "audience",
+              "value": "Limited appetite for DIY web management or an unsuitable bloated or opaque agency engagement.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "initial-geography",
+              "kind": "service-area",
+              "value": "Remote/national United States initially; international work requires deliberate later evaluation.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "clarity",
+              "kind": "goal",
+              "value": "Improve business and service explanation.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "trust",
+              "kind": "goal",
+              "value": "Improve credibility and trust.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "discoverability",
+              "kind": "goal",
+              "value": "Improve discoverability.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "conversion",
+              "kind": "goal",
+              "value": "Improve useful lead and conversion paths.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "continuity",
+              "kind": "goal",
+              "value": "Provide continuing attention and improvement.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "burden",
+              "kind": "goal",
+              "value": "Reduce customer technical and administrative burden.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "one-service",
+              "kind": "differentiator",
+              "value": "One managed Web Presence service.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "launch-ongoing",
+              "kind": "differentiator",
+              "value": "Launch establishes the presence; Ongoing carries knowledge and priorities into continuing improvement.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "bounded-complexity",
+              "kind": "differentiator",
+              "value": "Complexity may scale; customization does not.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "outcome-design",
+              "kind": "differentiator",
+              "value": "Customers approve outcomes; no arbitrary page building or pixel-level implementation control.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "pricing-direction",
+              "kind": "differentiator",
+              "value": "Clear public pricing is the intended direction; current amounts remain provisional.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "ownership",
+              "kind": "differentiator",
+              "value": "Customer ownership and a clean exit; retention through value rather than lock-in.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "infrastructure",
+              "kind": "differentiator",
+              "value": "Supporting infrastructure is subordinate to the managed service.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "human-authority",
+              "kind": "differentiator",
+              "value": "Human review and customer approval retain authority over business truth and publication.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "real-functions",
+              "kind": "differentiator",
+              "value": "No artifice: real service functions, not fabricated headcount.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "supported-integrations",
+              "kind": "constraint",
+              "value": "External integrations use reusable bounded supported patterns; no bespoke customer-only development by default.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "initial-scope",
+              "kind": "constraint",
+              "value": "United States commercial scope initially; no bespoke development in normal service.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "first-cohort",
+              "kind": "constraint",
+              "value": "An approximately 5-10 customer first cohort tests delivery and service economics.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "internal",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "service-posture",
+              "kind": "preference",
+              "value": "Purposeful professional design, plain-language explanation and human review.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "avoid-reseller-identity",
+              "kind": "preference",
+              "value": "Avoid making hosting/reseller infrastructure the product identity.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            },
+            {
+              "key": "avoid-ai-hype",
+              "kind": "preference",
+              "value": "AI provides leverage; unsupported claims and autonomous business responsibility are not the model.",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            }
+          ],
+          "approval": {
+            "at": "2026-10-07T01:06:33.315Z",
+            "by": "operator:approved-c0-discovery",
+            "scope": "public"
+          },
+          "identityEvidence": [
+            {
+              "field": "displayName",
+              "digest": "dc3a8cabe0b863aad79757a398e690d936ef74cae036706d46700db6f5b193f3",
+              "evidence": {
+                "sourceKind": "operator",
+                "visibility": "public",
+                "confirmedAt": "2026-10-07T01:06:33.315Z",
+                "confirmedBy": "operator:approved-c0-discovery",
+                "confirmation": "confirmed",
+                "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+              }
+            }
+          ]
+        },
+        "version": 1,
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "contract_version": 1
+      }
+    ],
+    "business_knowledge_revisions": [
+      {
+        "snapshot": {
+          "id": "3b233b77-a935-4d7c-9133-949760cb3116",
+          "payload": {
+            "entries": [
+              {
+                "key": "audience",
+                "kind": "audience",
+                "value": "Established expertise-led small service or technical businesses with real expertise and customers.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "size",
+                "kind": "audience",
+                "value": "Approximately 3-25 people is a planning profile, not an eligibility limit.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "capacity",
+                "kind": "audience",
+                "value": "Limited appetite for DIY web management or an unsuitable bloated or opaque agency engagement.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "initial-geography",
+                "kind": "service-area",
+                "value": "Remote/national United States initially; international work requires deliberate later evaluation.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "clarity",
+                "kind": "goal",
+                "value": "Improve business and service explanation.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "trust",
+                "kind": "goal",
+                "value": "Improve credibility and trust.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "discoverability",
+                "kind": "goal",
+                "value": "Improve discoverability.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "conversion",
+                "kind": "goal",
+                "value": "Improve useful lead and conversion paths.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "continuity",
+                "kind": "goal",
+                "value": "Provide continuing attention and improvement.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "burden",
+                "kind": "goal",
+                "value": "Reduce customer technical and administrative burden.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "one-service",
+                "kind": "differentiator",
+                "value": "One managed Web Presence service.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "launch-ongoing",
+                "kind": "differentiator",
+                "value": "Launch establishes the presence; Ongoing carries knowledge and priorities into continuing improvement.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "bounded-complexity",
+                "kind": "differentiator",
+                "value": "Complexity may scale; customization does not.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "outcome-design",
+                "kind": "differentiator",
+                "value": "Customers approve outcomes; no arbitrary page building or pixel-level implementation control.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "pricing-direction",
+                "kind": "differentiator",
+                "value": "Clear public pricing is the intended direction; current amounts remain provisional.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "ownership",
+                "kind": "differentiator",
+                "value": "Customer ownership and a clean exit; retention through value rather than lock-in.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "infrastructure",
+                "kind": "differentiator",
+                "value": "Supporting infrastructure is subordinate to the managed service.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "human-authority",
+                "kind": "differentiator",
+                "value": "Human review and customer approval retain authority over business truth and publication.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "real-functions",
+                "kind": "differentiator",
+                "value": "No artifice: real service functions, not fabricated headcount.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "supported-integrations",
+                "kind": "constraint",
+                "value": "External integrations use reusable bounded supported patterns; no bespoke customer-only development by default.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "initial-scope",
+                "kind": "constraint",
+                "value": "United States commercial scope initially; no bespoke development in normal service.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "first-cohort",
+                "kind": "constraint",
+                "value": "An approximately 5-10 customer first cohort tests delivery and service economics.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "internal",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "service-posture",
+                "kind": "preference",
+                "value": "Purposeful professional design, plain-language explanation and human review.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "avoid-reseller-identity",
+                "kind": "preference",
+                "value": "Avoid making hosting/reseller infrastructure the product identity.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              },
+              {
+                "key": "avoid-ai-hype",
+                "kind": "preference",
+                "value": "AI provides leverage; unsupported claims and autonomous business responsibility are not the model.",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              }
+            ],
+            "approval": {
+              "at": "2026-10-07T01:06:33.315Z",
+              "by": "operator:approved-c0-discovery",
+              "scope": "public"
+            },
+            "identityEvidence": [
+              {
+                "field": "displayName",
+                "digest": "dc3a8cabe0b863aad79757a398e690d936ef74cae036706d46700db6f5b193f3",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "public",
+                  "confirmedAt": "2026-10-07T01:06:33.315Z",
+                  "confirmedBy": "operator:approved-c0-discovery",
+                  "confirmation": "confirmed",
+                  "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+                }
+              }
+            ]
+          },
+          "version": 1,
+          "created_at": "2026-10-07T01:14:42.571Z",
+          "updated_at": "2026-10-07T01:14:42.571Z",
+          "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+          "contract_version": 1
+        },
+        "recorded_at": "2026-10-07T01:14:42.571049+00:00",
+        "knowledge_id": "3b233b77-a935-4d7c-9133-949760cb3116",
+        "change_reason": "Approved first MioPages C0 canonical slice; local provisional rendering only.",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "revision_version": 1,
+        "responsible_identity": "operator:approved-c0-discovery"
+      }
+    ],
+    "offerings": [
+      {
+        "id": "ad9aa219-0cd2-4d8c-b707-739eee07d60c",
+        "key": "managed-web-presence",
+        "name": "Managed Web Presence",
+        "type": "service",
+        "status": "active",
+        "payload": {
+          "detail": "Supporting infrastructure may be coordinated but is not the product. Customers supply business truth, goals, preferences, assets and approval; the platform/operator determines the bounded implementation. This is provisional product-definition state, not final marketing copy or an operational service promise.",
+          "summary": "Establish a professional managed Web Presence and continue improving it through Ongoing service.",
+          "approval": {
+            "at": "2026-10-07T01:06:33.315Z",
+            "by": "operator:approved-c0-discovery",
+            "scope": "public"
+          },
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          },
+          "outcomes": [
+            "Clarity",
+            "Trust",
+            "Discoverability",
+            "Useful conversion",
+            "Continuing improvement",
+            "Reduced technical burden"
+          ],
+          "actionIds": [
+            "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f",
+            "d6f20426-e80f-4f50-b838-9b7b144cf81b",
+            "19aaf955-92fe-47cc-870e-01465f9eab09"
+          ],
+          "audiences": [
+            "Established expertise-led small service or technical businesses with real expertise and customers."
+          ],
+          "components": [
+            {
+              "key": "standard-launch",
+              "kind": "establishment",
+              "name": "Standard Launch",
+              "pricing": {
+                "mode": "fixed",
+                "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                "basis": "one-time",
+                "amount": 109500,
+                "approval": {
+                  "at": "2026-10-07T01:06:33.315Z",
+                  "by": "operator:approved-c0-discovery",
+                  "scope": "internal"
+                },
+                "currency": "USD",
+                "applicability": "component",
+                "commercialStatus": "provisional-hypothesis"
+              },
+              "summary": "Normal good-fit establishment of the managed Web Presence.",
+              "boundaries": [
+                "Supported capabilities only; not all intended operating workflows are implemented.",
+                "No bespoke development or arbitrary page-builder control."
+              ],
+              "inclusions": [
+                "Structured intake and business-knowledge capture",
+                "Existing-presence review",
+                "Audience and offering organization",
+                "Bounded Visual Direction",
+                "Managed Site and essential Pages/Navigation",
+                "Contact and lead path",
+                "Modest supported migration",
+                "Deployment/infrastructure coordination",
+                "External-presence inventory",
+                "First-party measurement baseline",
+                "GA4/Search Console support where practical and proven",
+                "Customer review/approval and go-live"
+              ],
+              "timingGuidance": "Approximately 2-4 weeks after required information and approvals are available; planning guidance, not a contractual promise.",
+              "complexityNotes": [],
+              "commercialRelationship": "Establishes the presence before Ongoing."
+            },
+            {
+              "key": "expanded-launch",
+              "kind": "supported-complexity",
+              "name": "Expanded Launch",
+              "pricing": {
+                "mode": "scope-confirmed",
+                "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                "basis": "one-time",
+                "approval": {
+                  "at": "2026-10-07T01:06:33.315Z",
+                  "by": "operator:approved-c0-discovery",
+                  "scope": "internal"
+                },
+                "currency": "USD",
+                "applicability": "component",
+                "commercialStatus": "provisional-hypothesis"
+              },
+              "summary": "Additional supported complexity, not custom development.",
+              "boundaries": [
+                "Does not authorize bespoke development."
+              ],
+              "inclusions": [
+                "Larger supported catalogs",
+                "Multiple locations",
+                "Larger migrations and continuity work",
+                "More supported integrations",
+                "Larger approval surface"
+              ],
+              "complexityNotes": [
+                "Scope must be reviewed before a fixed price is confirmed."
+              ],
+              "commercialRelationship": "Establishes the presence before Ongoing."
+            },
+            {
+              "key": "ongoing",
+              "kind": "ongoing",
+              "name": "Ongoing",
+              "pricing": {
+                "mode": "fixed",
+                "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                "basis": "recurring",
+                "amount": 24900,
+                "approval": {
+                  "at": "2026-10-07T01:06:33.315Z",
+                  "by": "operator:approved-c0-discovery",
+                  "scope": "internal"
+                },
+                "currency": "USD",
+                "interval": "month",
+                "applicability": "component",
+                "commercialStatus": "provisional-hypothesis"
+              },
+              "summary": "Continuing managed service after Launch.",
+              "boundaries": [
+                "As supported; analytics, drafting and workflow capabilities remain deferred."
+              ],
+              "inclusions": [
+                "Operation and maintenance",
+                "Business updates",
+                "First-party measurement",
+                "Concise value/progress reporting",
+                "Prioritized recommendations",
+                "Grounded AI-assisted drafting",
+                "Human/customer approval",
+                "Supported content/optimization activity",
+                "Conversion refinement",
+                "Periodic next-action review"
+              ],
+              "complexityNotes": [],
+              "commercialRelationship": "Begins at go-live after Launch."
+            }
+          ],
+          "exclusions": [
+            "Bespoke custom development",
+            "Arbitrary page-builder control",
+            "Full CRM or marketing-automation replacement",
+            "Broad social-media management",
+            "Managed Google Business Profile",
+            "Guaranteed rankings, traffic, leads or revenue",
+            "Perfect full-funnel attribution"
+          ],
+          "inclusions": [
+            "Structured business knowledge",
+            "Bounded professional presentation",
+            "Launch-to-Ongoing continuity"
+          ],
+          "thirdPartyCosts": [
+            "Third-party costs remain separate and must be disclosed when applicable."
+          ]
+        },
+        "version": 1,
+        "created_at": "2026-10-07T01:14:42.571049+00:00",
+        "updated_at": "2026-10-07T01:14:42.571049+00:00",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "contract_version": 1
+      }
+    ],
+    "offering_revisions": [
+      {
+        "snapshot": {
+          "id": "ad9aa219-0cd2-4d8c-b707-739eee07d60c",
+          "key": "managed-web-presence",
+          "name": "Managed Web Presence",
+          "type": "service",
+          "status": "active",
+          "payload": {
+            "detail": "Supporting infrastructure may be coordinated but is not the product. Customers supply business truth, goals, preferences, assets and approval; the platform/operator determines the bounded implementation. This is provisional product-definition state, not final marketing copy or an operational service promise.",
+            "summary": "Establish a professional managed Web Presence and continue improving it through Ongoing service.",
+            "approval": {
+              "at": "2026-10-07T01:06:33.315Z",
+              "by": "operator:approved-c0-discovery",
+              "scope": "public"
+            },
+            "evidence": {
+              "sourceKind": "operator",
+              "visibility": "public",
+              "confirmedAt": "2026-10-07T01:06:33.315Z",
+              "confirmedBy": "operator:approved-c0-discovery",
+              "confirmation": "confirmed",
+              "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+            },
+            "outcomes": [
+              "Clarity",
+              "Trust",
+              "Discoverability",
+              "Useful conversion",
+              "Continuing improvement",
+              "Reduced technical burden"
+            ],
+            "actionIds": [
+              "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f",
+              "d6f20426-e80f-4f50-b838-9b7b144cf81b",
+              "19aaf955-92fe-47cc-870e-01465f9eab09"
+            ],
+            "audiences": [
+              "Established expertise-led small service or technical businesses with real expertise and customers."
+            ],
+            "components": [
+              {
+                "key": "standard-launch",
+                "kind": "establishment",
+                "name": "Standard Launch",
+                "pricing": {
+                  "mode": "fixed",
+                  "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                  "basis": "one-time",
+                  "amount": 109500,
+                  "approval": {
+                    "at": "2026-10-07T01:06:33.315Z",
+                    "by": "operator:approved-c0-discovery",
+                    "scope": "internal"
+                  },
+                  "currency": "USD",
+                  "applicability": "component",
+                  "commercialStatus": "provisional-hypothesis"
+                },
+                "summary": "Normal good-fit establishment of the managed Web Presence.",
+                "boundaries": [
+                  "Supported capabilities only; not all intended operating workflows are implemented.",
+                  "No bespoke development or arbitrary page-builder control."
+                ],
+                "inclusions": [
+                  "Structured intake and business-knowledge capture",
+                  "Existing-presence review",
+                  "Audience and offering organization",
+                  "Bounded Visual Direction",
+                  "Managed Site and essential Pages/Navigation",
+                  "Contact and lead path",
+                  "Modest supported migration",
+                  "Deployment/infrastructure coordination",
+                  "External-presence inventory",
+                  "First-party measurement baseline",
+                  "GA4/Search Console support where practical and proven",
+                  "Customer review/approval and go-live"
+                ],
+                "timingGuidance": "Approximately 2-4 weeks after required information and approvals are available; planning guidance, not a contractual promise.",
+                "complexityNotes": [],
+                "commercialRelationship": "Establishes the presence before Ongoing."
+              },
+              {
+                "key": "expanded-launch",
+                "kind": "supported-complexity",
+                "name": "Expanded Launch",
+                "pricing": {
+                  "mode": "scope-confirmed",
+                  "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                  "basis": "one-time",
+                  "approval": {
+                    "at": "2026-10-07T01:06:33.315Z",
+                    "by": "operator:approved-c0-discovery",
+                    "scope": "internal"
+                  },
+                  "currency": "USD",
+                  "applicability": "component",
+                  "commercialStatus": "provisional-hypothesis"
+                },
+                "summary": "Additional supported complexity, not custom development.",
+                "boundaries": [
+                  "Does not authorize bespoke development."
+                ],
+                "inclusions": [
+                  "Larger supported catalogs",
+                  "Multiple locations",
+                  "Larger migrations and continuity work",
+                  "More supported integrations",
+                  "Larger approval surface"
+                ],
+                "complexityNotes": [
+                  "Scope must be reviewed before a fixed price is confirmed."
+                ],
+                "commercialRelationship": "Establishes the presence before Ongoing."
+              },
+              {
+                "key": "ongoing",
+                "kind": "ongoing",
+                "name": "Ongoing",
+                "pricing": {
+                  "mode": "fixed",
+                  "note": "Planning hypothesis only; commercial terms are not confirmed.",
+                  "basis": "recurring",
+                  "amount": 24900,
+                  "approval": {
+                    "at": "2026-10-07T01:06:33.315Z",
+                    "by": "operator:approved-c0-discovery",
+                    "scope": "internal"
+                  },
+                  "currency": "USD",
+                  "interval": "month",
+                  "applicability": "component",
+                  "commercialStatus": "provisional-hypothesis"
+                },
+                "summary": "Continuing managed service after Launch.",
+                "boundaries": [
+                  "As supported; analytics, drafting and workflow capabilities remain deferred."
+                ],
+                "inclusions": [
+                  "Operation and maintenance",
+                  "Business updates",
+                  "First-party measurement",
+                  "Concise value/progress reporting",
+                  "Prioritized recommendations",
+                  "Grounded AI-assisted drafting",
+                  "Human/customer approval",
+                  "Supported content/optimization activity",
+                  "Conversion refinement",
+                  "Periodic next-action review"
+                ],
+                "complexityNotes": [],
+                "commercialRelationship": "Begins at go-live after Launch."
+              }
+            ],
+            "exclusions": [
+              "Bespoke custom development",
+              "Arbitrary page-builder control",
+              "Full CRM or marketing-automation replacement",
+              "Broad social-media management",
+              "Managed Google Business Profile",
+              "Guaranteed rankings, traffic, leads or revenue",
+              "Perfect full-funnel attribution"
+            ],
+            "inclusions": [
+              "Structured business knowledge",
+              "Bounded professional presentation",
+              "Launch-to-Ongoing continuity"
+            ],
+            "thirdPartyCosts": [
+              "Third-party costs remain separate and must be disclosed when applicable."
+            ]
+          },
+          "version": 1,
+          "created_at": "2026-10-07T01:14:42.571Z",
+          "updated_at": "2026-10-07T01:14:42.571Z",
+          "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+          "contract_version": 1,
+          "relatedAssetUsages": []
+        },
+        "offering_id": "ad9aa219-0cd2-4d8c-b707-739eee07d60c",
+        "recorded_at": "2026-10-07T01:14:42.571049+00:00",
+        "change_reason": "Approved first MioPages C0 canonical slice; local provisional rendering only.",
+        "web_presence_id": "926cb772-7507-4542-8acd-e7e57ce71324",
+        "revision_version": 1,
+        "responsible_identity": "operator:approved-c0-discovery"
+      }
+    ]
+  }
+}

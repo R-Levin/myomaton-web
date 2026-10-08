@@ -250,11 +250,32 @@ capability; report outlines here are preview-safe illustrations, not report deli
 
 ## Business in Focus preview boundary
 
-Human review accepted v3 as MioPages' provisional direction. The next boundary is
-a separately authorized promotion into reviewed canonical customer state, with
-fingerprints, validation and rollback. Publication, launch, operational Review and
+Human review accepted v3 as MioPages' provisional direction. The separately authorized
+[promotion](miopages-canonical-promotion.md) is now applied to reviewed canonical
+customer state, with fingerprints, validation and rollback. Publication, launch, operational Review and
 analytics/billing/onboarding automation remain withheld. Follow the
 [source-adequacy gate](visual-direction.md#visual-evidence-and-recommendation-process)
 for future recommendations; this checkpoint implements no deferred capabilities.
 
 [Service-led v3](miopages-business-focus.md) adds graphic arrival, bounded overlap, continuing fields, contribution zones, annotated report FPO and graphic footer families. Preview evidence space does not implement full production portfolio/evidence collection or authorize media. Permission-aware production media/evidence, broader V1 image-led range and structured technical capabilities remain deferred requirements.
+
+## Media acquisition and external intelligence pipeline
+
+This is the high-priority next architecture slice after canonical promotion. Define
+the acquisition/provider boundary before implementing broader approved media rendering.
+It must address customer/current-site Asset reuse, permissioned stock integration
+such as Pexels, deterministic SVG/chart-like graphics, and generated illustration/image
+providers. All paths need provenance/licensing, explicit approval, production
+eligibility and customer ownership; unresolved visual intent is not an eligible Asset.
+
+Use an OpenAI/API provider abstraction where appropriate, with bounded cost,
+logging, retry, error/refusal behavior and audit records. Provider output and external
+intelligence cannot silently change canonical facts or approve rights. Review how
+approved managed AssetUsage replaces each unresolved visual role, while keeping FPO
+preview-only and maintaining explicit evidence/contribution permissions. This slice
+implements no acquisition pipeline, API integration or stock download.
+
+The [text draft foundation](content-authority-and-editing.md) retains canonical
+reconciliation and spelling/grammar hooks. Customer UI, collaborative durable drafts,
+review/publish transitions, caller authorization and meaningful intelligence checks
+remain later boundaries; content editing never grants presentation control.

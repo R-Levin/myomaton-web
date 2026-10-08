@@ -15,6 +15,8 @@ import { startProductionFixture } from "../../tests/integration/production-serve
 import { validateDirection, resolvePlan } from "../../lib/platform/presentation/plan";
 import { validatePalette } from "../../lib/platform/presentation/tokens";
 import { projectCanonicalSections } from "../../lib/platform/canonical/projections";
+import promoted from "../customer-updates/miopages-focus-reviewed.json";
+import { customerGraph } from "../../lib/platform/customer-state";
 
 type Row = Record<string, unknown>;
 export type PreviewSection = { type: "hero" | "intro" | "collection" | "cta" | "relationship"; content: Row; configuration: Row };
@@ -37,6 +39,7 @@ export async function snapshotPublic(pool: Pool): Promise<CustomerState> {
 }
 
 export function assertCommittedCustomer(state: CustomerState, manifest: CustomerManifest) {
+  if (manifest.webPresenceId === promoted.target.webPresenceId && stateFingerprint(customerGraph(state,promoted.target)) === stateFingerprint(promoted.after as CustomerState)) return;
   for (const [table, rows] of Object.entries(manifest.rows)) for (const expected of rows) {
     const actual = state[table].find(row => row.id === expected.id);
     assert.ok(actual, `Missing baseline ${table}`);
@@ -87,7 +90,10 @@ export async function prepareDisposablePreview(databaseUrl: string, manifest: Cu
   try {
     const before = await snapshotPublic(source);
     assertCommittedCustomer(before, manifest);
-    const owned = selectedCustomer(before, manifest);
+    // Pinned experiments continue from their exact historical source graph after
+    // the separately reviewed real promotion; never reinterpret the experiments.
+    const owned = manifest.webPresenceId === promoted.target.webPresenceId && stateFingerprint(customerGraph(before,promoted.target)) === stateFingerprint(promoted.after as CustomerState)
+      ? structuredClone(promoted.before as CustomerState) : selectedCustomer(before, manifest);
     const projectedPages: Record<string, PreviewSection[]> = {};
     for (const [route, sections] of Object.entries(plan.pages)) {
       const projected = await projectCanonicalSections(source, manifest.webPresenceId, sections.map((s, i) => ({ ...s, id: String(i) })));

@@ -5,6 +5,9 @@ for internal review. It does not update real MioPages or Myomaton, publish a sit
 or authorize commercial launch. Final copy still needs operator review. Iteration
 six, A Business in Focus / service-led v3, is now the human-accepted provisional
 direction; the earlier iteration records below describe their historical status.
+That direction has since been [promoted into reviewed canonical state](miopages-canonical-promotion.md)
+under separate authorization. These preview commands remain disposable and use the
+frozen historical initial graph after recognizing the exact promoted canonical graph.
 
 ## Run and inspect
 

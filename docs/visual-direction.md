@@ -696,9 +696,10 @@ Human review must judge appropriateness, coherent Page flow and brand character.
 
 Human visual review accepted service-led v3 as the provisional direction to carry
 forward for MioPages Customer #0. Earlier experiments remain pinned architectural
-and regression evidence, not accepted MioPages directions. Canonical customer state
-has not been promoted; copy, production assets/evidence and operational workflows
-remain subject to approval. Commercial launch is not authorized.
+and regression evidence, not accepted MioPages directions. The separately authorized
+[canonical promotion](miopages-canonical-promotion.md) now stores reviewed direction,
+editorial content and approved brand configuration. Production assets/evidence and
+operational workflows remain unresolved. Publication and commercial launch are not authorized.
 
 ## Visual evidence and recommendation process
 

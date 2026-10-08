@@ -494,8 +494,10 @@ Review/onboarding/analytics/billing/hosting automation and launch remain deferre
 Service-led v3 is implemented and human accepted as MioPages' provisional **A Business
 in Focus** direction. It adds coordinated Source Sans, graphic/layered service arrival,
 continuing fields, annotated artifact/evidence FPO and graphic sign-off. This is
-repository acceptance, not canonical customer-state promotion or publication authority.
-See [the acceptance record](miopages-business-focus.md).
+now represented in reviewed [canonical MioPages state](miopages-canonical-promotion.md),
+with FPO production refusal and publication withheld. The bounded
+[text draft foundation](content-authority-and-editing.md) exposes content authority,
+not presentation controls. See [the acceptance record](miopages-business-focus.md).
 
 Implemented opt-in service-led v2 includes a finite Source Editorial font-resource
 system, semantic warm/brand/contrast palette relationships, acquisition navigation,

@@ -1,9 +1,13 @@
 import type { Pool } from "pg";
 import { approval, formatPrice, key, normalizeKnowledge, normalizeOffering, object, text, uuid } from "./model";
 
-export type SourceBinding = { role: "offering-relationship"; offeringId: string; kind: "stages" | "scope"; componentKeys: string[] } | { role: "knowledge"; knowledgeId: string; keys: string[] } |
+export type SourceBinding = { role: "offering-continuity" | "offering-commercial-structure"; offeringId: string } | { role: "offering-relationship"; offeringId: string; kind: "stages" | "scope"; componentKeys: string[] } | { role: "knowledge"; knowledgeId: string; keys: string[] } |
   { role: "offering-overview" | "offering-component" | "offering-pricing"; offeringId: string; componentKey?: string };
 export function normalizeBinding(value: unknown): SourceBinding {
+  if (value && typeof value === "object" && ["offering-continuity", "offering-commercial-structure"].includes(String((value as Record<string,unknown>).role))) {
+    const r=object(value,["role","offeringId"]);
+    return {role:r.role as "offering-continuity" | "offering-commercial-structure",offeringId:uuid(r.offeringId)};
+  }
   if (value && typeof value === "object" && (value as Record<string, unknown>).role === "offering-relationship") {
     const r = object(value, ["role", "offeringId", "kind", "componentKeys"]);
     if (!["stages", "scope"].includes(String(r.kind)) || !Array.isArray(r.componentKeys) || r.componentKeys.length < 1 || r.componentKeys.length > 6) throw Error("Invalid relationship binding");
@@ -36,6 +40,24 @@ export function projectContent(type: string, content: unknown, binding: SourceBi
   if (row.status!=="active" || approval(object(row.payload,["summary","detail","audiences","outcomes","inclusions","exclusions","actionIds","components","thirdPartyCosts","evidence","approval"]).approval).scope!=="public") return null;
   const o = normalizeOffering(row.payload);
   if (o.evidence.confirmation!=="confirmed" || o.evidence.visibility!=="public") return null;
+  if (binding.role === "offering-continuity") {
+    if (type !== "relationship") return null;
+    const launch=o.components.filter(c=>c.kind==="establishment"), ongoing=o.components.filter(c=>c.kind==="ongoing");
+    if (launch.length!==1 || ongoing.length!==1) return null;
+    const extensions=o.components.filter(c=>c.kind==="supported-complexity");
+    if (extensions.length>3) return null;
+    return {...context,contractVersion:2,kind:"stages",items:[launch[0],ongoing[0]].map(c=>({id:c.key,heading:c.name,text:c.summary})),
+      ...(extensions.length?{extensions:extensions.map(c=>({id:c.key,stageId:launch[0].key,heading:c.name,text:[c.summary,c.commercialRelationship,...c.complexityNotes].join("\n\n")}))}:{})};
+  }
+  if (binding.role === "offering-commercial-structure") {
+    if (type!=="collection") return null;
+    // Price basis/mode is canonical; private amounts and price notes never project.
+    const items=o.components.filter(c=>c.pricing).map(c=>({id:c.key,heading:c.name,text:c.pricing!.mode==="scope-confirmed"
+      ? "A fixed price is confirmed after scope review." : c.pricing!.basis==="recurring"
+        ? `One recurring service, billed by ${c.pricing!.interval}. Final commercial terms require confirmation.`
+        : "A separate one-time Launch fee. Final commercial terms require confirmation."}));
+    return items.length?{...context,itemSource:"inline",items}:null;
+  }
   if (binding.role === "offering-relationship") {
     if (type !== "relationship") return null;
     const components = binding.componentKeys.map(k => o.components.find(c => c.key === k));

@@ -1,5 +1,12 @@
 # MioPages C0 canonical customer slice
 
+The initial establishment below is historical. The accepted A Business in Focus
+direction has now been [promoted into reviewed canonical state](miopages-canonical-promotion.md):
+four Pages, 23 Sections, service-led v3, Source Sans 3 and two approved wordmarks.
+Publication and commercial launch remain withheld. The original initializer
+receipt is preserved; rerunning establishment against later reviewed state refuses
+rather than resets it.
+
 ## Authority and application status
 
 The approved [business brief](miopages-c0-business-brief.md) supplies business truth;

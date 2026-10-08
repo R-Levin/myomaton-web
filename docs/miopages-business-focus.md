@@ -18,9 +18,11 @@ Expanded scope, substantial evidence positions, a prominent Review artifact,
 distinct current/acquisition navigation and a graphic footer. Typography similarity
 to other work is acceptable when this remains the business-appropriate choice.
 
-This acceptance does not apply the preview to canonical customer state. Copy,
-production imagery/evidence and operational workflows require later approval;
-current FPO/artifacts are not final production artwork. Commercial launch remains
+The separately authorized [canonical promotion](miopages-canonical-promotion.md)
+now selects this direction and reviewed editorial content in real Customer #0 state.
+This document preserves the accepted disposable take as its source. Production
+imagery/evidence and operational workflows remain unresolved; current FPO/artifacts
+are not final production artwork. Publication and commercial launch remain
 unauthorized. See the [design evidence process](visual-direction.md#visual-evidence-and-recommendation-process).
 
 ## Explicit reusable selection
