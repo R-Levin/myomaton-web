@@ -1,3 +1,4 @@
+import { disposablePreviewEnabled } from "../lib/platform/presentation/fpo";
 import * as visualModel from "../lib/platform/visual-direction/model";
 import * as visualPolicy from "../lib/platform/policy/site-policy";
 import * as globalModel from "../lib/platform/site-globals/model";
@@ -72,6 +73,7 @@ function fixture() {
     throw new Error(`Unexpected query: ${query.text}`);
   } };
   const service = loadService("lib/platform/managed-sites/service.ts", {
+    "../presentation/fpo": { disposablePreviewEnabled },
     "../canonical/projections": { projectCanonicalSections: async (_pool: unknown,_owner: unknown,rows: unknown) => rows },
     "../canonical/media": { offeringImages: async () => new Map() },
     "../visual-direction/model": visualModel, "../policy/site-policy": visualPolicy, "../site-globals/model": globalModel,

@@ -21,7 +21,10 @@ export async function getSiteGlobals(input: {
     presentation.footer.showUtilityNavigation ? getNavigationByName(input.webPresenceId, "Utility Navigation", "managedSite", context) : null,
     presentation.header.contactActionId ? getActionsByIds(input.webPresenceId, [presentation.header.contactActionId], context) : new Map<string, Action>(),
   ]);
-  return { identity, presentation, policy, logo, utilityNavigation,
+  const direction = object(object(input.siteConfiguration).visualDirection);
+  const grammar = object(direction.grammar);
+  const logoLight = direction.contractVersion === 2 && grammar.id === "service-led" && [2, 3].includes(Number(grammar.version)) ? await logoImage(db, input.webPresenceId, "logo-light") : null;
+  return { identity, presentation, policy, logo, utilityNavigation, ...(logoLight ? { logoLight } : {}),
     contactAction: actions.get(presentation.header.contactActionId ?? "") ?? null };
 }
 export type SiteGlobals = Awaited<ReturnType<typeof getSiteGlobals>>;

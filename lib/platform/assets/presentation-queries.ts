@@ -54,17 +54,19 @@ export async function publicAsset(db: NodePgDatabase, domain: string, assetId: s
   const sectionAsset = [...eligible.values()].find(({ asset }) => asset.id === id)?.asset;
   if (sectionAsset) return sectionAsset;
   const logo = await eligibleLogo(db, presences[0].id);
-  return logo?.asset.id === id ? logo.asset : null;
+  if (logo?.asset.id === id) return logo.asset;
+  const light = await eligibleLogo(db, presences[0].id, "logo-light");
+  return light?.asset.id === id ? light.asset : null;
 }
 
 // AssetUsage is the single logo reference. Never duplicate its Asset UUID in
 // configuration. Inspect all usages for the target, including foreign ownership,
 // so malformed or ambiguous associations cannot expose an image.
-export async function eligibleLogo(db: NodePgDatabase, webPresenceId: string): Promise<EligibleUsage | null> {
+export async function eligibleLogo(db: NodePgDatabase, webPresenceId: string, role: "logo" | "logo-light" = "logo"): Promise<EligibleUsage | null> {
   const id = requireAssetUuid(webPresenceId);
   const rows = await db.select({ usagePresenceId: assetUsages.webPresenceId, asset: getTableColumns(assets), configuration: assetUsages.configuration })
     .from(webPresences)
-    .innerJoin(assetUsages, and(eq(assetUsages.entityId, webPresences.id), eq(assetUsages.entityType, "web_presence"), eq(assetUsages.role, "logo")))
+    .innerJoin(assetUsages, and(eq(assetUsages.entityId, webPresences.id), eq(assetUsages.entityType, "web_presence"), eq(assetUsages.role, role)))
     .innerJoin(assets, eq(assets.id, assetUsages.assetId))
     .where(and(eq(webPresences.id, id), eq(webPresences.status, "active")));
   if (rows.length !== 1) return null;
@@ -77,7 +79,7 @@ export async function eligibleLogo(db: NodePgDatabase, webPresenceId: string): P
   return sites.length ? { asset: row.asset, configuration: row.configuration } : null;
 }
 
-export async function logoImage(db: NodePgDatabase, webPresenceId: string): Promise<SectionImage | null> {
-  const logo = await eligibleLogo(db, webPresenceId);
+export async function logoImage(db: NodePgDatabase, webPresenceId: string, role: "logo" | "logo-light" = "logo"): Promise<SectionImage | null> {
+  const logo = await eligibleLogo(db, webPresenceId, role);
   return logo ? presentImage(logo.asset, logo.configuration) : null;
 }

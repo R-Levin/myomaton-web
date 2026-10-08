@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import type { ManagedSiteSection } from "@/lib/platform/managed-sites/service";
-import { normalizeDestination, type Action } from "../../lib/platform/actions/model";
+import { normalizeDestination, sectionActionId, type Action } from "../../lib/platform/actions/model";
 import { normalizeSection } from "../../lib/platform/managed-sites/sections";
 import { presentCollection } from "../../lib/platform/managed-sites/collections";
 import { PlainTextParagraphs } from "./plain-text-paragraphs";
@@ -21,17 +21,19 @@ export function SectionRenderer({ section, direction, index = 0, motionSlot }: {
   const { type, variant, content } = normalized;
   const image = type === "intro" ? section.image : null;
   const role = sectionRole(normalized, Boolean(image), direction);
-  const raw = section.rawConfiguration ?? section.configuration;
+  const raw = direction?.grammar && Object.hasOwn(section, "rawConfiguration")
+    ? section.rawConfiguration : section.rawConfiguration ?? section.configuration;
   const config = sectionPresentation(normalized.configuration, raw, type, index, direction, role);
   const composition = sectionComposition(config, role, direction);
   const { heading, text } = content;
-  const actionId = normalized.type !== "collection" ? normalized.content.actionId : undefined;
+  const actionId = normalized.type !== "collection" ? sectionActionId(normalized.content) : undefined;
   const action = actionId && section.action?.id === actionId ? section.action : null;
   const items = normalized.type === "collection"
     ? section.collectionItems ?? presentCollection(normalized.content) : [];
   const Heading = type === "hero" ? "h1" : "h2";
   const v2 = direction?.profileVersion === 2;
-  const staged = v2 && type === "hero";
+  const composed = v2 || Boolean(direction?.grammar);
+  const staged = composed && type === "hero";
   const hasHeading = Boolean(heading?.trim());
   const hasSupport = Boolean(text?.trim());
   const hasAction = Boolean(action?.label?.trim() && normalizeDestination(action.type, action.destination));
@@ -55,7 +57,7 @@ export function SectionRenderer({ section, direction, index = 0, motionSlot }: {
       id={config.anchor}
       className={`managed-site-section managed-site-section-${type}`}
       data-composition={composition}
-      data-section-role={v2 ? role : undefined}
+      data-section-role={composed ? role : undefined}
       data-accent-surface={wash ? "secondary-wash" : undefined}
       style={motionStyle}
       data-layout={layout}
@@ -88,7 +90,7 @@ export function SectionRenderer({ section, direction, index = 0, motionSlot }: {
             {normalized.type === "hero" && normalized.content.eyebrow && <p className="managed-site-eyebrow">{normalized.content.eyebrow}</p>}
             {!separateHeading && heading && <Heading>{heading}</Heading>}
             <PlainTextParagraphs text={text} />
-            <SectionAction action={action} role={v2 ? type === "cta" ? "primary" : "supporting" : undefined} />
+            <SectionAction action={action} role={composed ? type === "cta" ? "primary" : "supporting" : undefined} />
           </>}
         </div>
         {!split && media}
@@ -97,7 +99,7 @@ export function SectionRenderer({ section, direction, index = 0, motionSlot }: {
           {items.map((item) => <li key={item.id} className="managed-site-collection-item">
             <h3>{item.heading}</h3>
             <PlainTextParagraphs text={item.text} />
-            <SectionAction action={item.action} role={v2 ? "supporting" : undefined} />
+            <SectionAction action={item.action} role={composed ? "supporting" : undefined} />
           </li>)}
         </ul>}
       </div>

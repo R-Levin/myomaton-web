@@ -178,3 +178,30 @@ returns focus to the button; Arrow Down opens and focuses the first link; select
 or outside pointer interaction closes it. This is a non-modal disclosure with
 ordinary Tab order, not a focus-trapping drawer. Desktop Navigation and the
 server-rendered hierarchy remain unchanged. No new configurable variant is exposed.
+
+
+## Contract-v2 global presentation
+
+The [service-led grammar](visual-direction.md#commercial-presentation-contract-version-2)
+selects compact-inline or brand-prominent headers, quiet or commercial Navigation
+and compact-utility or service-led footers. These are resolved treatments, not a
+Header builder. Commercial emphasis follows the primary Action destination, not
+link position. Assessment uses the compact ending; arrival uses prominent branding.
+
+The new renderer has its own scoped styles and preserves shared functional
+keyboard disclosure behavior. Wordmark aspect ratio, intrinsic fitting, media
+eligibility, safe links, shallow hierarchy and Home identity remain invariant.
+Legacy reference-v2 and restrained-editorial global rendering remain pinned.
+
+## Acquisition presentation and contextual branding
+
+Service-led v2 uses the existing owned Header `contactActionId` as its acquisition
+navigation destination. It emphasizes the matching existing Navigation item, rather
+than duplicating a button or confusing current-page state with acquisition emphasis.
+`aria-current` continues to report location independently. No Header builder exists.
+
+An optional `logo-light` Web Presence AssetUsage provides an approved light lockup
+for contrast surfaces. It uses the same managed media, singular association, active
+presence/site and ownership eligibility as `logo`. The legacy Header/logo path is
+unchanged; new grammar opts into the contextual variant. Source files are unchanged,
+and preview copies are ingested solely in disposable state.

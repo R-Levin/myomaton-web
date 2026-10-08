@@ -1,5 +1,6 @@
 import { actionId, normalizeDestination } from "../actions/model";
 import { subjectId } from "../subjects/presentation";
+import { relationship, valuePoints, type Relationship, type ValuePoint } from "../presentation/content";
 
 export type InlineCollectionItem = { id: string; heading: string; text?: string; actionId?: string };
 export type SubjectCollectionItem = { id: string; subjectId: string; actionId?: string };
@@ -8,8 +9,10 @@ export type CollectionContent = { heading?: string; text?: string } & (
   | { itemSource: "subjects"; items: SubjectCollectionItem[] }
 );
 
-export type SectionContent = { heading?: string; text?: string; actionId?: string };
+export type SectionContent = { heading?: string; text?: string; actionId?: string; secondaryActionId?: string };
 export type SectionPresentation = {
+  presentation?: unknown;
+  previewMedia?: unknown;
   treatment?: "statement";
   composition?: "asymmetric-field" | "editorial-row" | "statement-break" | "image-evidence" | "grouped-field" | "conversion-band";
   anchor?: string;
@@ -21,7 +24,8 @@ export type SectionPresentation = {
   mediaFit: "natural" | "contain" | "cover";
 };
 export type NormalizedSection = { configuration: SectionPresentation } & (
-  | { type: "hero"; variant: "default"; content: SectionContent & { eyebrow?: string } }
+  | { type: "hero"; variant: "default"; content: SectionContent & { eyebrow?: string; valuePoints?: ValuePoint[] } }
+  | { type: "relationship"; variant: "default"; content: Relationship }
   | { type: "intro"; variant: "stack" | "split-text-first" | "split-image-first"; content: SectionContent }
   | { type: "cta"; variant: "default"; content: SectionContent }
   | { type: "contact"; variant: "default"; content: SectionContent & { contact_definition_id: string } }
@@ -71,18 +75,31 @@ function collectionContent(input: Record<string, unknown>): CollectionContent | 
 export function normalizeSection(value: unknown): NormalizedSection | null {
   const section = record(value);
   const type = section.type;
+  if (type === "relationship") {
+    try {
+      const normalized = normalizeSection({ ...section, type: "intro", content: {} });
+      return normalized ? { type, variant: "default", content: relationship(section.content), configuration: normalized.configuration } : null;
+    } catch { return null; }
+  }
   if (type !== "hero" && type !== "intro" && type !== "cta" && type !== "collection" && type !== "contact") return null;
   const input = record(section.content);
   const config = record(section.configuration);
-  const content: SectionContent & { eyebrow?: string } = {};
+  const content: SectionContent & { eyebrow?: string; valuePoints?: ValuePoint[] } = {};
   for (const key of ["heading", "text"] as const) {
     if (typeof input[key] === "string") content[key] = input[key];
   }
   if (type === "hero" && typeof input.eyebrow === "string") content.eyebrow = input.eyebrow;
+  if (type === "hero" && input.valuePoints !== undefined) {
+    try { content.valuePoints = valuePoints(input.valuePoints); } catch { /* Scaffold failure falls back without invented points. */ }
+  }
+  const secondary = type === "hero" ? actionId(input.secondaryActionId) : null;
+  if (secondary) content.secondaryActionId = secondary;
   const id = actionId(input.actionId);
   if (id) content.actionId = id;
   const anchor = typeof config.anchor === "string" ? normalizeDestination("section", `#${config.anchor}`)?.slice(1) : undefined;
   const configuration: SectionPresentation = {
+    ...(Object.hasOwn(config, "previewMedia") ? { previewMedia: config.previewMedia } : {}),
+    ...(Object.hasOwn(config, "presentation") ? { presentation: config.presentation } : {}),
     ...(typeof config.composition === "string" && ({ hero: ["asymmetric-field"], intro: ["editorial-row", "statement-break", "image-evidence"], collection: ["grouped-field"], cta: ["conversion-band"], contact: [] }[type] as readonly string[]).includes(config.composition)
       ? { composition: config.composition as SectionPresentation["composition"] } : {}),
     ...(type === "intro" && config.treatment === "statement" ? { treatment: "statement" as const } : {}),

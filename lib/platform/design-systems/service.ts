@@ -13,6 +13,7 @@ export type ResolvedDesignSystem = {
   id: string | null;
   name: string | null;
   configuration: DesignConfiguration;
+  rawConfiguration?: unknown;
 };
 
 export async function getDesignSystemByWebPresenceId(
@@ -35,5 +36,6 @@ export async function getDesignSystemByWebPresenceId(
     id: designSystem?.id ?? null,
     name: designSystem?.name ?? null,
     configuration: resolveDesignConfiguration(designSystem?.configuration),
+    ...(designSystem?.configuration && Object.hasOwn(designSystem.configuration, "palette") ? { rawConfiguration: designSystem.configuration } : {}),
   };
 }

@@ -1,4 +1,5 @@
 import "server-only";
+import { disposablePreviewEnabled } from "../presentation/fpo";
 import { projectCanonicalSections } from "../canonical/projections";
 import { offeringImages } from "../canonical/media";
 import { resolveVisualDirection, type VisualResolution } from "../visual-direction/model";
@@ -39,6 +40,8 @@ export type ManagedSiteSection = {
   configuration: unknown;
   rawConfiguration?: unknown;
   action?: Action | null;
+  secondaryAction?: Action | null;
+  relationshipActions?: Record<string, Action>;
   image?: SectionImage | null;
   collectionItems?: CollectionItem[];
   contact?: ContactPresentation;
@@ -46,12 +49,13 @@ export type ManagedSiteSection = {
 
 export type ManagedSitePage = {
   managedSite: { id: string; name: string };
-  page: { id: string; name: string; title: string; slug: string };
+  page: { id: string; name: string; title: string; slug: string; configuration?: unknown };
   sections: ManagedSiteSection[];
   designSystem: ResolvedDesignSystem;
   navigation?: Navigation | null;
   globals?: SiteGlobals;
   visual?: VisualResolution;
+  presentationPreview?: boolean;
 };
 
 export type ManagedSiteSelection = { domain: string; managedSiteName: string } | { webPresenceId: string; managedSiteId: string };
@@ -83,7 +87,7 @@ export async function getManagedSitePage(
 
   if (sites.length !== 1) return null;
   const site = sites[0];
-  const matches = await db.select({ id: pages.id, name: pages.name, title: pages.title, slug: pages.slug })
+  const matches = await db.select({ id: pages.id, name: pages.name, title: pages.title, slug: pages.slug, configuration: pages.configuration })
     .from(pages)
     .where(and(eq(pages.managedSiteId, site.managedSite.id), eq(pages.slug, slug), eq(pages.status, "active")))
     .limit(2);
@@ -116,7 +120,8 @@ export async function getManagedSitePage(
   const actionIds = supportedSections
     .flatMap((section) => section.type === "collection"
       ? section.content.items.map((item) => item.actionId ?? null)
-      : [sectionActionId(section.content)])
+      : section.type === "relationship" && section.content.kind !== "responsibilities" ? section.content.items.map(item => item.actionId ?? null)
+      : [sectionActionId(section.content), section.type === "hero" ? section.content.secondaryActionId ?? null : null])
     .filter((id) => id !== null);
   const resolvedActions = await getActionsByIds(match.webPresenceId, actionIds, { managedSiteId: match.managedSite.id });
   const subjectIds = supportedSections.flatMap((section) => section.type === "collection" && section.content.itemSource === "subjects"
@@ -130,6 +135,7 @@ export async function getManagedSitePage(
   const contacts = supportedSections.some(s => s.type === "contact") ? await contactPresentations(db,
     { id: match.webPresenceId, name: match.presenceName, configuration: match.presenceConfiguration }, supportedSections) : new Map<string, ContactPresentation>();
   return {
+    ...(disposablePreviewEnabled(process.env) ? { presentationPreview: true } : {}),
     visual: resolveVisualDirection(match.siteConfiguration, resolveVisualPolicy(
       servicePolicyFromEnvironment(process.env.WEB_PRESENCE_SERVICE_POLICY),
       object(match.presenceConfiguration).policy, object(match.siteConfiguration).policy)),
@@ -143,6 +149,8 @@ export async function getManagedSitePage(
       contact: contacts.get(section.id),
       image: boundIds.has(section.id) ? canonicalImages.get(section.id)?.image ?? null : images.get(section.id) ?? null,
       action: resolvedActions.get(sectionActionId(section.content) ?? "") ?? null,
+      ...(section.type === "hero" && section.content.secondaryActionId ? { secondaryAction: resolvedActions.get(section.content.secondaryActionId) ?? null } : {}),
+      ...(section.type === "relationship" ? { relationshipActions: Object.fromEntries(resolvedActions) } : {}),
       ...(section.type === "collection" ? { collectionItems: presentCollection(section.content, resolvedSubjects, resolvedActions) } : {}),
     })),
     designSystem,

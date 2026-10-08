@@ -1,3 +1,4 @@
+import { disposablePreviewEnabled } from "../lib/platform/presentation/fpo";
 import * as pageDestinations from "../lib/platform/managed-sites/page-destinations";
 import * as visualModel from "../lib/platform/visual-direction/model";
 import * as visualPolicy from "../lib/platform/policy/site-policy";
@@ -74,6 +75,7 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
   assert.equal(actionQueries, 1);
 
   const managedSiteService = loadService("lib/platform/managed-sites/service.ts", {
+    "../presentation/fpo": { disposablePreviewEnabled },
     "../canonical/projections": { projectCanonicalSections: async (_pool: unknown,_owner: unknown,rows: unknown) => rows },
     "../canonical/media": { offeringImages: async () => new Map() },
     "../visual-direction/model": visualModel, "../policy/site-policy": visualPolicy, "../site-globals/model": globalModel,

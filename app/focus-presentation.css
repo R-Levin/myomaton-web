@@ -1,0 +1,139 @@
+/* service-led v3: fixed semantic families. Nothing selects prior versions. */
+.focus-presence { --focus-violet: #555ccc; font-family: var(--p-font); font-size: 18px; line-height: 1.55; }
+.focus-presence :is(h1,h2,h3,h4) { font-family: var(--p-font); font-weight: 600; letter-spacing: 0; }
+.focus-presence h1 { font-size: clamp(2.8rem,4.6vw,4.8rem); line-height: 1.04; max-width: 17ch; }
+.focus-presence h2 { font-size: clamp(2rem,3vw,3rem); line-height: 1.1; max-width: 28ch; }
+.focus-presence h3 { font-size: 1.45rem; }
+.focus-presence h4 { font-size: 1.05rem; }
+.focus-presence .focus-kicker { font-weight: 600; font-size: .85rem; letter-spacing: .02em; margin-bottom: 1rem; }
+.focus-presence .p-header { padding: 1.4rem clamp(1.25rem,4vw,4rem); border: 0; background: var(--p-light); }
+.focus-presence .p-header-inner { max-width: 82rem; }
+.focus-presence .p-brand { max-width: 18rem; }
+.focus-presence .p-brand img { width: 100%; height: auto; }
+.focus-presence .p-header nav ul { gap: .5rem; }
+.focus-presence .p-header nav a { padding: .8rem 1.2rem; font-weight: 600; text-decoration: none; border: 0; border-radius: .2rem; }
+.focus-presence .p-header nav a[aria-current="page"] { background: var(--p-tonal); box-shadow: inset 0 0 0 2px var(--p-brand); }
+.focus-presence .p-header nav a[data-action-target="true"] { background: var(--p-strong); color: var(--p-on-strong); }
+.focus-presence .p-header nav a[data-action-target="true"][aria-current="page"] { box-shadow: inset 0 0 0 2px var(--p-brand); }
+.focus-presence .p-header nav a:hover { outline: 1px solid currentColor; outline-offset: -2px; }
+.focus-presence .p-section { padding: clamp(2.5rem,5vw,5rem) clamp(1.25rem,4vw,4rem); }
+.focus-presence .p-inner { max-width: 82rem; }
+.focus-presence .p-section[data-region="connected"] { padding-block: 2.4rem; }
+.focus-presence .focus-region { display: grid; gap: 2.5rem; }
+.focus-presence .focus-copy { max-width: 64ch; }
+.focus-presence .focus-prose, .focus-presence .p-hero-introduction { margin-top: 1.3rem; max-width: 58ch; }
+.focus-presence .p-hero-introduction { font-size: 1.15rem; }
+.focus-presence .focus-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .8rem 1.4rem; margin-top: 1.6rem; }
+.focus-presence .p-action { margin: 0; background: var(--p-brand); color: var(--p-on-brand); border-color: var(--p-brand); border-radius: .2rem; min-height: 48px; font-weight: 600; }
+.focus-presence .focus-secondary { display: inline-flex; align-items: center; min-height: 48px; font-weight: 600; text-decoration-thickness: 1px; }
+.focus-presence [data-surface="brand"] .p-action, .focus-presence [data-surface="contrast"] .p-action { background: var(--p-strong); color: var(--p-on-strong); border-color: var(--p-strong); }
+.focus-presence [data-surface="brand"] .focus-secondary { color: var(--p-on-brand); }
+.focus-presence .p-hero { padding: 0; border: 0; display: grid; gap: 3rem; }
+.focus-presence .p-hero:is([data-family="orientation"],[data-family="editorial-masthead"]) h1 { font-size: clamp(2.6rem,4vw,4.2rem); max-width: 26ch; }
+.focus-presence .p-hero:is([data-family="orientation"],[data-family="editorial-masthead"]) .focus-copy { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); gap: 1rem 4rem; max-width: none; align-items: center; }
+.focus-presence .p-hero .focus-kicker { grid-column: 1 / -1; }
+.focus-presence .p-hero:is([data-family="orientation"],[data-family="editorial-masthead"]) .p-hero-introduction { margin: 0; border: 0; padding: 0; max-width: 46ch; }
+.focus-presence .p-section[data-conversion] .p-inner { border: 0; padding: 0; max-width: 82rem; }
+.focus-presence .p-hero[data-family="service-illustrated"] { grid-template-columns: minmax(0,1fr) minmax(0,1.2fr); align-items: center; }
+.focus-presence .p-hero[data-family="service-illustrated"] .focus-copy { position: relative; z-index: 1; }
+.focus-presence [data-layer="field-bridge"] { padding-bottom: 0; margin-bottom: 3rem; }
+.focus-presence [data-layer="field-bridge"] .focus-service { margin-bottom: -3rem; }
+.focus-presence [data-layer="field-bridge"] + section { padding-top: 4rem; }
+.focus-presence .focus-visual { margin: 0; min-width: 0; }
+.focus-presence .focus-service svg { width: 100%; height: auto; display: block; }
+.focus-presence .focus-service { align-self: end; }
+.focus-presence .focus-visual-labels { display: flex; gap: 1rem; justify-content: space-between; padding: 1rem; background: var(--p-brand); color: var(--p-on-brand); font-size: .9rem; font-weight: 600; }
+.focus-presence .focus-visual-explanation { background: var(--p-light); color: var(--p-on-light); padding: 1rem; font-size: .95rem; }
+.focus-presence figcaption { display: flex; flex-wrap: wrap; gap: .3rem .8rem; padding: .8rem 1rem; background: var(--p-tonal); color: var(--p-on-tonal); font-size: .75rem; }
+.focus-presence figcaption small { flex-basis: 100%; font-size: inherit; }
+.focus-presence .focus-peers { padding: 0; list-style: none; display: grid; gap: 1.5rem; margin-top: 2rem; }
+.focus-presence .focus-peers p { margin-top: .6rem; }
+.focus-presence .focus-continuity { background: var(--p-brand); color: var(--p-on-brand); padding: 1.5rem 0 0; }
+.focus-presence .focus-continuity-cue { padding: 0 2.5rem 1.5rem; font-size: 1rem; font-weight: 600; }
+.focus-presence .focus-continuity ol { list-style: none; display: grid; grid-template-columns: 1fr 1fr; padding: 0; background: var(--focus-violet); }
+.focus-presence .focus-continuity li { position: relative; padding: 3rem 2.5rem; isolation: isolate; }
+.focus-presence .focus-continuity li:first-child { background: var(--p-brand); }
+.focus-presence .focus-continuity li:last-child { border-top: 1.5rem solid var(--p-brand); }
+.focus-presence .focus-continuity h3 { font-size: 2rem; margin-bottom: 1rem; }
+.focus-presence .focus-stage-shape { width: 4rem; height: 4rem; display: block; background: var(--p-strong); margin-bottom: 1.5rem; }
+.focus-presence [data-stage="continuation"] .focus-stage-shape { border: .7rem solid var(--p-tonal); background: transparent; border-radius: 50%; }
+.focus-presence .focus-extension { padding: 1.3rem; margin-top: 2rem; background: var(--p-strong); color: var(--p-on-strong); border-inline-start: .5rem solid var(--p-tonal); }
+.focus-presence .focus-extension p { font-size: .95rem; margin-top: .6rem; }
+.focus-presence .focus-contributions { display: grid; grid-template-columns: 1fr 1fr; background: var(--p-tonal); }
+.focus-presence .focus-party { padding: 2rem; }
+.focus-presence .focus-party:nth-child(2) { background: var(--p-brand); color: var(--p-on-brand); }
+.focus-presence .focus-party h3 { font-size: 1.8rem; margin-bottom: 1.8rem; }
+.focus-presence .focus-party > div + div { margin-top: 1.7rem; }
+.focus-presence .focus-party p { margin-top: .5rem; font-size: 1rem; }
+.focus-presence .focus-approval { grid-column: 1 / -1; background: var(--p-strong); color: var(--p-on-strong); padding: 1.3rem 2rem; max-width: none; font-weight: 600; }
+.focus-presence .focus-scope { display: grid; gap: 0; }
+.focus-presence .focus-scope > div { padding: 1.5rem 2rem; border-inline-start: .4rem solid var(--p-brand); background: var(--p-light); }
+.focus-presence .focus-scope > div[data-category="extension"] { background: var(--p-strong); }
+.focus-presence .focus-scope > div[data-category="boundary"] { background: var(--p-tonal); }
+.focus-presence .focus-scope dt { font-size: 1.2rem; font-weight: 600; }
+.focus-presence .focus-scope dd { margin-top: .5rem; }
+.focus-presence [data-visual="evidence-project"] .focus-region { grid-template-columns: minmax(0,.8fr) minmax(0,1.3fr); align-items: center; }
+.focus-presence .focus-evidence-mount { aspect-ratio: 5 / 2; background: var(--focus-violet); color: white; padding: 2rem; display: flex; flex-direction: column; justify-content: end; position: relative; isolation: isolate; overflow: hidden; }
+.focus-presence [data-fpo-importance="optional"] .focus-evidence-mount { aspect-ratio: 3 / 2; }
+.focus-presence .focus-evidence-form { position: absolute; inset: 15% 12% 22% 40%; border: 1.5rem solid var(--p-tonal); z-index: -1; opacity: .6; }
+.focus-presence .focus-evidence-mount strong { font-size: 1.4rem; max-width: 20ch; }
+.focus-presence .focus-evidence-mount p { font-size: .9rem; margin-top: .5rem; max-width: 32ch; }
+.focus-presence .focus-evidence-context { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1.5rem; background: white; color: var(--p-on-light); }
+.focus-presence .focus-evidence-context dt { font-weight: 600; }
+.focus-presence .focus-evidence-context dd { font-size: .9rem; margin-top: .5rem; }
+.focus-presence [data-visual="review-artifact"] .focus-region { grid-template-columns: minmax(0,.8fr) minmax(0,1.25fr); align-items: center; }
+.focus-presence [data-layer="artifact-bridge"] { padding-bottom: 0; margin-bottom: 2rem; }
+.focus-presence [data-layer="artifact-bridge"] .focus-report { margin-bottom: -2rem; }
+.focus-presence [data-layer="artifact-bridge"] + section { padding-top: 4rem; }
+.focus-presence .focus-report-composition { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(0,1fr); align-items: center; background: var(--focus-violet); padding: 1.5rem; gap: 1.1rem; }
+.focus-presence .focus-report-sheet { background: var(--p-light); color: var(--p-on-light); padding: 1.7rem; border-bottom: .7rem solid var(--p-strong); min-height: 30rem; }
+.focus-presence .focus-report-sheet h3 { font-size: 1.6rem; line-height: 1.15; margin-bottom: 1.5rem; }
+.focus-presence .focus-report-sheet .focus-kicker { font-size: .75rem; }
+.focus-presence .focus-report-region { padding-block: 1rem; border-top: 1px solid var(--p-border); font-size: .9rem; }
+.focus-presence .focus-report-region p { margin-top: .5rem; }
+.focus-presence .focus-priorities { padding: 0; list-style: none; }
+.focus-presence .focus-priorities li { margin-top: .8rem; }
+.focus-presence .focus-priorities span { display: block; height: .3rem; background: var(--p-tonal); width: 85%; margin-top: .5rem; }
+.focus-presence .focus-report-notes { display: grid; gap: 1rem; }
+.focus-presence .focus-report-notes aside { padding: 1rem; background: var(--p-tonal); color: var(--p-on-tonal); border-inline-start: .3rem solid var(--p-strong); }
+.focus-presence .focus-report-notes .focus-kicker { margin-bottom: .4rem; }
+.focus-presence .focus-report-notes p { font-size: .9rem; }
+.focus-presence .p-footer { position: relative; background: var(--p-contrast); color: var(--p-on-contrast); padding-top: 5rem; border: 0; isolation: isolate; }
+.focus-presence .focus-footer-edge { position: absolute; top: 0; inset-inline: 0; height: 1.5rem; background: var(--focus-violet); }
+.focus-presence .focus-footer-edge::after { content: ""; display: block; width: 30%; height: 3rem; margin-left: auto; background: var(--p-brand); }
+.focus-presence .p-footer-inner { align-items: start; position: relative; }
+.focus-presence .p-footer .p-brand { background: transparent; color: inherit; padding: 0; max-width: 22rem; }
+.focus-presence .focus-footer-brand p { margin-top: 1.5rem; max-width: 35ch; }
+.focus-presence .p-footer nav { padding-top: .5rem; }
+.focus-presence .p-footer nav a { display: inline-flex; min-height: 44px; align-items: center; }
+.focus-presence .p-footer small { padding-top: 1.5rem; border-top: 1px solid var(--focus-violet); }
+.focus-presence .focus-managed-image { width: 100%; height: auto; }
+.focus-presence :is(a,button):focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
+@media (width < 64rem) {
+  .focus-presence .p-header .p-brand { max-width: min(16rem,calc(100% - 7rem)); }
+  .focus-presence .p-hero[data-family="service-illustrated"] { grid-template-columns: 1fr; gap: 1rem; }
+  .focus-presence .focus-service { width: min(42rem,100%); justify-self: end; }
+  .focus-presence [data-visual="review-artifact"] .focus-region, .focus-presence [data-visual="evidence-project"] .focus-region { grid-template-columns: 1fr; }
+  .focus-presence .focus-copy { max-width: 62ch; }
+  .focus-presence .managed-site-menu-panel { background: var(--p-light); color: var(--p-on-light); }
+}
+@media (width < 40rem) {
+  .focus-presence { font-size: 17px; }
+  .focus-presence h1 { font-size: 2.8rem; }
+  .focus-presence .p-hero:is([data-family="orientation"],[data-family="editorial-masthead"]) .focus-copy { grid-template-columns: 1fr; gap: 1.2rem; }
+  .focus-presence .p-header { padding-block: 1rem; }
+  .focus-presence .p-header .p-brand { max-width: min(13rem,calc(100% - 6rem)); }
+  .focus-presence .focus-continuity ol, .focus-presence .focus-contributions { grid-template-columns: 1fr; }
+  .focus-presence .focus-continuity li { padding: 2rem 1.5rem; }
+  .focus-presence .focus-continuity li:last-child { border-top: 1rem solid var(--p-strong); border-inline-start: 1rem solid var(--p-brand); }
+  .focus-presence .focus-continuity-cue { padding-inline: 1.5rem; }
+  .focus-presence .focus-party { padding: 1.5rem; }
+  .focus-presence .focus-visual-labels { font-size: .75rem; gap: .5rem; }
+  .focus-presence .focus-report-composition { grid-template-columns: 1fr; padding: 1rem; }
+  .focus-presence .focus-report-sheet { min-height: 0; padding: 1.3rem; }
+  .focus-presence .focus-report-notes { grid-template-columns: 1fr; }
+  .focus-presence .focus-evidence-mount { aspect-ratio: 3 / 2; padding: 1.5rem; }
+  .focus-presence .focus-evidence-context { grid-template-columns: 1fr; }
+  .focus-presence .p-footer .p-brand { max-width: 18rem; }
+  .focus-presence .p-footer nav { margin-inline-start: 0; }
+}

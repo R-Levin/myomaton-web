@@ -19,5 +19,7 @@ export async function getDeploymentAsset(selection: {webPresenceId:string;manage
   const offering=[...canonical.values()].find(u=>u.asset.id===assetId)?.asset;
   if(offering)return offering;
   const logo=await eligibleLogo(db,selection.webPresenceId);
-  return logo?.asset.id===assetId ? logo.asset : null;
+  if (logo?.asset.id === assetId) return logo.asset;
+  const light = await eligibleLogo(db, selection.webPresenceId, "logo-light");
+  return light?.asset.id === assetId ? light.asset : null;
 }

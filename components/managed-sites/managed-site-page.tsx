@@ -7,8 +7,10 @@ import { resolveBusinessIdentity, resolveSitePresentation } from "@/lib/platform
 import { PageMotion } from "./page-motion";
 import { allocateDecoration, allocateMotion } from "../../lib/platform/visual-direction/model";
 import { visualTokens } from "./visual-tokens";
+import { PresentationPage } from "./presentation-page";
 
 export function ManagedSitePageView({ page }: { page: ManagedSitePage }) {
+  if (page.visual?.presentation) return <PresentationPage page={page} />;
   const direction = page.visual?.direction;
   const decoration = allocateDecoration(page.sections, direction);
   const motion = allocateMotion(page.sections, direction?.motion ?? "off");
@@ -17,6 +19,7 @@ export function ManagedSitePageView({ page }: { page: ManagedSitePage }) {
   return (
     <div className="managed-site" style={{ ...designTokens(page.designSystem.configuration), ...(direction ? visualTokens(page.designSystem.configuration, direction) : {}) }}
       data-visual-direction={direction?.profileId} data-visual-version={direction?.profileVersion} data-typography={direction?.typography}
+      data-visual-grammar={direction?.grammar?.id} data-grammar-version={direction?.grammar?.version}
       data-elevation={direction?.elevation} data-backdrop={direction?.backdrop} data-density={direction?.density}>
       <SiteHeader globals={globals} navigation={page.navigation} currentPath={direction ? page.page.slug : undefined} />
       <PageMotion enabled={direction?.profileVersion === 2}>

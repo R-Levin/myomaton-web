@@ -57,6 +57,41 @@ versioning identifies the recipe, not a new publishing/revision system.
 
 ## Selection through onboarding
 
+### Reference and context evidence
+
+**Reference-led when useful references exist; context-led when they are absent or
+weak after actual inspection.** Required but inaccessible references trigger the
+[source-adequacy stop gate](#visual-evidence-and-recommendation-process), not a
+context-only substitute. Customer-owned current/historical presence is important
+visual evidence when available. Customer-provided sites influence style when explicitly identified as liked,
+disliked, representative, aspirational or stylistically appropriate. Approved brand
+Assets and relevant peer research may provide additional evidence, never templates
+to copy. Record observations separately from recommended interpretation.
+
+Historical client work primarily establishes experience, business-domain context
+and operator background. It informs Visual Direction only when explicitly nominated
+as a style/reference source. It is not automatically current-customer design evidence.
+
+When inspected references are weak, or references are not required and genuinely
+absent, infer from business type and maturity, audience, buying
+context, trust/formality needs, emotional register, service/product type, expertise,
+desired visitor Action and customer preferences. A law practice may need restraint
+and authority; a party-supply business may support brighter color and playful imagery.
+Those differences follow business context, not a desire to make sites look different.
+
+Always constrain the recommendation by business purpose, content density, conversion
+needs, proof requirements, brand commitments, available imagery/Assets, accessibility
+and readability, relevant professional/regulatory expectations, and supported platform
+capabilities. **Visual novelty is not a success metric.** Similar businesses may
+appropriately receive similar treatment.
+
+The customer supplies preferences, references, dislikes, constraints, Assets and
+business/audience context. AI/operator recommends bounded typography, palette roles,
+density, imagery/evidence, surfaces, composition tendencies and motion. The customer
+approves representative outcomes, not composition names, spacing, breakpoints,
+animation timing or implementation mechanics. See
+[reference intake](onboarding-optimization.md#external-reference-intake).
+
 Ask which curated examples feel closest to the business, followed by a few
 comparisons about tone, density, imagery, boldness and motion. Accept brand/logo
 Assets as structured input. Customers should not need to understand tokens,
@@ -247,8 +282,9 @@ No generalized policy UI, customer writer or theme marketplace is introduced.
 
 ## Runtime contract
 
-Managed Site `configuration.visualDirection` accepts only `profileId`,
-`profileVersion` and optional `preferences`. Both `editorial` and `reference` have
+Managed Site `configuration.visualDirection` selects either legacy `profileId` /
+`profileVersion` or the [versioned grammar](#versioned-visual-grammar), with optional
+`preferences`. The following profile contract remains unchanged. Both `editorial` and `reference` have
 version `1`, plus `reference` version `2`; unknown identity/version returns legacy rendering with an internal
 `unsupported` reason. Missing configuration returns `missing`; malformed objects,
 unknown preference keys or invalid values return `invalid`. The whole direction
@@ -464,3 +500,242 @@ Design System section spacing. Hero, statement, evidence and conversion composit
 retain their own rhythm. There are no Page-specific spacing controls or selectors.
 This rhythm is part of the human-accepted reusable checkpoint. Customer transition
 choices remain separate from the shared contract.
+
+## Versioned Visual Grammar
+
+Bounded does not mean homogeneous. The authority chain is Design System tokens →
+versioned Visual Grammar → optional Page-purpose recipe → compatible Section
+compositions. Legacy grammar paths do not consume Page recipes. Grammar coordinates heading character,
+Hero proportions, prose/support measures, responsive hierarchy, density/rhythm,
+conversion emphasis and omitted presentation defaults; these are not independent
+customer styling knobs. Intake recommends a grammar from business/audience, trust,
+content density, approved style references, available imagery, buying context and
+preferences. Customers approve representative outcomes.
+
+Select the finite opt-in contract in Managed Site configuration:
+
+```json
+{"visualDirection":{"grammar":{"id":"restrained-editorial","version":1},"preferences":{"density":"comfortable","motion":"off"}}}
+```
+
+Grammar accepts existing density, motion, image, elevation and backdrop preferences,
+subject to the same service policy. Hero character belongs to the grammar, not an
+independent Hero preference. Grammar and legacy profile identity/version cannot be combined. Unknown identity,
+version or malformed configuration fails closed to ordinary rendering. Omitted
+grammar does not reinterpret a legacy profile. Reference v2 remains an accepted,
+unchanged rendering path; no schema migration or customer transition is required.
+
+Restrained-editorial v1 remains a pinned experimental rendering, not an accepted
+MioPages solution or evidence of market-wide visual suitability. Design System palette, font stacks and scale remain
+authoritative. Grammar caps Hero display scale and owns its monotonic responsive
+relationship, bounded support/prose measures, proportionate rhythm and modest CTA
+hierarchy. Comfortable/airy density remains distinct on narrow screens. Existing
+compositions use grammar-owned proportions without inventing new Section types.
+
+Container width (reading/standard/wide) is distinct from prose (64ch), Hero heading
+(24ch) and support (54ch) limits. Omitted width/alignment/spacing/surface/divider
+inherits grammar defaults. Explicit choices win, including conservative normalizer
+fallbacks for invalid-present values. Ordinary intros default to reading width;
+editorial compositions use standard width, asymmetric Hero uses wide width. CTA
+defaults to subtle; accent remains an explicit conversion choice. Service policy,
+contrast, focus, touch targets and reduced motion continue to constrain presentation.
+
+Image-brand links use intrinsic fitting without customer width settings; text
+brands retain their geometry. No custom CSS, pixel placement, arbitrary grids,
+breakpoints, spacing sliders or per-element sizes are exposed.
+
+Image-led Hero, visual evidence/portfolio collections and structured technical
+detail are separate future capability slices. This text-led grammar does not pretend
+to provide them. Future grammar versions are additive and explicitly selected;
+existing state must retain its resolved version, never be reinterpreted automatically.
+
+
+## Commercial presentation contract version 2
+
+Bounded creativity, not bounded blandness. Business appropriateness constrains visual
+choices; technical conservatism constrains state, security and tenancy. Human review
+of the restrained-editorial experiment found a continuing house style despite its
+correct hierarchy and responsive behavior. Functional fixture passes do not establish
+visual acceptance.
+
+Canonical content and managed Assets supply truth. The Design System supplies palette
+and typography resources. A versioned Visual Grammar determines character; optional
+Page-purpose recipes apply it; compatible compositions realize it. One resolved plan
+feeds a separate renderer. The functional foundation constrains every layer.
+
+Managed Site configuration selects the new path explicitly:
+
+```json
+{"visualDirection":{"contractVersion":2,"grammar":{"id":"service-led","version":1},"preferences":{"motion":"off"}}}
+```
+
+The writer/preparation contract rejects unknown keys, grammars, versions and preferences.
+Reads of an invalid new contract resolve a basic text presentation with internal
+diagnostics, never another expressive grammar. Selection is additive: reference v2
+and restrained-editorial v1 retain separate dispatch and are not reinterpreted.
+No schema migration or automatic customer upgrade is introduced.
+
+`service-led` v1 coordinates precise sans typography, display/heading/body/metadata
+relationships, prose (62ch) and support (46ch) measures, connected/separated/emphasized/
+closing rhythm, semantic surfaces, text-led evidence, supporting media, conversion
+families and chrome. Its finite manifest declares compatible recipe/composition
+version 1 and Hero fallback chains. Existing Geist sans resources are used. Motion
+Off has no entrance animation; minimal is a permitted ceiling, not a promise of a
+new motion sequence.
+
+### Page-purpose recipes
+
+Page configuration may contain:
+
+```json
+{"presentation":{"recipe":{"id":"arrival","version":1}}}
+```
+
+| Recipe v1 | Default Hero | Default conversion | Cadence |
+| --- | --- | --- | --- |
+| arrival | service-value | closing-emphasis | separated |
+| service | orientation | integrated-invitation | connected |
+| evidence | editorial-masthead | focused-next-step | separated, text-led evidence |
+| assessment | orientation | focused-next-step | connected, compact ending |
+| editorial | editorial-masthead | integrated-invitation | separated reading |
+
+Recipes never reorder Sections, write claims or invent evidence. They are optional.
+Precedence is safety/semantic validity, valid explicit Section choice, recipe,
+grammar, basic fallback. Omitted presentation inherits; deliberate existing width,
+alignment, spacing, surface and divider choices remain authoritative. New finite
+Section `presentation` choices are `hero`, `conversion`, `surface` and `region`,
+validated for their Section type. Legacy composition names cannot be mixed into this
+path. Invalid choices refuse preparation; reads retain supported content and use
+safe defaults with diagnostics.
+
+### Structural families
+
+Orientation provides compact heading/context/introduction entry. Editorial masthead
+places heading and introduction in distinct regions. Service value places proposition
+and two to four approved value points in separate regions. They remain structurally
+distinct at narrow widths. Service value without a valid scaffold falls back to
+masthead, then orientation if introduction is absent. No points are generated.
+
+Relationship version 1 supports ordered stages, aligned named-party responsibilities
+and labeled included/boundary/extension scope. Conversion supports integrated
+invitation, focused next step and closing emphasis. Actions remain independently
+owned and eligible; presentation cannot create a submission destination or disabled
+workflow imitation. See [Section contracts](sections.md#commercial-structured-content).
+
+### Palette and chrome
+
+Design System `palette.version: 1` supplies primary, supporting, tonal, light, strong
+and contrast background/foreground pairs plus border and muted text. Each text pair
+and muted-on-light is validated at 4.5:1. Grammar maps proposition/relationship/
+evidence/invitation/closing purposes to roles; Sections never supply hex colors.
+Invalid/missing new palette data derives safe supported pairs from existing tokens.
+Legacy palette resolution is unchanged.
+
+Service-led uses brand-prominent arrival chrome and compact other-page headers;
+commercial navigation emphasizes the authoritative primary Action destination.
+Footer is service-led except the compact assessment ending. Basic fallback uses
+compact chrome and quiet navigation. Header media fits intrinsically without
+customer sizing values. All paths retain keyboard disclosure, focus, touch targets,
+landmarks, safe destinations, media eligibility and scoped ownership.
+
+Phase 2 media/evidence-led Heroes, visual evidence collections and portfolio recipes
+are not implemented. Phase 3 structured technical detail, specification/comparison
+contracts and technical recipes are not implemented. No arbitrary CSS, page builder,
+per-breakpoint input, spacing knobs, uploaded fonts or unrestricted colors are added.
+
+## Evidence-led commercial grammar v2
+
+`service-led` version 2 is an additive, explicit contractVersion 2 selection. Version
+1, restrained-editorial v1 and accepted Myomaton reference v2 remain pinned. The
+working direction for the disposable MioPages proposal is **Clear work, continuing
+care**; it is not an industry theme or a new competing configuration authority.
+
+The grammar coordinates Source Editorial v1, paper/purple/ink/lavender/apricot/plum
+palette relationships, acquisition navigation, connected service relationships,
+preview-supported service arrival, warm integrated invitations and compact dark
+brand sign-off. The same recipe purpose/version acquires its coordinated defaults
+from the selected grammar; content order remains authoritative. Explicit valid
+Section choices still win. Unknown grammar/version refuses preparation and reads
+fall back to basic supported content with internal diagnostics.
+
+Source Editorial selects pinned Source Serif 4 semibold for display/major headings
+and Source Sans 3 regular/semibold for body, navigation, Actions and minor headings.
+No arbitrary fonts or element typography are exposed. See [font provenance and
+licenses](../public/fonts/README.md). The registry owns resources; grammar owns their
+relationship. Serif is purposeful commercial/editorial character, not universal
+luxury styling. Functional tests do not establish aesthetic suitability.
+
+The additional `service-illustrated` Hero is a media-supported **service** structure,
+not the general media-led/evidence-led families deferred to Phase 2. This slice
+supports explicit FPO service illustration only. Missing/ineligible preview media
+falls back to orientation, retaining approved heading, introduction and Actions.
+No fabricated value/evidence appears. A future approved-media contract is a separate
+eligibility-backed extension, not automatic promotion of the FPO.
+
+`previewMedia` carries version, finite role, importance, intended aspect, plain
+purpose, likely source category and unresolved permission. It is operator design
+metadata only. A trusted read-only disposable schema/environment must authorize
+rendering; ordinary production refuses all slots regardless of stored configuration.
+FPO never creates an Asset, AssetUsage or approved image and has no production
+promotion transition. Illustrative report outlines contain labels and blank priority
+positions, never findings, scores, customer data or performance claims.
+
+The acquisition destination comes from the existing scoped Header Action authority.
+Review emphasis remains independent of `aria-current`; the current location has
+separate weight/dot treatment. Mobile retains the labeled accessible disclosure.
+The compact sign-off uses an eligible contextual `logo-light` AssetUsage where
+available, independent of the ordinary Header wordmark; neither source path is public.
+
+See [preview iteration five](miopages-c0-preview.md#clear-work-continuing-care-iteration-five)
+and [range roadmap](deferred-architecture.md#evidence-led-commercial-presentation-range).
+Human review must judge appropriateness, coherent Page flow and brand character.
+
+## Confirmed historical DNA and service-led v3
+
+[A Business in Focus](miopages-business-focus.md) records the confirmed historical extraction and its additive implementation. Simplify historical techniques, not historical expressiveness. Finite layered fields, continuing-service composition, annotated artifact and evidence FPO families remain operator-selected, versioned capabilities; there are no customer placement controls.
+
+Human visual review accepted service-led v3 as the provisional direction to carry
+forward for MioPages Customer #0. Earlier experiments remain pinned architectural
+and regression evidence, not accepted MioPages directions. Canonical customer state
+has not been promoted; copy, production assets/evidence and operational workflows
+remain subject to approval. Commercial launch is not authorized.
+
+## Visual evidence and recommendation process
+
+1. Gather business/intake context and identify customer-owned current/historical presence.
+2. Gather explicit liked/disliked references when available; verify visual source adequacy.
+3. **STOP if required visual evidence cannot actually be inspected.** Record the gap
+   and obtain a usable source. Text extraction, generic adjectives, assumptions and
+   incomplete browser evidence cannot silently substitute for visual inspection.
+4. Extract concrete Visual DNA, distinguishing recurring behavior, one-off historical
+   choices, dated implementation techniques and business-model artifacts.
+5. Confirm the interpretation with customer/operator, then supplement with limited
+   business-area peer research where useful.
+6. Synthesize **one** recommended direction and identify imagery/FPO needs.
+7. Render faithfully with reusable capabilities, obtain human review and make bounded adjustments.
+
+Incomplete inspection contributed to failed C0 iterations by reducing expressive
+sources to generic traits. Functional correctness does not establish visual success.
+**Simplify historical techniques, not historical expressiveness. Bounded creativity,
+not bounded blandness.** Technical conservatism belongs in state, schema, security,
+tenancy, validation, migrations and rollback. Visual restraint must follow evidence;
+it is not the default recommendation.
+
+Customer/operator-owned current or historical sites can establish continuity,
+recurring behavior, historical range, imagery, density, color, metaphor and preferences
+to preserve or evolve. Historical client work remains experience/proof, business-domain
+and operator-history context unless explicitly nominated as a style reference.
+
+Visual DNA is descriptive evidence, not an algorithmic style generator. Use supported
+LOW / MODERATE / HIGH descriptions for illustration willingness, photography reliance,
+brand color strength/range, visual metaphor, information density, promotional energy,
+typography personality, decorative energy, whitespace, layering, shapes/graphic devices,
+image prominence, commercial directness, playfulness, technicality and formality.
+Record concrete observations and uncertainty; do not invent numerical scores.
+
+An FPO means “the recommended design believes visual material belongs here.” It does
+not establish production imagery, require existing customer ownership or permit
+placeholder publication. Resolve through customer-owned assets, permissioned existing-site
+reuse, supplied/commissioned photography, licensed stock, approved generated or
+commissioned illustration, or remove/redesign. FPO remains production-ineligible until
+an approved eligible Asset replaces it through a separately reviewed workflow.

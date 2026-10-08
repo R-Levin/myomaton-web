@@ -59,6 +59,16 @@ collection/reporting system described below.
 
 ## Visual preference and design selection
 
+Apply the [reference and context evidence principle](visual-direction.md#reference-and-context-evidence):
+lead with useful references when available, otherwise infer from the business and
+audience. Customer-provided style references must be explicitly liked, disliked,
+representative, aspirational or stylistically appropriate. Historical client work
+establishes experience/domain context unless explicitly nominated as a style source.
+References are evidence, not templates; novelty is not an objective.
+Customers supply preferences, references/dislikes, brand constraints, Assets and
+context. AI/operator recommends supported visual choices; customers approve
+representative outcomes without choosing implementation mechanics.
+
 Design selection is part of onboarding and product confidence, including Customer
 0's own sales experience and Myomaton as Customer #1. Use curated examples and a
 few comparisons about tone, density, imagery, boldness and motion, plus brand/logo
@@ -232,3 +242,45 @@ scalability metric. Customer 0 is the product's own intended Web Presence;
 Myomaton remains Customer #1/proving ground. Guided service can precede self-service.
 Pricing, promotions, crowdfunding and revenue forecasts are experiments, not
 platform invariants.
+
+
+## Presentation recommendation and acceptance
+
+Intake informs a coherent versioned grammar and optional Page-purpose recipes from
+business/audience, explicit style references, trust/formality, buying context,
+content relationships, brand resources and approved media. Bounded creativity
+permits strong scale, color, asymmetry and whitespace where appropriate. Customers
+provide preferences and approve outcomes; they do not select composition names,
+spacing, breakpoints or implementation mechanics.
+
+Historical client work is proof/context unless explicitly nominated as a stylistic
+reference. It is not automatic design evidence for MioPages. Functional tests cannot
+replace human judgment of visual appropriateness or coherent brand expression.
+See [contract-v2 presentation](visual-direction.md#commercial-presentation-contract-version-2).
+
+## Evidence-led design and unresolved imagery
+
+The [visual evidence process](visual-direction.md#visual-evidence-and-recommendation-process)
+is the reusable design gate: inspect adequate sources before extracting DNA, confirm
+interpretation before one recommendation, and require human review of faithful renders.
+Stop and obtain a usable source when required visual evidence cannot be inspected.
+Customer-owned history is primary style evidence; client work requires explicit nomination.
+
+Use gather evidence, one recommended direction, render, human review and bounded
+adjustment. Customer-owned prior presences and related business sites, when explicitly
+supplied as design evidence, take priority for continuity/preferences/range. Do not
+average them or copy a template. A small purposeful peer scan informs current market
+conventions, never overrides business, brand or customer evidence. Historical client
+work remains proof/context unless explicitly nominated as a style reference.
+
+Typography is part of the recommendation. Select a finite curated resource system
+through grammar; customers approve representative outcomes, not font mechanics.
+
+Unresolved imagery can use explicit disposable FPO with role, importance, intended
+aspect, information/emotional purpose and likely source. Source categories are
+customer-owned, existing-site reuse, customer photography, commissioned photography,
+licensed stock, generated/illustrated and optional/remove. These are acquisition
+hints, not an asset workflow or permission grant. During Launch, verify availability,
+rights, contribution and fit; acquire an eligible managed Asset through a separate
+reviewed path, or remove/redesign the treatment. FPO never promotes automatically.
+Assessment/report artifacts similarly show deliverable shape without invented findings.

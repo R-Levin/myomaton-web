@@ -214,3 +214,47 @@ the visual document owns the design contract, and this register owns its gates.
 | D4 | Exportability is an architecture check: new domains must keep customer-owned canonical state clearly separable from platform machinery and capable of eventual export where applicable. | Reviewing every new customer-data domain; implementing export is gated by P5. |
 | D5 | Preserve canonical first-party measurement, trusted business knowledge and operation-scoped approval across onboarding and optimization; provider output is not business truth. | Designing intake, intelligence, measurement or automated changes; see P11-P13 and the operating model. |
 | D6 | Keep service economics observable per customer: infrastructure/AI usage and human service minutes. Do not encode experimental pricing, promotion terms, crowdfunding plans or forecasts as invariants. The [operations model](service-operations-model.md#service-economics-and-planning-hypotheses) records non-canonical Launch hours and Ongoing minutes to test, not contractual targets. | Adding metered integrations, service workflows and operating reports. |
+
+
+## Evidence-led commercial presentation range
+
+Customer-owned prior presence and explicitly nominated style references are primary
+visual evidence; peer research supplies conventions, never templates. Historical
+client work is proof/context unless nominated as style evidence. One direction is
+recommended, rendered and human-reviewed. Bounded creativity is not bounded blandness.
+
+| Capability | Classification | Scope |
+| --- | --- | --- |
+| Curated pinned font registry; Source Serif 4 / Source Sans 3 system | Implemented this slice | Grammar-owned pair, self-hosted resources and diagnostics |
+| Connected continuing-service relationship | Implemented this slice | Launch/care continuity, authoritative ordering |
+| Acquisition Navigation; contextual light brand usage | Implemented this slice | Action emphasis distinct from current location |
+| Media-supported service Hero | Implemented this slice | Narrow explanatory service opening, not general media Hero |
+| Preview-only FPO slots and asset-resolution metadata | Implemented this slice | Guarded disposable deployment only; production refusal |
+| Illustrative assessment/report artifact | Implemented this slice | Outline only, no findings or workflow claims |
+| Richer semantic palette and coordinated recommended grammar | Implemented this slice | Explicit opt-in version; legacy rendering pinned |
+| General media-led and evidence-led Heroes | Near-term V1 range requirement | Separate capability slice |
+| Permission-aware evidence collection; portfolio/project presentation | Near-term V1 range requirement | Provenance, rights and verified contribution |
+| Broader image-forward grammar and portfolio recipe | Near-term V1 range requirement | Reusable visual-business range |
+| Structured technical detail; specifications/comparisons; technical recipe | Near-term V1 technical-range requirement | Separate structured contracts |
+| Further curated font catalog | Future/deferred | Add only from repeated evidence of need |
+
+The implementation slice below does not implement full evidence/portfolio or technical
+systems. Status becomes implemented only after validation; human aesthetic acceptance
+remains separate. Operational Review/onboarding/analytics/billing remain deferred.
+
+Production replacement of the service-illustration FPO requires an explicit approved,
+eligibility-backed managed AssetUsage selection. It is a near-term range requirement,
+not automatic promotion of preview metadata. This slice intentionally makes unresolved
+FPO impossible to publish. General media/evidence Heroes remain the broader Phase 2
+capability; report outlines here are preview-safe illustrations, not report delivery.
+
+## Business in Focus preview boundary
+
+Human review accepted v3 as MioPages' provisional direction. The next boundary is
+a separately authorized promotion into reviewed canonical customer state, with
+fingerprints, validation and rollback. Publication, launch, operational Review and
+analytics/billing/onboarding automation remain withheld. Follow the
+[source-adequacy gate](visual-direction.md#visual-evidence-and-recommendation-process)
+for future recommendations; this checkpoint implements no deferred capabilities.
+
+[Service-led v3](miopages-business-focus.md) adds graphic arrival, bounded overlap, continuing fields, contribution zones, annotated report FPO and graphic footer families. Preview evidence space does not implement full production portfolio/evidence collection or authorize media. Permission-aware production media/evidence, broader V1 image-led range and structured technical capabilities remain deferred requirements.

@@ -468,3 +468,42 @@ operator presentation file uses existing structured content and palette primitiv
 no customer-specific CSS, schema, arbitrary canvas or state transition is added.
 The specific Myomaton v2 transition is applied and verified in development;
 its customer choices remain separate from reusable profile defaults.
+
+
+## Commercial presentation Phase 1
+
+Implemented, pending human visual acceptance: explicit Visual Direction contract 2,
+service-led grammar v1, optional arrival/service/evidence/assessment/editorial recipes
+v1, three structural text Hero families, relationship v1 (stages/responsibilities/
+scope), three conversion families, paired semantic palette roles, coordinated sans
+typography and bounded global chrome. One resolved plan selects a separate renderer;
+legacy state never passes through new recipes. See [the contract](visual-direction.md#commercial-presentation-contract-version-2).
+
+Automated validation covers contracts, safety, determinism, responsiveness, contrast
+pairs, containment, ownership, managed bytes and exact legacy regressions. Human
+review assesses business appropriateness, expressive quality and brand fit.
+Restrained-editorial fixtures remain functional tests, not proof of aesthetic range.
+
+Phase 2 visual evidence collections, portfolio/media grammar and media/evidence-led
+Heroes remain unimplemented V1 range work. Phase 3 technical-detail Sections,
+specification/comparison structures and technical recipes remain unimplemented.
+Review/onboarding/analytics/billing/hosting automation and launch remain deferred.
+
+## Evidence-led commercial range
+
+Service-led v3 is implemented and human accepted as MioPages' provisional **A Business
+in Focus** direction. It adds coordinated Source Sans, graphic/layered service arrival,
+continuing fields, annotated artifact/evidence FPO and graphic sign-off. This is
+repository acceptance, not canonical customer-state promotion or publication authority.
+See [the acceptance record](miopages-business-focus.md).
+
+Implemented opt-in service-led v2 includes a finite Source Editorial font-resource
+system, semantic warm/brand/contrast palette relationships, acquisition navigation,
+connected service stages with attached scope extensions, contextual light wordmark,
+and preview-only explanatory FPO/artifacts. Normal production cannot render FPO.
+Typography and structure express a recommended direction; automated tests prove
+functional safety, not customer design acceptance. See [Visual Direction](visual-direction.md#evidence-led-commercial-grammar-v2).
+General media/evidence-led Heroes, permission-aware visual evidence, portfolio and
+media grammars remain near-term V1 requirements. Technical detail/specifications/
+comparisons and technical recipe remain a separate V1 range slice; see the
+[roadmap](deferred-architecture.md#evidence-led-commercial-presentation-range).

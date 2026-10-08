@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { resolveDesignConfiguration } from "../../lib/platform/design-systems/configuration";
 import type { VisualDirection } from "../../lib/platform/visual-direction/model";
 import { heroMotion } from "../../lib/platform/visual-direction/motion";
+import { grammarTokens } from "../../lib/platform/visual-direction/grammar";
 
 // Derived semantic roles only; primitive brand values remain Design System-owned.
 function luminance(hex: string) {
@@ -60,5 +61,5 @@ export function visualTokens(configuration: unknown, direction: VisualDirection)
   tokens["--visual-contrast-button-text"] = readableColor(c.accent, tokens["--visual-contrast-text"]);
   tokens["--visual-contrast-muted"] = readableColor(c.surface, c.text);
   tokens["--visual-contrast-link"] = readableColor(c.background, c.text);
-  return tokens as CSSProperties;
+  return { ...tokens, ...(direction.grammar ? grammarTokens(configuration) : {}) } as CSSProperties;
 }

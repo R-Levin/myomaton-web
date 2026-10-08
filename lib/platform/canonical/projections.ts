@@ -1,9 +1,15 @@
 import type { Pool } from "pg";
 import { approval, formatPrice, key, normalizeKnowledge, normalizeOffering, object, text, uuid } from "./model";
 
-export type SourceBinding = { role: "knowledge"; knowledgeId: string; keys: string[] } |
+export type SourceBinding = { role: "offering-relationship"; offeringId: string; kind: "stages" | "scope"; componentKeys: string[] } | { role: "knowledge"; knowledgeId: string; keys: string[] } |
   { role: "offering-overview" | "offering-component" | "offering-pricing"; offeringId: string; componentKey?: string };
 export function normalizeBinding(value: unknown): SourceBinding {
+  if (value && typeof value === "object" && (value as Record<string, unknown>).role === "offering-relationship") {
+    const r = object(value, ["role", "offeringId", "kind", "componentKeys"]);
+    if (!["stages", "scope"].includes(String(r.kind)) || !Array.isArray(r.componentKeys) || r.componentKeys.length < 1 || r.componentKeys.length > 6) throw Error("Invalid relationship binding");
+    const componentKeys = r.componentKeys.map(key); if (new Set(componentKeys).size !== componentKeys.length) throw Error("Duplicate component keys");
+    return { role: "offering-relationship", offeringId: uuid(r.offeringId), kind: r.kind as "stages" | "scope", componentKeys };
+  }
   const b = object(value,["role","knowledgeId","keys","offeringId","componentKey"]);
   if (b.role === "knowledge") {
     if (b.offeringId !== undefined || b.componentKey !== undefined || !Array.isArray(b.keys) || !b.keys.length || b.keys.length>30) throw Error("Invalid knowledge binding");
@@ -30,6 +36,19 @@ export function projectContent(type: string, content: unknown, binding: SourceBi
   if (row.status!=="active" || approval(object(row.payload,["summary","detail","audiences","outcomes","inclusions","exclusions","actionIds","components","thirdPartyCosts","evidence","approval"]).approval).scope!=="public") return null;
   const o = normalizeOffering(row.payload);
   if (o.evidence.confirmation!=="confirmed" || o.evidence.visibility!=="public") return null;
+  if (binding.role === "offering-relationship") {
+    if (type !== "relationship") return null;
+    const components = binding.componentKeys.map(k => o.components.find(c => c.key === k));
+    if (components.some(c => !c)) return null;
+    if (binding.kind === "stages") {
+      if (components.length < 2 || components.some(c => c!.kind === "supported-complexity")) return null;
+      return { ...context, contractVersion: 1, kind: "stages", items: components.map(c => ({ id: c!.key, heading: c!.name, text: c!.summary })) };
+    }
+    return { ...context, contractVersion: 1, kind: "scope", items: [
+      { id: "included", category: "included", heading: "Included scope", text: o.inclusions.join("\n\n") },
+      { id: "boundaries", category: "boundary", heading: "Service boundaries", text: o.exclusions.join("\n\n") },
+      ...components.filter(c => c!.kind === "supported-complexity").map(c => ({ id: c!.key, category: "extension", heading: c!.name, text: c!.summary })) ] };
+  }
   if (binding.role==="offering-overview") {
     if (!["hero","intro"].includes(type) || context.heading!==undefined) return null;
     return { heading:row.name,text:[context.text,o.summary,o.detail].filter(Boolean).join("\n\n"), ...(o.actionIds[0] ? {actionId:o.actionIds[0]} : {}) };
