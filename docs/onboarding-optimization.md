@@ -1,5 +1,12 @@
 # Onboarding, measurement and continuous optimization
 
+The [customer journey and change-management contract](customer-journey-and-change-management.md)
+owns prospect synthesis, self-service/assisted start, commercial handoff, progressive
+paid onboarding and four customer approval checkpoints. Both entry paths use the
+same structured process; operator-assisted rollout does not make self-service
+second-class or turn it into customer design customization. Business-change impact
+planning reuses the trusted-fact and bounded intelligence rules below.
+
 This is the intended operating model, **Core planned** unless an implemented
 boundary is explicitly identified. It adds no runtime capability. The
 [capability catalog](platform-capabilities.md) owns the product envelope;

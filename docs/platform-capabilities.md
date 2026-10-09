@@ -1,5 +1,14 @@
 # Web Presence platform capabilities
 
+The [customer journey and change-management contract](customer-journey-and-change-management.md)
+defines the intended prospect-to-customer flow and recurring business-change process.
+Gated Review/prospect state, customer approvals and their durable history, paid
+onboarding mechanics and business-change impact planning remain **Core planned**;
+existing rendering, media acquisition or operator QC does not complete them.
+Commercial/payment terms require separate validation; Review auto-delivery and an
+operator network remain future hypotheses. See P11–P14 and P26 in the
+[architecture register](deferred-architecture.md).
+
 ## Purpose
 
 This document defines the intended capability envelope of the managed Web Presence

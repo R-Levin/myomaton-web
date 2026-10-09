@@ -130,6 +130,14 @@ AI provider or bypassing [Action validation](actions.md).
 
 ## Human review and publication approval
 
+The [customer journey's approval model](customer-journey-and-change-management.md#four-approval-checkpoints)
+places this loop within recurring Ongoing approval. Approval of a topic permits
+preparation, not publication of an unseen draft; approve the actual reviewed
+substance/revision and destination scope. Routine technical implementation within
+approved meaning need not become a series of separate approvals. Material business
+changes use the [impact-planning process](customer-journey-and-change-management.md#impact-planning-and-change-sets),
+including references to retired offers in existing Articles.
+
 For initial product versions, human customer/operator review and approval is a
 platform invariant for externally published AI-assisted/generated content, including
 channel derivatives. Automatic drafting does not authorize automatic publication.
@@ -296,8 +304,9 @@ does not import robotics-specific requirements into the platform.
 
 ## Customer 0: MioPages
 
-MioPages is a useful Customer #0/generalization proving ground, not a claim that
-a customer record or complete workflow already exists. It can test commercial
+MioPages is a useful Customer #0/generalization proving ground. Its
+[canonical customer graph](miopages-c0-canonical-state.md) exists; that does not
+mean the complete journey or content-growth workflow exists. It can test commercial
 content opportunities, Web Presence service/business topics, lead-generation
 intent, limited-imagery design/content, external social/profile inventory, the
 existing 20i relationship, eventual distribution and measurement recommendations.

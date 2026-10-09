@@ -1,5 +1,10 @@
 # Launch and Ongoing service operations
 
+The [customer journey and change-management contract](customer-journey-and-change-management.md)
+owns the gated Review, free/paid handoff, four approval checkpoints and ongoing
+business-change process. This document continues to own service scope, cadence,
+responsibilities and operator-time hypotheses; planning targets are not SLAs.
+
 ## Continuous relationship, distinct service entities
 
 **Launch establishes the presence. Ongoing earns the relationship.** They are

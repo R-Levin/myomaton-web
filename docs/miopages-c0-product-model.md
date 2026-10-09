@@ -6,8 +6,9 @@ MioPages is both Customer #0, a deeper internal proving ground for the Web Prese
 platform, and a realistic candidate for the commercial home from which the service
 will eventually be offered. For development/generalization, it can also stand in
 for Customer #2: the first deliberate non-robotics case after Myomaton Customer #1.
-These are proving roles, not separate architectures or assertions that corresponding
-customer records have been created.
+These are proving roles, not separate architectures. The
+[canonical C0 customer graph](miopages-c0-canonical-state.md) now exists; its existence
+does not imply that the planned commercial workflows are implemented.
 
 MioPages already exists as a real but largely moribund web-presence business/site.
 Its existing content is historical input, not canonical product direction. Its
@@ -20,6 +21,11 @@ service independent of this business. The [capability catalog](platform-capabili
 and [implementation register](deferred-architecture.md) own implementation status
 and gates. MioPages requirements should expose reusable needs rather than create
 another manually crafted one-off website.
+
+The [customer journey and change-management contract](customer-journey-and-change-management.md)
+owns gated Review, pre-sale synthesis, paid onboarding, four approval checkpoints
+and Ongoing business evolution. C0 should prove these reusable processes and their
+operator effort/customer value, not create MioPages-only workflow invariants.
 
 The [approved provisional C0 business brief](miopages-c0-business-brief.md) is the
 completed discovery output and canonical input for the next IA/content-model phase.
@@ -275,7 +281,8 @@ and service responsibility split govern practical application.
 
 - **Implemented now:** existing Managed Site and structured rendering foundations,
   as cataloged in [platform capabilities](platform-capabilities.md). Myomaton's
-  reference-v2 application is a proving result, not a prebuilt MioPages customer.
+  reference-v2 application remains a proving result; MioPages has its own canonical
+  graph and provisional presentation. Neither authorizes commercial launch.
 - **Planned core / pre-launch:** MioPages-specific reviewed intake/positioning and
   an appropriate presence; repeatable onboarding, production operation, measurement
   and content-growth workflows subject to their existing gates.

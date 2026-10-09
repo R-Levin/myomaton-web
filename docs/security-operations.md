@@ -1,5 +1,27 @@
 # Security, operations and recovery
 
+## Prospect, approval and commercial boundaries
+
+The [customer journey and change-management contract](customer-journey-and-change-management.md)
+adds planned Review/prospect intake and recurring business-change approvals, not a
+new authorization implementation. Public submissions and inspected public sources
+are untrusted proposals, not canonical customer truth. Apply P14 input/abuse/privacy
+controls and bounded prospect retention before activation. Do not infer ownership,
+customer access or permission to reuse assets merely from an email or website URL.
+
+Prospect-to-customer handoff must explicitly bind identity, tenant and authority.
+Paid status does not grant arbitrary management access; payment confirmation must
+come through a trusted, reconciled commercial process, not a browser assertion.
+Apply P7 to every customer/operator write and approval; operator/QC access does not
+itself confer customer publication authority. Approval evidence must bind the
+reviewed substance/revision and destination scope, with stale-state safeguards.
+
+Approval/change history needs access, minimization, retention, export and deletion
+rules under P2/P4/P5/P7, not an indefinite archive. Billing/payment secrets and
+sensitive payment data require a separately reviewed boundary; do not collect raw
+payment credentials in ordinary intake or logs. P26 owns commercial/legal readiness.
+Customer pre-launch approval does not replace production/security/recovery gates.
+
 This is the intended low-admin, low-blast-radius operating posture of the Web
 Presence platform, not a claim of production security or disaster recovery
 readiness. Implementation gates live in [deferred architecture](deferred-architecture.md).

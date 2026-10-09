@@ -1,5 +1,10 @@
 # Web Presence service model
 
+The [customer journey and change-management contract](customer-journey-and-change-management.md)
+connects the free Review, paid Launch and Ongoing as one continuous service. It owns
+approval checkpoints and business-change handling, not new runtime capabilities,
+final payment terms or a public service commitment.
+
 ## Core service
 
 The Web Presence service captures what an organization knows about its business

@@ -240,6 +240,21 @@ and limitations; Google enriches this story rather than defining it. Prefer a
 small understandable report to analytics clutter. The
 [growth loop](content-growth-loop.md#compact-customer-experience) owns recommendation presentation.
 
+## Business-change context
+
+Material business changes should eventually contribute dated reporting markers,
+linked to the approved change and its actual effective/publication timing. For
+example, a new service launch gives context to later traffic, inquiries and
+customer-confirmed outcomes. See the
+[business-change history contract](customer-journey-and-change-management.md#history-and-measurement-context).
+Intentional offer changes should not be treated as unexplained anomalies.
+
+Markers are planned reporting context, not a collector/event-schema implementation.
+Any statement about leads since a change requires eligible observations and an
+explicit window; chronology alone does not establish causation or ROI. Preserve
+the conversion ladder, unknown outcomes and provenance above. Reuse P12, with
+P2/P4/P7 for change linkage, bounded history and access.
+
 ## Technical health is a separate track
 
 Uptime, response time, HTTP errors, broken routes/resources, SSL/domain health,
