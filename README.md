@@ -23,3 +23,7 @@ The [media acquisition foundation and disposable image pilot](docs/media-acquisi
 documents private candidates, attributable review, operational migration rehearsal
 and the narrow Hero eligibility gate. Real attachment and publication remain
 separate review boundaries.
+
+The [local operator QC harness](docs/operator-qc.md) prepares exact-context review
+packets, proposed visual strategies and readiness assessments without customer
+writes, image generation or publication authority.
