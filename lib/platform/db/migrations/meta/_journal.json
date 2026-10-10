@@ -64,6 +64,13 @@
       "when": 1791330177661,
       "tag": "0008_canonical-foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791484096111,
+      "tag": "0009_media_acquisition",
+      "breakpoints": true
     }
   ]
 }

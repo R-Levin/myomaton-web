@@ -53,7 +53,7 @@ test("managedSite resolves intro images through the Asset service and renders op
     "@/lib/platform/assets/presentation-service": { getSectionImages: async (presenceId: string, ids: string[]) => {
       assert.equal(presenceId, id(1)); assert.deepEqual(ids, [id(4)]);
       return new Map(hasImage ? [[id(4), image]] : []);
-    } },
+    }, getServiceIllustrations: async () => new Map() },
   }) as typeof import("../lib/platform/managed-sites/service");
   const page = await service.getManagedSitePage({ domain: "myomaton.com", managedSiteName: "Myomaton" }, "/");
   assert.ok(page); assert.deepEqual(page.sections[0].image, image);

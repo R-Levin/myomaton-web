@@ -262,3 +262,14 @@ customer-facing authentication/authorization and private assets; object-store/CD
 integration; lifecycle timestamps, retention/purge/archival; customer editing and
 revision history; export. An empty usage inventory alone never authorizes deletion.
 See [the active architecture register](deferred-architecture.md) for triggers.
+
+## Acquired Hero illustration
+
+The new `section/service-illustration` role is separate from Intro media. Its
+[acquisition foundation](media-acquisition.md) binds private candidate provenance,
+prepared bytes and current operator approval to one owned Home Hero. The same
+eligibility evaluator protects presentation and direct delivery; acquired media
+cannot use legacy Intro, Offering or logo slots to bypass it. Legacy records
+retain their existing behavior. The writer currently permits disposable
+application only; operational migration deployment, real attachment and public
+publication require separate review. General Asset lifecycle work remains deferred.

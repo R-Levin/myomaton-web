@@ -27,13 +27,16 @@ export async function eligibleSectionAssets(db: NodePgDatabase, webPresenceId: s
     .where(and(eq(webPresences.id, presenceId), eq(webPresences.status, "active"),
       eq(managedSites.status, "active"), eq(pages.status, "active"), eq(sections.status, "active"), eq(sections.type, "intro"),
       ids ? inArray(sections.id, ids) : undefined, managedSiteId ? eq(managedSites.id,managedSiteId) : undefined,
-      sql`NOT (${sections.content} ? 'source')`));
+      sql`NOT (${sections.content} ? 'source')`,
+      sql`NOT EXISTS (SELECT 1 FROM asset_usages acquired_usage WHERE acquired_usage.asset_id=${assets.id} AND acquired_usage.role='service-illustration')`));
   const groups = new Map<string, typeof rows>();
   for (const row of rows) groups.set(`${row.sectionId}:${row.role}`, [...(groups.get(`${row.sectionId}:${row.role}`) ?? []), row]);
   const result = new Map<string, EligibleUsage>();
   for (const [sectionId, group] of groups) {
     if (group.length !== 1) throw new Error("Ambiguous Section Asset association.");
     const row = group[0];
+    // Acquired media may not gain eligibility from an unrelated legacy slot.
+    if (row.asset.metadata && typeof row.asset.metadata === "object" && "acquisition" in row.asset.metadata) continue;
     if (row.usagePresenceId === presenceId && row.asset.webPresenceId === presenceId && managedAssetEligible(row.asset) && (row.role === "image" ? row.asset.type === "image" : row.asset.type === "document")) result.set(sectionId, { asset: row.asset, configuration: row.configuration });
   }
   return result;
@@ -68,9 +71,11 @@ export async function eligibleLogo(db: NodePgDatabase, webPresenceId: string, ro
     .from(webPresences)
     .innerJoin(assetUsages, and(eq(assetUsages.entityId, webPresences.id), eq(assetUsages.entityType, "web_presence"), eq(assetUsages.role, role)))
     .innerJoin(assets, eq(assets.id, assetUsages.assetId))
-    .where(and(eq(webPresences.id, id), eq(webPresences.status, "active")));
+    .where(and(eq(webPresences.id, id), eq(webPresences.status, "active"),
+      sql`NOT EXISTS (SELECT 1 FROM asset_usages acquired_usage WHERE acquired_usage.asset_id=${assets.id} AND acquired_usage.role='service-illustration')`));
   if (rows.length !== 1) return null;
   const row = rows[0];
+  if (row.asset.metadata && typeof row.asset.metadata === "object" && "acquisition" in row.asset.metadata) return null;
   if (row.usagePresenceId !== id || row.asset.webPresenceId !== id || !presentImage(row.asset, row.configuration)) return null;
   // Delivery requires an active Managed Site; inactive-only presences do not
   // expose a logo merely because the presence record remains active.

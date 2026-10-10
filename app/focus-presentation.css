@@ -41,6 +41,7 @@
 .focus-presence [data-layer="field-bridge"] + section { padding-top: 4rem; }
 .focus-presence .focus-visual { margin: 0; min-width: 0; }
 .focus-presence .focus-service svg { width: 100%; height: auto; display: block; }
+.focus-presence .focus-service [data-acquired-image] { width: 100%; height: auto; display: block; }
 .focus-presence .focus-service { align-self: end; }
 .focus-presence .focus-visual-labels { display: flex; gap: 1rem; justify-content: space-between; padding: 1rem; background: var(--p-brand); color: var(--p-on-brand); font-size: .9rem; font-weight: 600; }
 .focus-presence .focus-visual-explanation { background: var(--p-light); color: var(--p-on-light); padding: 1rem; font-size: .95rem; }

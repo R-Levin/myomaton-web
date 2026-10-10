@@ -14,11 +14,12 @@ import { JSDOM } from "jsdom";
 
 test("Contact upgrade/fresh replay preserves public state; isolated submission ownership, persistence and lifecycle", async t => {
   const url = process.env.ASSET_TEST_DATABASE_URL; assert.ok(url, "ASSET_TEST_DATABASE_URL required; writes use disposable schemas only");
-  const client = new Client({ connectionString: url }); await client.connect();
+  const client = new Client({ connectionString: url });
   const prefix = `myomaton_contact_test_${randomUUID().replaceAll("-", "")}`;
   const upgrade = `${prefix}_upgrade`, fresh = `${prefix}_fresh`;
   const quote = (name: string) => { assert.match(name, /^myomaton_contact_test_[a-f0-9]{32}_(upgrade|fresh)$/); return `"${name}"`; };
-  const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.equal(migrations.length, 9);
+  // Keep the historical Contact replay range; 0009 is covered by acquisition.
+  const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.equal(migrations.length, 10); await client.connect();
   const read = async (schema: string) => {
     assert.ok(schema === "public" || quote(schema));
     const rows: Record<string, unknown[]> = {};

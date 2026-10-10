@@ -10,7 +10,7 @@ import { contactPresentations } from "../contact/presentation";
 import type { ContactPresentation } from "../contact/model";
 
 import { and, asc, eq } from "drizzle-orm";
-import { getSectionImages } from "@/lib/platform/assets/presentation-service";
+import { getSectionImages, getServiceIllustrations } from "@/lib/platform/assets/presentation-service";
 import type { SectionImage } from "@/lib/platform/assets/source";
 
 import { db } from "@/lib/platform/db/connection";
@@ -43,6 +43,7 @@ export type ManagedSiteSection = {
   secondaryAction?: Action | null;
   relationshipActions?: Record<string, Action>;
   image?: SectionImage | null;
+  serviceIllustration?: SectionImage | null;
   collectionItems?: CollectionItem[];
   contact?: ContactPresentation;
 };
@@ -114,6 +115,7 @@ export async function getManagedSitePage(
     return normalized ? [{ ...section, ...normalized, rawConfiguration: section.configuration }] : [];
   });
   const images = await getSectionImages(match.webPresenceId, supportedSections.filter((section) => section.type === "intro" && !boundIds.has(section.id)).map((section) => section.id));
+  const serviceIllustrations = supportedSections.some(s=>s.type==="hero") ? await getServiceIllustrations(match.webPresenceId,match.managedSite.id) : new Map<string,SectionImage>();
   const canonicalImages = orderedSections.some(s => s.content && typeof s.content === "object" && Object.hasOwn(s.content,"source"))
     ? await offeringImages(db.$client,match.webPresenceId,match.managedSite.id) : new Map();
   const designSystem = await getDesignSystemByWebPresenceId(match.webPresenceId);
@@ -148,6 +150,7 @@ export async function getManagedSitePage(
       ...section,
       contact: contacts.get(section.id),
       image: boundIds.has(section.id) ? canonicalImages.get(section.id)?.image ?? null : images.get(section.id) ?? null,
+      ...(serviceIllustrations.has(section.id) ? {serviceIllustration:serviceIllustrations.get(section.id)} : {}),
       action: resolvedActions.get(sectionActionId(section.content) ?? "") ?? null,
       ...(section.type === "hero" && section.content.secondaryActionId ? { secondaryAction: resolvedActions.get(section.content.secondaryActionId) ?? null } : {}),
       ...(section.type === "relationship" ? { relationshipActions: Object.fromEntries(resolvedActions) } : {}),

@@ -32,16 +32,17 @@ function FocusRelationship({ section }: { section: ManagedSiteSection }) {
 function FocusSection({ section, plan, preview }: { section: ManagedSiteSection; plan: SectionPlan; preview: boolean }) {
   const c = record(section.content), slot = resolveFpo(record(section.configuration).previewMedia, preview);
   const hero = section.type === "hero";
-  const layer = slot ? boundedLayer(section.configuration) : undefined;
+  const illustration = hero ? section.serviceIllustration : null;
+  const layer = slot || illustration ? boundedLayer(section.configuration) : undefined;
   return <section className="p-section focus-section" data-type={section.type} data-surface={plan.surface} data-region={plan.region} data-layer={layer} data-visual={slot?.role} data-relationship={section.type === "relationship" ? c.kind as string : undefined} data-conversion={section.type === "cta" ? plan.conversion : undefined}>
-    <div className={`p-inner ${hero ? "p-hero" : "focus-region"}`} data-family={hero ? plan.hero : undefined}>
+    <div className={`p-inner ${hero ? "p-hero" : "focus-region"}`} data-family={hero ? illustration ? "service-illustrated" : plan.hero : undefined}>
       <div className="focus-copy">{typeof c.eyebrow === "string" && <p className="focus-kicker">{c.eyebrow}</p>}{hero ? <h1>{String(c.heading ?? "")}</h1> : typeof c.heading === "string" && <h2>{c.heading}</h2>}
         <div className={hero ? "p-hero-introduction" : "focus-prose"}><PlainTextParagraphs text={typeof c.text === "string" ? c.text : undefined} /></div>
         {section.type === "collection" && <ul className="focus-peers">{section.collectionItems?.map(item => <li key={item.id}><h3>{item.heading}</h3><PlainTextParagraphs text={item.text} /><ActionLink action={item.action} /></li>)}</ul>}
         <div className="focus-actions"><ActionLink action={section.action} /><ActionLink action={section.secondaryAction} secondary /></div>
       </div>
       {section.type === "relationship" && <FocusRelationship section={section} />}
-      {slot && <FocusVisual slot={slot} />}
+      {illustration ? <figure className="focus-visual focus-service" data-acquired-role="service-illustration"><Image data-acquired-image src={illustration.src} width={illustration.width} height={illustration.height} alt={illustration.alt} unoptimized /></figure> : slot && <FocusVisual slot={slot} />}
       {section.image && <Image className="focus-managed-image" src={section.image.src} width={section.image.width} height={section.image.height} alt={section.image.alt} unoptimized />}
     </div>
   </section>;

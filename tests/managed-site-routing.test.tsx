@@ -88,7 +88,7 @@ function fixture() {
       assert.equal(presenceId, id(1)); assert.deepEqual(context, { managedSiteId: id(2) }); return new Map();
     } },
     "@/lib/platform/subjects/presentation-service": { getPresentedSubjectsByIds: async () => new Map() },
-    "@/lib/platform/assets/presentation-service": { getSectionImages: async () => new Map() },
+    "@/lib/platform/assets/presentation-service": { getSectionImages: async () => new Map(), getServiceIllustrations: async () => new Map() },
     "@/lib/platform/design-systems/service": { getDesignSystemByWebPresenceId: async () => ({ id: id(9), name: "Design", configuration: myomatonDesignConfiguration }) },
     "@/lib/platform/navigations/service": { getNavigationByName: async (presenceId: string, name: string, surface: string, context: unknown) => {
       assert.equal(presenceId, id(1)); assert.equal(name, "Primary Navigation"); assert.equal(surface, "managedSite");

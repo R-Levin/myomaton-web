@@ -76,7 +76,7 @@ test("historical migrations, snapshots, journal entries and frozen Home v1 evide
     assert.equal(createHash("sha256").update(readFileSync(file)).digest("hex"), hash, file);
   }
   const journal = JSON.parse(readFileSync("lib/platform/db/migrations/meta/_journal.json", "utf8"));
-  assert.deepEqual(journal.entries.slice(0, 6), historicalJournal); assert.equal(journal.entries.length, 9);
+  assert.deepEqual(journal.entries.slice(0, 6), historicalJournal); assert.equal(journal.entries.length, 10);
   assert.deepEqual(journal.entries[6], { idx: 6, version: "7", when: 1790959692569, tag: "0006_managed-site-terminology", breakpoints: true });
   const old = JSON.parse(readFileSync("scripts/customer-updates/myomaton-home-v1-baseline.json", "utf8"));
   const { microsites, ...rest } = old;
@@ -85,18 +85,18 @@ test("historical migrations, snapshots, journal entries and frozen Home v1 evide
   });
 });
 
-test("canonical Drizzle snapshot matches active schema and adds only four tables to 0007", async () => {
+test("canonical Drizzle snapshot matches active schema and operational migration preserves customer tables", async () => {
   const imports: Record<string, unknown> = {};
   for (const file of readdirSync("lib/platform/db/schema").filter(f => f.endsWith(".ts"))) {
     Object.assign(imports, await import(pathToFileURL(resolve("lib/platform/db/schema", file)).href));
   }
-  const previous = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0007_snapshot.json", "utf8"));
-  const snapshot = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0008_snapshot.json", "utf8"));
+  const previous = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0008_snapshot.json", "utf8"));
+  const snapshot = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0009_snapshot.json", "utf8"));
   const generated = generateDrizzleJson(imports, previous.id);
   assert.deepEqual(JSON.parse(JSON.stringify({ ...generated, id: snapshot.id })), snapshot);
   assert.equal(snapshot.prevId, previous.id);
   const existing = { ...snapshot.tables };
-  for(const table of ["business_knowledge","business_knowledge_revisions","offerings","offering_revisions"]) delete existing[`public.${table}`];
+  for(const table of ["external_work","media_candidates","external_work_events"]) delete existing[`public.${table}`];
   assert.deepEqual(existing, previous.tables);
   assert.ok(snapshot.tables["public.managed_sites"]);
   assert.ok(snapshot.tables["public.pages"].columns.managed_site_id);

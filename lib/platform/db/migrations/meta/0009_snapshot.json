@@ -1,0 +1,3004 @@
+{
+  "id": "24841f53-4626-4233-a003-e443c886d9aa",
+  "prevId": "206dc8d3-2e96-48e6-b6ee-fc4bb7deb269",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.actions": {
+      "name": "actions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "destination": {
+          "name": "destination",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "actions_web_presence_id_web_presences_id_fk": {
+          "name": "actions_web_presence_id_web_presences_id_fk",
+          "tableFrom": "actions",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "actions_web_presence_id_name_unique": {
+          "name": "actions_web_presence_id_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.asset_usages": {
+      "name": "asset_usages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "asset_id": {
+          "name": "asset_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_type": {
+          "name": "entity_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_id": {
+          "name": "entity_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "asset_usages_web_presence_asset_idx": {
+          "name": "asset_usages_web_presence_asset_idx",
+          "columns": [
+            {
+              "expression": "web_presence_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "asset_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "asset_usages_same_web_presence_asset_fk": {
+          "name": "asset_usages_same_web_presence_asset_fk",
+          "tableFrom": "asset_usages",
+          "tableTo": "assets",
+          "columnsFrom": [
+            "web_presence_id",
+            "asset_id"
+          ],
+          "columnsTo": [
+            "web_presence_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "asset_usages_reference_unique": {
+          "name": "asset_usages_reference_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "entity_type",
+            "entity_id",
+            "role",
+            "asset_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "asset_usages_entity_type_nonempty": {
+          "name": "asset_usages_entity_type_nonempty",
+          "value": "btrim(\"asset_usages\".\"entity_type\") <> ''"
+        },
+        "asset_usages_role_nonempty": {
+          "name": "asset_usages_role_nonempty",
+          "value": "btrim(\"asset_usages\".\"role\") <> ''"
+        },
+        "asset_usages_version_positive": {
+          "name": "asset_usages_version_positive",
+          "value": "\"asset_usages\".\"version\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.assets": {
+      "name": "assets",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'image'"
+        },
+        "mime_type": {
+          "name": "mime_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "width": {
+          "name": "width",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "height": {
+          "name": "height",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alt_text": {
+          "name": "alt_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "source_type": {
+          "name": "source_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_reference": {
+          "name": "source_reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "assets_web_presence_id_web_presences_id_fk": {
+          "name": "assets_web_presence_id_web_presences_id_fk",
+          "tableFrom": "assets",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "assets_web_presence_id_id_unique": {
+          "name": "assets_web_presence_id_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "assets_name_nonempty": {
+          "name": "assets_name_nonempty",
+          "value": "btrim(\"assets\".\"name\") <> ''"
+        },
+        "assets_type_nonempty": {
+          "name": "assets_type_nonempty",
+          "value": "btrim(\"assets\".\"type\") <> ''"
+        },
+        "assets_mime_type_nonempty": {
+          "name": "assets_mime_type_nonempty",
+          "value": "btrim(\"assets\".\"mime_type\") <> ''"
+        },
+        "assets_source_type_nonempty": {
+          "name": "assets_source_type_nonempty",
+          "value": "btrim(\"assets\".\"source_type\") <> ''"
+        },
+        "assets_source_reference_nonempty": {
+          "name": "assets_source_reference_nonempty",
+          "value": "btrim(\"assets\".\"source_reference\") <> ''"
+        },
+        "assets_width_positive": {
+          "name": "assets_width_positive",
+          "value": "\"assets\".\"width\" IS NULL OR \"assets\".\"width\" > 0"
+        },
+        "assets_height_positive": {
+          "name": "assets_height_positive",
+          "value": "\"assets\".\"height\" IS NULL OR \"assets\".\"height\" > 0"
+        },
+        "assets_version_positive": {
+          "name": "assets_version_positive",
+          "value": "\"assets\".\"version\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.business_knowledge": {
+      "name": "business_knowledge",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contract_version": {
+          "name": "contract_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "payload": {
+          "name": "payload",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "business_knowledge_web_presence_id_web_presences_id_fk": {
+          "name": "business_knowledge_web_presence_id_web_presences_id_fk",
+          "tableFrom": "business_knowledge",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "business_knowledge_presence_unique": {
+          "name": "business_knowledge_presence_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id"
+          ]
+        },
+        "business_knowledge_owner_identity": {
+          "name": "business_knowledge_owner_identity",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "business_knowledge_versions": {
+          "name": "business_knowledge_versions",
+          "value": "\"business_knowledge\".\"version\">0 AND \"business_knowledge\".\"contract_version\"=1"
+        },
+        "business_knowledge_payload": {
+          "name": "business_knowledge_payload",
+          "value": "jsonb_typeof(\"business_knowledge\".\"payload\")='object'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.business_knowledge_revisions": {
+      "name": "business_knowledge_revisions",
+      "schema": "",
+      "columns": {
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "revision_version": {
+          "name": "revision_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot": {
+          "name": "snapshot",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "change_reason": {
+          "name": "change_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "responsible_identity": {
+          "name": "responsible_identity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recorded_at": {
+          "name": "recorded_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "knowledge_id": {
+          "name": "knowledge_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "business_knowledge_revisions_web_presence_id_knowledge_id_business_knowledge_web_presence_id_id_fk": {
+          "name": "business_knowledge_revisions_web_presence_id_knowledge_id_business_knowledge_web_presence_id_id_fk",
+          "tableFrom": "business_knowledge_revisions",
+          "tableTo": "business_knowledge",
+          "columnsFrom": [
+            "web_presence_id",
+            "knowledge_id"
+          ],
+          "columnsTo": [
+            "web_presence_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "knowledge_revision_unique": {
+          "name": "knowledge_revision_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "knowledge_id",
+            "revision_version"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "knowledge_revision_version": {
+          "name": "knowledge_revision_version",
+          "value": "\"business_knowledge_revisions\".\"revision_version\">0"
+        },
+        "knowledge_revision_snapshot": {
+          "name": "knowledge_revision_snapshot",
+          "value": "jsonb_typeof(\"business_knowledge_revisions\".\"snapshot\")='object'"
+        },
+        "knowledge_revision_identity": {
+          "name": "knowledge_revision_identity",
+          "value": "\"business_knowledge_revisions\".\"snapshot\" ? 'id' AND \"business_knowledge_revisions\".\"snapshot\" ? 'web_presence_id' AND \"business_knowledge_revisions\".\"snapshot\" ? 'version' AND \"business_knowledge_revisions\".\"snapshot\"->>'id' = \"business_knowledge_revisions\".\"knowledge_id\"::text AND \"business_knowledge_revisions\".\"snapshot\"->>'web_presence_id' = \"business_knowledge_revisions\".\"web_presence_id\"::text AND (\"business_knowledge_revisions\".\"snapshot\"->>'version')::integer = \"business_knowledge_revisions\".\"revision_version\""
+        },
+        "knowledge_revision_attestation": {
+          "name": "knowledge_revision_attestation",
+          "value": "length(btrim(\"business_knowledge_revisions\".\"change_reason\")) BETWEEN 1 AND 1000 AND length(btrim(\"business_knowledge_revisions\".\"responsible_identity\")) BETWEEN 1 AND 200"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.offering_revisions": {
+      "name": "offering_revisions",
+      "schema": "",
+      "columns": {
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "revision_version": {
+          "name": "revision_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot": {
+          "name": "snapshot",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "change_reason": {
+          "name": "change_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "responsible_identity": {
+          "name": "responsible_identity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recorded_at": {
+          "name": "recorded_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "offering_id": {
+          "name": "offering_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "offering_revisions_web_presence_id_offering_id_offerings_web_presence_id_id_fk": {
+          "name": "offering_revisions_web_presence_id_offering_id_offerings_web_presence_id_id_fk",
+          "tableFrom": "offering_revisions",
+          "tableTo": "offerings",
+          "columnsFrom": [
+            "web_presence_id",
+            "offering_id"
+          ],
+          "columnsTo": [
+            "web_presence_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "offering_revision_unique": {
+          "name": "offering_revision_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "offering_id",
+            "revision_version"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "offering_revision_version": {
+          "name": "offering_revision_version",
+          "value": "\"offering_revisions\".\"revision_version\">0"
+        },
+        "offering_revision_snapshot": {
+          "name": "offering_revision_snapshot",
+          "value": "jsonb_typeof(\"offering_revisions\".\"snapshot\")='object'"
+        },
+        "offering_revision_identity": {
+          "name": "offering_revision_identity",
+          "value": "\"offering_revisions\".\"snapshot\" ? 'id' AND \"offering_revisions\".\"snapshot\" ? 'web_presence_id' AND \"offering_revisions\".\"snapshot\" ? 'version' AND \"offering_revisions\".\"snapshot\"->>'id' = \"offering_revisions\".\"offering_id\"::text AND \"offering_revisions\".\"snapshot\"->>'web_presence_id' = \"offering_revisions\".\"web_presence_id\"::text AND (\"offering_revisions\".\"snapshot\"->>'version')::integer = \"offering_revisions\".\"revision_version\""
+        },
+        "offering_revision_attestation": {
+          "name": "offering_revision_attestation",
+          "value": "length(btrim(\"offering_revisions\".\"change_reason\")) BETWEEN 1 AND 1000 AND length(btrim(\"offering_revisions\".\"responsible_identity\")) BETWEEN 1 AND 200"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.offerings": {
+      "name": "offerings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contract_version": {
+          "name": "contract_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "payload": {
+          "name": "payload",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "offerings_web_presence_id_web_presences_id_fk": {
+          "name": "offerings_web_presence_id_web_presences_id_fk",
+          "tableFrom": "offerings",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "offerings_presence_key": {
+          "name": "offerings_presence_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "key"
+          ]
+        },
+        "offerings_owner_identity": {
+          "name": "offerings_owner_identity",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "offerings_versions": {
+          "name": "offerings_versions",
+          "value": "\"offerings\".\"version\">0 AND \"offerings\".\"contract_version\"=1"
+        },
+        "offerings_payload": {
+          "name": "offerings_payload",
+          "value": "jsonb_typeof(\"offerings\".\"payload\")='object'"
+        },
+        "offerings_type": {
+          "name": "offerings_type",
+          "value": "\"offerings\".\"type\" IN ('service','product')"
+        },
+        "offerings_status": {
+          "name": "offerings_status",
+          "value": "\"offerings\".\"status\" IN ('active','inactive')"
+        },
+        "offerings_key": {
+          "name": "offerings_key",
+          "value": "\"offerings\".\"key\" ~ '^[a-z][a-z0-9_-]{0,63}$'"
+        },
+        "offerings_name": {
+          "name": "offerings_name",
+          "value": "length(btrim(\"offerings\".\"name\")) BETWEEN 1 AND 200"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.contact_definitions": {
+      "name": "contact_definitions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "delivery_route_key": {
+          "name": "delivery_route_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "contact_definitions_web_presence_id_web_presences_id_fk": {
+          "name": "contact_definitions_web_presence_id_web_presences_id_fk",
+          "tableFrom": "contact_definitions",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "contact_definitions_owner_identity": {
+          "name": "contact_definitions_owner_identity",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "contact_definitions_version_positive": {
+          "name": "contact_definitions_version_positive",
+          "value": "\"contact_definitions\".\"version\" > 0"
+        },
+        "contact_definitions_name_bounded": {
+          "name": "contact_definitions_name_bounded",
+          "value": "length(trim(\"contact_definitions\".\"name\")) BETWEEN 1 AND 200"
+        },
+        "contact_definitions_status": {
+          "name": "contact_definitions_status",
+          "value": "\"contact_definitions\".\"status\" IN ('active','inactive')"
+        },
+        "contact_definitions_configuration_object": {
+          "name": "contact_definitions_configuration_object",
+          "value": "jsonb_typeof(\"contact_definitions\".\"configuration\") = 'object'"
+        },
+        "contact_definitions_route": {
+          "name": "contact_definitions_route",
+          "value": "\"contact_definitions\".\"delivery_route_key\" IS NULL OR \"contact_definitions\".\"delivery_route_key\" ~ '^[a-z][a-z0-9_-]{0,63}$'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.contact_submissions": {
+      "name": "contact_submissions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "managed_site_id": {
+          "name": "managed_site_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "page_id": {
+          "name": "page_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "section_id": {
+          "name": "section_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contact_definition_id": {
+          "name": "contact_definition_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contact_definition_version": {
+          "name": "contact_definition_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fields": {
+          "name": "fields",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "delivery_route_key": {
+          "name": "delivery_route_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "delivery_status": {
+          "name": "delivery_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "delivery_attempts": {
+          "name": "delivery_attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "last_attempt_at": {
+          "name": "last_attempt_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "delivered_at": {
+          "name": "delivered_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "delivery_error_code": {
+          "name": "delivery_error_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "idempotency_key": {
+          "name": "idempotency_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "contact_submissions_owner_created": {
+          "name": "contact_submissions_owner_created",
+          "columns": [
+            {
+              "expression": "web_presence_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "contact_submissions_expiry": {
+          "name": "contact_submissions_expiry",
+          "columns": [
+            {
+              "expression": "expires_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "contact_submissions_pending": {
+          "name": "contact_submissions_pending",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "\"contact_submissions\".\"delivery_status\" = 'pending'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "contact_submissions_web_presence_id_web_presences_id_fk": {
+          "name": "contact_submissions_web_presence_id_web_presences_id_fk",
+          "tableFrom": "contact_submissions",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "contact_submissions_managed_site_id_managed_sites_id_fk": {
+          "name": "contact_submissions_managed_site_id_managed_sites_id_fk",
+          "tableFrom": "contact_submissions",
+          "tableTo": "managed_sites",
+          "columnsFrom": [
+            "managed_site_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "contact_submissions_page_id_pages_id_fk": {
+          "name": "contact_submissions_page_id_pages_id_fk",
+          "tableFrom": "contact_submissions",
+          "tableTo": "pages",
+          "columnsFrom": [
+            "page_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "contact_submissions_section_id_sections_id_fk": {
+          "name": "contact_submissions_section_id_sections_id_fk",
+          "tableFrom": "contact_submissions",
+          "tableTo": "sections",
+          "columnsFrom": [
+            "section_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "contact_submissions_definition_owner_fk": {
+          "name": "contact_submissions_definition_owner_fk",
+          "tableFrom": "contact_submissions",
+          "tableTo": "contact_definitions",
+          "columnsFrom": [
+            "web_presence_id",
+            "contact_definition_id"
+          ],
+          "columnsTo": [
+            "web_presence_id",
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "contact_submissions_idempotency": {
+          "name": "contact_submissions_idempotency",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "contact_definition_id",
+            "idempotency_key"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "contact_submissions_version_positive": {
+          "name": "contact_submissions_version_positive",
+          "value": "\"contact_submissions\".\"contact_definition_version\" > 0"
+        },
+        "contact_submissions_fields_object": {
+          "name": "contact_submissions_fields_object",
+          "value": "jsonb_typeof(\"contact_submissions\".\"fields\") = 'object' AND octet_length(\"contact_submissions\".\"fields\"::text) <= 16384"
+        },
+        "contact_submissions_delivery_status": {
+          "name": "contact_submissions_delivery_status",
+          "value": "\"contact_submissions\".\"delivery_status\" IN ('pending','delivered','failed','disabled')"
+        },
+        "contact_submissions_attempts": {
+          "name": "contact_submissions_attempts",
+          "value": "\"contact_submissions\".\"delivery_attempts\" >= 0"
+        },
+        "contact_submissions_route": {
+          "name": "contact_submissions_route",
+          "value": "(\"contact_submissions\".\"delivery_status\" = 'disabled' AND \"contact_submissions\".\"delivery_route_key\" IS NULL) OR (\"contact_submissions\".\"delivery_status\" <> 'disabled' AND \"contact_submissions\".\"delivery_route_key\" IS NOT NULL AND \"contact_submissions\".\"delivery_route_key\" ~ '^[a-z][a-z0-9_-]{0,63}$')"
+        },
+        "contact_submissions_error": {
+          "name": "contact_submissions_error",
+          "value": "\"contact_submissions\".\"delivery_error_code\" IS NULL OR \"contact_submissions\".\"delivery_error_code\" ~ '^[a-z][a-z0-9_]{0,63}$'"
+        },
+        "contact_submissions_key": {
+          "name": "contact_submissions_key",
+          "value": "\"contact_submissions\".\"idempotency_key\" ~ '^[A-Za-z0-9_-]{16,100}$'"
+        },
+        "contact_submissions_expiry_after_creation": {
+          "name": "contact_submissions_expiry_after_creation",
+          "value": "\"contact_submissions\".\"expires_at\" > \"contact_submissions\".\"created_at\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.design_systems": {
+      "name": "design_systems",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "design_systems_web_presence_active_unique": {
+          "name": "design_systems_web_presence_active_unique",
+          "columns": [
+            {
+              "expression": "web_presence_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"design_systems\".\"status\" = 'active'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "design_systems_web_presence_id_web_presences_id_fk": {
+          "name": "design_systems_web_presence_id_web_presences_id_fk",
+          "tableFrom": "design_systems",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.external_work": {
+      "name": "external_work",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "capability": {
+          "name": "capability",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "identity": {
+          "name": "identity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "context_digest": {
+          "name": "context_digest",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "context": {
+          "name": "context",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "template_version": {
+          "name": "template_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "iteration": {
+          "name": "iteration",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'queued'"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "retries": {
+          "name": "retries",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "lease_token": {
+          "name": "lease_token",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lease_until": {
+          "name": "lease_until",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budget_micros": {
+          "name": "budget_micros",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reserved_micros": {
+          "name": "reserved_micros",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "actual_micros": {
+          "name": "actual_micros",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result": {
+          "name": "result",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "external_work_queue_idx": {
+          "name": "external_work_queue_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "lease_until",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "external_work_need_idx": {
+          "name": "external_work_need_idx",
+          "columns": [
+            {
+              "expression": "web_presence_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "context_digest",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "external_work_web_presence_id_web_presences_id_fk": {
+          "name": "external_work_web_presence_id_web_presences_id_fk",
+          "tableFrom": "external_work",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "external_work_owner_id_unique": {
+          "name": "external_work_owner_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "id"
+          ]
+        },
+        "external_work_identity_unique": {
+          "name": "external_work_identity_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "identity"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "external_work_capability": {
+          "name": "external_work_capability",
+          "value": "\"external_work\".\"capability\" IN ('image-generation','editorial-reconciliation')"
+        },
+        "external_work_status": {
+          "name": "external_work_status",
+          "value": "\"external_work\".\"status\" IN ('queued','running','awaiting-review','completed','failed','cancelled')"
+        },
+        "external_work_digest": {
+          "name": "external_work_digest",
+          "value": "\"external_work\".\"context_digest\" ~ '^[a-f0-9]{64}$' AND \"external_work\".\"identity\" ~ '^[a-f0-9]{64}$'"
+        },
+        "external_work_bounds": {
+          "name": "external_work_bounds",
+          "value": "\"external_work\".\"version\">0 AND \"external_work\".\"iteration\" BETWEEN 1 AND 2 AND \"external_work\".\"attempts\" BETWEEN 0 AND 3 AND \"external_work\".\"retries\" BETWEEN 0 AND 2 AND \"external_work\".\"budget_micros\">0 AND \"external_work\".\"reserved_micros\" BETWEEN 0 AND \"external_work\".\"budget_micros\" AND (\"external_work\".\"actual_micros\" IS NULL OR \"external_work\".\"actual_micros\">=0)"
+        },
+        "external_work_payload": {
+          "name": "external_work_payload",
+          "value": "octet_length(\"external_work\".\"context\"::text)<=16384 AND octet_length(\"external_work\".\"result\"::text)<=8192"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.external_work_events": {
+      "name": "external_work_events",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "work_id": {
+          "name": "work_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "candidate_id": {
+          "name": "candidate_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payload": {
+          "name": "payload",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "external_work_events_work_idx": {
+          "name": "external_work_events_work_idx",
+          "columns": [
+            {
+              "expression": "web_presence_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "work_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "external_work_events_candidate_idx": {
+          "name": "external_work_events_candidate_idx",
+          "columns": [
+            {
+              "expression": "web_presence_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "candidate_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "external_work_events_owned_work_fk": {
+          "name": "external_work_events_owned_work_fk",
+          "tableFrom": "external_work_events",
+          "tableTo": "external_work",
+          "columnsFrom": [
+            "web_presence_id",
+            "work_id"
+          ],
+          "columnsTo": [
+            "web_presence_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "external_work_events_owned_candidate_fk": {
+          "name": "external_work_events_owned_candidate_fk",
+          "tableFrom": "external_work_events",
+          "tableTo": "media_candidates",
+          "columnsFrom": [
+            "web_presence_id",
+            "candidate_id"
+          ],
+          "columnsTo": [
+            "web_presence_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "external_work_events_kind": {
+          "name": "external_work_events_kind",
+          "value": "\"external_work_events\".\"kind\" IN ('queued','dispatch','result','failure','retry','stale','decision','ingestion','cancel','lease-expired','cleanup')"
+        },
+        "external_work_events_payload": {
+          "name": "external_work_events_payload",
+          "value": "octet_length(\"external_work_events\".\"payload\"::text)<=8192"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.media_candidates": {
+      "name": "media_candidates",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "work_id": {
+          "name": "work_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'proposed'"
+        },
+        "source_kind": {
+          "name": "source_kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quarantine_key": {
+          "name": "quarantine_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bytes_digest": {
+          "name": "bytes_digest",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subject_digest": {
+          "name": "subject_digest",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provenance_digest": {
+          "name": "provenance_digest",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provenance": {
+          "name": "provenance",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "width": {
+          "name": "width",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "height": {
+          "name": "height",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mime_type": {
+          "name": "mime_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "policy_version": {
+          "name": "policy_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "media_candidates_retention_idx": {
+          "name": "media_candidates_retention_idx",
+          "columns": [
+            {
+              "expression": "web_presence_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "state",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "expires_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "media_candidates_owned_work_fk": {
+          "name": "media_candidates_owned_work_fk",
+          "tableFrom": "media_candidates",
+          "tableTo": "external_work",
+          "columnsFrom": [
+            "web_presence_id",
+            "work_id"
+          ],
+          "columnsTo": [
+            "web_presence_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "media_candidates_owner_id_unique": {
+          "name": "media_candidates_owner_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "id"
+          ]
+        },
+        "media_candidates_one_per_work_unique": {
+          "name": "media_candidates_one_per_work_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "work_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "media_candidates_state": {
+          "name": "media_candidates_state",
+          "value": "\"media_candidates\".\"state\" IN ('proposed','rejected','approved','ingested','expired','revoked')"
+        },
+        "media_candidates_format": {
+          "name": "media_candidates_format",
+          "value": "\"media_candidates\".\"source_kind\"='generated-illustrated' AND \"media_candidates\".\"mime_type\" IN ('image/png','image/jpeg','image/webp') AND \"media_candidates\".\"width\">0 AND \"media_candidates\".\"height\">0 AND \"media_candidates\".\"width\"::bigint*\"media_candidates\".\"height\"<=40000000 AND \"media_candidates\".\"revision\">0 AND \"media_candidates\".\"version\">0"
+        },
+        "media_candidates_digests": {
+          "name": "media_candidates_digests",
+          "value": "\"media_candidates\".\"bytes_digest\" ~ '^[a-f0-9]{64}$' AND \"media_candidates\".\"subject_digest\" ~ '^[a-f0-9]{64}$' AND \"media_candidates\".\"provenance_digest\" ~ '^[a-f0-9]{64}$' AND \"media_candidates\".\"quarantine_key\"='objects/'||\"media_candidates\".\"bytes_digest\""
+        },
+        "media_candidates_provenance": {
+          "name": "media_candidates_provenance",
+          "value": "octet_length(\"media_candidates\".\"provenance\"::text)<=16384"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.managed_sites": {
+      "name": "managed_sites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "managed_sites_web_presence_id_web_presences_id_fk": {
+          "name": "managed_sites_web_presence_id_web_presences_id_fk",
+          "tableFrom": "managed_sites",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.navigation_items": {
+      "name": "navigation_items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "navigation_id": {
+          "name": "navigation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_type": {
+          "name": "target_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_reference": {
+          "name": "target_reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "navigation_items_navigation_id_navigations_id_fk": {
+          "name": "navigation_items_navigation_id_navigations_id_fk",
+          "tableFrom": "navigation_items",
+          "tableTo": "navigations",
+          "columnsFrom": [
+            "navigation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "navigation_items_same_navigation_parent_fk": {
+          "name": "navigation_items_same_navigation_parent_fk",
+          "tableFrom": "navigation_items",
+          "tableTo": "navigation_items",
+          "columnsFrom": [
+            "navigation_id",
+            "parent_id"
+          ],
+          "columnsTo": [
+            "navigation_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "navigation_items_navigation_id_name_unique": {
+          "name": "navigation_items_navigation_id_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "navigation_id",
+            "name"
+          ]
+        },
+        "navigation_items_navigation_id_id_unique": {
+          "name": "navigation_items_navigation_id_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "navigation_id",
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "navigation_items_not_own_parent": {
+          "name": "navigation_items_not_own_parent",
+          "value": "\"navigation_items\".\"parent_id\" IS NULL OR \"navigation_items\".\"parent_id\" <> \"navigation_items\".\"id\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.navigations": {
+      "name": "navigations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "navigations_web_presence_id_web_presences_id_fk": {
+          "name": "navigations_web_presence_id_web_presences_id_fk",
+          "tableFrom": "navigations",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "navigations_web_presence_id_name_unique": {
+          "name": "navigations_web_presence_id_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "web_presence_id",
+            "name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.organizations": {
+      "name": "organizations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'standard'"
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pages": {
+      "name": "pages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "managed_site_id": {
+          "name": "managed_site_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "pages_managed_site_id_managed_sites_id_fk": {
+          "name": "pages_managed_site_id_managed_sites_id_fk",
+          "tableFrom": "pages",
+          "tableTo": "managed_sites",
+          "columnsFrom": [
+            "managed_site_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "pages_managed_site_id_slug_unique": {
+          "name": "pages_managed_site_id_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "managed_site_id",
+            "slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sections": {
+      "name": "sections",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "page_id": {
+          "name": "page_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "variant": {
+          "name": "variant",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "content": {
+          "name": "content",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sections_page_id_pages_id_fk": {
+          "name": "sections_page_id_pages_id_fk",
+          "tableFrom": "sections",
+          "tableTo": "pages",
+          "columnsFrom": [
+            "page_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.subject_types": {
+      "name": "subject_types",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "subject_types_parent_id_fk": {
+          "name": "subject_types_parent_id_fk",
+          "tableFrom": "subject_types",
+          "tableTo": "subject_types",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "subject_types_key_unique": {
+          "name": "subject_types_key_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "key"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.subjects": {
+      "name": "subjects",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "web_presence_id": {
+          "name": "web_presence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subject_type_id": {
+          "name": "subject_type_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "legal_name": {
+          "name": "legal_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "subjects_web_presence_id_web_presences_id_fk": {
+          "name": "subjects_web_presence_id_web_presences_id_fk",
+          "tableFrom": "subjects",
+          "tableTo": "web_presences",
+          "columnsFrom": [
+            "web_presence_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "subjects_subject_type_id_subject_types_id_fk": {
+          "name": "subjects_subject_type_id_subject_types_id_fk",
+          "tableFrom": "subjects",
+          "tableTo": "subject_types",
+          "columnsFrom": [
+            "subject_type_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.web_presences": {
+      "name": "web_presences",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "primary_domain": {
+          "name": "primary_domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "locale": {
+          "name": "locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'en-US'"
+        },
+        "timezone": {
+          "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'UTC'"
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "configuration": {
+          "name": "configuration",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "web_presences_organization_id_organizations_id_fk": {
+          "name": "web_presences_organization_id_organizations_id_fk",
+          "tableFrom": "web_presences",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

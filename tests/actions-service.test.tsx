@@ -91,7 +91,7 @@ test("services load seeded Action, enforce tenant scope, and resolve shared Hero
     "@/lib/platform/db/schema/pages": pagesSchema,
     "@/lib/platform/db/schema/sections": sectionsSchema,
     "@/lib/platform/db/schema/web-presences": presencesSchema,
-    "@/lib/platform/assets/presentation-service": { getSectionImages: async () => new Map() },
+    "@/lib/platform/assets/presentation-service": { getSectionImages: async () => new Map(), getServiceIllustrations: async () => new Map() },
     "@/lib/platform/actions/service": actionService,
     "@/lib/platform/actions/model": actionModel,
     "@/lib/platform/navigations/service": {

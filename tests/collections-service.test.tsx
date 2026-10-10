@@ -110,7 +110,7 @@ test("managedSite batches Subject and item Action dependencies, preserves curate
     "@/lib/platform/db/schema/sections": sections, "@/lib/platform/db/schema/web-presences": presences,
     "@/lib/platform/actions/model": actionModel, "@/lib/platform/actions/service": actionService,
     "@/lib/platform/subjects/presentation-service": subjectService, "./sections": sectionModel, "./collections": collections,
-    "@/lib/platform/assets/presentation-service": { getSectionImages: async (_tenant: string, ids: string[]) => { assert.deepEqual(ids, []); return new Map(); } },
+    "@/lib/platform/assets/presentation-service": { getSectionImages: async (_tenant: string, ids: string[]) => { assert.deepEqual(ids, []); return new Map(); }, getServiceIllustrations: async () => new Map() },
     "@/lib/platform/navigations/service": { getNavigationByName: async () => null },
     "@/lib/platform/design-systems/service": { getDesignSystemByWebPresenceId: async () => ({ id: null, name: null, configuration: {} }) },
   }) as typeof import("../lib/platform/managed-sites/service");
