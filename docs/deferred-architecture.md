@@ -161,6 +161,25 @@ adds no customer Pages or authoring workflow; P9 and P10 remain deferred.
 | P25 | Separately prove GA4 service-account/property-grant access on authorized Myomaton and MioPages properties, including useful report coverage/configuration, ownership/tenant binding, least privilege, credential/revocation behavior and repeatability. Record the decision rather than default to brittle per-customer refresh-token infrastructure. See [spike acceptance](measurement-and-analytics.md#spike-acceptance-and-refusal-boundaries). | Near-term technical spike, before selecting or promising GA4 onboarding. Reuse P7/P18 for access/secrets and P12 for reporting; absence of usable GA4 is not a core-service blocker. |
 | P26 | Define an understandable commercial commitment/payment handoff with separately identifiable Launch and Ongoing scope, trusted confirmation, retry/reconciliation safeguards and authority to begin paid work. Validate installment, cancellation/unpaid Launch, billing and agreement treatment through commercial/legal review before use; hypotheses are not final terms. Material supported expansion needs agreed scope/cost before execution. | Before accepting commercial commitments/payments or offering installments. Manual/external tools may bridge if the same boundaries are satisfied; native billing software is not required by this gate. Reuse P7/P18 for access/secrets and P11 for onboarding, with no payment-data collection in ordinary intake/logs. See [commercial handoff](customer-journey-and-change-management.md#commercial-handoff-and-paid-onboarding). |
 
+### Opportunity and evaluation completion under existing gates
+
+The [opportunity and optimization model](opportunity-and-optimization-model.md)
+extends the intended Ongoing decision loop beyond content. It adds no gate IDs,
+runtime workflow, numeric effort caps or automatic publication authority. The
+following requirements refine existing gates when the corresponding slice is built:
+
+| Existing gate | Required completion / trigger |
+| --- | --- |
+| P1/P2/P3, P13 | Before persistent opportunity/recommendation workflows: retain customer-scoped evidence, rationale, expected value/effort, lifecycle, approval and resulting action; separate surface assessment from opportunity/result/attention states. Use explainable stable factors, customer capacity and context-based weights; preserve guarded writes and protected truth. |
+| P15, D6 | Before operating effort-budget/ranking policy: define permitted policy scope, bounded internal effort envelope and escalation without implying hours-included entitlements or unlimited labor. Observe actual system/operator/customer burden and maintenance; C0 calibrates, not a universal numeric limit. |
+| P12, P2/P4/P7 | Before post-action evaluation: persist the approved action's measurement contract, actual timing, baseline/gaps, metric meaning, evaluation window, evidence requirements, result and next decision. Distinguish sparse/confounded evidence from neutral/zero; use business-change markers and customer-specific learning with bounded provenance/access/retention. |
+| P13/P15/P26 | Before a Campaign leaves candidate status: review supported scope, approval, effort, separate economics where justified and overall reporting; do not automatically create a high-growth tier or bill routine evolution. Applicable P8/P9/P10/P14/P16 serving/coexistence gates remain required; this does not implement synchronized secondary presences or Campaign automation. |
+| P7/P12/P13/P19, P4/P6 | **Future-only**, before cross-customer aggregate learning or benchmarking: explicit privacy/legal/security review of permitted purpose/data, authorization, minimization, retention and aggregation/re-identification risk. No customer content, strategy or private performance appropriation. Initial launch/customer-specific optimization must not depend on this capability. |
+
+C2/C3/C7 still own content-specific drafting/publication, while the opportunity model
+owns selecting and evaluating actions. Automated learning-driven weights/predictive
+scoring and advanced Campaign automation remain future, not gate completion claims.
+
 ## REQUIRED: Content Engine
 
 The native Article baseline and optional external-engine direction supersede the

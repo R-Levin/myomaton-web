@@ -46,6 +46,20 @@ code, dependencies, credentials or operations remain possible.
 
 ## Shared platform and customer boundaries
 
+The [opportunity and optimization model](opportunity-and-optimization-model.md#customer-specific-and-aggregate-learning)
+keeps initial learning within the customer's authorized data, approved external
+intelligence and confirmed outcomes. Opportunity evidence, capacity context,
+lead-quality feedback and evaluation records require tenant-scoped access, provider
+minimization and bounded retention/export under existing gates. They are not an
+excuse to collect private inquiry bodies into analytics or invent confirmed facts.
+
+Cross-customer anonymous/aggregate learning is future-only and needs explicit
+privacy/legal and security review of purpose, authorization, data minimization,
+aggregation/re-identification risk, retention and disclosures before production use.
+Removing names alone is not sufficient. Do not share private customer performance,
+copy customer content/strategy or use operator access as permission for a shared
+learning pool. Initial optimization must work without cross-customer learning.
+
 Prefer one shared application/platform, centralized deployment, monitoring and
 security controls, and shared dependency maintenance over an independently patched
 application stack per customer. One platform patch should benefit many customers.

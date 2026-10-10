@@ -410,6 +410,16 @@ duplicating global facts in each presentation.
 
 ## 12. Onboarding, measurement and optimization
 
+The [opportunity and optimization model](opportunity-and-optimization-model.md)
+defines **Core planned** customer-specific opportunity persistence/prioritization,
+maintain/watch/intervene assessment, effort budgeting, explainable recommendations,
+measurement contracts, post-action evaluation and customer-specific learning.
+Content is one response, not a quota; capacity and lead quality constrain sustainable
+growth. Existing Actions/rendering and Contact hooks do not implement these workflows.
+Advanced Campaign automation, aggregate learning, category benchmarking,
+learning-driven weights and predictive scoring remain **Optional/later**, with
+privacy/legal review before cross-customer learning. No new service tier is implied.
+
 **Core planned:** conditional guided onboarding, ongoing direct updates to global
 business knowledge, canonical first-party analytics and a continuous
 measure → analyze → recommend → approve/implement → measure-again loop.

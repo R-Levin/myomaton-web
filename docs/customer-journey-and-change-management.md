@@ -244,6 +244,13 @@ bounded by P2/P4/P5/P7 and the security/operations contract.
 
 ## Ongoing content and optimization
 
+The [opportunity and optimization model](opportunity-and-optimization-model.md)
+owns selecting the best next action, sustainable-growth/capacity assessment,
+Now/Later/Watching/Campaign views, effort budgeting and post-action learning.
+It consumes this document's business-change history and approvals, rather than
+creating a second authority. A recommendation or Campaign candidate does not
+authorize publication, expansion charges or new canonical business truth.
+
 Ongoing includes continuous optimization, useful content-opportunity identification,
 gathering missing knowledge, preparing content-marketing assets, customer review,
 publishing/implementation, measurement and refinement. The intended value replaces

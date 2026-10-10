@@ -56,6 +56,13 @@ existing website. The [operating model](onboarding-optimization.md) owns these d
 
 ## Ongoing service and value
 
+The [opportunity and optimization model](opportunity-and-optimization-model.md)
+owns the best-next-action framework: core-site, content, conversion, trust and other
+supported responses, selected for evidence, value, effort and customer capacity.
+Base Ongoing supports sustainable growth rather than maximum activity. Healthy
+content need not change; large focused opportunities may justify a bounded Campaign,
+not a default high-growth tier or unlimited labor commitment.
+
 Ongoing work may include a small set of content opportunities, targeted customer
 questions, AI-assisted drafting, human approval, publication, measurement,
 optimization and understandable reporting. Business/service updates and conversion

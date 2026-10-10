@@ -227,6 +227,13 @@ wording changes. It establishes neither final prices nor contractual entitlement
 
 ## What Customer 0 must prove
 
+Also prove the [opportunity and optimization model](opportunity-and-optimization-model.md#conceptual-metadata-c0-proving-and-gates):
+detection/classification, maintain/watch/intervene, explainable ranking and
+Now/Later/Watch/Campaign routing, effort estimates versus operator burden,
+measurement contracts/windows/results, insufficient-data handling, business-change
+context and customer-specific learning. These are planned reusable workflow tests,
+not a claim that the queue or evaluation system exists or that more output is better.
+
 Also test the [Launch/Ongoing operating model](service-operations-model.md#miopages-c0-proving-work):
 progressive intake, handoff, attention ownership, value/outcome reporting, role
 simulation and actual service minutes. C0 must not receive bespoke exceptions

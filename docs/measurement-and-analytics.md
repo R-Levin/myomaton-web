@@ -242,6 +242,14 @@ small understandable report to analytics clutter. The
 
 ## Business-change context
 
+The [opportunity model's measurement contract](opportunity-and-optimization-model.md#measurement-contract-and-post-action-evaluation)
+links each meaningful approved action to rationale, expected outcome, baseline,
+primary metrics, action-specific window, minimum evidence, result and next decision.
+It owns evaluation states and selection; this document retains source semantics,
+coverage, privacy and attribution authority. Lead-quality feedback (good prospect,
+poor fit, unclear) complements confirmed sales outcomes; neither is inferred from
+anonymous clicks. Sparse/confounded data must remain inconclusive, not false precision.
+
 Material business changes should eventually contribute dated reporting markers,
 linked to the approved change and its actual effective/publication timing. For
 example, a new service launch gives context to later traffic, inquiries and

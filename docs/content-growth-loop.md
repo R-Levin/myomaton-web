@@ -18,7 +18,11 @@ existing content, gathering evidence, pausing or retiring a topic instead of
 creating another article. The trusted-knowledge path can reuse confirmed knowledge
 without asking the customer the same questions again.
 
-This document owns the durable loop, customer experience and expansion boundaries.
+This document owns the content-specific loop, customer experience and expansion boundaries.
+The [opportunity and optimization model](opportunity-and-optimization-model.md) owns
+broader action selection, prioritization, effort budgeting, sustainable growth and
+post-action evaluation. Content is one possible response, not the default answer
+to every opportunity; the core site and dynamic discovery layer serve different purposes.
 It does not define a schema, provider, scheduler, analytics implementation or large
 editorial project-management system. The [capability catalog](platform-capabilities.md)
 owns the product envelope; [onboarding and optimization](onboarding-optimization.md)
@@ -74,6 +78,13 @@ archive. See [security and operations](security-operations.md).
 
 ## A small content-opportunity queue
 
+This is the content-specific view of the broader
+[opportunity lifecycle](opportunity-and-optimization-model.md#opportunity-lifecycle-and-customer-view),
+not a separate queue authority requiring every recommendation to become an Article.
+Core-site, conversion, linking, trust and other actions share the wider framework.
+Use [maintain/watch/intervene](opportunity-and-optimization-model.md#evidence-driven-cadence-and-existing-surface-assessment)
+to avoid unnecessary changes to healthy material; age alone does not justify a rewrite.
+
 Maintain a short prioritized backlog, not an unlimited AI idea generator. An
 opportunity may come from unanswered customer/prospect questions, search/query
 signals, incomplete or underperforming service/product coverage, supporting content
@@ -87,7 +98,7 @@ Each opportunity should eventually be able to record:
 | --- | --- |
 | Topic and why it matters | A comprehensible recommendation tied to a business need. |
 | Evidence/signals | Source, observation period and uncertainty; distinguish evidence from interpretation. |
-| Related business/service/product/Page | Connect the topic to supported customer knowledge and conversion context; a future Offering domain is not assumed to exist now. |
+| Related business/service/product/Page | Connect the topic to confirmed customer knowledge, supported Offering records and conversion context; do not assume an unrestricted catalog contract. |
 | Intended audience and outcome | Identify who should benefit and what useful result is expected. |
 | Known supporting knowledge | Trusted facts, customer-specific examples and source context available for drafting. |
 | Missing information | A small, answerable set of questions or evidence requests. |
@@ -95,7 +106,7 @@ Each opportunity should eventually be able to record:
 | Eventual published artifact | Connect the approved outcome to its canonical publication and derivatives. |
 | Measured result | Observation window, useful signals, limitations and the next recommendation. |
 
-A lightweight conceptual lifecycle is:
+A lightweight content-preparation/publication subworkflow is:
 
 ```text
 suggested → gathering information → ready to draft → draft → review
@@ -106,7 +117,8 @@ Stages can be skipped when their conditions are already satisfied, such as exist
 approved knowledge. Review can return a draft for correction; an opportunity may
 be deferred or dismissed with a reason. Merge duplicates and revisit priorities
 instead of multiplying similar ideas. These names are product concepts, not a
-prescribed enum or an implemented workflow. A small visible set, such as three
+prescribed enum or an implemented workflow. The wider opportunity state and
+evaluation contract remain owned by the opportunity model. A small visible set, such as three
 useful opportunities, is a presentation goal rather than an arbitrary storage cap.
 
 ## Two drafting paths
@@ -268,6 +280,12 @@ or first-party measurement. Observe per-customer infrastructure/AI usage and hum
 service minutes alongside business outcomes, without fixing pricing here.
 
 ## Compact customer experience
+
+The broader customer opportunity view is Now / Later / Watching / Campaign under
+the [opportunity model](opportunity-and-optimization-model.md#opportunity-lifecycle-and-customer-view).
+A content suggestion is one possible item, not a publishing quota. Every meaningful
+action should retain its rationale, baseline, evaluation window and next decision
+under the [measurement contract](opportunity-and-optimization-model.md#measurement-contract-and-post-action-evaluation).
 
 Translate analytics into comprehensible action, such as “Three useful content
 opportunities,” rather than an overwhelming marketing dashboard. An illustrative

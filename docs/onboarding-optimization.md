@@ -15,7 +15,11 @@ boundary is explicitly identified. It adds no runtime capability. The
 The [service model](web-presence-service-model.md) defines reusable launch and
 ongoing customer outcomes. [MioPages C0](miopages-c0-product-model.md) is a
 commercial proving context; the [content-growth loop](content-growth-loop.md)
-owns the detailed opportunity, drafting, approval and distribution lifecycle.
+owns the content-specific drafting, approval and distribution lifecycle. The
+[opportunity and optimization model](opportunity-and-optimization-model.md) owns
+broader action selection, effort budgeting and evaluation. Reuse its customer
+capacity/priority context during progressive intake; AI interpretation never
+confirms business availability or authority by itself.
 The [service operations model](service-operations-model.md) owns Launch/Ongoing
 scope, cadence, progressive intake and selective customer effort.
 
@@ -146,6 +150,13 @@ retention. First-party collection does not remove those obligations. This docume
 does not prescribe persistent visitor tracking, a vendor or an analytics schema.
 
 ## Continuous optimization and intelligence boundary
+
+Use the [structured-efficiency model](opportunity-and-optimization-model.md#structured-efficiency-bounded-intelligence):
+deterministic signal/state/baseline/evaluation work where practical, selective AI
+for ambiguous interpretation, synthesis, explanations and proposed actions.
+Maintain an explainable stable framework with context-driven weights; automated
+learning-driven weighting remains future. Do not build an opaque autonomous
+marketing engine or bypass actual-content approval and protected business truth.
 
 Optimization is core product behavior:
 

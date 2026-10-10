@@ -180,6 +180,11 @@ require customers to maintain another complex dashboard or marketing workflow.
 
 ## Operating cadences
 
+The [opportunity and optimization model](opportunity-and-optimization-model.md)
+owns evidence-driven action selection and maintain/watch/intervene assessment.
+Calendar reviews do not require content quotas or changes to healthy Pages. Base
+Ongoing supports sustainable growth within customer capacity, not maximum activity.
+
 Cadences describe intended service behavior as capabilities become available;
 they are not implemented schedulers, publication quotas or contractual response times.
 
@@ -227,6 +232,11 @@ What happened?” For each known lead, offer **Became customer**, **Still open**
 phone/email clicks as if identifiable leads had been captured. Nonresponse remains
 Unknown; customer confirmation should be minimal, attributable and correctable
 under appropriate access/privacy/retention rules.
+
+The [opportunity model](opportunity-and-optimization-model.md#explainable-prioritization-and-sustainable-growth)
+adds a complementary good-prospect / poor-fit / unclear quality dimension. Lead
+quality and sales outcome are distinct: a good prospect may not buy. Both feedback
+paths remain planned, minimal and subject to the same customer authority/privacy rules.
 
 This is a planned lightweight workflow, not an implemented CRM or outcome table.
 Future CRM integration may improve it automatically without becoming a prerequisite.
@@ -294,6 +304,15 @@ appropriate routing without exposing private facts to unrelated operators. Urgen
 does not bypass approval. Response commitments remain future service-policy decisions.
 
 ## Service economics and planning hypotheses
+
+Use the [effort-budgeting model](opportunity-and-optimization-model.md#effort-budgeting-and-campaign-escalation)
+to distinguish value, next priority and the bounded internal service envelope.
+Include system/operator work, customer review, implementation and future maintenance.
+The time hypotheses below are neither numeric entitlement caps nor “hours included.”
+Surface large opportunities for scope review as supported expansion, a bounded
+Campaign, operator review or outside scope; do not silently absorb unlimited labor
+or automatically surcharge routine included evolution. Calibrate with C0/early
+customer evidence and preserve agreed commercial/approval boundaries.
 
 Track Launch operator hours, **service minutes per customer per month**, infrastructure
 cost, AI/API usage, exceptional support time, incidents and content/review activity.
