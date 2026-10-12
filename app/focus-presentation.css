@@ -109,6 +109,29 @@
 .focus-presence .p-footer nav a { display: inline-flex; min-height: 44px; align-items: center; }
 .focus-presence .p-footer small { padding-top: 1.5rem; border-top: 1px solid var(--focus-violet); }
 .focus-presence .focus-managed-image { width: 100%; height: auto; }
+/* Opt-in outcome overview: existing recipes and accepted customers stay pinned. */
+.focus-presence[data-recipe="overview"] .p-section { padding-block: clamp(2.25rem,4vw,3.5rem); }
+.focus-presence[data-recipe="overview"] .p-hero h1 { font-size: clamp(2.3rem,3.6vw,3.5rem); max-width: 22ch; }
+.focus-presence[data-recipe="overview"] h2 { font-size: clamp(1.8rem,2.6vw,2.5rem); max-width: 32ch; }
+.focus-presence[data-recipe="overview"] .p-hero .focus-copy { gap: 1rem 3rem; }
+.focus-presence[data-recipe="overview"] .focus-actions:empty,
+.focus-presence[data-recipe="overview"] .focus-prose:empty { display: none; }
+.focus-presence[data-recipe="overview"] [data-type="collection"] .focus-copy { max-width: none; }
+.focus-presence[data-recipe="overview"] .focus-peers { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.8rem; }
+.focus-presence[data-recipe="overview"] .focus-peers[data-columns="3"] { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.focus-presence[data-recipe="overview"] .focus-peers > li { border-top: 3px solid var(--p-border); padding-top: 1rem; }
+.focus-presence[data-recipe="overview"] [data-surface="brand"] .focus-peers > li { border-color: var(--p-strong); }
+.focus-presence[data-recipe="overview"] .focus-peers h3 { font-size: 1.3rem; }
+.focus-presence[data-recipe="overview"] .focus-peers .p-action { display: inline-flex; align-items: center; margin-top: 1.1rem; }
+.focus-presence[data-recipe="overview"] [data-type="intro"] .focus-copy { max-width: 70ch; }
+@media (max-width: 900px) {
+  .focus-presence[data-recipe="overview"] .p-hero .focus-copy { grid-template-columns: 1fr; }
+  .focus-presence[data-recipe="overview"] .p-hero h1 { max-width: 24ch; }
+}
+@media (max-width: 650px) {
+  .focus-presence[data-recipe="overview"] .focus-peers,
+  .focus-presence[data-recipe="overview"] .focus-peers[data-columns="3"] { grid-template-columns: 1fr; gap: 1.5rem; }
+}
 .focus-presence :is(a,button):focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
 @media (width < 64rem) {
   .focus-presence .p-header .p-brand { max-width: min(16rem,calc(100% - 7rem)); }

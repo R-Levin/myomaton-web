@@ -1,0 +1,1873 @@
+{
+  "authority": {
+    "stage": "Human-accepted MioPages C0 revamp",
+    "editorialSource": "MioPages-R3.docx",
+    "editorialSha256": "92da3cda258787eb16353ec44a0b46d48447441f71cb9fd849850b9e9889ac9e"
+  },
+  "business": {
+    "knowledge": {
+      "entries": [
+        {
+          "key": "audience",
+          "kind": "audience",
+          "value": "Businesses and organizations that understand marketing is necessary but do not want online prospecting to become another job.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        },
+        {
+          "key": "size",
+          "kind": "audience",
+          "value": "Fit depends on needs, supported complexity and willingness to share accurate business information, not a fixed headcount.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        },
+        {
+          "key": "capacity",
+          "kind": "audience",
+          "value": "Marketing matters, but online prospecting should not become another job for the customer.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        },
+        {
+          "key": "initial-geography",
+          "kind": "service-area",
+          "value": "Remote/national United States initially; international work requires deliberate later evaluation.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "clarity",
+          "kind": "goal",
+          "value": "Improve business and service explanation.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "trust",
+          "kind": "goal",
+          "value": "Improve credibility and trust.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "discoverability",
+          "kind": "goal",
+          "value": "Help qualified visitors find the business through search-oriented core Pages and useful supporting content.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        },
+        {
+          "key": "conversion",
+          "kind": "goal",
+          "value": "Help relevant interest become useful enquiries and leads, without guaranteeing results.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        },
+        {
+          "key": "continuity",
+          "kind": "goal",
+          "value": "Keep improving the Web Presence through customer-approved content, implementation, measurement and optimization.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        },
+        {
+          "key": "burden",
+          "kind": "goal",
+          "value": "Reduce customer technical and administrative burden.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "one-service",
+          "kind": "differentiator",
+          "value": "One managed Web Presence service.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "launch-ongoing",
+          "kind": "differentiator",
+          "value": "Launch establishes the presence; Ongoing carries knowledge and priorities into continuing improvement.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "bounded-complexity",
+          "kind": "differentiator",
+          "value": "Complexity may scale; customization does not.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "outcome-design",
+          "kind": "differentiator",
+          "value": "Customers approve outcomes; no arbitrary page building or pixel-level implementation control.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "pricing-direction",
+          "kind": "differentiator",
+          "value": "Clear public pricing is the intended direction; current amounts remain provisional.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "ownership",
+          "kind": "differentiator",
+          "value": "Customer ownership and a clean exit; retention through value rather than lock-in.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "infrastructure",
+          "kind": "differentiator",
+          "value": "Supporting infrastructure is subordinate to the managed service.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "human-authority",
+          "kind": "differentiator",
+          "value": "Human review and customer approval retain authority over business truth and publication.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "real-functions",
+          "kind": "differentiator",
+          "value": "No artifice: real service functions, not fabricated headcount.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "supported-integrations",
+          "kind": "constraint",
+          "value": "External integrations use reusable bounded supported patterns; no bespoke customer-only development by default.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "initial-scope",
+          "kind": "constraint",
+          "value": "United States commercial scope initially; no bespoke development in normal service.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "first-cohort",
+          "kind": "constraint",
+          "value": "An approximately 5-10 customer first cohort tests delivery and service economics.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "internal",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "service-posture",
+          "kind": "preference",
+          "value": "Experienced people shape the work. Automation reduces repetition and handoffs. Guided AI helps where it is useful; people remain responsible for decisions, and you approve what represents your business.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-site-draft",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-site-draft.md; operator-confirmed site-draft brief"
+          }
+        },
+        {
+          "key": "avoid-reseller-identity",
+          "kind": "preference",
+          "value": "Avoid making hosting/reseller infrastructure the product identity.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        },
+        {
+          "key": "avoid-ai-hype",
+          "kind": "preference",
+          "value": "AI is one contributor alongside human expertise and structured automation, not the product or an autonomous business decision-maker.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        },
+        {
+          "key": "performance",
+          "kind": "goal",
+          "value": "Understand performance and identify worthwhile growth opportunities, with clear measurement limits.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        },
+        {
+          "key": "core-and-growth",
+          "kind": "differentiator",
+          "value": "The core site represents stable business truth and conversion; useful content supports discovery and opportunity-driven growth.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        },
+        {
+          "key": "routine-evolution",
+          "kind": "constraint",
+          "value": "Routine business evolution is expected. Campaigns may address exceptional focused opportunities; a future major Revamp is separately scoped, not a headline service.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        },
+        {
+          "key": "runtime-responsibility",
+          "kind": "constraint",
+          "value": "MioPages manages the core runtime. Optional domain/DNS assistance supports the integrated service rather than defining it.",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-10T17:05:47.700Z",
+            "confirmedBy": "operator-authorized:miopages-home-preview",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-home-revamp.md; operator-confirmed bounded Home revamp brief"
+          }
+        }
+      ],
+      "approval": {
+        "at": "2026-10-10T17:05:47.700Z",
+        "by": "operator-authorized:miopages-site-draft",
+        "scope": "public"
+      },
+      "identityEvidence": [
+        {
+          "field": "displayName",
+          "digest": "dc3a8cabe0b863aad79757a398e690d936ef74cae036706d46700db6f5b193f3",
+          "evidence": {
+            "sourceKind": "operator",
+            "visibility": "public",
+            "confirmedAt": "2026-10-07T01:06:33.315Z",
+            "confirmedBy": "operator:approved-c0-discovery",
+            "confirmation": "confirmed",
+            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery"
+          }
+        }
+      ]
+    },
+    "offering": {
+      "detail": "Experienced human judgment, structured automation and guided AI turn customer business knowledge into a managed presence. The core site supports stable business truth and conversion; useful content supports discovery and growth. Customers supply facts, goals, preferences, assets and approvals; MioPages owns bounded structure, presentation and operation. This is the confirmed service model, not a claim that its intake, reporting or optimization workflows are operational in this development preview.",
+      "summary": "One managed Web Presence service that helps qualified visitors discover the business, turn relevant interest into leads and improve over time.",
+      "approval": {
+        "at": "2026-10-10T17:05:47.700Z",
+        "by": "operator-authorized:miopages-site-draft",
+        "scope": "public"
+      },
+      "evidence": {
+        "sourceKind": "operator",
+        "visibility": "public",
+        "confirmedAt": "2026-10-10T17:05:47.700Z",
+        "confirmedBy": "operator-authorized:miopages-site-draft",
+        "confirmation": "confirmed",
+        "sourceReference": "docs/miopages-site-draft.md; operator-confirmed site-draft brief"
+      },
+      "outcomes": [
+        "Qualified discovery",
+        "Useful enquiries and leads",
+        "Search visibility",
+        "Performance understanding",
+        "Worthwhile growth opportunities",
+        "Continuing improvement",
+        "Reduced customer administration"
+      ],
+      "actionIds": [
+        "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f",
+        "d6f20426-e80f-4f50-b838-9b7b144cf81b",
+        "19aaf955-92fe-47cc-870e-01465f9eab09"
+      ],
+      "audiences": [
+        "Businesses and organizations that understand marketing is necessary but do not want online prospecting to become another job."
+      ],
+      "components": [
+        {
+          "key": "standard-launch",
+          "kind": "establishment",
+          "name": "Standard Launch",
+          "pricing": {
+            "mode": "fixed",
+            "note": "Planning hypothesis only; commercial terms are not confirmed.",
+            "basis": "one-time",
+            "amount": 109500,
+            "approval": {
+              "at": "2026-10-07T01:06:33.315Z",
+              "by": "operator:approved-c0-discovery",
+              "scope": "internal"
+            },
+            "currency": "USD",
+            "applicability": "component",
+            "commercialStatus": "provisional-hypothesis"
+          },
+          "summary": "Normal good-fit establishment of the managed Web Presence.",
+          "boundaries": [
+            "Supported capabilities only; not all intended operating workflows are implemented.",
+            "No bespoke development or arbitrary page-builder control."
+          ],
+          "inclusions": [
+            "Structured intake and business-knowledge capture",
+            "Existing-presence review",
+            "Audience and offering organization",
+            "Bounded Visual Direction",
+            "Managed Site and essential Pages/Navigation",
+            "Contact and lead path",
+            "Modest supported migration",
+            "Deployment/infrastructure coordination",
+            "External-presence inventory",
+            "First-party measurement baseline",
+            "GA4/Search Console support where practical and proven",
+            "Customer review/approval and go-live"
+          ],
+          "timingGuidance": "Approximately 2-4 weeks after required information and approvals are available; planning guidance, not a contractual promise.",
+          "complexityNotes": [],
+          "commercialRelationship": "Establishes the presence before Ongoing."
+        },
+        {
+          "key": "expanded-launch",
+          "kind": "supported-complexity",
+          "name": "Expanded Launch",
+          "pricing": {
+            "mode": "scope-confirmed",
+            "note": "Planning hypothesis only; commercial terms are not confirmed.",
+            "basis": "one-time",
+            "approval": {
+              "at": "2026-10-07T01:06:33.315Z",
+              "by": "operator:approved-c0-discovery",
+              "scope": "internal"
+            },
+            "currency": "USD",
+            "applicability": "component",
+            "commercialStatus": "provisional-hypothesis"
+          },
+          "summary": "Additional supported complexity, not custom development.",
+          "boundaries": [
+            "Does not authorize bespoke development."
+          ],
+          "inclusions": [
+            "Larger supported catalogs",
+            "Multiple locations",
+            "Larger migrations and continuity work",
+            "More supported integrations",
+            "Larger approval surface"
+          ],
+          "complexityNotes": [
+            "Scope must be reviewed before a fixed price is confirmed."
+          ],
+          "commercialRelationship": "Establishes the presence before Ongoing."
+        },
+        {
+          "key": "ongoing",
+          "kind": "ongoing",
+          "name": "Ongoing",
+          "pricing": {
+            "mode": "fixed",
+            "note": "Planning hypothesis only; commercial terms are not confirmed.",
+            "basis": "recurring",
+            "amount": 24900,
+            "approval": {
+              "at": "2026-10-07T01:06:33.315Z",
+              "by": "operator:approved-c0-discovery",
+              "scope": "internal"
+            },
+            "currency": "USD",
+            "interval": "month",
+            "applicability": "component",
+            "commercialStatus": "provisional-hypothesis"
+          },
+          "summary": "Continuing managed service after Launch.",
+          "boundaries": [
+            "As supported; analytics, drafting and workflow capabilities remain deferred."
+          ],
+          "inclusions": [
+            "Operation and maintenance",
+            "Business updates",
+            "First-party measurement",
+            "Concise value/progress reporting",
+            "Prioritized recommendations",
+            "Grounded AI-assisted drafting",
+            "Human/customer approval",
+            "Supported content/optimization activity",
+            "Conversion refinement",
+            "Periodic next-action review"
+          ],
+          "complexityNotes": [],
+          "commercialRelationship": "Begins at go-live after Launch."
+        }
+      ],
+      "exclusions": [
+        "Bespoke custom development",
+        "Arbitrary page-builder control",
+        "Full CRM or marketing-automation replacement",
+        "Broad social-media management",
+        "Managed Google Business Profile",
+        "Guaranteed rankings, traffic, leads or revenue",
+        "Perfect full-funnel attribution"
+      ],
+      "inclusions": [
+        "Structured business knowledge",
+        "Bounded professional presentation",
+        "Launch-to-Ongoing continuity"
+      ],
+      "thirdPartyCosts": [
+        "Third-party costs remain separate and must be disclosed when applicable."
+      ]
+    }
+  },
+  "pages": [
+    {
+      "id": "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d",
+      "name": "Home",
+      "title": "MioPages",
+      "slug": "/",
+      "status": "active",
+      "sort_order": 0,
+      "configuration": {
+        "presentation": {
+          "recipe": {
+            "id": "overview",
+            "version": 1
+          }
+        }
+      },
+      "sections": [
+        {
+          "id": "cce9affd-4875-477e-9848-da52eec40826",
+          "name": "Home revamp 1",
+          "type": "hero",
+          "variant": "default",
+          "sort_order": 0,
+          "content": {
+            "text": "Businesses and organizations understand marketing is necessary, but don’t want online prospecting to become a full-time job.\n\nMioPages delivers a complete managed Web presence built for online discovery, with targeted content that encourages visitor contact and a system of continuous analysis and improvement that helps grow traffic over time.",
+            "eyebrow": "Managed Web Presence",
+            "heading": "Help the right people find you online. Make contacting you a breeze.",
+            "actionId": "375db6fd-a4cb-44c2-83ca-ab898f6fb10c",
+            "secondaryActionId": "3518dc28-9324-4af6-bf15-f6a21f6f7a6c"
+          },
+          "configuration": {
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        },
+        {
+          "id": "c18776da-f19a-481a-a239-6644eda51f94",
+          "name": "Home revamp 2",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 10,
+          "content": {
+            "text": "",
+            "items": [
+              {
+                "id": "understand",
+                "text": "Build a website that can be found and clearly explains what you offer, so the right visitors are naturally guided to connect when there’s a good fit.",
+                "heading": "Reach relevant prospects"
+              },
+              {
+                "id": "discover",
+                "text": "Bring your business knowledge, audience and offer together in clear pages that answer the questions people have before getting in touch.",
+                "heading": "Explain why visitors should choose you"
+              },
+              {
+                "id": "enquire",
+                "text": "Give interested visitors a clear and easy path to connect.",
+                "heading": "Get to the next step"
+              }
+            ],
+            "heading": "Turn what you know into a Web presence people can act on.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 3,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "8052f100-3265-4e63-b3a2-d4f4b69642e4",
+          "name": "Home revamp 3",
+          "type": "intro",
+          "variant": "stack",
+          "sort_order": 20,
+          "content": {
+            "text": "You should not have to become a web administrator, coordinate with an agency at every step, or start from scratch whenever you need to add new information to your Website or Blog.\n\nThe MioPages advantage comes from experienced professionals who shape the work, smart automation that reduces repetition and unnecessary manual effort, and guided AI that helps where it is useful. People remain responsible for decisions, and you approve what represents your business.",
+            "heading": "The MioPages Advantage: Human judgment. Useful automation. One coordinated service."
+          },
+          "configuration": {
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "d67c9c6b-b15e-4e8b-9e76-015701386fdb",
+          "name": "Home revamp 4",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 30,
+          "content": {
+            "text": "A carefully structured launch establishes a powerful Web presence that fully represents your business or organization. Ongoing operation carries that same understanding into persuasive content, continuous measurement and improvement. Everything is part of one cohesive service, not separate processes competing for attention.",
+            "items": [
+              {
+                "id": "presence",
+                "text": "MioPages uses your knowledge to deliver clear content, purposeful design, and a complete foundation for search and effective conversion. You confirm the facts and determine where you want to go; MioPages takes care of the rest.",
+                "heading": "A professional core presence"
+              },
+              {
+                "id": "growth",
+                "text": "MioPages provides content recommendations shaped around worthwhile opportunities, then, with your review and approval, meaningful changes are implemented to support ongoing growth.",
+                "heading": "Content with a purpose"
+              },
+              {
+                "id": "operation",
+                "text": "Reporting and ongoing refinement are an intrinsic part of the service. We maintain the website, explain how it’s performing and recommend useful improvements.",
+                "heading": "Operation and improvement"
+              }
+            ],
+            "heading": "A strong foundation, then informed advice to keep improving.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 3,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        },
+        {
+          "id": "3b03cf8f-ca8a-4a40-ac1f-5202c2c2fa58",
+          "name": "Home revamp 5",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 40,
+          "content": {
+            "text": "Here’s an example of how the system works: A training company wants to offer workshops on improving results for business teams by leveraging project management, group chats and other online tools. They know they need to reach larger small and midsize businesses whose employees work across multiple teams.",
+            "items": [
+              {
+                "id": "knowledge",
+                "text": "The MioPages system takes the information the company provides, then applies proven marketing techniques and focused online research to create an optimized landing page with strong conversion elements. Once approved, the page is published and tracking begins.",
+                "heading": "Understanding the need and tailoring the approach"
+              },
+              {
+                "id": "presence",
+                "text": "Visitors from the target market find clear workshop information, useful supporting content and an easy path to getting more information.",
+                "heading": "Answer the questions qualified visitors have"
+              },
+              {
+                "id": "improve",
+                "text": "If fewer leads than expected are acquired, or those seeking information are poorly matched, the system will flag the results and work with the training company to enhance or revise page content without changing elements that are working effectively.",
+                "heading": "Improve what matters"
+              }
+            ],
+            "heading": "The System in Action",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 3,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "7e089212-fae6-4090-8986-e5f30c803e1c",
+          "name": "Home revamp 6",
+          "type": "cta",
+          "variant": "default",
+          "sort_order": 50,
+          "content": {
+            "text": "MioPages is a complete system for creating and maintaining a growth-oriented online presence focused on getting visitors and converting them into leads.\n\nStart with a cost-free Web Presence Review to see where MioPages could help, without committing to paid work. If you are already ready to start, How It Works explains how we confirm fit and scope before paid onboarding.\n\nQuestions or need help? Talk to us. When requests open, an operator can help you through the same process.",
+            "heading": "Ready to see if MioPages is the right choice for you?",
+            "actionId": "375db6fd-a4cb-44c2-83ca-ab898f6fb10c"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "16a9ec53-f447-4dac-a968-b165f0dc1531",
+      "name": "Why MioPages?",
+      "title": "Why MioPages? | MioPages",
+      "slug": "/service",
+      "status": "active",
+      "sort_order": 10,
+      "configuration": {
+        "presentation": {
+          "recipe": {
+            "id": "overview",
+            "version": 1
+          }
+        }
+      },
+      "sections": [
+        {
+          "id": "e00562b2-9ef8-4ff5-8857-5cd3631f2200",
+          "name": "What Is MioPages?: Your business, clearly presented. Your web presence, looked after.",
+          "type": "hero",
+          "variant": "default",
+          "sort_order": 0,
+          "content": {
+            "text": "MioPages brings the work that makes an effective Web presence together in one managed service. You tell us about your business, your customers and what you want to accomplish. We use that knowledge to build and operate a professional online presence designed to help the right people find you, understand what you offer and get in touch.",
+            "heading": "One complete Web presence, without the usual complexity.",
+            "actionId": "375db6fd-a4cb-44c2-83ca-ab898f6fb10c"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        },
+        {
+          "id": "e5b72ca3-6deb-427e-8fde-a1700f9e388d",
+          "name": "What Is MioPages?: Start with what makes your business worth choosing.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 10,
+          "content": {
+            "text": "The better we understand your business, the better the result. MioPages begins by learning what you offer, who you serve, what makes you different and what a good prospect needs to know before contacting you.",
+            "items": [
+              {
+                "id": "truth",
+                "text": "We organize what you know into clear pages and supporting content that answer real visitor questions and explain the value of what you offer.",
+                "heading": "Turn business knowledge into useful content"
+              },
+              {
+                "id": "presence",
+                "text": "The site is structured so interested visitors can quickly find the information they need and contact you when there is a good fit.",
+                "heading": "Make it easy to take the next step"
+              },
+              {
+                "id": "discovery",
+                "text": "Search-friendly structure and purposeful content create additional paths into the site for people already looking for the products or services you provide.",
+                "heading": "Give the right people more ways to find you"
+              },
+              {
+                "id": "improve",
+                "text": "MioPages continues to watch what is happening, identify worthwhile opportunities and recommend changes that can improve discovery, inquiries and overall performance.",
+                "heading": "Keep improving after launch"
+              }
+            ],
+            "heading": "Start with what makes your business worth choosing.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "fd416786-38fb-46f4-9b96-104a4f5527f7",
+          "name": "Why MioPages?: Judgment where it matters. Less repetition everywhere else.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 20,
+          "content": {
+            "text": "Traditional Web work is often split among designers, developers, hosting companies, search specialists, content providers and reporting tools. MioPages coordinates the work as one system, using the same knowledge of your business throughout.\n\nMioPages grew out of decades of practical Web development, optimization and operations experience. The lesson is simple: effective Web marketing should not require a business owner to coordinate a collection of specialists, tools and repetitive manual tasks.",
+            "items": [
+              {
+                "id": "judgment",
+                "text": "Understanding a business, deciding what matters, recognizing a worthwhile opportunity and knowing when not to change something require context and judgment. Experienced people remain responsible for those decisions.",
+                "heading": "Experienced judgment"
+              },
+              {
+                "id": "automation",
+                "text": "Repeatable work should not have to be done by hand every time. Automation helps keep the system consistent, reduces duplicated effort and lets human attention stay focused on work that actually needs it.",
+                "heading": "Useful automation"
+              },
+              {
+                "id": "ai",
+                "text": "AI is useful for organizing information, exploring possibilities, preparing drafts and helping analyze results. It is one contributor to the service, not the service itself. Important claims, decisions and published material remain subject to human review and customer approval.",
+                "heading": "Guided AI"
+              }
+            ],
+            "heading": "Use people, automation and AI where each works best.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 3,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "1d5f4429-d66b-4229-a53a-bcbb633afafe",
+          "name": "Why MioPages?: A different way to organize the work.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 30,
+          "content": {
+            "text": "The website, supporting content, reporting and ongoing improvement all work from the same understanding of your business. That means less repeated explanation, fewer handoffs and less time spent managing the people and tools that are supposed to be helping you.\n\nYou make the business decisions and approve what represents your organization. MioPages handles the Web work needed to put those decisions into practice.",
+            "items": [
+              {
+                "id": "diy",
+                "text": "You do not have to learn a site builder, choose every layout, chase multiple vendors or become the project manager for your own Web presence.",
+                "heading": "Less work for you"
+              },
+              {
+                "id": "agency",
+                "text": "MioPages is designed around getting the right people to your site, helping them understand your offer and making it easy to contact you. Design and technology support that goal instead of becoming the goal themselves.",
+                "heading": "More focus on the result"
+              }
+            ],
+            "heading": "One coordinated system instead of a chain of projects.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        },
+        {
+          "id": "07ce2622-c610-405c-bc63-bde141651795",
+          "name": "Why MioPages?: Design should help people understand and act.",
+          "type": "intro",
+          "variant": "stack",
+          "sort_order": 40,
+          "content": {
+            "text": "A polished site matters because it helps visitors understand and trust the business. You can share brand preferences and examples, but MioPages does not turn the process into endless pixel-level revisions. The emphasis stays on clarity, credibility and action.",
+            "heading": "Professional design without design theater."
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "e09e1f2f-96bb-4e44-8d9b-324dbae2a386",
+          "name": "What Is MioPages?: See what the relationship includes.",
+          "type": "cta",
+          "variant": "default",
+          "sort_order": 50,
+          "content": {
+            "text": "MioPages is a new service model, so the strongest proof will come from the quality of the presence, the usefulness of the recommendations and the results that build over time. We would rather demonstrate the system than make claims that only the success of your online presence can prove.",
+            "heading": "The value should be visible in the work.",
+            "actionId": "375db6fd-a4cb-44c2-83ca-ab898f6fb10c"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "b67ad2da-e72a-4ab8-b603-bbd8db5464d5",
+      "name": "What You Get",
+      "title": "What You Get | MioPages",
+      "slug": "/what-you-get",
+      "status": "active",
+      "sort_order": 20,
+      "configuration": {
+        "presentation": {
+          "recipe": {
+            "id": "overview",
+            "version": 1
+          }
+        }
+      },
+      "sections": [
+        {
+          "id": "1f27f21c-9ed9-4c46-a154-6987cc93e31c",
+          "name": "What You Get: A presence that works together. Support that continues.",
+          "type": "hero",
+          "variant": "default",
+          "sort_order": 0,
+          "content": {
+            "text": "MioPages is one coordinated service rather than a menu of disconnected Web products. It establishes a strong online foundation, keeps the site current and uses what we learn over time to recommend useful ways to improve traffic, inquiries and growth.",
+            "heading": "A complete Web presence, built, managed and improved for you.",
+            "actionId": "375db6fd-a4cb-44c2-83ca-ab898f6fb10c"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        },
+        {
+          "id": "ea8920d3-c629-4f1e-9cd3-a8c4d4dec113",
+          "name": "What You Get: A clear foundation for discovery and enquiries.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 10,
+          "content": {
+            "text": "",
+            "items": [
+              {
+                "id": "design",
+                "text": "Clear writing, purposeful design and a sensible site structure present your business professionally and make it easy for visitors to understand what you offer.",
+                "heading": "A professional core presence"
+              },
+              {
+                "id": "search",
+                "text": "The site is structured for search and supported by content that helps connect your business with people looking for the products or services you provide.",
+                "heading": "Built to be found"
+              },
+              {
+                "id": "conversion",
+                "text": "Visitors are given clear reasons and easy paths to contact you when they are a good fit.",
+                "heading": "Built to turn interest into inquiries"
+              },
+              {
+                "id": "r3-item-3",
+                "text": "MioPages operates the core Web presence, including the technical foundation needed to keep it available, secure and working properly. Domain and related services can be coordinated as needed without forcing you to replace systems that already work.",
+                "heading": "Managed operation"
+              }
+            ],
+            "heading": "A strong foundation from the start.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 3,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "e083a053-5ea2-4dc1-ae67-d74660bc14fc",
+          "name": "What You Get: After launch, the work stays connected to your goals.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 20,
+          "content": {
+            "text": "Launch is the beginning, not the end. MioPages keeps working with the same understanding of your business to help the presence stay accurate, useful and productive.",
+            "items": [
+              {
+                "id": "content",
+                "text": "We look for worthwhile questions and growth opportunities rather than publishing on an arbitrary schedule. That may mean new supporting content, a stronger service page, clearer proof or a better path to contact you.",
+                "heading": "Content with a reason"
+              },
+              {
+                "id": "report",
+                "text": "Reporting focuses on what matters: who is finding you, whether they are taking useful actions, what is changing and where the next opportunity may be.",
+                "heading": "Reporting you can use"
+              },
+              {
+                "id": "work",
+                "text": "MioPages prepares the recommended work, you review and approve important business claims and suggested new content, and we put the changes you approve into practice.",
+                "heading": "Recommendations that lead to action"
+              },
+              {
+                "id": "updates",
+                "text": "Routine changes—including adding, removing or updating services, staff, locations and other business information—are part of ongoing operation. When a larger opportunity or major change falls outside normal scope, we identify it clearly before additional work begins.",
+                "heading": "A presence that keeps up with your business"
+              }
+            ],
+            "heading": "Ongoing work is part of the service.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        },
+        {
+          "id": "c597c6e6-63e1-4bc8-8257-9ddd8627fc84",
+          "name": "What You Get: Agree the scope before the work begins.",
+          "type": "cta",
+          "variant": "default",
+          "sort_order": 30,
+          "content": {
+            "text": "Launch has a one-time cost and Ongoing operation is a recurring managed service. Most ongoing work is part of that managed service. If an unusually large supported expansion, focused Campaign or major Revamp falls outside normal operation, we explain the scope and any additional cost before the work proceeds.",
+            "heading": "Clear scope. No surprise projects.",
+            "actionId": "375db6fd-a4cb-44c2-83ca-ab898f6fb10c"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "84c76c34-6207-42d0-9ca1-9387c8e8f78b",
+      "name": "How It Works",
+      "title": "How It Works | MioPages",
+      "slug": "/getting-started",
+      "status": "active",
+      "sort_order": 30,
+      "configuration": {
+        "presentation": {
+          "recipe": {
+            "id": "overview",
+            "version": 1
+          }
+        }
+      },
+      "sections": [
+        {
+          "id": "fbe323bb-fcde-4edc-9ea7-759ed9522ce3",
+          "name": "Getting Started: Begin with a clearer view of what you need.",
+          "type": "hero",
+          "variant": "default",
+          "sort_order": 0,
+          "content": {
+            "text": "Start with a Free Web Presence Review, or skip it if you are ready to proceed. Either way, we confirm fit, scope and price before commercial commitment and deeper paid onboarding. Getting started should not require a design brief, sitemap or technical plan.",
+            "heading": "From first interest to launch and Ongoing.",
+            "actionId": "375db6fd-a4cb-44c2-83ca-ab898f6fb10c",
+            "secondaryActionId": "3518dc28-9324-4af6-bf15-f6a21f6f7a6c"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        },
+        {
+          "id": "b8bf111c-2394-4381-9aa6-9966377374f0",
+          "name": "Getting Started: Two ways to begin. The same considered service.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 10,
+          "content": {
+            "text": "",
+            "items": [
+              {
+                "id": "self",
+                "text": "Use the Review to decide whether to continue. We then confirm fit, scope and price with you before you commit to paid onboarding.",
+                "heading": "After the Free Review"
+              },
+              {
+                "id": "help",
+                "text": "You can skip the Free Review. Share the foundational information about your business, audience, goals and existing Web presence so we can confirm fit and scope. Once the scope and price are agreed and you make the commercial commitment, paid onboarding begins.",
+                "heading": "Ready to start now?"
+              }
+            ],
+            "heading": "Choose the starting point that fits.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "4029e8f7-69c2-4808-9cd9-3f875eb445b3",
+          "name": "Getting Started: From business knowledge to an agreed direction.",
+          "type": "intro",
+          "variant": "stack",
+          "sort_order": 20,
+          "content": {
+            "text": "When requests open, you can share information on your own or work through it with a knowledgeable operator. The same process confirms what you need and whether MioPages is a good fit; assistance is available whichever starting point you choose.",
+            "heading": "Questions or need help? Talk to us."
+          },
+          "configuration": {
+            "columns": 3,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        },
+        {
+          "id": "fac8d1de-702a-4290-b305-ae9e10810cf5",
+          "name": "Getting Started: Launch is the beginning of the relationship.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 30,
+          "content": {
+            "text": "Paid onboarding begins after commercial commitment. We deepen our understanding of your business, agree the Presence direction, then build, review and launch. Ongoing operation follows launch.",
+            "items": [
+              {
+                "id": "launch",
+                "text": "MioPages reflects back its understanding of your business, audience, offer and goals. You correct anything that is missing or inaccurate before it becomes the basis for public content.",
+                "heading": "Confirm what we understand"
+              },
+              {
+                "id": "ongoing",
+                "text": "We prepare the recommended structure, content direction, visual approach and conversion path. You review the proposal and approve the proposed path before implementation.",
+                "heading": "Review the proposed direction"
+              },
+              {
+                "id": "r3-item-2",
+                "text": "MioPages creates the presence, coordinates the agreed technical setup and gives you a real site to review before it goes live.",
+                "heading": "Build, review and launch"
+              },
+              {
+                "id": "r3-item-3",
+                "text": "After launch, MioPages continues to create useful content, recommend improvements, keep business information current and report on what is happening. You stay involved in the decisions that require your knowledge or approval; we handle the Web work.",
+                "heading": "Keep improving"
+              }
+            ],
+            "heading": "Once fit, scope and price are agreed, we go deeper.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "5c147663-3a34-4708-943f-bf34b3d3ea14",
+      "name": "Why MioPages?",
+      "title": "Why MioPages? | MioPages",
+      "slug": "/experience",
+      "status": "inactive",
+      "sort_order": 40,
+      "configuration": {
+        "presentation": {
+          "recipe": {
+            "id": "overview",
+            "version": 1
+          }
+        }
+      },
+      "sections": [
+        {
+          "id": "e7d1b2aa-1257-4a47-9cdc-0d79da12f6e8",
+          "name": "Why MioPages?: Put experience to work. Keep the work focused.",
+          "type": "hero",
+          "variant": "default",
+          "sort_order": 0,
+          "content": {
+            "text": "The MioPages explanation is now available in one place.",
+            "heading": "Why MioPages?",
+            "actionId": "19aaf955-92fe-47cc-870e-01465f9eab09"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "56e8802d-f643-4a95-93db-e683a27e8186",
+      "name": "Web Presence Review",
+      "title": "Web Presence Review | MioPages",
+      "slug": "/review",
+      "status": "active",
+      "sort_order": 50,
+      "configuration": {
+        "presentation": {
+          "recipe": {
+            "id": "overview",
+            "version": 1
+          }
+        }
+      },
+      "sections": [
+        {
+          "id": "4af04629-9b7a-4ffd-b6b3-322af962ee5d",
+          "name": "Web Presence Review: Find the next useful step for your web presence.",
+          "type": "hero",
+          "variant": "default",
+          "sort_order": 0,
+          "content": {
+            "text": "The cost-free Web Presence Review is designed to show what appears to be working, what may be holding the success of your presence back and where we would focus first. It also helps determine whether MioPages is the right fit for your business.\n\nThe Review is cost-free and does not commit you to paid work.\n\nYou receive a concise assessment tailored to your business, with initial direction on where to focus.",
+            "heading": "Get a useful first look before you commit.",
+            "secondaryActionId": "426c5333-34ab-44ca-b9f6-246111c85741",
+            "previewControlLabel": "Start My Free Review"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        },
+        {
+          "id": "4d95d0d8-0a1b-4202-90ed-f8870b6355aa",
+          "name": "Web Presence Review: Enough context to make it relevant.",
+          "type": "intro",
+          "variant": "stack",
+          "sort_order": 10,
+          "content": {
+            "text": "We ask for the essentials: what your business does, who you want to reach, your goals, your current website or public profiles when you have them, and the concern or goal that matters most. If you are starting fresh, we focus instead on what you want to accomplish and what needs to be created. If you are unsure where to begin, you can ask for help.",
+            "heading": "A small amount of information gives us a useful place to start."
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        },
+        {
+          "id": "831fd96b-52cc-41ac-91b3-0c9472cbeda5",
+          "name": "Web Presence Review: Useful clarity before a paid commitment.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 20,
+          "content": {
+            "text": "",
+            "items": [
+              {
+                "id": "strengths",
+                "text": "A plain-language view of the parts of your current presence that communicate the business well and are worth preserving.",
+                "heading": "What is already working"
+              },
+              {
+                "id": "priorities",
+                "text": "A short list of the issues or opportunities that appear most important, why they matter and what we would look at first.",
+                "heading": "The strongest opportunities"
+              },
+              {
+                "id": "fit",
+                "text": "An honest assessment of whether MioPages appears well suited to the work you need, including any important open questions or reasons another approach may make more sense.",
+                "heading": "A view of fit"
+              }
+            ],
+            "heading": "What you receive.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 3,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "9944bdd0-58a2-431a-8bda-bca8cec181c3",
+          "name": "Web Presence Review: See what would happen next.",
+          "type": "intro",
+          "variant": "stack",
+          "sort_order": 30,
+          "content": {
+            "text": "The Review is a diagnosis and initial direction, not a complete strategy or a disguised sales pitch. If you decide MioPages is a good fit, we confirm scope and price before paid work begins.",
+            "heading": "Useful whether or not you continue.",
+            "actionId": "8ff0544b-60b3-4e23-87c0-e3837dc0e9af"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        },
+        {
+          "id": "e4de122b-13f4-47c0-ad16-cb6c7f6f6655",
+          "name": "Web Presence Review: A clear boundary between free and paid work.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 40,
+          "content": {
+            "text": "If you decide to continue, we confirm fit, scope and price before any paid onboarding begins.",
+            "items": [
+              {
+                "id": "free",
+                "text": "A concise assessment of your current presence—or, for a new venture, the initial needs and opportunities—plus the most useful next step.",
+                "heading": "The Review"
+              },
+              {
+                "id": "paid",
+                "text": "Deeper onboarding, the full Web Presence direction, content preparation, implementation, launch and ongoing operation are put into place once you sign up.",
+                "heading": "The managed service"
+              }
+            ],
+            "heading": "Free Review. Paid implementation.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "267b46a6-105b-4d14-8d4b-2fe171834c94",
+          "name": "Review: primary preview conversion",
+          "type": "cta",
+          "variant": "default",
+          "sort_order": 50,
+          "content": {
+            "text": "This preview control is disabled. No information is collected or submitted.",
+            "heading": "Start with a clearer view of your Web presence.",
+            "previewControlLabel": "Start My Free Review"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        },
+        {
+          "id": "0775ed85-a954-436b-87aa-3070325b3cb4",
+          "name": "Review: direct-start alternative",
+          "type": "intro",
+          "variant": "stack",
+          "sort_order": 60,
+          "content": {
+            "text": "If you already understand MioPages and want to proceed, you may skip the Free Review and move directly toward establishing scope and starting the service.",
+            "heading": "Ready to get started now?",
+            "actionId": "8476824c-b1fe-47e7-a78f-32572f9a36fd"
+          },
+          "configuration": {
+            "columns": 3,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "c74fa19e-3e8a-451a-8fa7-a8fa7fa25d12",
+      "name": "Questions & Answers",
+      "title": "Questions & Answers | MioPages",
+      "slug": "/faq",
+      "status": "active",
+      "sort_order": 60,
+      "configuration": {
+        "presentation": {
+          "recipe": {
+            "id": "overview",
+            "version": 1
+          }
+        }
+      },
+      "sections": [
+        {
+          "id": "1cf779a6-1f31-4080-8e82-68970b1dc85a",
+          "name": "Questions & Answers: Practical questions. Straightforward answers.",
+          "type": "hero",
+          "variant": "default",
+          "sort_order": 0,
+          "content": {
+            "text": "MioPages is designed to simplify Web Presence work, not create another system for you to manage. Here are answers to some of the questions that are likely to matter before you get started.",
+            "heading": "Practical questions. Straightforward answers.",
+            "actionId": "c79ba04e-22ed-401b-93cf-97dc0e796699"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        },
+        {
+          "id": "5cab8ff3-34cf-4e40-97ed-7a4df79a3e15",
+          "name": "Questions & Answers: Keeping the presence useful.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 10,
+          "content": {
+            "text": "",
+            "items": [
+              {
+                "id": "changes",
+                "text": "That is expected. Routine changes to services, staff, locations and other business information are part of your account’s ongoing operation. Tell us what changed; MioPages prepares the necessary updates and checks important claims with you before they are published.",
+                "heading": "What if my business changes?"
+              },
+              {
+                "id": "after",
+                "text": "Ongoing operation includes automated operation of the current Web presence, routine business updates, content recommendations and preparation, reporting and continuous improvement. MioPages handles the Web work; you stay involved in the decisions that require your business knowledge or approval.",
+                "heading": "What is included after launch?"
+              },
+              {
+                "id": "content",
+                "text": "MioPages looks for worthwhile opportunities rather than publishing on an arbitrary schedule. A recommendation might be a new article, a stronger service page, better proof, a clearer path to contact or another change that has a good reason behind it.",
+                "heading": "How does content marketing work?"
+              },
+              {
+                "id": "revamp",
+                "text": "Routine evolution is part of Ongoing operation. A major repositioning, large new service line or coordinated redesign may require a separately scoped Revamp. In day to day operation, the goal is to preserve useful work and add or improve only what needs to change for continued success.",
+                "heading": "What if I need a major revamp later?"
+              }
+            ],
+            "heading": "Keeping your Web presence useful",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "7a5795b5-d5bf-414f-ae52-e8978961b8ac",
+          "name": "Questions & Answers: Existing websites and connected services.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 20,
+          "content": {
+            "text": "",
+            "items": [
+              {
+                "id": "existing",
+                "text": "Many customers will already have a website. The Web Presence Review helps identify useful content, assets, links, search value and other material worth preserving, and MioPages plans the transition carefully—including important URL continuity and redirects where needed. If you are starting from scratch, we build the new presence from the business information gathered during onboarding instead of migrating an existing site.",
+                "heading": "What if I already have a website?"
+              },
+              {
+                "id": "domain",
+                "text": "No. Your domain can usually stay in an account you control. MioPages can coordinate the DNS changes needed to connect it to the managed presence, and domain registration or transfer can be provided when it is useful.",
+                "heading": "Do I need to move my domain?"
+              },
+              {
+                "id": "email",
+                "text": "No. If your business email already works well, there is no reason to move it just because the website changes. MioPages uses its own reliable delivery method for website-generated messages and can work alongside your existing email service. If you need email accounts, we can provide them.",
+                "heading": "Do I need to move my email?"
+              },
+              {
+                "id": "systems",
+                "text": "Often, yes. MioPages is well suited to working alongside specialized services rather than trying to replace them. We confirm that a suitable, supportable connection exists before including an integration in the scope.",
+                "heading": "Can MioPages work with ecommerce, booking or CRM systems?"
+              }
+            ],
+            "heading": "Your existing website and connected services",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        },
+        {
+          "id": "b3fd732f-0351-4e04-b80a-ba3a55d440c6",
+          "name": "Questions & Answers: Your involvement and the service model.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 30,
+          "content": {
+            "text": "",
+            "items": [
+              {
+                "id": "manage",
+                "text": "No. You provide accurate business information, share important changes and review proposed work when your approval is needed. MioPages manages the site and puts approved changes into practice.",
+                "heading": "Do I have to manage the website?"
+              },
+              {
+                "id": "custom",
+                "text": "You can share your brand, preferences and examples, and you approve the overall direction. MioPages does not provide pixel-level control or a page builder. The service is designed to deliver an effective professional presence optimized for site traffic and lead conversions without turning you into the designer or developer.",
+                "heading": "Can I customize the design?"
+              },
+              {
+                "id": "agency",
+                "text": "Traditional agency work is often organized as a series of separate projects and specialties. MioPages brings the website, content, reporting and ongoing improvement into one managed system, reducing repeated briefing, coordination and labor that does not add value.",
+                "heading": "How is MioPages different from an agency?"
+              },
+              {
+                "id": "builder",
+                "text": "A builder gives you tools and leaves you responsible for using them. MioPages takes responsibility for preparing and managing the Web work using your business knowledge and approval. AI helps where it is useful, but it does not replace experienced judgment or your ability to guide critical business decisions.",
+                "heading": "How is MioPages different from a DIY or AI site builder?"
+              }
+            ],
+            "heading": "Your role and the MioPages service",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "1d156d4e-27d1-4f2b-89e3-17ac2721f21c",
+          "name": "Questions & Answers: Ownership, trust and the next step.",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 40,
+          "content": {
+            "text": "",
+            "items": [
+              {
+                "id": "ownership",
+                "text": "Your business information and customer-owned material remain yours. Domain and connected-service accounts should stay under your control wherever practical. Ownership, access and any licensed material are made clear before work begins.",
+                "heading": "Who owns my information, content and accounts?"
+              },
+              {
+                "id": "leave",
+                "text": "MioPages is not designed around lock-in. If you leave, you receive a practical export package containing your business information, customer-owned assets, MioPages-created content, and useful reporting and history. Customer-owned accounts such as your domain remain under your control. The managed MioPages platform and backend access do not transfer. The agreement will spell out notice, export timing and format, any temporary data-retention period, licensed material and other handoff details before work begins.",
+                "heading": "What happens if I leave?"
+              },
+              {
+                "id": "ai",
+                "text": "AI is one useful resource within the system. It can help organize information, explore possibilities, prepare drafts and analyze results. Experienced people guide the work, and you confirm important business claims and approve published material.",
+                "heading": "How does AI fit into the service?"
+              }
+            ],
+            "heading": "Ownership, trust and the future",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "tonal"
+            }
+          }
+        },
+        {
+          "id": "6f26a264-db54-4b8e-a611-a418bb80c589",
+          "name": "FAQ: Free Review next step",
+          "type": "cta",
+          "variant": "default",
+          "sort_order": 50,
+          "content": {
+            "text": "Start with a cost-free Review, without committing to paid work.",
+            "heading": "See where MioPages could help.",
+            "actionId": "375db6fd-a4cb-44c2-83ca-ab898f6fb10c"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "b0bf642c-a4bc-4568-ba42-fcbff2628116",
+      "name": "Start MioPages",
+      "title": "Start MioPages | MioPages",
+      "slug": "/start",
+      "status": "active",
+      "sort_order": 70,
+      "configuration": {
+        "presentation": {
+          "recipe": {
+            "id": "overview",
+            "version": 1
+          }
+        }
+      },
+      "sections": [
+        {
+          "id": "a077eb28-b0cd-48d8-84fe-5f79479ebeed",
+          "name": "Start MioPages: entry",
+          "type": "hero",
+          "variant": "default",
+          "sort_order": 0,
+          "content": {
+            "text": "Ready to move forward? We'll confirm what you need, make sure MioPages is a good fit, and gather the information needed to build your Web Presence.\n\nThis page outlines the next steps. Intake, payment and onboarding are not available here; no information is collected or submitted.",
+            "heading": "Start MioPages"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "brand"
+            }
+          }
+        },
+        {
+          "id": "94561089-d6f1-4396-9080-920e48b1b013",
+          "name": "Start MioPages: known information",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 10,
+          "content": {
+            "items": [
+              {
+                "id": "after-review",
+                "text": "Continue with the business information already provided for your Review. We would ask only for missing details or confirmation of information that may have changed.",
+                "heading": "After your Free Review"
+              },
+              {
+                "id": "direct",
+                "text": "First share the foundational information about your business, audience, goals, existing Web presence and primary concern or opportunity. Then continue through the same fit, scope and onboarding process.",
+                "heading": "Starting directly"
+              }
+            ],
+            "heading": "Start from what we already know.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        },
+        {
+          "id": "e1ed4ba1-0093-47d2-ac33-e251155f0b92",
+          "name": "Start MioPages: progressive journey",
+          "type": "collection",
+          "variant": "grid",
+          "sort_order": 20,
+          "content": {
+            "text": "Fit, scope and commercial agreement come before deeper paid onboarding. You confirm our understanding and approve the proposed direction before we build.",
+            "items": [
+              {
+                "id": "business",
+                "text": "Use the information already shared in your Review, or establish the foundational business information if you are starting directly.",
+                "heading": "1. Tell us about the business"
+              },
+              {
+                "id": "scope",
+                "text": "Confirm what you need, whether MioPages is a good fit and the complexity of your Launch. Collect only the additional facts needed to establish scope.",
+                "heading": "2. Confirm fit and scope"
+              },
+              {
+                "id": "terms",
+                "text": "Agree the scope, Launch cost and service terms before making a commercial commitment. No final prices or terms are offered in this preview.",
+                "heading": "3. Review Launch cost and service terms"
+              },
+              {
+                "id": "intake",
+                "text": "After commercial commitment, paid onboarding gathers the deeper missing business facts needed for implementation. You confirm that MioPages understands your business accurately.",
+                "heading": "4. Complete the deeper business intake"
+              },
+              {
+                "id": "direction",
+                "text": "Review and approve the proposed structure, content direction, visual approach and conversion path.",
+                "heading": "5. Review the proposed Web Presence direction"
+              },
+              {
+                "id": "build",
+                "text": "MioPages builds the agreed presence and gives you a real site to review before it goes live.",
+                "heading": "6. Build and review"
+              },
+              {
+                "id": "launch",
+                "text": "Launch the approved presence with the agreed technical setup.",
+                "heading": "7. Launch"
+              },
+              {
+                "id": "ongoing",
+                "text": "Continue with useful content, reporting and worthwhile improvements, using your business knowledge and approval.",
+                "heading": "8. Ongoing improvement"
+              }
+            ],
+            "heading": "From agreement to continuing improvement.",
+            "itemSource": "inline"
+          },
+          "configuration": {
+            "columns": 2,
+            "presentation": {
+              "region": "connected",
+              "surface": "light"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "19aaf955-92fe-47cc-870e-01465f9eab09",
+      "name": "see-experience",
+      "label": "Why MioPages?",
+      "type": "page",
+      "configuration": {},
+      "route": "/service"
+    },
+    {
+      "id": "3518dc28-9324-4af6-bf15-f6a21f6f7a6c",
+      "name": "conversion-10",
+      "label": "Ready to start now?",
+      "type": "page",
+      "configuration": {},
+      "route": "/start"
+    },
+    {
+      "id": "375db6fd-a4cb-44c2-83ca-ab898f6fb10c",
+      "name": "conversion-9",
+      "label": "Get Your Free Web Presence Review",
+      "type": "page",
+      "configuration": {},
+      "route": "/review"
+    },
+    {
+      "id": "426c5333-34ab-44ca-b9f6-246111c85741",
+      "name": "conversion-11",
+      "label": "Ready to get started now?",
+      "type": "page",
+      "configuration": {},
+      "route": "/start"
+    },
+    {
+      "id": "8476824c-b1fe-47e7-a78f-32572f9a36fd",
+      "name": "preview-13",
+      "label": "Start Now",
+      "type": "page",
+      "configuration": {},
+      "route": "/start"
+    },
+    {
+      "id": "8ff0544b-60b3-4e23-87c0-e3837dc0e9af",
+      "name": "conversion-12",
+      "label": "What happens if I continue?",
+      "type": "page",
+      "configuration": {},
+      "route": "/start"
+    },
+    {
+      "id": "ba6ee5af-ebce-4529-8072-dd0a1ecadc6f",
+      "name": "request-review",
+      "label": "Explore the cost-free Review",
+      "type": "page",
+      "configuration": {},
+      "route": "/review"
+    },
+    {
+      "id": "c79ba04e-22ed-401b-93cf-97dc0e796699",
+      "name": "explore-start",
+      "label": "See How It Works",
+      "type": "page",
+      "configuration": {},
+      "route": "/getting-started"
+    }
+  ],
+  "navigation": [
+    {
+      "id": "cd92fb3c-0e28-4758-8e4c-8b54476c3c8e",
+      "name": "What Is MioPages?",
+      "label": "Why MioPages?",
+      "sort_order": 0,
+      "configuration": {},
+      "route": "/service"
+    },
+    {
+      "id": "1b7e0ff3-f022-48a0-bc94-6f45f5a4d44b",
+      "name": "What You Get",
+      "label": "What You Get",
+      "sort_order": 10,
+      "configuration": {},
+      "route": "/what-you-get"
+    },
+    {
+      "id": "fa49d5ec-784a-4753-ae25-e23da235beb0",
+      "name": "Getting Started",
+      "label": "How It Works",
+      "sort_order": 20,
+      "configuration": {},
+      "route": "/getting-started"
+    },
+    {
+      "id": "c893b7c2-e355-48a2-b365-fdefb9c8e0b7",
+      "name": "FAQ",
+      "label": "Questions & Answers",
+      "sort_order": 30,
+      "configuration": {},
+      "route": "/faq"
+    },
+    {
+      "id": "5a84f6c4-7fd7-4f85-9642-86d29d5bd340",
+      "name": "Review",
+      "label": "Get Your Free Review",
+      "sort_order": 40,
+      "configuration": {},
+      "route": "/review"
+    }
+  ]
+}

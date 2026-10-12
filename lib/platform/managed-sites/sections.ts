@@ -9,7 +9,7 @@ export type CollectionContent = { heading?: string; text?: string } & (
   | { itemSource: "subjects"; items: SubjectCollectionItem[] }
 );
 
-export type SectionContent = { heading?: string; text?: string; actionId?: string; secondaryActionId?: string };
+export type SectionContent = { heading?: string; text?: string; actionId?: string; secondaryActionId?: string; previewControlLabel?: string };
 export type SectionPresentation = {
   presentation?: unknown;
   previewMedia?: unknown;
@@ -89,6 +89,8 @@ export function normalizeSection(value: unknown): NormalizedSection | null {
     if (typeof input[key] === "string") content[key] = input[key];
   }
   if (type === "hero" && typeof input.eyebrow === "string") content.eyebrow = input.eyebrow;
+  // A non-submitting prototype control; presentation still requires the isolated-preview gate.
+  if ((type === "hero" || type === "cta") && typeof input.previewControlLabel === "string" && input.previewControlLabel.trim() && input.previewControlLabel.length <= 200) content.previewControlLabel = input.previewControlLabel.trim();
   if (type === "hero" && input.valuePoints !== undefined) {
     try { content.valuePoints = valuePoints(input.valuePoints); } catch { /* Scaffold failure falls back without invented points. */ }
   }

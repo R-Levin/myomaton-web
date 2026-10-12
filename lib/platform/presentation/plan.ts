@@ -11,6 +11,7 @@ export const recipes = {
   evidence: { hero: "editorial-masthead", conversion: "focused-next-step", rhythm: "separated" },
   assessment: { hero: "orientation", conversion: "focused-next-step", rhythm: "connected" },
   editorial: { hero: "editorial-masthead", conversion: "integrated-invitation", rhythm: "separated" },
+  overview: { hero: "orientation", conversion: "focused-next-step", rhythm: "connected" },
 } as const;
 export const serviceLed = Object.freeze({ id: "service-led", version: 1, typography: "precise-sans", header: "brand-prominent", navigation: "commercial", footer: "service-led",
   heroes: ["orientation", "editorial-masthead", "service-value"], conversions, surfaces, recipeVersion: 1, compositionVersion: 1, hero: "editorial-masthead", conversion: "focused-next-step", rhythm: "separated",
@@ -41,7 +42,10 @@ function recipe(input: unknown): keyof typeof recipes | null {
 export function resolvePlan(selection: Selection, pageConfiguration: unknown, sections: readonly Section[], strict = false, preview = false): PresentationPlan {
   const diagnostics = [...selection.diagnostics]; let purpose: keyof typeof recipes | null = null;
   const fail = (e: unknown) => { if (strict) throw e; diagnostics.push(String(e instanceof Error ? e.message : e)); };
-  try { purpose = recipe(record(pageConfiguration).presentation); } catch (e) { fail(e); }
+  try {
+    purpose = recipe(record(pageConfiguration).presentation);
+    if (purpose === "overview" && selection.version !== 3) throw Error("Overview requires service-led v3");
+  } catch (e) { purpose = null; fail(e); }
   if (selection.grammar === "basic") purpose = null;
   const manifest = selection.version === 3 ? serviceLedV3 : selection.version === 2 ? serviceLedV2 : serviceLed;
   const recipeSet = selection.version >= 2 ? commercialRecipes : recipes;
