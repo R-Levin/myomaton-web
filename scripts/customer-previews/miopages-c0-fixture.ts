@@ -8,7 +8,7 @@ import { readMigrationFiles } from "drizzle-orm/migrator";
 import reviewed from "../customer-updates/miopages-focus-reviewed.json";
 import { snapshotPublic } from "./disposable";
 import { customerGraph } from "../../lib/platform/customer-state";
-import { readCustomerState, stateFingerprint } from "../../lib/platform/customer-initialization";
+import { readCustomerState, stateFingerprint, type CustomerState } from "../../lib/platform/customer-initialization";
 import { inspectCanonical, writeCanonical } from "../../lib/platform/canonical/writes";
 import { projectCanonicalSections } from "../../lib/platform/canonical/projections";
 import { normalizeSection } from "../../lib/platform/managed-sites/sections";
@@ -16,9 +16,10 @@ import { resolvePlan, validateDirection } from "../../lib/platform/presentation/
 import { assetRoot, readManagedObject, provisionManagedObject } from "../../lib/platform/assets/local-storage";
 import { startProductionFixture } from "../../tests/integration/production-server";
 import { acceptedRevamp } from "./miopages-c0";
+import { after as transitioned, planC0Transition } from "../customer-updates/miopages-c0-revamp";
 
 // No public-schema write mode or caller-supplied schema. Always create a new
-// isolated copy of the current approved graph, never the historical experiment.
+// isolated reproduction of the accepted draft from its frozen predecessor.
 export async function prepareAcceptedRevamp(databaseUrl: string) {
   const source = new Pool({ connectionString: databaseUrl, options: "-c default_transaction_read_only=on -c timezone=UTC" });
   const admin = new Pool({ connectionString: databaseUrl });
@@ -30,8 +31,10 @@ export async function prepareAcceptedRevamp(databaseUrl: string) {
   const root = await mkdtemp(path.join(os.tmpdir(), "miopages-c0-"));
   let created = false, server: Awaited<ReturnType<typeof startProductionFixture>> | undefined;
   try {
-    const before = await snapshotPublic(source), owned = customerGraph(before, reviewed.target);
-    assert.equal(stateFingerprint(owned), stateFingerprint(reviewed.after), "Current accepted MioPages graph required");
+    const before = await snapshotPublic(source), current = customerGraph(before, reviewed.target);
+    if (stateFingerprint(current) === stateFingerprint(transitioned)) assert.equal(planC0Transition(before).changed,false);
+    else assert.equal(stateFingerprint(current), stateFingerprint(reviewed.after), "Exact accepted MioPages endpoint required");
+    const owned: CustomerState = structuredClone(reviewed.after);
     const at = new Date().toISOString(), draft = acceptedRevamp(owned, at);
     const { business, sections } = draft;
     const c = await admin.connect();

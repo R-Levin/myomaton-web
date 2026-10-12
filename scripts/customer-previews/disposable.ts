@@ -17,6 +17,7 @@ import { validatePalette } from "../../lib/platform/presentation/tokens";
 import { projectCanonicalSections } from "../../lib/platform/canonical/projections";
 import promoted from "../customer-updates/miopages-focus-reviewed.json";
 import { customerGraph } from "../../lib/platform/customer-state";
+import { after as c0Transitioned, planC0Transition } from "../customer-updates/miopages-c0-revamp";
 
 type Row = Record<string, unknown>;
 export type PreviewSection = { type: "hero" | "intro" | "collection" | "cta" | "relationship"; content: Row; configuration: Row };
@@ -40,6 +41,9 @@ export async function snapshotPublic(pool: Pool): Promise<CustomerState> {
 
 export function assertCommittedCustomer(state: CustomerState, manifest: CustomerManifest) {
   if (manifest.webPresenceId === promoted.target.webPresenceId && stateFingerprint(customerGraph(state,promoted.target)) === stateFingerprint(promoted.after as CustomerState)) return;
+  if (manifest.webPresenceId === promoted.target.webPresenceId && stateFingerprint(customerGraph(state,promoted.target)) === stateFingerprint(c0Transitioned)) {
+    assert.equal(planC0Transition(state).changed,false); return;
+  }
   for (const [table, rows] of Object.entries(manifest.rows)) for (const expected of rows) {
     const actual = state[table].find(row => row.id === expected.id);
     assert.ok(actual, `Missing baseline ${table}`);
@@ -92,7 +96,7 @@ export async function prepareDisposablePreview(databaseUrl: string, manifest: Cu
     assertCommittedCustomer(before, manifest);
     // Pinned experiments continue from their exact historical source graph after
     // the separately reviewed real promotion; never reinterpret the experiments.
-    const owned = manifest.webPresenceId === promoted.target.webPresenceId && stateFingerprint(customerGraph(before,promoted.target)) === stateFingerprint(promoted.after as CustomerState)
+    const owned = manifest.webPresenceId === promoted.target.webPresenceId && [stateFingerprint(promoted.after as CustomerState),stateFingerprint(c0Transitioned)].includes(stateFingerprint(customerGraph(before,promoted.target)))
       ? structuredClone(promoted.before as CustomerState) : selectedCustomer(before, manifest);
     const projectedPages: Record<string, PreviewSection[]> = {};
     for (const [route, sections] of Object.entries(plan.pages)) {

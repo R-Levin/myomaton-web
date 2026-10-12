@@ -7,6 +7,8 @@ import { mioPagesPreview } from "../../scripts/customer-previews/miopages";
 import { validateMioPagesPreview } from "../../scripts/preview-miopages";
 import { projectCanonicalSections } from "../../lib/platform/canonical/projections";
 import { relationship } from "../../lib/platform/presentation/content";
+import promoted from "../../scripts/customer-updates/miopages-focus-reviewed.json";
+import type { CustomerState } from "../../lib/platform/customer-initialization";
 
 test("disposable preview preserves canonical customers, isolates serving, and delivers only approved media", async () => {
   const url = process.env.ASSET_TEST_DATABASE_URL; assert.ok(url, "PostgreSQL fixture URL required");
@@ -27,7 +29,8 @@ test("disposable preview preserves canonical customers, isolates serving, and de
         assert.ok(references.rows.length); assert.ok(references.rows.every(r => r.nspname === preview.schema));
         for (const table of ["business_knowledge", "offerings", "business_knowledge_revisions", "offering_revisions"]) {
           const current = (await runtime.query(`SELECT to_jsonb(t) row FROM ${table} t`)).rows.map(r => r.row);
-          assert.deepEqual(current, before[table].filter(r => r.web_presence_id === manifest.webPresenceId), `${table} copied without edits`);
+          const historical: CustomerState = promoted.before;
+          assert.deepEqual(current, historical[table], `${table} reproduces the pinned historical source without edits`);
         }
         const sourceBinding = { role: "offering-relationship", offeringId: manifest.offering.id, kind: "stages", componentKeys: ["standard-launch", "ongoing"] };
         const projected = await projectCanonicalSections(runtime, manifest.webPresenceId, [{ type: "relationship", content: { source: sourceBinding } }]);
