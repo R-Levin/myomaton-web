@@ -410,6 +410,15 @@ duplicating global facts in each presentation.
 
 ## 12. Onboarding, measurement and optimization
 
+**Core planned:** [Conversion Architecture](conversion-architecture.md) between
+Business Knowledge and Page/content planning: a Site Conversion Brief, materially
+necessary Offering/intent/relationship profiles, inherited defaults/overrides,
+Page conversion roles, CTA hierarchy, Conversion QC and measurement-step mapping.
+Existing Action destinations and isolated C0 CTA refinement are foundations, not
+that reusable workflow. Intent is primary; urgency is an attribute. Sophisticated
+recognition, automatic relationship detection, dynamic journey weighting and
+adaptive personalization remain future, not launch dependencies.
+
 The [opportunity and optimization model](opportunity-and-optimization-model.md)
 defines **Core planned** customer-specific opportunity persistence/prioritization,
 maintain/watch/intervene assessment, effort budgeting, explainable recommendations,

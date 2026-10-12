@@ -35,6 +35,13 @@ implementation and safety authority. No customer state is changed by this docume
 
 ## Core site and dynamic discovery layer
 
+The [Conversion Architecture contract](conversion-architecture.md) supplies the
+intent, information/proof, qualification, Page-role and appropriate-outcome model
+that conversion opportunities improve. Recommend changes to that model when
+evidence justifies them, rather than optimize every visitor toward one CTA or
+maximum submissions. This document retains ranking, effort and evaluation ownership;
+conversion-plan changes still require existing customer authority and approvals.
+
 | Layer | Primary role |
 | --- | --- |
 | Core site | Relatively stable business truth, core offers/services/products, proof/trust, conversion paths and durable positioning. Stable does not mean immutable. |

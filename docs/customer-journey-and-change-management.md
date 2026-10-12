@@ -27,6 +27,15 @@ The [architecture register](deferred-architecture.md) owns implementation gates;
 
 ## One continuous service journey
 
+The [Conversion Architecture contract](conversion-architecture.md) owns the
+visitor-intent-to-outcome model before Page/content generation: information, proof,
+qualification, CTA hierarchy and appropriate friction. This document owns the
+subsequent service/commercial lifecycle and approvals, not a mandatory sequence of
+Pages. The Review-first flow below is the normal MioPages path; a ready prospect may
+use direct start, establish foundational information and join fit/scope/commercial
+commitment before paid onboarding. Assistance supports either path. Neither shortcut
+removes required commercial, business-truth or publication approval.
+
 The intended funnel is:
 
 1. Discover MioPages.

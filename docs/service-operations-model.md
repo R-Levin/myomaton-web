@@ -180,6 +180,13 @@ require customers to maintain another complex dashboard or marketing workflow.
 
 ## Operating cadences
 
+The [Conversion Architecture contract](conversion-architecture.md#post-conversion-confidence-and-response-expectations)
+requires truthful post-action confirmation, next steps and response expectations.
+An urgent visitor intent does not create availability or a callback commitment.
+Confirm response responsibility/capacity before publishing timing; internal review
+or service-minute hypotheses are not prospect-facing response promises. Existing
+customers may need a distinct supported service path without competing with acquisition.
+
 The [opportunity and optimization model](opportunity-and-optimization-model.md)
 owns evidence-driven action selection and maintain/watch/intervene assessment.
 Calendar reviews do not require content quotas or changes to healthy Pages. Base

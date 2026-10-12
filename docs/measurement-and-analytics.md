@@ -240,6 +240,21 @@ and limitations; Google enriches this story rather than defining it. Prefer a
 small understandable report to analytics clutter. The
 [growth loop](content-growth-loop.md#compact-customer-experience) owns recommendation presentation.
 
+## Intent-to-outcome step mapping
+
+[Conversion Architecture](conversion-architecture.md#measurement-and-conversion-qc)
+defines planned journey steps: qualified visit, relevant Page/offer engagement,
+CTA engagement, inquiry/request, good prospect and customer/business outcome where
+known. Select meaningful intermediate steps per intent; this is not a universal
+tracked funnel or permission to identify visitors automatically. Define eligibility,
+source and limits under P12. A visit does not prove qualification, a click does not
+prove a call/submission, and accepted requests do not prove delivery or lead quality.
+
+Reuse the conversion ladder above and the opportunity model's measurement contract
+for baseline, action-specific window, evidence sufficiency, confounding context,
+result and next decision. Preserve unknown outcomes and privacy/minimization; do
+not introduce a second event store, attribution model or unbuilt collection claim.
+
 ## Business-change context
 
 The [opportunity model's measurement contract](opportunity-and-optimization-model.md#measurement-contract-and-post-action-evaluation)

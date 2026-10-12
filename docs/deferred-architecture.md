@@ -180,6 +180,24 @@ C2/C3/C7 still own content-specific drafting/publication, while the opportunity 
 owns selecting and evaluating actions. Automated learning-driven weights/predictive
 scoring and advanced Campaign automation remain future, not gate completion claims.
 
+### Conversion Architecture completion under existing gates
+
+The [Conversion Architecture contract](conversion-architecture.md) adds a planned
+intent-to-outcome layer before Page/content generation, not a schema or runtime
+workflow. Reuse existing gates; no new gate IDs or automatic personalization are needed.
+
+| Existing gate | Required completion / trigger |
+| --- | --- |
+| P11/P13, P1/P2/P3/P7 | Before persisting/generating from Conversion Briefs: confirm business truth, review proposed site strategy and materially needed Offering/intent/relationship profiles, preserve authorized selection/inheritance and approval provenance. Page roles inform approved IA without silently adding/reordering Pages. |
+| P15/P21, P8/P10 | Before resolving conversion configuration into presentation: validate bounded default/override scope and compatibility, retain truthful availability and URL continuity, and refuse conflicting/unsupported choices. A visual recipe does not establish conversion intent. Existing Action destination/tenant validation remains authoritative; semantic CTA-label/destination matching also needs QC. |
+| P11/P13/P14 | Before customer acceptance/activation of intended paths: review important intents, ready-visitor shortcuts, qualification, proof, assistance, material existing-customer needs, circular/dead-end paths and post-action expectations. Conversion QC is planned; valid links or existing operator-QC tooling do not prove journey effectiveness. No Review/intake/response workflow becomes operational through copy or prototype controls. |
+| P12, P2/P4/P7 | Before journey measurement: define intent-appropriate step meaning/eligibility and approved-action mapping, retaining observed/attributed/confirmed/unknown distinctions, bounded evidence and opportunity-model evaluation. No implicit visitor recognition, excessive tracking or inferred good-prospect status. |
+
+C3/C7 still require actual-content publication approval and P26 owns commercial
+commitment. Advanced recognition, automatic relationship detection, dynamic journey
+weighting and adaptive personalization remain future; any later activation requires
+separate policy/privacy/security review rather than reinterpretation of these defaults.
+
 ## REQUIRED: Content Engine
 
 The native Article baseline and optional external-engine direction supersede the

@@ -222,6 +222,14 @@ the intelligence/security boundaries. See [security and operations](security-ope
 
 ## Distribution and deterministic links
 
+Preserve the discovery-to-conversion context defined by
+[Conversion Architecture](conversion-architecture.md#page-roles-and-journey-continuity).
+Supporting content should connect to its relevant confirmed offer, appropriate
+proof and next action rather than restart generic site education. An Article can
+attract or support later conversion without acting as a lead Page itself. Use the
+existing Action/destination and approval rules; entry context is not proof of
+visitor identity, qualification or complete attribution.
+
 The future distribution loop is:
 
 ```text

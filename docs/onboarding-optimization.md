@@ -38,6 +38,16 @@ source-controlled transitions are historical tooling, not ongoing authority.
 
 ## Guided onboarding and ongoing updates
 
+Before generating detailed Pages/content, derive
+[Conversion Architecture](conversion-architecture.md#generation-and-ongoing-review)
+from confirmed business knowledge, Offerings and audiences: compact Site Conversion
+Brief, materially distinct intents/relationships, minimal overrides and Page roles.
+Then propose IA and content/presentation, render, run Conversion QC and obtain
+existing customer approvals before authorized launch. The broader flow above does
+not imply that canonical facts or a visual recipe alone supply a conversion strategy.
+This sequence is planned core for Customer 2+; it adds no intake writer or automatic
+visitor recognition and must respect already-approved customer IA.
+
 Onboarding is a core product function that should be both easy and complete.
 Initial production can use operator-assisted guided intake; sales need not wait
 for fully automated customer self-service. Questions are conditional on business

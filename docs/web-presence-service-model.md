@@ -34,6 +34,13 @@ and non-canonical service-time hypotheses. It does not expand implemented scope.
 
 ## Launch-stage customer outcome
 
+Derive [Conversion Architecture](conversion-architecture.md) between Business
+Knowledge and Page/content generation. Define the visitor intent, appropriate
+business outcome, information/proof and friction before detailed copy/composition.
+Accurate, attractive Pages with CTAs are not by themselves a coherent conversion
+model. Support ready-to-act and materially different intent/relationship paths
+within the same bounded system, rather than force every visitor through one CTA.
+
 The likely launch offer combines the following, conditional on customer need and
 implemented/operational readiness:
 

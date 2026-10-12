@@ -227,6 +227,15 @@ wording changes. It establishes neither final prices nor contractual entitlement
 
 ## What Customer 0 must prove
 
+The [Conversion Architecture lesson](conversion-architecture.md#miopages-c0-evidence-and-myomaton-follow-up)
+captures the C0 revamp's gap: stronger accuracy/presentation/IA initially led visitors
+sideways through explanation rather than toward an appropriate outcome. Test a
+primary Free Review, subordinate direct start and support, progressive information
+reuse, Page roles and Conversion QC. The
+[accepted C0 checkpoint](miopages-c0-checkpoint.md) owns current stage/route evidence;
+these decisions do not impose MioPages' funnel or Pages on future customers, change
+real customer state or claim that Review/onboarding is operational.
+
 Also prove the [opportunity and optimization model](opportunity-and-optimization-model.md#conceptual-metadata-c0-proving-and-gates):
 detection/classification, maintain/watch/intervene, explainable ranking and
 Now/Later/Watch/Campaign routing, effort estimates versus operator burden,
