@@ -27,6 +27,13 @@ implemented; it adds no runtime, staffing system, service guarantee or customer 
 
 ## Standard Launch
 
+Most businesses/organizations should fit Standard. Absorb normal customer-to-customer
+effort variation and minor complexity; Standard is not a teaser. The
+[progressive onboarding/readiness model](progressive-onboarding-and-launch-readiness.md)
+owns shared intake, Presence Direction and verified launch handoff. Its working
+MioPages prices/timing are business-specific assumptions pending final review,
+not universal service entitlements or canonical pricing updates.
+
 Standard Launch is the normal good-fit customer envelope. Its typical scope is:
 
 - Structured onboarding and trusted business-knowledge capture.
@@ -35,8 +42,10 @@ Standard Launch is the normal good-fit customer envelope. Its typical scope is:
   proof where available; do not invent credentials or testimonials.
 - A core Managed Site with essential Pages/Navigation, an appropriate Contact/lead
   path, bounded Visual Direction and initial content foundation.
-- First-party measurement baseline; preferred optional GA4/Search Console setup or
-  support where practical, authorized and proven. Their absence does not block the core.
+- Measurement baseline using GA4 as preferred primary for traffic/behavior/conversion
+  analysis and Search Console for organic search when properly connected and available;
+  independent first-party fallback/platform signals and direct lead/outcome evidence
+  remain necessary. Provider unavailability must not block operation.
 - Domain/hosting/deployment coordination where applicable, customer review/approval,
   go-live verification and direct transition into Ongoing.
 
@@ -83,12 +92,13 @@ not a restart of discovery.
 
 ## Expanded Launch
 
-Expanded Launch handles more supported complexity, not bespoke development.
-Potential triggers include multiple locations, larger catalogs, large team/resource
-collections, a larger approval surface, multiple supported integrations, multiple
-brands/business units where supported, meaningful redirect/SEO preservation,
-substantial existing search/analytics continuity, or substantial content transfer
-where a supported migration path exists.
+Expanded Launch is a rare exception for materially unusual supported complexity,
+not bespoke development or a default upgrade for normal variation. A very large
+catalog, many locations or substantial unusual supported setup/integration/migration
+burden may justify it when economics/operating effort materially change. Additional
+Pages, a minor integration or ordinary location/content variation alone must not
+trigger added charges. Operator/customer confirm exceptional scope and price before
+commitment; Campaigns/major Revamps are separately scoped only when justified.
 
 Use the same structured platform, supported entity types, bounded composition/
 design system and supported integration patterns. More time can be needed for
@@ -154,6 +164,10 @@ Ongoing increment for recurring support/reporting, or no extra charge when burde
 is negligible. Charging should follow repeatable service burden, not open-ended
 custom estimates. No price, fixed entitlement or final commercial term is set here.
 
+Normal variation/minor complexity should be absorbed, not automatically charged.
+The increment principle applies when material supported burden actually justifies
+it and is agreed, rather than creating plan-tier creep.
+
 ## Progressive onboarding and selective customer effort
 
 The system can work with limited information, but accurate business knowledge
@@ -197,7 +211,7 @@ they are not implemented schedulers, publication quotas or contractual response 
 
 | Cadence | Intended value cycle |
 | --- | --- |
-| Continuous | Observe operation/uptime, first-party traffic and Actions, available referrals, lead/Contact activity, content performance, optimization signals, stale/missing information and opportunity candidates. No routine customer action required. |
+| Continuous | Observe operation/uptime, GA4 traffic/behavior/conversion and Search Console organic-search evidence as preferred primary analysis when usable, with independent first-party fallback/platform Actions, direct lead/Contact activity and outcome feedback. Monitor content, stale facts and opportunity candidates; no routine customer action required. |
 | Monthly | Concise account of what happened, leads/Contact activity, known/confirmed outcomes, improvements and attention needs; 1–3 prioritized recommendations, draft/review items and targeted questions where needed. No analytics dump or artificial quota when evidence is insufficient. |
 | Quarterly | Broader view of service/topic performance, accumulated content effects, useful channels, important underperforming Pages, business/positioning priorities, external-presence accuracy and next-period recommendations. A meeting is optional when it adds value. |
 | Triggered | Respond to meaningful traffic/lead-volume changes, emerging search visibility, high activity with weak conversion, recurring questions, new business/service facts, seasonal opportunities, stale critical information or sufficiently supported content opportunities. Do not wait for a calendar cycle when attention is useful sooner. |
@@ -343,6 +357,15 @@ investigate those causes instead of relying on unpaid bespoke effort. D6 already
 owns the durable economics principle; no actual prices are established here.
 
 ## Commercial structure, retention and fit
+
+One broadly inclusive Ongoing service absorbs normal updates, ordinary additions/
+removals, useful content/core-site/conversion improvements, reporting, optimization
+and operations within the effort envelope. More posts are a prioritization question,
+not a quota plan: do useful work within normal Ongoing or recommend a bounded Campaign
+when a real accelerated initiative materially exceeds it. See the
+[current working commercial/exit direction](progressive-onboarding-and-launch-readiness.md#miopages-working-commercial-model)
+for MioPages assumptions, Ongoing from go-live and nonpayment/ownership safeguards;
+final agreement/legal/accounting review is still required.
 
 Current non-final direction is a fixed/bounded Launch component and a recurring
 Ongoing component. A likely pattern is Standard Launch, Expanded Launch, one primary

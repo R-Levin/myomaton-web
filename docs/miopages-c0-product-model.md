@@ -143,6 +143,13 @@ Detailed scope, cadence, responsibilities and service economics remain in the
 
 ### One primary managed service
 
+The [current working commercial model](progressive-onboarding-and-launch-readiness.md#miopages-working-commercial-model)
+records the provisional Standard Launch, six-payment option and Ongoing amounts,
+with Ongoing beginning at go-live. Most normal variation belongs in Standard and
+one inclusive Ongoing service; Expanded is rare material complexity, not a teaser
+upgrade. These planning assumptions do not update canonical Offering/Pricing records
+or approve public prices, final terms, billing implementation or commercial launch.
+
 MioPages sells one primary managed Web Presence service: establish the presence,
 then continuously improve it. Hosting, domains and email may be supplied or
 coordinated where needed, but they do not define the product. The customer is
@@ -168,8 +175,10 @@ A normal good-fit customer may receive:
 - Migration/normalization of a modest amount of useful existing content where
   applicable and a supported path exists; no automatic site cloning/import promise.
 - Domain/hosting/deployment handling where needed and external-presence inventory.
-- Baseline first-party measurement and GA4/Search Console setup or connection
-  where practical, authorized and proven; Google access remains an unproven spike.
+- Measurement baseline with GA4 preferred primary for traffic/behavior/conversion
+  analysis and Search Console for organic search when usable; independent internal
+  fallback/platform events and direct lead/customer outcomes remain important.
+  Google access remains an unproven spike, not an operating dependency.
 - Customer review/approval and Launch directly into the Ongoing managed service.
 
 The customer need not arrive with a sitemap, wireframes, design specification,
@@ -195,6 +204,10 @@ the [measurement architecture](measurement-and-analytics.md) owns evidence and
 attribution limits. These activities remain subject to their implementation status.
 
 ### Expanded Launch and initial non-promises
+
+Expanded is a rare exception: most normal variation should fit Standard. The
+examples below justify review only when they materially change operating burden;
+minor complexity does not automatically increase price or create another tier.
 
 Expanded Launch means **more supported complexity, not customization**: substantial
 content migration where supported, more locations, larger service/product catalogs,
@@ -226,6 +239,13 @@ and customer FAQs. Preserve its substance and boundaries even when marketing
 wording changes. It establishes neither final prices nor contractual entitlements.
 
 ## What Customer 0 must prove
+
+Also test [progressive onboarding and Launch Readiness](progressive-onboarding-and-launch-readiness.md#existing-gates-and-c0-proving):
+shared foundational intake, operator-approved/private Review, optional teaser effort/
+value, direct-start convergence, commercial clarity, focused corrections/questions,
+one Home direction and readiness state/owner/evidence through controlled cutover
+and Ongoing handoff. Proving objectives do not implement Free Review or make C0's
+question answers, prices or provider choices platform invariants.
 
 The [Conversion Architecture lesson](conversion-architecture.md#miopages-c0-evidence-and-myomaton-follow-up)
 captures the C0 revamp's gap: stronger accuracy/presentation/IA initially led visitors

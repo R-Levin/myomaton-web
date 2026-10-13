@@ -34,6 +34,13 @@ and non-canonical service-time hypotheses. It does not expand implemented scope.
 
 ## Launch-stage customer outcome
 
+The [progressive onboarding and Launch Readiness model](progressive-onboarding-and-launch-readiness.md)
+owns the shared Free Review/direct-start foundation, paid understanding confirmation,
+one Presence Direction/Home concept, complete build and verified go-live process.
+Review is the start of progressive onboarding, not a separate intake. Readiness
+tracks applicable facts, owner, state and evidence; provider-specific procedures
+belong in runbooks. Normal variation should fit Standard and inclusive Ongoing.
+
 Derive [Conversion Architecture](conversion-architecture.md) between Business
 Knowledge and Page/content generation. Define the visitor intent, appropriate
 business outcome, information/proof and friction before detailed copy/composition.
@@ -51,7 +58,7 @@ implemented/operational readiness:
 | Core service/product information | Help prospects understand relevant offerings and proof. Existing Subjects/content are usable within bounds; a general Offering/Testimonial domain is planned, not implied. |
 | Contact / lead path | Provide appropriate valid Actions and canonical contact methods. Contact has a bounded development foundation; production forms/delivery remain gated. |
 | Hosting/deployment and ongoing operation | Coordinate managed hosting where applicable, maintenance, media durability and recovery. Production readiness is not established merely by a working development site. |
-| Analytics/search configuration | Useful first-party measurement and appropriate discovery configuration; optional GA4/Search Console where supported. Analytics and full discovery contracts remain planned. |
+| Analytics/search configuration | GA4 preferred primary traffic/behavior/conversion analysis and Search Console preferred primary organic-search evidence when usable; independent internal fallback/platform events, direct leads/outcomes and discovery configuration. Analytics and full discovery contracts remain planned; operation must continue without Google availability. |
 | External-presence inventory | Understand relevant public profiles, links and ownership/status. Bounded social-link presentation exists; richer inventory/integrations are planned. |
 | Initial content foundation | Appropriate conversion content and, when implemented, native Articles supporting discovery. Native Article/review/publish workflows are planned core. |
 
@@ -118,16 +125,18 @@ in the [growth contract](content-growth-loop.md#distribution-and-deterministic-l
 
 ## Useful measurement, explicit uncertainty
 
-Use first-party analytics, deterministic campaign identifiers, referrals, search,
-configured Search Console/GA4, Contact submissions, phone/email Actions, social
-referrals, content performance and identifiable AI-assistant/referral traffic as
-available. First-party measurement must not depend on optional external providers.
+Use properly connected/available GA4 as preferred primary for traffic, acquisition,
+behavior and conversion analytics, and Search Console for organic-search performance.
+MioPages-owned measurement provides independent fallback/continuity, platform events
+and corroboration. Direct Contact/lead signals and customer outcome feedback remain
+important even when Google works. Available campaign/referral/content signals add
+context; no provider outage or disconnection should leave the service completely blind.
 
 Unknown or likely attribution stays explicitly uncertain. A click is not a
 qualified lead, and correlation is not proof of causal improvement. The objective
 is useful decision support, not a giant marketing analytics suite or perfect
 cross-channel attribution. The [measurement architecture](measurement-and-analytics.md)
-defines the independent core plus preferred optional GA4/Search Console intelligence,
+defines that preferred-primary/fallback hierarchy,
 normalized signals and degraded-mode reporting. P12 governs collection/ingestion;
 service-account onboarding is unproven and GBP reporting remains future optional scope.
 
@@ -155,6 +164,13 @@ providers remain replaceable behind supported deployment/operational boundaries.
 owns secrets, least privilege, recovery and infrastructure obligations.
 
 ## Customer ownership and understandable exit
+
+The [working nonpayment/exit direction](progressive-onboarding-and-launch-readiness.md#inclusive-ongoing-and-understandable-exit)
+separates unpaid work/Launch obligations from customer data ownership: do not hold
+customer information/accounts/assets as leverage. A practical export should include
+applicable MioPages-created content and useful reporting/history under final terms,
+without transferring the managed backend/platform or promising indefinite history.
+Legal/accounting validation and the existing export implementation gate still apply.
 
 Customers retain ownership of business knowledge, customer-provided content and IP,
 domains where applicable, portable data/exports and appropriate account ownership

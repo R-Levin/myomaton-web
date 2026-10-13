@@ -2,6 +2,13 @@
 
 ## Authority and implementation status
 
+The [progressive onboarding and Launch Readiness model](progressive-onboarding-and-launch-readiness.md)
+owns the current provisional intake, private Review delivery, shared Review/direct-start
+information flow, Presence Direction artifact and tracked readiness inventory. Its
+MioPages working commercial assumptions refine the earlier hypotheses below without
+changing canonical prices, final terms or publication authority. This document
+retains the four approval checkpoints and business-change contract.
+
 This document owns the intended prospect-to-customer journey, approval checkpoints,
 commercial handoff and ongoing business-change process. These are service/product
 decisions, not an implemented workflow, public offer, contract or launch approval.
@@ -63,11 +70,11 @@ The exchange should be explicit and fair: the prospect supplies a small amount o
 useful information; MioPages returns a concise, business-specific review. The gate
 must not feel like a complete sales questionnaire or paid onboarding exercise.
 
-Likely required inputs are name, business name, email, website URL if one exists,
-what the business does, who it wants to attract, its primary business/Web Presence
-goal and one key pain point or concern. Phone, a reference/competitor site and
-social/profile links may be optional. Having no existing website is valid input,
-not a reason to fabricate an audit of one.
+The [provisional standard intake](progressive-onboarding-and-launch-readiness.md#provisional-free-review-intake)
+now owns the question baseline, including goals, audience, offer, differentiators,
+conversion preferences, relevant geography and delivery details. Reuse already-known
+answers; phone is not required. Having no existing website is valid input, not a
+reason to fabricate an audit of one. Conditional questions need material justification.
 
 The Review has one primary job: prove that MioPages understands the business and
 can identify useful next steps without giving away the paid Launch work.
@@ -79,13 +86,17 @@ can identify useful next steps without giving away the paid Launch work.
 | Top opportunities | Two or three meaningful weaknesses/opportunities, rather than a generic website score. |
 | What we would focus on first | Short prioritized direction, not a complete strategy or implementation plan. |
 | Likely fit | Standard Launch, Expanded Launch or outside fit/requires review; provisional classification is not a binding quote. |
-| Next step | Start on your own or talk it through first. |
+| Next step | One forward Continue/Start with MioPages action; help remains subordinate within the same process. Self-service and assisted start remain supported entry paths, not competing intake systems. |
 
 ### Free and paid value boundary
 
 Free value is diagnosis, opportunity identification, directional recommendation
 and evidence of business understanding. It may identify likely Page needs or a
 Visual Direction, but does not deliver a complete Presence Plan, full copy or design.
+
+An [optional experimental Home teaser](progressive-onboarding-and-launch-readiness.md#optional-experimental-home-teaser)
+may illustrate capability when evidence and effort allow; it is neither guaranteed
+nor final design/copy and must not become unpaid Launch implementation.
 
 Paid Launch deepens synthesis and establishes complete confirmed structured customer
 state for the agreed scope. It includes recommended information/Page architecture,
@@ -184,8 +195,14 @@ Customers should not need a sitemap, wireframes, design brief or technical knowl
 
 ### Launch payment hypotheses and review gate
 
+The [current MioPages working commercial model](progressive-onboarding-and-launch-readiness.md#miopages-working-commercial-model)
+supplies the provisional Standard/6-payment/Ongoing amounts and go-live billing
+start. It supersedes the earlier open-ended option discussion for current planning;
+twelve-month treatment is not a current option. Commercial/legal/accounting review
+and P26 remain required before use, with no automatic public or canonical pricing change.
+
 Launch is a real, separately valued service cost; Ongoing is the recurring service.
-Current commercial hypotheses, **not final prices or terms**, are:
+Earlier option hypotheses retained for rationale, **not current offer or final terms**, are:
 
 | Option | Planning rationale |
 | --- | --- |
@@ -213,7 +230,7 @@ merely because they appear in internal planning.
 | Checkpoint | Customer confirms | Result and boundary |
 | --- | --- | --- |
 | 1. Business understanding | Identity, offers, audience, differentiators, important proof/claims, geography and primary goals/conversion path. | Establish trusted business truth; confirmed corrections enter canonical business knowledge. This alone does not authorize every public presentation. |
-| 2. Presence Plan | Recommended Pages, major offer groupings, primary Actions, Visual Direction, content priorities, supported integrations and intentional exclusions. | Approve outcomes/direction, not pixel mechanics. This is not approval of unseen final copy. |
+| 2. Presence Plan / Presence Direction | Recommended Pages, major offer groupings, primary Actions, Visual Direction, content priorities, supported integrations and intentional exclusions. | The [Presence Direction and one Home concept](progressive-onboarding-and-launch-readiness.md#one-concise-presence-direction) make this checkpoint tangible; they do not add a fifth approval. Approve outcomes/direction, not pixels or unseen final copy. |
 | 3. Pre-launch | Actual rendered presence: important copy/claims, contact data, forms/Actions, primary media, business metadata and overall direction. | Authorize go-live for the reviewed scope/revision, subject also to operational/security gates. Customer approval cannot make an unavailable workflow operational. |
 | 4. Recurring Ongoing | New content, business-information changes, material optimizations, new offer presentation and significant positioning changes. | Approve, request change, not now or reject. Keep decisions simple rather than introduce complex project management. |
 

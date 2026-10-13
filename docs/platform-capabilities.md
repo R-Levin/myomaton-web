@@ -335,6 +335,13 @@ visual system. Applying a new customer profile/version requires its own authoriz
 
 ## 9. Production readiness track
 
+The [Launch Readiness model](progressive-onboarding-and-launch-readiness.md#launch-readiness-as-a-tracked-workflow)
+is **Core planned**: applicable item states (Not needed / Needed / In progress /
+Ready / Verified), MioPages/customer/external-provider responsibility and verification
+evidence, separating pre-launch requirements, applicable dependencies and later
+maturation. It coordinates existing gates; a checklist or customer visual approval
+does not complete them. Provider-specific runbooks/automation remain separate.
+
 Launching Myomaton should drive the following from theory into implementation
 and operational verification:
 
@@ -346,7 +353,7 @@ and operational verification:
 - SMTP/outbound email.
 - Email deliverability/sender-domain setup.
 - Spam protection.
-- First-party analytics/conversion measurement, independent of optional GA4/Search Console integration.
+- Preferred primary GA4 traffic/behavior/conversion and Search Console organic-search analysis when usable, backed by independent first-party fallback/platform events and direct lead/outcome evidence.
 - SEO metadata.
 - Sitemap/robots/canonical URLs.
 - Structured data.
@@ -410,6 +417,14 @@ duplicating global facts in each presentation.
 
 ## 12. Onboarding, measurement and optimization
 
+**Core planned:** [progressive Review-to-launch onboarding](progressive-onboarding-and-launch-readiness.md),
+including one reused information model, conditional questions, operator-approved
+Review and private Web delivery, commercial gate, understanding confirmation,
+targeted gaps, one Presence Direction/Home concept and final go-live approval.
+Free Review implementation is not added here. Provider-task/access automation and
+richer analytics may mature later; critical lead delivery, security and basic
+first-party measurement must not be hidden behind that deferral.
+
 **Core planned:** [Conversion Architecture](conversion-architecture.md) between
 Business Knowledge and Page/content planning: a Site Conversion Brief, materially
 necessary Offering/intent/relationship profiles, inherited defaults/overrides,
@@ -430,13 +445,16 @@ learning-driven weights and predictive scoring remain **Optional/later**, with
 privacy/legal review before cross-customer learning. No new service tier is implied.
 
 **Core planned:** conditional guided onboarding, ongoing direct updates to global
-business knowledge, canonical first-party analytics and a continuous
+business knowledge, the preferred-primary/fallback measurement hierarchy and a continuous
 measure → analyze → recommend → approve/implement → measure-again loop.
 Operator-assisted intake can support initial production sales before full
-customer self-service automation. GA4 and Google Search Console are preferred
-optional external intelligence sources, never dependencies of core measurement or
-optimization. The [measurement architecture](measurement-and-analytics.md) defines
-the minimal independent core, normalized signals and degraded reporting. Service-account
+customer self-service automation. Properly connected/available GA4 is preferred
+primary for traffic/acquisition/behavior/conversion analysis; Search Console is
+preferred primary for organic-search evidence. Internal measurement provides independent
+fallback, platform events and corroboration; direct leads and customer feedback remain
+important. Google availability must not determine operational success. The
+[measurement architecture](measurement-and-analytics.md) defines source priority,
+normalized signals and explicit fallback reporting. Service-account
 access is an unproven near-term spike; GBP reporting remains future optional scope.
 
 AI/API assistance belongs behind a provider-neutral intelligence boundary for

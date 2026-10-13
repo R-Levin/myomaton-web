@@ -2,6 +2,16 @@
 
 ## Prospect, approval and commercial boundaries
 
+The [progressive onboarding/readiness contract](progressive-onboarding-and-launch-readiness.md)
+adds planned private Web Review delivery, account/access inventory and verified
+lead/technical handoffs. Email-linked private delivery requires explicit scoped,
+revocable access/retention design; a hidden URL is not authorization. Reused public
+research remains unconfirmed evidence until reviewed, not account ownership.
+Readiness notes record ownership/authorization, never raw secrets or payment data.
+Transactional sender setup must preserve customer mail; it does not require mailbox
+migration. Applicable privacy/accessibility/security, backup/restore, abuse and
+monitoring requirements remain launch gates even while procedures are manual.
+
 The [customer journey and change-management contract](customer-journey-and-change-management.md)
 adds planned Review/prospect intake and recurring business-change approvals, not a
 new authorization implementation. Public submissions and inspected public sources
@@ -139,10 +149,11 @@ privacy, access and retention. No arbitrary relay behavior: untrusted requests
 must not select unrestricted recipients, headers or credentials. Lead/event
 capture must not expose secrets. Future forms consume shared canonical contact
 identity; current phone/email links and Contact Actions do not implement forms.
-First-party analytics is canonical, but event endpoints are also untrusted input
+First-party event endpoints are also untrusted input
 and need bounded collection, abuse protection and privacy controls (P12).
 The [measurement architecture](measurement-and-analytics.md) distinguishes the
-independent core from optional provider intelligence; it retains scoped access,
+preferred primary GA4/Search Console analysis when usable from independent fallback
+and complementary platform/lead signals; it retains scoped access,
 protected credentials, source provenance and degraded-mode reporting requirements.
 
 The [Contact foundation](contact-forms.md) implements bounded validation, scoped

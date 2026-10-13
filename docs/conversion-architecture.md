@@ -247,6 +247,13 @@ review or authorizes launch by itself.
 
 ## Generation and ongoing review
 
+The [progressive onboarding and Launch Readiness model](progressive-onboarding-and-launch-readiness.md)
+applies this sequence through shared Review/direct-start intake, understanding
+confirmation, targeted gap analysis, one Presence Direction/Home concept and tracked
+technical/commercial readiness. A ready visitor skips Review delivery, not foundational
+knowledge or fit/scope/commitment. Conversion QC and customer approval do not replace
+end-to-end lead-handling verification or production readiness.
+
 The intended Customer 2+ onboarding/generation sequence is:
 
 1. Capture Business Knowledge and confirm essential truth under existing policy.

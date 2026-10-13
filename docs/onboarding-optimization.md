@@ -38,6 +38,15 @@ source-controlled transitions are historical tooling, not ongoing authority.
 
 ## Guided onboarding and ongoing updates
 
+The [progressive onboarding and Launch Readiness model](progressive-onboarding-and-launch-readiness.md)
+owns the complete workflow and provisional question baseline. Free Review is its
+first stage, not a separate intake. Reuse known answers unless changed, ambiguous/
+incomplete or materially deeper detail is needed. Do homework before asking for
+proprietary facts/corrections/priorities; after commitment reflect understanding,
+then ask only gaps whose answers would materially change the build or claims.
+Presence Direction is the existing plan approval, followed by complete build and
+final review/readiness. No giant second questionnaire or customer design mechanics.
+
 Before generating detailed Pages/content, derive
 [Conversion Architecture](conversion-architecture.md#generation-and-ongoing-review)
 from confirmed business knowledge, Offerings and audiences: compact Site Conversion
@@ -137,13 +146,15 @@ The implemented [Visual Direction contract](visual-direction.md) defines the
 current mapping target. Customer-specific briefs and disposable selections remain
 separate from this planned intake capability.
 
-## Canonical first-party measurement
+## Preferred analytical sources and independent measurement
 
-First-party/internal analytics is the canonical product measurement system.
-Collection, reporting and optimization must work without GA4 or Google Search
-Console. Those services are preferred optional external intelligence sources;
-their presence must not determine whether the platform can measure its own
-conversion outcomes. The [measurement architecture](measurement-and-analytics.md)
+When properly connected and available, GA4 is preferred primary for traffic,
+acquisition, behavior and conversion analytics; Search Console is preferred primary
+for organic-search performance. MioPages first-party measurement supplies independent
+fallback/continuity, complementary platform events and verification. Direct lead/contact
+data and customer outcome feedback remain important even when Google works.
+Reporting/optimization must continue from available evidence when either provider
+is unavailable, delayed or disconnected. The [measurement architecture](measurement-and-analytics.md)
 owns source roles, normalized signals, service-account validation and graceful
 degradation. The platform does not aim to recreate GA4/Search Console; GBP reporting
 is outside initial measurement scope.
