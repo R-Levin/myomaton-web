@@ -1,0 +1,34 @@
+.shell { min-height: 100vh; padding: clamp(1rem, 4vw, 3rem); background: #f6f1e8; color: #30154a; font-family: Arial, sans-serif; overflow-wrap: anywhere; }
+.shell header, .shell footer { display: flex; justify-content: space-between; gap: 1rem; max-width: 52rem; margin: 0 auto 2rem; }
+.shell a { color: #4b2ba6; text-underline-offset: .2em; }
+.card { max-width: 52rem; margin: auto; padding: clamp(1rem, 4vw, 2.5rem); background: #fffdfa; border: 1px solid #c8b8eb; border-radius: .75rem; }
+.card h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.15; margin: 0 0 1rem; }
+.card h2 { font-size: 1.45rem; line-height: 1.3; margin: 1.6rem 0 1rem; }
+.card p { line-height: 1.6; margin: 0 0 1.25rem; }
+.progress { font-weight: bold; margin-bottom: .5rem; }
+.card progress { width: 100%; height: .5rem; appearance: none; border: 0; border-radius: .25rem; background: #ecebe8; overflow: hidden; }
+.card progress::-webkit-progress-bar { background: #ecebe8; }
+.card progress::-webkit-progress-value { background: #31834a; }
+.card progress::-moz-progress-bar { background: #31834a; }
+.field { margin-bottom: 2rem; }
+.field label, .field legend { font-weight: 600; line-height: 1.5; }
+.field > label { display: block; margin-bottom: .4rem; }
+.field fieldset { min-width: 0; border: 0; margin: 0; padding: 0; }
+.field input:not([type=checkbox]):not([type=radio]), .field textarea { display: block; box-sizing: border-box; width: 100%; min-width: 0; padding: .75rem; border: 1px solid #776588; border-radius: .25rem; background: white; color: #30154a; font: inherit; }
+.field textarea { resize: vertical; }
+.choice { display: flex; align-items: flex-start; gap: .75rem; min-height: 2.75rem; padding: .7rem; margin-top: .5rem; border: 1px solid #c8b8eb; border-radius: .25rem; cursor: pointer; }
+.choice input { flex-shrink: 0; margin: .3rem 0 0; accent-color: #6843cf; width: 1.1rem; height: 1.1rem; }
+.choice:has(input:checked) { background: #eee7fc; border-color: #6843cf; }
+.choice:has(input:disabled) { color: #67586f; cursor: default; }
+.hint { font-size: .9rem; color: #574763; }
+.error { color: #9e2336; font-weight: 600; }
+.field [aria-invalid=true] { border-color: #9e2336; }
+.actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 2rem 0 1.25rem; }
+.card button { font: inherit; font-weight: bold; padding: .8rem 1rem; min-height: 2.75rem; border: 2px solid #4b2ba6; border-radius: .25rem; background: #4b2ba6; color: white; cursor: pointer; }
+.card button.secondary { background: transparent; color: #4b2ba6; }
+.card button:disabled { opacity: .65; cursor: wait; }
+.shell :focus-visible { outline: 3px solid #6843cf; outline-offset: 3px; }
+.field input:not([type=checkbox]):not([type=radio]), .field textarea { margin-bottom: .75rem; }
+.shell footer { margin: 2rem auto 0; font-size: .9rem; flex-wrap: wrap; }
+.visuallyHidden, .field > label.visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+@media (max-width: 480px) { .field { margin-bottom: 1.5rem; } .actions { margin-top: 1.5rem; } .shell header { font-size: .9rem; } }

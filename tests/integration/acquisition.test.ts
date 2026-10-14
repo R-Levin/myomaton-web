@@ -32,8 +32,8 @@ test("operational migration fresh/upgrade fidelity and tenant/lifecycle/audit gu
   const f=await fixture();const admin=new Pool({connectionString:url});const schema=`canonical_test_${randomUUID().replaceAll("-","")}_acquisition`;
   try{
     const c=await admin.connect();try{await c.query("BEGIN");await c.query(`CREATE SCHEMA "${schema}"`);await c.query(`SET LOCAL search_path="${schema}"`);
-      const migrations=readMigrationFiles({migrationsFolder:"lib/platform/db/migrations"});for(const m of migrations.slice(0,-1))for(const sql of m.sql)await c.query(sql.replaceAll('"public".',`"${schema}".`));await c.query("COMMIT");
-      await c.query("BEGIN");await c.query(`SET LOCAL search_path="${schema}"`);for(const sql of migrations.at(-1)!.sql)await c.query(sql.replaceAll('"public".',`"${schema}".`));await c.query("COMMIT");
+      const migrations=readMigrationFiles({migrationsFolder:"lib/platform/db/migrations"});for(const m of migrations.slice(0,9))for(const sql of m.sql)await c.query(sql.replaceAll('"public".',`"${schema}".`));await c.query("COMMIT");
+      await c.query("BEGIN");await c.query(`SET LOCAL search_path="${schema}"`);for(const sql of migrations[9].sql)await c.query(sql.replaceAll('"public".',`"${schema}".`));await c.query("COMMIT");
       await c.query("SET search_path=pg_catalog");assert.deepEqual(await schemaSignature(c,schema,["external_work","media_candidates","external_work_events"]),await schemaSignature(c,f.receipt.schema,["external_work","media_candidates","external_work_events"]));
       const guards=await c.query("SELECT count(*)::integer AS count FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=$1 AND c.relname IN ('external_work','media_candidates','external_work_events') AND NOT t.tgisinternal",[schema]);assert.equal(guards.rows[0].count,3);
     }finally{c.release();}

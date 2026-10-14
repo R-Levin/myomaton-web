@@ -8,9 +8,10 @@ import { PageMotion } from "./page-motion";
 import { allocateDecoration, allocateMotion } from "../../lib/platform/visual-direction/model";
 import { visualTokens } from "./visual-tokens";
 import { PresentationPage } from "./presentation-page";
+import type { OperationalConversions } from "../../lib/platform/intake/conversion";
 
-export function ManagedSitePageView({ page }: { page: ManagedSitePage }) {
-  if (page.visual?.presentation) return <PresentationPage page={page} />;
+export function ManagedSitePageView({ page, operationalConversions }: { page: ManagedSitePage; operationalConversions?: OperationalConversions }) {
+  if (page.visual?.presentation) return <PresentationPage page={page} operationalConversions={operationalConversions} />;
   const direction = page.visual?.direction;
   const decoration = allocateDecoration(page.sections, direction);
   const motion = allocateMotion(page.sections, direction?.motion ?? "off");

@@ -174,6 +174,7 @@ test("App Router shares metadata/render lookup, preserves Home title and throws 
     "next/navigation": { notFound }, "next/server": { connection: async () => {} },
     "@/components/managed-sites/managed-site-page": { ManagedSitePageView },
     "@/lib/platform/managed-sites/paths": paths,
+    "@/lib/platform/intake/conversion": { reviewConversions: () => ({}) },
     "@/lib/platform/managed-sites/deployment": { deploymentSelection: () => deploymentSelection({WEB_PRESENCE_ID:id(1),MANAGED_SITE_ID:id(2)}) },
     "@/lib/platform/managed-sites/service": { getManagedSitePage: async (selected: unknown, path: string) => {
       calls++; assert.deepEqual(selected, {webPresenceId:id(1),managedSiteId:id(2)});

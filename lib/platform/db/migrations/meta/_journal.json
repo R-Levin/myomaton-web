@@ -71,6 +71,13 @@
       "when": 1791484096111,
       "tag": "0009_media_acquisition",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791984652575,
+      "tag": "0010_progressive_intake",
+      "breakpoints": true
     }
   ]
 }

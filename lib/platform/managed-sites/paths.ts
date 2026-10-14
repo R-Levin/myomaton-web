@@ -9,6 +9,8 @@ export function normalizePagePath(value: unknown): string | null {
   // Managed media, Next infrastructure, and the framework's generated error
   // entries own these namespaces (also present in the production route manifest).
   if (["media", "api", "_next", "_not-found", "_global-error"].includes(segments[0])) return null;
+  // The operational intake owns this nested route, not a canonical Managed Page.
+  if (path === "/review/intake" || path.startsWith("/review/intake/")) return null;
   return path;
 }
 

@@ -86,6 +86,14 @@ Asset enhancements.
 
 ## REQUIRED: Platform
 
+The [Free Review intake slice](free-review-intake.md) partially implements shared
+progressive intake under P11/P14 in local development only. Real canonical customer
+state and migration rows remain unchanged; prospect persistence uses isolated
+storage with scoped resume and immutable submission. Production authorization,
+privacy/purge/export, distributed abuse defense, operator review/delivery and
+combined PostgreSQL/managed-file backup/restore verification remain required before
+activation; this slice does not close P4/P7/P13/P18–P20 or authorize launch.
+
 The [customer journey and change-management contract](customer-journey-and-change-management.md)
 owns the intended Review-to-Ongoing flow. Reuse existing intake, intelligence,
 public-input, authorization and history gates for that flow rather than creating

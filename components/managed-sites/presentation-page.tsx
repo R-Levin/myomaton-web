@@ -3,6 +3,7 @@ import { sourceEditorial } from "../../lib/platform/presentation/fonts";
 import { fontDiagnostics } from "../../lib/platform/presentation/fonts-server";
 import { FpoVisual } from "./fpo-visual";
 import { FocusPage } from "./focus-page";
+import type { OperationalConversions } from "../../lib/platform/intake/conversion";
 import Image from "next/image";
 import Link from "next/link";
 import type { ManagedSitePage, ManagedSiteSection } from "../../lib/platform/managed-sites/service";
@@ -84,8 +85,8 @@ function Section({ section, plan, basic, preview, commercial }: { section: Manag
     </>}</div>
   </section>;
 }
-export function PresentationPage({ page }: { page: ManagedSitePage }) {
-  if (page.visual?.presentation?.grammar === "service-led" && page.visual.presentation.version === 3) return <FocusPage page={page} />;
+export function PresentationPage({ page, operationalConversions }: { page: ManagedSitePage; operationalConversions?: OperationalConversions }) {
+  if (page.visual?.presentation?.grammar === "service-led" && page.visual.presentation.version === 3) return <FocusPage page={page} operationalConversions={operationalConversions} />;
   const plan = resolvePlan(page.visual!.presentation!, page.page.configuration, page.sections, false, page.presentationPreview === true);
   const commercial = plan.selection.grammar === "service-led" && plan.selection.version === 2;
   const diagnostics = commercial ? fontDiagnostics() : [];

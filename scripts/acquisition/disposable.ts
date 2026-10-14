@@ -9,6 +9,8 @@ import { stateFingerprint } from "../../lib/platform/customer-initialization";
 import { customerGraph } from "../../lib/platform/customer-state";
 import { snapshotPublic } from "../customer-previews/disposable";
 import { assetRoot, readManagedObject, provisionManagedObject } from "../../lib/platform/assets/local-storage";
+import { after as c0Transitioned, planC0Transition } from "../customer-updates/miopages-c0-revamp";
+import type { CustomerState } from "../../lib/platform/customer-initialization";
 
 export type PilotReceipt = {version:1;schema:string;root:string;quarantineRoot:string;webPresenceId:string;managedSiteId:string;sectionId:string;workId?:string;beforeFingerprint:string;budgetMicros:number;reserveMicros:number};
 export function disposablePool(url:string,schema:string) {
@@ -22,8 +24,11 @@ export async function createPilot(databaseUrl:string,budgetMicros:number,reserve
   const root=await mkdtemp(path.join(os.tmpdir(),"acquisition-managed-"));
   const quarantineRoot=await mkdtemp(path.join(os.tmpdir(),"acquisition-quarantine-"));
   try{
-    const before=await snapshotPublic(source),owned=customerGraph(before,reviewed.target);
-    if(stateFingerprint(owned)!==stateFingerprint(reviewed.after))throw Error("Accepted canonical MioPages baseline differs");
+    const before=await snapshotPublic(source),current=customerGraph(before,reviewed.target);
+    if(stateFingerprint(current)===stateFingerprint(c0Transitioned))planC0Transition(before);
+    else if(stateFingerprint(current)!==stateFingerprint(reviewed.after))throw Error("Accepted canonical MioPages baseline differs");
+    // Historical image experiments remain pinned; only their disposable source is reproduced.
+    const owned:CustomerState=structuredClone(reviewed.after);
     const c=await admin.connect();try{
       await c.query("BEGIN");await c.query(`CREATE SCHEMA ${quoted}`);await c.query(`SET LOCAL search_path=${quoted}`);
       for(const migration of readMigrationFiles({migrationsFolder:"lib/platform/db/migrations"}))for(const sql of migration.sql)await c.query(sql.replaceAll('"public".',`${quoted}.`));

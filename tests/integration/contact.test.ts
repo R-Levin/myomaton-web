@@ -19,7 +19,7 @@ test("Contact upgrade/fresh replay preserves public state; isolated submission o
   const upgrade = `${prefix}_upgrade`, fresh = `${prefix}_fresh`;
   const quote = (name: string) => { assert.match(name, /^myomaton_contact_test_[a-f0-9]{32}_(upgrade|fresh)$/); return `"${name}"`; };
   // Keep the historical Contact replay range; 0009 is covered by acquisition.
-  const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.equal(migrations.length, 10); await client.connect();
+  const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.equal(migrations.length, 11); await client.connect();
   const read = async (schema: string) => {
     assert.ok(schema === "public" || quote(schema));
     const rows: Record<string, unknown[]> = {};

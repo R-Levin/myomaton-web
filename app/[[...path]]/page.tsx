@@ -6,6 +6,7 @@ import { ManagedSitePageView } from "@/components/managed-sites/managed-site-pag
 import { getManagedSitePage } from "@/lib/platform/managed-sites/service";
 import { deploymentSelection } from "@/lib/platform/managed-sites/deployment";
 import { pagePathFromSegments } from "@/lib/platform/managed-sites/paths";
+import { reviewConversions } from "@/lib/platform/intake/conversion";
 
 type Props = { params: Promise<{ path?: string[] }> };
 
@@ -24,5 +25,5 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function Page({ params }: Props) {
   const result = await getPage(pagePathFromSegments((await params).path));
-  return <ManagedSitePageView page={result} />;
+  return <ManagedSitePageView page={result} operationalConversions={reviewConversions(result, deploymentSelection())} />;
 }

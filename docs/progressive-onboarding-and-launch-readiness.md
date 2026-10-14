@@ -38,6 +38,11 @@ Free Review implementation, preview change or commercial launch authorization.
 
 ## Provisional Free Review intake
 
+The [first operational development intake slice](free-review-intake.md) now provides
+shared Review/direct-start answers, conditional questions, resumable server-side
+drafts and immutable submitted/operator-needed state in isolated prospect storage.
+Review synthesis, approval/delivery, commercial handoff and launch remain planned.
+
 The current standard intake is an implementation-ready baseline, not an immutable
 questionnaire. Keep answers short, reuse/prefill supported known information for
 confirmation and defer specialist questions. The goal-choice limit below organizes
