@@ -1,5 +1,10 @@
 # Free Review: first operational development slice
 
+The [backup/restore baseline](backup-recovery.md) now has verified native/managed
+backups and an isolated semantic/security restore proof on a separate approved disk.
+Scheduled automatic execution remains uninstalled/unproved; durable prospect
+activation stays gated. No public migration or prospect activation is authorized.
+
 ## Scope and reused foundations
 
 Authorized from `bc1c467` (Document progressive onboarding and Launch Readiness).

@@ -86,6 +86,11 @@ Asset enhancements.
 
 ## REQUIRED: Platform
 
+The [development backup/recovery baseline](backup-recovery.md) partially implements
+P18/P20: separate-disk native/managed artifacts and semantic/security isolated restore
+are proven. Scheduled automatic execution remains uninstalled/unproved, and durable
+prospect activation remains gated. This does not authorize intake migration or launch.
+
 The [Free Review intake slice](free-review-intake.md) partially implements shared
 progressive intake under P11/P14 in local development only. Real canonical customer
 state and migration rows remain unchanged; prospect persistence uses isolated
