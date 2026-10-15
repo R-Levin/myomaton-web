@@ -14,18 +14,19 @@ export function localBrowserRequest(request: Request) {
   const init: RequestInit & { duplex: "half" } = { method: request.method, headers: request.headers, body: request.body, duplex: "half" };
   return new Request(url, init);
 }
-export function sessionToken(request: Request) {
-  const candidates = (request.headers.get("cookie") ?? "").split(";").map(s => s.trim()).filter(s => s.startsWith(intakeCookie + "="));
+export function sessionToken(request: Request, cookieName = intakeCookie) {
+  const candidates = (request.headers.get("cookie") ?? "").split(";").map(s => s.trim()).filter(s => s.startsWith(cookieName + "="));
   if (candidates.length !== 1) return null;
-  const token = candidates[0].slice(intakeCookie.length + 1);
+  const token = candidates[0].slice(cookieName.length + 1);
   return /^[a-f0-9]{64}$/.test(token) ? token : null;
 }
-export async function intakeHttp(request: Request, service: IntakeService, abuse: ContactAbuseGuard, enabled: boolean) {
+export async function intakeHttp(request: Request, service: IntakeService, abuse: ContactAbuseGuard, enabled: boolean, sharedDevelopment = false) {
+  const cookieName = sharedDevelopment ? "miopages_intake_shared_development" : intakeCookie;
   const reply = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store", "Vary": "Cookie" } });
   if (!enabled || !loopbackOrigin(request.url)) return reply({ error: "unavailable" }, 503);
   if (request.headers.get("x-intake-request") !== "1") return reply({ error: "invalid_origin" }, 403);
   if (request.method !== "GET" && request.headers.get("origin") !== new URL(request.url).origin) return reply({ error: "invalid_origin" }, 403);
-  let token = sessionToken(request), fresh = false;
+  let token = sessionToken(request, cookieName), fresh = false;
   try {
     // Scope-only guard avoids storing IPs/contact data. Not a production spam defense.
     if (!await abuse.allow(`${service.selection.webPresenceId}:intake`)) return reply({ error: "rate_limited" }, 429);
@@ -48,7 +49,7 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
     });
     if (error) return reply({ error: error.code, fieldErrors: error.fields }, error.status);
     response.headers.set("Vary", "Cookie");
-    if (fresh && response.ok) response.headers.set("Set-Cookie", `${intakeCookie}=${token}; Path=/api/intake; HttpOnly; SameSite=Strict; Max-Age=2592000`);
+    if (fresh && response.ok) response.headers.set("Set-Cookie", `${cookieName}=${token}; Path=/api/intake; HttpOnly; SameSite=Strict; Max-Age=2592000`);
     return response;
   } catch (e) {
     return e instanceof IntakeError ? reply({ error: e.code, fieldErrors: e.fields }, e.status) : reply({ error: "unavailable" }, 503);

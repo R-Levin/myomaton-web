@@ -91,12 +91,17 @@ P18/P20: separate-disk native/managed artifacts and semantic/security isolated r
 are proven. Encrypted dedicated H: storage, external recovery custody and actual
 Windows Task Scheduler execution are also proven; the local durable-prospect backup
 operational gate is SATISFIED. Broader P18/P20 readiness remains partial. This does
-not authorize intake migration, real prospect activation or launch.
+not itself authorize intake migration, prospect activation or launch. Separately
+authorized ordered migrations 0009/0010 and durable DEVELOPMENT intake are now
+complete; public/production activation remains closed.
 
 The [Free Review intake slice](free-review-intake.md) partially implements shared
 progressive intake under P11/P14 in local development only. Real canonical customer
-state and migration rows remain unchanged; prospect persistence uses isolated
-storage with scoped resume and immutable submission. Production authorization,
+state remains unchanged. Shared development now has eleven migration rows and one
+synthetic durable intake/submission, with explicit development-only storage,
+scoped resume and an immutable submission. Disposable mode and the two original
+human evidence records remain separately preserved. Acquisition runtime is inactive.
+Production authorization,
 privacy/purge/export, distributed abuse defense, operator review/delivery and
 the remaining deployment/configuration and application-serving recovery proof remain required before
 activation; this slice does not close P4/P7/P13/P18–P20 or authorize launch.

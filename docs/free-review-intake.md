@@ -4,8 +4,52 @@ The [backup/restore baseline](backup-recovery.md) now has verified native/manage
 backups and an isolated semantic/security restore proof on a separate approved disk.
 Encrypted dedicated H: storage, external recovery custody and Windows Task Scheduler
 execution are now proven; the local durable-prospect backup operational gate is
-SATISFIED. Migration 0010 and real prospect activation remain separately unauthorized;
-access, privacy/purge/export and deployment requirements still apply.
+SATISFIED. Ordered migrations 0009 and 0010 are now applied to shared development
+(11 journal rows), and explicitly selected durable DEVELOPMENT intake is active.
+Public/production intake remains unauthorized and fail-closed; access,
+privacy/purge/export and deployment requirements still apply.
+
+## Current durable development checkpoint
+
+The standard Drizzle migrator upgraded the shared development database from nine
+to eleven rows in order, after an isolated actual-migrator rehearsal and verified
+pre-migration backup. The same migrator reran without schema/data/journal changes.
+Media acquisition has an installed, empty schema; its runtime remains inactive.
+Canonical customers and all five managed objects are unchanged. Shared intake holds
+one infrastructure-only synthetic business, **MioPages Durable Intake Test**, with
+one immutable submission in `needs_operator_review`; it is not a Customer.
+
+The original human Review and separate UX-only submission remain disposable evidence,
+not shared prospects. The authoritative superseding preservation bundle is
+`H:\MyomatonBackups\preserved-development-evidence\20261015T175502974Z_0894e5a0`.
+Its eleven accepted source files are exact Git blobs from `e4d48e5`; both human
+records, all 24 disposable tables, configuration and scoped inspection recovered
+exactly. The original bundle remains unchanged. No human details are committed.
+Review synthesis, delivery, matching/promotion and public activation remain deferred.
+Earlier disposable checkpoint results below are historical, not current migration
+or activation status. See [recovery](backup-recovery.md) for the current restore point.
+
+Production execution was checked through loopback-only production processes for
+both development modes: API requests refused with 503, the intake Page returned
+404 and the Review Page exposed no operational intake link. Process-isolated API
+tests also prove production/foreign selection is refused before writer-pool creation
+and request tenant hints cannot change the deployment binding.
+
+The interrupted Turbopack CSS worker failure was an environment/generated-artifact
+issue: installed dependency directories were incomplete. Restoring the unchanged
+lockfile's dependencies and rebuilding with fresh generated output resolved it.
+Retained build diagnostics were moved outside the source tree to avoid including
+their generated TypeScript in checks. The canonical `next build` passed without an
+application, build-configuration or dependency-version change for this diagnosis.
+
+Checkpoint validation passed 242 standard tests, 16 focused intake/activation tests,
+91 private PostgreSQL regression tests, the read-only QC test against its existing
+disposable acquisition evidence, and the isolated actual ordered-migrator/no-op
+test, with zero skips. The QC evidence is intentionally absent from normal backups;
+it is not imported into the private canonical restore to satisfy that test. Desktop
+and narrow-mobile checks preserve the accepted intake flow, separate-tab links and
+resumed confirmation. The infrastructure-only shared submission remains the sole
+durable intake; no additional submission was created for final rendered checks.
 
 ## Scope and reused foundations
 
@@ -117,16 +161,16 @@ No response-time target, generation, delivery or publication is claimed.
 
 ## Local development activation and storage
 
-The current real database intentionally has nine recorded migrations and no media
-acquisition tables. Neither 0009 nor 0010 is applied to public here; all nine journal
-rows and the complete real customer fingerprint remain unchanged. Full fresh/
-upgrade migration replay is tested only in owned disposable schemas.
+The shared development database has eleven recorded migrations, including additive
+0009 and 0010. Public acquisition tables remain empty; only the one synthetic
+durable intake/submission occupies the new prospect domain. Migration SQL, journal
+and snapshots are unchanged. Fresh/upgrade replay runs in owned disposable targets.
 
 [Preview runner](../scripts/preview-review-intake.ts) provisions a fresh named
 `canonical_test_<random UUID>_intake` schema with a copied baseline and the new
 prospect domain. A separate writer pool points there; the real public content
-connection is read-only. Runtime refuses a writer URL aimed at public/canonical
-storage. Prospect test submissions are confined to this isolated domain, not real
+connection is read-only. Disposable mode refuses a writer URL aimed at public
+storage. Its prospect test submissions are confined to this isolated domain, not real
 customer tables. The named schema deliberately survives stopping the server so
 resume/persistence can be reviewed and restarted; it is disposable local evidence.
 It is not a database backup or production deployment strategy.
@@ -135,13 +179,21 @@ It is not a database backup or production deployment strategy.
 node --env-file=.env.local --import tsx scripts/preview-review-intake.ts
 # Restart the same persisted development intake schema:
 node --env-file=.env.local --import tsx scripts/preview-review-intake.ts --resume
+# Explicit durable shared-development mode; never creates/migrates/imports a schema:
+node --env-file=.env.local --import tsx scripts/preview-review-intake.ts --shared-development
 ```
 
 Activation requires all of: `NODE_ENV=development`, explicit
-`MIOPAGES_REVIEW_INTAKE=local-development`, dedicated intake writer URL, exact
-MioPages service-owner/Managed-Site selection and loopback requests. The runner
+`MIOPAGES_REVIEW_INTAKE=local-development` (disposable) or `shared-development`,
+an explicit intake writer URL, exact MioPages service-owner/Managed-Site selection
+and loopback requests. Shared mode additionally requires the exact public/UTC
+connection options and the same local `myomaton_dev` database at port 5432 as the
+canonical reader. It cannot use a disposable schema. The runner
 binds to 127.0.0.1. Production Page/API paths fail closed regardless of flags.
 No schema administration, public migration or automatic seed runs on HTTP requests.
+Shared development uses a separate HttpOnly session-cookie name, preserving the
+original disposable browser session without importing or overwriting its evidence.
+Shared runner metadata uses `shared-development.json`; `preview.json` stays disposable.
 
 After isolated validation, the two development `/review` conversion positions
 render operational **Start My Free Review** links to `/review/intake`, through a
@@ -155,13 +207,17 @@ through the shared service/model in disposable tests, not paid onboarding.
 ## Operator visibility and privacy/security
 
 [Local inspection command](../scripts/inspect-review-intake.ts) requires an explicit
-owned intake schema and trusted local PostgreSQL access. It reads only the selected
+owned intake schema or `--shared-development`, plus trusted local PostgreSQL access.
+Shared inspection also requires `NODE_ENV=development` and the same narrow storage
+validation. It reads only the selected
 service-owner/site's submitted queue, identity/contact, answers, provenance and
 state, using a read-only connection. Optional `--id` narrows to one prospect.
 There is no public operator endpoint or hidden-URL substitute for authorization.
 
 ```powershell
 node --env-file=.env.local --import tsx scripts/inspect-review-intake.ts --schema canonical_test_<uuid_without_hyphens>_intake
+# In a development process, inspect shared submissions; --id narrows to one record:
+node --env-file=.env.local --import tsx scripts/inspect-review-intake.ts --shared-development --id <intake_uuid>
 ```
 
 HTTP access is capability-scoped, no-store and Vary: Cookie. Writes require exact

@@ -9,8 +9,12 @@ return normalized results only. Rendering consumes eligible canonical Assets.
 The existing nineteen customer tables have no durable external job, private
 candidate or attributable media decision equivalent. Migration 0009 adds only
 `external_work`, `media_candidates` and `external_work_events`. No customer table
-changes are needed. It is rehearsed in disposable schemas; the live journal is
-deliberately left at nine rows pending separate operational deployment review.
+changes are needed. After disposable rehearsal, 0009 was applied as an inert schema
+foundation to shared development, followed normally by 0010 (eleven journal rows).
+All three acquisition tables remain empty. Table existence starts no work/provider
+call and enables no shared/public acquisition runtime. Existing disposable pilot,
+quarantine, budget and approval/refusal boundaries remain unchanged. See the
+[durable development intake checkpoint](free-review-intake.md#current-durable-development-checkpoint).
 
 Each record belongs to a Web Presence. Composite foreign keys keep work,
 candidates and events in that same tenant. Work IDs and deterministic identities

@@ -12,10 +12,10 @@ let pool: Pool | undefined;
 async function handle(request: Request) {
   const selection = deploymentSelection();
   if (!intakeEnabled(selection)) return Response.json({ error: "unavailable" }, { status: 503, headers: { "Cache-Control": "no-store" } });
-  try { intakeStorageSchema(process.env.INTAKE_DATABASE_URL!); }
+  try { intakeStorageSchema(process.env.INTAKE_DATABASE_URL!, process.env, selection); }
   catch { return Response.json({ error: "unavailable" }, { status: 503, headers: { "Cache-Control": "no-store" } }); }
   pool ??= new Pool({ connectionString: process.env.INTAKE_DATABASE_URL, max: 4 });
-  return intakeHttp(localBrowserRequest(request), new IntakeService(pool, selection), abuse, true);
+  return intakeHttp(localBrowserRequest(request), new IntakeService(pool, selection), abuse, true, process.env.MIOPAGES_REVIEW_INTAKE === "shared-development");
 }
 export const GET = handle;
 export const POST = handle;

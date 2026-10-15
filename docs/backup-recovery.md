@@ -2,6 +2,28 @@
 
 ## Current result: local durable-prospect backup operational gate SATISFIED
 
+The current shared-development checkpoint has eleven migrations (ordered 0009 then
+0010), an empty acquisition domain and one synthetic durable Review intake/submission.
+Post-activation restore point `20261015T180922081Z_6ce39b28` on encrypted H: passed
+archive/manifest/checksum/COMPLETE and five managed-object checks. Its isolated
+restore matched all 25 application/journal tables, semantic schema, security,
+environment and sequences; the synthetic snapshot and `needs_operator_review` state
+recovered exactly. The temporary target was removed and all five prior H: points
+remained intact. Scheduler/encryption configuration and normal exclusions are unchanged.
+
+Customer-tables-only fingerprint (19 tables, excluding the journal) remains
+`b3e924ef1d62943742c567fbc950f9892d04be64d3aba31dc0d546e154d937a4`.
+The existing combined customer-plus-journal definition now gives
+`5db2726ad9b83cb8954cd7f29512f0a7d48dd731024b106b0d06d1f92cd177ea`;
+the historical nine-migration fingerprint below is not redefined.
+
+Human Review/UX evidence remains outside shared prospect storage in the separate
+preserved-development-evidence bundle `20261015T175502974Z_0894e5a0`, with exact
+accepted Git source bytes and its own isolated recovery proof. This is explicitly
+preserved development/test evidence, not an exception to normal backup exclusions.
+Public/production intake, Review synthesis and offsite AWS/S3 remain unauthorized.
+Earlier backup/scheduler checkpoints below retain their historical migration state.
+
 The verified backup on operator-approved `F:\MyomatonBackups` has passed an isolated
 restore with semantic schema, security/ownership, locale, sequence and all 20 table
 content comparisons. The complete canonical customer fingerprint matches. All five
@@ -18,7 +40,7 @@ corrected test recreates and verifies original locale, owners, grants and role f
 Backup/restore mechanics, encrypted dedicated H: storage with externally retained
 recovery material, and scheduled backup execution are proven for this local
 development checkpoint. The local durable-prospect backup operational gate is
-SATISFIED. This does not authorize migration 0010, prospect activation or launch;
+SATISFIED. This backup gate alone does not authorize migrations, prospect activation or launch;
 the remaining access/privacy/retention and deployment gates still apply.
 The attached disk protects against primary-disk loss, not whole-machine loss/theft
 or administrator/ransomware compromise. AWS/S3 remains future offsite resilience
@@ -88,7 +110,7 @@ ACL and the scheduler-created point. No action/task adaptation or extra executio
 was needed. Native log hash:
 `b31313db70e69cfba3ff454b43e34fee2411ad427463c0b874bd5d71be9173f2`.
 
-Migration 0010 remains unapplied publicly. Durable prospect intake, Review synthesis,
+At that scheduler checkpoint, migration 0010 remained unapplied. Durable prospect intake, Review synthesis,
 operator approval UI and delivery remain disabled/deferred. This checkpoint covers
 backup/recovery tooling, comparison, tests and documentation only; it does not
 authorize further encryption changes, cloud configuration or intake activation.
@@ -100,9 +122,9 @@ directory on C: according to the PostgreSQL Windows service configuration. Publi
 state owns organizations, customers/Web Presences, Managed Sites, Pages/Sections,
 Actions/Navigation, Subjects, Design Systems, Assets/AssetUsages, Contact state,
 canonical Knowledge/Offering records and revision history. Drizzle's migration
-tracker is in `drizzle.__drizzle_migrations`. Nine migrations are installed; public
-media-acquisition and prospect-intake tables are absent. Checked-in migration 0010
-is pending source. Configuration is read from protected `.env.local`; connection
+tracker is in `drizzle.__drizzle_migrations`. Eleven migrations are installed; the
+public media-acquisition domain is empty and the prospect domain contains the one
+synthetic development submission. Configuration is read from protected `.env.local`; connection
 URLs/passwords are never arguments, manifests or logs.
 
 The five managed objects live at
