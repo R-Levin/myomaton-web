@@ -74,8 +74,13 @@ async function protect(root: string) {
   if (process.platform !== "win32") { assert.equal((await lstat(root)).mode & 0o077, 0, "Backup root must be private"); return; }
   const sid = (await exec("whoami.exe", ["/user","/fo","csv","/nh"], { windowsHide:true })).stdout.match(/S-1-5-[0-9-]+/)?.[0]; assert.ok(sid);
   await exec("icacls.exe", [root,"/inheritance:r","/grant:r",`*${sid}:(OI)(CI)F`,"*S-1-5-18:(OI)(CI)F","*S-1-5-32-544:(OI)(CI)F"], {windowsHide:true});
-  const output = await exec("pwsh.exe", ["-NoProfile","-NonInteractive","-Command","$ErrorActionPreference='Stop'; $a=Get-Acl -LiteralPath $env:BACKUP_ACL_ROOT; @{protected=$a.AreAccessRulesProtected;allow=@($a.Access | Where-Object AccessControlType -eq Allow | ForEach-Object {$_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value})} | ConvertTo-Json -Compress"], {env:{...process.env,BACKUP_ACL_ROOT:root},windowsHide:true});
+  // Use the durable Windows installation, independent of Codex/PATH runtimes.
+  // Reset only this child's module search path to Windows PowerShell's modules.
+  const systemRoot=process.env.SystemRoot||"C:\\Windows";
+  const windowsPowerShell=path.join(systemRoot,"System32","WindowsPowerShell","v1.0","powershell.exe");
+  const output = await exec(windowsPowerShell, ["-NoProfile","-NonInteractive","-Command","$ErrorActionPreference='Stop'; $a=[System.IO.Directory]::GetAccessControl($env:BACKUP_ACL_ROOT); @{protected=$a.AreAccessRulesProtected;allow=@($a.GetAccessRules($true,$true,[System.Security.Principal.SecurityIdentifier]) | Where-Object AccessControlType -eq Allow | ForEach-Object {$_.IdentityReference.Value})} | ConvertTo-Json -Compress"], {env:{...process.env,PSModulePath:path.join(systemRoot,"System32","WindowsPowerShell","v1.0","Modules"),BACKUP_ACL_ROOT:root},windowsHide:true});
   const acl = JSON.parse(output.stdout); assert.equal(acl.protected,true); assert.ok(acl.allow.every((v:string)=>[sid,"S-1-5-18","S-1-5-32-544"].includes(v)), "Unexpected backup access grant");
+  assert.ok([sid,"S-1-5-18","S-1-5-32-544"].every(v=>acl.allow.includes(v)),"Required private backup access grant missing");
 }
 export async function openRoot(config: Config, initialize = false) {
   const root = assertBackupRoot(config.root,[config.repository,config.objectsRoot,path.dirname(config.pgBin)]);

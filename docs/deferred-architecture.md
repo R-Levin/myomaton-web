@@ -88,15 +88,17 @@ Asset enhancements.
 
 The [development backup/recovery baseline](backup-recovery.md) partially implements
 P18/P20: separate-disk native/managed artifacts and semantic/security isolated restore
-are proven. Scheduled automatic execution remains uninstalled/unproved, and durable
-prospect activation remains gated. This does not authorize intake migration or launch.
+are proven. Encrypted dedicated H: storage, external recovery custody and actual
+Windows Task Scheduler execution are also proven; the local durable-prospect backup
+operational gate is SATISFIED. Broader P18/P20 readiness remains partial. This does
+not authorize intake migration, real prospect activation or launch.
 
 The [Free Review intake slice](free-review-intake.md) partially implements shared
 progressive intake under P11/P14 in local development only. Real canonical customer
 state and migration rows remain unchanged; prospect persistence uses isolated
 storage with scoped resume and immutable submission. Production authorization,
 privacy/purge/export, distributed abuse defense, operator review/delivery and
-combined PostgreSQL/managed-file backup/restore verification remain required before
+the remaining deployment/configuration and application-serving recovery proof remain required before
 activation; this slice does not close P4/P7/P13/P18–P20 or authorize launch.
 
 The [customer journey and change-management contract](customer-journey-and-change-management.md)

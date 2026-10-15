@@ -2,8 +2,10 @@
 
 The [backup/restore baseline](backup-recovery.md) now has verified native/managed
 backups and an isolated semantic/security restore proof on a separate approved disk.
-Scheduled automatic execution remains uninstalled/unproved; durable prospect
-activation stays gated. No public migration or prospect activation is authorized.
+Encrypted dedicated H: storage, external recovery custody and Windows Task Scheduler
+execution are now proven; the local durable-prospect backup operational gate is
+SATISFIED. Migration 0010 and real prospect activation remain separately unauthorized;
+access, privacy/purge/export and deployment requirements still apply.
 
 ## Scope and reused foundations
 
@@ -434,7 +436,9 @@ intake tables. No runtime request applies migrations or enables durable real int
 Before public/shared migration or durable real prospect collection, prove automatic
 PostgreSQL backups, retained restore points, backup copies separate from the live
 DB/server, successful isolated restore, managed-file/object backup strategy and a
-documented recovery procedure. This gate remains open. Further bounded capabilities
+documented recovery procedure. This local backup operational gate is now satisfied
+as recorded in the backup/recovery baseline; migration and activation still need
+separate authorization. Further bounded capabilities
 require separate authorization: production operator/prospect access, privacy/export/
 purge operations, distributed abuse controls, Review synthesis, human operator
 approval UI, approved delivery/email, explicit prospect→customer promotion and paid

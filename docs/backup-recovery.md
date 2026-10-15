@@ -1,6 +1,6 @@
 # PostgreSQL and managed-object recovery baseline
 
-## Current result: restore-mechanics gate SATISFIED; automation pending
+## Current result: local durable-prospect backup operational gate SATISFIED
 
 The verified backup on operator-approved `F:\MyomatonBackups` has passed an isolated
 restore with semantic schema, security/ownership, locale, sequence and all 20 table
@@ -15,17 +15,83 @@ normalizes only that Boolean representation and retains exact conditions/order.
 The original test also used a different locale and omitted owners/privileges; the
 corrected test recreates and verifies original locale, owners, grants and role flags.
 
-Backup/restore gate criteria are satisfied for this development checkpoint. This
-does not authorize durable prospect collection. Remaining automation: rehearse the
-scheduler wrapper, obtain explicit job authorization, install and prove an automatic
-run. Verify appropriate encryption/key recovery for removable prospect-data backups.
+Backup/restore mechanics, encrypted dedicated H: storage with externally retained
+recovery material, and scheduled backup execution are proven for this local
+development checkpoint. The local durable-prospect backup operational gate is
+SATISFIED. This does not authorize migration 0010, prospect activation or launch;
+the remaining access/privacy/retention and deployment gates still apply.
 The attached disk protects against primary-disk loss, not whole-machine loss/theft
-or administrator/ransomware compromise. No scheduled job has been installed/run.
+or administrator/ransomware compromise. AWS/S3 remains future offsite resilience
+and is not configured by this checkpoint.
+
+The intended dedicated destination is now `H:\MyomatonBackups`, on healthy NTFS
+physical disk 2 (USB-connected Micron); C: is disk 0 and the preserved F: LaCie is
+disk 3. H: initially contained only approved Windows metadata directories and no
+encryption/protectors. Operator authorization covers H: encryption, external key
+custody, restricted root creation and a fresh verified point. The operator then
+separately authorized scheduler installation after corrected rehearsal. Full-volume
+encryption and external recovery custody were verified first. Keep the original F: point
+unchanged; its read-only integrity verification must not reapply root ACLs.
+
+On 2026-10-15, H: was verified FullyEncrypted (100%, XTS-AES-128), protection On,
+with Password and RecoveryPassword protectors; the conversion flags were zero
+(whole-volume mode). The operator confirmed recovery information accessible from a
+password manager on another device and a sealed paper copy stored separately.
+The restricted H: root now contains fresh point `20261015T131046902Z_5185c01c`.
+Its isolated restore passed all 16 integration checks, including semantic schema,
+security, environment, sequences, all application tables and five managed objects.
+The private target was removed. The canonical fingerprint remains
+`5bc262817185f533992f8af139eef0dba1edb6dd655c62849d66bf395ded9275`;
+nine migrations remain installed and migration 0010 is absent. Read-only checksum
+and archive verification of the original F: point passed without changing its ACLs.
+The scheduler remained uninstalled at this restore checkpoint; the subsequent
+conditional authorization and rehearsal result are recorded below.
+
+The operator authorized the exact scheduler proposal on 2026-10-15, conditional on
+successful rehearsal. Rehearsal used the signed system Windows PowerShell 5.1 with
+process-only RemoteSigned and exited zero, creating verified point
+`20261015T132115848Z_7636859a`. Archive/manifest/checksums and five managed objects
+passed; the retention result matched the policy and performed no deletions. Prior
+H: point files and all 989 preserved F: backup files retained their hashes/sizes;
+customer state, migrations and five live objects remained unchanged.
+
+The first rehearsal was not accepted: the exact proposed action initialized its restricted
+log with UTF-8 `Set-Content`, but Windows PowerShell 5.1 `>>` appends UTF-16LE,
+producing a mixed-encoding log. Installation and scheduler execution stopped before
+registration. The operator authorized correcting only the encoding blocker and
+continuing the existing scheduler proof after successful corrected rehearsal.
+
+The [scheduler log writer](../scripts/backup/scheduler-log.ps1) now uses explicit
+UTF-8 without a BOM through .NET WriteAllText/AppendAllText for every entry. The
+action captures stdout/stderr with `2>&1` into this writer, never into a log-file
+redirection operator. Start/success/failure timestamps use the same writer; failure
+messages remain visible and exceptions/native failures still return nonzero.
+The [Windows PowerShell 5.1 test](../tests/backup-scheduler.test.tsx) verifies reset,
+append, Unicode, captured stdout/stderr, native exit code and readable success/failure
+entries, with strict UTF-8 decoding and no embedded NUL/BOM.
+
+Corrected exact-action rehearsal exited zero and created verified point
+`20261015T132928979Z_de64de87`. The approved task was then installed unchanged apart
+from the logging fix, explicitly triggered through Windows Task Scheduler, and
+returned LastTaskResult **0**, State **Ready**. Its distinct point
+`20261015T133324395Z_8431b50d` passed PostgreSQL custom-archive listing/full readability,
+manifest/checksum and all five managed-object checks. The log passed strict UTF-8
+decoding with no BOM/NUL corruption. Retention output exactly matched policy, with
+zero deletions; all three earlier H: points remain intact. All 989 F: backup files,
+the F:/H: root ACLs, customer fingerprint, nine migrations and five live managed
+objects remained unchanged. Migration 0010 is still unapplied.
+
+Codex's packaged-app AppData virtualization exposed the rehearsal log when inspecting
+the apparent native path. Read-only inspection through the local administrative
+share confirmed the actual scheduled log at the approved native path, its restricted
+ACL and the scheduler-created point. No action/task adaptation or extra execution
+was needed. Native log hash:
+`b31313db70e69cfba3ff454b43e34fee2411ad427463c0b874bd5d71be9173f2`.
 
 Migration 0010 remains unapplied publicly. Durable prospect intake, Review synthesis,
 operator approval UI and delivery remain disabled/deferred. This checkpoint covers
 backup/recovery tooling, comparison, tests and documentation only; it does not
-authorize scheduler installation, encryption changes, cloud configuration or intake activation.
+authorize further encryption changes, cloud configuration or intake activation.
 
 ## Storage topology and scope
 
@@ -71,7 +137,7 @@ refused. Windows root access is restricted and checked for the current user,
 SYSTEM and Administrators. POSIX roots must be private. No public links are created.
 
 ```
-F:\MyomatonBackups\
+H:\MyomatonBackups\
   backup-root.json
   points\<UTC timestamp>_<random suffix>\
     database.dump
@@ -107,21 +173,27 @@ archive readability. Only a successful real isolated restore establishes recover
 ## Commands
 
 Run from the repository with PostgreSQL 18 binaries (default installed Windows
-path; PG_BIN_DIR may select another matching installation) and PowerShell 7.
+path; PG_BIN_DIR may select another matching installation). The durable Windows
+shell is Microsoft-signed Windows PowerShell 5.1 at
+`C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`; the wrapper syntax is
+compatible. The ACL verifier uses that system executable and Windows module paths,
+independent of Codex cache/runtime directories. Node remains system-installed.
 Do not put connection passwords in commands.
+H: commands require completed encryption, verified external recovery custody and
+the approved restricted root first; these examples are not authority to install a task.
 
 ```powershell
-node --env-file=.env.local --import tsx scripts/backup-recovery.ts backup --root F:\MyomatonBackups
-node --env-file=.env.local --import tsx scripts/backup-recovery.ts verify --root F:\MyomatonBackups --point <reported-point-id>
+node --env-file=.env.local --import tsx scripts/backup-recovery.ts backup --root H:\MyomatonBackups
+node --env-file=.env.local --import tsx scripts/backup-recovery.ts verify --root H:\MyomatonBackups --point <reported-point-id>
 # Creates its own private target; never specify a live restore destination.
-node --env-file=.env.local --import tsx scripts/backup-recovery.ts restore-test --root F:\MyomatonBackups --point <reported-point-id>
-node --env-file=.env.local --import tsx scripts/backup-recovery.ts retention-plan --root F:\MyomatonBackups
+node --env-file=.env.local --import tsx scripts/backup-recovery.ts restore-test --root H:\MyomatonBackups --point <reported-point-id>
+node --env-file=.env.local --import tsx scripts/backup-recovery.ts retention-plan --root H:\MyomatonBackups
 ```
 
 An optional copy operation can duplicate a verified complete point to another
 explicitly authorized dedicated root; it never establishes a failure domain merely
-from a different folder. F: is the sole authorized artifact destination in this
-review. No alternate copy destination was used.
+from a different folder. Create a fresh H: point without modifying the preserved
+F: point; copying is not needed for this transition.
 
 Restore-test has no user-supplied destination connection. It initializes its own
 SCRAM-authenticated cluster under the dedicated root, binds loopback on a fresh port,
@@ -208,23 +280,44 @@ Review the exact plan before any later separately authorized bounded cleanup.
 Retention must eventually include restored prospect deletion/expiry obligations;
 backup is not indefinite archive, and this policy is not a production privacy waiver.
 
-Proposed Windows Task Scheduler job, **not installed**:
+Installed and scheduler-executed Windows Task Scheduler job:
 
-- Name: MioPages Development Backup; daily 03:00 local time.
+- Name: MioPages Development Backup; daily 03:00 America/New_York.
 - Account: the current operator, only while logged on; no stored task password or
   elevated principal. Source read access and backup-root access are required.
-- Program: installed PowerShell 7 pwsh.exe.
-- Arguments: `-NoProfile -NonInteractive -File C:\Users\mplxs\Projects\myomaton-web\scripts\run-backup.ps1 -BackupRoot F:\MyomatonBackups -NodePath "C:\Program Files\nodejs\node.exe"`.
-- Start in: `C:\Users\mplxs\Projects\myomaton-web`; StartWhenAvailable; IgnoreNew
+- Program: `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`.
+- Arguments: `-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy RemoteSigned -EncodedCommand <action encoded as UTF-16LE base64>`.
+  The decoded action retains the destination-identity/marker and logging-ACL guards,
+  dot-sources the log writer, invokes `scripts/run-backup.ps1` with explicit H: root
+  and `C:\Program Files\nodejs\node.exe`, then invokes retention-plan. The command
+  encoding is independent of the explicit UTF-8 log encoding.
+- Windows PowerShell's current default is Restricted, so file execution is blocked.
+  The approved RemoteSigned allowance is scoped to the task process only and respects
+  Group Policy. CurrentUser/LocalMachine scopes remain Undefined. No
+  CurrentUser/LocalMachine policy change or Bypass is proposed/performed.
+- Start in: `C:\Users\mplxs\Projects\myomaton-web`; StartWhenAvailable; WakeToRun; IgnoreNew
   while another run executes; one-hour execution limit. Do not bypass execution
-  policy; sign/authorize local scripts through the operator's existing policy.
+  policy beyond the explicitly reviewed process-scoped RemoteSigned allowance.
+- Log: `C:\Users\mplxs\AppData\Local\MyomatonBackupLogs\last-run.log`.
+  The log directory has inheritance disabled and allows only the operator, SYSTEM
+  and Administrators, matching the private backup-root access boundary.
 - Wrapper exits unsuccessfully for failed backup or verify. Monitor task exit codes
-  and last verified point; missing/offline F: is a failure, not permission to silently
+  and last verified point; missing/offline/locked H: is a failure, not permission to silently
   write to a different disk. Local task history is not centralized alerting.
 
-The CLI backup was exercised; the wrapper requires an operational rehearsal before
-job creation. Install a machine-level task only after explicit operator authorization
-and clean restore proof. No scheduled task or Codex automation was silently installed.
+For the complete action, bind H: to the verified volume identity and require its
+existing backup-root marker before invoking the wrapper. Capture its output and
+exit code in a restricted local log outside Git, then run the retention planner;
+any failed stage must leave a failed task result. No Codex executable or cache path
+belongs in the action/environment. C: was not BitLocker-protected at inspection,
+so H: requires manual unlocking; fixed-data auto-unlock must not be enabled by
+silently changing C:. Confirm this operational limitation before task approval.
+
+The exact corrected action passed rehearsal and Windows Task Scheduler execution.
+The next daily trigger is 2026-10-16 at 03:00 America/New_York; that first calendar
+trigger has not yet occurred. The account must remain logged on and H: must already
+be unlocked. This is an accepted local operational constraint, not unattended
+recovery across reboot/sign-out. No automatic retry or retention deletion is enabled.
 
 ## Actual disaster recovery procedure
 
@@ -246,7 +339,9 @@ and clean restore proof. No scheduled task or Codex automation was silently inst
    after recovery-path changes and periodically; a successful rehearsal is not cutover approval.
 
 Separate/off-machine or removable-media storage should be encrypted at rest, with
-protected recoverable keys and restricted access. Encryption/key recovery remains
-unverified here; no key-management or volume-encryption changes were attempted.
+protected recoverable keys and restricted access. H: encryption and external
+recovery-material custody are verified as recorded above; an actual unlock using
+the recovery password has not been rehearsed. No recovery material is recorded in
+repository content, logs or runtime evidence. F: was not changed.
 The [security/recovery posture](security-operations.md#backups-and-disaster-recovery)
 and [intake gate](free-review-intake.md) remain authoritative.
