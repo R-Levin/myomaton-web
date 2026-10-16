@@ -11,6 +11,10 @@ privacy/purge/export and deployment requirements still apply.
 
 ## Current durable development checkpoint
 
+The separate [development Review synthesis/operator slice](free-review-synthesis.md)
+consumes immutable snapshots through read-only adapters. It adds no intake writes,
+human import, shared migration, customer promotion or prospect delivery.
+
 The standard Drizzle migrator upgraded the shared development database from nine
 to eleven rows in order, after an isolated actual-migrator rehearsal and verified
 pre-migration backup. The same migrator reran without schema/data/journal changes.
@@ -25,7 +29,8 @@ not shared prospects. The authoritative superseding preservation bundle is
 Its eleven accepted source files are exact Git blobs from `e4d48e5`; both human
 records, all 24 disposable tables, configuration and scoped inspection recovered
 exactly. The original bundle remains unchanged. No human details are committed.
-Review synthesis, delivery, matching/promotion and public activation remain deferred.
+Live automated synthesis, delivery, matching/promotion and public activation remain
+deferred; the separately isolated manual synthesis/operator slice is linked above.
 Earlier disposable checkpoint results below are historical, not current migration
 or activation status. See [recovery](backup-recovery.md) for the current restore point.
 
