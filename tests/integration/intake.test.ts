@@ -9,13 +9,40 @@ import { intakeHttp, intakeCookie, localBrowserRequest } from "../../lib/platfor
 import { developmentGuard } from "../../lib/platform/contact/boundaries";
 import { customerTables, readCustomerState, stateFingerprint } from "../../lib/platform/customer-initialization";
 import { schemaSignature } from "./schema-fidelity";
-import { intakeAnswers } from "../helpers/intake";
+import { intakeAnswersV2 as intakeAnswers, intakeAnswers as legacyAnswers } from "../helpers/intake";
+import { projects } from "../../lib/platform/intake/model";
 
 test("progressive intake PostgreSQL persistence, immutable submission, resume, scope and HTTP boundaries", async t => {
   const url = process.env.ASSET_TEST_DATABASE_URL; assert.ok(url, "Disposable PostgreSQL URL required; never skip persistence coverage");
   const f = await createIntakeFixture(url);
   const token = newResumeToken(), otherToken = newResumeToken();
   try {
+    await t.test("startup accepts no references while existing/Campaign require a reference in v1 and v2", async () => {
+      const f = await createIntakeFixture(url);
+      try {
+      for (const version of ["foundational-intake/1", "foundational-intake/2"]) {
+        const testToken = newResumeToken();
+        if (version === "foundational-intake/1") await f.pool.query("INSERT INTO prospect_intakes(web_presence_id,managed_site_id,entry_intent,questionnaire_version,resume_hash,expires_at,resume_expires_at) VALUES($1,$2,'FREE_REVIEW',$3,$4,now()+interval '30 days',now()+interval '30 days')", [f.service.selection.webPresenceId, f.service.selection.managedSiteId, version, resumeHash(testToken)]);
+        const initial = version === "foundational-intake/1" ? await f.service.resume(testToken) : await f.service.create(testToken, "FREE_REVIEW");
+        const answers = version === "foundational-intake/1" ? legacyAnswers(projects[1]) : intakeAnswers(projects[1]);
+        const saved = await f.service.save(testToken, initial.version, { ...answers, website: " ", publicProfile: "" }, 2);
+        assert.equal(saved.answers.website, version === "foundational-intake/1" ? "" : undefined);
+        assert.deepEqual((await f.service.resume(testToken)).answers, saved.answers);
+        assert.deepEqual((await f.pool.query("SELECT answers FROM prospect_intakes WHERE resume_hash=$1", [resumeHash(testToken)])).rows[0].answers, saved.answers);
+        await assert.rejects(f.service.save(testToken, saved.version, { ...saved.answers, website: "malformed input" }, 2));
+        assert.deepEqual(await f.service.resume(testToken), saved);
+        let current = saved;
+        for (const project of [projects[0], projects[2]]) {
+          current = await f.service.save(testToken, current.version, { ...saved.answers, project }, 2);
+          await assert.rejects(f.service.submit(testToken, current.version), /incomplete/);
+        }
+        current = await f.service.save(testToken, current.version, saved.answers, 2);
+        assert.equal((await f.service.submit(testToken, current.version)).state, "needs_operator_review");
+      }
+      assert.equal((await f.service.queue()).length, 2);
+      for (const s of await f.service.queue()) assert.ok(!s.answers.website && !s.answers.publicProfile);
+      } finally { await f.stop(); }
+    });
     await t.test("draft survives a new connection; repeated writes are exact retries; stale tabs refuse", async () => {
       const initial = await f.service.create(token, "FREE_REVIEW"); assert.equal(initial.state, "draft");
       const saved = await f.service.save(token, initial.version, { businessName: "MioPages", website: "miopages.com", publicProfile: "linkedin.com/company/example" }, 1);
@@ -125,4 +152,35 @@ test("intake migration fresh/upgrade fidelity adds empty domain without rewritin
     } catch (error) { await c.query("ROLLBACK"); throw error; } finally { c.release(); }
     await f.verify();
   } finally { if (created) await admin.query(`DROP SCHEMA "${schema}" CASCADE`); await admin.end(); await f.stop(); }
+});
+
+
+test("v1 resume/save/submit coexist with default v2 sessions without upgrading or rewriting old snapshots", async () => {
+  const url = process.env.ASSET_TEST_DATABASE_URL; assert.ok(url);
+  const f = await createIntakeFixture(url);
+  try {
+    const oldToken = newResumeToken();
+    await f.pool.query("INSERT INTO prospect_intakes(web_presence_id,managed_site_id,entry_intent,questionnaire_version,resume_hash,expires_at,resume_expires_at) VALUES($1,$2,'FREE_REVIEW','foundational-intake/1',$3,now()+interval '30 days',now()+interval '30 days')", [f.service.selection.webPresenceId, f.service.selection.managedSiteId, resumeHash(oldToken)]);
+    const old = await f.service.resume(oldToken); assert.equal(old.questionnaireVersion, "foundational-intake/1");
+    assert.equal((await f.service.create(oldToken, "FREE_REVIEW")).questionnaireVersion, "foundational-intake/1");
+    const saved = await f.service.save(oldToken, old.version, legacyAnswers(), 12);
+    assert.deepEqual(saved.answers.responses, legacyAnswers().responses);
+    assert.equal(saved.questionnaireVersion, "foundational-intake/1");
+    const sent = await f.service.submit(oldToken, saved.version);
+    const oldSnapshot = (await f.pool.query("SELECT * FROM prospect_intake_submissions WHERE questionnaire_version='foundational-intake/1'")).rows;
+    const token = newResumeToken(), current = await f.service.create(token, "FREE_REVIEW");
+    assert.equal(current.questionnaireVersion, "foundational-intake/2");
+    await assert.rejects(f.service.save(token, current.version, legacyAnswers(), 8));
+    await assert.rejects(f.service.save(token, current.version, { ...intakeAnswers(), secondaryResponses: [intakeAnswers().primaryResponse] }, 8));
+    assert.deepEqual(await f.service.resume(token), current);
+    const v2 = await f.service.save(token, current.version, intakeAnswers(), 12);
+    const complete = await f.service.submit(token, v2.version);
+    assert.equal(complete.questionnaireVersion, "foundational-intake/2");
+    assert.equal(complete.state, "needs_operator_review");
+    assert.deepEqual(await f.service.submit(oldToken, saved.version), sent);
+    assert.deepEqual((await f.pool.query("SELECT * FROM prospect_intake_submissions WHERE questionnaire_version='foundational-intake/1'")).rows, oldSnapshot);
+    const versions = (await f.pool.query("SELECT questionnaire_version FROM prospect_intakes ORDER BY questionnaire_version")).rows.map(r => r.questionnaire_version);
+    assert.deepEqual(versions, ["foundational-intake/1", "foundational-intake/2"]);
+    await f.verify();
+  } finally { await f.stop(); }
 });

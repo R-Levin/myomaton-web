@@ -7,23 +7,23 @@ import { JSDOM } from "jsdom";
 import * as model from "../lib/platform/intake/model";
 import { InterviewQuestion } from "../components/intake/question";
 import { loadService } from "./helpers/load-service";
-import { intakeAnswers } from "./helpers/intake";
+import { intakeAnswers, intakeAnswersV2 } from "./helpers/intake";
 import type { IntakeView } from "../lib/platform/intake/service";
 
-test("client saves current controls, shows Saved, resumes and submits Q12 directly with the new version", async () => {
+for (const questionnaireVersion of [model.legacyIntakeVersion, model.intakeVersion]) test(`client saves, resumes and submits with its stored questionnaire version (${questionnaireVersion})`, async () => {
   const dom = new JSDOM('<div id="root"></div>', {url:"http://localhost:61150/review/intake"});
   const names = ["window", "document", "navigator", "FormData", "IS_REACT_ACT_ENVIRONMENT", "fetch"];
   const old = names.map(name => Object.getOwnPropertyDescriptor(globalThis, name));
   for (const name of names.slice(0,4)) Object.defineProperty(globalThis, name, {configurable:true, value:dom.window[name as keyof Window]});
   Object.defineProperty(globalThis, "IS_REACT_ACT_ENVIRONMENT", {configurable:true,value:true});
-  let stored: IntakeView = {intent:"FREE_REVIEW", state:"draft", answers:{project:model.projects[0]}, step:1, version:2, expiresAt:"2026-11-14T00:00:00.000Z"};
+  let stored: IntakeView = {questionnaireVersion,intent:"FREE_REVIEW", state:"draft", answers:{project:model.projects[0]}, step:1, version:2, expiresAt:"2026-11-14T00:00:00.000Z"};
   const calls: Record<string,unknown>[] = [];
   Object.defineProperty(globalThis, "fetch", {configurable:true,value:async (_url:unknown, options:RequestInit) => {
     if (options.body) {
       const op = JSON.parse(String(options.body)); calls.push(op);
       if (op.version !== stored.version) return {ok:false,status:409,json:async()=>({error:"draft_changed"})};
-      if (op.operation === "save") stored={...stored,answers:model.normalizeAnswers(op.answers),step:op.step,version:stored.version+1};
-      else {model.validateComplete(stored.answers);stored={...stored,state:"needs_operator_review",version:stored.version+1};}
+      if (op.operation === "save") stored={...stored,answers:model.normalizeAnswers(op.answers,stored.questionnaireVersion),step:op.step,version:stored.version+1};
+      else {model.validateComplete(stored.answers,stored.questionnaireVersion);stored={...stored,state:"needs_operator_review",version:stored.version+1};}
     }
     return {ok:true,json:async()=>structuredClone(stored)};
   }});
@@ -48,19 +48,50 @@ test("client saves current controls, shows Saved, resumes and submits Q12 direct
     await act(async()=>root.unmount());root=createRoot(dom.window.document.getElementById("root")!);await mount();
     assert.equal((dom.window.document.querySelector('[name="businessName"]') as HTMLInputElement).value,"Current-screen business");
     assert.match(dom.window.document.body.textContent!,/Question 2 of 12/);
+    (dom.window.document.querySelector('[name="website"]') as HTMLInputElement).value="";
+    await click("Continue");
+    assert.match(dom.window.document.body.textContent!,/Question 2 of 12/);
+    assert.match(dom.window.document.body.textContent!,/Provide your website or a public profile/);
+    assert.equal(stored.answers.website,"https://miopages.com/");
+    (dom.window.document.querySelector('[name="publicProfile"]') as HTMLInputElement).value="example.test/profile";
+    await click("Continue");
+    assert.match(dom.window.document.body.textContent!,/Question 3 of 12/);
+    assert.equal(stored.answers.publicProfile,"https://example.test/profile");
+    if (questionnaireVersion === model.intakeVersion) assert.ok(!("website" in stored.answers));
+    else assert.equal(stored.answers.website, "");
+    await click("Back");
+    assert.match(dom.window.document.body.textContent!,/Question 2 of 12/);
     (dom.window.document.querySelector('[name="website"]') as HTMLInputElement).value="http://127.0.0.1";
     await act(async()=>dom.window.document.querySelector("footer a")!.dispatchEvent(new dom.window.MouseEvent("click",{bubbles:true,cancelable:true})));
     assert.match(dom.window.document.querySelector('[role="alert"]')!.textContent!, /highlighted fields/);
     assert.match(dom.window.document.body.textContent!, /Enter a valid public website address\./);
     assert.equal((dom.window.document.querySelector('[name="website"]') as HTMLInputElement).value,"http://127.0.0.1");
-    assert.equal(stored.answers.website,"https://miopages.com/");
+    assert.equal(stored.answers.publicProfile,"https://example.test/profile");
     (dom.window.document.querySelector('[name="website"]') as HTMLInputElement).value="miopages.com";
     // A stale server version must still refuse a different save and show an error.
     stored={...stored,version:stored.version+1};
     (dom.window.document.querySelector('[name="businessName"]') as HTMLInputElement).value="Stale answer";
     await act(async()=>dom.window.document.querySelector("header a")!.dispatchEvent(new dom.window.MouseEvent("click",{bubbles:true,cancelable:true})));assert.match(dom.window.document.querySelector('[role="alert"]')!.textContent!,/another tab/);
     assert.equal(stored.answers.businessName,"Current-screen business");
-    stored={...stored,answers:intakeAnswers(),step:12};
+    if (questionnaireVersion === model.intakeVersion) {
+      stored={...stored,answers:intakeAnswersV2(),step:8};
+      await act(async()=>root.unmount());root=createRoot(dom.window.document.getElementById("root")!);await mount();
+      assert.match(dom.window.document.body.textContent!, /Question 9 of 12/);
+      const input=(name:string,value:string)=>dom.window.document.querySelector<HTMLInputElement>(`input[name="${name}"][value="${value}"]`)!;
+      await act(async()=>input("primaryResponse",model.responsesV2[1]).click());
+      assert.equal(input("secondaryResponses",model.responsesV2[1]).disabled,true);
+      assert.equal(input("secondaryResponses",model.responsesV2[1]).checked,false);
+      await act(async()=>input("secondaryResponses",model.responses[3]).click());
+      assert.equal(dom.window.document.querySelectorAll('[name="bookingContext"]').length,1);
+      await act(async()=>input("primaryResponse","Something else").click());
+      (dom.window.document.querySelector('[name="primaryResponseOther"]') as HTMLInputElement).value="Complete the Free Web Presence Review";
+      (dom.window.document.querySelector('[name="bookingContext"]') as HTMLInputElement).value="Synthetic calendar";
+      await click("Save progress");
+      assert.equal(stored.answers.primaryResponseOther,"Complete the Free Web Presence Review");
+      assert.deepEqual(stored.answers.secondaryResponses,[model.responses[3]]);
+      assert.equal(stored.answers.bookingContext,"Synthetic calendar");
+    }
+    stored={...stored,answers:questionnaireVersion === model.intakeVersion ? intakeAnswersV2() : intakeAnswers(),step:12};
     await act(async()=>root.unmount());root=createRoot(dom.window.document.getElementById("root")!);await mount();
     assert.match(dom.window.document.body.textContent!,/Question 12 of 12/);assert.doesNotMatch(dom.window.document.body.textContent!,/Check your answers|Check before sending/);
     (dom.window.document.querySelector('[name="additional"]') as HTMLTextAreaElement).value="Final unsaved note";

@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import type { DeploymentSelection } from "../managed-sites/deployment";
 import { fingerprint } from "../canonical/model";
-import { IntakeError, intakeVersion, normalizeAnswers, validateComplete, type Answers, type EntryIntent } from "./model";
+import { IntakeError, intakeVersion, questionsFor, normalizeAnswers, validateComplete, type Answers, type EntryIntent } from "./model";
 
 export const draftDays = 30, submissionDays = 90;
 export const newResumeToken = () => randomBytes(32).toString("hex");
@@ -11,8 +11,8 @@ export function resumeHash(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
 type Row = { id: string; entry_intent: EntryIntent; questionnaire_version: string; state: "draft" | "needs_operator_review"; answers: Answers; provenance: Record<string, unknown>; step: number; version: number; expires_at: Date; submitted_at: Date | null };
-export type IntakeView = { intent: EntryIntent; state: Row["state"]; answers: Answers; step: number; version: number; expiresAt: string };
-function view(r: Row): IntakeView { return { intent: r.entry_intent, state: r.state, answers: r.answers, step: r.step, version: r.version, expiresAt: r.expires_at.toISOString() }; }
+export type IntakeView = { questionnaireVersion: string; intent: EntryIntent; state: Row["state"]; answers: Answers; step: number; version: number; expiresAt: string };
+function view(r: Row): IntakeView { return { questionnaireVersion: r.questionnaire_version, intent: r.entry_intent, state: r.state, answers: r.answers, step: r.step, version: r.version, expiresAt: r.expires_at.toISOString() }; }
 async function transaction<T>(pool: Pool, run: (db: PoolClient) => Promise<T>) {
   const db = await pool.connect();
   try { await db.query("BEGIN"); const result = await run(db); await db.query("COMMIT"); return result; }
@@ -29,7 +29,8 @@ export class IntakeService {
   private async owned(db: Pick<PoolClient, "query">, token: string, lock = false): Promise<Row> {
     await this.scope(db, lock);
     const r = await db.query(`SELECT * FROM prospect_intakes WHERE web_presence_id=$1 AND managed_site_id=$2 AND resume_hash=$3 AND expires_at>now() AND resume_expires_at>now() ${lock ? "FOR UPDATE" : ""}`, [this.selection.webPresenceId, this.selection.managedSiteId, resumeHash(token)]);
-    if (r.rows.length !== 1 || r.rows[0].questionnaire_version !== intakeVersion) throw new IntakeError("session_unavailable", 404);
+    if (r.rows.length !== 1) throw new IntakeError("session_unavailable", 404);
+    try { questionsFor(r.rows[0].questionnaire_version); } catch { throw new IntakeError("session_unavailable", 404); }
     return r.rows[0];
   }
   async resume(token: string) { return view(await this.owned(this.pool, token)); }
@@ -45,11 +46,11 @@ export class IntakeService {
     });
   }
   async save(token: string, version: number, value: unknown, step: number) {
-    const answers = normalizeAnswers(value);
     if (!Number.isInteger(version) || version < 1 || !Number.isInteger(step) || step < 0 || step > 12) throw new IntakeError("invalid_request");
     return transaction(this.pool, async db => {
       const r = await this.owned(db, token, true);
       if (r.state !== "draft") throw new IntakeError("already_submitted", 409);
+      const answers = normalizeAnswers(value, r.questionnaire_version);
       // Lost-response retries are idempotent; stale tabs cannot overwrite newer answers.
       if (fingerprint(r.answers) === fingerprint(answers) && r.step === step) return view(r);
       if (r.version !== version) throw new IntakeError("draft_changed", 409);
@@ -67,7 +68,7 @@ export class IntakeService {
       const r = await this.owned(db, token, true);
       if (r.state === "needs_operator_review") return view(r);
       if (r.version !== version) throw new IntakeError("draft_changed", 409);
-      const answers = normalizeAnswers(r.answers); validateComplete(answers);
+      const answers = normalizeAnswers(r.answers, r.questionnaire_version); validateComplete(answers, r.questionnaire_version);
       const at = new Date(), expires = new Date(at.getTime() + submissionDays * 86400000);
       const snapshot = { intent: r.entry_intent, questionnaireVersion: r.questionnaire_version, draftVersion: r.version, answers, provenance: r.provenance };
       await db.query(`INSERT INTO prospect_intake_submissions(web_presence_id,intake_id,entry_intent,questionnaire_version,draft_version,answers,provenance,digest,submitted_at,expires_at)

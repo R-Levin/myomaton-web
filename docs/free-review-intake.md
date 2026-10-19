@@ -82,7 +82,7 @@ acquisition is called by intake. No email infrastructure is introduced.
 ## Shared foundation and questions
 
 [The versioned question model](../lib/platform/intake/model.ts) serves both
-`FREE_REVIEW` and `DIRECT_START`. There is one set of answers and one persistence
+`FREE_REVIEW` and `DIRECT_START`. There is one versioned answer contract and one persistence
 contract; direct start skips future Review delivery, not the foundational information.
 No customer/prospect matching is inferred from business name, email, domain or URL.
 Existing canonical MioPages facts are never prefilled as a stranger's business facts.
@@ -97,12 +97,15 @@ One group at a time, with Back/Continue, explicit Save progress and progress cou
 6. Why customers choose the business; uncertainty may be stated honestly.
 7. Current problem; wording adapts to startup or Campaign intent.
 8. Most useful Review question/problem/opportunity.
-9. Multiple preferred prospect response methods; other detail when selected.
+9. V2: one primary visitor action and optional secondary actions, with separate custom details. Existing v1 sessions retain their unranked response-method choices.
 10. Service geography; location detail for local/regional/statewide/other scope.
 11. Name/email; role/title and phone optional.
 12. Optional additional information.
 
 Existing/Campaign intent requires a website or public profile; startup does not.
+Each URL field is individually optional; the branch requirement concerns the pair.
+Entered addresses must pass public-URL validation. No existing website or website
+findings may be inferred when no URL was supplied for a startup.
 Declarative conditions and conditional labels are shared by server validation and
 the interview. An optional existing booking-system question appears only for
 appointment/consultation or service scheduling. Hidden conditional answers are
@@ -526,3 +529,46 @@ including every customer and all nine migration rows. Five managed-object byte h
 remain unchanged. Migration 0010 is retained as additive source and still unapplied
 publicly. No backup/recovery readiness, real prospect activation or later-phase
 capability is implied by this accepted development checkpoint.
+
+## Foundational intake v2: visitor-action intent
+
+New sessions use `foundational-intake/2`; existing `foundational-intake/1` sessions
+remain readable/resumable and save/submit under v1 rules. The service returns
+`questionnaireVersion` in `IntakeView`; the UI selects the same version. Requests
+do not choose or upgrade a session version. Unknown versions fail closed. Existing
+submitted answers, provenance/digests and Review packets are not migrated.
+
+Both versions retain twelve screens; only Q9 differs. V2 requires single-select
+`primaryResponse`: What is the main next step you want an interested visitor to take?
+`secondaryResponses` is an optional multi-select: What other ways should people be
+able to contact or engage with you? Existing general action options remain.
+A named primary action is disabled in secondary choices and cannot be stored there.
+The server rejects unknown keys/options, array primary values and duplicate secondary
+values. Normalization remains bounded; completion requires the primary.
+
+Something else uses distinct `primaryResponseOther` and `secondaryResponseOther`
+text fields, required only for their selected role. One custom secondary description
+is supported, not a list editor. Both roles may select the Other placeholder when
+the actual custom actions differ; identical descriptions (trimmed/case-insensitive)
+are refused. Inactive custom fields are removed. `bookingContext` remains one optional
+field, applicable to booking/consultation or service scheduling in either role.
+
+V2 uses `Send a message or contact request` for the contact-action option; its
+stored choice text and semantic Review snapshot use the same wording. V1 keeps
+`Send a message`. Neither choice implies a particular form or contact mechanism.
+
+The v1 question definitions and frozen Review wording file remain unchanged.
+The established Q2 branch requirement is shared by both versions: existing-presence
+and Campaign/addition projects need at least one website or public-profile URL;
+new-presence/startup projects may omit both. V1 retains its original normalization,
+including supplied blank URL strings; v2 omits blank URL fields. Neither creates
+placeholder links or changes the branch policy.
+Persisted historical submissions and their digests are never rewritten.
+Version-aware service consumers always pass the stored version into validation;
+legacy low-level helper defaults continue to mean v1 for existing callers. New
+sessions explicitly use the v2 default. JSONB answers and the existing version
+columns suffice; no database migration or public activation is introduced.
+
+Q3 goals is unchanged: up to three selections form an unranked shortlist, not an
+ordered set of priorities. Its ranking ambiguity remains deferred. No full signup
+interview, customer portal or cross-prospect learning is added.

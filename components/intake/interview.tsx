@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { questions, questionTitle, currentScreenAnswers, normalizeAnswers, validateComplete, questionErrors, IntakeError, reviewConfirmation, type Answers } from "../../lib/platform/intake/model";
+import { questionsFor, intakeVersion, questionTitle, currentScreenAnswers, normalizeAnswers, validateComplete, questionErrors, IntakeError, reviewConfirmation, type Answers } from "../../lib/platform/intake/model";
 import type { IntakeView } from "../../lib/platform/intake/service";
 import styles from "./interview.module.css";
 import { InterviewQuestion } from "./question";
@@ -18,13 +18,15 @@ export function ReviewInterview() {
   const [loading, setLoading] = useState(true), [busy, setBusy] = useState(false), [message, setMessage] = useState(""), [errors, setErrors] = useState<Record<string, string>>({});
   const heading = useRef<HTMLHeadingElement>(null), form = useRef<HTMLFormElement>(null);
   const [hasError, setHasError] = useState(false);
+  const questionnaireVersion = view?.questionnaireVersion ?? intakeVersion;
+  const questions = questionsFor(questionnaireVersion);
   function activeAnswers() {
-    const current = form.current ? currentScreenAnswers(step, answers, new FormData(form.current)) : answers;
+    const current = form.current ? currentScreenAnswers(step, answers, new FormData(form.current), questionnaireVersion) : answers;
     // Retain captured/autofilled edits even when normalization refuses the save.
     setAnswers(current);
-    return normalizeAnswers(current);
+    return normalizeAnswers(current, questionnaireVersion);
   }
-  function adopt(v: IntakeView) { setView(v); setAnswers(v.answers); setStep(Math.min(v.step, questions.length - 1)); }
+  function adopt(v: IntakeView) { setView(v); setAnswers(v.answers); setStep(Math.min(v.step, questionsFor(v.questionnaireVersion).length - 1)); }
   function failed(error: unknown) {
     setHasError(true);
     const e = error instanceof IntakeError ? error : new IntakeError("unavailable"); setErrors(e.fields);
@@ -40,7 +42,7 @@ export function ReviewInterview() {
     if (!view) return;
     setErrors({}); setMessage(""); setHasError(false);
     try {
-      const normalized = activeAnswers(), fieldErrors = requireAnswer ? questionErrors(step, normalized) : {};
+      const normalized = activeAnswers(), fieldErrors = requireAnswer ? questionErrors(step, normalized, questionnaireVersion) : {};
       if (Object.keys(fieldErrors).length) throw new IntakeError("incomplete", 400, fieldErrors);
       setBusy(true); const v = await request({ operation: "save", version: view.version, answers: normalized, step: next });
       if (v.state !== "not_started") adopt(v);
@@ -51,7 +53,7 @@ export function ReviewInterview() {
   async function submit() {
     if (!view) return; setBusy(true); setMessage(""); setErrors({}); setHasError(false);
     try {
-      const normalized = activeAnswers(); validateComplete(normalized);
+      const normalized = activeAnswers(); validateComplete(normalized, questionnaireVersion);
       const saved = await request({ operation: "save", version: view.version, answers: normalized, step });
       if (saved.state === "not_started") throw new IntakeError("session_unavailable");
       adopt(saved);
@@ -83,7 +85,7 @@ export function ReviewInterview() {
         <p className={styles.progress}>{`Question ${step + 1} of ${questions.length}`}</p>
         <progress max={questions.length} value={step} aria-label="Review progress" />
         <form ref={form} noValidate onSubmit={e => { e.preventDefault(); if (step === questions.length - 1) void submit(); else void save(step + 1, true); }}>
-          <h2>{questionTitle(step, answers)}</h2><InterviewQuestion classes={styles} index={step} answers={answers} errors={errors} change={(key, value) => { setAnswers(a => ({ ...a, [key]: value })); setErrors({}); setMessage(""); setHasError(false); }} />
+          <h2>{questionTitle(step, answers, view.intent, questionnaireVersion)}</h2><InterviewQuestion questionnaireVersion={questionnaireVersion} classes={styles} index={step} answers={answers} errors={errors} change={(key, value) => { setAnswers(a => { const next = { ...a, [key]: value }; if (key === "primaryResponse" && typeof value === "string" && value !== "Something else" && Array.isArray(next.secondaryResponses)) next.secondaryResponses = next.secondaryResponses.filter(v => v !== value); return next; }); setErrors({}); setMessage(""); setHasError(false); }} />
           <div className={styles.actions}>
             {step > 0 && <button type="button" className={styles.secondary} disabled={busy} onClick={() => void save(step - 1)}>Back</button>}
             <button type="submit" disabled={busy}>{busy ? "Saving…" : step === questions.length - 1 ? "Submit my Review" : "Continue"}</button>

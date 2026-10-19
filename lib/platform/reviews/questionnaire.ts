@@ -1,28 +1,35 @@
+import { createHash } from "node:crypto";
+import current from "./questionnaires/foundational-intake-2.json";
 import archived from "./questionnaires/foundational-intake-1.json";
 import { object, text } from "../canonical/model";
 import type { Submission } from "./model";
 
 type Condition = { field: string; oneOf: string[] };
-type Definition = { questionnaireVersion: string; definitionCommit: string; definitionSha256: string; groups: { number: number; title: string; titleFromField?: string; intentTitles?: Record<string, string>; fields: { key: string; label: string; kind: string; required?: boolean; when?: Condition; labels?: { when: Condition; label: string }[] }[] }[] };
-export type QuestionnaireContext = { version: "review-questionnaire/1"; questionnaireVersion: string; definitionCommit: string; definitionSha256: string; groups: { number: number; title: string; fields: { key: string; label: string; kind: string; optional: boolean; followUpTo?: { key: string; choice: string } }[] }[] };
+type Definition = { questionnaireVersion: string; definitionCommit: string; definitionSha256: string; definitionBasis?: "semantic-json"; groups: { number: number; title: string; titleFromField?: string; intentTitles?: Record<string, string>; fields: { key: string; label: string; kind: string; required?: boolean; when?: Condition; whenAny?: Condition[]; labels?: { when: Condition; label: string }[] }[] }[] };
+export type QuestionnaireContext = { version: "review-questionnaire/1"; questionnaireVersion: string; definitionCommit: string; definitionSha256: string; definitionBasis?: "semantic-json"; groups: { number: number; title: string; fields: { key: string; label: string; kind: string; optional: boolean; followUpTo?: { key: string; choice: string } }[] }[] };
 // Frozen semantic data from the accepted version, never today's mutable UI source.
-const definitions: Record<string, Definition> = { [archived.questionnaireVersion]: archived as Definition };
+const definitions: Record<string, Definition> = { [archived.questionnaireVersion]: archived as Definition, [current.questionnaireVersion]: current as Definition };
 export function snapshotQuestionnaire(submission: Submission): QuestionnaireContext {
   const definition = definitions[submission.questionnaire_version];
   if (!definition) throw Error("No pinned questionnaire definition for this version");
+  if (definition.definitionBasis === "semantic-json" && createHash("sha256").update(JSON.stringify({ questionnaireVersion: definition.questionnaireVersion, groups: definition.groups })).digest("hex") !== definition.definitionSha256) throw Error("Semantic questionnaire definition hash mismatch");
   const applies = (condition?: Condition) => !condition || condition.oneOf.some(v => {
     const answer = submission.answers[condition.field]; return Array.isArray(answer) ? answer.includes(v) : answer === v;
   });
   const groups = definition.groups.map(g => {
-    const fields = g.fields.filter(f => applies(f.when)).map(f => ({ key: f.key, label: f.labels?.find(l => applies(l.when))?.label ?? f.label, kind: f.kind, optional: !f.required, ...(f.when && g.fields.some(parent => parent.key === f.when!.field) ? { followUpTo: { key: f.when.field, choice: f.when.oneOf.find(choice => applies({ field: f.when!.field, oneOf: [choice] }))! } } : {}) }));
+    const fields = g.fields.filter(f => applies(f.when) && (!f.whenAny || f.whenAny.some(applies))).map(f => {
+      const trigger = [f.when, ...(f.whenAny ?? [])].find((c): c is Condition => !!c && applies(c));
+      return { key: f.key, label: f.labels?.find(l => applies(l.when))?.label ?? f.label, kind: f.kind, optional: !f.required, ...(trigger && g.fields.some(parent => parent.key === trigger.field) ? { followUpTo: { key: trigger.field, choice: trigger.oneOf.find(choice => applies({ field: trigger.field, oneOf: [choice] }))! } } : {}) };
+    });
     return { number: g.number, title: g.titleFromField ? fields.find(f => f.key === g.titleFromField)!.label : g.intentTitles?.[submission.entry_intent] ?? g.title, fields };
   });
-  const context: QuestionnaireContext = { version: "review-questionnaire/1", questionnaireVersion: definition.questionnaireVersion, definitionCommit: definition.definitionCommit, definitionSha256: definition.definitionSha256, groups };
+  const context: QuestionnaireContext = { version: "review-questionnaire/1", questionnaireVersion: definition.questionnaireVersion, definitionCommit: definition.definitionCommit, definitionSha256: definition.definitionSha256, ...(definition.definitionBasis ? { definitionBasis: definition.definitionBasis } : {}), groups };
   validateQuestionnaire(context, submission); return context;
 }
 export function validateQuestionnaire(context: QuestionnaireContext, submission: Submission) {
-  object(context, ["version", "questionnaireVersion", "definitionCommit", "definitionSha256", "groups"]);
+  object(context, ["version", "questionnaireVersion", "definitionCommit", "definitionSha256", "definitionBasis", "groups"]);
   if (context.version !== "review-questionnaire/1" || context.questionnaireVersion !== submission.questionnaire_version || !/^[a-f0-9]{40}$/.test(context.definitionCommit) || !/^[a-f0-9]{64}$/.test(context.definitionSha256)) throw Error("Invalid questionnaire context/version");
+  if (context.definitionBasis !== undefined && context.definitionBasis !== "semantic-json") throw Error("Invalid questionnaire definition basis");
   if (!Array.isArray(context.groups) || context.groups.length < 1 || context.groups.length > 30) throw Error("Invalid questionnaire groups");
   const keys = new Set<string>();
   for (const [i, g] of context.groups.entries()) {

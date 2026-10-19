@@ -1,17 +1,17 @@
-import { questions, questionTitle, fieldLabel, matches, type Answers } from "../../lib/platform/intake/model";
+import { questionsFor, legacyIntakeVersion, intakeVersion, questionTitle, fieldLabel, fieldApplies, type Answers } from "../../lib/platform/intake/model";
 
-export function InterviewQuestion({ index, answers, errors, change, classes = {} }: { index: number; answers: Answers; errors: Record<string, string>; change: (key: string, value: string | string[]) => void; classes?: Record<string,string> }) {
-  return <>{questions[index].fields.filter(f => matches(f.when, answers)).map(field => {
+export function InterviewQuestion({ index, answers, errors, change, classes = {}, questionnaireVersion = legacyIntakeVersion }: { index: number; answers: Answers; errors: Record<string, string>; change: (key: string, value: string | string[]) => void; classes?: Record<string,string>; questionnaireVersion?: string }) {
+  return <>{questionsFor(questionnaireVersion)[index].fields.filter(f => fieldApplies(f, answers)).map(field => {
     const id = `intake-${field.key}`, error = errors[field.key], description = [field.hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined;
     const label = fieldLabel(field, answers), value = answers[field.key];
-    const repeated = label.replace(/ \(optional\)$/i, "") === questionTitle(index, answers);
+    const repeated = label.replace(/ \(optional\)$/i, "") === questionTitle(index, answers, "FREE_REVIEW", questionnaireVersion);
     return <div className={classes.field} key={field.key}>
       {field.choices ? <fieldset aria-describedby={description} aria-invalid={!!error}>
         <legend className={repeated ? classes.visuallyHidden : undefined}>{label}</legend>
         {field.choices.map(option => {
           const selected = field.kind === "multiple" ? Array.isArray(value) && value.includes(option) : value === option;
           return <label className={classes.choice} key={option}><input type={field.kind === "multiple" ? "checkbox" : "radio"} name={field.key} value={option} checked={selected}
-            disabled={field.kind === "multiple" && !selected && Array.isArray(value) && !!field.max && value.length >= field.max}
+            disabled={questionnaireVersion === intakeVersion && field.key === "secondaryResponses" && option !== "Something else" && option === answers.primaryResponse || field.kind === "multiple" && !selected && Array.isArray(value) && !!field.max && value.length >= field.max}
             onChange={() => change(field.key, field.kind === "multiple" ? selected ? (value as string[]).filter(v => v !== option) : [...(Array.isArray(value) ? value : []), option] : option)} /><span>{option}</span></label>;
         })}
       </fieldset> : <><label className={repeated ? classes.visuallyHidden : undefined} htmlFor={id}>{label}</label>{repeated && !field.required && <p className={classes.hint}>Optional</p>}{field.kind === "textarea" ?

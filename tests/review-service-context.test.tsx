@@ -94,7 +94,7 @@ test("solution loading has no customer database or prior-Review prose reader", a
 });
 
 test("refined guidance is immutable packet context; synthesis uses its exact snapshot rather than mutable current defaults", async () => {
-  const context = await loadSolutionContext(); assert.equal(context.writingGuidance!.version, "review-writing/4");
+  const context = await loadSolutionContext(); assert.equal(context.writingGuidance!.version, "review-writing/5");
   assert.deepEqual(context.writingGuidance, snapshotWritingGuidance());
   const p = evidencePacket(owner, submission, evidence, "Synthetic only", presence, context);
   const bad = structuredClone(p); bad.solutionContext!.writingGuidance!.text += "tamper"; assert.throws(() => validatePacket(bad), /guidance snapshot\/hash/);

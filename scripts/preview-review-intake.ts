@@ -1,3 +1,4 @@
+import path from "node:path";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { createServer } from "node:net";
@@ -10,11 +11,12 @@ import { intakeStorageSchema } from "../lib/platform/intake/storage";
 import { Pool } from "pg";
 
 async function main() {
-const args = parseArgs({ options: { resume: { type: "boolean", default: false }, "shared-development": { type: "boolean", default: false } }, strict: true });
+const args = parseArgs({ options: { resume: { type: "boolean", default: false }, "shared-development": { type: "boolean", default: false }, "output-directory": { type: "string" } }, strict: true });
 if (!process.env.DATABASE_URL) throw Error("Local database configuration required");
 const shared = args.values["shared-development"];
 if (shared && (args.values.resume || process.env.NODE_ENV === "production")) throw Error("Shared development cannot resume/replace the disposable preview or run in production");
-const directory = "runtime-content/miopages-review-intake";
+const directory = args.values["output-directory"] ?? "runtime-content/miopages-review-intake";
+if (!path.resolve(directory).startsWith(path.resolve("runtime-content") + path.sep)) throw Error("Preview output must stay under runtime-content");
 await mkdir(directory, { recursive: true });
 let schema: string;
 if (shared) schema = "public";

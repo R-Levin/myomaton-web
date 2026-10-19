@@ -593,3 +593,25 @@ The desired-response PRIMARY versus SECONDARY intake refinement above remains a
 documented follow-up only. No questionnaire or shared schema changes are involved.
 The operator comparison defaults to the immediately preceding revision versus
 the current one; explicit CLI `--from` and `--to` can select another ordered pair.
+
+### Foundational intake v2 interpretation and wording snapshots
+
+`foundational-intake/2` separates explicit `primaryResponse` intent from optional
+`secondaryResponses`; separate Other text belongs to each role. Future guidance
+`review-writing/5` gives primary intent materially greater interpretive weight.
+Secondary actions are acceptable alternatives, not equal-priority goals. Consider
+the full business context and surface conflicts rather than silently replacing
+the explicit primary or treating it alone as the business model. The questionnaire
+contains no MioPages-specific Review-first default. V1 `responses` and Q3 goals
+remain unranked; array order never supplies missing historical intent.
+
+The new semantic definition is [foundational-intake-2.json](../lib/platform/reviews/questionnaires/foundational-intake-2.json).
+It preserves twelve ordered groups, role-specific labels/types and applicable
+follow-ups. A single booking-context field binds to the first applicable parent
+(primary first, otherwise secondary). Its `definitionBasis: semantic-json` identifies
+a SHA-256 of the version/groups semantic JSON. `definitionCommit` identifies the
+implementation base checkpoint, not a claim that v2 existed in that Git object.
+The semantic hash is checked on capture; packet digests bind the resulting context.
+Existing v1 Git-pinned definitions, embedded contexts, legacy rendering and all
+historical Review events remain unchanged. No new Review synthesis or revision is
+required by this intake version transition.

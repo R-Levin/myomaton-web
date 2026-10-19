@@ -1,0 +1,325 @@
+{
+  "questionnaireVersion": "foundational-intake/2",
+  "groups": [
+    {
+      "number": 1,
+      "title": "What are you looking to do?",
+      "fields": [
+        {
+          "key": "project",
+          "label": "What are you looking to do?",
+          "kind": "single",
+          "choices": [
+            "Improve or replace an existing Web presence",
+            "Build a new Web presence from scratch",
+            "Create a focused Campaign/addition alongside an existing presence"
+          ],
+          "required": true
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "What business or organization should we review?",
+      "fields": [
+        {
+          "key": "businessName",
+          "label": "Business or organization name",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "website",
+          "label": "Website URL",
+          "kind": "url"
+        },
+        {
+          "key": "publicProfile",
+          "label": "Other public profile or listing (optional)",
+          "kind": "url"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "What do you most want your Web presence to accomplish?",
+      "fields": [
+        {
+          "key": "goals",
+          "label": "Choose up to 3",
+          "kind": "multiple",
+          "choices": [
+            "Get more qualified leads",
+            "Help the right people understand what we offer",
+            "Improve search visibility",
+            "Promote a specific service, product, location, or Campaign",
+            "Replace an outdated or ineffective website",
+            "Establish a professional presence for a new business or organization",
+            "Something else"
+          ],
+          "required": true
+        },
+        {
+          "key": "goalOther",
+          "label": "What else would you like to accomplish?",
+          "kind": "text",
+          "required": true,
+          "when": {
+            "field": "goals",
+            "oneOf": [
+              "Something else"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Who are you most trying to reach?",
+      "fields": [
+        {
+          "key": "audience",
+          "label": "Who are you most trying to reach?",
+          "kind": "textarea",
+          "required": true
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "What do you offer?",
+      "fields": [
+        {
+          "key": "offer",
+          "label": "Main products, services, programs or other offerings",
+          "kind": "textarea",
+          "required": true
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Why do customers choose you?",
+      "fields": [
+        {
+          "key": "difference",
+          "label": "Why do customers choose you?",
+          "kind": "textarea",
+          "required": true
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "What is the biggest problem with your current Web presence?",
+      "titleFromField": "problem",
+      "fields": [
+        {
+          "key": "problem",
+          "label": "What is the biggest problem with your current Web presence?",
+          "kind": "textarea",
+          "required": true,
+          "labels": [
+            {
+              "when": {
+                "field": "project",
+                "oneOf": [
+                  "Build a new Web presence from scratch"
+                ]
+              },
+              "label": "What is the biggest challenge in establishing your new Web presence?"
+            },
+            {
+              "when": {
+                "field": "project",
+                "oneOf": [
+                  "Create a focused Campaign/addition alongside an existing presence"
+                ]
+              },
+              "label": "What should this focused Campaign or addition improve?"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "What would make this Review most useful to you?",
+      "intentTitles": {
+        "DIRECT_START": "What would make getting started most useful to you?"
+      },
+      "fields": [
+        {
+          "key": "reviewFocus",
+          "label": "What would make this Review most useful to you?",
+          "kind": "textarea",
+          "required": true
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "What is the main next step you want an interested visitor to take?",
+      "fields": [
+        {
+          "key": "primaryResponse",
+          "label": "What is the main next step you want an interested visitor to take?",
+          "kind": "single",
+          "choices": [
+            "Call us",
+            "Send a message or contact request",
+            "Request a quote or estimate",
+            "Book an appointment or consultation",
+            "Schedule service",
+            "Visit a location",
+            "Buy or order through another system",
+            "Sign up / register",
+            "Something else"
+          ],
+          "required": true
+        },
+        {
+          "key": "primaryResponseOther",
+          "label": "What is the main next step?",
+          "kind": "text",
+          "required": true,
+          "when": {
+            "field": "primaryResponse",
+            "oneOf": [
+              "Something else"
+            ]
+          }
+        },
+        {
+          "key": "secondaryResponses",
+          "label": "What other ways should people be able to contact or engage with you? (optional)",
+          "kind": "multiple",
+          "choices": [
+            "Call us",
+            "Send a message or contact request",
+            "Request a quote or estimate",
+            "Book an appointment or consultation",
+            "Schedule service",
+            "Visit a location",
+            "Buy or order through another system",
+            "Sign up / register",
+            "Something else"
+          ]
+        },
+        {
+          "key": "secondaryResponseOther",
+          "label": "What other action should people be able to take?",
+          "kind": "text",
+          "required": true,
+          "when": {
+            "field": "secondaryResponses",
+            "oneOf": [
+              "Something else"
+            ]
+          }
+        },
+        {
+          "key": "bookingContext",
+          "label": "Do you already use a booking system? (optional)",
+          "kind": "text",
+          "whenAny": [
+            {
+              "field": "primaryResponse",
+              "oneOf": [
+                "Book an appointment or consultation",
+                "Schedule service"
+              ]
+            },
+            {
+              "field": "secondaryResponses",
+              "oneOf": [
+                "Book an appointment or consultation",
+                "Schedule service"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Where do you serve customers?",
+      "fields": [
+        {
+          "key": "serviceArea",
+          "label": "Where do you serve customers?",
+          "kind": "single",
+          "choices": [
+            "Local area",
+            "Several cities or regions",
+            "Statewide",
+            "Nationwide",
+            "Primarily online / location is not important",
+            "Something else"
+          ],
+          "required": true
+        },
+        {
+          "key": "locations",
+          "label": "Which locations or service areas?",
+          "kind": "text",
+          "required": true,
+          "when": {
+            "field": "serviceArea",
+            "oneOf": [
+              "Local area",
+              "Several cities or regions",
+              "Statewide",
+              "Something else"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "title": "Where should we send your Review?",
+      "intentTitles": {
+        "DIRECT_START": "How should we contact you about getting started?"
+      },
+      "fields": [
+        {
+          "key": "contactName",
+          "label": "Your name",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "email",
+          "label": "Email",
+          "kind": "email",
+          "required": true
+        },
+        {
+          "key": "role",
+          "label": "Role or title (optional)",
+          "kind": "text"
+        },
+        {
+          "key": "phone",
+          "label": "Phone (optional)",
+          "kind": "text"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "title": "Anything else you'd like us to know?",
+      "fields": [
+        {
+          "key": "additional",
+          "label": "Anything else you'd like us to know? (optional)",
+          "kind": "textarea"
+        }
+      ]
+    }
+  ],
+  "definitionCommit": "e7db009950346db62e01c6303ae97e44fdaa0bfc",
+  "definitionBasis": "semantic-json",
+  "definitionSha256": "b243edf1ccc688b66eee451aaf70bbf0ec234b007e2b80b2d6d069e761a2b894"
+}
