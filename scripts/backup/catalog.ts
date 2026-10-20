@@ -22,7 +22,9 @@ function ordered(rows: Row[]) { return rows.sort((a,b)=>{const x=JSON.stringify(
 export function normalizedCheck(definition:string):unknown {
   if(!definition.startsWith("CHECK (") || !definition.endsWith(")"))return definition;
   const tokens=definition.slice(6).match(/'(?:''|[^'])*'|"(?:""|[^"])*"|[A-Za-z_][A-Za-z_0-9$]*|\s+|[\s\S]/g)?.filter(t=>!/^\s+$/.test(t))||[];
-  if(tokens.some(t=>/^(BETWEEN|CASE|SELECT|E)$/i.test(t)||t.includes("$")||t.includes("\\")))return definition;
+  // Standard quoted literals are opaque, byte-exact atoms: a regex '$' is data,
+  // not dollar quoting. Escape strings/backslashes and unsupported SQL still refuse.
+  if(tokens.some(t=>/^(BETWEEN|CASE|SELECT|E)$/i.test(t)||t.includes("\\")||t.includes("$")&&!/^'(?:''|[^'])*'$/.test(t)))return definition;
   const balanced=(ts:string[])=>{let depth=0;for(let i=0;i<ts.length;i++){if(ts[i]==="(")depth++;if(ts[i]===")")depth--;if(depth<0 || depth===0&&i<ts.length-1)return false;}return depth===0;};
   const parse=(input:string[]):unknown=>{
     let ts=input;while(ts[0]==="("&&ts.at(-1)===")"&&balanced(ts))ts=ts.slice(1,-1);
@@ -78,7 +80,11 @@ export async function recoveryCatalog(client:PoolClient,schemas:string[]):Promis
 export function assertRecoveryEquivalent(source:RecoveryCatalog,restored:RecoveryCatalog) {
   assert.equal(restored.version,source.version);
   assert.deepEqual(restored.environment,source.environment,"Database locale/provider/encoding differs");
-  assert.deepEqual(restored.semantic,source.semantic,"Semantic schema differs");
+  // Older version-2 manifests can retain the exact-text CHECK fallback. Apply the
+  // same narrow rule to both sides in memory; never rewrite manifests or hashes.
+  // Other catalog fields and already-structured CHECKs remain exact comparisons.
+  const comparable=(catalog:RecoveryCatalog)=>({...catalog.semantic,constraints:catalog.semantic.constraints.map(row=>({...row,definition:row.contype==='c'&&typeof row.definition==='string'?normalizedCheck(row.definition):row.definition}))});
+  assert.deepEqual(comparable(restored),comparable(source),"Semantic schema differs");
   assert.deepEqual(restored.security,source.security,"Ownership/privileges/security differs");
   assert.deepEqual(restored.roles,source.roles,"Role security differs");
   return {semanticHash:fingerprint(source.semantic),securityHash:fingerprint({security:source.security,roles:source.roles}),environmentHash:fingerprint(source.environment)};

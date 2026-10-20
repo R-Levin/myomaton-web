@@ -23,6 +23,21 @@ test("CHECK normalization only flattens associative AND and preserves meaningful
   for(const unsupported of ['CHECK (a BETWEEN 1 AND 2)','CHECK (a = E\'a\\b\')','CHECK (a = $$b$$)','CHECK (CASE WHEN a THEN b ELSE c END)'])assert.equal(normalizedCheck(unsupported),unsupported);
 });
 
+test("activation CHECK regrouping preserves regex literals and compares existing version-2 manifests without rewriting",()=>{
+  const original="CHECK ((((version >= 1) AND (version <= 100)) AND (operation = ANY (ARRAY['create'::text, 'confirm-commercial'::text, 'assess'::text])) AND (octet_length((snapshot)::text) <= 16384) AND (digest ~ '^[a-f0-9]{64}$'::text) AND (request_digest ~ '^[a-f0-9]{64}$'::text) AND ((length(actor) >= 1) AND (length(actor) <= 200)) AND ((length(authority_reference) >= 1) AND (length(authority_reference) <= 300))))";
+  const restored="CHECK (((version >= 1) AND (version <= 100) AND (operation = ANY (ARRAY['create'::text, 'confirm-commercial'::text, 'assess'::text])) AND (octet_length((snapshot)::text) <= 16384) AND (digest ~ '^[a-f0-9]{64}$'::text) AND (request_digest ~ '^[a-f0-9]{64}$'::text) AND ((length(actor) >= 1) AND (length(actor) <= 200)) AND ((length(authority_reference) >= 1) AND (length(authority_reference) <= 300))))";
+  assert.notEqual(original,restored);assert.notEqual(normalizedCheck(original),original);
+  assert.deepEqual(normalizedCheck(original),normalizedCheck(restored));
+  const source:RecoveryCatalog={version:2,semantic:{constraints:[{contype:'c',conname:'activation_event_bounds',definition:original}]},security:{},environment:[],roles:[]};
+  const saved=structuredClone(source),current=structuredClone(source);current.semantic.constraints[0].definition=normalizedCheck(restored);
+  assertRecoveryEquivalent(source,current);assertRecoveryEquivalent(current,source);assert.deepEqual(source,saved);
+  for(const changed of [restored.replace('<= 100','<= 99'),restored.replace('version >= 1','version > 1'),restored.replace('{64}$','{63}$'),restored.replace("'assess'","'other'"),restored.replace(' AND (digest',' OR (digest')]){
+    const target=structuredClone(current);target.semantic.constraints[0].definition=normalizedCheck(changed);
+    assert.throws(()=>assertRecoveryEquivalent(source,target),/Semantic schema differs/);
+  }
+  assert.notDeepEqual(normalizedCheck("CHECK ((label = 'it''s $ AND ()') AND (n > 0))"),normalizedCheck("CHECK ((label = 'it''s $ OR ()') AND (n > 0))"));
+});
+
 test("semantic contract refuses security, environment, function, extension and schema drift",()=>{
   const source:RecoveryCatalog={version:2,semantic:{columns:[{name:'required',type:'text',nullable:false,default:"'ok'"}],constraints:[{definition:'required'}],indexes:[{definition:'unique'}],sequences:[{increment:1}],functions:[{definition:'body'}],extensions:[{name:'plpgsql'}]},security:{relations:[{owner:'app',acl:null}]},environment:[{locale:'source'}],roles:[{name:'app',superuser:false}]};
   assertRecoveryEquivalent(source,structuredClone(source));

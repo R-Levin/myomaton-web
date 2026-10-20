@@ -5,6 +5,22 @@ import { defaultConfig, restoreTest } from "../../scripts/backup/core";
 import { recoveryCatalog, assertRecoveryEquivalent, assertSequenceValues, normalizedCheck } from "../../scripts/backup/catalog";
 import {readCustomerState,stateFingerprint} from "../../lib/platform/customer-initialization";
 
+// Diagnostic for this actual PostgreSQL CHECK tree only, not a general SQL parser.
+// Flatten native AND containers; retain every child subtree byte-for-byte, including
+// operator/function/type/collation IDs, variable attributes and binary literal values.
+function activationAndAtoms(node:string):string[] {
+  const prefix='{BOOLEXPR :boolop and :args (';
+  if(!node.startsWith(prefix))return [node];
+  let i=prefix.length;const children:string[]=[];
+  while(node[i]==='{'){
+    const start=i;let depth=0;
+    do{if(node[i]==='{')depth++;else if(node[i]==='}')depth--;i++;assert.ok(i<=node.length,'Malformed native expression');}while(depth);
+    children.push(node.slice(start,i));if(node[i]===' ')i++;
+  }
+  assert.match(node.slice(i),/^\) :location -?\d+\}$/);
+  return children.flatMap(activationAndAtoms);
+}
+
 test("private backup restore preserves semantic/security state and rejects real schema drift",async t=>{
   const root=process.env.BACKUP_TEST_ROOT,point=process.env.BACKUP_TEST_POINT;
   assert.ok(root&&point,"Explicit dedicated backup root/point required; never use shared DB as restore target");
@@ -13,7 +29,28 @@ test("private backup restore preserves semantic/security state and rejects real 
   const proof=await restoreTest(config,point,async(target,manifest)=>{
     const source=new Pool({connectionString:config.databaseUrl,options:"-c default_transaction_read_only=on"});
     const read=async(pool:Pool)=>{const c=await pool.connect();try{await c.query('BEGIN READ ONLY');return await recoveryCatalog(c,manifest.source.includedSchemas);}finally{await c.query('ROLLBACK');c.release();}};
-    try{assertRecoveryEquivalent(await read(source),await read(target));}finally{await source.end();}
+    try{
+      assertRecoveryEquivalent(await read(source),await read(target));
+      await check('actual activation CHECK has identical native atoms and three-valued AND semantics',async()=>{
+        const sql="SELECT pg_get_constraintdef(oid) definition,pg_get_constraintdef(oid,false) nonpretty,pg_get_expr(conbin,conrelid,false) expression,conbin::text tree FROM pg_constraint WHERE conrelid='public.activation_case_events'::regclass AND conname='activation_event_bounds'";
+        const original=(await source.query(sql)).rows[0],restored=(await target.query(sql)).rows[0];assert.ok(original&&restored);
+        assert.equal(original.definition,original.nonpretty);assert.equal(restored.definition,restored.nonpretty);
+        assert.equal(activationAndAtoms(original.tree).length,10);assert.deepEqual(activationAndAtoms(original.tree),activationAndAtoms(restored.tree));
+        assert.deepEqual(normalizedCheck(original.definition),normalizedCheck(restored.definition));
+        const truth=(await target.query("SELECT count(*)::int n,bool_and((((a AND b) AND c) IS NOT DISTINCT FROM (a AND (b AND c)))) same FROM (VALUES (true),(false),(NULL::boolean)) x(a) CROSS JOIN (VALUES (true),(false),(NULL::boolean)) y(b) CROSS JOIN (VALUES (true),(false),(NULL::boolean)) z(c)")).rows[0];assert.deepEqual(truth,{n:27,same:true});
+      });
+      await check('a real activation CHECK bound change still refuses recovery equivalence',async()=>{
+        const baseline=await read(target),c=await target.connect();
+        try{
+          await c.query('BEGIN');const definition=(await c.query("SELECT pg_get_constraintdef(oid,false) definition FROM pg_constraint WHERE conrelid='public.activation_case_events'::regclass AND conname='activation_event_bounds'")).rows[0].definition;
+          const changed=definition.replace('version <= 100','version <= 99');assert.notEqual(changed,definition);
+          await c.query('ALTER TABLE public.activation_case_events DROP CONSTRAINT activation_event_bounds');
+          await c.query('ALTER TABLE public.activation_case_events ADD CONSTRAINT activation_event_bounds '+changed);
+          const actual=await recoveryCatalog(c,manifest.source.includedSchemas);
+          assert.throws(()=>assertRecoveryEquivalent(baseline,actual),/Semantic schema differs/);
+        }finally{await c.query('ROLLBACK');c.release();}
+      });
+    }finally{await source.end();}
     const c=await target.connect();
     const capture=async(client:PoolClient)=>recoveryCatalog(client,['backup_fixture']);
     try{
