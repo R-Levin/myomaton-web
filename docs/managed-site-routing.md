@@ -16,8 +16,10 @@ change selection. Contact and media use the same deployment context.
 See [canonical deployment boundaries](canonical-foundation.md#deployment-and-remaining-boundaries).
 
 Page queries then use the resolved Managed Site UUID, exact slug and `active` status.
-The existing model has no separate published state; this does not implement a
-draft/publishing workflow. Production host/domain selection remains deferred at
+The existing Page model has no separate published state. Local
+[change proposals](content-authority-and-editing.md#reviewable-managed-site-change-proposals)
+render isolated candidates without changing these active routes; exact approval
+does not publish or switch destinations. Production host/domain selection remains deferred at
 P9 in [the architecture register](deferred-architecture.md). Replace the selection
 boundary when that trigger is reached, retaining shared Page rendering.
 

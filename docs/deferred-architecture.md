@@ -372,6 +372,9 @@ preview-only and maintaining explicit evidence/contribution permissions. This sl
 implements no acquisition pipeline, API integration or stock download.
 
 The [text draft foundation](content-authority-and-editing.md) retains canonical
-reconciliation and spelling/grammar hooks. Customer UI, collaborative durable drafts,
-review/publish transitions, caller authorization and meaningful intelligence checks
-remain later boundaries; content editing never grants presentation control.
+reconciliation and spelling/grammar hooks. Its bounded local
+[Managed Site proposal extension](content-authority-and-editing.md#reviewable-managed-site-change-proposals)
+now binds confirmed canonical sources, candidate revisions, readable preview and exact
+customer-authority approval in disposable proof. Customer UI, shared durable proposal
+storage/authentication, publication/release/rollback and meaningful intelligence
+checks remain later boundaries; content editing never grants presentation control.

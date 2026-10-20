@@ -106,6 +106,15 @@ Current [routing](managed-site-routing.md) selects one explicit deployment; it d
 not implement production host-based tenant selection (P9). Existing public active
 content is not a private-content or draft/publish authorization model.
 
+The [local Managed Site proposal boundary](content-authority-and-editing.md#reviewable-managed-site-change-proposals)
+requires operation-specific trusted scope grants and a separately represented
+customer-representative/accepted-authority mandate to approve an exact revision,
+base, destination and preview digest. Operator identity alone is insufficient.
+It accepts only disposable inactive bound foundations, exposes no HTTP mutation
+surface and has no publication capability. Local evidence is private, ignored
+development data; shared durable storage/backup, production authentication and
+release authorization remain separate gates.
+
 ## Database privileges and canonical state
 
 Separate normal runtime application credentials, migration/schema-admin execution

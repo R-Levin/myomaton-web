@@ -623,3 +623,20 @@ portal, shared operational enablement, retention/purge and publication remain se
 The [synthetic operator proof](../tests/integration/onboarding-information.test.ts)
 produces ignored `runtime-content/onboarding-information-proof/synthetic-operator.txt`.
 Tests run in a separate disposable PostgreSQL database and remove their fixtures.
+
+### Managed Site proposal and exact approval
+
+The [bounded proposal extension](content-authority-and-editing.md#reviewable-managed-site-change-proposals)
+now prepares one candidate Page/ordered Sections from exact confirmed canonical
+Knowledge/Offering revisions plus explicitly labeled editorial choices. The candidate
+and its full readable preview remain separate from active site content. Exact
+human approval binds revision, digest, destination, base state and rendered preview,
+with customer-representative/accepted-authority mandate distinct from the recording
+operator. Later edits require a new revision; changed base state invalidates current
+approval validity. This disposable local proof does not publish, write shared
+content, activate a customer or reinterpret Review/intake as facts.
+
+The future authoritative onboarding Home direction may reuse this boundary after
+sufficient confirmed knowledge. The optional Free Review illustrative Home concept
+remains separate/deferred. Actual Customer #1 site creation still waits for that
+knowledge; full onboarding interview and safe publication/release remain later work.
