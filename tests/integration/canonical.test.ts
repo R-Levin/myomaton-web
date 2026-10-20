@@ -23,7 +23,7 @@ test("canonical upgrade/fresh replay, scoped revisions, projections and two isol
   const quote=(s:string)=>{assert.match(s,/^canonical_test_[a-f0-9]{32}_(fresh|upgrade)$/);return `"${s}"`;};
   // This fixture pins canonical migration 0008; operational 0009 has its own
   // fresh/upgrade coverage. Assert before opening a client to avoid leaked workers.
-  const migrations=readMigrationFiles({migrationsFolder:"lib/platform/db/migrations"});assert.equal(migrations.length,11);await c.connect();
+  const migrations=readMigrationFiles({migrationsFolder:"lib/platform/db/migrations"});assert.ok(migrations.length>=11);await c.connect();
   const replay=async(s:string,from:number,to:number)=>{await c.query("BEGIN");try{await c.query(`SET LOCAL search_path TO ${quote(s)}`);for(const m of migrations.slice(from,to))for(const sql of m.sql)await c.query(sql.replaceAll('"public".',`${quote(s)}.`));await c.query("COMMIT");}catch(e){await c.query("ROLLBACK");throw e;}};
   const real=async()=>{const state:Record<string,unknown>={};await c.query("BEGIN READ ONLY");try{await c.query("SET LOCAL TIME ZONE 'UTC'");const tables=(await c.query("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename")).rows;for(const {tablename}of tables)state[tablename]=(await c.query(`SELECT to_jsonb(t) row FROM public."${tablename}" t ORDER BY to_jsonb(t)::text`)).rows;return state;}finally{await c.query("ROLLBACK");}};
   const before=await real();const root=await mkdtemp(path.join(os.tmpdir(),"canonical-media-"));let p:Pool|undefined;

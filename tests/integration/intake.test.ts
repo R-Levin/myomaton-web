@@ -137,7 +137,7 @@ test("intake migration fresh/upgrade fidelity adds empty domain without rewritin
     const c = await admin.connect();
     try {
       await c.query("BEGIN"); await c.query(`CREATE SCHEMA "${schema}"`); await c.query(`SET LOCAL search_path="${schema}"`);
-      const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.equal(migrations.length, 11);
+      const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.ok(migrations.length >= 11);
       for (const m of migrations.slice(0, 10)) for (const sql of m.sql) await c.query(sql.replaceAll('"public".', `"${schema}".`));
       const order = ["organizations", "subject_types", "web_presences", "managed_sites"];
       for (const table of order) for (const r of f.before[table]) await c.query(`INSERT INTO ${table} SELECT * FROM jsonb_populate_record(NULL::${table},$1::jsonb)`, [JSON.stringify(r)]);

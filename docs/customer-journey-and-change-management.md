@@ -411,3 +411,84 @@ review of installment/cancellation terms. This document does not close any gate.
 Functional foundations and isolated development tooling are not evidence that a
 production prospect, payment, approval or business-change workflow is complete.
 Commercial launch remains unauthorized until separately reviewed and authorized.
+
+## Activation/onboarding case foundation
+
+The private [ActivationService](../lib/platform/activation/service.ts) is the bounded
+handoff between submitted intake and later paid onboarding. Migration
+[0011](../lib/platform/db/migrations/0011_activation_cases.sql) adds only
+`activation_cases` and `activation_case_events`, their constraints and append-only
+guards. It is tested in disposable schemas; applying it to shared development is a
+separate authorization. No public route or customer interface exposes this service.
+
+Each case has one immutable submitted-intake source (ID, digest, questionnaire and
+draft version, Free Review or Direct Start path). Direct Start requires no Review.
+Free Review may bind an exact approved Review revision, digest, evidence digest and
+approval-event hash through the existing validated Review store. Delivery is not a
+prerequisite. Later Review revisions cannot retarget an existing case. Review prose
+and recommendations are never copied into business facts or the assessment.
+
+Ownership is the exact intake-service Web Presence/Managed Site pair plus a unique
+pending-customer UUID. The service owner is MioPages; it is **not** the prospect's
+future canonical customer. A pending identity cannot be reassigned, matched by name
+or domain, or used to borrow MioPages Knowledge/Offering confirmation. One submission
+and one pending identity can each have only one case. A later customer-creation slice
+must resolve that identity explicitly, check the current case version and commercial
+authority, obtain confirmed business information and invoke the existing
+[guarded initializer](../lib/platform/customer-initialization.ts) with its canonical
+baseline/manifest guards. This slice neither invokes it nor grants general canonical
+write, content-approval or publishing authority.
+
+`PENDING_COMMERCIAL` means there is no authority to begin paid onboarding. An
+operator-verified external confirmation changes it to `AUTHORIZED_FOR_ONBOARDING`.
+It records manual invoice, agreement/order or provider-neutral external evidence,
+an opaque reference, confirmation timestamp, recording operator/authority, accepted
+Launch and Ongoing scope, and an optional bounded note. Both scope statements are
+required; no prices, installment terms, provider integration or native payment engine
+are implied. Store references only: never paste payment secrets or credentials into
+these fields. Organization/Web Presence active flags do not substitute for this
+confirmation. A conflicting second confirmation fails rather than replacing it.
+
+The assessment contains five areas: business identity, audience, offering, service
+area and operating access. `UNCONFIRMED` points to immutable intake fields and their
+original provenance; `MISSING` identifies a material gap without inventing an answer.
+`CONFIRMED` requires a separate scoped confirmation permission and an explicit
+customer-information attestation reference, with operator and timestamp recorded by
+the service. That is a case-local assessment, **not** canonical Knowledge/Offering
+promotion or public truth. Commercial confirmation alone changes no assessment.
+No existing customer's canonical records are borrowed to confirm a pending prospect.
+
+The trusted composition root must inject `OperatorAuthority.authorize(context,
+operation, scope)`. It resolves an opaque authenticated caller context and checks
+`create`, `inspect`, `confirm-commercial`, `assess`, or `confirm-information` for the
+exact service-owner/pending-customer scope. A request-body actor string or development
+flag grants nothing. Grant identity/reference are persisted. Production authentication
+and its trusted authority adapter remain absent; the service additionally refuses
+production and any schema outside the isolated intake-fixture namespace. The synthetic
+WeakMap capability adapter in the [proof fixture](../scripts/activation/disposable.ts)
+is only a disposable test adapter, not production authentication.
+
+The operator API supports `create`, scoped `inspect`, and expected-version `update`
+for commercial confirmation or assessment. Creation uses a request UUID plus exact
+payload digest; mutations use request UUIDs and expected case versions. Same-request
+retries are no-ops; reused request IDs with changed payloads, stale writes, foreign
+scope and duplicate source creation refuse. A locked case and immutable hash-linked
+events preserve significant changes. History is bounded to 100 events, failing closed
+at capacity. Source/review bindings cannot be replaced. The source FK deliberately
+prevents intake retention deletion while referenced: a later authorized case retention,
+export and purge policy must resolve that hold before live use. There is no silent
+history pruning or indefinite-retention product promise.
+
+The [focused PostgreSQL proof](../tests/integration/activation.test.ts) creates
+synthetic v2 Free Review and Direct Start submissions, verifies durable rereads,
+guards and migration fidelity, and writes ignored
+`runtime-content/activation-proof/synthetic-case.txt` for human inspection before
+removing its disposable fixtures. Run with `ASSET_TEST_DATABASE_URL` pointing to the
+development database: the fixture reads shared state, mutates only its fresh private
+schemas and verifies shared state unchanged. This does not authorize shared migration.
+
+The fuller onboarding interview remains deferred under P11. It will reuse source
+answers and provenance, collect meaningful gaps as a benefit and requirement, and
+transfer operating knowledge up front without ongoing customer homework. This case
+provides its source/assessment handoff; it does not design or implement that interview,
+customer portal, billing, canonical activation, launch or publication workflow.

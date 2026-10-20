@@ -19,7 +19,7 @@ test("Contact upgrade/fresh replay preserves public state; isolated submission o
   const upgrade = `${prefix}_upgrade`, fresh = `${prefix}_fresh`;
   const quote = (name: string) => { assert.match(name, /^myomaton_contact_test_[a-f0-9]{32}_(upgrade|fresh)$/); return `"${name}"`; };
   // Keep the historical Contact replay range; 0009 is covered by acquisition.
-  const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.equal(migrations.length, 11); await client.connect();
+  const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.ok(migrations.length >= 11); await client.connect();
   const read = async (schema: string) => {
     assert.ok(schema === "public" || quote(schema));
     const rows: Record<string, unknown[]> = {};
@@ -38,7 +38,7 @@ test("Contact upgrade/fresh replay preserves public state; isolated submission o
   try {
     await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
     const journal = (await client.query("SELECT hash,created_at FROM drizzle.__drizzle_migrations ORDER BY id")).rows;
-    assert.ok(journal.length >= 7 && journal.length <= 9);
+    assert.ok(journal.length >= 7 && journal.length <= migrations.length);
     assert.deepEqual(journal, migrations.slice(0,journal.length).map(m => ({ hash: m.hash, created_at: String(m.folderMillis) })));
     const before = await read("public"); await client.query("ROLLBACK");
     for (const schema of [upgrade, fresh]) await client.query(`CREATE SCHEMA ${quote(schema)}`);
@@ -183,6 +183,7 @@ test("Contact upgrade/fresh replay preserves public state; isolated submission o
     assert.deepEqual((await client.query("SELECT hash,created_at FROM drizzle.__drizzle_migrations ORDER BY id")).rows, journal);
     await client.query("ROLLBACK");
   } finally {
+    await client.query("ROLLBACK");
     await pool?.end();
     for (const schema of [upgrade, fresh]) await client.query(`DROP SCHEMA IF EXISTS ${quote(schema)} CASCADE`);
     await client.end();
