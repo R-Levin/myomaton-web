@@ -221,11 +221,13 @@ separate policy/privacy/security review rather than reinterpretation of these de
 ### Progressive onboarding and Launch Readiness under existing gates
 
 The private [activation/onboarding case foundation](customer-journey-and-change-management.md#activationonboarding-case-foundation)
-now provides P11/P26's bounded source/commercial/assessment handoff in disposable
-development proof. Shared application of 0011, production authentication/authority,
-case retention/purge, explicit canonical customer binding and initialization, the
-fuller gap-based onboarding interview and publication remain separate gates. It
-does not activate customer service, collect payments or deliver a Review.
+provides P11/P26's bounded source/commercial/assessment handoff. Its explicit
+[new-customer transition](customer-journey-and-change-management.md#guarded-canonical-customer-foundation)
+now creates/binds an inactive canonical identity foundation in disposable proof,
+without promoting intake/Review facts. Shared application of 0012, production
+authentication/authority, case retention/purge, existing-customer reconciliation,
+the fuller gap-based onboarding interview and publication remain separate gates.
+This proof does not activate real customer service, collect payments or deliver a Review.
 
 The [progressive onboarding and Launch Readiness model](progressive-onboarding-and-launch-readiness.md)
 owns the complete workflow. These are added completion criteria for existing gates,

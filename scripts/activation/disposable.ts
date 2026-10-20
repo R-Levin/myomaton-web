@@ -12,13 +12,13 @@ import path from "node:path";
 // Only synthetic disposable proof setup. This is NOT a production identity adapter.
 export async function activationFixture(databaseUrl: string) {
   const f = await createIntakeFixture(databaseUrl), stores: LocalReviewStore[] = [];
-  const grants = new WeakMap<object, { scope: Scope; operations: Operation[] }>();
+  const grants = new WeakMap<object, { scope: Scope; operations: Operation[]; operatorId: string }>();
   const authority: OperatorAuthority = { async authorize(context, operation, scope) {
     const grant = context && typeof context === "object" ? grants.get(context) : undefined;
     if (!grant || !same(scope, grant.scope) || !grant.operations.includes(operation)) throw Error("Missing scoped operator authority");
-    return { operatorId: "synthetic-activation-operator", authorityReference: "disposable-proof-capability" };
+    return { operatorId: grant.operatorId, authorityReference: "disposable-proof-capability" };
   } };
-  const grant = (scope: Scope, operations: Operation[] = ["create", "inspect", "confirm-commercial", "assess", "confirm-information"]) => { const context = Object.freeze({}); grants.set(context, { scope: structuredClone(scope), operations: [...operations] }); return context; };
+  const grant = (scope: Scope, operations: Operation[] = ["create", "inspect", "confirm-commercial", "assess", "confirm-information"], operatorId = "synthetic-activation-operator") => { const context = Object.freeze({}); grants.set(context, { scope: structuredClone(scope), operations: [...operations], operatorId }); return context; };
   const service = () => new ActivationService(f.pool, authority, localApprovedReviews);
   const submit = async (intent: "FREE_REVIEW" | "DIRECT_START", answers: Record<string, string | string[]>) => {
     const token = newResumeToken(), draft = await f.service.create(token, intent), saved = await f.service.save(token, draft.version, answers, 12);

@@ -17,6 +17,13 @@ export type CustomerManifest = {
   offering: { id: string; key: string; type: "service" | "product"; name: string; status: "active" | "inactive"; payload: unknown };
   responsibleIdentity: string; changeReason: string;
 };
+export type CustomerFoundationManifest = {
+  kind: "customer-foundation/1";
+  organizationId: string; webPresenceId: string; managedSiteId: string;
+  organizationName: string; webPresenceName: string; managedSiteName: string;
+  sourceReference: string;
+  confirmation: { reference: string; confirmedAt: string; confirmedBy: string };
+};
 
 export async function readCustomerState(c: Pick<PoolClient, "query">): Promise<CustomerState> {
   const state: CustomerState = {};
@@ -89,8 +96,40 @@ function postcondition(graph:CustomerState, m:CustomerManifest) {
   }
 }
 
+// Identity-only establishment deliberately creates no Knowledge, Offering or content.
+// The caller's authority and outer transaction remain the service's responsibility.
+async function initializeFoundation(pool: Pick<Pool,"connect">, manifest: CustomerFoundationManifest, baseline: CustomerState, options: { failAfter?: number }) {
+  object(manifest,["kind","organizationId","webPresenceId","managedSiteId","organizationName","webPresenceName","managedSiteName","sourceReference","confirmation"]);
+  assert.equal(manifest.kind,"customer-foundation/1");
+  const ids=[uuid(manifest.organizationId),uuid(manifest.webPresenceId),uuid(manifest.managedSiteId)];assert.equal(new Set(ids).size,3);
+  for(const field of ["organizationName","webPresenceName","managedSiteName","sourceReference"] as const)assert.equal(text(manifest[field],field==="sourceReference"?300:200),manifest[field]);
+  object(manifest.confirmation,["reference","confirmedAt","confirmedBy"]);text(manifest.confirmation.reference,300);text(manifest.confirmation.confirmedBy,200);
+  assert.ok(Number.isFinite(Date.parse(manifest.confirmation.confirmedAt))&&Date.parse(manifest.confirmation.confirmedAt)<=Date.now(),"Explicit identity confirmation required");
+  const rows:Record<string,Row[]>={organizations:[{id:ids[0],name:manifest.organizationName,type:"standard",status:"inactive",configuration:{},metadata:{},version:1}],web_presences:[{id:ids[1],organization_id:ids[0],name:manifest.webPresenceName,primary_domain:null,locale:"en-US",timezone:"UTC",status:"inactive",configuration:{},metadata:{},version:1}],managed_sites:[{id:ids[2],web_presence_id:ids[1],name:manifest.managedSiteName,status:"inactive",configuration:{},metadata:{},version:1}]};
+  const select=(state:CustomerState)=>Object.fromEntries(customerTables.map(t=>[t,state[t].filter(r=>(rows[t]??[]).some(intended=>intended.id===r.id))]));
+  const preserve=(state:CustomerState)=>{const graph=select(state),rest:CustomerState={migrations:state.migrations};for(const t of customerTables)rest[t]=state[t].filter(r=>!graph[t].includes(r));assert.equal(stateFingerprint(rest),stateFingerprint(baseline),"Existing customer/migration baseline drift; no repair mode");return graph;};
+  const c=await pool.connect();let writes=0;const changed=()=>{if(++writes===options.failAfter)throw Error("Forced initializer rollback");};
+  try {
+    await c.query("BEGIN");await c.query("SET LOCAL lock_timeout='5s'");await c.query("SET LOCAL statement_timeout='30s'");await c.query("SET LOCAL TIME ZONE 'UTC'");
+    await c.query(`LOCK TABLE ${customerTables.join(",")} IN SHARE ROW EXCLUSIVE MODE`);await c.query("LOCK TABLE drizzle.__drizzle_migrations IN SHARE MODE");
+    const before=await readCustomerState(c),graph=preserve(before);
+    const check=(actual:CustomerState)=>{for(const [table,intended]of Object.entries(rows)){assert.equal(actual[table].length,1,"Partial customer foundation");for(const [key,value]of Object.entries(intended[0]))assert.deepEqual(key==="metadata"&&table==="organizations"?withoutReceipt(actual,ids[0]).organizations[0].metadata:actual[table][0][key],value,`Unexpected foundation ${table}.${key}`);}};
+    if(Object.values(graph).some(r=>r.length)) {
+      check(graph);const receipt=(graph.organizations[0].metadata as Row).initialization as Row|undefined;assert.ok(receipt,"Existing customer is not an initializer retry");
+      assert.equal(receipt.manifestDigest,fingerprint(manifest));assert.equal(receipt.stateDigest,stateFingerprint(withoutReceipt(graph,ids[0])));await c.query("COMMIT");return {inserted:0,updated:0,deleted:0};
+    }
+    assert.equal(stateFingerprint(before),stateFingerprint(baseline));
+    for(const [table,list]of Object.entries(rows)){const row=list[0],columns=Object.keys(row);await c.query(`INSERT INTO ${table} (${columns.map(k=>`"${k}"`).join(",")}) VALUES (${columns.map((_,i)=>`$${i+1}`).join(",")})`,Object.values(row));changed();}
+    const resulting=preserve(await readCustomerState(c));check(resulting);
+    const receipt={kind:manifest.kind,sourceReference:manifest.sourceReference,confirmation:manifest.confirmation,manifestDigest:fingerprint(manifest),stateDigest:stateFingerprint(resulting)};
+    await c.query("UPDATE organizations SET metadata=metadata || $2::jsonb WHERE id=$1",[ids[0],JSON.stringify({initialization:receipt})]);changed();
+    const final=preserve(await readCustomerState(c));check(final);await c.query("COMMIT");return {inserted:3,updated:1,deleted:0};
+  }catch(error){await c.query("ROLLBACK");throw error;}finally{c.release();}
+}
+
 // Operator-only one-time establishment, not a seed/sync or public management API.
-export async function initializeCustomer(pool:Pick<Pool,"connect">, manifest:CustomerManifest, baseline:CustomerState, options:{failAfter?:number}={}) {
+export async function initializeCustomer(pool:Pick<Pool,"connect">, manifest:CustomerManifest | CustomerFoundationManifest, baseline:CustomerState, options:{failAfter?:number}={}) {
+  if("kind" in manifest)return initializeFoundation(pool,manifest,baseline,options);
   validate(manifest);const c=await pool.connect();let writes=0;
   const changed=()=>{writes++;if(options.failAfter===writes)throw Error("Forced initializer rollback");};
   try {

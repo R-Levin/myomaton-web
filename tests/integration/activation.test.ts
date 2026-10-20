@@ -106,11 +106,11 @@ test("activation foundation: fresh/upgrade PostgreSQL, durable source paths and 
       Object.assign(process.env, { NODE_ENV: "production" });
       try { await assert.rejects(svc.inspect(a.context, created.id, a.scope), /isolated/); } finally { Object.assign(process.env, { NODE_ENV: "development" }); }
     });
-    await t.test("0011 upgrade from 0010 matches fresh replay and preserves canonical data", async () => {
+    await t.test("0011 upgrade from 0010 preserves canonical data; later ordered replay matches fresh schema", async () => {
       const schema = f.schema.replace("_intake", "_act"), quoted = `"${schema}"`, c = await f.pool.connect();
       try {
         await c.query("BEGIN"); await c.query(`CREATE SCHEMA ${quoted}`); await c.query(`SET LOCAL search_path=${quoted}`);
-        const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.equal(migrations.length, 12);
+        const migrations = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.ok(migrations.length >= 12);
         for (const m of migrations.slice(0, 11)) for (const sql of m.sql) await c.query(sql.replaceAll('"public".', `${quoted}.`));
         const order = ["organizations", "subject_types", "web_presences", "managed_sites", ...customerTables.filter(t => !["organizations", "subject_types", "web_presences", "managed_sites"].includes(t))];
         for (const table of order) for (const row of f.before[table]) await c.query(`INSERT INTO ${table} SELECT * FROM jsonb_populate_record(NULL::${table},$1::jsonb)`, [JSON.stringify(row)]);
@@ -118,6 +118,7 @@ test("activation foundation: fresh/upgrade PostgreSQL, durable source paths and 
         for (const table of customerTables) original[table] = (await c.query(`SELECT to_jsonb(t) row FROM ${table} t ORDER BY to_jsonb(t)::text`)).rows;
         const before = (await c.query("SELECT tablename FROM pg_tables WHERE schemaname=$1 ORDER BY tablename", [schema])).rows; assert.equal(before.length, 24);
         for (const sql of migrations[11].sql) await c.query(sql.replaceAll('"public".', `${quoted}.`));
+        for (const migration of migrations.slice(12)) for (const sql of migration.sql) await c.query(sql.replaceAll('"public".', `${quoted}.`));
         for (const table of customerTables) assert.deepEqual((await c.query(`SELECT to_jsonb(t) row FROM ${table} t ORDER BY to_jsonb(t)::text`)).rows, original[table]);
         await c.query("SET LOCAL search_path=pg_catalog");
         assert.deepEqual(await schemaSignature(c, schema, ["activation_cases", "activation_case_events"]), await schemaSignature(c, f.schema, ["activation_cases", "activation_case_events"]));

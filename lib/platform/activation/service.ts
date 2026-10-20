@@ -2,13 +2,15 @@ import { randomUUID } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { fingerprint, object, text, uuid } from "../canonical/model";
 import { questionsFor } from "../intake/model";
+import { initializeCustomer, readCustomerState, stateFingerprint, type CustomerFoundationManifest } from "../customer-initialization";
 import type { Submission } from "../reviews/model";
 import { approvedReview, type ApprovedReviewSource } from "./review-source";
 import { assessment, commercial, digest, initialAssessment, same, scope, source, type Authority, type CaseState, type CreateCase, type Operation, type OperatorAuthority, type ReviewBinding, type Scope, type Source } from "./model";
+import { confirmedIdentity, type CanonicalBinding, type CanonicalRequest } from "./canonical";
 
 export type CaseIdentity = { id: string; scope: Scope; source: Source; review: ReviewBinding | null; createdAt: string; createdBy: string; authorityReference: string };
 export type CaseEvent = { version: number; requestId: string; requestDigest: string; operation: string; actor: string; authorityReference: string; at: string; previous: string | null; snapshot: CaseState; digest: string };
-export type CaseInspection = CaseIdentity & { version: number; state: CaseState; history: CaseEvent[] };
+export type CaseInspection = CaseIdentity & { version: number; state: CaseState; history: CaseEvent[]; canonicalBinding: CanonicalBinding | null };
 type CaseRow = { id: string; web_presence_id: string; managed_site_id: string; pending_customer_id: string; submission_id: string; source: Source; review: ReviewBinding | null; request_id: string; request_digest: string; created_by: string; authority_reference: string; created_at: Date };
 
 // Private trusted service API; deliberately no HTTP/Server Action exposure or default
@@ -48,7 +50,10 @@ export class ActivationService {
     let previous: string | null = null;
     for (const [i, event] of history.entries()) { const { digest: hash, ...body } = event; if (event.version !== i + 1 || event.previous !== previous || fingerprint({ caseId: r.id, ...body }) !== hash) throw Error("Activation history integrity failure"); previous = hash; }
     if (!history.length) throw Error("Activation history missing");
-    return { id: r.id, scope: { webPresenceId: r.web_presence_id, managedSiteId: r.managed_site_id, pendingCustomerId: r.pending_customer_id }, source: r.source, review: r.review, createdAt: r.created_at.toISOString(), createdBy: r.created_by, authorityReference: r.authority_reference, version: history.length, state: history.at(-1)!.snapshot, history };
+    const b=(await c.query("SELECT b.*,w.organization_id actual_org,m.web_presence_id actual_presence FROM activation_customer_bindings b JOIN web_presences w ON w.id=b.web_presence_id JOIN managed_sites m ON m.id=b.managed_site_id WHERE b.case_id=$1",[r.id])).rows[0];
+    let canonicalBinding: CanonicalBinding | null=null;
+    if(b){const event=history.find(e=>e.version===b.event_version);if(!event||event.operation!=="initialize-customer"||fingerprint(b.identity)!==b.identity_digest||b.actual_org!==b.organization_id||b.actual_presence!==b.web_presence_id||b.identity.confirmation.confirmedBy!==event.actor)throw Error("Canonical binding integrity failure");canonicalBinding={organizationId:b.organization_id,webPresenceId:b.web_presence_id,managedSiteId:b.managed_site_id,eventVersion:b.event_version,identity:b.identity,identityDigest:b.identity_digest};}
+    return { id: r.id, scope: { webPresenceId: r.web_presence_id, managedSiteId: r.managed_site_id, pendingCustomerId: r.pending_customer_id }, source: r.source, review: r.review, createdAt: r.created_at.toISOString(), createdBy: r.created_by, authorityReference: r.authority_reference, version: history.length, state: history.at(-1)!.snapshot, history, canonicalBinding };
   }
   private async append(c: PoolClient, id: string, history: CaseEvent[], requestId: string, requestDigest: string, operation: string, actor: Authority, snapshot: CaseState) {
     const body = { version: history.length + 1, requestId, requestDigest, operation, actor: actor.operatorId, authorityReference: actor.authorityReference, at: new Date().toISOString(), previous: history.at(-1)?.digest ?? null, snapshot };
@@ -81,6 +86,41 @@ export class ActivationService {
     const owner = scope(selection); await this.authorize(context, "inspect", owner);
     return this.transaction(async c => this.inspectRow(c, await this.row(c, id, owner)));
   }
+  private async eligibleSource(c:PoolClient,r:CaseRow,current:CaseInspection) {
+    const s=await this.submission(c,r.submission_id,current.scope);
+    if(!same(source(s),r.source))throw Error("Activation immutable source mismatch");
+    if(r.review){const bound=await approvedReview(this.reviews,{id:r.review.id,revision:r.review.revision,digest:r.review.digest},current.scope,s);if(!same(bound,r.review))throw Error("Approved Review binding changed");}
+    const comm=current.state.commercial;
+    if(current.state.status!=="AUTHORIZED_FOR_ONBOARDING"||!comm)throw Error("Commercial confirmation and onboarding authority required");
+    const {source:kind,reference,confirmedAt,launchScope,ongoingScope,note}=comm;
+    if(!same(commercial({source:kind,reference,confirmedAt,launchScope,ongoingScope,...(note===undefined?{}:{note})},{operatorId:comm.recordedBy,authorityReference:comm.authorityReference}),comm))throw Error("Invalid accepted commercial scope");
+  }
+  async canonicalReadiness(context:unknown,id:string,selection:Scope) {
+    const owner=scope(selection);await this.authorize(context,"initialize-customer",owner);
+    return this.transaction(async c=>{const r=await this.row(c,id,owner),current=await this.inspectRow(c,r);await this.eligibleSource(c,r,current);return {caseId:id,caseVersion:current.version,scope:owner,eligible:current.canonicalBinding===null,canonicalBinding:current.canonicalBinding,customerStateFingerprint:stateFingerprint(await readCustomerState(c)),requiredIdentity:["organizationName","webPresenceName","managedSiteName","confirmation.reference","confirmation.confirmedAt"]};});
+  }
+  async initializeCanonicalCustomer(context:unknown,id:string,selection:Scope,input:CanonicalRequest):Promise<CaseInspection> {
+    input=structuredClone(input);object(input,["requestId","expectedVersion","expectedCustomerFingerprint","identity"]);uuid(input.requestId);digest(input.expectedCustomerFingerprint);
+    if(!Number.isSafeInteger(input.expectedVersion)||input.expectedVersion<1)throw Error("Expected case version required");
+    const owner=scope(selection),actor=await this.authorize(context,"initialize-customer",owner),identity=confirmedIdentity(input.identity,actor);
+    const requestDigest=fingerprint({id,scope:owner,operation:"initialize-customer",expectedVersion:input.expectedVersion,expectedCustomerFingerprint:input.expectedCustomerFingerprint,identity});
+    return this.transaction(async c=>{
+      const r=await this.row(c,id,owner),current=await this.inspectRow(c,r);await this.eligibleSource(c,r,current);
+      const retry=current.history.find(e=>e.requestId===input.requestId);
+      if(retry){if(retry.operation!=="initialize-customer"||retry.requestDigest!==requestDigest||retry.actor!==actor.operatorId||!current.canonicalBinding||current.canonicalBinding.eventVersion!==retry.version)throw Error("Canonical transition idempotency conflict");return current;}
+      if(current.canonicalBinding)throw Error("Activation case already bound; canonical retargeting refused");
+      if(current.version!==input.expectedVersion)throw Error("Stale activation version");
+      const baseline=await readCustomerState(c);if(stateFingerprint(baseline)!==input.expectedCustomerFingerprint)throw Error("Canonical customer baseline changed");
+      const manifest:CustomerFoundationManifest={kind:"customer-foundation/1",organizationId:randomUUID(),webPresenceId:randomUUID(),managedSiteId:randomUUID(),...identity,sourceReference:"activation-case:"+id};
+      // Existing initializer uses a savepoint inside this case transaction, so a
+      // later event/binding failure also rolls back all three canonical records.
+      const transactional={connect:async()=>({release(){},query:async(sql:string,values?:unknown[])=>c.query(sql==="BEGIN"?"SAVEPOINT activation_customer_initialization":sql==="COMMIT"?"RELEASE SAVEPOINT activation_customer_initialization":sql==="ROLLBACK"?"ROLLBACK TO SAVEPOINT activation_customer_initialization":sql,values)})} as unknown as Pool;
+      await initializeCustomer(transactional,manifest,baseline);
+      await this.append(c,id,current.history,input.requestId,requestDigest,"initialize-customer",actor,current.state);
+      await c.query("INSERT INTO activation_customer_bindings(case_id,organization_id,web_presence_id,managed_site_id,event_version,identity,identity_digest) VALUES($1,$2,$3,$4,$5,$6,$7)",[id,manifest.organizationId,manifest.webPresenceId,manifest.managedSiteId,current.version+1,identity,fingerprint(identity)]);
+      return this.inspectRow(c,r);
+    });
+  }
   async update(context: unknown, id: string, selection: Scope, expectedVersion: number, requestId: string, operation: "confirm-commercial" | "assess", value: unknown): Promise<CaseInspection> {
     value = structuredClone(value);
     const owner = scope(selection); uuid(requestId);
@@ -112,5 +152,5 @@ export class ActivationService {
 }
 
 export function inspectionText(c: CaseInspection): string {
-  return `Activation case ${c.id}\nSource path: ${c.source.path}\nSubmission: ${c.source.submissionId} (${c.source.questionnaireVersion}, ${c.source.digest})\nReview: ${c.review ? `${c.review.id} revision ${c.review.revision}, ${c.review.digest}` : "none (not required)"}\nScope: ${JSON.stringify(c.scope)}\nStatus: ${c.state.status}\nCommercial: ${JSON.stringify(c.state.commercial)}\nInformation assessment (references only, no automatic canonical promotion):\n${c.state.assessment.map(a => `- ${a.area}: ${a.state}; ${JSON.stringify(a)}`).join("\n")}\nHistory:\n${c.history.map(e => `- v${e.version} ${e.operation} by ${e.actor} (${e.authorityReference}) at ${e.at}; ${e.digest}`).join("\n")}\n`;
+  return `Activation case ${c.id}\nSource path: ${c.source.path}\nSubmission: ${c.source.submissionId} (${c.source.questionnaireVersion}, ${c.source.digest})\nReview: ${c.review ? `${c.review.id} revision ${c.review.revision}, ${c.review.digest}` : "none (not required)"}\nScope: ${JSON.stringify(c.scope)}\nStatus: ${c.state.status}\nCommercial: ${JSON.stringify(c.state.commercial)}\nCanonical foundation: ${c.canonicalBinding?JSON.stringify(c.canonicalBinding):"not created"}\nOnboarding remains incomplete; no intake facts or Review recommendations promoted.\nInformation assessment (references only, no automatic canonical promotion):\n${c.state.assessment.map(a => `- ${a.area}: ${a.state}; ${JSON.stringify(a)}`).join("\n")}\nHistory:\n${c.history.map(e => `- v${e.version} ${e.operation} by ${e.actor} (${e.authorityReference}) at ${e.at}; ${e.digest}`).join("\n")}\n`;
 }

@@ -85,6 +85,13 @@
       "when": 1792461300193,
       "tag": "0011_activation_cases",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792505989054,
+      "tag": "0012_activation_customer_binding",
+      "breakpoints": true
     }
   ]
 }

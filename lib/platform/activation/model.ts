@@ -1,7 +1,7 @@
 import { choice, fingerprint, object, text, uuid } from "../canonical/model";
 import { submissionDigest, type Owner, type Submission } from "../reviews/model";
 
-export type Operation = "inspect" | "create" | "confirm-commercial" | "assess" | "confirm-information";
+export type Operation = "inspect" | "create" | "confirm-commercial" | "assess" | "confirm-information" | "initialize-customer";
 export type Scope = Owner & { pendingCustomerId: string };
 export type Authority = { operatorId: string; authorityReference: string };
 // Supplied by a trusted composition root, never deserialized from a request body.

@@ -416,10 +416,12 @@ Commercial launch remains unauthorized until separately reviewed and authorized.
 
 The private [ActivationService](../lib/platform/activation/service.ts) is the bounded
 handoff between submitted intake and later paid onboarding. Migration
-[0011](../lib/platform/db/migrations/0011_activation_cases.sql) adds only
+[0011](../lib/platform/db/migrations/0011_activation_cases.sql) establishes
 `activation_cases` and `activation_case_events`, their constraints and append-only
-guards. It is tested in disposable schemas; applying it to shared development is a
-separate authorization. No public route or customer interface exposes this service.
+guards. No public route or customer interface exposes this service. The later
+[0012](../lib/platform/db/migrations/0012_activation_customer_binding.sql) transition
+extension is tested only in disposable schemas; shared application needs separate
+authorization.
 
 Each case has one immutable submitted-intake source (ID, digest, questionnaire and
 draft version, Free Review or Direct Start path). Direct Start requires no Review.
@@ -432,12 +434,10 @@ Ownership is the exact intake-service Web Presence/Managed Site pair plus a uniq
 pending-customer UUID. The service owner is MioPages; it is **not** the prospect's
 future canonical customer. A pending identity cannot be reassigned, matched by name
 or domain, or used to borrow MioPages Knowledge/Offering confirmation. One submission
-and one pending identity can each have only one case. A later customer-creation slice
-must resolve that identity explicitly, check the current case version and commercial
-authority, obtain confirmed business information and invoke the existing
-[guarded initializer](../lib/platform/customer-initialization.ts) with its canonical
-baseline/manifest guards. This slice neither invokes it nor grants general canonical
-write, content-approval or publishing authority.
+and one pending identity can each have only one case. The explicit new-customer
+transition below resolves that identity using the existing
+[guarded initializer](../lib/platform/customer-initialization.ts), without granting
+general canonical write, content-approval or publishing authority.
 
 `PENDING_COMMERCIAL` means there is no authority to begin paid onboarding. An
 operator-verified external confirmation changes it to `AUTHORIZED_FOR_ONBOARDING`.
@@ -460,7 +460,8 @@ No existing customer's canonical records are borrowed to confirm a pending prosp
 
 The trusted composition root must inject `OperatorAuthority.authorize(context,
 operation, scope)`. It resolves an opaque authenticated caller context and checks
-`create`, `inspect`, `confirm-commercial`, `assess`, or `confirm-information` for the
+`create`, `inspect`, `confirm-commercial`, `assess`, `confirm-information`, or
+`initialize-customer` for the
 exact service-owner/pending-customer scope. A request-body actor string or development
 flag grants nothing. Grant identity/reference are persisted. Production authentication
 and its trusted authority adapter remain absent; the service additionally refuses
@@ -491,4 +492,61 @@ The fuller onboarding interview remains deferred under P11. It will reuse source
 answers and provenance, collect meaningful gaps as a benefit and requirement, and
 transfer operating knowledge up front without ongoing customer homework. This case
 provides its source/assessment handoff; it does not design or implement that interview,
-customer portal, billing, canonical activation, launch or publication workflow.
+customer portal, billing, launch or publication workflow.
+
+### Guarded canonical customer foundation
+
+`canonicalReadiness` and `initializeCanonicalCustomer` require the distinct
+`initialize-customer` permission for the exact service-owner/pending-customer scope.
+Existing case-management permissions do not imply it. The case must still have a valid
+immutable submitted source, its exact approved Review binding if present, and valid
+external commercial confirmation accepting both Launch and Ongoing scope. Review
+delivery is not required. Direct Start uses the same transition without a Review.
+
+The readiness response supplies the current case version and canonical-state
+fingerprint. The operator then supplies a request UUID, those expected values, three
+explicit names (Organization, Web Presence and Managed Site), and a separate identity
+confirmation reference/timestamp. The service records the trusted confirming operator.
+Names are never inferred from intake prose, a commercial reference or a Review. No
+domain, slug, Page, business description, Knowledge or Offering is required or created.
+
+The existing initializer now has a closed `customer-foundation/1` mode. It creates
+exactly three **inactive** identity records with empty configuration, no public
+domain and an initialization receipt binding the confirmed names/attestation to the
+case. Its original full-manifest path remains available unchanged for existing
+reviewed customer initializers. Canonical baseline/preservation guards and locks still
+apply. The foundation mode creates no structural Knowledge/Offering placeholders,
+products/services, claims, content or navigation.
+
+The initializer runs through a savepoint inside the case transaction. Successful
+initialization appends an immutable `initialize-customer` event and inserts one
+`activation_customer_bindings` row with exact Organization/Web Presence/Managed Site
+IDs, identity digest and event version. FKs, unique identity bindings and an immutable
+binding guard prevent retargeting. A deferred event guard requires the matching
+binding before commit and preserves the prior commercial/assessment snapshot. Any
+initializer, event, binding or commit failure rolls back the entire operation; no
+partial graph or false initialized event remains. Exact request retries return the
+existing binding; changed inputs, stale versions, canonical-baseline drift and a
+second binding attempt refuse. Reads also verify the canonical parent relationships.
+
+This operation supports **new customers only**. It allocates new IDs; request-supplied
+target IDs and silent name/domain matching are refused. Binding a pre-created graph
+would require separate authority over that customer, reconciliation of its existing
+initializer receipt/state and an explicit no-merge policy, so that path remains a
+future bounded case.
+
+Case inspection shows the confirmed identity and canonical IDs beside its history
+and remaining information assessment. `AUTHORIZED_FOR_ONBOARDING` retains its
+commercial meaning; a canonical binding means only that the customer foundation now
+exists. The assessment remains unchanged, including unconfirmed intake information
+and material gaps. Later onboarding must deliberately confirm/populate business
+Knowledge and Offering under their own guards. Full onboarding, customer management,
+publication/go-live and production authentication remain separate. The service still
+refuses shared/public schemas even when earlier migrations exist there; 0012 does not
+activate it operationally. Binding/source retention and controlled purge remain a
+separate live-use requirement.
+
+The [synthetic transition proof](../tests/integration/canonical-activation.test.ts)
+produces ignored `runtime-content/canonical-activation-proof/synthetic-case.txt`,
+showing the resulting identities, authorization, gaps and history before its disposable
+fixtures are removed. No real activation case or customer graph is created by that proof.

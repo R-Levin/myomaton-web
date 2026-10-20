@@ -1,6 +1,9 @@
 import { sql } from "drizzle-orm";
-import { pgTable, uuid, text, integer, jsonb, timestamp, unique, check } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, integer, jsonb, timestamp, unique, check, foreignKey } from "drizzle-orm/pg-core";
 import { prospectIntakeSubmissions } from "./prospect-intakes";
+import { organizations } from "./organizations";
+import { webPresences } from "./web-presences";
+import { managedSites } from "./managed-sites";
 
 export const activationCases = pgTable("activation_cases", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -19,4 +22,15 @@ export const activationCaseEvents = pgTable("activation_case_events", {
   operation: text("operation").notNull(), actor: text("actor").notNull(), authorityReference: text("authority_reference").notNull(),
   at: timestamp("at", { withTimezone: true }).notNull(), previous: text("previous"), digest: text("digest").notNull(), snapshot: jsonb("snapshot").notNull(),
 }, t => [unique("activation_event_version").on(t.caseId, t.version), unique("activation_event_request").on(t.caseId, t.requestId),
-  check("activation_event_bounds", sql`${t.version} BETWEEN 1 AND 100 AND ${t.operation} IN ('create','confirm-commercial','assess') AND octet_length(${t.snapshot}::text)<=16384 AND ${t.digest} ~ '^[a-f0-9]{64}$' AND ${t.requestDigest} ~ '^[a-f0-9]{64}$' AND length(${t.actor}) BETWEEN 1 AND 200 AND length(${t.authorityReference}) BETWEEN 1 AND 300`)]);
+  check("activation_event_bounds", sql`${t.version} BETWEEN 1 AND 100 AND ${t.operation} IN ('create','confirm-commercial','assess','initialize-customer') AND octet_length(${t.snapshot}::text)<=16384 AND ${t.digest} ~ '^[a-f0-9]{64}$' AND ${t.requestDigest} ~ '^[a-f0-9]{64}$' AND length(${t.actor}) BETWEEN 1 AND 200 AND length(${t.authorityReference}) BETWEEN 1 AND 300`)]);
+
+// One immutable canonical identity per pending case; this is not an entitlement or publication record.
+export const activationCustomerBindings = pgTable("activation_customer_bindings", {
+  caseId: uuid("case_id").primaryKey().references(() => activationCases.id),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  webPresenceId: uuid("web_presence_id").notNull().references(() => webPresences.id),
+  managedSiteId: uuid("managed_site_id").notNull().references(() => managedSites.id),
+  eventVersion: integer("event_version").notNull(), identity: jsonb("identity").notNull(), identityDigest: text("identity_digest").notNull(),
+}, t => [unique("activation_binding_org_once").on(t.organizationId), unique("activation_binding_presence_once").on(t.webPresenceId), unique("activation_binding_site_once").on(t.managedSiteId),
+  foreignKey({columns:[t.caseId,t.eventVersion],foreignColumns:[activationCaseEvents.caseId,activationCaseEvents.version],name:"activation_binding_event_fk"}),
+  check("activation_binding_bounds",sql`${t.eventVersion} BETWEEN 2 AND 100 AND jsonb_typeof(${t.identity})='object' AND octet_length(${t.identity}::text)<=4096 AND ${t.identityDigest} ~ '^[a-f0-9]{64}$'`)]);
