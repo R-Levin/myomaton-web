@@ -12,13 +12,14 @@ import path from "node:path";
 // Only synthetic disposable proof setup. This is NOT a production identity adapter.
 export async function activationFixture(databaseUrl: string) {
   const f = await createIntakeFixture(databaseUrl), stores: LocalReviewStore[] = [];
-  const grants = new WeakMap<object, { scope: Scope; operations: Operation[]; operatorId: string }>();
+  const grants = new WeakMap<object, { scopes: Scope[]; operations: Operation[]; operatorId: string }>();
   const authority: OperatorAuthority = { async authorize(context, operation, scope) {
     const grant = context && typeof context === "object" ? grants.get(context) : undefined;
-    if (!grant || !same(scope, grant.scope) || !grant.operations.includes(operation)) throw Error("Missing scoped operator authority");
+    if (!grant || !grant.scopes.some(s=>same(scope,s)) || !grant.operations.includes(operation)) throw Error("Missing scoped operator authority");
     return { operatorId: grant.operatorId, authorityReference: "disposable-proof-capability" };
   } };
-  const grant = (scope: Scope, operations: Operation[] = ["create", "inspect", "confirm-commercial", "assess", "confirm-information"], operatorId = "synthetic-activation-operator") => { const context = Object.freeze({}); grants.set(context, { scope: structuredClone(scope), operations: [...operations], operatorId }); return context; };
+  const grantScopes = (scopes:Scope[],operations:Operation[],operatorId="synthetic-activation-operator")=>{const context=Object.freeze({});grants.set(context,{scopes:structuredClone(scopes),operations:[...operations],operatorId});return context;};
+  const grant = (scope: Scope, operations: Operation[] = ["create", "inspect", "confirm-commercial", "assess", "confirm-information"], operatorId = "synthetic-activation-operator") => grantScopes([scope],operations,operatorId);
   const service = () => new ActivationService(f.pool, authority, localApprovedReviews);
   const submit = async (intent: "FREE_REVIEW" | "DIRECT_START", answers: Record<string, string | string[]>) => {
     const token = newResumeToken(), draft = await f.service.create(token, intent), saved = await f.service.save(token, draft.version, answers, 12);
@@ -38,5 +39,5 @@ export async function activationFixture(databaseUrl: string) {
     return { store, request: { id: store.id, revision: binding.revision, digest: binding.revisionDigest } };
   };
   const stop = async () => { try { for (const store of stores) { const directory = path.resolve(reviewRoot(), store.id); if (path.dirname(directory) !== reviewRoot()) throw Error("Synthetic cleanup scope refused"); await rm(directory, { recursive: true, force: true }); } } finally { await f.stop(); } };
-  return { ...f, intake: f.service, authority, grant, service, submit, review, stop };
+  return { ...f, intake: f.service, authority, grant, grantScopes, service, submit, review, stop };
 }

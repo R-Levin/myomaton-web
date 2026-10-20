@@ -17,6 +17,21 @@ export async function inspectCanonical(pool: Pool, domain: CanonicalDomain, webP
   return row ? { row, fingerprint: fingerprint(await snapshotCanonical(pool,domain,row)) } : null;
 }
 export async function writeCanonical(pool: Pool, input: WriteInput, options: { failAfterCurrent?: boolean } = {}) {
+  return write(pool,input,options);
+}
+export type OnboardingOwner = { caseId:string; organizationId:string; webPresenceId:string; managedSiteId:string };
+// Trusted service composition only. The caller must supply scoped operator authority.
+// Unlike the default active-owner writer, this explicit path is restricted to the
+// exact canonically bound inactive foundation and internal, non-image information.
+export async function writeOnboardingCanonical(pool:Pool,input:WriteInput,owner:OnboardingOwner) {
+  object(owner,["caseId","organizationId","webPresenceId","managedSiteId"]);
+  for(const value of Object.values(owner))uuid(value);
+  if(input.webPresenceId!==owner.webPresenceId||input.image||input.offering&&input.offering.status!=="inactive")throw Error("Inactive onboarding owner required");
+  const payload=input.domain==="knowledge"?normalizeKnowledge(input.payload):normalizeOffering(input.payload);
+  if(payload.approval.scope!=="internal")throw Error("Onboarding information is internal only");
+  return write(pool,input,{},owner);
+}
+async function write(pool:Pool,input:WriteInput,options:{failAfterCurrent?:boolean},foundation?:OnboardingOwner) {
   object(input,["domain","id","webPresenceId","expectedVersion","expectedFingerprint","payload","offering","image","responsibleIdentity","changeReason"]);
   if(input.offering)object(input.offering,["key","type","name","status"]);
   if(input.image){object(input.image,["assetId","altText","decorative"]);if(input.image.decorative!==undefined && typeof input.image.decorative!=="boolean")throw Error("Invalid decorative intent");}
@@ -33,7 +48,14 @@ export async function writeCanonical(pool: Pool, input: WriteInput, options: { f
   try {
     await c.query("BEGIN");
     // Owner lock serializes initialization, updates and same-owner attachments.
-    if ((await c.query("SELECT id FROM web_presences WHERE id=$1 AND status='active' FOR UPDATE",[owner])).rowCount !== 1) throw Error("Active owner required");
+    if(foundation){
+      const bound=await c.query(`SELECT w.id FROM activation_customer_bindings b
+        JOIN organizations o ON o.id=b.organization_id JOIN web_presences w ON w.id=b.web_presence_id AND w.organization_id=o.id
+        JOIN managed_sites m ON m.id=b.managed_site_id AND m.web_presence_id=w.id
+        WHERE b.case_id=$1 AND o.id=$2 AND w.id=$3 AND m.id=$4
+        AND o.status='inactive' AND w.status='inactive' AND m.status='inactive' FOR UPDATE OF w`,[foundation.caseId,foundation.organizationId,owner,foundation.managedSiteId]);
+      if(bound.rowCount!==1)throw Error("Exact bound inactive onboarding foundation required");
+    }else if ((await c.query("SELECT id FROM web_presences WHERE id=$1 AND status='active' FOR UPDATE",[owner])).rowCount !== 1) throw Error("Active owner required");
     const current = (await c.query(`SELECT * FROM ${table} WHERE id=$1 FOR UPDATE`,[id])).rows[0];
     if (current && current.web_presence_id !== owner) throw Error("Foreign canonical record");
     const currentSnapshot=current ? await snapshotCanonical(c,domain,current) : null;

@@ -1,7 +1,8 @@
 import { choice, fingerprint, object, text, uuid } from "../canonical/model";
 import { submissionDigest, type Owner, type Submission } from "../reviews/model";
+import type { InformationConfirmation } from "./information";
 
-export type Operation = "inspect" | "create" | "confirm-commercial" | "assess" | "confirm-information" | "initialize-customer";
+export type Operation = "inspect" | "create" | "confirm-commercial" | "assess" | "confirm-information" | "initialize-customer" | "confirm-business-information";
 export type Scope = Owner & { pendingCustomerId: string };
 export type Authority = { operatorId: string; authorityReference: string };
 // Supplied by a trusted composition root, never deserialized from a request body.
@@ -10,7 +11,7 @@ export interface OperatorAuthority { authorize(context: unknown, operation: Oper
 export type ReviewBinding = { id: string; revision: number; digest: string; evidenceDigest: string; approvalEventHash: string };
 export const areas = ["business-identity", "audience", "offering", "service-area", "operating-access"] as const;
 export type Area = typeof areas[number];
-export type Assessment = { area: Area; state: "CONFIRMED" | "UNCONFIRMED" | "MISSING"; fields: string[]; reference?: string; confirmedBy?: string; confirmedAt?: string }[];
+export type Assessment = { area: Area; state: "CONFIRMED" | "UNCONFIRMED" | "MISSING"; fields: string[]; reference?: string; confirmedBy?: string; confirmedAt?: string; confirmations?:InformationConfirmation[] }[];
 export type Commercial = { source: "manual-invoice" | "agreement-order" | "external-provider"; reference: string; confirmedAt: string; launchScope: string; ongoingScope: string; note?: string; recordedBy: string; authorityReference: string };
 export type CaseState = { status: "PENDING_COMMERCIAL" | "AUTHORIZED_FOR_ONBOARDING"; commercial: Commercial | null; assessment: Assessment };
 export type Source = { submissionId: string; intakeId: string; digest: string; questionnaireVersion: string; draftVersion: number; path: "FREE_REVIEW" | "DIRECT_START" };
@@ -25,10 +26,15 @@ const fields: Record<Area, string[]> = { "business-identity": ["businessName"], 
 export function initialAssessment(s: Submission): Assessment {
   return areas.map(area => { const present = fields[area].filter(k => s.answers[k] !== undefined && s.answers[k] !== ""); return { area, state: present.length ? "UNCONFIRMED" : "MISSING", fields: present }; });
 }
-export function assessment(value: unknown, s: Submission, authority: Authority, at: string): Assessment {
+export function assessment(value: unknown, s: Submission, authority: Authority, at: string, previous?:Assessment): Assessment {
   if (!Array.isArray(value) || value.length !== areas.length) throw Error("Five bounded assessment areas required");
   const result = value.map(v => {
     const r = object(v, ["area", "state", "fields", "reference"]), area = choice(r.area, areas), state = choice(r.state, ["CONFIRMED", "UNCONFIRMED", "MISSING"]);
+    const retained=previous?.find(a=>a.area===area);
+    if(retained?.confirmations?.length){
+      if(!same(r,{area:retained.area,state:retained.state,fields:retained.fields,...(retained.reference===undefined?{}:{reference:retained.reference})}))throw Error("Canonical confirmations require the business-information workflow");
+      return structuredClone(retained);
+    }
     if (!Array.isArray(r.fields) || r.fields.length > 8 || new Set(r.fields).size !== r.fields.length || r.fields.some(k => typeof k !== "string" || !Object.hasOwn(s.answers, k) || !s.provenance[k] || s.answers[k] === "")) throw Error("Assessment source fields must exist in immutable intake");
     if (state === "MISSING" && r.fields.length || state === "UNCONFIRMED" && !r.fields.length) throw Error("Assessment source/state conflict");
     if (state !== "CONFIRMED" && r.reference !== undefined) throw Error("Only explicit confirmation has an external attestation reference");

@@ -550,3 +550,76 @@ The [synthetic transition proof](../tests/integration/canonical-activation.test.
 produces ignored `runtime-content/canonical-activation-proof/synthetic-case.txt`,
 showing the resulting identities, authorization, gaps and history before its disposable
 fixtures are removed. No real activation case or customer graph is created by that proof.
+
+### Operator-assisted business-information confirmation
+
+The private `ActivationService.inspectBusinessInformation` and
+`confirmBusinessInformation` methods provide a bounded first onboarding write path.
+They require `confirm-business-information` permission for **both** the exact
+intake-service/pending-customer scope and the exact bound customer Web Presence /
+Managed Site scope. Both grants must resolve to the same trusted operator. The
+Organization/Web Presence/Managed Site IDs must match the immutable case binding.
+Commercial authority, source integrity and any approved Review binding are rechecked.
+The service continues to refuse shared/public and production execution.
+
+An operator inspects the case, original four candidate fields and provenance, current
+canonical records/fingerprints, and remaining assessment. The request supplies a UUID,
+expected case version, explicit canonical customer IDs, existing canonical record
+ID/version/fingerprint (or null creation guards), selected confirmed values, and an
+explicit confirmation flag/reference/non-future timestamp. Confirmer identity comes
+from authority, never request text. New canonical record IDs are allocated by the service.
+
+This first slice uses the existing models, without a second business-knowledge model:
+
+- Knowledge: one audience entry or service-area/location entry, with explicit local
+  key, value and the existing `audience` / `service-area` kind. Other entries and
+  identity evidence are preserved; this path does not change business identity or
+  introduce unsupported business-description fields.
+- Offering: explicit key, service/product type, name, summary and detail. Other
+  existing payload fields are preserved. New optional collections are empty; prices,
+  components, Actions, images and claims are not inferred. Offerings stay inactive.
+
+Sources are deliberately limited. Immutable intake fields must exist, retain their
+prospect provenance and match the supplied source digest; promoted text must match
+the canonical-normalized intake text. Edited/additional information instead uses an
+operator-collected onboarding reference and supplied-at time. This supports manually
+collecting Customer #1's gaps through a controlled conversation or email, then recording
+only explicitly confirmed facts, without copying transcripts into canonical state.
+An existing canonical source must belong to this customer, match its current version
+and immutable revision fingerprint, and contain the same already-confirmed value.
+Every source still requires a fresh explicit attestation. Review recommendations,
+analysis and suggested positioning are not accepted source kinds. A later customer
+confirmation of an idea from a Review must enter as separately attested onboarding input.
+
+The existing revisioned canonical writer is reused through a savepoint inside the case
+transaction. Its default active-owner requirement remains unchanged. A separately named
+`writeOnboardingCanonical` path permits only the exact bound inactive Organization /
+Web Presence / Managed Site foundation and internal, non-image information. No record
+is made active and no publication scope is granted. Canonical evidence stores the
+source, case/request IDs and confirmation; immutable revisions preserve previous/new
+values and responsible identity. A subsequent `assess` event records the revision
+identity/fingerprint and compact confirmation receipt in the existing five-area snapshot.
+No migration is needed. Canonical current state, revision and assessment event either
+all commit or all roll back; no assessment advances after a failed canonical write.
+
+One latest confirmation per bounded field is retained in the current assessment;
+corrections keep that field's exact canonical record/key and cannot silently retarget it.
+previous receipts remain in append-only case history and canonical revisions. Audience
+and Offering description each cover their existing single bounded information field.
+Service-area requires **both** `serviceArea` and `locations` (including an explicit
+remote/no-office statement where appropriate); one confirmed aspect leaves the area
+`UNCONFIRMED`, with its partial confirmations visible. Business identity and operating
+access remain separate gaps. `CONFIRMED` describes this bounded material, not a complete
+catalog, commercial terms, Launch Readiness or onboarding completion. Generic assessment
+edits cannot clobber these canonical confirmation links; unrelated areas remain editable.
+
+Case and owner locks plus expected canonical versions/fingerprints reject competing
+writes. Exact request retries return the existing immutable revision, even after later
+corrections; changed content under the same request key refuses. Inspection exposes
+previous/new revisions, source/attestation and remaining gaps. Both Free Review and
+Direct Start work; the latter has no Review dependency. Full onboarding interview,
+portal, shared operational enablement, retention/purge and publication remain separate.
+
+The [synthetic operator proof](../tests/integration/onboarding-information.test.ts)
+produces ignored `runtime-content/onboarding-information-proof/synthetic-operator.txt`.
+Tests run in a separate disposable PostgreSQL database and remove their fixtures.

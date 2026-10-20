@@ -7,6 +7,8 @@ import type { Submission } from "../reviews/model";
 import { approvedReview, type ApprovedReviewSource } from "./review-source";
 import { assessment, commercial, digest, initialAssessment, same, scope, source, type Authority, type CaseState, type CreateCase, type Operation, type OperatorAuthority, type ReviewBinding, type Scope, type Source } from "./model";
 import { confirmedIdentity, type CanonicalBinding, type CanonicalRequest } from "./canonical";
+import { inspectCanonical, writeOnboardingCanonical, type OnboardingOwner } from "../canonical/writes";
+import { confirmedAssessment, confirmedInformationSource, informationFields, informationRequest, informationRevision, prepareInformationWrite, type InformationConfirmation, type InformationRequest } from "./information";
 
 export type CaseIdentity = { id: string; scope: Scope; source: Source; review: ReviewBinding | null; createdAt: string; createdBy: string; authorityReference: string };
 export type CaseEvent = { version: number; requestId: string; requestDigest: string; operation: string; actor: string; authorityReference: string; at: string; previous: string | null; snapshot: CaseState; digest: string };
@@ -121,6 +123,61 @@ export class ActivationService {
       return this.inspectRow(c,r);
     });
   }
+  private async informationOwner(context:unknown,current:CaseInspection,customer:InformationRequest["customer"],actor:Authority):Promise<OnboardingOwner> {
+    object(customer,["organizationId","webPresenceId","managedSiteId"]);
+    const b=current.canonicalBinding;
+    if(!b)throw Error("Canonically bound onboarding case required");
+    const expected={organizationId:b.organizationId,webPresenceId:b.webPresenceId,managedSiteId:b.managedSiteId};
+    if(!same(customer,expected))throw Error("Exact bound canonical customer scope required");
+    const grant=await this.authorize(context,"confirm-business-information",{webPresenceId:b.webPresenceId,managedSiteId:b.managedSiteId,pendingCustomerId:current.scope.pendingCustomerId});
+    if(grant.operatorId!==actor.operatorId)throw Error("Information confirmation authority identity mismatch");
+    return {caseId:current.id,...expected};
+  }
+  async inspectBusinessInformation(context:unknown,id:string,selection:Scope,customer:InformationRequest["customer"]) {
+    const owner=scope(selection),actor=await this.authorize(context,"confirm-business-information",owner);
+    return this.transaction(async c=>{
+      const r=await this.row(c,id,owner),current=await this.inspectRow(c,r);await this.eligibleSource(c,r,current);
+      const bound=await this.informationOwner(context,current,customer,actor),submission=await this.submission(c,r.submission_id,owner);
+      const confirmations=[];
+      for(const area of current.state.assessment)for(const link of area.confirmations??[])confirmations.push({link,
+        previous:link.previousVersion===null?null:await informationRevision(c,{...link,revision:link.previousVersion,revisionFingerprint:link.previousFingerprint!},bound.webPresenceId),revision:await informationRevision(c,link,bound.webPresenceId)});
+      const knowledgeRows=(await c.query("SELECT id FROM business_knowledge WHERE web_presence_id=$1",[bound.webPresenceId])).rows;
+      const offeringRows=(await c.query("SELECT id FROM offerings WHERE web_presence_id=$1 ORDER BY key",[bound.webPresenceId])).rows;
+      return {case:current,customer:bound,intakeCandidates:informationFields.filter(field=>submission.answers[field]!==undefined&&submission.answers[field]!=="").map(field=>({field,value:submission.answers[field],valueDigest:fingerprint(submission.answers[field]),provenance:submission.provenance[field]})),
+        knowledge:await Promise.all(knowledgeRows.map(r=>inspectCanonical(c as unknown as Pool,"knowledge",bound.webPresenceId,r.id))),
+        offerings:await Promise.all(offeringRows.map(r=>inspectCanonical(c as unknown as Pool,"offering",bound.webPresenceId,r.id))),confirmations};
+    });
+  }
+  async confirmBusinessInformation(context:unknown,id:string,selection:Scope,value:InformationRequest) {
+    const input=informationRequest(structuredClone(value)),owner=scope(selection),actor=await this.authorize(context,"confirm-business-information",owner);
+    const requestDigest=fingerprint({workflow:"confirm-business-information/1",caseId:id,scope:owner,input});
+    return this.transaction(async c=>{
+      const r=await this.row(c,id,owner),current=await this.inspectRow(c,r);await this.eligibleSource(c,r,current);
+      const bound=await this.informationOwner(context,current,input.customer,actor);
+      const result=async(confirmation:InformationConfirmation)=>({case:await this.inspectRow(c,r),confirmation,
+        previous:confirmation.previousVersion===null?null:await informationRevision(c,{...confirmation,revision:confirmation.previousVersion,revisionFingerprint:confirmation.previousFingerprint!},bound.webPresenceId),
+        revision:await informationRevision(c,confirmation,bound.webPresenceId)});
+      const retry=current.history.find(e=>e.requestId===input.requestId);
+      if(retry){
+        const confirmation=retry.snapshot.assessment.flatMap(a=>a.confirmations??[]).find(r=>r.requestId===input.requestId);
+        if(retry.operation!=="assess"||retry.requestDigest!==requestDigest||retry.actor!==actor.operatorId||!confirmation)throw Error("Business-information idempotency conflict");
+        return result(confirmation);
+      }
+      if(current.version!==input.expectedVersion)throw Error("Stale activation version");
+      const submission=await this.submission(c,r.submission_id,owner),source=await confirmedInformationSource(c,input,submission,bound.webPresenceId);
+      const previousField=current.state.assessment.flatMap(a=>a.confirmations??[]).find(c=>c.field===input.fact.field);
+      if(previousField&&(previousField.recordId!==input.record.id||previousField.key!==input.fact.key))throw Error("Existing confirmed field requires its exact canonical target");
+      for(const link of current.state.assessment.flatMap(a=>a.confirmations??[]))if(link.recordId===input.record.id&&link.key===input.fact.key&&link.field!==input.fact.field)throw Error("Canonical key already confirms another information field");
+      const write=await prepareInformationWrite(c,id,input,actor,source);
+      const transactional={connect:async()=>({release(){},query:async(sql:string,values?:unknown[])=>c.query(sql==="BEGIN"?"SAVEPOINT onboarding_information":sql==="COMMIT"?"RELEASE SAVEPOINT onboarding_information":sql==="ROLLBACK"?"ROLLBACK TO SAVEPOINT onboarding_information":sql,values)})} as unknown as Pool;
+      const written=await writeOnboardingCanonical(transactional,write,bound),after=await inspectCanonical(c as unknown as Pool,write.domain,bound.webPresenceId,write.id);
+      if(!after)throw Error("Canonical confirmation result missing");
+      const confirmation:InformationConfirmation={requestId:input.requestId,field:input.fact.field,key:input.fact.key,domain:write.domain,recordId:write.id,previousVersion:input.record.expectedVersion,previousFingerprint:input.record.expectedFingerprint,revision:written.version,revisionFingerprint:after.fingerprint,source,confirmation:{by:actor.operatorId,reference:input.confirmation.reference,at:input.confirmation.at}};
+      const state={...current.state,assessment:confirmedAssessment(current.state.assessment,confirmation)};
+      await this.append(c,id,current.history,input.requestId,requestDigest,"assess",actor,state);
+      return result(confirmation);
+    });
+  }
   async update(context: unknown, id: string, selection: Scope, expectedVersion: number, requestId: string, operation: "confirm-commercial" | "assess", value: unknown): Promise<CaseInspection> {
     value = structuredClone(value);
     const owner = scope(selection); uuid(requestId);
@@ -138,7 +195,7 @@ export class ActivationService {
         state.commercial = confirmation; state.status = "AUTHORIZED_FOR_ONBOARDING";
       } else {
         const s = await this.submission(c, r.submission_id, owner);
-        const assessed = assessment(value, s, actor, new Date().toISOString());
+        const assessed = assessment(value, s, actor, new Date().toISOString(),current.state.assessment);
         if (assessed.some(a => a.state === "CONFIRMED")) {
           const confirmer = await this.authorize(context, "confirm-information", owner);
           if (confirmer.operatorId !== actor.operatorId) throw Error("Information confirmation authority identity mismatch");
@@ -152,5 +209,5 @@ export class ActivationService {
 }
 
 export function inspectionText(c: CaseInspection): string {
-  return `Activation case ${c.id}\nSource path: ${c.source.path}\nSubmission: ${c.source.submissionId} (${c.source.questionnaireVersion}, ${c.source.digest})\nReview: ${c.review ? `${c.review.id} revision ${c.review.revision}, ${c.review.digest}` : "none (not required)"}\nScope: ${JSON.stringify(c.scope)}\nStatus: ${c.state.status}\nCommercial: ${JSON.stringify(c.state.commercial)}\nCanonical foundation: ${c.canonicalBinding?JSON.stringify(c.canonicalBinding):"not created"}\nOnboarding remains incomplete; no intake facts or Review recommendations promoted.\nInformation assessment (references only, no automatic canonical promotion):\n${c.state.assessment.map(a => `- ${a.area}: ${a.state}; ${JSON.stringify(a)}`).join("\n")}\nHistory:\n${c.history.map(e => `- v${e.version} ${e.operation} by ${e.actor} (${e.authorityReference}) at ${e.at}; ${e.digest}`).join("\n")}\n`;
+  return `Activation case ${c.id}\nSource path: ${c.source.path}\nSubmission: ${c.source.submissionId} (${c.source.questionnaireVersion}, ${c.source.digest})\nReview: ${c.review ? `${c.review.id} revision ${c.review.revision}, ${c.review.digest}` : "none (not required)"}\nScope: ${JSON.stringify(c.scope)}\nStatus: ${c.state.status}\nCommercial: ${JSON.stringify(c.state.commercial)}\nCanonical foundation: ${c.canonicalBinding?JSON.stringify(c.canonicalBinding):"not created"}\nOnboarding remains incomplete; no automatic fact or Review-recommendation promotion.\nInformation assessment and explicit canonical confirmation links:\n${c.state.assessment.map(a => `- ${a.area}: ${a.state}; ${JSON.stringify(a)}`).join("\n")}\nHistory:\n${c.history.map(e => `- v${e.version} ${e.operation} by ${e.actor} (${e.authorityReference}) at ${e.at}; ${e.digest}`).join("\n")}\n`;
 }

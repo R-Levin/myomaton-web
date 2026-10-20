@@ -224,8 +224,12 @@ The private [activation/onboarding case foundation](customer-journey-and-change-
 provides P11/P26's bounded source/commercial/assessment handoff. Its explicit
 [new-customer transition](customer-journey-and-change-management.md#guarded-canonical-customer-foundation)
 now creates/binds an inactive canonical identity foundation in disposable proof,
-without promoting intake/Review facts. Shared application of 0012, production
-authentication/authority, case retention/purge, existing-customer reconciliation,
+without automatically promoting intake/Review facts. The bounded
+[operator-assisted information path](customer-journey-and-change-management.md#operator-assisted-business-information-confirmation)
+now deliberately confirms audience/service-area Knowledge and Offering descriptions
+through existing immutable revisions in disposable proof. Shared schema 0012 is
+present; shared operational enablement, production authentication/authority,
+case retention/purge, existing-customer reconciliation,
 the fuller gap-based onboarding interview and publication remain separate gates.
 This proof does not activate real customer service, collect payments or deliver a Review.
 
