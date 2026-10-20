@@ -1,0 +1,20 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import { renderToStaticMarkup } from "react-dom/server";
+import { SectionRenderer } from "../../components/managed-sites/section-renderer";
+import { fingerprint } from "../../lib/platform/canonical/model";
+import type { ContentSnapshot } from "../../lib/platform/content-editing/release";
+import type { ReleaseRecord } from "../../lib/platform/content-editing/releases";
+import type { Revision } from "../../lib/platform/content-editing/proposal";
+
+/* eslint-disable @next/next/no-head-element -- Standalone synthetic inspection HTML. */
+export function renderContent(content: ContentSnapshot) {
+  return renderToStaticMarkup(<div><h2>{String(content.page?.title ?? "No current Page")}</h2>{[...content.sections].sort((a, b) => Number(a.sort_order) - Number(b.sort_order)).map(s => <SectionRenderer key={String(s.id)} section={{ id: String(s.id), type: String(s.type), variant: s.variant as string | null, name: s.name as string | null, content: s.content, configuration: s.configuration, action: null }} index={Number(s.sort_order)} />)}</div>);
+}
+export async function writeReleaseInspection(revision: Revision, release: ReleaseRecord, rollback: ReleaseRecord) {
+  const stages = [{ label: "Before release", content: release.before_content, fingerprint: release.before_fingerprint }, { label: "After content release", content: release.after_content, fingerprint: release.after_fingerprint }, { label: "After exact rollback", content: rollback.after_content, fingerprint: rollback.after_fingerprint }];
+  const html = "<!doctype html>" + renderToStaticMarkup(<html lang="en"><head><meta charSet="utf-8" /><meta name="robots" content="noindex,nofollow" /><title>Synthetic content release / rollback proof</title><style>{"body{font:17px/1.6 system-ui;max-width:70rem;margin:3rem auto;padding:0 2rem;background:#faf8f3;color:#252238}article{border-top:2px solid #8572b8;margin-top:3rem;padding:2rem 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}aside{background:#eee9fa;padding:1.5rem}"}</style></head><body><h1>Synthetic content release / rollback proof</h1><aside>Private disposable evidence. Inactive site; no hostname, customer go-live or external publication. Actions are inert.</aside><h2>Exact approved proposal</h2><p>{revision.binding.proposalId} · revision {revision.binding.revision}</p><pre>{JSON.stringify({ binding: revision.binding, candidate: revision.candidate, resolved: revision.resolved }, null, 2)}</pre>{stages.map(s => <article key={s.label}><h1>{s.label}</h1><p>Site fingerprint: {s.fingerprint}</p><div dangerouslySetInnerHTML={{ __html: renderContent(s.content) }} /><details><summary>Exact canonical Page/Section rows</summary><pre>{JSON.stringify(s.content, null, 2)}</pre></details></article>)}<h2>Immutable successful release and rollback history</h2><p>Release: {release.id}. Rollback: {rollback.id}. Rollback availability: false (already restored). The restored content fingerprint equals the predecessor; rollback has a distinct immutable event identity.</p><pre>{JSON.stringify([release, rollback], null, 2)}</pre></body></html>);
+  const root = "runtime-content/site-release-proof"; await mkdir(root, { recursive: true });
+  await writeFile(`${root}/inspection.html`, html);
+  await writeFile(`${root}/inspection.json`, JSON.stringify({ label: "SYNTHETIC DISPOSABLE CONTENT RELEASE PROOF", htmlDigest: fingerprint(html), revision, release, rollback, stages, noRealPublication: true }, null, 2));
+  await writeFile(`${root}/inspection.md`, `# Synthetic content release / rollback\n\nOpen inspection.html for exact approved candidate, before/released/restored rendering, snapshots and immutable history.\n\nRelease: ${release.id}\nRollback: ${rollback.id}\nBefore: ${release.before_fingerprint}\nReleased: ${release.after_fingerprint}\nRestored: ${rollback.after_fingerprint}\n\nInactive synthetic site only. No external publication, deployment or real Home direction. Actions inert. Source fixture removed after proof.\n`);
+}

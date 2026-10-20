@@ -379,5 +379,11 @@ customer-authority approval in disposable proof. The
 [PostgreSQL proposal adapter](content-authority-and-editing.md#durable-postgresql-adapter)
 now preserves that history with migration 0013 and isolated restore proof; shared
 migration application/operational authorization, production authentication,
-customer UI, publication/release/rollback and meaningful intelligence
+customer UI and meaningful intelligence
 checks remain later boundaries; content editing never grants presentation control.
+
+The [bounded content-release foundation](content-authority-and-editing.md#controlled-content-release-and-rollback)
+now proves exact approved Page/Section application and latest-only rollback with
+immutable history in private disposable PostgreSQL. Shared/production release,
+deployment/go-live, DNS/TLS and production authorization remain separately gated.
+Migration 0014 is not applied to shared development by that implementation proof.

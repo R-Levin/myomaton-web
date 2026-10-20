@@ -21,7 +21,7 @@ export async function proposalSnapshot<T>(pool: Pool, scope: Scope, fn: (c: Pool
     return await fn(c, await siteBase(c, scope));
   } finally { if (!options.client) { await c.query("ROLLBACK"); c.release(); } }
 }
-async function siteBase(c: PoolClient, scope: Scope) {
+export async function siteBase(c: PoolClient, scope: Scope) {
   const graph = (await c.query(`SELECT to_jsonb(o) organization,to_jsonb(w) presence,to_jsonb(m) site,to_jsonb(b) binding FROM managed_sites m
     JOIN web_presences w ON w.id=m.web_presence_id JOIN organizations o ON o.id=w.organization_id
     JOIN activation_customer_bindings b ON b.managed_site_id=m.id AND b.web_presence_id=w.id AND b.organization_id=o.id

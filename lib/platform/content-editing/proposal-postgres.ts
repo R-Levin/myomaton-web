@@ -5,13 +5,14 @@ import { proposalExecution, proposalScope, type Event } from "./proposal";
 import { nextProposalEvent, replayProposal, type AppendProposalEvent, type ProposalPersistence, type ProposalStore } from "./proposal-history";
 
 export const proposalRendererIdentity = "site-proposal-section-renderer/1";
+type TransactionBoundary = { beforeBegin(c: PoolClient): Promise<void>; afterBegin(c: PoolClient): Promise<void> };
 export class PostgresProposalPersistence implements ProposalPersistence {
   readonly kind = "postgres" as const;
-  constructor(private pool: Pool) {}
-  open(id: string, scope: Scope): ProposalStore { return new PostgresProposalStore(this.pool, uuid(id), proposalScope(scope)); }
+  constructor(private pool: Pool, private boundary?: TransactionBoundary) {}
+  open(id: string, scope: Scope): ProposalStore { return new PostgresProposalStore(this.pool, uuid(id), proposalScope(scope), this.boundary); }
 }
 class PostgresProposalStore implements ProposalStore {
-  constructor(private pool: Pool, private id: string, private scope: Scope) {}
+  constructor(private pool: Pool, private id: string, private scope: Scope, private boundary?: TransactionBoundary) {}
   async locked<T>(create: boolean, fn: Parameters<ProposalStore["locked"]>[1]): Promise<T> {
     proposalExecution("postgres");
     for (let attempt = 0; ; attempt++) {
@@ -20,7 +21,11 @@ class PostgresProposalStore implements ProposalStore {
         // Acquire before establishing the serializable snapshot so a waiting
         // duplicate creator rereads the committed predecessor, including retries.
         await c.query("SELECT pg_advisory_lock(hashtextextended($1,0))", ["site-proposal:" + this.id]);
+        await this.boundary?.beforeBegin(c);
         await c.query("BEGIN ISOLATION LEVEL SERIALIZABLE");
+        // Utility LOCK commands run before the first snapshot-bearing SELECT.
+        // Only the separate disposable release service supplies this boundary.
+        await this.boundary?.afterBegin(c);
         const schema = (await c.query("SELECT current_schema() s")).rows[0].s;
         if (!/^canonical_test_[a-f0-9]{32}_intake$/.test(schema) && !(schema === "public" && process.env.MIOPAGES_SITE_PROPOSALS === "shared-development")) throw Error("Durable proposals require disposable schema or explicit shared-development execution");
         await c.query(`SET LOCAL search_path="${schema}"`);

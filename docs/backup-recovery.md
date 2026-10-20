@@ -27,6 +27,17 @@ silently replace what was reviewed. Purge/retention and publication remain separ
 
 ## Current result: local durable-prospect backup operational gate SATISFIED
 
+The [content release foundation](content-authority-and-editing.md#controlled-content-release-and-rollback)
+adds migration 0014's append-only `site_content_events`. Normal database inventory
+includes its release/rollback records and bounded exact predecessor/current
+Page/Section snapshots automatically after separately authorized application.
+No backup exclusions, scheduler or destination changes are needed. The isolated
+release recovery test uses the existing custom-format archive, checksum,
+semantic/security, sequence, all-table and managed-object restore checks. Current
+content and immutable release/rollback history must agree after recovery; no
+runtime inspection HTML or local ledger supplies missing correctness evidence.
+0014 remains unapplied to shared development in this implementation task.
+
 The recorded durable-intake recovery checkpoint had eleven migrations (ordered 0009 then
 0010), an empty acquisition domain and one synthetic durable Review intake/submission.
 Post-activation restore point `20261015T180922081Z_6ce39b28` on encrypted H: passed

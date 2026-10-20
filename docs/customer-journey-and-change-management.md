@@ -649,3 +649,10 @@ shared application and real customer use remain separately authorized. Durable
 approval is commercial evidence, never publication permission. Review/intake
 material still requires explicit canonical confirmation, and neither Home concept
 is implemented by persistence.
+
+The [bounded content-release foundation](content-authority-and-editing.md#controlled-content-release-and-rollback)
+now consumes an exact approved proposal with a separate release mandate, atomic
+canonical Page/Section mutation, durable successful history and guarded latest-only
+rollback. Its proof is private synthetic data only. Customer go-live and runtime
+deployment remain separate authorization/readiness gates; neither Home concept is
+implemented by the release machinery.

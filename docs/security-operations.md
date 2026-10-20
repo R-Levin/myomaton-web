@@ -120,6 +120,16 @@ verification and operational controls. Release authorization remains separate.
 
 ## Database privileges and canonical state
 
+The [content release foundation](content-authority-and-editing.md#controlled-content-release-and-rollback)
+requires separate scoped release and rollback grants, in addition to exact customer
+content approval. The current adapter refuses shared/public/production execution
+and permits only private disposable inactive sites. One serializable transaction
+owns canonical Page/Section mutation and immutable evidence. PostgreSQL enforces
+approval/destination references, append-only history and exact latest rollback
+relationships. This does not supply production authentication, release privileges,
+go-live approval or deployment. Runtime mutation credentials must remain private;
+database owners are trusted administrators, not untrusted customer principals.
+
 Separate normal runtime application credentials, migration/schema-admin execution
 and operational/admin credentials. Grant runtime only needed data privileges;
 schema administration must not be an incidental runtime permission. Scope

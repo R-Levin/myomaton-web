@@ -76,7 +76,7 @@ test("historical migrations, snapshots, journal entries and frozen Home v1 evide
     assert.equal(createHash("sha256").update(readFileSync(file)).digest("hex"), hash, file);
   }
   const journal = JSON.parse(readFileSync("lib/platform/db/migrations/meta/_journal.json", "utf8"));
-  assert.deepEqual(journal.entries.slice(0, 6), historicalJournal); assert.equal(journal.entries.length, 14);
+  assert.deepEqual(journal.entries.slice(0, 6), historicalJournal); assert.equal(journal.entries.length, 15);
   assert.deepEqual(journal.entries[6], { idx: 6, version: "7", when: 1790959692569, tag: "0006_managed-site-terminology", breakpoints: true });
   const old = JSON.parse(readFileSync("scripts/customer-updates/myomaton-home-v1-baseline.json", "utf8"));
   const { microsites, ...rest } = old;
@@ -92,8 +92,12 @@ test("canonical Drizzle snapshot matches active schema and operational migration
   }
   const previous = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0012_snapshot.json", "utf8"));
   const snapshot = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0013_snapshot.json", "utf8"));
-  const generated = generateDrizzleJson(imports, previous.id);
-  assert.deepEqual(JSON.parse(JSON.stringify({ ...generated, id: snapshot.id })), snapshot);
+  const latest = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0014_snapshot.json", "utf8"));
+  const generated = generateDrizzleJson(imports, snapshot.id);
+  assert.deepEqual(JSON.parse(JSON.stringify({ ...generated, id: latest.id })), latest);
+  assert.equal(latest.prevId, snapshot.id);
+  const priorTables = structuredClone(latest.tables); delete priorTables["public.site_content_events"];
+  assert.deepEqual(priorTables, snapshot.tables);
   assert.equal(snapshot.prevId, previous.id);
   const existing = structuredClone(snapshot.tables);
   for (const table of ["site_change_proposals", "site_change_revisions", "site_change_events"]) delete existing[`public.${table}`];

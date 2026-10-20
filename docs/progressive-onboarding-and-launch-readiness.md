@@ -38,6 +38,13 @@ Free Review implementation, preview change or commercial launch authorization.
 
 ## Provisional Free Review intake
 
+The [content-release foundation](content-authority-and-editing.md#controlled-content-release-and-rollback)
+separates exact content approval, separately authorized canonical content release,
+and deployment/go-live readiness. The current release/rollback proof accepts only
+private disposable inactive sites. It does not activate a customer, hostname,
+delivery channel, DNS or TLS, and does not make Customer #1 launch-ready. Both Home
+concepts remain deferred until their distinct knowledge/authority gates are met.
+
 The [first operational development intake slice](free-review-intake.md) now provides
 shared Review/direct-start answers, conditional questions, resumable server-side
 drafts and immutable submitted/operator-needed state in isolated prospect storage.

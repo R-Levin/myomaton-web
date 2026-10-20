@@ -16,7 +16,12 @@ change selection. Contact and media use the same deployment context.
 See [canonical deployment boundaries](canonical-foundation.md#deployment-and-remaining-boundaries).
 
 Page queries then use the resolved Managed Site UUID, exact slug and `active` status.
-The existing Page model has no separate published state. Local
+The existing Page model has no separate published state. Controlled
+content release updates those same Page/Section rows under the
+[controlled release contract](content-authority-and-editing.md#controlled-content-release-and-rollback).
+The current release proof accepts only an inactive disposable site; it never
+changes site/deployment selection, Navigation, DNS or TLS. Exact content rollback
+does not change those routing rules. Local
 [change proposals](content-authority-and-editing.md#reviewable-managed-site-change-proposals)
 render isolated candidates without changing these active routes; exact approval
 does not publish or switch destinations. Production host/domain selection remains deferred at

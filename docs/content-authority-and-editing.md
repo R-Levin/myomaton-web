@@ -8,7 +8,8 @@ projections. They grant text editing only; CSS, layout, fonts, palette, spacing,
 breakpoints, Section composition and Visual Grammar are outside the contract.
 The original text harness is trusted local development tooling, not a customer
 HTTP editor. The bounded proposal extension below adds explicit authority and
-exact approval; it still has no publication path or production identity adapter.
+exact approval. The separate disposable content-release foundation below can apply
+that candidate; production identity and go-live remain unavailable.
 
 | Source | Owner and behavior |
 | --- | --- |
@@ -250,3 +251,73 @@ remains separate, illustrative, non-canonical and unimplemented. No Customer #1
 site or real Home direction is created; manual gap collection remains acceptable
 while the fuller onboarding interview is deferred. Publication/release/rollback
 and public visibility approval remain separate guarded stages.
+
+## Controlled content release and rollback
+
+The [release service](../lib/platform/content-editing/releases.ts) consumes an exact
+durable approved proposal; the proposal service's `publish` method still refuses.
+Release requires a separate scoped `release-managed-site-change` mandate from a
+trusted capability adapter, not a free-form name or customer approval alone. It
+verifies latest revision, proposal/approval event, customer mandate, destination,
+base, confirmed canonical sources and unchanged candidate/preview digest. No copy
+is regenerated and no intake or Review recommendation becomes a fact.
+
+This first slice requires `NODE_ENV=development`,
+`MIOPAGES_SITE_RELEASES=disposable-operator`, a private non-5432 generated rehearsal
+database and the exact disposable inactive bound site. Shared/public/production
+release is refused. No HTTP writer, real Customer #1 proposal, hostname, site
+activation, deployment, DNS or TLS is introduced. Canonical current content means
+the existing Page and ordered Section rows, not a parallel published-content model.
+Active Page rows on an inactive site do not make that site publicly available.
+
+Only existing create/replace-one-Page proposals with one to six supported Sections
+are accepted. Existing eligible Actions remain unchanged references. Navigation,
+site identity/status, business sources, media and other Pages remain untouched.
+Media-bound targets and deletion of referenced Page/Sections refuse rather than
+silently remove dependencies. This is intentionally not broad site CRUD.
+
+The PostgreSQL proposal transaction serializes proposal changes and site release
+requests. The private release adapter conservatively takes canonical-table
+`SHARE ROW EXCLUSIVE` locks before its first snapshot-bearing SELECT. This blocks
+phantom inserts and unrelated canonical writers until commit and ensures a waiter
+sees their committed state before eligibility checks. Reads remain available;
+this coarse private-proof boundary is not a claim of production-scale concurrency.
+Complete Page/Section mutation and one successful append-only
+`site_content_events` record commit together or both roll back. Migration **0014**
+adds only this bounded history table and integrity/immutability guards. Records
+bind proposal/revision/digest/base, exact approval event and rendered-preview hash,
+destination, affected Page/Section IDs, separate release actor/mandate/reference,
+request identity/time, before/after site fingerprints and exact affected-row
+snapshots. One release per proposal revision; matching retries return the original
+result and conflicting reuse refuses. Editing or rollback does not transfer consent.
+
+`rollback-managed-site-change` is a separate mandate. Only the current latest
+successful release may roll back, and only while its entire canonical site
+fingerprint still matches. No arbitrary rollback chain/time travel is supported.
+Unrelated content/source/Action/Navigation changes refuse. Rollback restores the
+stored prior Page/Section rows atomically with a new immutable rollback record,
+including metadata, versions and PostgreSQL microsecond timestamps. Exact restore
+therefore returns the prior content fingerprint; the rollback has a new distinct
+history identity/digest. Prior history is never deleted. An already released
+proposal revision cannot be released again after restoration; prepare/review a new
+proposal instead. Limits: 24 predecessor Sections, 1 MiB per affected-row snapshot,
+256 history records per site; exceeding a bound refuses atomically.
+
+Proposal fingerprints retain their existing definition. Release fingerprints use
+the same site graph with Page/Section and related owned-row timestamps represented
+at full PostgreSQL precision, explicitly separate from JS Date millisecond projection. This avoids
+losing exact rollback state or missing sub-millisecond drift.
+
+The [disposable integration proof](../tests/integration/site-releases.test.ts)
+checks exact replacement/restoration, authority, stale state, concurrency, retries,
+failure before commit and reopen. [Ordered migration rehearsal](../tests/integration/site-release-migration.test.ts)
+covers upgrade/fresh/no-op. Normal database backup/restore covers release history,
+snapshots and current rows; no runtime ledger is needed. The synthetic inspection
+under ignored `runtime-content/site-release-proof/` shows exact before, released
+and restored rendering using the existing Section renderer with inert Actions.
+
+Content release/publication changes canonical content only. Runtime deployment,
+customer go-live, production authorization, domain/TLS and readiness are separate.
+The illustrative Free Review Home concept and authoritative onboarding Home
+direction both remain deferred. Migration 0014 is not applied to shared development
+in this implementation task; shared remains at 14 applied migrations.
