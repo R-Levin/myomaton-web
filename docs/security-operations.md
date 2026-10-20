@@ -110,10 +110,13 @@ The [local Managed Site proposal boundary](content-authority-and-editing.md#revi
 requires operation-specific trusted scope grants and a separately represented
 customer-representative/accepted-authority mandate to approve an exact revision,
 base, destination and preview digest. Operator identity alone is insufficient.
-It accepts only disposable inactive bound foundations, exposes no HTTP mutation
-surface and has no publication capability. Local evidence is private, ignored
-development data; shared durable storage/backup, production authentication and
-release authorization remain separate gates.
+It accepts only exact inactive bound foundations, exposes no HTTP mutation
+surface and has no publication capability. Local evidence remains private ignored
+development data. The explicit PostgreSQL adapter persists immutable approval
+evidence with normal DB backup coverage; shared-development use additionally
+requires its migration, explicit adapter/environment and trusted scoped grants.
+Production execution still refuses pending real authentication/customer-mandate
+verification and operational controls. Release authorization remains separate.
 
 ## Database privileges and canonical state
 

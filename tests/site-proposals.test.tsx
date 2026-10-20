@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { randomUUID } from "node:crypto";
-import { pageProposal, proposalOnly, revisionDigest, type PageProposal, type Revision } from "../lib/platform/content-editing/proposal";
+import { pageProposal, proposalOnly, proposalExecution, revisionDigest, type PageProposal, type Revision } from "../lib/platform/content-editing/proposal";
 import { proposalPreview } from "../lib/platform/content-editing/proposal-preview";
 const editorial = (text: string) => ({ kind: "editorial" as const, text, rationale: "Editorial framing" });
 const page = (): PageProposal => ({ operation: "create-page", pageId: randomUUID(), slug: "/", title: editorial("Candidate title"), purpose: "Synthetic proof", sections: [{ id: randomUUID(), type: "hero", heading: editorial("Clear direction"), text: editorial("Supporting copy") }] });
@@ -20,4 +20,12 @@ test("preview uses shared Section rendering; copy origins are readable and CTA d
 test("proposal runtime refuses production and missing local operator gate", () => {
   const old = { NODE_ENV: process.env.NODE_ENV, MIOPAGES_SITE_PROPOSALS: process.env.MIOPAGES_SITE_PROPOSALS };
   try { Object.assign(process.env, { NODE_ENV: "production", MIOPAGES_SITE_PROPOSALS: "local-operator" }); assert.throws(proposalOnly); Object.assign(process.env, { NODE_ENV: "development", MIOPAGES_SITE_PROPOSALS: "" }); assert.throws(proposalOnly); } finally { Object.assign(process.env, old); }
+});
+test("durable configuration permits explicit shared development without enabling local or production execution", () => {
+  const old = { NODE_ENV: process.env.NODE_ENV, MIOPAGES_SITE_PROPOSALS: process.env.MIOPAGES_SITE_PROPOSALS };
+  try {
+    Object.assign(process.env, { NODE_ENV: "development", MIOPAGES_SITE_PROPOSALS: "shared-development" });
+    assert.doesNotThrow(() => proposalExecution("postgres")); assert.throws(() => proposalExecution("local"));
+    Object.assign(process.env, { NODE_ENV: "production" }); assert.throws(() => proposalExecution("postgres"));
+  } finally { Object.assign(process.env, old); }
 });

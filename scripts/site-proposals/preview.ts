@@ -8,10 +8,14 @@ import { proposalOnly } from "../../lib/platform/content-editing/proposal";
 // No database, writer, arbitrary path, external resource or operational CTA.
 async function main() {
   proposalOnly();
-  if (process.argv.slice(2).join(" ") !== "--synthetic-proof") throw Error("Explicit --synthetic-proof required");
-  const html = await readFile("runtime-content/site-proposal-proof/candidate.html", "utf8");
-  const evidence = JSON.parse(await readFile("runtime-content/site-proposal-proof/inspection.json", "utf8"));
-  if (evidence.label !== "SYNTHETIC DISPOSABLE EVIDENCE ONLY; source fixture removed after proof" || evidence.previewDigest !== fingerprint(html)) throw Error("Exact synthetic proof digest required");
+  const flag = process.argv.slice(2).join(" ");
+  if (!["--synthetic-proof", "--durable-synthetic-proof"].includes(flag)) throw Error("Explicit synthetic proof selection required");
+  const durable = flag === "--durable-synthetic-proof", root = durable ? "runtime-content/site-proposal-durable-proof" : "runtime-content/site-proposal-proof";
+  const html = await readFile(`${root}/candidate.html`, "utf8");
+  const evidence = JSON.parse(await readFile(`${root}/inspection.json`, "utf8"));
+  const label = durable ? "SYNTHETIC DURABLE DATABASE PROOF; disposable source removed" : "SYNTHETIC DISPOSABLE EVIDENCE ONLY; source fixture removed after proof";
+  const digest = durable ? evidence.state?.approval?.previewDigest : evidence.previewDigest;
+  if (evidence.label !== label || digest !== fingerprint(html) || durable && (evidence.state?.state !== "APPROVED" || evidence.state?.published !== false || evidence.activeSiteUnchanged !== true || evidence.rereadAfterReopen !== true)) throw Error("Exact synthetic proof digest required");
   const token = randomBytes(32).toString("hex"), route = `/proposal/${token}`;
   const server = createServer((request, response) => {
     const address = server.address();

@@ -1,8 +1,33 @@
 # PostgreSQL and managed-object recovery baseline
 
+## Managed Site proposal evidence
+
+The [durable proposal adapter](content-authority-and-editing.md#durable-postgresql-adapter)
+adds migration 0013's `site_change_proposals`, `site_change_revisions` and
+`site_change_events`. Once separately authorized/applied, these normal PostgreSQL
+tables are automatically included in existing custom-format backups, manifests,
+all-table content comparison and semantic/security recovery checks. No exclusion,
+scheduler, destination or backup mechanism changes are needed. This task leaves
+shared development at 13 applied migrations; 0013 is pending, not installed.
+
+The [private recovery proof](../tests/integration/site-proposal-recovery.test.ts)
+uses only generated disposable databases/clusters and the existing `backup`,
+checksum verification and `restoreTest` functions. It recovers exact proposal
+revisions, source inputs, customer mandate, operator, preview digest and approval
+history, rereads through a new PostgreSQL adapter, and reproduces the preview hash.
+No ignored runtime ledger or HTML artifact is required for correctness. The normal
+disposable-schema exclusions stay intact; the test temporarily gives only its
+synthetic schema the normal `public` name in an isolated cluster. Shared PostgreSQL
+and the encrypted H:/F: restore points are not backup or restore targets in this proof.
+
+Retain approved proposals as commercial evidence under the normal restricted DB
+backup/access policy. Preserve matching renderer versions for historical visual
+reproduction; changed output must fail the recorded preview digest rather than
+silently replace what was reviewed. Purge/retention and publication remain separate.
+
 ## Current result: local durable-prospect backup operational gate SATISFIED
 
-The current shared-development checkpoint has eleven migrations (ordered 0009 then
+The recorded durable-intake recovery checkpoint had eleven migrations (ordered 0009 then
 0010), an empty acquisition domain and one synthetic durable Review intake/submission.
 Post-activation restore point `20261015T180922081Z_6ce39b28` on encrypted H: passed
 archive/manifest/checksum/COMPLETE and five managed-object checks. Its isolated

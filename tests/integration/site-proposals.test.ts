@@ -12,11 +12,11 @@ import { proposalRoot } from "../../lib/platform/content-editing/proposal-store"
 import type { Binding, Copy, PageProposal } from "../../lib/platform/content-editing/proposal";
 import { customerTables } from "../../lib/platform/customer-initialization";
 
-test("site proposals: disposable confirmed source, isolated candidate, exact human approval and immutable history", async t => {
+for (const durable of [false, true]) test(`site proposals (${durable ? "postgres" : "local"}): disposable confirmed source, isolated candidate, exact human approval and immutable history`, async t => {
   const url = process.env.ASSET_TEST_DATABASE_URL; assert.ok(url, "Isolated PostgreSQL URL required");
   const old = { NODE_ENV: process.env.NODE_ENV, MIOPAGES_REVIEW_SYNTHESIS: process.env.MIOPAGES_REVIEW_SYNTHESIS, MIOPAGES_SITE_PROPOSALS: process.env.MIOPAGES_SITE_PROPOSALS };
   Object.assign(process.env, { NODE_ENV: "development", MIOPAGES_REVIEW_SYNTHESIS: "local-operator", MIOPAGES_SITE_PROPOSALS: "local-operator" });
-  const f = await siteProposalFixture(url), svc = f.service, id = randomUUID(), createRequest = randomUUID();
+  const f = await siteProposalFixture(url, durable), svc = f.service, id = randomUUID(), createRequest = randomUUID();
   const databaseState = async () => {
     const rows: Record<string, unknown> = {};
     for (const table of [...customerTables, "activation_cases", "activation_case_events", "activation_customer_bindings", "prospect_intakes", "prospect_intake_submissions"])
@@ -49,7 +49,7 @@ test("site proposals: disposable confirmed source, isolated candidate, exact hum
       assert.equal(state.revisions[0].resolved.filter(r => r.origin.kind === "canonical").length, 4);
       assert.equal((await f.pool.query("SELECT count(*)::int n FROM pages WHERE managed_site_id=$1", [f.scope.managedSiteId])).rows[0].n, 0);
       const foreignScope = { ...f.scope, managedSiteId: randomUUID() };
-      await assert.rejects(svc.inspect(f.grant(["inspect-site-proposal"], undefined, foreignScope), id, foreignScope), /Broken proposal revision/);
+      await assert.rejects(svc.inspect(f.grant(["inspect-site-proposal"], undefined, foreignScope), id, foreignScope), /Broken proposal revision|Foreign proposal scope/);
     });
     await t.test("full shared-renderer preview is readable, inert, exact and separate from active routes", async () => {
       const requestId = randomUUID(); preview = await svc.preview(f.operator, first, requestId);
@@ -120,8 +120,12 @@ test("site proposals: disposable confirmed source, isolated candidate, exact hum
       const nextOffer = (await f.canonical(1))!, offerInput = structuredClone(input);
       offerInput.sections = [{ ...f.page.sections[0], heading: { kind: "canonical", source: { domain: "offering", recordId: nextOffer.row.id, revision: nextOffer.row.version, fingerprint: nextOffer.fingerprint, field: "name" } }, text: undefined }];
       await assert.rejects(svc.prepare(f.operator, randomUUID(), f.scope, randomUUID(), offerInput), /Confirmed Offering/);
-      const file = path.join(proposalRoot(), id, "000001.json"), bytes = await readFile(file); await writeFile(file, bytes.toString().replace("Representative synthetic", "Tampered synthetic"));
-      try { await assert.rejects(svc.inspect(f.operator, id, f.scope), /Broken proposal history/); } finally { await writeFile(file, bytes); }
+      if (durable) {
+        await assert.rejects(f.pool.query("UPDATE site_change_revisions SET digest=$1 WHERE proposal_id=$2", ["0".repeat(64), id]), /immutable/);
+      } else {
+        const file = path.join(proposalRoot(), id, "000001.json"), bytes = await readFile(file); await writeFile(file, bytes.toString().replace("Representative synthetic", "Tampered synthetic"));
+        try { await assert.rejects(svc.inspect(f.operator, id, f.scope), /Broken proposal history/); } finally { await writeFile(file, bytes); }
+      }
     });
     await f.verify();
   } finally { await f.stop(); Object.assign(process.env, old); }

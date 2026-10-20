@@ -640,3 +640,12 @@ The future authoritative onboarding Home direction may reuse this boundary after
 sufficient confirmed knowledge. The optional Free Review illustrative Home concept
 remains separate/deferred. Actual Customer #1 site creation still waits for that
 knowledge; full onboarding interview and safe publication/release remain later work.
+
+The [durable PostgreSQL proposal adapter](content-authority-and-editing.md#durable-postgresql-adapter)
+now preserves the same contract in immutable identity/revision/event records,
+including exact rendered-preview approval and a customer mandate distinct from the
+recording operator. Its migration is rehearsed only in disposable databases;
+shared application and real customer use remain separately authorized. Durable
+approval is commercial evidence, never publication permission. Review/intake
+material still requires explicit canonical confirmation, and neither Home concept
+is implemented by persistence.

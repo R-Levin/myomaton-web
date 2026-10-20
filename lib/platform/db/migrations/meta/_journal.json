@@ -92,6 +92,13 @@
       "when": 1792505989054,
       "tag": "0012_activation_customer_binding",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792523646680,
+      "tag": "0013_site_change_proposals",
+      "breakpoints": true
     }
   ]
 }

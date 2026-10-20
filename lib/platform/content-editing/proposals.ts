@@ -1,17 +1,18 @@
 import type { Pool } from "pg";
 import { choice, fingerprint, object, text, uuid } from "../canonical/model";
 import type { Scope } from "./authority";
-import { binding, hash, pageProposal, proposalOnly, proposalScope, revisionDigest, type Actor, type Binding, type CustomerAuthority, type PageProposal, type Permission, type ProposalAuthority, type ProposalState, type Revision } from "./proposal";
+import { binding, hash, pageProposal, proposalExecution, proposalScope, revisionDigest, type Actor, type Binding, type CustomerAuthority, type PageProposal, type Permission, type ProposalAuthority, type ProposalState, type Revision } from "./proposal";
 import { proposalSnapshot, resolvePage } from "./proposal-context";
-import { LocalProposalStore } from "./proposal-store";
+import { localProposalPersistence } from "./proposal-store";
+import type { ProposalPersistence } from "./proposal-history";
 import { proposalPreview } from "./proposal-preview";
 
 // Trusted private composition root only. No default grant, HTTP/Server Action,
 // canonical/content writer, release operation or production authentication claim.
 export class SiteProposalService {
-  constructor(private pool: Pool, private authority: ProposalAuthority) {}
+  constructor(private pool: Pool, private authority: ProposalAuthority, private persistence: ProposalPersistence = localProposalPersistence) {}
   private async actor(context: unknown, operation: Permission, scope: Scope) {
-    proposalOnly(); const grant = await this.authority.authorize(context, operation, structuredClone(scope));
+    proposalExecution(this.persistence.kind); const grant = await this.authority.authorize(context, operation, structuredClone(scope));
     object(grant, ["operatorId", "authorityReference", "customer"]);
     const actor: Actor = { operatorId: text(grant.operatorId), authorityReference: text(grant.authorityReference, 300) };
     let customer: CustomerAuthority | undefined;
@@ -33,7 +34,7 @@ export class SiteProposalService {
     id = uuid(id); requestId = uuid(requestId); const scope = proposalScope(selection), page = pageProposal(structuredClone(value));
     const before = expected === null ? null : binding(expected), { actor } = await this.actor(context, before ? "revise-site-proposal" : "prepare-site-proposal", scope);
     const digest = fingerprint({ operation: "revise", id, scope, requestId, page, expected: before });
-    return new LocalProposalStore(id, scope).locked(before === null, async (state, append) => {
+    return this.persistence.open(id, scope).locked(before === null, async (state, append, client) => {
       const retry = this.retry(state, requestId, digest, actor); if (retry) return retry;
       if (before) this.exact(state, before); else if (state.events.length) throw Error("Existing proposal requires exact revision");
       return proposalSnapshot(this.pool, scope, async (c, base) => {
@@ -42,23 +43,23 @@ export class SiteProposalService {
         const body = { at: new Date().toISOString(), author: actor, page, resolved, candidate, base };
         const revision: Revision = { ...body, binding: { ...identity, digest: revisionDigest(body, identity) } };
         return append({ requestId, requestDigest: digest, action: "revise", actor, at: revision.at, revision });
-      });
+      }, { durable: this.persistence.kind === "postgres", client });
     });
   }
   async inspect(context: unknown, id: string, selection: Scope) {
     const scope = proposalScope(selection); await this.actor(context, "inspect-site-proposal", scope);
-    return new LocalProposalStore(uuid(id), scope).locked(false, async state => {
+    return this.persistence.open(uuid(id), scope).locked(false, async (state, _append, client) => {
       if (!state.revisions.length) throw Error("Missing proposal");
       return proposalSnapshot(this.pool, scope, async (_c, base) => {
         const stale = fingerprint(base) !== state.revisions.at(-1)!.binding.baseFingerprint;
         const previewMatches = state.approval !== null && fingerprint(proposalPreview(state.revisions.at(-1)!)) === state.approval.previewDigest;
         return { ...state, stale, approvalValid: state.state === "APPROVED" && !stale && previewMatches, published: false as const };
-      });
+      }, { durable: this.persistence.kind === "postgres", client });
     });
   }
   async preview(context: unknown, expectedValue: Binding, requestId: string) {
     const expected = binding(expectedValue), { actor } = await this.actor(context, "preview-site-proposal", expected.scope); requestId = uuid(requestId);
-    return new LocalProposalStore(expected.proposalId, expected.scope).locked(false, async (state, append) => {
+    return this.persistence.open(expected.proposalId, expected.scope).locked(false, async (state, append, client) => {
       const requestDigest = fingerprint({ operation: "preview", expected, requestId });
       const retry = this.retry(state, requestId, requestDigest, actor); this.exact(state, expected);
       return proposalSnapshot(this.pool, expected.scope, async (c, base) => {
@@ -69,7 +70,7 @@ export class SiteProposalService {
         const event = retry ?? await append({ requestId, requestDigest, action: "preview", actor, at: new Date().toISOString(), preview: { binding: expected, digest } });
         if (event.preview?.digest !== digest) throw Error("Preview renderer changed; new preview required");
         return { html, digest, event: event.hash, binding: expected };
-      });
+      }, { durable: this.persistence.kind === "postgres", client });
     });
   }
   async approve(context: unknown, value: { binding: Binding; requestId: string; previewDigest: string; previewEvent: string; reference: string }) {
@@ -77,7 +78,7 @@ export class SiteProposalService {
     const expected = binding(input.binding), requestId = uuid(input.requestId), previewDigest = hash(input.previewDigest), previewEvent = hash(input.previewEvent), reference = text(input.reference, 500);
     const { actor, customer } = await this.actor(context, "approve-site-proposal", expected.scope);
     const requestDigest = fingerprint({ operation: "approve", expected, requestId, previewDigest, previewEvent, reference, customer });
-    return new LocalProposalStore(expected.proposalId, expected.scope).locked(false, async (state, append) => {
+    return this.persistence.open(expected.proposalId, expected.scope).locked(false, async (state, append, client) => {
       const retry = this.retry(state, requestId, requestDigest, actor); this.exact(state, expected);
       if (state.state !== "PROPOSED" && !retry) throw Error("Proposal already approved");
       const preview = state.events.find(e => e.hash === previewEvent);
@@ -89,7 +90,7 @@ export class SiteProposalService {
         if (retry) return retry;
         const at = new Date().toISOString();
         return append({ requestId, requestDigest, action: "approve", actor, at, approval: { binding: expected, previewDigest, previewEvent, recordedBy: actor, customer: customer!, reference, at } });
-      });
+      }, { durable: this.persistence.kind === "postgres", client });
     });
   }
   async publish(): Promise<never> { throw Error("Publication is not implemented or authorized by site proposals"); }

@@ -5,18 +5,21 @@ import { informationRevision } from "../activation/information";
 import { normalizeAction } from "../actions/model";
 import { normalizeSection } from "../managed-sites/sections";
 import type { Scope } from "./authority";
-import { proposalOnly, type Candidate, type Copy, type PageProposal, type ResolvedCopy } from "./proposal";
+import { proposalExecution, type Candidate, type Copy, type PageProposal, type ResolvedCopy } from "./proposal";
 
-// All database access is a repeatable-read, read-only snapshot. No site writer.
-export async function proposalSnapshot<T>(pool: Pool, scope: Scope, fn: (c: PoolClient, base: Awaited<ReturnType<typeof siteBase>>) => Promise<T>) {
-  proposalOnly(); const c = await pool.connect();
+// Local reads use a read-only snapshot; durable reads share the store transaction.
+// Neither path has a site/content writer.
+export async function proposalSnapshot<T>(pool: Pool, scope: Scope, fn: (c: PoolClient, base: Awaited<ReturnType<typeof siteBase>>) => Promise<T>, options: { durable?: boolean; client?: PoolClient } = {}) {
+  proposalExecution(options.durable ? "postgres" : "local"); const c = options.client ?? await pool.connect();
   try {
-    await c.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+    if (!options.client) await c.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
     const schema = (await c.query("SELECT current_schema() s")).rows[0].s;
-    if (!/^canonical_test_[a-f0-9]{32}_intake$/.test(schema)) throw Error("Site proposals require isolated disposable schema; shared/public operation refused");
+    const isolated = /^canonical_test_[a-f0-9]{32}_intake$/.test(schema);
+    if (!isolated && !(options.durable && schema === "public" && process.env.MIOPAGES_SITE_PROPOSALS === "shared-development")) throw Error("Site proposals require isolated disposable schema or explicitly configured durable shared-development execution");
     await c.query(`SET LOCAL search_path="${schema}"`);
+    await c.query("SET LOCAL TIME ZONE 'UTC'");
     return await fn(c, await siteBase(c, scope));
-  } finally { await c.query("ROLLBACK"); c.release(); }
+  } finally { if (!options.client) { await c.query("ROLLBACK"); c.release(); } }
 }
 async function siteBase(c: PoolClient, scope: Scope) {
   const graph = (await c.query(`SELECT to_jsonb(o) organization,to_jsonb(w) presence,to_jsonb(m) site,to_jsonb(b) binding FROM managed_sites m

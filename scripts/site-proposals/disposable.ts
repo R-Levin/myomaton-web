@@ -5,11 +5,12 @@ import { intakeAnswersV2 } from "../../tests/helpers/intake";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { inspectCanonical } from "../../lib/platform/canonical/writes";
 import { SiteProposalService } from "../../lib/platform/content-editing/proposals";
+import { PostgresProposalPersistence } from "../../lib/platform/content-editing/proposal-postgres";
 import { type Actor, type CustomerAuthority, type Copy, type PageProposal, type Permission, type ProposalAuthority } from "../../lib/platform/content-editing/proposal";
 import type { Scope } from "../../lib/platform/content-editing/authority";
 
 // Synthetic fixture authority only; never an authentication/customer-identity adapter.
-export async function siteProposalFixture(databaseUrl: string) {
+export async function siteProposalFixture(databaseUrl: string, durable = false) {
   const f = await activationFixture(databaseUrl), activation = f.service();
   try {
     const a = await f.submit("DIRECT_START", intakeAnswersV2());
@@ -34,7 +35,7 @@ export async function siteProposalFixture(databaseUrl: string) {
     const grant = (operations: Permission[], customer?: CustomerAuthority, selected = scope) => { const token = Object.freeze({}); grants.set(token, { scope: selected, operations, actor: { operatorId: "synthetic-proposal-operator", authorityReference: "synthetic-capability" }, ...(customer ? { customer } : {}) }); return token; };
     const operator = grant(["prepare-site-proposal", "inspect-site-proposal", "revise-site-proposal", "preview-site-proposal"]);
     const approver = grant(["approve-site-proposal"], { kind: "business-representative", subjectId: "synthetic-customer-representative", authorityReference: "Synthetic verified representative mandate" });
-    const service = new SiteProposalService(f.pool, authority);
+    const service = new SiteProposalService(f.pool, authority, durable ? new PostgresProposalPersistence(f.pool) : undefined);
     const editorial = (text: string): Copy => ({ kind: "editorial", text, rationale: "Editorial framing only; not a new business fact" });
     const fact = (index: number, field: string): Copy => ({ kind: "canonical", source: { domain: index === 0 ? "knowledge" : "offering", recordId: confirmed[index].confirmation.recordId, revision: confirmed[index].confirmation.revision, fingerprint: confirmed[index].confirmation.revisionFingerprint, field } });
     const page: PageProposal = { operation: "create-page", pageId: randomUUID(), slug: "/", title: editorial("A practical starting point"), purpose: "Representative synthetic page to prove proposal mechanics; not a real Home direction", sections: [

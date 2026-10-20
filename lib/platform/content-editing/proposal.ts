@@ -21,6 +21,10 @@ export type ProposalState = { id: string; scope: Scope; revisions: Revision[]; e
 export function proposalOnly() {
   if (process.env.NODE_ENV !== "development" || process.env.MIOPAGES_SITE_PROPOSALS !== "local-operator") throw Error("Local development site-proposal tooling only");
 }
+export function proposalExecution(kind: "local" | "postgres") {
+  if (kind === "local") return proposalOnly();
+  if (process.env.NODE_ENV !== "development" || !["local-operator", "shared-development"].includes(process.env.MIOPAGES_SITE_PROPOSALS ?? "")) throw Error("Explicit trusted DEVELOPMENT proposal execution required; production authentication is not implemented");
+}
 export function proposalScope(value: unknown): Scope { const s = object(value, ["webPresenceId", "managedSiteId"]); return { webPresenceId: uuid(s.webPresenceId), managedSiteId: uuid(s.managedSiteId) }; }
 export function hash(value: unknown): string { if (typeof value !== "string" || !/^[a-f0-9]{64}$/.test(value)) throw Error("Exact proposal digest required"); return value; }
 export function binding(value: unknown): Binding {

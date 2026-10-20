@@ -99,7 +99,10 @@ candidate, source evidence, author/authority and timestamp form its SHA-256 dige
 The baseline includes the exact inactive bound Organization/Web Presence/Managed
 Site graph, Pages/Sections, Actions, Navigation/items, Design System/Visual Direction
 configuration, canonical sources and relevant media/subject/contact-definition rows.
-The reader uses a read-only repeatable PostgreSQL transaction. A changed base or
+The local adapter reads in a read-only repeatable PostgreSQL transaction. The
+durable adapter reads the same baseline and appends only proposal evidence within
+one serializable transaction. Snapshot timestamps use UTC consistently across
+reopened connections. A changed base or
 canonical source refuses preview/approval; explicit re-preparation against the
 current base creates a new revision, never a silent rebase. Historical approval
 remains recorded; inspection reports `stale` and `approvalValid: false` if its
@@ -127,9 +130,9 @@ current approval, while preserving prior decisions. Approval leaves the Page,
 Sections, Actions, Navigation, routing and all canonical state untouched. `publish`
 always refuses; there is no release/deployment/publication operation.
 
-### Local persistence and operator proof
+### Persistence and operator proof
 
-No migration is required. Like the existing local Review ledger, the bounded
+The retained disposable adapter needs no migration. Like the existing local Review ledger, the bounded
 `LocalProposalStore` stores append-only, hash-chained revision/preview/approval events
 under ignored `runtime-content/site-change-proposals/<UUID>/`. Exclusive file creation,
 sync and local locks preserve history; corrupt/partial history refuses rather than
@@ -138,15 +141,86 @@ automatic lock removal. Files use restricted creation modes and reject redirecte
 directories; Windows ACLs must still come from the restricted local workspace.
 These are operator-private development artifacts, excluded from normal backup by
 the existing runtime-content policy. They are not shared durable customer storage;
-review retention, restricted shared persistence and backup inclusion before real
-use. Do not put real customer proposals into this disposable adapter.
+use the durable adapter below for shared persistence. Do not put real customer
+proposals into this disposable adapter.
 
-The environment must explicitly be `NODE_ENV=development` and
+For local storage the environment must explicitly be `NODE_ENV=development` and
 `MIOPAGES_SITE_PROPOSALS=local-operator`. Database operations additionally require
 the existing isolated `canonical_test_<32 hex>_intake` fixture schema and its exact
 bound inactive foundation. Shared/public and production execution refuse even
 when a caller supplies authority. No customer HTTP endpoint or Next Server Action
 is exposed. No preview is mounted on public application routes.
+
+### Durable PostgreSQL adapter
+
+`ProposalPersistence` / `ProposalStore` separate service semantics from storage.
+Both adapters use the same event construction and `replayProposal` validation,
+proposal model, renderer and authority contracts. The default remains local.
+Explicitly inject `PostgresProposalPersistence(pool)` into `SiteProposalService`
+to store the same immutable history in migration **0013_site_change_proposals**:
+
+- `site_change_proposals`: immutable Organization/Web Presence/Managed Site identity
+  and creation time, indexed by owner. No mutable published/status pointer.
+- `site_change_revisions`: exact revision JSON, resolved confirmed source references
+  and evidence, editorial rationale, candidate inputs, base snapshot/fingerprint,
+  author/authority/time and digest. Events reference the exact relational binding.
+- `site_change_events`: ordered immutable request/hash chain, preview identity/digest,
+  customer mandate and recording operator separately, consent reference/time, and
+  exact approval. Revision JSON is stored once and joined back into revision events.
+
+Database guards reject retargeting, UPDATE/DELETE/TRUNCATE, orphan identities/revisions,
+foreign/unconfirmed canonical source revisions, broken event order, mismatched
+revision/digest/base/preview and approvals without the exact preview/customer mandate.
+One approval per revision and unique request IDs are enforced relationally. Current
+state is derived through the existing replay rules; editing never transfers consent.
+Revision JSON is bounded to 2 MiB, event JSON to 32 KiB and history to the existing
+128-event limit. No publication/release tables, active content writes or account
+model are introduced.
+
+Per-proposal locks are acquired before the serializable snapshot. Request identity,
+ledger append and baseline/source reads share the transaction; failures roll back
+everything, including a first identity. Bounded serialization/deadlock retries
+re-evaluate the exact request. Duplicate retries return the same immutable event;
+competing revisions/approvals cannot silently overwrite or inherit consent.
+
+Durable shared development requires all of: an explicitly injected PostgreSQL
+adapter, `NODE_ENV=development`, `MIOPAGES_SITE_PROPOSALS=shared-development`, migration
+0013 installed, and the existing operation-specific trusted authority and exact
+bound inactive foundation. `local-operator` with that adapter is restricted to
+disposable schemas. Shared execution does not fall back to local files. Production
+still refuses: real operator authentication, customer mandate verification, DB
+privileges and deployment controls require separate operational authorization.
+Table existence or environment configuration alone grants no authority. This task
+does not apply 0013 or activate any real shared proposal.
+
+Preview events additionally persist `site-proposal-section-renderer/1`. Full
+revision inputs and the exact HTML digest are durable; previews are regenerated
+and compared, not stored as duplicate HTML. Renderer/output changes invalidate
+approval validity until explicitly reviewed again. Preserve the matching renderer
+version when historical visual reproduction is required. Correctness and approval
+history do not depend on an ignored HTML file or local ledger. There is deliberately
+no automatic import of synthetic local approvals into shared commercial evidence.
+
+The [same semantic suite](../tests/integration/site-proposals.test.ts) runs against
+both adapters. [Durable tests](../tests/integration/site-proposal-persistence.test.ts)
+prove concurrency, reopening, source/authority binding and direct SQL refusal.
+[Migration rehearsal](../tests/integration/site-proposal-migration.test.ts) covers
+0012 upgrade, fresh replay and no-op rerun in private databases. The
+[existing backup/restore proof](../tests/integration/site-proposal-recovery.test.ts)
+recovers exact approval/history in a second isolated cluster without runtime files.
+Normal PostgreSQL backups already include every non-disposable schema/table; no
+backup exclusion or mechanism changes are needed. After a separately authorized
+0013 deployment, retain these tables as commercial approval evidence under the
+same backup, access and recovery policy. Retention/purge is not implemented here.
+
+The readable durable example is ignored
+`runtime-content/site-proposal-durable-proof/inspection.md` plus `inspection.json`
+and `candidate.html`. It contains only synthetic disposable evidence; shared
+PostgreSQL, active content and the approved Free Review are unchanged.
+Run the same fixed-artifact viewer with `--durable-synthetic-proof` to inspect
+that approved durable snapshot. It checks the durable evidence label, reopened
+approval and preview digest and retains the same loopback/CSP/inert boundaries.
+The viewer still uses the `local-operator` environment and never opens a database.
 
 The [disposable proof helper](../scripts/site-proposals/disposable.ts) uses the
 existing activation fixture, Direct Start and explicit Knowledge/Offering confirmation.

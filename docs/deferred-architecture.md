@@ -375,6 +375,9 @@ The [text draft foundation](content-authority-and-editing.md) retains canonical
 reconciliation and spelling/grammar hooks. Its bounded local
 [Managed Site proposal extension](content-authority-and-editing.md#reviewable-managed-site-change-proposals)
 now binds confirmed canonical sources, candidate revisions, readable preview and exact
-customer-authority approval in disposable proof. Customer UI, shared durable proposal
-storage/authentication, publication/release/rollback and meaningful intelligence
+customer-authority approval in disposable proof. The
+[PostgreSQL proposal adapter](content-authority-and-editing.md#durable-postgresql-adapter)
+now preserves that history with migration 0013 and isolated restore proof; shared
+migration application/operational authorization, production authentication,
+customer UI, publication/release/rollback and meaningful intelligence
 checks remain later boundaries; content editing never grants presentation control.
