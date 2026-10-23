@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   uuid,
+  unique,
 } from "drizzle-orm/pg-core";
 
 import { webPresences } from "./web-presences";
@@ -31,4 +32,4 @@ export const managedSites = pgTable("managed_sites", {
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
-});
+}, t => [unique("managed_sites_owner_identity").on(t.webPresenceId, t.id)]);

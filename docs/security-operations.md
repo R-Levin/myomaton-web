@@ -1,5 +1,12 @@
 # Security, operations and recovery
 
+## Shared runtime tenant routing
+
+[Shared hostname routing](shared-hostname-routing.md) is the P0 launch architecture
+for 100+ customers, with C0/C1 isolation proof required. Host bindings resolve immutable
+request tenant context; unknown hosts refuse and public routing grants no operator
+authority. Provider proxy/cache behavior requires hosted proof before launch.
+
 ## Prospect, approval and commercial boundaries
 
 The [progressive onboarding/readiness contract](progressive-onboarding-and-launch-readiness.md)

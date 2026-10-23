@@ -1,9 +1,9 @@
 import { ContactError } from "./model";
 
-export async function contactHttp(request: Request, accept: (value: unknown) => Promise<unknown>) {
+export async function contactHttp(request: Request, accept: (value: unknown) => Promise<unknown>, trustedOrigin = new URL(request.url).origin) {
   const respond = (body: unknown, status: number) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
   try {
-    if (request.headers.get("origin") !== new URL(request.url).origin) throw new ContactError("invalid_origin", 403);
+    if (request.headers.get("origin") !== trustedOrigin) throw new ContactError("invalid_origin", 403);
     if (request.headers.get("content-type")?.split(";")[0] !== "application/json") throw new ContactError("invalid_content_type", 415);
     if (Number(request.headers.get("content-length")) > 16384) throw new ContactError("payload_too_large", 413);
     const reader = request.body?.getReader(); if (!reader) throw new ContactError("invalid_request");

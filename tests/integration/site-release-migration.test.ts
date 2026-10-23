@@ -22,7 +22,10 @@ test("0014 ordered upgrade preserves prior rows, fresh replay matches and rerun 
     } finally { await c.query("ROLLBACK"); c.release(); }
   };
   try {
-    const journal = JSON.parse(await readFile("lib/platform/db/migrations/meta/_journal.json", "utf8")); assert.equal(journal.entries.length, 15); assert.equal(journal.entries[14].tag, "0014_site_content_releases");
+    const fullJournal = JSON.parse(await readFile("lib/platform/db/migrations/meta/_journal.json", "utf8")); const journal = { ...fullJournal, entries: fullJournal.entries.slice(0, 15) }; assert.equal(journal.entries.length, 15); assert.equal(journal.entries[14].tag, "0014_site_content_releases");
+    const current = path.join(prefix, "current"); await mkdir(path.join(current, "meta"), { recursive: true });
+    await writeFile(path.join(current, "meta/_journal.json"), JSON.stringify(journal));
+    for (const e of journal.entries) await copyFile(path.join("lib/platform/db/migrations", `${e.tag}.sql`), path.join(current, `${e.tag}.sql`));
     await mkdir(path.join(prefix, "meta")); await writeFile(path.join(prefix, "meta/_journal.json"), JSON.stringify({ ...journal, entries: journal.entries.slice(0, 14) }));
     for (const e of journal.entries.slice(0, 14)) await copyFile(path.join("lib/platform/db/migrations", `${e.tag}.sql`), path.join(prefix, `${e.tag}.sql`));
     for (const name of names) { await admin.query(`CREATE DATABASE "${name}"`); const next = new URL(input); next.pathname = "/" + name; pools.push(new Pool({ connectionString: next.toString() })); }
@@ -30,11 +33,11 @@ test("0014 ordered upgrade preserves prior rows, fresh replay matches and rerun 
     const source = await readCustomerState(admin), order = ["organizations", "subject_types", "web_presences", "managed_sites", ...customerTables.filter(t => !["organizations", "subject_types", "web_presences", "managed_sites"].includes(t))];
     for (const table of order) for (const row of source[table]) await upgrade.query(`INSERT INTO ${table} SELECT * FROM jsonb_populate_record(NULL::${table},$1::jsonb)`, [JSON.stringify(row)]);
     const before = await capture(upgrade); assert.equal(before.state.migrations.length, 14);
-    await migrate(drizzle(upgrade), { migrationsFolder: "lib/platform/db/migrations" }); const after = await capture(upgrade); assert.equal(after.state.migrations.length, 15);
+    await migrate(drizzle(upgrade), { migrationsFolder: current }); const after = await capture(upgrade); assert.equal(after.state.migrations.length, 15);
     for (const [name, rows] of Object.entries(before.tables)) if (name !== "drizzle.__drizzle_migrations") assert.deepEqual(after.tables[name], rows, name);
     assert.deepEqual(after.tables["public.site_content_events"], []);
-    await migrate(drizzle(fresh), { migrationsFolder: "lib/platform/db/migrations" }); const replay = await capture(fresh); assertRecoveryEquivalent(after.catalog, replay.catalog);
-    await migrate(drizzle(upgrade), { migrationsFolder: "lib/platform/db/migrations" }); assert.deepEqual(await capture(upgrade), after);
+    await migrate(drizzle(fresh), { migrationsFolder: current }); const replay = await capture(fresh); assertRecoveryEquivalent(after.catalog, replay.catalog);
+    await migrate(drizzle(upgrade), { migrationsFolder: current }); assert.deepEqual(await capture(upgrade), after);
     await mkdir("runtime-content/site-release-proof", { recursive: true }); await writeFile("runtime-content/site-release-proof/migration.json", JSON.stringify({ upgradedFrom: 14, upgradedTo: 15, freshReplay: true, noOp: true, priorRowsPreserved: true, sharedTouched: false }, null, 2));
   } finally {
     for (const pool of pools) await pool.end(); for (const name of names) await admin.query(`DROP DATABASE IF EXISTS "${name}"`); await admin.end();

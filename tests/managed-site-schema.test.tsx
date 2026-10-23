@@ -76,7 +76,7 @@ test("historical migrations, snapshots, journal entries and frozen Home v1 evide
     assert.equal(createHash("sha256").update(readFileSync(file)).digest("hex"), hash, file);
   }
   const journal = JSON.parse(readFileSync("lib/platform/db/migrations/meta/_journal.json", "utf8"));
-  assert.deepEqual(journal.entries.slice(0, 6), historicalJournal); assert.equal(journal.entries.length, 15);
+  assert.deepEqual(journal.entries.slice(0, 6), historicalJournal); assert.equal(journal.entries.length, 16);
   assert.deepEqual(journal.entries[6], { idx: 6, version: "7", when: 1790959692569, tag: "0006_managed-site-terminology", breakpoints: true });
   const old = JSON.parse(readFileSync("scripts/customer-updates/myomaton-home-v1-baseline.json", "utf8"));
   const { microsites, ...rest } = old;
@@ -93,8 +93,13 @@ test("canonical Drizzle snapshot matches active schema and operational migration
   const previous = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0012_snapshot.json", "utf8"));
   const snapshot = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0013_snapshot.json", "utf8"));
   const latest = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0014_snapshot.json", "utf8"));
-  const generated = generateDrizzleJson(imports, snapshot.id);
-  assert.deepEqual(JSON.parse(JSON.stringify({ ...generated, id: latest.id })), latest);
+  const current = JSON.parse(readFileSync("lib/platform/db/migrations/meta/0015_snapshot.json", "utf8"));
+  const generated = generateDrizzleJson(imports, latest.id);
+  assert.deepEqual(JSON.parse(JSON.stringify({ ...generated, id: current.id })), current);
+  assert.equal(current.prevId, latest.id);
+  const beforeHostnames = structuredClone(current.tables); delete beforeHostnames["public.managed_site_hostnames"];
+  beforeHostnames["public.managed_sites"].uniqueConstraints = latest.tables["public.managed_sites"].uniqueConstraints;
+  assert.deepEqual(beforeHostnames, latest.tables);
   assert.equal(latest.prevId, snapshot.id);
   const priorTables = structuredClone(latest.tables); delete priorTables["public.site_content_events"];
   assert.deepEqual(priorTables, snapshot.tables);

@@ -98,10 +98,11 @@ test("delivery hides unavailable assets and filesystem failures, serves JPEG wit
   } finally { await rm(temp, { recursive: true, force: true }); }
 });
 
-test("media route binds delivery to explicit deployment context, never request Host", async () => {
+test("media route uses the resolved request context rather than browser tenant hints", async () => {
   const { loadService } = await import("./helpers/load-service");
   const response = new Response("JPEG fixture");
   const route = loadService("app/media/assets/[assetId]/route.ts", {
+    "@/lib/platform/managed-sites/hostname": await import("../lib/platform/managed-sites/hostname"),
     "@/lib/platform/actions/model": await import("../lib/platform/actions/model"),
     "@/lib/platform/managed-sites/context": {deploymentContext:async()=>({domain:"myomaton.com",webPresenceId:uuid,managedSiteId:uuid})},
     "@/lib/platform/assets/presentation-service": { getDeploymentAsset: async (selected: {domain:string}, assetId: string) => {
