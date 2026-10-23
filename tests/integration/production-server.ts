@@ -8,7 +8,9 @@ export async function startProductionFixture(databaseUrl: string, schema: string
   const reservation = createServer(); reservation.listen(0, "127.0.0.1"); await once(reservation, "listening");
   const port = (reservation.address() as { port: number }).port;
   await new Promise<void>((resolve, reject) => reservation.close(error => error ? reject(error) : resolve()));
-  if (!/^(?:myomaton_(?:asset_test|rename_test|contact_test|visual_test)|canonical_test)_[a-f0-9]{32}(?:_\w+)?$/.test(schema)) throw new Error("Disposable schema required");
+  const privateUrl = new URL(databaseUrl);
+  const privatePublic = shared && schema === "public" && privateUrl.hostname === "127.0.0.1" && (privateUrl.port || "5432") !== "5432" && /^\/migration_rehearsal_[a-f0-9]{32}$/.test(privateUrl.pathname);
+  if (!privatePublic && !/^(?:myomaton_(?:asset_test|rename_test|contact_test|visual_test)|canonical_test)_[a-f0-9]{32}(?:_\w+)?$/.test(schema)) throw new Error("Disposable schema required");
   const url = new URL(databaseUrl); url.searchParams.set("options", `-c search_path=${schema} -c default_transaction_read_only=on`);
   const child = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port)], {
     env: { ...process.env, MIOPAGES_ROUTING_MODE: shared ? "shared-hostnames" : "disposable-single-site", PRESENTATION_PREVIEW_SCHEMA: preview ? schema : "", DATABASE_URL: url.toString(), MANAGED_ASSET_ROOT: root, WEB_PRESENCE_ID: shared ? "" : selection.webPresenceId, MANAGED_SITE_ID: shared ? "" : selection.managedSiteId }, windowsHide: true, stdio: "ignore",

@@ -6,6 +6,7 @@ import { snapshotPublic } from "../customer-previews/disposable";
 import { stateFingerprint } from "../../lib/platform/customer-initialization";
 import { IntakeService } from "../../lib/platform/intake/service";
 import { mioPagesIntakeOwner } from "../../lib/platform/intake/availability";
+import { replayDisposableMigration } from "../db/bootstrap";
 
 export function intakeSchema(schema: string) {
   assert.match(schema, /^canonical_test_[a-f0-9]{32}_intake$/);
@@ -25,7 +26,7 @@ export async function createIntakeFixture(databaseUrl: string) {
     const c = await admin.connect();
     try {
       await c.query("BEGIN"); await c.query(`CREATE SCHEMA ${quoted}`); await c.query(`SET LOCAL search_path=${quoted}`);
-      for (const m of readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" })) for (const sql of m.sql) await c.query(sql.replaceAll('"public".', `${quoted}.`));
+      for (const m of readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" })) await replayDisposableMigration(c, m, schema);
       const order = ["organizations", "subject_types", "web_presences", "managed_sites", "pages", "sections", "actions", "navigations", "navigation_items", "assets", "asset_usages", "design_systems", "subjects", "contact_definitions", "contact_submissions", "business_knowledge", "offerings", "business_knowledge_revisions", "offering_revisions"];
       for (const table of order) for (const row of before[table]) await c.query(`INSERT INTO ${table} SELECT * FROM jsonb_populate_record(NULL::${table},$1::jsonb)`, [JSON.stringify(row)]);
       await c.query("COMMIT"); created = true;

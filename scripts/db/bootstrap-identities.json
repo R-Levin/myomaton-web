@@ -1,0 +1,82 @@
+[
+  {
+    "tag": "0000_initial-foundation",
+    "hash": "44f936f11b8d7498c653af3b6e83fe068d4dd756d0ba83c091bb6dffd117b924",
+    "when": 1790522828994
+  },
+  {
+    "tag": "0001_microsite-foundation",
+    "hash": "6f0c72eb9c90c40a28bcf351bb6ff8d0c8c8b3578a3a0d11e647aae9d113f271",
+    "when": 1790525683157
+  },
+  {
+    "tag": "0002_design-system-foundation",
+    "hash": "2b06b4efc9758157bafd963bf4eec625eaa7d22eb967b83fa85b80a5ba7c32e3",
+    "when": 1790537698702
+  },
+  {
+    "tag": "0003_action-foundation",
+    "hash": "31ad42ead532fbbd0eec60c265c535df069509710c8e6f28e6aff1137fa29a01",
+    "when": 1790558322905
+  },
+  {
+    "tag": "0004_navigation-foundation",
+    "hash": "9b7da026fdcdb6e1c8d0f88072da44b5424d5184ec7204744f77cd0fe80f444d",
+    "when": 1790600904099
+  },
+  {
+    "tag": "0005_asset-foundation",
+    "hash": "69f0886e36a64ede3f4ad5fd00e2477d779215b57e447712d7f8ddc2b0a20b8c",
+    "when": 1790641266624
+  },
+  {
+    "tag": "0006_managed-site-terminology",
+    "hash": "916b37ef27eba28149f1093a170993026f080a5258276d59c30180d1c2a83180",
+    "when": 1790959692569
+  },
+  {
+    "tag": "0007_contact-foundation",
+    "hash": "5a06eab60dd5494c1c7506e60b7902b08f91f8c63df50cc97788a9fd7e6a0108",
+    "when": 1791067838170
+  },
+  {
+    "tag": "0008_canonical-foundation",
+    "hash": "20ecfcbaa366aa7a11f95a7d34639b8d306da333e56fcad04983863d778f63e2",
+    "when": 1791330177661
+  },
+  {
+    "tag": "0009_media_acquisition",
+    "hash": "96c48b375220956e309d5a825b0b27d144a687ad9dba71bd1c5d798805f1b992",
+    "when": 1791484096111
+  },
+  {
+    "tag": "0010_progressive_intake",
+    "hash": "4b84cd175fc043ca55f770e5fd2f4d85a0173a621f86805c95d4db6b7ce371ae",
+    "when": 1791984652575
+  },
+  {
+    "tag": "0011_activation_cases",
+    "hash": "48f6675ea7b1668d1a56683b0a5de43ce2dfabf5258e03f9ff0df8f194cd8aba",
+    "when": 1792461300193
+  },
+  {
+    "tag": "0012_activation_customer_binding",
+    "hash": "e2f57d74a3ed94b927b5b7b8d9639c1ceef6b31997c7009fae99a307500a817b",
+    "when": 1792505989054
+  },
+  {
+    "tag": "0013_site_change_proposals",
+    "hash": "58c2aac5fc58356bcbc9945c391f7068607e565880d071fe6ffb0361cdd6f2b6",
+    "when": 1792523646680
+  },
+  {
+    "tag": "0014_site_content_releases",
+    "hash": "4e9c03a0b5d987b3c48da63a42b35037c935719b697a89db783f102e5ef68d78",
+    "when": 1792530598458
+  },
+  {
+    "tag": "0015_managed_site_hostnames",
+    "hash": "f48157697d136c6ab2b0368cc90054dbd7384aad590e84d42313065b1dc7e1da",
+    "when": 1792713063729
+  }
+]

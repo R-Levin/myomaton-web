@@ -1,5 +1,11 @@
 # PostgreSQL and managed-object recovery baseline
 
+The [managed PostgreSQL recovery foundation](managed-postgres-recovery.md) adds a
+separate application-owned contract. It does not replace this controlled-cluster
+path. PG17 fresh bootstrap uses an explicit, checksum-pinned 0006 compatibility
+adapter; historical migration content remains immutable. No external provider has
+been provisioned.
+
 ## Managed Site proposal evidence
 
 The [durable proposal adapter](content-authority-and-editing.md#durable-postgresql-adapter)
