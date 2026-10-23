@@ -11,6 +11,12 @@ HTTP editor. The bounded proposal extension below adds explicit authority and
 exact approval. The separate disposable content-release foundation below can apply
 that candidate; production identity and go-live remain unavailable.
 
+Current implementation checkpoint: shared development has migrations 0000–0015
+applied (16 total). The earlier 0013/0014 implementation notes below preserve their
+then-pending shared status; separate authorized migration checkpoints subsequently
+installed them. Empty shared proposal/release tables do not authorize shared
+operational execution. See the [current architecture boundary](platform-service-architecture.md#current-implementation-and-next-boundary).
+
 | Source | Owner and behavior |
 | --- | --- |
 | Canonical business truth | Identity, Offering, relationships, commercial structure, ownership and reusable knowledge belong to their existing canonical records. Projected fields refuse Page-local overrides. A future change must propose or update the canonical source with its review/version contract. |

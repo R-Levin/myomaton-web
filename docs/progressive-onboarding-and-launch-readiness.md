@@ -28,13 +28,19 @@ prices, Pages or business-specific answers platform invariants.
 
 | Status | Actual boundary |
 | --- | --- |
-| Implemented foundations | Canonical Business Knowledge/Offering and Page/Section state, bounded presentation/Actions/Navigation, managed media, development Contact semantics and local operator-QC tooling. These do not implement the Review, progressive intake, private delivery, billing or Launch Readiness workflow. |
-| Planned core | Information reuse, system-drafted/operator-approved Review, private Web delivery, commercial commitment gate, understanding confirmation, targeted gap analysis, Presence Direction with one Home concept, readiness item/state/responsibility tracking and final go-live approval. Partly manual procedures still need explicit ownership and verification. |
+| Implemented locally / development | Canonical Knowledge/Offering and rendering/media/Contact/QC foundations; versioned progressive development intake; local Review synthesis/revisions/approval; bounded activation, canonical confirmation, proposals and content release/rollback; shared hostname C0/C1 isolation and PG17/PG18 recovery proofs. These are bounded implementations, not production onboarding or delivery authorization. |
+| Planned core / remaining completion | Private Review delivery, production commercial/understanding/gap handoff, fuller onboarding interview, Presence Direction/Home concept and operational readiness tracking/go-live. Existing foundations must gain their production authority and verification; manual procedures still need ownership/evidence. |
 | Commercial/legal/accounting review | MioPages working prices/installments, cancellation/nonpayment treatment, agreement, export entitlements and billing timing. No final terms or public offer is approved here. |
 | Future / maturing | Increasing automation of provider-specific tasks and account/access verification, richer analytics/reporting and reduced operator intervention where proven safe. Unattended Review delivery is not a launch requirement. |
 
-This is documentation only: no schema, runtime workflow, customer-state update,
-Free Review implementation, preview change or commercial launch authorization.
+This document supplies no schema, workflow or activation itself. Current development
+has 16 migrations and Draft D Revision 3 is APPROVED but undelivered; historical
+scope notes do not override the [current checkpoint](platform-service-architecture.md#current-implementation-and-next-boundary).
+
+The 100+ customer shared runtime is **P0 launch architecture**: many customer
+hostnames → shared runtime → immutable request-scoped tenant context → shared
+PostgreSQL → strict isolation. Initial C0/C1 same-process proof is implemented;
+real-provider proxy/cache behavior and capacity still require hosted verification.
 
 ## Provisional Free Review intake
 
@@ -322,6 +328,40 @@ may become Campaign/major Revamp/exceptional work. This is continuing managed ca
 not a traditional “here are the keys” handoff. Existing content and opportunity loops
 govern ongoing preparation, approval, measurement and learning.
 
+## Operational runbook status
+
+This is the current procedure inventory, not a new task system or a claim that
+hosted operations have run. The [deferred register](deferred-architecture.md) owns
+work/triggers; the [architecture assumptions](platform-service-architecture.md#hosted-assumptions-and-proof-questions)
+own unresolved hosted facts. Assign an accountable operator and record evidence
+before each applicable activation. A reviewed manual first-customer procedure can
+suffice; automation is not the definition of ready.
+
+| Procedure | Status | Remaining boundary / trigger |
+| --- | --- | --- |
+| Deployment | Partial | Builds are repeatable; document and verify actual host startup/configuration/deployment before hosted operation. |
+| Migrations | Sufficient locally; partial hosted | Ordered replay, pinned history and refusal are proven; verify hosted authority, compatibility, backup and recovery before hosted migration. |
+| Application rollback | Partial | Code rollback is distinct from DB/content rollback; define the compatible hosted release/configuration procedure before live deployment. |
+| Database recovery | Sufficient locally; partial hosted | Isolated semantic/security/data recovery exists; verify actual provider access/target/cutover before real hosted data. |
+| Media recovery | Sufficient locally; partial hosted | Bytes and matching references restore; prove hosted persistence, independent copy and recovery before real hosted media. |
+| Managed PostgreSQL recovery | Sufficient locally; partial hosted | PG17→17/18 logical recovery and roles proven; provider privileges/TLS/exit remain empirical. |
+| Monitoring | Missing P0 operational procedure | Policy exists; assign health/error/resource/backup alert ownership and response before public operation. |
+| Incident handling | Partial | Disaster-recovery sequence exists; assign triage, communication/escalation and scoped intervention before launch. |
+| Patching / updates | Partial | Centralized update policy exists; name owner, review cadence, validation and rollback before launch. |
+| Provider failure | Partial | Recovery/portability mechanics exist; verify environment replacement and authorized cutover before relying on hosted state. |
+| Credential rotation | Partial | Protected-storage policy exists; verify environment-specific recovery/revocation/rotation before production access. |
+| Customer exit / export | Deferred | Ownership/portability contract exists; supply usable data/media export and handoff procedure before applicable real-customer commitments/offboarding. |
+| Cancellation / suspension | Partial | Commercial direction exists; validate terms, authority, communications and restoration/exit treatment before offering them. |
+| Independent external backup | Deferred | AWS is available, not configured; authorize and verify an independent destination/retention/restore before relying on real hosted customer state. |
+| Hostname / domain changes | Partial | Registry and local isolation proven; establish authorized DNS/TLS/mail-preserving changes, reassignment and rollback before real domains. |
+| Restoration / cutover | Partial | Isolated restoration is proven; live replacement/traffic switch needs explicit authority, environment procedure and post-cutover checks. |
+
+Richer monitoring dashboards, automated provider procedures and advanced reporting
+are P1/maturing improvements. Basic actionable monitoring, agreed lead handoff,
+security and usable recovery remain applicable P0 requirements; they are not
+postponed merely because manual work is allowed. Synthetic hosted proof may test
+these dependencies without authorizing real customer data or public workflows.
+
 ## Readiness model versus operational runbooks
 
 The platform readiness model defines **what must be true, who owns it, state and
@@ -345,5 +385,6 @@ retention remains P4. No new gate IDs or automatic closure of existing gates.
 C0 should test shared intake reuse, operator Review effort, optional teaser value,
 commercial clarity, targeted questions, one direction/Home concept, readiness
 ownership/evidence, lead handoff, controlled cutover and Ongoing continuity. These
-are proving goals, not implemented workflows, numerical service entitlements or
-permission to launch. Free Review implementation remains a later authorized slice.
+are proving goals, not claims that the complete production workflow exists,
+numerical service entitlements or permission to launch. Development Review/intake
+and local approval now exist; private delivery and production completion remain gated.

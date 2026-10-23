@@ -6,6 +6,24 @@ path. PG17 fresh bootstrap uses an explicit, checksum-pinned 0006 compatibility
 adapter; historical migration content remains immutable. No external provider has
 been provisioned.
 
+## Current local boundary
+
+As verified at implementation checkpoint `7bd79c02048e7537074463fc148122fc728dc7a1`,
+shared development is PostgreSQL 18.6 with 16 migrations (0000–0015), zero pending,
+empty hostname/activation/proposal/release domains and five unchanged live managed
+objects. The local encrypted-H:/scheduled-backup gate is SATISFIED; hosted recovery,
+independent off-provider backup and production readiness remain separate obligations.
+No scheduler/destination/configuration change is made by this reconciliation.
+
+The proof narratives below preserve their original migration counts, fingerprints,
+dates and authorization boundaries. They are historical evidence, not instructions
+to reset current state. Current procedure status is indexed in
+[operational readiness](progressive-onboarding-and-launch-readiness.md#operational-runbook-status);
+[architecture](platform-service-architecture.md#current-implementation-and-next-boundary)
+owns current checkpoint/provider direction. Local Review approval is now implemented
+and Draft D Revision 3 is APPROVED, undelivered; older synthesis/approval deferrals
+below refer to their dated checkpoints.
+
 ## Managed Site proposal evidence
 
 The [durable proposal adapter](content-authority-and-editing.md#durable-postgresql-adapter)
@@ -13,8 +31,10 @@ adds migration 0013's `site_change_proposals`, `site_change_revisions` and
 `site_change_events`. Once separately authorized/applied, these normal PostgreSQL
 tables are automatically included in existing custom-format backups, manifests,
 all-table content comparison and semantic/security recovery checks. No exclusion,
-scheduler, destination or backup mechanism changes are needed. This task leaves
-shared development at 13 applied migrations; 0013 is pending, not installed.
+scheduler, destination or backup mechanism changes are needed. **Historical 0013
+implementation checkpoint:** it left shared development at 13 migrations with
+0013 pending. Later authorized application installed it; current shared state is
+the 16-migration boundary above.
 
 The [private recovery proof](../tests/integration/site-proposal-recovery.test.ts)
 uses only generated disposable databases/clusters and the existing `backup`,
@@ -42,7 +62,8 @@ release recovery test uses the existing custom-format archive, checksum,
 semantic/security, sequence, all-table and managed-object restore checks. Current
 content and immutable release/rollback history must agree after recovery; no
 runtime inspection HTML or local ledger supplies missing correctness evidence.
-0014 remains unapplied to shared development in this implementation task.
+Historically, that implementation proof left 0014 unapplied. A later authorized
+checkpoint installed it; this sentence does not describe current migration state.
 
 The recorded durable-intake recovery checkpoint had eleven migrations (ordered 0009 then
 0010), an empty acquisition domain and one synthetic durable Review intake/submission.
@@ -55,7 +76,8 @@ remained intact. Scheduler/encryption configuration and normal exclusions are un
 
 Customer-tables-only fingerprint (19 tables, excluding the journal) remains
 `b3e924ef1d62943742c567fbc950f9892d04be64d3aba31dc0d546e154d937a4`.
-The existing combined customer-plus-journal definition now gives
+At that eleven-migration checkpoint, the existing combined customer-plus-journal
+definition gave
 `5db2726ad9b83cb8954cd7f29512f0a7d48dd731024b106b0d06d1f92cd177ea`;
 the historical nine-migration fingerprint below is not redefined.
 
@@ -63,7 +85,9 @@ Human Review/UX evidence remains outside shared prospect storage in the separate
 preserved-development-evidence bundle `20261015T175502974Z_0894e5a0`, with exact
 accepted Git source bytes and its own isolated recovery proof. This is explicitly
 preserved development/test evidence, not an exception to normal backup exclusions.
-Public/production intake, Review synthesis and offsite AWS/S3 remain unauthorized.
+At that checkpoint, public/production intake, Review synthesis and offsite AWS/S3
+were unauthorized. Current local approval and provider boundaries are stated above;
+public delivery and AWS/S3 activation are still not granted by backup readiness.
 Earlier backup/scheduler checkpoints below retain their historical migration state.
 
 The verified backup on operator-approved `F:\MyomatonBackups` has passed an isolated
@@ -153,7 +177,7 @@ was needed. Native log hash:
 `b31313db70e69cfba3ff454b43e34fee2411ad427463c0b874bd5d71be9173f2`.
 
 At that scheduler checkpoint, migration 0010 remained unapplied. Durable prospect intake, Review synthesis,
-operator approval UI and delivery remain disabled/deferred. This checkpoint covers
+operator approval UI and delivery were disabled/deferred. That checkpoint covered
 backup/recovery tooling, comparison, tests and documentation only; it does not
 authorize further encryption changes, cloud configuration or intake activation.
 
@@ -378,9 +402,10 @@ so H: requires manual unlocking; fixed-data auto-unlock must not be enabled by
 silently changing C:. Confirm this operational limitation before task approval.
 
 The exact corrected action passed rehearsal and Windows Task Scheduler execution.
-The next daily trigger is 2026-10-16 at 03:00 America/New_York; that first calendar
-trigger has not yet occurred. The account must remain logged on and H: must already
-be unlocked. This is an accepted local operational constraint, not unattended
+At the 2026-10-15 installation proof, the next daily trigger was 2026-10-16 at
+03:00 America/New_York; its calendar execution had not yet been observed. This is
+not a current monitoring observation. The account must remain logged on and H:
+must already be unlocked. This is an accepted local operational constraint, not unattended
 recovery across reboot/sign-out. No automatic retry or retention deletion is enabled.
 
 ## Actual disaster recovery procedure
@@ -394,7 +419,9 @@ recovery across reboot/sign-out. No automatic retry or retention deletion is ena
    credentials. Do not obtain credentials from Git or an archive manifest.
 3. Verify artifact checksums/archive, restore into separate infrastructure, restore
    matching managed objects into a new volume and compare every recorded state/hash.
-4. Check migration prefix (do not automatically apply pending 0010), customer scopes,
+4. Check the exact migration prefix recorded for the selected restore point and its
+   compatible application release; restoration does not authorize applying pending
+   migrations. Verify customer scopes,
    relationships, contact/prospect state, expiry/privacy requirements, roles/ACLs,
    source/restore fingerprints, object references/bytes and application/media serving.
    Verify backups/schedule on recovered infrastructure and resolve every discrepancy.

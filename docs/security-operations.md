@@ -109,9 +109,12 @@ identity or unauthorized actions. UUID knowledge is not permission. Review tenan
 boundaries explicitly before multi-customer production, including routing, queries,
 media, caches, management, background work and exports where present.
 
-Current [routing](managed-site-routing.md) selects one explicit deployment; it does
-not implement production host-based tenant selection (P9). Existing public active
-content is not a private-content or draft/publish authorization model.
+Current [shared routing](shared-hostname-routing.md) implements hostname-based
+immutable request context with local C0/C1 isolation proof. The older
+[single-site selection](managed-site-routing.md) is nonproduction compatibility,
+not the production launch model. Hosted proxy/CDN/TLS verification and production
+authorization remain P9/P18/P19 gates. Public active content is not private-content
+or draft/publish authorization.
 
 The [local Managed Site proposal boundary](content-authority-and-editing.md#reviewable-managed-site-change-proposals)
 requires operation-specific trusted scope grants and a separately represented
@@ -260,8 +263,12 @@ without platform lock-in (P5/P6/D4). This also aids recovery, but an export is n
 automatically a complete platform backup, and a backup is not necessarily a usable
 customer export.
 
-This document adds no runtime controls, hosting configuration or recovery system.
-Existing routing and Asset checks are bounded implementations, not evidence that
-production management, multi-customer isolation, uploads or disaster recovery are
-complete. Guided onboarding, future authenticated management and production launch
-must satisfy the applicable gates in the register. P9/P10 remain deferred.
+This document states policy, not new runtime controls or hosting configuration.
+Routing and local recovery have bounded proofs; hosted isolation, production
+management, general uploads and production disaster recovery remain unverified.
+Guided onboarding, authenticated management and launch must satisfy the register;
+hosted P9 verification and the remaining P10 scope are still required.
+The [Human/AI charter](platform-service-architecture.md#human-and-ai-operating-charter)
+owns project-level action authority; the [runbook status](progressive-onboarding-and-launch-readiness.md#operational-runbook-status)
+distinguishes local sufficiency from missing production procedures. Neither policy
+nor adjacent approval authorizes provisioning, live restore, deletion or spend.

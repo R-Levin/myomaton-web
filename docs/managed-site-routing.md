@@ -9,6 +9,12 @@ The terminology/schema transition is documented in the
 
 ## Explicit deployment selection
 
+This section describes legacy/nonproduction single-site compatibility. Required
+production mode is [shared hostname routing](shared-hostname-routing.md), which
+derives immutable request-scoped tenant identity and has local C0/C1 proof. Hosted
+proxy/CDN/TLS behavior and production authorization remain unverified. The Page
+path/rendering rules below are reused within that resolved context.
+
 `lib/platform/managed-sites/deployment.ts` requires `WEB_PRESENCE_ID` and
 `MANAGED_SITE_ID` together. They select an exact active ownership relationship,
 never the request Host, a name search or an implicit customer. Renaming does not
@@ -24,9 +30,9 @@ changes site/deployment selection, Navigation, DNS or TLS. Exact content rollbac
 does not change those routing rules. Local
 [change proposals](content-authority-and-editing.md#reviewable-managed-site-change-proposals)
 render isolated candidates without changing these active routes; exact approval
-does not publish or switch destinations. Production host/domain selection remains deferred at
-P9 in [the architecture register](deferred-architecture.md). Replace the selection
-boundary when that trigger is reached, retaining shared Page rendering.
+does not publish or switch destinations. Host/domain resolution is now implemented
+locally; P9 in [the architecture register](deferred-architecture.md) retains hosted
+verification obligations rather than deferring the entire routing implementation.
 
 ## Paths and destinations
 

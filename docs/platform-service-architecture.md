@@ -19,6 +19,20 @@ ownership explicit while leaving provider procedures to later integration runboo
 
 ## Architectural principles
 
+- Deliver a managed service with bounded customization, not bespoke site-building;
+  preserve the [service model](web-presence-service-model.md) and customer ownership.
+- PostgreSQL remains the database architecture. Launch for 100+ customers uses
+  many hostnames → shared runtime (or small shared pool) → immutable request-scoped
+  tenant context → shared PostgreSQL → strict isolation. C0/C1 is the initial
+  same-process proof; see [shared routing](shared-hostname-routing.md).
+- Confirmed business knowledge is distinct from intake, inference and Review
+  recommendations. [Canonical authority](canonical-foundation.md) and
+  [content authority](content-authority-and-editing.md) govern promotion.
+- Content approval, release and go-live are separate authorities under the
+  [journey](customer-journey-and-change-management.md) and
+  [readiness](progressive-onboarding-and-launch-readiness.md) contracts.
+- [Managed recovery](managed-postgres-recovery.md) verifies application-owned state
+  and provider dependencies without pretending to recreate provider infrastructure.
 - Keep the core domain provider-neutral. Organizations, Web Presences and Managed
   Sites must not depend on 20i vocabulary, identifiers or implementation assumptions.
 - Use a centralized MioPages control plane with MioPages-owned operator and
@@ -75,9 +89,11 @@ host/custom-domain routing, TLS/HTTPS, deployment state and content serving from
 the appropriate approved/configured state. It may initially run alongside the
 control plane, but the delivery role remains separable.
 
-The current [routing contract](managed-site-routing.md) uses explicit deployment
-selection. Production host/domain routing and deployment orchestration still require
-their implementation and readiness gates; this document does not activate them.
+The current [shared routing contract](shared-hostname-routing.md) resolves hostnames
+to exact tenant context and has local C0/C1 proof. The older
+[Page routing contract](managed-site-routing.md) also documents nonproduction
+single-site compatibility. Hosted proxy/CDN/TLS, deployment orchestration and
+production authorization remain separate gates.
 
 ### Ancillary customer infrastructure
 
@@ -212,8 +228,9 @@ WordPress hosting where appropriate, and HostShop billing/provisioning. Managed,
 cloud or VPS infrastructure for the MioPages runtime is another possibility to evaluate.
 
 These are provider/deployment choices, not product-domain assumptions or verified
-service entitlements. Whether the core MioPages runtime itself will be hosted on
-20i remains undecided. Existing reseller access is useful leverage, not a dependency.
+service entitlements. The preferred hosted proof is 20i Managed Cloud for the
+shared runtime with Supabase managed PostgreSQL. Neither is permanently selected
+or provisioned for this proof. Existing reseller access is useful, not a dependency.
 
 ## Core runtime / server
 
@@ -222,9 +239,9 @@ central platform and Managed Site delivery. Prefer a managed server/cloud servic
 over unnecessary low-level infrastructure administration when cost and control are
 acceptable. Managed hosting still requires accountable security, monitoring and recovery.
 
-An initial appropriately protected/managed environment may colocate reverse
-proxy/TLS, the Next.js MioPages application, workers/background services and
-PostgreSQL. Logical separation does not require separate machines on day one.
+The preferred proof separates the 20i application runtime from candidate Supabase
+PostgreSQL. Protected colocation remains an architectural option, not the current
+proof plan. Logical separation does not always require separate machines.
 
 Scale or reliability needs may later separate PostgreSQL, workers, object/Asset
 storage, Managed Site delivery and application/control-plane nodes. Deployment
@@ -292,19 +309,128 @@ migrate every existing customer service into MioPages or require 20i.
 | MioPages-managed Managed Site TLS, independent of reseller wildcard SSL | TLS/reverse-proxy implementation |
 | Customer mailbox email separate from transactional email | Transactional email vendor and delivery implementation |
 | Provider-neutral service/entitlement state and billing-provider boundary | Final billing integration, synchronization and enforcement |
-| 20i as useful initial provider candidate, not architectural dependency | Whether 20i hosts the central runtime or any particular ancillary service |
+| 20i Managed Cloud preferred for the shared-runtime proof, not a permanent dependency | Hosted feasibility and final production selection |
 | Separable data, delivery and recovery responsibilities | Object storage provider and AWS/S3 or alternative off-machine backup implementation |
 
-## Implications for current development
+## Current implementation and next boundary
 
-Continue product feature work without prematurely implementing provisioning
-infrastructure. New schemas/services/interfaces must avoid assuming that all
-customers use 20i, MioPages DNS or MioPages mailbox hosting; that HostShop is the
-customer database; or that operator/customer identity equals provider identity.
+Verified implementation checkpoint: `7bd79c02048e7537074463fc148122fc728dc7a1`,
+Add managed PostgreSQL compatibility and recovery. Shared development is PG18.6,
+16 migrations (0000–0015), zero pending; hostname/activation/proposal/release domains
+are empty. Five live managed objects remain unchanged. Development intake and local
+Review approval are implemented; Draft D Revision 3 is APPROVED and undelivered.
+Earlier Review-frontier notes are superseded by this summary and the domain docs.
 
-The immediate product-development frontier remains:
+PG17.11 bootstrap through 0015, managed roles/workflows, PG17→PG17 and PG17→PG18
+logical recovery, PG18 controlled recovery and C0/C1 isolation are proven locally.
+They do not prove provider permissions, production authentication or hosted capacity.
+The next execution boundary is a separately authorized synthetic hosted proof after
+this documentation review/checkpoint. No external provisioning is authorized by
+this document. The [deferred register](deferred-architecture.md) owns remaining work.
 
-1. Operator-friendly Prospect Q&A presentation.
-2. Claim-level Review evidence/provenance presentation.
-3. Durable question-wording context.
-4. Subsequent human Review Revision 2.
+## Recent durable decisions
+
+These concise records preserve the accepted direction and rationale; they are not
+provider entitlements or claims that hosted tests have run.
+
+| Decision | Rationale and boundary |
+| --- | --- |
+| Retain PostgreSQL over MariaDB after the portability audit | Current integrity depends on PostgreSQL JSONB, PL/pgSQL guards, deferred constraints, advisory locking and migration/recovery semantics. A MariaDB move would require porting and re-proving these contracts rather than replacing a connection setting. It is not the current launch path. |
+| Shared runtime rather than one deployment per customer | Central deployment/patching and a shared pool avoid per-customer runtime overhead and maintenance. The 100+ customer model requires strict isolation and explicit shared-platform blast-radius review. Capacity remains unproved. |
+| Hostname-based tenant resolution | Many customer domains must resolve an exact active Web Presence/Managed Site per request. Global mutable tenant selection and browser-supplied tenant IDs cannot grant scope. |
+| C0 plus distinct C1 in the initial same-process proof | A single customer cannot demonstrate refusal of cross-tenant data/media or cache/context leakage. MioPages alone is insufficient evidence. |
+| Prototype Supabase before committing to a self-managed 20i PostgreSQL VPS | Seek reduced database administration while preserving standard PostgreSQL and application-owned recovery. Acceptance depends on the hosted proofs below. If required permissions, connectivity, recovery or capacity cannot be met safely, review the 20i PostgreSQL DB VPS fallback and its administration burden with the human owner; do not provision it automatically. |
+| Prefer the 20i application/hosting ecosystem | Existing reseller relationship and useful hosting/domain/mail infrastructure justify evaluating Managed Cloud first, without making provider vocabulary or APIs product dependencies. |
+| AWS is available for independent off-provider backup | A separate failure domain can reduce dependence on the application/database provider. Availability of an account is not configured backup, approved spend or verified recovery. |
+| Separate application recovery from provider infrastructure | Own and verify application schema/data/history/media and required privileges/dependencies. Provider roles, extensions, settings and services require explicit target contracts, not a claim that MioPages owns or can clone the provider cluster. |
+
+## Human and AI operating charter
+
+The human product owner retains product, commercial, customer and acceptable-risk
+authority, including explicit authorization for material infrastructure, commercial
+and destructive actions. ChatGPT supports continuity, architecture, sequencing,
+synthesis, review, thread checkpoints and conversion of business intent into bounded
+tasks. Codex performs bounded inspection, implementation, tests, verification and
+evidence/reporting. AI assistance has no independent production authority.
+Material customer, infrastructure, commercial or destructive actions require
+explicit human authorization for that operation and environment.
+
+| Operation | Authority boundary |
+| --- | --- |
+| Analyze / inspect | Read-only evidence gathering within authorized scope; access is not permission to change state. |
+| Propose / prepare | Produce a reviewable recommendation or artifact; neither authorizes execution. |
+| Approve | Accept the identified substance/revision/scope, not every adjacent operation. |
+| Provision / incur cost | Explicit human authorization for the resource, environment and material expenditure. |
+| Mutate / migrate | Explicit authority for the affected customer/data/schema operation and environment; honor baseline/refusal guards. |
+| Restore | Isolated rehearsal and destructive live restore/cutover are separate scopes; live replacement needs explicit human authority. |
+| Publish | Content approval, release execution, external delivery and go-live retain their separate mandates. |
+| Delete | Explicit human authority for material deletion, scope and recovery/retention consequences. |
+
+Authorization already granted for a bounded task remains usable within that scope;
+analysis/proposal or adjacent approval does not grant destructive or external-cost
+authority. No project-management RBAC system is implied.
+
+After launch the loop continues: **observe → analyze → decide → authorize →
+implement → verify → release → monitor → learn**. Apply it to infrastructure,
+performance, content, measurement, leads/conversion, recovery and provider changes.
+Each actionable item needs an owner, evidence, scoped authority, verification and
+follow-up; a manual record can suffice. Use the existing
+[service cadences](service-operations-model.md#operating-cadences) and
+[opportunity model](opportunity-and-optimization-model.md), not a parallel backlog.
+
+## Hosted assumptions and proof questions
+
+These are unproven facts, distinct from decisions and completed local proofs.
+The human owner authorizes each proof; its bounded task identifies executor and
+verification evidence. Failures return for a decision rather than silent adaptation.
+
+| Question | Proof required | Consequence / decision | Revisit trigger |
+| --- | --- | --- | --- |
+| 20i Managed Cloud Node/runtime behavior | Deploy the reviewed build; verify supported runtime, startup and same-process C0/C1 responses. | Accept the runtime contract or reconsider hosting. | Authorized synthetic hosted deployment. |
+| Outbound connectivity/egress | Verify app-to-DB DNS/TCP/TLS, restrictions and failure behavior without leaking credentials. | Accept topology or review a supported alternative. | Before hosted DB connection. |
+| Persistent media | Verify durable byte storage, restart/redeploy behavior, access isolation and independent restore. | Select a proven storage contract; ephemeral disk is insufficient. | Before hosted media claims or real data. |
+| Restart supervision | Verify process restart, logs, configuration recovery and owned failure response. | Establish a manual/managed supervision procedure. | Synthetic runtime proof. |
+| Actual Supabase PostgreSQL version | Inspect actual major and capabilities; rehearse the pinned migration chain. | Use proven PG17/18 path or stop for compatibility review. | After separately authorized project creation. |
+| Roles/default ACLs | Verify migration ownership, runtime/backup least privilege, default grants and future-object behavior. | Accept only a supported effective privilege model. | Hosted bootstrap and role proof. |
+| TLS/network/direct versus session-pooler | Verify trust and network path, transaction/session/advisory-lock behavior and dump/restore access for the chosen endpoint. | Choose a tested endpoint; unsupported pooler behavior refuses. | Before hosted workflows or recovery proof. |
+| Hosted recovery/provider exit | Export application-owned bundle plus media; independently restore and verify histories, privileges and C0/C1 isolation. | Accept recovery contract or review provider/fallback. | Before real hosted customer data. |
+| Latency/connection pressure/capacity | Measure representative traffic, pool multiplication, locks, resource limits and isolation under load. | Size/bound the shared runtime; two tenants do not prove 100-customer capacity. | Synthetic hosted load proof and material scaling changes. |
+| AWS backup integration | Verify protected access, independent destination, retention and usable restore with configuration/secrets recovery. | Accept off-provider resilience or review another destination. | Separately authorized backup setup, before relying on real hosted state. |
+| Transactional email | Verify sender identity, delivery/retry/reconciliation, recipients and mail-DNS preservation. | Enable only the proven delivery scope. | Before public lead/Review/system email promises. |
+| Production operator authentication | Verify caller identity, operation-specific authority, tenant isolation and credential/session lifecycle. | Keep management private until verified and authorized. | Before exposing production management. |
+
+## External resource inventory
+
+**No 20i/Supabase/AWS test or production resources have been provisioned for this
+hosted proof as of this reconciliation. The inventory below is intentionally empty.**
+Existing 20i account access and operator-stated AWS availability are account context,
+not resources created by this project checkpoint. This is not an account-wide audit.
+
+Distinguish **available account**, **candidate**, **authorized to provision** (a
+specific human decision), and **provisioned** (an observed resource). Candidate
+selection is not provisioning authorization. Supabase remains a prototype candidate.
+
+| Provider | Resource | Environment | Region | Purpose | Non-secret identifier | State | Owner | Dependencies | Data classification | Recovery role | Replacement / decommission reference |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+Future entries may include role names, domain/hostname assignments, backup
+destinations and certificate boundaries, or link to a reviewed non-secret record.
+Git holds durable metadata/decisions. Passwords, API keys, connection strings,
+private keys and recovery material belong in approved protected storage/provider
+accounts, never this table. Temporary test URLs/processes and detailed logs belong
+in restricted ignored local state, not the durable resource inventory.
+
+## External provisioning checkpoints
+
+For each material provider change, record resource/provider/environment/region,
+non-secret identifier, purpose, dependencies, accountable owner, current state,
+authorization scope, synthetic versus real data, verification/evidence, remaining
+unknowns, backup/recovery responsibility and rollback/replacement/decommission
+procedure. Update the inventory and link relevant domain runbooks; record the Git
+source/configuration checkpoint and separately protected configuration dependencies.
+An unsuccessful attempt still needs its actual resource state recorded.
+
+Git records metadata and decisions; it does not itself provision or recover external
+resources. A source checkpoint is not proof of live provider state. Readiness uses
+the existing [state/responsibility model](progressive-onboarding-and-launch-readiness.md#launch-readiness-as-a-tracked-workflow).
+No new management application, ADR framework or parallel work register is introduced.

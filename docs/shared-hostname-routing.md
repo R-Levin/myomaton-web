@@ -121,9 +121,12 @@ on the same port, then `unknown.localhost` for refusal. Browsers normally resolv
 Node fetch rewrites Host; the test's [HTTP client](../tests/helpers/host-request.ts)
 sets the actual wire header. Stop the viewer with Ctrl+C to remove its schema/media.
 
-Runtime output is ignored evidence, never source. Migration 0015 is tested only in
-disposable PostgreSQL in this slice and remains unapplied to shared development.
-No real customer, domain, DNS, approved Review or provider resource is changed.
+Runtime output is ignored evidence, never source. **Historical implementation
+boundary:** that slice tested 0015 only in disposable PostgreSQL and did not apply
+it to shared development. A subsequent authorized checkpoint applied 0015; shared
+development now has 16 migrations, zero pending and an empty hostname registry.
+No real hostname/DNS binding or provider resource has been created for hosted proof.
+See the [current architecture boundary](platform-service-architecture.md#current-implementation-and-next-boundary).
 
 ## Capacity limits
 

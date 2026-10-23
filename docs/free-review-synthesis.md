@@ -4,13 +4,16 @@
 
 Development/manual synthesis, validated structured Review content, evidence mapping,
 immutable local revisions and exact operator approval are implemented. The substantive
-original-human MioPages Review remains **NEEDS_OPERATOR_REVIEW**. Only synthetic
+original-human MioPages Draft D Revision 3 is **APPROVED and undelivered** after
+explicit human authorization and persisted-state verification. Only synthetic
 artifacts exercise approval automatically. No email, prospect delivery, paid work,
 customer promotion, public operator surface or live text-provider dispatch exists.
 
-Human-inspected Draft D revision 3 is the current Review-quality target and remains
-unapproved. The experiment/checkpoint notes below describe their historical stages;
-human revisions now use the same immutable workflow without rewriting earlier work.
+Human-inspected Draft D Revision 3 is the current Review-quality target. Its digest
+remains `8c880b38bea80b864b639a45aa498337384bc74a9201a085509f11c746bfb1ef`;
+approval did not change content or deliver it. The experiment/checkpoint notes
+below describe their historical stages, including earlier unapproved states.
+Human revisions use the same immutable workflow without rewriting earlier work.
 
 The [progressive onboarding contract](progressive-onboarding-and-launch-readiness.md#concise-review-approval-and-delivery)
 owns the Review-to-launch workflow. [Conversion Architecture](conversion-architecture.md),
@@ -401,12 +404,14 @@ Approval binds exact revision number/content digest, source submission digest,
 evidence packet/version digest, operator identity, timestamp, note and all QC checks.
 Stale/superseded approval is refused. Approval is not delivery or publication authority.
 
-No migration 0011 is created: this slice's persistence is deliberately the local
+**Historical synthesis implementation boundary:** no migration 0011 was created
+by that slice; its persistence is deliberately the local
 disposable evidence store, not shared durable Review tables. It recovers through
 reopening the same validated store. A future shared/production adapter requires a
 separately reviewed additive migration, tenant/authorization/retention and isolated
-migration tests. Shared migrations remain exactly eleven; acquisition tables are
-neither reused nor activated. This does not claim production Review persistence.
+migration tests. At that checkpoint shared development had eleven migrations;
+later authorized activation/proposal/release/routing migrations brought it to 16.
+Those migrations do not create shared Review persistence or activate acquisition.
 
 ## Provider and operator tools
 

@@ -3,7 +3,7 @@
 Phase 1's [canonical foundation](canonical-foundation.md) implements local scoped
 knowledge/Offering writers, bounded immutable revisions, finite projections and explicit
 UUID deployment selection. This partially satisfies P1/P2 for these domains only;
-it does not close P7 authorization, P9 host routing, P11 onboarding, P12 measurement,
+it does not close P7 authorization, hosted P9 verification, P11 onboarding, P12 measurement,
 P13 intelligence or P14 production Contact. Retention beyond the revision capacity
 guard remains gated; no customer data is backfilled.
 
@@ -46,6 +46,36 @@ For each coherent implementation slice:
 3. Record material new deferrals, with an explicit trigger wherever possible and a reason when useful.
 4. Architecture review must distinguish genuine future requirements from speculative enhancements.
 5. Remove resolved items from the active list; preserve only a useful minimal decision or reference after resolution, not a growing completion log.
+6. At 10, 100 and 1000 customers, what happens to cost, connections, locking, operator effort, isolation, recovery and reversibility?
+
+## Current implementation boundary
+
+At implementation checkpoint `7bd79c02048e7537074463fc148122fc728dc7a1`, shared
+development is PG18.6 with 16 migrations (0000–0015), zero pending and empty
+hostname/activation/proposal/release domains. Local shared-hostname C0/C1 routing,
+development intake, local Review approval and bounded activation/proposal/release
+foundations exist. PG17/PG18 managed recovery and cross-major logical exit are
+proven locally. This does not activate shared/production release or public intake.
+
+This register remains the only active deferred-work register. The
+[architecture document](platform-service-architecture.md) owns current provider
+decisions, assumptions and resource metadata; specialist documents own mechanisms.
+No external resources are provisioned for the hosted proof. These are completion
+criteria for existing gates, not a new backlog or additional gate IDs:
+
+| Existing gate | Remaining scope and revisit trigger |
+| --- | --- |
+| P9/P18/P19 | Local hostname routing is implemented. Verify real-provider Host/proxy/CDN/TLS and C0/C1 isolation before hosted/production routing claims. The shared 100+ customer runtime is P0, not future scaling. |
+| P18/P20 | In the authorized synthetic hosted proof, verify 20i Node/runtime, egress, durable media and restart supervision, plus Supabase version/roles/default ACLs/TLS/direct-or-session-pooler and recovery. See the architecture assumption table for acceptance consequences. |
+| P18/P20 | AWS or another independently authorized off-provider backup needs destination/access, retention and restore proof before relying on real hosted customer state. Local encrypted H: proof is not off-provider resilience. |
+| P18/P19 | Measure hosted latency, connections, cross-tenant locking and representative load before capacity claims/production use, and after material topology changes. C0/C1 proof alone is not a 100-customer load test. |
+| P18/P20 | Revisit the 20i PostgreSQL DB VPS fallback if managed-provider requirements cannot be met safely; human review must accept administration/security/recovery burden and authorize any provisioning. No automatic fallback. |
+| P7/P19 | Production operator/customer authentication and operation-specific authority remain outstanding before exposing management; public routing never grants management authority. |
+| P14/P18 | Transactional email, Contact/lead handling, safe recipients, abuse/privacy/retention and actual delivery/reconciliation must verify before public workflow promises. Local forms and Review approval do not supply delivery. |
+| P12/P13 | Measurement and optimization remain planned under their existing evidence/privacy/approval gates. Minimum independent signals/reporting are required at launch; richer automation can mature later. |
+| P11 | The fuller onboarding interview remains intentionally deferred; revisit before production onboarding writes, reusing evidence and asking only material knowledge gaps. |
+| P11/P13/P21 | Optional illustrative Free Review Home concept remains deferred; revisit only in a bounded, reviewed experiment with adequate evidence and effort/value measurement. It is not approved customer truth or a free design promise. |
+| P11/P13/P21, P1/P2/P3/P7 | Authoritative onboarding Home direction remains deferred until sufficient confirmed knowledge supports Presence Plan checkpoint #2. Approved direction guides the build; actual-content and go-live approvals remain separate. |
 
 ## REQUIRED: Assets
 
@@ -97,14 +127,14 @@ complete; public/production activation remains closed.
 
 The [Free Review intake slice](free-review-intake.md) partially implements shared
 progressive intake under P11/P14 in local development only. Real canonical customer
-state remains unchanged. Shared development now has eleven migration rows and one
-synthetic durable intake/submission, with explicit development-only storage,
-scoped resume and an immutable submission. Disposable mode and the two original
-human evidence records remain separately preserved. Acquisition runtime is inactive.
-Production authorization,
-privacy/purge/export, distributed abuse defense, operator review/delivery and
-the remaining deployment/configuration and application-serving recovery proof remain required before
-activation; this slice does not close P4/P7/P13/P18–P20 or authorize launch.
+state remains unchanged. Shared development has 16 migration rows; the original
+durable-development intake checkpoint recorded one synthetic submission. Scoped
+resume and immutable submission are implemented; disposable mode and the two
+original human evidence records remain separately preserved. Acquisition runtime
+is inactive. Local operator Review approval is implemented and Draft D Revision 3
+is approved, undelivered. Production authorization, privacy/purge/export,
+distributed abuse defense, delivery and hosted deployment/recovery verification
+remain required before public activation; this does not close P4/P7/P13/P18–P20.
 
 The [customer journey and change-management contract](customer-journey-and-change-management.md)
 owns the intended Review-to-Ongoing flow. Reuse existing intake, intelligence,
@@ -142,10 +172,11 @@ The [Customer #1 Home v1 operator transition](myomaton-home-v1.md) uses a frozen
 expected-state guard for this bounded update; it does not complete those future
 workflows or make its source definition continuing authority over customer state.
 
-[Multi-page serving](managed-site-routing.md) is implemented within one explicitly
-selected active Managed Site, preserving P8 without a page-count cap. It introduces
-no customer-state writer or management surface. P9 remains deferred: deployment
-selection is explicit configuration, not request-host/domain tenant resolution.
+[Multi-page serving](managed-site-routing.md) preserves P8 without a page-count cap.
+[Shared hostname routing](shared-hostname-routing.md) now selects an exact active
+site per request and has same-process C0/C1 proof. Single-site configuration remains
+nonproduction compatibility. P9's hosted proxy/CDN/TLS verification remains open;
+local routing introduces no customer-state writer or management authority.
 Basic per-Page titles do not complete the capability catalog's production SEO track.
 
 [Page-target Actions](actions.md) now resolve stable Page UUIDs in the explicit
@@ -357,9 +388,11 @@ for future recommendations; this checkpoint implements no deferred capabilities.
 
 ## Media acquisition and external intelligence pipeline
 
-This is the high-priority next architecture slice after canonical promotion. Define
-the acquisition/provider boundary before implementing broader approved media rendering.
-It must address customer/current-site Asset reuse, permissioned stock integration
+Historically this was the next slice after canonical promotion. The bounded
+[acquisition foundation and pilot](media-acquisition.md) now exist; broader supported
+acquisition/production attachment remains gated. Extend the acquisition/provider
+boundary before broader approved media rendering. It must address customer/current-site
+Asset reuse, permissioned stock integration
 such as Pexels, deterministic SVG/chart-like graphics, and generated illustration/image
 providers. All paths need provenance/licensing, explicit approval, production
 eligibility and customer ownership; unresolved visual intent is not an eligible Asset.
@@ -368,8 +401,9 @@ Use an OpenAI/API provider abstraction where appropriate, with bounded cost,
 logging, retry, error/refusal behavior and audit records. Provider output and external
 intelligence cannot silently change canonical facts or approve rights. Review how
 approved managed AssetUsage replaces each unresolved visual role, while keeping FPO
-preview-only and maintaining explicit evidence/contribution permissions. This slice
-implements no acquisition pipeline, API integration or stock download.
+preview-only and maintaining explicit evidence/contribution permissions. The original
+architecture-only checkpoint implemented no pipeline/API/stock download; that is
+historical scope, not a claim that the later bounded pilot is absent.
 
 The [text draft foundation](content-authority-and-editing.md) retains canonical
 reconciliation and spelling/grammar hooks. Its bounded local
@@ -377,13 +411,15 @@ reconciliation and spelling/grammar hooks. Its bounded local
 now binds confirmed canonical sources, candidate revisions, readable preview and exact
 customer-authority approval in disposable proof. The
 [PostgreSQL proposal adapter](content-authority-and-editing.md#durable-postgresql-adapter)
-now preserves that history with migration 0013 and isolated restore proof; shared
-migration application/operational authorization, production authentication,
-customer UI and meaningful intelligence
-checks remain later boundaries; content editing never grants presentation control.
+now preserves that history with migration 0013 and isolated restore proof. Shared
+migrations through 0015 are applied; shared operational authorization, production
+authentication, customer UI and meaningful intelligence checks remain later
+boundaries; content editing never grants presentation control.
 
 The [bounded content-release foundation](content-authority-and-editing.md#controlled-content-release-and-rollback)
 now proves exact approved Page/Section application and latest-only rollback with
 immutable history in private disposable PostgreSQL. Shared/production release,
 deployment/go-live, DNS/TLS and production authorization remain separately gated.
-Migration 0014 is not applied to shared development by that implementation proof.
+The original implementation proof did not apply 0014 to shared development; it was
+subsequently applied in a separate authorized checkpoint. Installing its schema
+does not authorize shared release execution.
