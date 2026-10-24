@@ -356,6 +356,35 @@ boundaries, insufficient automation, unsuitable pricing or poor customer fit;
 investigate those causes instead of relying on unpaid bespoke effort. D6 already
 owns the durable economics principle; no actual prices are established here.
 
+### Cost-to-serve and provider expenses
+
+Track real cost-to-serve as the service matures, alongside operator effort. Separate
+**fixed platform costs** from **variable/per-customer costs**, and record whether
+each cost is **absorbed** by MioPages or **passed through** transparently. Cost driver
+and commercial treatment are different dimensions; avoid counting one expense twice.
+
+Include actual 20i Managed Cloud/runtime, Supabase/PostgreSQL, AWS backup/storage,
+email, domains, paid SSL exceptions, applicable CDN/provider fees and other external
+services. Record provider/item, observation period, actual amount/billing basis and
+customer attribution where applicable. These are management records, not a new
+accounting system, assumed vendor prices or public service entitlements.
+
+For [paid SSL exceptions](platform-service-architecture.md#dns-and-tls--https), track
+the number of exception customers, affected customer, unit/annual certificate cost
+and absorbed versus passed-through treatment. Initial absorption of a modest
+annual cost is allowed by the operating direction; later transparent pass-through
+needs appropriate commercial agreement. Neither policy changes canonical pricing.
+
+Use actual expenses and service effort in recurring margin, pricing and plan-design
+reviews. Repeated exceptions may justify automation or architectural change, but
+review total implementation/maintenance burden and risk rather than certificate
+price alone. At 10/100/1000 customers ask whether SSL exceptions justify automation,
+operator-assisted Google grants are a bottleneck, accounting/entity/insurance
+processes need to mature, and provider costs remain sensible. Set no customer-count or revenue threshold
+without evidence. Material pressure can promote an existing deferred item to P0
+through the [register's review workflow](deferred-architecture.md#slice-workflow),
+not by silently changing prices or approving infrastructure work.
+
 ## Commercial structure, retention and fit
 
 One broadly inclusive Ongoing service absorbs normal updates, ordinary additions/

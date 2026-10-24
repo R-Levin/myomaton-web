@@ -212,6 +212,26 @@ adds no customer Pages or authoring workflow; P9 and P10 remain deferred.
 | P25 | Separately prove GA4 service-account/property-grant access on authorized Myomaton and MioPages properties, including useful report coverage/configuration, ownership/tenant binding, least privilege, credential/revocation behavior and repeatability. Record the decision rather than default to brittle per-customer refresh-token infrastructure. See [spike acceptance](measurement-and-analytics.md#spike-acceptance-and-refusal-boundaries). | Near-term technical spike, before selecting or promising GA4 onboarding. Reuse P7/P18 for access/secrets and P12 for reporting; absence of usable GA4 is not a core-service blocker. |
 | P26 | Define an understandable commercial commitment/payment handoff with separately identifiable Launch and Ongoing scope, trusted confirmation, retry/reconciliation safeguards and authority to begin paid work. Validate installment, cancellation/unpaid Launch, billing and agreement treatment through commercial/legal review before use; hypotheses are not final terms. Material supported expansion needs agreed scope/cost before execution. | Before accepting commercial commitments/payments or offering installments. Manual/external tools may bridge if the same boundaries are satisfied; native billing software is not required by this gate. Reuse P7/P18 for access/secrets and P11 for onboarding, with no payment-data collection in ordinary intake/logs. See [commercial handoff](customer-journey-and-change-management.md#commercial-handoff-and-paid-onboarding). |
 
+### Operating and business readiness under existing gates
+
+These decisions extend existing gates, not a parallel register. Detailed ownership
+stays with [measurement](measurement-and-analytics.md),
+[DNS/SSL architecture](platform-service-architecture.md#dns-and-tls--https),
+[service economics](service-operations-model.md#cost-to-serve-and-provider-expenses)
+and [business readiness](progressive-onboarding-and-launch-readiness.md#business-readiness).
+At each slice/recurring management review, assess actual evidence and promote an
+applicable deferred obligation to P0 when its trigger is reached; no fixed customer,
+revenue or calendar threshold is invented here.
+
+| Existing gate | Deferred scope / operating direction | Revisit trigger |
+| --- | --- | --- |
+| P12/P24/P25, P7/P18 | Prefer operator-assisted/server-to-server Google access: MioPages service-account GA4 grants where practical; test Search Console the same way. Dedicated MioPages operator Google account is fallback. Customer-facing OAuth remains deferred. Build a restrained Performance Snapshot using normalized daily aggregates and useful traffic/search/action/opportunity evidence, not raw analytics exhaust. | Measurement slice: separately prove both property/report paths, revocation/security, independent fallback and effort. Revisit customer-facing OAuth only when actual scale/burden proves need. |
+| P9/P18/P20 | Default to 20i DNS/included wildcard SSL where appropriate; preserve external authoritative DNS for established-service exceptions and initially prefer suitable 20i-managed paid SSL. Self-managed Let's Encrypt/ACME and Cloudflare for SaaS remain deferred, not launch dependencies. | Hosted TLS/renewal/proxy verification before customer use; revisit automation when exception count, paid expense or long-term cost/risk justifies it. No forced DNS transfer. |
+| D6/P15/P26 | Track fixed versus variable/per-customer cost and absorbed versus passed-through treatment across actual vendor expenses. Track SSL exception customer/count/unit annual cost/treatment. Use cost-to-serve and effort to review margins, pricing and plans; do not build accounting software. | Begin recording actual expenses as incurred; recurring management review and material cost/exception changes, with commercial authority before price/pass-through changes. |
+| P26/P18 | Sole-proprietor start is acceptable operating direction; company/entity formation remains deferred and is not currently a technical launch blocker. | Meaningful revenue, liability, contracts, customer scale, tax considerations or other appropriate change require qualified review and an explicit owner decision. No legal/tax conclusion is implied. |
+| P26/D6 | Bookkeeping/accounting, tax compliance, business banking/payment operations, vendor expense tracking and customer billing remain required business-readiness work. | Before applicable commitments, invoicing/payments or compliance obligations; review actual revenue/expense/reconciliation burden as scale changes. Manual processes may suffice initially. |
+| P26/P7/P14/P18 | Customer contracts/terms, privacy/compliance and insurance where appropriate remain required review scopes. | Before affected real-customer services/data/commitments and when liability, contracts or customer scale materially change; obtain appropriate professional advice rather than infer compliance from technical readiness. |
+
 ### Opportunity and evaluation completion under existing gates
 
 The [opportunity and optimization model](opportunity-and-optimization-model.md)

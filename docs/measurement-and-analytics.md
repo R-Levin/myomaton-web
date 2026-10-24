@@ -145,6 +145,15 @@ operationally reliable, grant a service-account identity access to the appropria
 customer-owned GA4/Search Console property. Prefer this to building per-customer
 interactive OAuth refresh-token infrastructure as the initial default.
 
+Current operating direction is operator-assisted/server-to-server access: use a
+MioPages service account granted GA4 property access where practical, and test
+Search Console first with the same service-account/access-grant model. A dedicated
+MioPages operator Google account is an acceptable fallback with explicitly granted
+customer access; do not request customer passwords or infer property authority.
+Avoid customer-facing Google OAuth initially. Revisit it only when observed
+onboarding/access burden at actual scale proves the need for a separately reviewed
+integration. Neither service-account path nor fallback access is proven here.
+
 Potential benefits to validate are fewer per-customer token lifecycle problems,
 clear property-grant revocation, simpler authorization/offboarding and less
 customer credential handling. Consent-screen/verification burden may differ;
@@ -180,8 +189,9 @@ is not a verified Google property. With explicit authorization, demonstrate:
 
 No account connection, credential provisioning or property change is authorized by
 this architecture document. Do not promise this onboarding method commercially
-until both provider paths are demonstrated. If unsuitable, record why and reassess
-operator assistance, scoped alternatives or an explicitly reviewed OAuth path;
+until both provider paths are demonstrated. If unsuitable, record why and test
+the dedicated operator-account fallback or other scoped assistance. Customer-facing
+OAuth remains deferred until actual operational/scale evidence justifies review;
 do not force an unmaintainable token architecture or make Google access a launch blocker.
 
 ## Customer ownership and access
@@ -264,6 +274,25 @@ and limitations. Use GA4/Search Console as preferred primary analysis where usab
 alongside direct lead/contact and confirmed outcomes; fall back explicitly when not. Prefer a
 small understandable report to analytics clutter. The
 [growth loop](content-growth-loop.md#compact-customer-experience) owns recommendation presentation.
+
+### Restrained Performance Snapshot
+
+Initial reporting should be a **Performance Snapshot**, not a reproduction of GA4
+or Search Console dashboards. Likely visual areas are traffic trend, search
+visibility, important actions/conversions and actionable opportunities. Include only
+areas supported by useful evidence; a chart is not mandatory when data is sparse.
+Pair charts with **what changed, what it means and what MioPages recommends**.
+Report outcomes and actionable evidence rather than analytics exhaust, and connect
+traffic/search to leads and confirmed business outcomes where feasible without
+inventing attribution or treating clicks as sales.
+
+Prefer useful normalized daily aggregates over retaining raw analytics exhaust,
+with tenant/source scope, metric meaning, period, freshness and limitations.
+Apply existing minimization/access/retention rules; do not copy inquiry bodies or
+unnecessary person-level data into reports. Detailed ingestion, storage, visuals
+and implementation remain deferred to the P12/P24/P25 measurement slice. Its proof
+must include access/revocation, useful reports, independent fallback and actual
+operator effort before promising a repeatable customer onboarding process.
 
 ## Intent-to-outcome step mapping
 

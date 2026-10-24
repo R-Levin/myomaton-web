@@ -147,21 +147,34 @@ These are modeling constraints for future work, not a new schema in this checkpo
 
 ## DNS and TLS / HTTPS
 
-MioPages Managed Site HTTPS must not depend on 20i reseller wildcard SSL. For a
-normal custom domain, the appropriate DNS record points the domain to the MioPages
-delivery runtime. That runtime obtains and renews an appropriate certificate
-automatically through a standard certificate/ACME mechanism. Certificate validation,
-issuance, renewal and failure handling belong to Managed Site delivery infrastructure.
+The current launch policy prioritizes streamlined onboarding and low operational
+burden over minimum certificate price. It supersedes the earlier requirement for
+self-managed ACME at launch, while preserving provider-neutral product boundaries.
 
-The customer's authoritative DNS may remain with 20i, Cloudflare, GoDaddy, another
-registrar/provider or the customer's IT environment. Ordinary per-domain automatic
-HTTPS must not require transferring DNS authority to 20i. Required validation and
-record changes still need customer authorization and verified readiness.
+- **Default:** where reasonably appropriate for the customer, use 20i authoritative
+  DNS and the included 20i wildcard SSL as the simplest operating path.
+- **Established-presence exception:** retain existing authoritative DNS when moving
+  it would create unnecessary responsibility. Initially prefer the simplest
+  20i-managed paid SSL option that works with external DNS. MioPages may absorb a
+  modest annual cost initially; a later transparent pass-through requires appropriate
+  commercial agreement, not a silent price change.
+- **Deferred options:** self-managed Let's Encrypt/ACME and Cloudflare for SaaS are
+  not launch dependencies. Revisit if external-DNS exceptions become common, paid
+  SSL expense is material, or automation demonstrably reduces long-term cost/risk.
 
-The exact reverse proxy/certificate mechanism is deferred: no choice between Caddy,
-Traefik, nginx/certbot, a cloud load balancer or another implementation is made here.
-Provider-specific SSL products may help services actually hosted on those providers;
-they are separate from MioPages Managed Site TLS architecture.
+This records intended policy, not verified provider entitlement or configured TLS.
+Hosted proof must verify the selected product's actual hostname coverage, DNS
+requirements, runtime/proxy integration, issuance, renewal and failure behavior.
+The public Host/tenant contract still applies. No certificate/provider is provisioned
+or permanently selected by this document.
+
+Moving substantial authoritative DNS can create responsibility for Microsoft 365 /
+Google Workspace, SPF/DKIM/DMARC, third-party applications, verification records,
+subdomains and unrelated infrastructure. A full transfer is acceptable when simple
+and appropriate, but is not an unconditional MioPages requirement merely to obtain
+SSL. Inventory affected records/services, confirm ownership and authorize changes
+before cutover; preserve existing mail and other services. Track exceptions in
+[cost-to-serve reviews](service-operations-model.md#cost-to-serve-and-provider-expenses).
 
 ## Email
 
@@ -306,7 +319,7 @@ migrate every existing customer service into MioPages or require 20i.
 | Provider-neutral MioPages core and centralized control plane | Production compute provider and exact VPS/server sizing |
 | MioPages-owned operator and customer interfaces | Full identity/authentication/authorization implementation |
 | Generic domain/provider representation; existing customer services can remain | Final DNS automation strategy and concrete domain/provider integration |
-| MioPages-managed Managed Site TLS, independent of reseller wildcard SSL | TLS/reverse-proxy implementation |
+| 20i DNS/included wildcard SSL default where appropriate; external-DNS/paid SSL exception | Actual hosted coverage/renewal/proxy proof; self-managed ACME and Cloudflare for SaaS deferred |
 | Customer mailbox email separate from transactional email | Transactional email vendor and delivery implementation |
 | Provider-neutral service/entitlement state and billing-provider boundary | Final billing integration, synchronization and enforcement |
 | 20i Managed Cloud preferred for the shared-runtime proof, not a permanent dependency | Hosted feasibility and final production selection |
@@ -343,6 +356,21 @@ provider entitlements or claims that hosted tests have run.
 | Prefer the 20i application/hosting ecosystem | Existing reseller relationship and useful hosting/domain/mail infrastructure justify evaluating Managed Cloud first, without making provider vocabulary or APIs product dependencies. |
 | AWS is available for independent off-provider backup | A separate failure domain can reduce dependence on the application/database provider. Availability of an account is not configured backup, approved spend or verified recovery. |
 | Separate application recovery from provider infrastructure | Own and verify application schema/data/history/media and required privileges/dependencies. Provider roles, extensions, settings and services require explicit target contracts, not a claim that MioPages owns or can clone the provider cluster. |
+
+The preferred synthetic proof remains **20i Managed Cloud → shared MioPages runtime
+→ Supabase managed PostgreSQL**, with **AWS off-provider backup** as the independent
+recovery direction. No external resource has been provisioned for that proof.
+The 20i self-managed PostgreSQL VPS remains fallback; Cloudflare for SaaS is optional
+and self-managed ACME is deferred under the SSL policy above. These directions do
+not grant provisioning or spending authority.
+
+Measurement access/reporting direction belongs to the
+[measurement contract](measurement-and-analytics.md#service-accountproperty-grant-hypothesis):
+operator-assisted/server-to-server access first, customer-facing OAuth deferred,
+and a restrained Performance Snapshot. The
+[service operations model](service-operations-model.md#cost-to-serve-and-provider-expenses)
+owns cost-to-serve review; [business readiness](progressive-onboarding-and-launch-readiness.md#business-readiness)
+owns the sole-proprietor starting direction and professional/operational obligations.
 
 ## Human and AI operating charter
 
@@ -398,6 +426,7 @@ verification evidence. Failures return for a decision rather than silent adaptat
 | AWS backup integration | Verify protected access, independent destination, retention and usable restore with configuration/secrets recovery. | Accept off-provider resilience or review another destination. | Separately authorized backup setup, before relying on real hosted state. |
 | Transactional email | Verify sender identity, delivery/retry/reconciliation, recipients and mail-DNS preservation. | Enable only the proven delivery scope. | Before public lead/Review/system email promises. |
 | Production operator authentication | Verify caller identity, operation-specific authority, tenant isolation and credential/session lifecycle. | Keep management private until verified and authorized. | Before exposing production management. |
+| 20i default/exception SSL operating paths | Verify actual included wildcard coverage and a managed paid option usable with external DNS, renewal, proxy behavior and service-preserving DNS changes. | Accept a proven low-burden path or return for a decision; no forced zone transfer or automatic ACME/Cloudflare adoption. | Authorized hosted TLS proof and before each customer domain cutover. |
 
 ## External resource inventory
 

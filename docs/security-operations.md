@@ -194,6 +194,19 @@ HTTP writer remains disabled outside development pending production review;
 it does not satisfy distributed spam/rate limiting, real delivery, retention
 operations or general management authorization by itself.
 
+## DNS and certificate responsibility
+
+Follow the [launch DNS/SSL policy](platform-service-architecture.md#dns-and-tls--https):
+20i authoritative DNS/included wildcard SSL where reasonably appropriate, with an
+external-DNS/20i-managed paid SSL exception. Verify actual provider coverage and
+renewal before use. Do not require control of a customer's entire DNS zone merely
+to obtain SSL: mail, authentication/verification records, applications and subdomains
+may serve unrelated systems. Inventory dependencies, obtain scoped customer
+authorization and preserve those services before any DNS transfer/cutover.
+Self-managed ACME and Cloudflare for SaaS are deferred options, not launch controls
+that this policy claims are implemented. HTTPS and safe tenant/proxy behavior still
+require verification; lower operational burden does not waive them.
+
 ## Secrets and repeatable deployment
 
 Secrets/API keys must never enter Git or client-rendered data/bundles. Manage them

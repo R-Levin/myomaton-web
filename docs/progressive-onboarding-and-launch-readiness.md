@@ -328,6 +328,31 @@ may become Campaign/major Revamp/exceptional work. This is continuing managed ca
 not a traditional “here are the keys” handoff. Existing content and opportunity loops
 govern ongoing preparation, approval, measurement and learning.
 
+## Business readiness
+
+Starting initially as a **sole proprietor** is the accepted operating direction;
+formal entity formation is not currently a technical launch blocker. This is not
+a legal/tax conclusion, a statement about jurisdiction-specific eligibility, or a
+waiver of applicable obligations. Review those matters with appropriate qualified
+support before the relevant commercial activity. No entity, bank/payment account
+or insurance arrangement is created by this document.
+
+The [deferred register](deferred-architecture.md#operating-and-business-readiness-under-existing-gates)
+keeps formation, bookkeeping/accounting, tax compliance, business banking/payment
+operations, appropriate insurance, contracts/terms, privacy/compliance, vendor
+expenses, customer billing and unit-economics/margin review visible. They are
+deferred work, not forgotten obligations or blanket permission to postpone them.
+Revisit entity structure based on meaningful revenue, liability, contracts,
+customer scale, tax considerations or another relevant change; do not invent a
+revenue/date threshold or assert that incorporation resolves those matters.
+
+Commercial readiness should record applicability, owner, evidence and review outcome
+using the existing readiness states. Resolve applicable payment/contract/privacy
+requirements before offering the affected service or accepting commitments. Later
+scale may change the needed process even when initial manual procedures suffice.
+The [cost-to-serve review](service-operations-model.md#cost-to-serve-and-provider-expenses)
+feeds pricing/margin and process decisions without becoming accounting software.
+
 ## Operational runbook status
 
 This is the current procedure inventory, not a new task system or a claim that
