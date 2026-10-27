@@ -4,6 +4,30 @@ Canonical customer records own facts, content, VisualNeed, Assets and AssetUsage
 The acquisition service owns work, candidates, budget, review and audit. Providers
 return normalized results only. Rendering consumes eligible canonical Assets.
 
+## Commercial V1 completion boundary
+
+Managed Assets / AssetUsage, safe operator ingestion, media delivery and the bounded
+provider-independent generated-image acquisition pilot already exist. They are
+reusable foundations, not proof of production customer upload or stock acquisition.
+The pilot details below retain their original disposable scope and approval rules.
+
+Commercial V1 requires completion of two practical acquisition/use paths:
+
+- **Customer-supplied media:** logo/image upload, safe validation/ingestion, canonical
+  Asset creation and AssetUsage metadata, tenant isolation and approved use in the
+  generated site; retain alt/caption/crop/intended-use context as supported.
+- **Stock/source media:** a practical provider-neutral stock sourcing path. Pexels is
+  a sensible first provider candidate, not a hard architectural dependency. Preserve
+  source/provenance/licensing and appropriate rights/use evidence, with review,
+  ingestion, approval and eligible production delivery under the existing gates.
+
+Both paths remain incomplete for production. Provider search/download success is
+not approval or an eligible canonical Asset. Extend the existing acquisition and
+Asset boundaries, preserving safe ingestion, authority, isolation and refusal.
+A multi-provider marketplace/ecosystem and deterministic graphics expansion are
+later capabilities, not V1 requirements. Media recommendations belong in generation
+orchestration; unresolved visual gaps must remain explicit until safely resolved.
+
 ## Schema review before migration
 
 The existing nineteen customer tables have no durable external job, private
@@ -127,10 +151,12 @@ Unresolved visuals stay canonical metadata; preview FPOs are not production
 Assets. Production-safe fallback omits unresolved visuals without revoking
 acceptance. A future eligible illustration fills only the Home Hero slot.
 
-Stock/Pexels, deterministic graphics and non-image intelligence remain future
-provider-independent capabilities. Editorial/canonical reconciliation is the
-recommended first non-image capability. Real canonical attachment, public
-publication, commercial launch, customer UI and commit/push are outside this
+The disposable pilot does not implement stock/Pexels sourcing. Practical stock
+acquisition and customer media upload are Commercial V1 completion work above;
+deterministic graphics and broader non-image intelligence remain later extensions.
+Editorial/canonical reconciliation remains a reusable non-image direction. Real
+canonical attachment, public publication, commercial launch, customer UI and
+commit/push are outside this
 slice. Operational deployment and human illustration approval are the next
 review boundaries.
 

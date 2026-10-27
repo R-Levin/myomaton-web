@@ -36,23 +36,25 @@ not universal service entitlements or canonical pricing updates.
 
 Standard Launch is the normal good-fit customer envelope. Its typical scope is:
 
-- Structured onboarding and trusted business-knowledge capture.
+- Full structured Commercial V1 interview and trusted business-knowledge capture,
+  reusing existing intake/Review knowledge with targeted gap follow-up.
 - Current-presence and external-profile inventory, existing systems and constraints.
 - Core services/products/offers, audiences, customer needs, differentiators and
   proof where available; do not invent credentials or testimonials.
 - A core Managed Site with essential Pages/Navigation, an appropriate Contact/lead
   path, bounded Visual Direction and initial content foundation.
-- Measurement baseline using GA4 as preferred primary for traffic/behavior/conversion
-  analysis and Search Console for organic search when properly connected and available;
-  independent first-party fallback/platform signals and direct lead/outcome evidence
-  remain necessary. Provider unavailability must not block operation.
+- First-party MioPages measurement baseline, important Action and Contact
+  acceptance/delivery evidence, useful trends and concise Performance Snapshot.
+  GA4/Search Console are optional later enrichment, outside the V1 critical path.
 - Domain/hosting/deployment coordination where applicable, customer review/approval,
   go-live verification and direct transition into Ongoing.
 
 The customer supplies business truth, goals, preferences, Assets, existing systems
 and useful examples when available. They do not need to supply a sitemap,
-wireframes, a formal design brief or pixel-level direction. The system/operator
-interprets that input into supported structure and presentation for review.
+wireframes, a formal design brief or pixel-level direction. The system uses practical AI assistance to orchestrate existing multi-page
+generation into a near-finished candidate for operator QA/correction and customer
+approval. Operators resolve exceptions and refine rather than routinely assemble
+each Page. Measure actual operator time/cost-to-serve from future operations.
 Customers approve outcomes rather than become webmasters.
 
 This envelope is product intent, not a statement that every business entity,
@@ -177,12 +179,13 @@ Avoid exhaustive labor-intensive discovery as the normal service model.
 
 | Level | Intended operation |
 | --- | --- |
-| Minimum viable onboarding | Gather enough trusted identity, offering/audience, goals, Assets and valid Contact/next-step information for a credible initial presence. Confirm essential facts and unresolved limits. |
+| Commercial V1 structured interview | Reuse the versioned/resumable intake and immutable submissions, activation/customer foundation and confirmation model. Collect material identity, offerings/audiences, goals, Assets, operational and site knowledge for near-finished generation; separate confirmed facts, claims, preferences, recommendations and gaps. Target follow-up without repeated questions. The full interview remains incomplete and is required for V1. |
 | Progressive enrichment | Ask the highest-value missing questions when relevant to content, business changes or a recommendation. Reuse approved knowledge rather than repeat intake. |
 | Operator-assisted exception | Additional help when a customer genuinely needs it, with scope/time visible; not the default assumption of a large discovery engagement. |
 
-Initial proving can use operator-assisted intake before self-service exists. That
-implementation bridge does not define the target workload or justify routine
+Local/synthetic proving can use operator-assisted intake before portal completion.
+Commercial V1 still requires the minimal customer portal. That implementation
+bridge does not define the target workload or justify routine
 manual reconstruction. The [onboarding model](onboarding-optimization.md) owns
 trust, conditional questions and authorized canonical writes.
 
@@ -211,7 +214,7 @@ they are not implemented schedulers, publication quotas or contractual response 
 
 | Cadence | Intended value cycle |
 | --- | --- |
-| Continuous | Observe operation/uptime, GA4 traffic/behavior/conversion and Search Console organic-search evidence as preferred primary analysis when usable, with independent first-party fallback/platform Actions, direct lead/Contact activity and outcome feedback. Monitor content, stale facts and opportunity candidates; no routine customer action required. |
+| Continuous | Observe operation/uptime and primary first-party site/Page/Action activity, accepted/delivered Contacts and available attribution/outcome feedback. Monitor content, stale facts and opportunities; optional later GA4/Search Console may enrich evidence. No routine customer action required. |
 | Monthly | Concise account of what happened, leads/Contact activity, known/confirmed outcomes, improvements and attention needs; 1–3 prioritized recommendations, draft/review items and targeted questions where needed. No analytics dump or artificial quota when evidence is insufficient. |
 | Quarterly | Broader view of service/topic performance, accumulated content effects, useful channels, important underperforming Pages, business/positioning priorities, external-presence accuracy and next-period recommendations. A meeting is optional when it adds value. |
 | Triggered | Respond to meaningful traffic/lead-volume changes, emerging search visibility, high activity with weak conversion, recurring questions, new business/service facts, seasonal opportunities, stale critical information or sufficiently supported content opportunities. Do not wait for a calendar cycle when attention is useful sooner. |
@@ -222,6 +225,20 @@ review, a customer question or an operational response, not automatic publicatio
 or changes to protected business facts. Missing Google data should be disclosed
 without interrupting independent first-party reporting. Technical-health and
 business-conversion signals remain separate under the measurement contract.
+
+## Minimal Commercial V1 customer experience
+
+The incomplete minimal portal must cover onboarding/interview, site/content review,
+corrections/feedback, approvals, current service/site status, concise reports and
+change/support requests. Use supported HostShop links/handoff for account/billing
+where practical, with capability/authority proof before promises. Do not build
+native billing, CRM, sophisticated account administration, unrestricted page
+building or broad infrastructure self-service for V1.
+
+Commercial V1 also needs operational communications sufficient for onboarding,
+approvals and support; one reliable visitor conversion path, durable Contact/lead
+acceptance/delivery state and verified customer/operator handoff, with appropriate
+abuse/privacy/retention controls. CRM and Mailchimp integration are not required.
 
 ## Value and conversion reporting
 
@@ -430,9 +447,9 @@ MioPages-specific account/provider/content choices do not become platform defaul
   Visual Direction, Actions/Navigation, managed Assets and development Contact
   foundation as cataloged in [platform capabilities](platform-capabilities.md).
   These do not implement the operating cadences or general service management.
-- **Planned core / pre-launch:** repeatable supported Launch/handoff, progressive
-  intake, production operational readiness, independent measurement, concise value
-  reporting, lead/outcome confirmation, grounded draft/review/publish, a small
+- **Planned core / pre-launch:** repeatable supported Launch/handoff, full structured
+  interview and minimal portal, production operational readiness, first-party
+  measurement, concise value reporting, lead/outcome confirmation, grounded draft/review/publish, a small
   attention workflow and service-time observability. Minimum authorized operator
   access is required before production management; broad team tooling is not.
 - **Future:** richer team administration/routing, additional supported integrations,
@@ -441,8 +458,8 @@ MioPages-specific account/provider/content choices do not become platform defaul
 
 No Launch/Ongoing management records, attention dashboard, scheduler, operator role
 system, time tracker, outcome-confirmation UI, analytics integration or automated
-content publisher is added by this document. Google access remains the P24/P25
-spike; GBP reporting remains future-reference only.
+content publisher is added by this document. Google access remains optional later
+P24/P25 work, not a Commercial V1 dependency; GBP reporting remains future-reference only.
 
 Detailed contracts remain with the [service model](web-presence-service-model.md),
 [MioPages C0 model](miopages-c0-product-model.md), [content-growth loop](content-growth-loop.md),

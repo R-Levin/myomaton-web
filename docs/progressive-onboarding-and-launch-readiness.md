@@ -29,7 +29,7 @@ prices, Pages or business-specific answers platform invariants.
 | Status | Actual boundary |
 | --- | --- |
 | Implemented locally / development | Canonical Knowledge/Offering and rendering/media/Contact/QC foundations; versioned progressive development intake; local Review synthesis/revisions/approval; bounded activation, canonical confirmation, proposals and content release/rollback; shared hostname C0/C1 isolation and PG17/PG18 recovery proofs. These are bounded implementations, not production onboarding or delivery authorization. |
-| Planned core / remaining completion | Private Review delivery, production commercial/understanding/gap handoff, fuller onboarding interview, Presence Direction/Home concept and operational readiness tracking/go-live. Existing foundations must gain their production authority and verification; manual procedures still need ownership/evidence. |
+| Commercial V1 / remaining completion | Full structured interview and confirmed knowledge/gaps; AI-assisted near-finished generation orchestration; customer upload/practical stock acquisition; minimal customer portal; private Review delivery; production commercial handoff, publication/conversion, first-party measurement/Performance Snapshot and operational readiness. Extend existing foundations; production authority and hosted verification remain outstanding. |
 | Commercial/legal/accounting review | MioPages working prices/installments, cancellation/nonpayment treatment, agreement, export entitlements and billing timing. No final terms or public offer is approved here. |
 | Future / maturing | Increasing automation of provider-specific tasks and account/access verification, richer analytics/reporting and reduced operator intervention where proven safe. Unattended Review delivery is not a launch requirement. |
 
@@ -204,6 +204,28 @@ Managed MioPages backend/platform access or IP does not transfer. Export remains
 gated by P5/P6, not implemented here. Rare bad debt may be preferable to collections
 drama; legal/accounting review must resolve actual treatment before use.
 
+## Full structured Commercial V1 interview
+
+The fuller structured onboarding interview is required for Commercial V1 and is
+not complete. Extend the existing versioned/resumable intake, immutable submissions,
+activation/customer foundation and confirmation model; do not replace them with a
+second questionnaire. Reuse Free Review/direct-start knowledge with source,
+freshness and confirmation state, avoiding repeated questions except for material
+confirmation or clarification. The short provisional Free Review intake remains
+appropriate before commitment; it does not satisfy the full paid interview.
+
+Collect material business/site information for generation, with targeted follow-up
+for gaps. Keep confirmed facts, unconfirmed claims, preferences, recommendations
+and unresolved gaps distinguishable. Unknown information must remain flagged,
+not invented or silently promoted to canonical truth. Completion means sufficient
+confirmed knowledge for a near-finished site candidate, with explicit exceptions,
+rather than either a giant mandatory form or routine manual site assembly.
+
+The [minimal V1 portal](platform-service-architecture.md#miopages-customer) provides
+interview, review/corrections and approvals, then status, reports and support/change
+requests with supported HostShop links. Its incomplete status is a V1 completion
+gate, not permission to substitute a broad account/billing/page-builder project.
+
 ## Paid understanding, gap analysis and Presence Direction
 
 After commitment, prepare **Here is what we understand about your business** from
@@ -240,8 +262,11 @@ the outcome rather than design the site.
 
 Presence Direction is the concrete decision artifact for existing **Presence Plan
 approval checkpoint #2**, not a fifth competing approval. Approved direction forms
-the build basis; material subsequent changes need review. Then build the complete
-presence, prepare final content/conversion/compositions and technical operation.
+the build basis; material subsequent changes need review. Then orchestrate the
+existing multi-page generation substrate into a near-finished complete presence:
+supported Pages/Sections, draft copy, SEO preparation, eligible media and explicit
+gaps. The operator corrects/refines the candidate and verifies content/conversion,
+compositions and technical operation rather than manually assembling ordinary sites.
 Final review focuses on factual accuracy, offers, important claims, contact/action
 paths, omissions and overall appropriateness. Do not automatically reopen Visual
 Direction unless materially wrong. Explicit approval of live-bound contact data,
@@ -276,7 +301,7 @@ return to Needed/In progress when dependencies, facts, credentials or scope chan
 | Area | What must be tracked and verified when applicable |
 | --- | --- |
 | Domain / DNS / HTTPS | Domain exists or needs registration; registrar owner; DNS owner/provider; MioPages- or customer-managed responsibility; authorized access; required changes; preserved email records; SSL/HTTPS preparation and cutover responsibility. Registration/transfer may be ancillary service, not an implemented provider integration. |
-| Measurement | GA4 is preferred primary for traffic/acquisition/behavior/conversion analytics and Search Console for organic-search performance when properly connected and available. Track access, freshness and coverage; maintain independent MioPages fallback/platform events, direct contact/lead signals, baseline and usable reporting. Google does not replace lead/outcome evidence. No launch blind to the agreed path or dependent on Google availability. |
+| Measurement | MioPages-owned first-party visits/page activity, important Actions, Contact acceptance and delivery state, available referral/UTM attribution, baseline, useful trends and concise Performance Snapshot are Commercial V1 requirements. Verify collection and reporting with limits; distinguish clicks, inquiries, delivered inquiries and later-confirmed qualified/business outcomes. GA4/Search Console are optional later evidence, never V1 dependencies. |
 | Lead handling | Visitor acts → request is received → correct person/system receives it → response expectation is known. Verify forms, phone numbers, booking destinations, CRM routing where applicable, recipients, transactional delivery, spam/abuse controls, visitor confirmation and customer-side responsibility. A rendered form or clicked link is not end-to-end success. |
 | Transactional email | MioPages-controlled forms, confirmations, Review delivery and system notifications; account messages later when accounts exist. Verify delivery and safe SPF/DKIM/DMARC coordination where necessary, preserving existing mail. Customer mailbox migration is not required merely for transactional mail. |
 | External systems | Applicable CRM, booking, ecommerce, payment provider, calendars, social/business profiles, maps/listings, external forms and specialized services. Verify required end-to-end behavior/ownership, not merely presence of a link or credentials. Do not imply every listed connector exists. |
@@ -284,7 +309,7 @@ return to Needed/In progress when dependencies, facts, credentials or scope chan
 | Privacy / consent | Appropriate privacy policy, form consent, analytics/cookie treatment and regulated disclosures where needed. Obtain competent legal/customer input; MioPages does not provide legal advice. |
 | Accessibility | Semantics/headings, keyboard/focus, contrast, alt text, usable forms and responsive behavior in the actual presence. |
 | Security / resilience | HTTPS, bounded backups, demonstrated restore/rollback, protected secrets, abuse/spam controls, patching/runtime maintenance and actionable uptime/error monitoring. Existing production gates cannot be waived by visual/customer approval. |
-| Account ownership / access | Domain, DNS, GA4, Search Console, CRM, booking, email, social/business profiles and other required systems: owner, scoped authorization, access status and accountable contact. Avoid undocumented operator-only access; store secrets through protected mechanisms, not readiness notes. |
+| Account ownership / access | Domain, DNS, email and other actually required systems; GA4/Search Console, CRM, booking and social/business profiles only if separately in scope: owner, scoped authorization, access status and accountable contact. Avoid undocumented operator-only access; store secrets through protected mechanisms, not readiness notes. |
 | Business truth / approval | Explicit customer approval of the live-bound substantive facts/claims and rendered revision, plus approved direction and operational responsibilities. |
 | Cutover / continuity | Who changes DNS, agreed timing, propagation expectations, old-site treatment and rollback path; dependencies and launch authorization recorded. |
 | Post-launch verification | Actual DNS/SSL, rendering, forms/lead delivery, analytics/events, redirects, indexing signals and external integrations. Establish/confirm the Ongoing measurement baseline and resolve defects. |
@@ -309,12 +334,10 @@ agreed customer outcome. A useful optional profile is not automatically a blocke
 
 **May mature after launch:** richer reporting, advanced analytics automation and more
 advanced monitoring/optimization. This does not defer basic first-party collection,
-lead delivery, recovery or operational monitoring. GA4/Search Console are preferred
-primary analytical sources in their respective domains when usable; unavailability
-must trigger explicit fallback/limited reporting, not block operation. First-party
-lead/contact signals and customer outcome feedback remain important while Google works.
-A known zero-traffic baseline is valid, missing independent fallback collection is
-not. Initial reports may be simple/operator-assisted but need real
+lead delivery, recovery or operational monitoring. GA4/Search Console remain optional
+later enrichment, outside the Commercial V1 critical path. First-party reporting
+must stand on its own; absent search evidence stays unknown. A known zero-traffic
+baseline is valid; missing first-party collection is not. Initial reports may be simple/operator-assisted but need real
 evidence and explicit uncertainty.
 
 After cutover, perform live checks promptly under an owned plan and use the defined
@@ -401,7 +424,8 @@ with completed customer-specific verification. No runbook automation is built he
 Reuse P11/P13/P14 for prospect/intake reuse, Review synthesis/operator approval and
 controlled delivery; P1/P2/P3/P7 for authorization, confirmed writes, reviewed
 direction and approval provenance; P26 for commitment/payment/exit terms; P5/P6 for
-export/ownership; P12/P24/P25 for the preferred-primary/fallback measurement hierarchy;
+export/ownership; P12 for primary first-party V1 measurement/reporting and P24/P25
+only for optional later Google evidence;
 P9/P10/P16 for serving/URL/replacement continuity; P17/A1–A3 for media where applicable;
 P18–P20 for operation, readiness evidence, rollback/recovery and tenant safety; P21
 for supported direction; and C3/C7 for actual content review/publication. Bounded

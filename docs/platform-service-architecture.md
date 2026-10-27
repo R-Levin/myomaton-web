@@ -63,7 +63,7 @@ include the operator console; prospect intake; the Free Web Presence Review
 workflow and evidence/operator review; organizations, Web Presences and Managed
 Sites; structured business knowledge/content; Pages, Sections, Actions and Assets;
 customer approvals; provisioning/orchestration; analytics/reporting; service status;
-and a future customer portal.
+and a minimal Commercial V1 customer portal, with broader self-service later.
 
 These responsibilities describe the architecture, not a claim of current general
 self-service or automation. The application must not become a skin over a hosting
@@ -114,14 +114,18 @@ roles and authorization govern actions; infrastructure access alone is insuffici
 
 ### MioPages Customer
 
-The future customer interface should support appropriate business-level work:
-reviewing/updating structured business information, submitting content/information,
-approvals, results/reporting, leads where appropriate, service/domain status and
-billing/service summaries or links. Customers should primarily manage information
-about their business and outcomes, rather than website infrastructure.
+The minimal Customer Portal is required for Commercial V1 and remains incomplete.
+Its narrow responsibilities are onboarding/interview access, site/content review,
+corrections/feedback, exact approvals, current service/site status, concise reports,
+change/support requests and links/handoff to HostShop account/billing functions
+where supported. HostShop is the preferred account/billing bridge where practical;
+its actual capabilities and integration still need verification.
 
-This does not promise every function at launch or make a prospect an authorized
-customer user. The [customer journey](customer-journey-and-change-management.md)
+Full native billing, CRM, sophisticated account administration, unrestricted page
+building and broad self-service infrastructure administration are outside V1.
+Customers manage business information and outcomes. Portal access requires scoped
+customer authentication/authorization; a prospect or provider login does not
+establish customer authority. The [customer journey](customer-journey-and-change-management.md)
 and [onboarding contract](progressive-onboarding-and-launch-readiness.md) retain
 their distinct approval and commercial boundaries.
 
@@ -341,6 +345,85 @@ The next execution boundary is a separately authorized synthetic hosted proof af
 this documentation review/checkpoint. No external provisioning is authorized by
 this document. The [deferred register](deferred-architecture.md) owns remaining work.
 
+## Commercial V1 scope and development sequence
+
+Commercial V1 must onboard a paying customer, interpret structured business
+knowledge and generate a largely near-finished professional site for operator QA
+and customer approval; publish safely, capture leads/actions, measure useful
+first-party activity, report understandable results, propose operator-approved
+improvements and maintain the site safely. This is completion of the existing
+platform, with production proof still outstanding, rather than a greenfield build.
+
+Reusable foundations already include Organization / Web Presence / Managed Site,
+structured Knowledge / Offerings, Pages, Sections, Navigation, Actions / CTAs,
+Visual Direction, responsive rendering, managed Assets / AssetUsage, multi-page
+initialization/generation, proposal / preview / exact approval / release / rollback
+and hostname-based shared delivery. Versioned/resumable intake, immutable
+submissions, activation/customer foundation and canonical confirmation also exist
+within their documented development/disposable boundaries. PG17/PG18 compatibility
+and recovery are implemented locally; hosted operation remains unproven.
+
+The remaining generation work is completion/orchestration:
+
+**confirmed onboarding knowledge → AI interpretation → site/page plan → supported
+Page/Section selection and composition → draft copy → SEO preparation → media
+selection/recommendations → unresolved-gap flags → near-finished candidate →
+operator QA → customer approval → authorized release**.
+
+Practical V1 AI assistance covers intake interpretation, gaps/ambiguities, site
+architecture, copy, supported Section composition, SEO metadata/preparation, media
+recommendations, subsequent revisions and improvement recommendations. Confirmed
+facts retain their authority; claims, preferences, AI recommendations and gaps
+remain distinct. Operator QA and existing approval/release authority are mandatory.
+Autonomous publication and sophisticated autonomous optimization remain deferred.
+
+Use this development sequence under the existing readiness and deferred gates:
+
+1. **Hosted foundation — immediate:** separately authorized 20i Managed Cloud,
+   Supabase managed PostgreSQL and AWS independent backup proof; shared C0/C1
+   runtime, TLS/DNS, persistent media, deploy/restart/recovery, actionable monitoring
+   and capacity observations. Provider selection alone is not operational proof.
+2. **Production authority:** operator authentication, scoped production authorization
+   and protected management operations before production management exposure.
+3. **Commercial intake + generation completion:** full structured interview, confirmed
+   knowledge/gaps, AI interpretation, site/page plan, near-finished multi-page
+   generation, copy/SEO preparation, customer media upload, practical provider-neutral
+   stock sourcing (Pexels is the first candidate) and operator QA.
+4. **Minimal customer portal:** onboarding, review/corrections, approvals, status,
+   concise reporting, support/change requests and supported HostShop account/billing
+   handoff. Customer access must satisfy P7 before exposure; later reporting and
+   publication capabilities complete the end-to-end portal flow.
+5. **Production publication + conversion:** proposal, exact approval, authorized
+   release, rollback, one reliable visitor conversion path, Contact/lead durable
+   acceptance and delivery state, verified customer/operator handoff and operational
+   communications sufficient for onboarding, approvals and support. Apply existing
+   abuse, privacy and retention controls; CRM and Mailchimp are not dependencies.
+6. **First-party measurement + improvement:** site/activity/Action collection,
+   normalized metrics, Performance Snapshot, recommendation, AI-assisted revision,
+   operator approval, release and remeasurement. Stage 5 verifies production
+   mechanics; first-party collection/reporting must be ready before real go-live.
+7. **Commercial V1 rehearsal:** prove prospect → Free Review/direct start → commercial
+   commitment → full intake → confirmed knowledge → near-finished generation →
+   operator QA → customer approval → release → lead/action → reporting → improvement
+   → rollback/recovery, with evidence for each applicable readiness gate.
+8. **C0 then Customer #1:** move real miopages.com onto MioPages only after hosted
+   proof/readiness; use C0 as the first real production proving ground, then onboard
+   the first external paying customer.
+
+Ordinary sites should emerge near-finished. Operators review, correct/refine,
+resolve exceptional gaps, make judgment calls and prepare/approve the customer
+candidate; routine page-by-page manual assembly is not the delivery model. Quantify
+operator time and cost-to-serve from future real operations rather than assumptions.
+
+Commercial V1, shortly-after-V1 refinements and later expansion remain distinct in
+[the existing register](deferred-architecture.md#commercial-v1-and-later-boundaries).
+For Commercial V1 scope/status, this section and the current specialist contracts
+in readiness, measurement, media, operations and the deferred register supersede
+older interview-deferral, future-portal and Google-primary wording in the capability
+catalog, onboarding, customer journey, service model, C0 and historical slice notes.
+Their approved technical/authority contracts remain in force. This sequence changes
+scope/priorities, not schema, runtime behavior or authority to provision/publish.
+
 ## Recent durable decisions
 
 These concise records preserve the accepted direction and rationale; they are not
@@ -364,10 +447,12 @@ The 20i self-managed PostgreSQL VPS remains fallback; Cloudflare for SaaS is opt
 and self-managed ACME is deferred under the SSL policy above. These directions do
 not grant provisioning or spending authority.
 
-Measurement access/reporting direction belongs to the
+Commercial V1 requires MioPages-owned first-party measurement and a restrained
+Performance Snapshot. GA4/Search Console are optional later enrichment, outside
+the critical path. If separately pursued, measurement access direction belongs to the
 [measurement contract](measurement-and-analytics.md#service-accountproperty-grant-hypothesis):
 operator-assisted/server-to-server access first, customer-facing OAuth deferred,
-and a restrained Performance Snapshot. The
+with external access proven separately from V1 reporting. The
 [service operations model](service-operations-model.md#cost-to-serve-and-provider-expenses)
 owns cost-to-serve review; [business readiness](progressive-onboarding-and-launch-readiness.md#business-readiness)
 owns the sole-proprietor starting direction and professional/operational obligations.

@@ -2,32 +2,24 @@
 
 ## Decision and scope
 
-The intended measurement architecture is:
+Commercial V1 prioritizes MioPages-owned first-party measurement:
 
 ```text
-PREFERRED PRIMARY GA4 / SEARCH CONSOLE ANALYSIS WHEN USABLE
-+ INDEPENDENT FIRST-PARTY FALLBACK / PLATFORM-SPECIFIC SIGNALS
-+ NORMALIZED OPTIMIZATION SIGNALS
+PRIMARY MIOPAGES FIRST-PARTY ACTIVITY / ACTION / LEAD EVIDENCE
+→ NORMALIZED METRICS → PERFORMANCE SNAPSHOT → RECOMMENDATION / APPROVED CHANGE
+→ REMEASUREMENT
++ OPTIONAL LATER GA4 / SEARCH CONSOLE ENRICHMENT
 ```
 
-When properly connected, authorized and available, **GA4 is the preferred primary
-source for traffic, acquisition, behavior and conversion analytics; Search Console
-is the preferred primary source for organic-search visibility, impressions, clicks,
-queries and related search-performance evidence**. They are not merely supplements
-to MioPages analytics when usable. The platform should not recreate their full UI
-or analytical suites.
+This scope supersedes the earlier preferred-primary Google / first-party fallback
+hierarchy. Core collection, useful reporting and improvement must work without
+Google access. GA4 and Search Console are optional later external evidence sources,
+not Commercial V1 dependencies or critical-path integration work. Do not build a
+GA4 clone or claim first-party data reproduces unavailable search-query evidence.
 
-MioPages-owned first-party/internal measurement is the independent fallback and
-complementary platform-specific layer: continuity when Google sources are unavailable,
-delayed or disconnected; direct events and lead/contact signals; and verification/
-corroboration where useful. It must be sufficient that MioPages is never completely
-blind, without claiming parity with missing Google data. Operation and useful
-reporting/optimization must continue from available evidence, with limitations shown.
-
-Google analytics does not replace direct lead/contact data or customer outcome
-feedback. Platform acceptance/delivery, lead quality and confirmed business outcomes
-retain their own evidence even when GA4/Search Console work. Source priority is
-domain- and availability-specific, not permission to merge incompatible counts.
+First-party observation, Contact acceptance/delivery, later-confirmed lead quality
+and business outcomes retain separate meanings and provenance. Available external
+evidence may enrich a report; incompatible counts must not be merged.
 
 Google Business Profile (GBP) is outside the initial measurement/search integration
 specification. It remains a future optional local-presence signal source, not
@@ -38,15 +30,15 @@ signal boundaries and degraded reporting. It specifies no schema, vendor SDK,
 event endpoint or implemented connector. The [content-growth loop](content-growth-loop.md)
 owns recommendation-to-publication behavior; the [service model](web-presence-service-model.md)
 owns customer outcomes; the [implementation register](deferred-architecture.md)
-owns gates. Preferred analytical sources do not make operation dependent on Google.
+owns gates. Optional external sources never gate core V1 measurement/reporting.
 
 ## Implementation status
 
 | Status | Actual boundary |
 | --- | --- |
 | Implemented now | Bounded development Contact submission persistence and delivery status; an optional best-effort `ContactEvents.accepted` hook emits `form_submit` after new durable acceptance. The hook is not durable analytics, a report or proof that an inquiry became a customer. |
-| Near-term technical spike | Separately prove service-account/property-grant access to Search Console and GA4 with Myomaton and MioPages, where customer-owned properties are available and authorized. No proof or commercial onboarding promise exists yet. |
-| Planned core | Normalized GA4/Search Console analysis as preferred primary sources in their respective domains when usable; independent first-party fallback/platform events, direct lead/outcome evidence, provider-failure handling and understandable reporting/optimization. Production privacy/security and event semantics must be implemented first. |
+| Optional / later external spikes | Separately prove service-account/property-grant access to Search Console and GA4 on authorized properties if later justified. No connector proof or commercial onboarding promise exists; P24/P25 are outside the V1 critical path. |
+| Commercial V1 / incomplete | First-party visits/page/site activity, important Action events, Contact acceptance/delivery, available referral/UTM attribution, normalized useful trends, a concise Performance Snapshot and baseline → recommendation/change → remeasurement. Production privacy/security and event semantics must be implemented first. |
 | Future extensions | Optional GBP investigation, richer provider integrations, expanded technical-health automation and deeper attribution/reporting. Existing technical monitoring obligations still apply before production; this is not their deferral. |
 
 No first-party visit/click analytics collector, GA4/Search Console integration,
@@ -60,22 +52,24 @@ for the precise implemented hook and production activation limits.
 The [measurement-readiness requirement](progressive-onboarding-and-launch-readiness.md#readiness-inventory)
 tracks first-party events, meaningful conversion/lead signals, baseline and usable
 initial reporting before launch, with live verification after cutover. A site
-must not launch blind to its agreed conversion path. Track GA4/Search Console
-status/access and use them as preferred primary analytical sources when usable;
-their absence does not block operation with the independent fallback and direct signals.
+must not launch blind to its agreed conversion path. First-party data is primary;
+track external source status/access only if later enabled. Missing Google access
+must not prevent core measurement/reporting.
 Simple operator-assisted reporting may precede richer automation, but missing
 collection is not a known zero baseline. No collector/reporting capability is
 implemented by the readiness document.
 
 Directly observe what the platform controls or can reliably measure. Planned scope:
 
-- Page/route visits at a defined useful level, with landing route and available
-  referrer/source context; distinguish requests from estimated human visits.
+- Visits/page views and site/Page activity at a defined useful level, with landing
+  route and available referrer/source context; distinguish requests from estimated human visits.
 - Important Actions, including click-to-call, click-to-email and other explicitly
   defined lead-generation Actions. A click is not proof of a completed call/email.
 - Accepted Contact submissions, distinct from delivery success, retry or rejection.
 - Useful bounded article/content engagement, when native publishing exists.
-- Platform-generated campaign/source/medium identifiers where appropriate.
+- Available UTM/campaign/source/medium attribution with explicit coverage limits.
+- Useful period-over-period trends and enough normalized data for a concise
+  Performance Snapshot and baseline → recommendation/change → remeasurement.
 - Operational delivery/health observations where relevant, kept separate from
   visitor/conversion measurements.
 
@@ -99,15 +93,16 @@ Public event input is untrusted and requires scope validation and abuse controls
 the caller must not choose unrestricted tenant identities. See
 [security and operations](security-operations.md#public-input-and-contact).
 
-## GA4: preferred external analytics
+## GA4: optional later external analytics
 
-When properly connected, authorized and available, customer-owned GA4 is the
-preferred primary analytical source for traffic/session/user trends, acquisition/source/medium, landing Pages,
-engagement, events/conversions, campaign performance and other useful dimensions
+If separately justified, connected, authorized and available later, customer-owned
+GA4 can enrich first-party reports with traffic/session/user trends, acquisition/
+source/medium, landing Pages, engagement, events/conversions, campaign performance
+and other useful dimensions
 and metrics supported by the integration.
 
-Its role is primary traffic/behavior/conversion analysis, familiar independently accessible
-customer reporting and portability, avoiding the cost of rebuilding a large
+Its optional role is additional traffic/behavior/conversion analysis, independently
+accessible customer reporting and portability, avoiding the cost of rebuilding a large
 analytics suite. Ingest only data needed for platform recommendations/reporting.
 Do not reproduce the GA4 interface or assume a property's events and conversion
 definitions align with the platform's lead semantics.
@@ -120,10 +115,10 @@ not merely authenticate. Google's [Data API overview](https://developers.google.
 and [API quickstart](https://developers.google.com/analytics/devguides/reporting/data/v1/quickstart)
 are technical starting points, not evidence of a working platform connector.
 
-## Search Console: preferred search intelligence
+## Search Console: optional later search intelligence
 
-When properly connected, authorized and available, Search Console is the preferred
-primary organic-search analytical source for search queries,
+If separately justified, connected, authorized and available later, Search Console
+can supply organic-search evidence unavailable in first-party activity: search queries,
 impressions, clicks, CTR, average position and search-visible Pages. Supported
 API coverage may also inform indexing/discovery and sitemap questions. Do not
 assume every Search Console UI report has equivalent API coverage; validate the
@@ -145,8 +140,8 @@ operationally reliable, grant a service-account identity access to the appropria
 customer-owned GA4/Search Console property. Prefer this to building per-customer
 interactive OAuth refresh-token infrastructure as the initial default.
 
-Current operating direction is operator-assisted/server-to-server access: use a
-MioPages service account granted GA4 property access where practical, and test
+If pursued later, prefer operator-assisted/server-to-server access: use a MioPages
+service account granted GA4 property access where practical, and test
 Search Console first with the same service-account/access-grant model. A dedicated
 MioPages operator Google account is an acceptable fallback with explicitly granted
 customer access; do not request customer passwords or infer property authority.
@@ -172,7 +167,8 @@ Technical references were reviewed on 2026-10-05 and must be rechecked during th
 
 ### Spike acceptance and refusal boundaries
 
-Test Search Console and GA4 separately, first with Myomaton and MioPages. Confirm
+These optional later spikes are not Commercial V1 prerequisites. Test Search
+Console and GA4 separately, first with Myomaton and MioPages. Confirm
 actual property availability and customer authority; a site or reseller account
 is not a verified Google property. With explicit authorization, demonstrate:
 
@@ -251,8 +247,9 @@ a provider. A last successful summary may be useful if its age and scope
 are clearly shown and retention/access policy permits it; never present it as live.
 
 When Google is unavailable, continue first-party observations and applicable
-recommendations. State which primary analytical source is missing/delayed and the
-fallback's limits; never pretend first-party data reproduces unavailable search evidence.
+recommendations. State which optional external source is missing/delayed and the
+available evidence's limits; never pretend first-party data reproduces unavailable
+search evidence.
 Before activation, test permission revocation, outage/quota/error handling,
 partial ingestion, duplicate retries and recovery without losing or double-counting
 first-party events. A successful spike is not production resilience verification.
@@ -266,21 +263,27 @@ first-party events. A successful spike is not production resilience verification
 | Customer confirmed | Customer reports that a lead became a customer/client or produced business value. Preserve who confirmed what; do not infer it from a click. |
 | Unknown | Downstream outcome is not reported or observable. Unknown is not failure or zero value. |
 
+Within observed reporting, distinguish **click → inquiry accepted → inquiry
+delivered → qualified/business outcome where later confirmed**. These are different
+events/evidence, not automatic progression. A delivered inquiry is not a qualified
+lead or sale, and an accepted inquiry remains recorded if delivery fails.
+
 These are evidence levels, not a claim that every lead progresses through an
 implemented tracked funnel. Reporting should answer: what happened, what generated
 useful activity, what became leads, which outcomes were customer-confirmed, what
 improved, and what useful step comes next. Show an appropriate observation window
-and limitations. Use GA4/Search Console as preferred primary analysis where usable,
-alongside direct lead/contact and confirmed outcomes; fall back explicitly when not. Prefer a
+and limitations. Use first-party MioPages evidence with direct lead/contact and
+confirmed outcomes; optional later Google evidence may enrich it. Prefer a
 small understandable report to analytics clutter. The
 [growth loop](content-growth-loop.md#compact-customer-experience) owns recommendation presentation.
 
 ### Restrained Performance Snapshot
 
-Initial reporting should be a **Performance Snapshot**, not a reproduction of GA4
-or Search Console dashboards. Likely visual areas are traffic trend, search
-visibility, important actions/conversions and actionable opportunities. Include only
-areas supported by useful evidence; a chart is not mandatory when data is sparse.
+Commercial V1 reporting uses first-party evidence for a concise **Performance
+Snapshot**, not a reproduction of GA4 or Search Console dashboards. Useful areas
+are visits/Page activity trends, important Actions, accepted/delivered inquiries
+and actionable opportunities; add search visibility only with later evidence.
+Include only areas supported by useful evidence; a chart is not mandatory when data is sparse.
 Pair charts with **what changed, what it means and what MioPages recommends**.
 Report outcomes and actionable evidence rather than analytics exhaust, and connect
 traffic/search to leads and confirmed business outcomes where feasible without
@@ -290,9 +293,10 @@ Prefer useful normalized daily aggregates over retaining raw analytics exhaust,
 with tenant/source scope, metric meaning, period, freshness and limitations.
 Apply existing minimization/access/retention rules; do not copy inquiry bodies or
 unnecessary person-level data into reports. Detailed ingestion, storage, visuals
-and implementation remain deferred to the P12/P24/P25 measurement slice. Its proof
-must include access/revocation, useful reports, independent fallback and actual
-operator effort before promising a repeatable customer onboarding process.
+and implementation remain incomplete under P12 and are required for Commercial V1.
+Prove useful first-party reports, tenant-scoped access, delivery distinctions,
+trends/limitations and actual operator effort. P24/P25 independently gate optional
+later Google ingestion, access/revocation and failure behavior; neither is a V1 gate.
 
 ## Intent-to-outcome step mapping
 
@@ -353,16 +357,16 @@ acknowledge its role and offer setup guidance/operator assistance. It does not
 include GBP reporting or API management in planned-core measurement.
 
 Ownership/authorization complexity, uncertain API/quota/approval requirements and
-potential support burden warrant a separate future value assessment. GA4/Search
-Console and the independent core take priority. Investigate optional GBP signals
+potential support burden warrant a separate future value assessment. The first-party
+V1 core takes priority; GA4/Search Console remain optional later enrichment. Investigate optional GBP signals
 only if access, authorization, operations and customer value justify promotion;
 no near-term GBP gate or launch blocker is created here.
 
 ## Product messaging and later terms review
 
-Customer-owned GA4/Search Console access can be presented as familiar, recognized,
-portable, independently accessible preferred primary analysis in their respective
-domains, backed by MioPages fallback/platform signals and direct lead/outcome data.
+Commercial V1 messaging should describe first-party MioPages activity, leads and
+understandable results. Later customer-owned GA4/Search Console access may provide
+portable, independently accessible external enrichment where actually proven.
 Do not imply Google endorsement, infallibility,
 guaranteed attribution or a proven connector. “Gold standard” is at most internal
 shorthand, not an objective service guarantee or preferred public claim.
