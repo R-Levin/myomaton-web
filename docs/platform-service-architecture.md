@@ -309,6 +309,34 @@ explicit URL/content ownership, forms and measurement coordination. Native Artic
 remain the intended baseline; optional external engines follow the
 [onboarding/content contract](onboarding-optimization.md#native-articles-and-optional-external-engines).
 
+### Post-V1 WordPress adoption for designers and agencies
+
+Preserve a future WordPress plugin/adoption path as an alternative deployment
+adapter. MioPages measurement, analysis, content intelligence, conversion components,
+approvals and improvement workflows must remain independent of the native MioPages
+renderer. This is an architectural separation requirement, not a claim that these
+capabilities or a WordPress integration already exist.
+
+The designer/agency retains control of the WordPress theme, surrounding layout and
+non-MioPages content. MioPages may own explicitly designated conversion blocks and
+constrained Posts/blog content, with clear content ownership, approval and change
+boundaries; it must not silently take over the rest of the site. A future turnkey
+MioPages-informed WordPress theme offering remains possible, not required.
+
+WordPress hosting location is infrastructure, not customer/business identity.
+A connected site may live on 20i Reseller, 20i Managed Cloud or an external WordPress
+host without changing the MioPages domain model. Within 20i, ordinary agency/customer
+sites may naturally use Reseller WordPress hosting; higher-resource cases may use
+a separate WordPress-oriented Managed Cloud environment. These are future placement
+options, not verified provider capabilities or provisioning decisions. Cohosting
+WordPress workloads on the core MioPages Node runtime is not an architectural
+requirement.
+
+This path is explicitly post-V1: it adds no Commercial V1 deliverable or launch
+dependency and must not delay launch or change its sequence. Do not implement a
+plugin, adapter framework, WordPress schema or hosting automation now. Revisit only
+under the [existing deferred gates](deferred-architecture.md#post-v1-wordpress-adoption-path).
+
 ## Non-goals
 
 This architecture does not require building a hosting control panel, registrar,

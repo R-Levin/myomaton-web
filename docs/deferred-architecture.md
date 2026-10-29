@@ -95,6 +95,25 @@ prepares the customer-facing candidate. Routine manual Page-by-Page assembly is 
 the target. Use future real operator-time/cost-to-serve evidence to prioritize
 refinements. Broader architecture/capabilities remain preserved; deferral is not deletion.
 
+### Post-V1 WordPress adoption path
+
+Preserve the [designer/agency WordPress path](platform-service-architecture.md#post-v1-wordpress-adoption-for-designers-and-agencies)
+as later product expansion, not a Commercial V1 deliverable or launch dependency.
+MioPages measurement, analysis, content intelligence, conversion components,
+approvals and improvement workflows must remain independent of its native renderer.
+WordPress may later be an alternative deployment adapter: designers/agencies retain
+theme, surrounding layout and non-MioPages content; MioPages may own designated
+conversion blocks and constrained Posts/blog content. Hosting placement must not
+redefine customer/business identity or require WordPress on the core Node runtime.
+The architecture contract preserves Reseller, separate WordPress-oriented Managed
+Cloud and external hosting options, plus a possible future turnkey theme.
+
+Revisit only for a separately scoped post-V1 designer/agency adoption requirement,
+reusing P1/P2/P3/P7/P12/P13/P16/P18/P19 and C1/C3/C4/C8 as applicable for ownership,
+approval, measurement, integration and isolation. No new gate IDs or roadmap are
+introduced. No plugin, adapter framework, WordPress schema or hosting automation
+is authorized now; preserve the Commercial V1 scope/sequence and do not delay launch.
+
 ## REQUIRED: Assets
 
 Satisfied for the first managed site slice: **A1/A2** for transactional `intro` Section
