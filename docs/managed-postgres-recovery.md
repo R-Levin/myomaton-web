@@ -240,6 +240,70 @@ managed recovery tests reuse the production conversion policy. No historical
 migration, ownership inventory, PG17 0006 mechanism or ICU/libc identity comparison
 is changed by this role-provisioning path.
 
+## Bounded provisioning verification diagnostics
+
+A later authorized hosted `create` reached `verification` and rolled back. That
+stage alone does not identify the failing invariant. Repository-only reproduction
+with the exact checkpoint implementation passed on PG17.11 ICU and PG18 with a
+non-superuser CREATEROLE source owner, `pg_database_owner` ownership of `public`,
+schema-local provider defaults (including source-owner grants), unrelated database
+CREATE grants, storage objects/defaults and broad application ACLs. These patterns
+alone do not reproduce the hosted refusal. The local Windows ICU environment is
+not an exact copy of the hosted Linux provider environment. The exact hosted
+assertion and root cause remain unproven; no permission correction is justified
+by this evidence, and successful hosted conversion is not yet established.
+
+The protected CLI now adds an allowlisted `reason` only for verification failures.
+It reports the last verification operation entered, never arbitrary assertion text,
+SQL, connection strings, passwords or provider details. Codes distinguish:
+
+- `provider-dependencies`, `application-defaults` and `role-contract`;
+- `application-ownership`, `application-acl` and `application-catalog`;
+- `snapshot-data`, `application-dependencies` and `migration-history`;
+- `semantic-equivalence`, `data-equivalence`, `shared-provider-authority` and
+  `bootstrap-equivalence`.
+
+A code identifies the bounded operation, not necessarily its individual assertion
+or cause. For example, `role-contract` covers effective privileges and required
+built-in execution as well as role flags. It is not proof of a membership issue.
+`pg_auth_members.member = application-role OID` tests memberships held by the
+application role. Non-superuser creator ADMIN membership points in the opposite
+direction. The existing assertions, exact equality comparisons, transactional
+rollback and permission writer are unchanged. Provider source-owner global/public/
+storage defaults and shared authority must remain intact.
+
+After review/checkpoint, a separately authorized hosted attempt can collect the
+safe reason. Pull that checkpoint onto the runtime, establish the protected
+verify-full administrative connection, and securely inject the existing three
+saved passwords and explicit identities from the provisioning table above. Do
+not place credentials in shell history or arguments. With that configuration
+already supplied, use this sequence (shell syntax for the 20i runtime):
+
+```sh
+export MIOPAGES_DATABASE_OPERATION=managed-role-provision
+MIOPAGES_ROLE_ACTION=create node --import tsx scripts/provision-managed-postgres-roles.ts
+```
+
+Stop on any failure and retain only the bounded stage/reason/SQLSTATE for further
+investigation. Do not loop, repair provider ACLs or assume the reported reason is
+itself a demonstrated cause. Confirm rollback/all three roles absent before any
+later deliberate create retry; a COMMIT connection loss remains an unknown outcome
+and requires read-only inspection. If create succeeds, clear administrative
+connection/password configuration, securely supply the independent backup-role
+verify-full `DATABASE_URL` and run:
+
+```sh
+MIOPAGES_ROLE_ACTION=verify node --import tsx scripts/provision-managed-postgres-roles.ts
+```
+
+Confirm the three permanent LOGIN roles and exact ACL/ownership contract from
+successful independent verification. In all outcomes, clear administrative
+credentials and provisioning secrets from the shell, including `DATABASE_URL`,
+`PGPASSWORD` if used, and `MIOPAGES_RUNTIME_PASSWORD`, `MIOPAGES_MIGRATION_PASSWORD`,
+`MIOPAGES_BACKUP_PASSWORD`. Do not rerun bootstrap or migrations: the reported
+hosted database already has 16 applied / 0 pending and a valid PG17 receipt.
+This documentation and its synthetic tests authorize no external execution.
+
 ## Archive and independent restore
 
 `managedBackup` uses a consistent exported snapshot and matching-source-major

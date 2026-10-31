@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { provisionManagedRoles, type RoleProvisioning } from "./db/managed-roles";
+import { provisionManagedRoles, roleProvisioningDiagnostic, type RoleProvisioning } from "./db/managed-roles";
 
 // No .env loading, passwords/URLs in arguments, or SQL/credential diagnostics.
 async function main() {
@@ -11,9 +11,6 @@ async function main() {
   console.log(JSON.stringify(await provisionManagedRoles(config)));
 }
 main().catch(error => {
-  const stages = ["connection", "identity", "dependencies", "role-precondition", "inventory-preflight", "role-creation", "ownership-transfer", "acl-normalization", "default-privileges", "verification", "membership-cleanup", "commit"];
-  const stage = stages.includes(error?.roleProvisioningStage) ? error.roleProvisioningStage : "configuration";
-  const sqlState = typeof error?.code === "string" && /^[0-9A-Z]{5}$/.test(error.code) ? error.code : undefined;
-  console.error(JSON.stringify({ error: "Managed role provisioning/verification refused; no successful commit claimed", stage, sqlState }));
+  console.error(JSON.stringify(roleProvisioningDiagnostic(error)));
   process.exitCode = 1;
 });

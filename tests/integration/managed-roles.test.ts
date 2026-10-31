@@ -5,7 +5,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { Pool } from "pg";
 import { disposableCluster } from "../../scripts/backup/disposable-cluster";
 import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
-import { provisionManagedRoles, type RoleProvisioning } from "../../scripts/db/managed-roles";
+import { provisionManagedRoles, roleProvisioningDiagnostic, type RoleProvisioning } from "../../scripts/db/managed-roles";
 import { managedSnapshot } from "../../scripts/backup/managed";
 import { recoveryCatalog } from "../../scripts/backup/catalog";
 import { quote as q } from "../../scripts/backup/managed-permissions";
@@ -27,12 +27,19 @@ for (const major of [17, 18]) test(`PG${major} inventory-only provider ACL conve
     }
     await root.query(`CREATE ROLE provider_owner LOGIN CREATEROLE CREATEDB NOSUPERUSER NOREPLICATION NOBYPASSRLS PASSWORD '${ownerPassword}'; ALTER DATABASE ${q(url.pathname.slice(1))} OWNER TO provider_owner`);
     const superuser = new Pool({ connectionString: url.toString(), options: "-c timezone=UTC" });
-    try { await superuser.query("ALTER SCHEMA public OWNER TO provider_owner"); } finally { await superuser.end(); }
+    try { await superuser.query("ALTER SCHEMA public OWNER TO pg_database_owner"); } finally { await superuser.end(); }
     const providerUrl = new URL(url); providerUrl.username = "provider_owner"; providerUrl.password = ownerPassword;
     provider = new Pool({ connectionString: providerUrl.toString(), options: "-c timezone=UTC" });
     for (const role of ["anon", "authenticated", "service_role", "unknown_grantee", 'quoted "reader', "column_only", "downstream"]) await root.query(`CREATE ROLE ${q(role)} NOLOGIN`);
     const external = ["anon", "authenticated", "service_role", "postgres", "unknown_grantee", 'quoted "reader'].map(q).join(",");
-    await provider.query(`ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO ${external}; ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO ${external}`);
+    await provider.query(`CREATE SCHEMA storage; CREATE TABLE storage.provider_private(value text); CREATE FUNCTION storage.provider_private_probe() RETURNS int LANGUAGE sql AS 'SELECT 1';
+      ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO ${external}; ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO ${external};
+      ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO ${external},provider_owner;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO ${external},provider_owner;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO ${external},provider_owner;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA storage GRANT ALL ON TABLES TO ${external},provider_owner;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA storage GRANT EXECUTE ON FUNCTIONS TO ${external},provider_owner`);
+    await root.query(`CREATE ROLE dashboard_user NOLOGIN; CREATE ROLE provider_etl NOLOGIN; CREATE ROLE provider_storage NOLOGIN; GRANT CONNECT,CREATE,TEMPORARY ON DATABASE ${q(url.pathname.slice(1))} TO dashboard_user; GRANT CREATE ON DATABASE ${q(url.pathname.slice(1))} TO provider_etl,provider_storage`);
     await migrateWithBootstrapCompatibility(provider);
     await provider.query(`CREATE TABLE public.provider_marker(id serial PRIMARY KEY,value text); INSERT INTO public.provider_marker(value) VALUES('unchanged provider data'); CREATE FUNCTION public.provider_probe() RETURNS int LANGUAGE sql AS 'SELECT 1'; GRANT ALL ON SEQUENCE public.provider_marker_id_seq TO anon; GRANT SELECT(value) ON public.provider_marker TO column_only; GRANT SELECT(name),UPDATE(name) ON public.pages TO column_only WITH GRANT OPTION; GRANT ALL ON SEQUENCE drizzle.__drizzle_migrations_id_seq TO anon`);
     const delegationPool = new Pool({ connectionString: url.toString() }); const delegated = await delegationPool.connect(); try { await delegated.query("BEGIN; SET LOCAL ROLE column_only; GRANT SELECT(name) ON public.pages TO downstream; COMMIT"); } finally { delegated.release(); await delegationPool.end(); }
@@ -45,6 +52,9 @@ for (const major of [17, 18]) test(`PG${major} inventory-only provider ACL conve
       columns: (await dbRoot.query("SELECT attname,attacl::text FROM pg_attribute WHERE attrelid='public.provider_marker'::regclass ORDER BY attnum")).rows,
       fn: (await dbRoot.query("SELECT proowner,proacl::text,pg_get_functiondef(oid) definition FROM pg_proc WHERE oid='public.provider_probe()'::regprocedure")).rows,
       defaults: (await dbRoot.query("SELECT defaclnamespace,defaclobjtype,defaclacl::text FROM pg_default_acl WHERE defaclrole='provider_owner'::regrole ORDER BY 1,2")).rows,
+      storage: (await dbRoot.query("SELECT c.relname,c.relowner,c.relacl::text FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='storage' ORDER BY c.relname")).rows,
+      storageFunctions: (await dbRoot.query("SELECT p.proname,p.proowner,p.proacl::text,pg_get_functiondef(p.oid) definition FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='storage' ORDER BY p.proname")).rows,
+      shared: (await dbRoot.query(`SELECT 'database' object,pg_get_userbyid(d.datdba) owner,a.* FROM pg_database d CROSS JOIN LATERAL aclexplode(d.datacl) a WHERE d.datname=current_database() AND NOT a.grantee=ANY(SELECT oid FROM pg_roles WHERE rolname=ANY($1)) UNION ALL SELECT 'public',pg_get_userbyid(n.nspowner),a.* FROM pg_namespace n CROSS JOIN LATERAL aclexplode(n.nspacl) a WHERE n.nspname='public' AND NOT a.grantee=ANY(SELECT oid FROM pg_roles WHERE rolname=ANY($1)) ORDER BY 1,2,3,4,5,6`, [Object.values(roles)])).rows,
       data: (await dbRoot.query("SELECT * FROM public.provider_marker ORDER BY id")).rows,
     });
     try {
@@ -65,7 +75,12 @@ for (const major of [17, 18]) test(`PG${major} inventory-only provider ACL conve
       });
       await check("late verifier refusal rolls back roles, owners, grants and defaults", async () => {
         await dbRoot.query("REVOKE EXECUTE ON FUNCTION pg_catalog.pg_advisory_lock(bigint) FROM PUBLIC"); const before = await capture();
-        try { await assert.rejects(provisionManagedRoles(config), /Required provider execution capability/); assert.deepEqual(await capture(), before); assert.equal((await dbRoot.query("SELECT count(*)::int n FROM pg_roles WHERE rolname=ANY($1)", [Object.values(roles)])).rows[0].n, 0); }
+        try { await assert.rejects(provisionManagedRoles(config), error => {
+          assert.match(String(error), /Required provider execution capability/);
+          assert.equal(roleProvisioningDiagnostic(error).stage, "verification");
+          assert.equal(roleProvisioningDiagnostic(error).reason, "role-contract");
+          return true;
+        }); assert.deepEqual(await capture(), before); assert.equal((await dbRoot.query("SELECT count(*)::int n FROM pg_roles WHERE rolname=ANY($1)", [Object.values(roles)])).rows[0].n, 0); }
         finally { await dbRoot.query("GRANT EXECUTE ON FUNCTION pg_catalog.pg_advisory_lock(bigint) TO PUBLIC"); }
       });
       const providerBefore = await unrelated();
@@ -76,7 +91,7 @@ for (const major of [17, 18]) test(`PG${major} inventory-only provider ACL conve
         const success = attempts.find(r => r.status === "fulfilled") as PromiseFulfilledResult<Awaited<ReturnType<typeof provisionManagedRoles>>>;
         assert.equal(success.value.verified, true); assert.equal(success.value.migrations, 16);
         assert.deepEqual(await unrelated(), providerBefore);
-        assert.equal((await dbRoot.query("SELECT pg_get_userbyid(nspowner) owner FROM pg_namespace WHERE nspname='public'")).rows[0].owner, "provider_owner");
+        assert.equal((await dbRoot.query("SELECT pg_get_userbyid(nspowner) owner FROM pg_namespace WHERE nspname='public'")).rows[0].owner, "pg_database_owner");
         assert.equal((await dbRoot.query("SELECT count(*)::int n FROM organizations WHERE name='Preserved synthetic organization'")).rows[0].n, 1);
         for (const kind of ["runtime", "migration", "backup"] as const) {
           const next = new URL(url); next.username = roles[kind]; next.password = passwords[kind];
@@ -92,7 +107,11 @@ for (const major of [17, 18]) test(`PG${major} inventory-only provider ACL conve
       await check("read-only verification refuses committed drift without repairing it", async () => {
         await migration!.query("GRANT EXECUTE ON FUNCTION public.site_content_guard() TO PUBLIC");
         const before = await capture(), backupUrl = new URL(url); backupUrl.username = roles.backup; backupUrl.password = passwords.backup;
-        try { await assert.rejects(provisionManagedRoles({ ...config, operation: "verify", databaseUrl: backupUrl.toString(), passwords: undefined })); assert.deepEqual(await capture(), before); }
+        try { await assert.rejects(provisionManagedRoles({ ...config, operation: "verify", databaseUrl: backupUrl.toString(), passwords: undefined }), error => {
+          assert.equal(roleProvisioningDiagnostic(error).stage, "verification");
+          assert.equal(roleProvisioningDiagnostic(error).reason, "role-contract");
+          return true;
+        }); assert.deepEqual(await capture(), before); }
         finally { await migration!.query("REVOKE EXECUTE ON FUNCTION public.site_content_guard() FROM PUBLIC"); }
       });
       await check("future objects have owner-only defaults; provider defaults remain unchanged", async () => {
@@ -114,7 +133,8 @@ for (const major of [17, 18]) test(`PG${major} inventory-only provider ACL conve
             `GRANT USAGE ON SEQUENCE drizzle.__drizzle_migrations_id_seq TO ${q(roles.runtime)}`,
             `ALTER DEFAULT PRIVILEGES FOR ROLE ${q(roles.migration)} IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO anon`,
             `ALTER DEFAULT PRIVILEGES FOR ROLE ${q(roles.migration)} GRANT EXECUTE ON FUNCTIONS TO PUBLIC`,
-          ]) { await c.query("BEGIN"); try { await c.query(sql); await assert.rejects(managedSnapshot(c, config.databaseUrl, roles)); } finally { await c.query("ROLLBACK"); } }
+          ]) { await c.query("BEGIN"); try { await c.query(sql); let reason: string | undefined; await assert.rejects(managedSnapshot(c, config.databaseUrl, roles, next => { reason = next; }));
+            assert.equal(reason, sql.startsWith("ALTER DEFAULT") ? "application-defaults" : sql.includes("unknown_grantee") || sql.includes("column_only") || sql.includes("GRANT OPTION") ? "application-acl" : "role-contract"); } finally { await c.query("ROLLBACK"); } }
         } finally { c.release(); }
         const c2 = await backup!.connect(); try { await c2.query("BEGIN READ ONLY"); const state = await managedSnapshot(c2, config.databaseUrl, roles); assert.equal(state.provider.locale.datlocprovider, major === 17 ? "i" : "c"); assert.equal(state.migrations.length, 16); } finally { await c2.query("ROLLBACK"); c2.release(); }
       });

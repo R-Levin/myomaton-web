@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash, createHmac, pbkdf2Sync, randomBytes } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import ownership from "../backup/application-ownership.json";
-import { managedSnapshot, managedDependencies, applicationSemantic } from "../backup/managed";
+import { managedSnapshot, managedDependencies, applicationSemantic, managedVerificationReasons, type ManagedVerificationReason } from "../backup/managed";
 import { applyApplicationGrants, establishApplicationDefaults, normalizeOwnedSchemaGrants, quote as q, qualified, type Roles, type Sql } from "../backup/managed-permissions";
 import { recoveryCatalog } from "../backup/catalog";
 import { bootstrapFiles, bootstrapStatus } from "./bootstrap";
@@ -69,7 +69,8 @@ export async function provisionManagedRoles(input: RoleProvisioning) {
   const pool = new Pool({ connectionString: input.databaseUrl, connectionTimeoutMillis: 10000 });
   let c: PoolClient;
   try { c = await pool.connect(); } catch (error) { await pool.end(); if (error && typeof error === "object") Object.assign(error, { roleProvisioningStage: "connection" }); throw error; }
-  let stage = "identity";
+  let stage = "identity", verificationReason: ManagedVerificationReason | undefined;
+  const progress = (reason: ManagedVerificationReason) => { verificationReason = reason; };
   try {
     await c.query(input.operation === "verify" ? "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY" : "BEGIN");
     await c.query("SET LOCAL lock_timeout='10s'; SET LOCAL statement_timeout='120s'; SET LOCAL search_path=pg_catalog; SET LOCAL TIME ZONE 'UTC'");
@@ -83,7 +84,7 @@ export async function provisionManagedRoles(input: RoleProvisioning) {
     const existing = (await c.query("SELECT rolname FROM pg_roles WHERE rolname=ANY($1)", [Object.values(input.roles)])).rows;
     if (input.operation === "verify") {
       assert.equal(existing.length, 3, "Verify requires the complete existing role set");
-      stage = "verification"; const state = await managedSnapshot(c, input.databaseUrl, input.roles); stage = "commit"; await c.query("COMMIT");
+      stage = "verification"; const state = await managedSnapshot(c, input.databaseUrl, input.roles, progress); stage = "commit"; await c.query("COMMIT");
       return { operation: "verify", verified: true, roles: input.roles, major: state.provider.major, migrations: state.migrations.length };
     }
     assert.equal(existing.length, 0, "Create requires all three role names absent; partial/existing roles are never repaired");
@@ -110,17 +111,26 @@ export async function provisionManagedRoles(input: RoleProvisioning) {
     stage = "acl-normalization"; await applyApplicationGrants(c, input.roles);
     for (const schema of ownership.schemas.filter(s => s !== "public")) await normalizeOwnedSchemaGrants(c, input.roles, schema);
     stage = "default-privileges"; await establishApplicationDefaults(c, input.roles);
-    stage = "verification"; const state = await managedSnapshot(c, input.databaseUrl, input.roles);
-    assert.deepEqual(state.semantic, catalog, "Role provisioning changed application semantics");
-    assert.deepEqual(await dataState(c), data, "Role provisioning changed data or sequence values");
-    assert.deepEqual(await sharedAuthority(c, input.roles), shared, "Provider database/public authority changed");
-    assert.deepEqual(await bootstrapStatus(c, bootstrapFiles()), bootstrap, "Bootstrap receipt/history changed");
+    stage = "verification"; const state = await managedSnapshot(c, input.databaseUrl, input.roles, progress);
+    progress("semantic-equivalence"); assert.deepEqual(state.semantic, catalog, "Role provisioning changed application semantics");
+    progress("data-equivalence"); assert.deepEqual(await dataState(c), data, "Role provisioning changed data or sequence values");
+    progress("shared-provider-authority"); assert.deepEqual(await sharedAuthority(c, input.roles), shared, "Provider database/public authority changed");
+    progress("bootstrap-equivalence"); assert.deepEqual(await bootstrapStatus(c, bootstrapFiles()), bootstrap, "Bootstrap receipt/history changed");
     stage = "membership-cleanup"; await c.query("SET LOCAL ROLE NONE");
     await c.query(`REVOKE ${Object.values(input.roles).map(q).join(",")} FROM ${q(input.sourceOwner)}`);
     const membership = (await c.query("SELECT m.inherit_option,m.set_option FROM pg_auth_members m WHERE m.roleid=ANY(SELECT oid FROM pg_roles WHERE rolname=ANY($1))", [Object.values(input.roles)])).rows;
     assert.ok(membership.every(r => !r.inherit_option && !r.set_option), "Unexpected retained application-role SET/INHERIT membership");
     stage = "commit"; await c.query("COMMIT");
     return { operation: "create", verified: true, roles: input.roles, major: state.provider.major, migrations: state.migrations.length };
-  } catch (error) { if (error && typeof error === "object") Object.assign(error, { roleProvisioningStage: stage }); try { await c.query("ROLLBACK"); } catch { /* A lost connection never claims a successful commit. */ } throw error; }
+  } catch (error) { if (error && typeof error === "object") Object.assign(error, { roleProvisioningStage: stage, roleProvisioningReason: stage === "verification" ? verificationReason : undefined }); try { await c.query("ROLLBACK"); } catch { /* A lost connection never claims a successful commit. */ } throw error; }
   finally { c.release(); await pool.end(); }
+}
+
+export function roleProvisioningDiagnostic(error: unknown) {
+  const stages = ["connection", "identity", "dependencies", "role-precondition", "inventory-preflight", "role-creation", "ownership-transfer", "acl-normalization", "default-privileges", "verification", "membership-cleanup", "commit"];
+  const failure = error && typeof error === "object" ? error as Record<string, unknown> : {};
+  const stage = typeof failure.roleProvisioningStage === "string" && stages.includes(failure.roleProvisioningStage) ? failure.roleProvisioningStage : "configuration";
+  const reason = stage === "verification" && managedVerificationReasons.includes(failure.roleProvisioningReason as ManagedVerificationReason) ? failure.roleProvisioningReason as ManagedVerificationReason : undefined;
+  const sqlState = typeof failure.code === "string" && /^[0-9A-Z]{5}$/.test(failure.code) ? failure.code : undefined;
+  return { error: "Managed role provisioning/verification refused; no successful commit claimed", stage, reason, sqlState };
 }

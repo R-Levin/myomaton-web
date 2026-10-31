@@ -72,9 +72,14 @@ export async function managedDependencies(c: Pick<PoolClient, "query">, url: str
   if (locale.datlocprovider === "i") assert.equal(daticurules, null, "Custom ICU collation rules require a separate recovery contract");
   return { major, plpgsql: extension.extversion, capabilities: ["plpgsql", "jsonb", "gen_random_uuid", "advisory-locks", "deferred-triggers"], locale, timezone: "UTC", transport: local ? "loopback-test" : "tls-verify-full" };
 }
-async function privileges(c: PoolClient, roles: Roles) {
+// Fixed, non-sensitive progress labels; never derived from SQL or assertion text.
+export const managedVerificationReasons = ["provider-dependencies", "application-defaults", "role-contract", "application-ownership", "application-acl", "application-catalog", "snapshot-data", "application-dependencies", "migration-history", "semantic-equivalence", "data-equivalence", "shared-provider-authority", "bootstrap-equivalence"] as const;
+export type ManagedVerificationReason = typeof managedVerificationReasons[number];
+type VerificationProgress = (reason: ManagedVerificationReason) => void;
+async function privileges(c: PoolClient, roles: Roles, progress?: VerificationProgress) {
   assert.equal(new Set(Object.values(roles)).size, 3, "Three distinct application roles required");
-  await assertApplicationDefaults(c, roles);
+  progress?.("application-defaults"); await assertApplicationDefaults(c, roles);
+  progress?.("role-contract");
   const result: unknown[] = [];
   for (const [kind, role] of Object.entries(roles)) {
     const flags = (await c.query("SELECT rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls FROM pg_roles WHERE rolname=$1", [role])).rows[0]; assert.ok(flags);
@@ -104,6 +109,7 @@ async function privileges(c: PoolClient, roles: Roles) {
     if (kind === "runtime") for (const fn of ["pg_catalog.gen_random_uuid()", "pg_catalog.hashtextextended(text,bigint)", "pg_catalog.pg_advisory_lock(bigint)", "pg_catalog.pg_advisory_unlock(bigint)", "pg_catalog.pg_advisory_xact_lock(bigint)"]) { const execute = (await c.query("SELECT has_function_privilege($1,$2,'EXECUTE') ok", [role, fn])).rows[0].ok; assert.equal(execute, true, "Required provider execution capability missing"); providerFunctions.push({ fn, execute }); }
     result.push({ kind, flags, schemas, tables, sequences, functions, providerFunctions });
   }
+  progress?.("application-ownership");
   const schemas = (await c.query("SELECT nspname,pg_get_userbyid(nspowner) owner FROM pg_namespace WHERE nspname=ANY($1)", [ownership.schemas.filter(s => s !== "public")])).rows;
   assert.equal(schemas.length, ownership.schemas.length - 1); assert.ok(schemas.every(r => r.owner === roles.migration), "Application schema owner differs");
   const relations = (await c.query("SELECT n.nspname,c.relname,pg_get_userbyid(c.relowner) owner FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE (n.nspname||'.'||c.relname)=ANY($1)", [[...ownership.tables, ...ownership.sequences]])).rows;
@@ -111,6 +117,7 @@ async function privileges(c: PoolClient, roles: Roles) {
   assert.ok(relations.every(r => r.owner === roles.migration), "Application relations require migration-role ownership");
   const fns = (await c.query("SELECT n.nspname,p.proname,pg_get_userbyid(p.proowner) owner,p.prosecdef,p.proconfig,pg_get_function_identity_arguments(p.oid) arguments FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE (n.nspname||'.'||p.proname)=ANY($1) ORDER BY p.proname", [ownership.functions])).rows;
   assert.equal(fns.length, ownership.functions.length); assert.ok(fns.every(f => f.owner === roles.migration && f.arguments === "" && f.prosecdef === false && f.proconfig === null));
+  progress?.("application-acl");
   const acl = (await c.query(`SELECT n.nspname||'.'||r.relname object,'' field,a.grantee,a.grantor,a.privilege_type,a.is_grantable FROM pg_class r JOIN pg_namespace n ON n.oid=r.relnamespace CROSS JOIN LATERAL aclexplode(r.relacl) a WHERE (n.nspname||'.'||r.relname)=ANY($1)
     UNION ALL SELECT n.nspname||'.'||r.relname,col.attname,a.grantee,a.grantor,a.privilege_type,a.is_grantable FROM pg_attribute col JOIN pg_class r ON r.oid=col.attrelid JOIN pg_namespace n ON n.oid=r.relnamespace CROSS JOIN LATERAL aclexplode(col.attacl) a WHERE (n.nspname||'.'||r.relname)=ANY($1)
     UNION ALL SELECT n.nspname||'.'||p.proname,'()',a.grantee,a.grantor,a.privilege_type,a.is_grantable FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(p.proacl) a WHERE (n.nspname||'.'||p.proname)=ANY($2)`, [[...ownership.tables, ...ownership.sequences], ownership.functions])).rows;
@@ -124,17 +131,22 @@ async function privileges(c: PoolClient, roles: Roles) {
   result.push({ applicationAcl: edges });
   return result;
 }
-export async function managedSnapshot(c: PoolClient, url: string, roles: Roles) {
+export async function managedSnapshot(c: PoolClient, url: string, roles: Roles, progress?: VerificationProgress) {
   await c.query("SET LOCAL search_path=public"); await c.query("SET LOCAL TIME ZONE 'UTC'");
-  const provider = await managedDependencies(c, url), security = await privileges(c, roles), catalog = await recoveryCatalog(c, ownership.schemas);
+  progress?.("provider-dependencies"); const provider = await managedDependencies(c, url);
+  const security = await privileges(c, roles, progress);
+  progress?.("application-catalog"); const catalog = await recoveryCatalog(c, ownership.schemas);
   const semantic = applicationSemantic(catalog), tables = [], sequences = [];
+  progress?.("snapshot-data");
   for (const table of ownership.tables) { const rows = (await c.query(`SELECT to_jsonb(t) row FROM ${qualified(table)} t ORDER BY to_jsonb(t)::text`)).rows.map(r => r.row); tables.push({ table, count: rows.length, hash: fingerprint(rows) }); }
   for (const sequence of ownership.sequences) sequences.push({ sequence, ...(await c.query(`SELECT last_value::text,is_called FROM ${qualified(sequence)}`)).rows[0] });
+  progress?.("application-dependencies");
   assert.equal(semantic.relations.length, ownership.tables.length + ownership.sequences.length);
   assert.ok(semantic.relations.every(r => r.relrowsecurity === false), "RLS-enabled application objects require a separate recovery contract");
   assert.equal(semantic.functions.length, ownership.functions.length);
   const foreign = (await c.query("SELECT c.conname FROM pg_constraint c WHERE c.contype='f' AND c.conrelid=ANY($1::regclass[]) AND NOT c.confrelid=ANY($1::regclass[])", [ownership.tables])).rows; assert.deepEqual(foreign, [], "Unowned foreign-key dependency");
   const triggerDeps = (await c.query("SELECT n.nspname||'.'||p.proname fn FROM pg_trigger t JOIN pg_proc p ON p.oid=t.tgfoid JOIN pg_namespace n ON n.oid=p.pronamespace WHERE NOT t.tgisinternal AND t.tgrelid=ANY($1::regclass[])", [ownership.tables])).rows; assert.ok(triggerDeps.every(r => ownership.functions.includes(r.fn)), "Unowned trigger dependency");
+  progress?.("migration-history");
   const migrations = (await c.query("SELECT hash,created_at::text FROM drizzle.__drizzle_migrations ORDER BY id")).rows;
   const expected = readMigrationFiles({ migrationsFolder: "lib/platform/db/migrations" }); assert.equal(expected.length, 16, "Ownership contract requires review for new migrations");
   assert.deepEqual(migrations, expected.map(m => ({ hash: m.hash, created_at: String(m.folderMillis) })));

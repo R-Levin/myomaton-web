@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { validateRoleProvisioning, type RoleProvisioning } from "../scripts/db/managed-roles";
+import { validateRoleProvisioning, roleProvisioningDiagnostic, type RoleProvisioning } from "../scripts/db/managed-roles";
 import { allowedPrivileges } from "../scripts/backup/managed-permissions";
 const base: RoleProvisioning = { operation: "create", databaseUrl: "postgresql://localhost/synthetic", databaseName: "synthetic", sourceOwner: "provider_owner", roles: { runtime: "site_runtime", migration: "site_migration", backup: "site_backup" }, passwords: { runtime: "r".repeat(32), migration: "m".repeat(32), backup: "b".repeat(32) } };
 test("role provisioning requires explicit distinct identities and protected credentials before connection", () => {
@@ -32,4 +32,16 @@ test("operator entry uses an explicit gate and protected environment without loa
   assert.ok(source.includes('"managed-role-provision"')); assert.ok(source.includes('"MIOPAGES_ROLE_ACTION"'));
   assert.doesNotMatch(source, /dotenv|env-file|process\.argv/);
   assert.doesNotMatch(source, /console\.error\(error/);
+});
+
+test("protected diagnostics expose only fixed stages, verification reasons and SQLSTATE", () => {
+  const privateText = "private provider diagnostic, URL, SQL and password material";
+  const failure = Object.assign(new Error(privateText), { roleProvisioningStage: "verification", roleProvisioningReason: "application-acl", code: "42501", detail: privateText, query: privateText });
+  assert.deepEqual(roleProvisioningDiagnostic(failure), { error: "Managed role provisioning/verification refused; no successful commit claimed", stage: "verification", reason: "application-acl", sqlState: "42501" });
+  assert.ok(!JSON.stringify(roleProvisioningDiagnostic(failure)).includes(privateText));
+  for (const value of [null, privateText, { roleProvisioningStage: privateText, roleProvisioningReason: privateText, code: privateText }]) {
+    assert.deepEqual(roleProvisioningDiagnostic(value), { error: "Managed role provisioning/verification refused; no successful commit claimed", stage: "configuration", reason: undefined, sqlState: undefined });
+  }
+  assert.equal(roleProvisioningDiagnostic({ roleProvisioningStage: "verification", roleProvisioningReason: privateText }).reason, undefined);
+  assert.equal(roleProvisioningDiagnostic({ roleProvisioningStage: "connection", roleProvisioningReason: "role-contract" }).reason, undefined);
 });
