@@ -3,28 +3,45 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { Pool } from "pg";
 import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
 import ownership from "../../scripts/backup/application-ownership.json";
-import type { Roles } from "../../scripts/backup/managed";
+import { provisionManagedRoles, createManagedLoginRoles } from "../../scripts/db/managed-roles";
+import { establishApplicationDefaults, normalizeObjectGrants, type Roles } from "../../scripts/backup/managed-permissions";
 import { mioPagesIntakeOwner } from "../../lib/platform/intake/availability";
 import { managedKey, provisionManagedObject } from "../../lib/platform/assets/local-storage";
 import sharp from "sharp";
 
 const q = (s: string) => '"' + s.replaceAll('"', '""') + '"';
-export async function roleGrants(admin: Pool, roles: Roles, schema = "public") {
-  await admin.query(`GRANT USAGE ON SCHEMA ${q(schema)} TO ${q(roles.runtime)},${q(roles.backup)},${q(roles.migration)}; GRANT CREATE ON SCHEMA ${q(schema)} TO ${q(roles.migration)}`);
-  for (const name of ownership.tables.filter(t => t.startsWith("public.")).map(t => t.slice(7))) {
-    await admin.query(`ALTER TABLE ${q(schema)}.${q(name)} OWNER TO ${q(roles.migration)}; GRANT SELECT,INSERT,UPDATE,DELETE ON ${q(schema)}.${q(name)} TO ${q(roles.runtime)}; GRANT SELECT ON ${q(schema)}.${q(name)} TO ${q(roles.backup)}`);
-  }
-  for (const name of ownership.functions.map(t => t.slice(7))) await admin.query(`ALTER FUNCTION ${q(schema)}.${q(name)}() OWNER TO ${q(roles.migration)}; REVOKE ALL ON FUNCTION ${q(schema)}.${q(name)}() FROM PUBLIC; GRANT EXECUTE ON FUNCTION ${q(schema)}.${q(name)}() TO ${q(roles.runtime)}`);
-  if (schema === "public") await admin.query(`GRANT USAGE ON SCHEMA drizzle TO ${q(roles.runtime)},${q(roles.backup)}; GRANT SELECT ON drizzle.__drizzle_migrations TO ${q(roles.runtime)},${q(roles.backup)}; GRANT SELECT ON SEQUENCE drizzle.__drizzle_migrations_id_seq TO ${q(roles.backup)}`);
+export async function roleGrants(admin: Pool, roles: Roles, schema: string) {
+  assert.match(schema, /^canonical_test_[a-f0-9]{32}(?:_\w+)?$/);
+  const c = await admin.connect();
+  try {
+    await c.query("BEGIN");
+    await c.query(`GRANT USAGE,CREATE ON SCHEMA ${q(schema)} TO ${q(roles.migration)}; GRANT USAGE ON SCHEMA ${q(schema)} TO ${q(roles.runtime)},${q(roles.backup)}`);
+    for (const table of ownership.tables.filter(t => t.startsWith("public."))) await c.query(`ALTER TABLE ${q(schema)}.${q(table.slice(7))} OWNER TO ${q(roles.migration)}`);
+    for (const fn of ownership.functions) await c.query(`ALTER FUNCTION ${q(schema)}.${q(fn.slice(7))}() OWNER TO ${q(roles.migration)}`);
+    await c.query(`SET LOCAL ROLE ${q(roles.migration)}`);
+    for (const table of ownership.tables.filter(t => t.startsWith("public."))) await normalizeObjectGrants(c, roles, "TABLE", `${schema}.${table.slice(7)}`);
+    for (const fn of ownership.functions) await normalizeObjectGrants(c, roles, "FUNCTION", `${schema}.${fn.slice(7)}`);
+    await c.query("COMMIT");
+  } catch (e) { await c.query("ROLLBACK"); throw e; } finally { c.release(); }
 }
 export async function managedEnvironment(url: string, migrateNow: boolean) {
   const u = new URL(url); assert.equal(u.hostname, "127.0.0.1"); assert.notEqual(u.port, "5432"); assert.match(u.pathname, /^\/migration_rehearsal_[a-f0-9]{32}$/);
   const admin = new Pool({ connectionString: url }), roles = { runtime: "proof_runtime", migration: "proof_migration", backup: "proof_backup" }, urls = {} as Record<keyof Roles, string>;
+  const passwords = { runtime: randomBytes(32).toString("hex"), migration: randomBytes(32).toString("hex"), backup: randomBytes(32).toString("hex") };
   try {
-  for (const [kind, role] of Object.entries(roles)) { const password = randomBytes(32).toString("hex"); await admin.query(`CREATE ROLE ${q(role)} LOGIN PASSWORD '${password}' NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS`); const next = new URL(url); next.username = role; next.password = password; urls[kind as keyof Roles] = next.toString(); }
-  await admin.query(`GRANT CREATE ON DATABASE ${q(decodeURIComponent(u.pathname.slice(1)))} TO ${q(roles.migration)}; REVOKE CREATE ON SCHEMA public FROM PUBLIC; CREATE SCHEMA drizzle AUTHORIZATION ${q(roles.migration)}; GRANT USAGE,CREATE ON SCHEMA public TO ${q(roles.migration)}; GRANT USAGE ON SCHEMA public,drizzle TO ${q(roles.runtime)},${q(roles.backup)}; CREATE TABLE public.provider_marker(value text); INSERT INTO public.provider_marker VALUES('provider infrastructure, not app data')`);
-  if (migrateNow) { const migration = new Pool({ connectionString: urls.migration }); try { await migrateWithBootstrapCompatibility(migration); } finally { await migration.end(); } await roleGrants(admin, roles); }
-  return { admin, roles, urls };
+    await admin.query("CREATE TABLE public.provider_marker(value text); INSERT INTO public.provider_marker VALUES('provider infrastructure, not app data')");
+    if (migrateNow) {
+      await migrateWithBootstrapCompatibility(admin);
+      await provisionManagedRoles({ operation: "create", databaseUrl: url, databaseName: decodeURIComponent(u.pathname.slice(1)), sourceOwner: "postgres", roles, passwords });
+    } else {
+      // Empty restore targets have no complete application inventory yet. Their
+      // disposable setup reuses the production role/default policy, not a writer.
+      await createManagedLoginRoles(admin, roles, passwords);
+      await admin.query(`GRANT CREATE ON DATABASE ${q(decodeURIComponent(u.pathname.slice(1)))} TO ${q(roles.migration)}; CREATE SCHEMA drizzle AUTHORIZATION ${q(roles.migration)}; GRANT USAGE,CREATE ON SCHEMA public TO ${q(roles.migration)}; GRANT USAGE ON SCHEMA public,drizzle TO ${q(roles.runtime)},${q(roles.backup)}`);
+      await establishApplicationDefaults(admin, roles);
+    }
+    for (const kind of ["runtime", "migration", "backup"] as const) { const next = new URL(url); next.username = roles[kind]; next.password = passwords[kind]; urls[kind] = next.toString(); }
+    return { admin, roles, urls };
   } catch (error) { await admin.end(); throw error; }
 }
 export async function seedManagedTenants(pool: Pool, root: string) {

@@ -142,6 +142,104 @@ Effective table/column/sequence/function/schema privileges and memberships are
 verified. Runtime cannot disable guards or alter their functions. The provider
 supplies database/public-schema ownership and must support this bounded role model.
 
+## Transactional application role provisioning
+
+The authorized synthetic hosted proof exposed provider/default ACLs on the explicit
+MioPages inventory: broad table grants to roles such as `anon`, `authenticated`,
+`service_role` and `postgres`, and PUBLIC/provider EXECUTE on trigger functions.
+The old verifier correctly refused `Unowned/PUBLIC application ACL grant`; the
+attempt rolled back without permanent application roles. Provider-created defaults
+are not permission to expose application data through those identities.
+
+Use the [operator entry point](../scripts/provision-managed-postgres-roles.ts) and
+[transactional provisioner](../scripts/db/managed-roles.ts), not the disposable test
+helper or ad hoc chat SQL. This procedure changes database roles/ownership/ACLs;
+run it only within separately authorized database/environment scope. No hosted
+execution is implied by this document or its local tests.
+
+Supply protected process configuration explicitly; the entry loads no `.env` file
+and accepts no passwords or connection URLs in command arguments:
+
+| Environment key | Required value / boundary |
+| --- | --- |
+| `MIOPAGES_DATABASE_OPERATION` | `managed-role-provision` |
+| `MIOPAGES_ROLE_ACTION` | `create` or `verify`; no repair or reset mode |
+| `DATABASE_URL` | Create: authorized provider-owner connection. Verify: prefer the supplied backup-role connection, or migration role. Remote connections require verified TLS. |
+| `MIOPAGES_DATABASE_NAME` | Exact expected database name, also checked against the connected database |
+| `MIOPAGES_PROVIDER_OWNER` | Exact initial application-object owner; create requires this caller/session identity |
+| `MIOPAGES_RUNTIME_ROLE`, `MIOPAGES_MIGRATION_ROLE`, `MIOPAGES_BACKUP_ROLE` | Three distinct dedicated LOGIN role names, for example `miopages_runtime`, `miopages_migration`, `miopages_backup` |
+| `MIOPAGES_RUNTIME_PASSWORD`, `MIOPAGES_MIGRATION_PASSWORD`, `MIOPAGES_BACKUP_PASSWORD` | Create only: distinct cryptographically random printable ASCII secrets, 32–256 characters. Inject through protected configuration; never commit them. |
+
+With that configuration supplied, run:
+
+```text
+npx tsx scripts/provision-managed-postgres-roles.ts
+```
+
+Create requires all three role names absent, the complete bootstrapped inventory,
+exact 16-entry migration history/required PG17 receipt, and uniform declared initial
+ownership. Partial/existing roles, mixed ownership, missing/overloaded functions,
+unreviewed dependent sequences and unrelated contents in a schema whose ownership
+would transfer refuse. Quiesce application/migration writers before conversion. The
+provider owner needs the actual database/schema/role/ownership capabilities; local
+proof includes a non-superuser CREATEROLE/database owner. Inherited PUBLIC database
+or shared-schema CREATE that violates the application role contract causes refusal;
+the tool does not remove shared provider privileges to force success.
+
+One bounded transaction serializes conversion, locks and rechecks the inventoried
+tables, creates restricted SCRAM-backed LOGIN roles, transfers the reviewed relations,
+sequence, functions and dedicated `drizzle` schema, and preserves provider ownership
+of `public`. The provider database/public ACLs keep their existing non-application
+edges. No `REASSIGN OWNED`, schema-wide relation grant/revoke or provider-object scan
+is used to select mutation targets. Unrelated provider tables, sequences, functions,
+data, column ACLs and provider-role default privileges remain untouched.
+
+The [shared privilege policy](../scripts/backup/managed-permissions.ts) backs
+`applyApplicationGrants`, provisioning and guarded test setup. It enumerates actual
+relation/function/column ACL grantees on each inventory object; all non-owner grants
+and dependent grant chains on that object are removed before exact runtime/backup
+grants are applied. PUBLIC, unknown and quoted provider identities are handled by
+catalog identity, not a Supabase name allowlist. Unreviewed signatures/dependencies
+or an inability to remove an ACL refuse and roll back. Provider administrators'
+inherent administrative power is not removed by deleting their explicit ACL edges.
+
+Migration-role defaults are deliberately owner-only for future tables, sequences
+and functions. Global PUBLIC EXECUTE is explicitly revoked for the dedicated
+migration role; schema-local revocation alone cannot cancel PostgreSQL's global
+function default. Provider-owner defaults are unchanged. Future migrations must
+run as the migration role, review new inventory and apply explicit application
+grants; runtime/backup get no automatic access to unreviewed new objects. The
+verifier now requires safe defaults, LOGIN roles, migration ownership of dedicated
+schemas and the exact ACL policy, including rejection of column ACLs, delegation
+and runtime/backup MAINTAIN. See PostgreSQL's
+[default privilege rules](https://www.postgresql.org/docs/17/sql-alterdefaultprivileges.html).
+
+Verification runs under migration authority before commit and compares application
+semantics, data/sequence values, shared provider authority and bootstrap provenance
+with pre-conversion state. Temporary SET membership is revoked before commit;
+PostgreSQL's non-superuser creator ADMIN-only grants may remain, with no SET or
+INHERIT capability. Any failure rolls back roles, ownership, ACLs and defaults.
+The CLI emits only a bounded phase/SQLSTATE diagnostic, never SQL, passwords,
+SCRAM verifiers or connection strings. A connection loss during COMMIT is an
+unknown outcome, not proof of rollback: inspect with `verify` before any retry.
+
+Create deliberately refuses every existing-role retry. `verify` requires the full
+existing set and runs the repository verifier in a read-only transaction; it does
+not rotate passwords, repair ACL drift or adopt partial roles. Existing roles with
+unsafe defaults require a separately reviewed upgrade plan. Restore target setup
+remains separate: this converter requires an existing complete bootstrap and does
+not authorize overwriting application state during recovery.
+
+Local synthetic [provisioning tests](../tests/integration/managed-roles.test.ts)
+cover PG17 ICU/PG18 libc, the hosted grant pattern plus arbitrary/quoted/column
+and delegated grantees, unchanged provider objects/defaults, concurrent creation,
+partial/mixed states, unreviewed automatic sequence-owner transfers, late verifier
+rollback, non-repairing read-only verification,
+future-object defaults and ACL/MAINTAIN/default negative controls. Existing
+managed recovery tests reuse the production conversion policy. No historical
+migration, ownership inventory, PG17 0006 mechanism or ICU/libc identity comparison
+is changed by this role-provisioning path.
+
 ## Archive and independent restore
 
 `managedBackup` uses a consistent exported snapshot and matching-source-major

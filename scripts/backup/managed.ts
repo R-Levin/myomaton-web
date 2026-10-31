@@ -10,7 +10,9 @@ import { fingerprint } from "../../lib/platform/canonical/model";
 import { readManagedObject, provisionManagedObject } from "../../lib/platform/assets/local-storage";
 import { bootstrapStatus } from "../db/bootstrap";
 
-export type Roles = { runtime: string; migration: string; backup: string };
+import { applyApplicationGrants, assertApplicationDefaults, allowedPrivileges, type Roles } from "./managed-permissions";
+export { applyApplicationGrants } from "./managed-permissions";
+export type { Roles } from "./managed-permissions";
 export type ManagedConfig = Config & { mode: "managed-postgres"; roles: Roles };
 const q = (s: string) => '"' + s.replaceAll('"', '""') + '"';
 const qualified = (s: string) => s.split(".").map(q).join(".");
@@ -72,10 +74,12 @@ export async function managedDependencies(c: Pick<PoolClient, "query">, url: str
 }
 async function privileges(c: PoolClient, roles: Roles) {
   assert.equal(new Set(Object.values(roles)).size, 3, "Three distinct application roles required");
+  await assertApplicationDefaults(c, roles);
   const result: unknown[] = [];
   for (const [kind, role] of Object.entries(roles)) {
     const flags = (await c.query("SELECT rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls FROM pg_roles WHERE rolname=$1", [role])).rows[0]; assert.ok(flags);
     assert.ok(Object.values(flags).every(v => v === false), "Application roles must not have provider administration flags");
+    assert.equal((await c.query("SELECT rolcanlogin FROM pg_roles WHERE rolname=$1", [role])).rows[0].rolcanlogin, true, "Application roles require LOGIN");
     assert.equal((await c.query("SELECT count(*)::int n FROM pg_auth_members WHERE member=(SELECT oid FROM pg_roles WHERE rolname=$1)", [role])).rows[0].n, 0, "Inherited/settable role membership unsupported");
     assert.equal((await c.query("SELECT has_database_privilege($1,current_database(),'CREATE') ok", [role])).rows[0].ok, kind === "migration", "Only the migration role may create application schemas");
     const schemas = [];
@@ -85,20 +89,23 @@ async function privileges(c: PoolClient, roles: Roles) {
       const row: Record<string, boolean> = {};
       for (const perm of ["SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"]) {
         const granted = (await c.query("SELECT has_table_privilege($1,$2,$3) ok", [role, table, perm])).rows[0].ok;
-        const expected = kind === "migration" || perm === "SELECT" || kind === "runtime" && table !== "drizzle.__drizzle_migrations" && ["INSERT", "UPDATE", "DELETE"].includes(perm);
+        const expected = allowedPrivileges(kind as keyof Roles, "TABLE", table === "drizzle.__drizzle_migrations").includes(perm);
         assert.equal(granted, expected, `${kind} ${table} ${perm} differs`); row[perm] = granted;
       }
-      for (const perm of ["INSERT", "UPDATE", "REFERENCES"]) { const granted = (await c.query("SELECT has_any_column_privilege($1,$2,$3) ok", [role, table, perm])).rows[0].ok; assert.equal(granted, kind === "migration" || kind === "runtime" && table !== "drizzle.__drizzle_migrations" && perm !== "REFERENCES"); }
+      for (const perm of ["INSERT", "UPDATE", "REFERENCES"]) { const granted = (await c.query("SELECT has_any_column_privilege($1,$2,$3) ok", [role, table, perm])).rows[0].ok; assert.equal(granted, allowedPrivileges(kind as keyof Roles, "TABLE", table === "drizzle.__drizzle_migrations").includes(perm)); }
+      assert.equal((await c.query("SELECT has_table_privilege($1,$2,'MAINTAIN') ok", [role, table])).rows[0].ok, allowedPrivileges(kind as keyof Roles, "TABLE").includes("MAINTAIN"), "Unreviewed MAINTAIN privilege");
       tables.push({ table, privileges: row });
     }
     const sequences = [];
-    for (const sequence of ownership.sequences) { const row: Record<string, boolean> = {}; for (const perm of ["SELECT", "USAGE", "UPDATE"]) { row[perm] = (await c.query("SELECT has_sequence_privilege($1,$2,$3) ok", [role, sequence, perm])).rows[0].ok; assert.equal(row[perm], kind === "migration" || kind === "backup" && perm === "SELECT"); } sequences.push({ sequence, ...row }); }
+    for (const sequence of ownership.sequences) { const row: Record<string, boolean> = {}; for (const perm of ["SELECT", "USAGE", "UPDATE"]) { row[perm] = (await c.query("SELECT has_sequence_privilege($1,$2,$3) ok", [role, sequence, perm])).rows[0].ok; assert.equal(row[perm], allowedPrivileges(kind as keyof Roles, "SEQUENCE").includes(perm)); } sequences.push({ sequence, ...row }); }
     const functions = [];
-    for (const fn of ownership.functions) { const execute = (await c.query("SELECT has_function_privilege($1,$2,'EXECUTE') ok", [role, fn + "()"]) ).rows[0].ok; assert.equal(execute, kind !== "backup"); functions.push({ fn, execute }); }
+    for (const fn of ownership.functions) { const execute = (await c.query("SELECT has_function_privilege($1,$2,'EXECUTE') ok", [role, fn + "()"]) ).rows[0].ok; assert.equal(execute, allowedPrivileges(kind as keyof Roles, "FUNCTION").includes("EXECUTE")); functions.push({ fn, execute }); }
     const providerFunctions = [];
     if (kind === "runtime") for (const fn of ["pg_catalog.gen_random_uuid()", "pg_catalog.hashtextextended(text,bigint)", "pg_catalog.pg_advisory_lock(bigint)", "pg_catalog.pg_advisory_unlock(bigint)", "pg_catalog.pg_advisory_xact_lock(bigint)"]) { const execute = (await c.query("SELECT has_function_privilege($1,$2,'EXECUTE') ok", [role, fn])).rows[0].ok; assert.equal(execute, true, "Required provider execution capability missing"); providerFunctions.push({ fn, execute }); }
     result.push({ kind, flags, schemas, tables, sequences, functions, providerFunctions });
   }
+  const schemas = (await c.query("SELECT nspname,pg_get_userbyid(nspowner) owner FROM pg_namespace WHERE nspname=ANY($1)", [ownership.schemas.filter(s => s !== "public")])).rows;
+  assert.equal(schemas.length, ownership.schemas.length - 1); assert.ok(schemas.every(r => r.owner === roles.migration), "Application schema owner differs");
   const relations = (await c.query("SELECT n.nspname,c.relname,pg_get_userbyid(c.relowner) owner FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE (n.nspname||'.'||c.relname)=ANY($1)", [[...ownership.tables, ...ownership.sequences]])).rows;
   assert.equal(relations.length, ownership.tables.length + ownership.sequences.length);
   assert.ok(relations.every(r => r.owner === roles.migration), "Application relations require migration-role ownership");
@@ -109,7 +116,11 @@ async function privileges(c: PoolClient, roles: Roles) {
     UNION ALL SELECT n.nspname||'.'||p.proname,'()',a.grantee,a.grantor,a.privilege_type,a.is_grantable FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(p.proacl) a WHERE (n.nspname||'.'||p.proname)=ANY($2)`, [[...ownership.tables, ...ownership.sequences], ownership.functions])).rows;
   const roleRows = (await c.query("SELECT oid,rolname FROM pg_roles WHERE rolname=ANY($1)", [Object.values(roles)])).rows;
   const roleName = (oid: number) => roleRows.find(r => r.oid === oid)?.rolname;
-  const edges = acl.map(a => { const name = roleName(a.grantee); assert.ok(name, "Unowned/PUBLIC application ACL grant"); assert.equal(roleName(a.grantor), roles.migration, "Unreviewed application ACL grantor"); assert.ok(name === roles.migration || a.is_grantable === false, "Application privilege delegation refused"); return { object: a.object, field: a.field, kind: Object.entries(roles).find(([, value]) => value === name)![0], privilege: a.privilege_type, grantable: a.is_grantable }; }).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+  const edges = acl.map(a => { const name = roleName(a.grantee); assert.ok(name, "Unowned/PUBLIC application ACL grant"); assert.equal(roleName(a.grantor), roles.migration, "Unreviewed application ACL grantor"); assert.ok(name === roles.migration || a.is_grantable === false, "Application privilege delegation refused");
+    assert.ok(a.field === "" || a.field === "()", "Column ACLs require explicit review");
+    const kind = Object.entries(roles).find(([, value]) => value === name)![0] as keyof Roles;
+    const type = a.field === "()" ? "FUNCTION" : ownership.sequences.includes(a.object) ? "SEQUENCE" : "TABLE";
+    assert.ok(allowedPrivileges(kind, type, a.object === "drizzle.__drizzle_migrations").includes(a.privilege_type), "Unreviewed application ACL privilege"); return { object: a.object, field: a.field, kind: Object.entries(roles).find(([, value]) => value === name)![0], privilege: a.privilege_type, grantable: a.is_grantable }; }).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
   result.push({ applicationAcl: edges });
   return result;
 }
@@ -189,6 +200,7 @@ export async function restoreManagedBundle(root: string, target: ManagedConfig) 
   try {
     const c = await pool.connect(); try {
       await c.query("BEGIN READ ONLY"); await c.query("SET LOCAL TIME ZONE 'UTC'");
+      await assertApplicationDefaults(c, target.roles);
       const provider = await managedDependencies(c, target.databaseUrl); versionPolicy(source.state.provider.major, source.state.provider.major, provider.major, await binaryMajor(target.pgBin, "pg_restore"));
       assert.deepEqual(provider.locale, source.state.provider.locale); assert.equal(provider.plpgsql, source.state.provider.plpgsql);
       assert.equal((await c.query("SELECT current_user name")).rows[0].name, target.roles.migration);
@@ -207,16 +219,6 @@ export async function restoreManagedBundle(root: string, target: ManagedConfig) 
     await applyApplicationGrants(pool, target.roles);
   } finally { await pool.end(); }
   return source;
-}
-export async function applyApplicationGrants(pool: Pool, roles: Roles) {
-  const runtime = q(roles.runtime), backup = q(roles.backup);
-  for (const table of ownership.tables) {
-    await pool.query(`REVOKE ALL ON TABLE ${qualified(table)} FROM PUBLIC,${runtime},${backup}`);
-    await pool.query(`GRANT SELECT ON TABLE ${qualified(table)} TO ${runtime},${backup}`);
-    if (table !== "drizzle.__drizzle_migrations") await pool.query(`GRANT INSERT,UPDATE,DELETE ON TABLE ${qualified(table)} TO ${runtime}`);
-  }
-  for (const sequence of ownership.sequences) { await pool.query(`REVOKE ALL ON SEQUENCE ${qualified(sequence)} FROM PUBLIC,${runtime},${backup}`); await pool.query(`GRANT SELECT ON SEQUENCE ${qualified(sequence)} TO ${backup}`); }
-  for (const fn of ownership.functions) { await pool.query(`REVOKE ALL ON FUNCTION ${qualified(fn)}() FROM PUBLIC,${runtime},${backup}`); await pool.query(`GRANT EXECUTE ON FUNCTION ${qualified(fn)}() TO ${runtime}`); }
 }
 export async function verifyManagedRestore(root: string, target: ManagedConfig) {
   const source = await verifyManagedBundle(root), current = await snapshot(target);
