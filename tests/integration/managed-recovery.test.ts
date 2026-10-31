@@ -116,3 +116,57 @@ for (const sourceMajor of [17, 18]) test(`managed PG${sourceMajor} bootstrap and
     for (const pool of pools) await pool.end(); for (const cluster of clusters.reverse()) await cluster.stop(); assert.equal(path.dirname(work), path.resolve(tmpdir())); assert.match(path.basename(work), /^miopages-managed-proof-/); await rm(work, { recursive: true });
   }
 });
+
+// The existing libc PG17/PG18 proofs above remain unchanged. This independent
+// ICU proof uses only disposable loopback clusters, never a hosted connection.
+test("managed PG17 ICU snapshot, backup and restore retain exact locale identity", { skip: !process.env.PG17_BIN_DIR, timeout: 180000 }, async () => {
+  const bin = process.env.PG17_BIN_DIR!;
+  const work = await mkdtemp(path.join(tmpdir(), "miopages-managed-icu-"));
+  const clusters: Awaited<ReturnType<typeof disposableCluster>>[] = [], pools: Pool[] = [];
+  const icuEnvironment = async (locale: "en-US" | "de-DE", migrateNow: boolean) => {
+    const cluster = await disposableCluster(bin); clusters.push(cluster);
+    const database = "migration_rehearsal_" + randomUUID().replaceAll("-", "");
+    const admin = new Pool({ connectionString: cluster.url });
+    try { await admin.query(`CREATE DATABASE "${database}" TEMPLATE template0 ENCODING 'UTF8' LOCALE_PROVIDER icu ICU_LOCALE '${locale}' LC_COLLATE 'C' LC_CTYPE 'C'`); }
+    finally { await admin.end(); }
+    const url = new URL(cluster.url); url.pathname = "/" + database;
+    const env = await managedEnvironment(url.toString(), migrateNow); pools.push(env.admin);
+    return env;
+  };
+  try {
+    const source = await icuEnvironment("en-US", true);
+    const runtime = new Pool({ connectionString: source.urls.runtime }); pools.push(runtime);
+    const mediaRoot = path.join(work, "source-media"); await seedManagedTenants(runtime, mediaRoot);
+    const config: ManagedConfig = { mode: "managed-postgres", root: path.join(work, "bundle"), databaseUrl: source.urls.backup, objectsRoot: mediaRoot, pgBin: bin, repository: process.cwd(), roles: source.roles };
+    const manifest = await managedBackup(config), locale = manifest.state.provider.locale;
+    assert.equal(manifest.state.provider.major, 17); assert.equal(locale.datlocprovider, "i");
+    assert.equal(locale.datlocale, "en-US"); assert.equal(typeof locale.datcollversion, "string");
+    assert.equal(manifest.state.migrations.length, 16); assert.ok(manifest.state.bootstrapReceipt);
+    const actual = (await source.admin.query("SELECT pg_encoding_to_char(encoding) encoding,datlocprovider,datcollate,datctype,datlocale,datcollversion FROM pg_database WHERE datname=current_database()")).rows[0];
+    assert.deepEqual(locale, actual);
+
+    const wrong = await icuEnvironment("de-DE", false);
+    await assert.rejects(restoreManagedBundle(config.root, { ...config, databaseUrl: wrong.urls.migration, roles: wrong.roles }));
+    assert.equal((await wrong.admin.query("SELECT to_regclass('public.pages') name")).rows[0].name, null, "Locale mismatch must refuse before restore writes");
+
+    const target = await icuEnvironment("en-US", false);
+    const restored: ManagedConfig = { ...config, databaseUrl: target.urls.migration, roles: target.roles, objectsRoot: path.join(work, "restored-media") };
+    await restoreManagedBundle(config.root, restored); await restoreManagedMedia(config.root, restored.objectsRoot);
+    const proof = await verifyManagedRestore(config.root, restored); assert.equal(proof.verified, true); assert.equal(proof.objects, 2);
+    const c = await target.admin.connect();
+    try {
+      await c.query("BEGIN READ ONLY");
+      const state = await managedSnapshot(c, restored.databaseUrl, target.roles);
+      assert.deepEqual(state.provider.locale, locale); assertManagedEquivalent(manifest.state, state);
+      for (const changed of [{ ...locale, datlocprovider: "b" }, { ...locale, datlocprovider: "c", datlocale: null }, { ...locale, datlocale: "de-DE" }, { ...locale, datcollversion: String(locale.datcollversion) + ".drift" }]) {
+        const drifted = structuredClone(state); drifted.provider.locale = changed;
+        assert.throws(() => assertManagedEquivalent(manifest.state, drifted));
+      }
+    } finally { await c.query("ROLLBACK"); c.release(); }
+    await mkdir("runtime-content/managed-postgres-proof", { recursive: true });
+    await writeFile("runtime-content/managed-postgres-proof/icu-17.json", JSON.stringify({ ...proof, locale, migrations: 16, localeMismatchRefusesBeforeWrites: true, negativeControls: true, sharedTouched: false, hostedTouched: false }, null, 2));
+  } finally {
+    for (const pool of pools) await pool.end(); for (const cluster of clusters.reverse()) await cluster.stop();
+    assert.equal(path.dirname(work), path.resolve(tmpdir())); assert.match(path.basename(work), /^miopages-managed-icu-/); await rm(work, { recursive: true });
+  }
+});

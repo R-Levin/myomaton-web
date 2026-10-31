@@ -98,12 +98,35 @@ retains the full PG18 representation and all existing comparison guarantees.
 
 ## Provider and role contract
 
-Dependencies include PG17/18, UTF-8, exact libc locale/collation/version, UTC sessions,
+Dependencies include PG17/18, UTF-8, exact libc or ICU locale/collation/version, UTC sessions,
 PL/pgSQL version and built-in UUID/JSONB capabilities. Application workflows also
 require advisory locks and deferred triggers. Other majors, RLS-enabled application
 tables, role memberships and unreviewed locale providers refuse. Remote connections
 require `sslmode=verify-full` and an actual TLS backend connection. Plain loopback
 is explicitly local-test evidence. Credentials/trust roots remain protected config.
+
+Only explicit locale providers `c` (libc) and `i` (ICU) are supported; builtin
+(`b`) and unknown providers still refuse. Every managed snapshot/bundle retains
+all six database locale identity fields without normalization: `encoding`,
+`datlocprovider`, `datcollate`, `datctype`, `datlocale` and `datcollversion`.
+Non-null custom ICU rules (`daticurules`) refuse because they are outside this
+six-field recovery identity; supporting them needs a separate contract review.
+For libc, `datlocale` is null and its existing nullable collation version is
+preserved. ICU requires a nonempty provider locale and collation version; the
+reported PG17 hosted identity (`UTF8`, `i`, `en_US.UTF-8`, `en_US.UTF-8`, `en-US`,
+`153.121`) satisfies this contract without hardcoding Supabase or that locale.
+See the [PG17 database catalog](https://www.postgresql.org/docs/17/catalog-pg-database.html).
+
+Managed restore preflight and final equivalence require exact recorded identity:
+libc ↔ ICU, ICU locale spelling and collation-version differences refuse, as do
+encoding, collation or character-classification differences. Major-version
+compatibility alone does not establish locale equivalence. A provider/ICU upgrade
+or provider exit with a different version needs separately reviewed compatibility
+and recovery evidence; do not strip versions, normalize locale names, or refresh
+catalog version metadata merely to make a comparison pass. Controlled-cluster
+PG18 recovery remains libc-only with its existing exact environment comparison.
+No historical migration, PG17 0006 compatibility receipt, role model or ownership
+scope changes as a result of adding managed ICU acceptance.
 
 Three distinct configurable roles are required; provider role names are not assumed:
 
@@ -160,12 +183,46 @@ synthetic activation/canonical/confirmed-information/proposal/approval/release/r
 history, Contact retries and C0/C1 content/navigation/metadata/media. Provider-marker
 state is excluded. Negative controls cover tables, constraints, functions, deferred
 guards, partial indexes, migration state, privileges, data, media, hostnames and
-provider capabilities. Disposable clusters are removed after testing. Readable
+provider capabilities. An additional local PG17 ICU proof exercises full snapshots,
+backup/media/restore and receipt preservation, with a real different-ICU-locale
+target refused before application writes. Unit and integration controls reject
+unsupported providers, libc/ICU mismatch, ICU locale and collation-version drift;
+existing libc PG17/PG18 and controlled PG18 tests remain in place. The local ICU
+library's version is recorded, not assumed to equal the hosted version. Disposable
+clusters are removed after testing. Readable
 evidence remains ignored under `runtime-content/managed-postgres-proof` and
 `runtime-content/pg17-bootstrap-proof`. Negative bootstrap controls include lost or
 wrong-column NOT NULL, changed constraints/types, wrong checksums/ledger/receipt,
 unrelated SQL, unsupported adapter majors, populated PG17 prefixes and later
 migration failure. These must not falsely record 0006 as applied.
+
+## Broad regression fixture prerequisites
+
+A bounded local comparison against unchanged `main` checkpoint
+`9236fa076e1975772c0a52f7a2219c5fd5b78e3b` reran the same broad PG18 harness
+with and without the ICU changes. Both produced 114 passes / 27 failures, with
+the same failing tests and failure types. The generic source created by
+`managedEnvironment` plus `seedManagedTenants` is not a universal historical fixture.
+It contains two synthetic tenants, no canonical Knowledge revisions, a 16-entry
+migration journal, two synthetic PNGs and an explicit migration-role database ACL.
+
+The 27 reported failures comprise 18 frozen-content prerequisite failures, three
+historical-media-root failures, three controlled database-ACL refusals, one
+historical 6-to-9-entry migration-prefix requirement, one missing foreign canonical
+revision and its failing parent test. The promotion test's existing unconditional
+schema cleanup masks its earlier frozen-baseline fingerprint refusal with a
+missing-schema error. These behaviors also occur on unchanged main.
+
+Supplying the exact existing historical Asset bytes in a private media root and
+one supported synthetic foreign canonical revision makes the nine corresponding
+unchanged checks pass. Providing the exact checked-in accepted C0 source graph
+and original managed bytes passes all 11 unchanged acquisition tests. Using the
+supported no-explicit-database-ACL controlled fixture passes all 49 controlled
+recovery/proposal/release checks. This does not
+waive exact content, ownership, locale or privilege comparisons. Historical
+rehearsals need their documented source state/bytes; do not rewrite frozen evidence,
+relax migration-prefix assertions, or remove ACL checks to turn a generic run green.
+No recovery implementation correction was required by this comparison.
 
 Provider exit remains standard PostgreSQL: no Supabase Auth, Storage, Realtime,
 Edge Functions, generated APIs or provider migration history are dependencies.

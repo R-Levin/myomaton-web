@@ -42,7 +42,21 @@ export function applicationSemantic(catalog: RecoveryCatalog) {
   }
   return output;
 }
-async function dependencies(c: PoolClient, url: string) {
+// Validate without normalizing: every recorded locale field remains exact recovery
+// identity, including ICU locale spelling and the provider's collation version.
+export function assertManagedLocale(locale: Record<string, unknown>) {
+  assert.equal(locale.encoding, "UTF8");
+  assert.ok(locale.datlocprovider === "c" || locale.datlocprovider === "i", "Only libc and ICU locale providers are supported");
+  for (const field of ["datcollate", "datctype"]) assert.ok(typeof locale[field] === "string" && locale[field].length > 0, `Missing ${field}`);
+  if (locale.datlocprovider === "i") {
+    assert.ok(typeof locale.datlocale === "string" && locale.datlocale.length > 0, "ICU locale required");
+    assert.ok(typeof locale.datcollversion === "string" && locale.datcollversion.length > 0, "ICU collation version required");
+  } else {
+    assert.equal(locale.datlocale, null, "libc uses datcollate/datctype rather than datlocale");
+    assert.ok(locale.datcollversion === null || typeof locale.datcollversion === "string", "Invalid libc collation version");
+  }
+}
+export async function managedDependencies(c: Pick<PoolClient, "query">, url: string) {
   const major = supportedMajor(Math.floor(Number((await c.query("SHOW server_version_num")).rows[0].server_version_num) / 10000));
   const u = new URL(url), local = ["127.0.0.1", "localhost", "[::1]"].includes(u.hostname);
   if (!local) { assert.equal(u.searchParams.get("sslmode"), "verify-full", "Remote managed connections require verify-full"); assert.equal((await c.query("SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()")).rows[0]?.ssl, true); }
@@ -50,8 +64,10 @@ async function dependencies(c: PoolClient, url: string) {
   assert.ok((await c.query("SELECT to_regprocedure('pg_catalog.gen_random_uuid()') name")).rows[0].name, "Provider UUID capability missing");
   assert.equal((await c.query("SELECT ('{\"a\":1}'::jsonb @> '{\"a\":1}'::jsonb) ok")).rows[0].ok, true);
   assert.equal((await c.query("SHOW TimeZone")).rows[0].TimeZone, "UTC");
-  const locale = (await c.query("SELECT pg_encoding_to_char(encoding) encoding,datlocprovider,datcollate,datctype,datlocale,datcollversion FROM pg_database WHERE datname=current_database()")).rows[0];
-  assert.equal(locale.encoding, "UTF8"); assert.equal(locale.datlocprovider, "c", "Only proven libc locales supported");
+  const { daticurules, ...locale } = (await c.query("SELECT pg_encoding_to_char(encoding) encoding,datlocprovider,datcollate,datctype,datlocale,datcollversion,daticurules FROM pg_database WHERE datname=current_database()")).rows[0];
+  assertManagedLocale(locale);
+  // Custom ICU rules are outside the existing six-field identity contract.
+  if (locale.datlocprovider === "i") assert.equal(daticurules, null, "Custom ICU collation rules require a separate recovery contract");
   return { major, plpgsql: extension.extversion, capabilities: ["plpgsql", "jsonb", "gen_random_uuid", "advisory-locks", "deferred-triggers"], locale, timezone: "UTC", transport: local ? "loopback-test" : "tls-verify-full" };
 }
 async function privileges(c: PoolClient, roles: Roles) {
@@ -99,7 +115,7 @@ async function privileges(c: PoolClient, roles: Roles) {
 }
 export async function managedSnapshot(c: PoolClient, url: string, roles: Roles) {
   await c.query("SET LOCAL search_path=public"); await c.query("SET LOCAL TIME ZONE 'UTC'");
-  const provider = await dependencies(c, url), security = await privileges(c, roles), catalog = await recoveryCatalog(c, ownership.schemas);
+  const provider = await managedDependencies(c, url), security = await privileges(c, roles), catalog = await recoveryCatalog(c, ownership.schemas);
   const semantic = applicationSemantic(catalog), tables = [], sequences = [];
   for (const table of ownership.tables) { const rows = (await c.query(`SELECT to_jsonb(t) row FROM ${qualified(table)} t ORDER BY to_jsonb(t)::text`)).rows.map(r => r.row); tables.push({ table, count: rows.length, hash: fingerprint(rows) }); }
   for (const sequence of ownership.sequences) sequences.push({ sequence, ...(await c.query(`SELECT last_value::text,is_called FROM ${qualified(sequence)}`)).rows[0] });
@@ -117,6 +133,7 @@ export async function managedSnapshot(c: PoolClient, url: string, roles: Roles) 
 }
 export type ManagedState = Awaited<ReturnType<typeof managedSnapshot>>;
 export function assertManagedEquivalent(source: ManagedState, target: ManagedState) {
+  assertManagedLocale(source.provider.locale); assertManagedLocale(target.provider.locale);
   versionPolicy(source.provider.major, source.provider.major, target.provider.major, target.provider.major);
   assert.deepEqual(target.provider.locale, source.provider.locale, "Provider locale differs");
   assert.equal(target.provider.plpgsql, source.provider.plpgsql); assert.deepEqual(target.provider.capabilities, source.provider.capabilities);
@@ -157,6 +174,7 @@ export async function verifyManagedBundle(root: string) {
   const hashes = JSON.parse(await readFile(await safeFile(root, "checksums.json"), "utf8"));
   const manifest = JSON.parse(await readFile(await safeFile(root, "manifest.json"), "utf8")) as { kind: string; mode: string; ownership: typeof ownership; state: ManagedState; objects: { owner: string; key: string; file: string; sha256: string; size: number }[] };
   assert.equal(manifest.kind, "miopages-managed-recovery/1"); assert.equal(manifest.mode, "managed-postgres"); assert.deepEqual(manifest.ownership, ownership);
+  assertManagedLocale(manifest.state.provider.locale);
   const expected = ["application.dump", "functions.sql", "manifest.json", ...manifest.objects.map(o => o.file)].sort(); assert.deepEqual(Object.keys(hashes).sort(), expected);
   for (const file of expected) assert.equal(await hashFile(await safeFile(root, file)), hashes[file], "Bundle checksum differs");
   for (const o of manifest.objects) { assert.equal(o.file, `objects/${o.owner}/${o.key}`); assert.equal(o.sha256, o.key.slice(8)); assert.equal(hashes[o.file], o.sha256); assert.equal((await lstat(await safeFile(root, o.file))).size, o.size); }
@@ -171,7 +189,7 @@ export async function restoreManagedBundle(root: string, target: ManagedConfig) 
   try {
     const c = await pool.connect(); try {
       await c.query("BEGIN READ ONLY"); await c.query("SET LOCAL TIME ZONE 'UTC'");
-      const provider = await dependencies(c, target.databaseUrl); versionPolicy(source.state.provider.major, source.state.provider.major, provider.major, await binaryMajor(target.pgBin, "pg_restore"));
+      const provider = await managedDependencies(c, target.databaseUrl); versionPolicy(source.state.provider.major, source.state.provider.major, provider.major, await binaryMajor(target.pgBin, "pg_restore"));
       assert.deepEqual(provider.locale, source.state.provider.locale); assert.equal(provider.plpgsql, source.state.provider.plpgsql);
       assert.equal((await c.query("SELECT current_user name")).rows[0].name, target.roles.migration);
       for (const role of Object.values(target.roles)) { const flags = (await c.query("SELECT rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls FROM pg_roles WHERE rolname=$1", [role])).rows[0]; assert.ok(flags); assert.ok(Object.values(flags).every(v => v === false), "Unreviewed target role authority"); }
