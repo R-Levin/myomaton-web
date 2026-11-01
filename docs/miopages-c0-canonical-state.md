@@ -1,5 +1,10 @@
 # MioPages C0 canonical customer slice
 
+For a new hosted database with all 16 migrations and no application/customer rows,
+use the [fresh-hosted operator procedure](#fresh-hosted-synthetic-establishment)
+below. The historical development transition and its frozen baseline remain
+protected and must not be used as a repair path for that environment.
+
 The initial establishment below is historical. The accepted A Business in Focus
 direction has now been [promoted into reviewed canonical state](miopages-canonical-promotion.md):
 four Pages, 23 Sections, service-led v3, Source Sans 3 and two approved wordmarks.
@@ -105,3 +110,89 @@ selector configuration. Final copy/Visual Direction, Review/onboarding, analytic
 content growth, billing, production Contact, integrations and commercial readiness
 remain deferred. Historical Myomaton transition guards remain frozen; multi-customer
 fixtures isolate their original scope rather than weakening operator updater guards.
+
+## Fresh-hosted synthetic establishment
+
+The historical `initialize-miopages-c0.ts` transition preserves a frozen
+nine-migration Myomaton development graph before adding C0. The new
+[fresh-hosted service](../scripts/customer-initializers/fresh-hosted-miopages-c0.ts)
+and [protected entry point](../scripts/initialize-fresh-hosted-miopages-c0.ts)
+serve a different contract: the exact checked-in 16-migration lineage, a valid
+PG17 compatibility receipt where required, the verified managed PostgreSQL role
+contract, and otherwise empty application inventory. They reuse the original
+reviewed C0 manifest and canonical initialization/writer machinery; customer
+content and historical baseline files are unchanged.
+
+Run this operator action using the dedicated migration login. The live
+`miopages_runtime` connection remains for serving and cannot take the required
+journal SHARE lock. No runtime permissions are broadened. The entry points load
+no environment files and accept no credentials in arguments. Supply protected
+`DATABASE_URL` (migration credential, remote `sslmode=verify-full`),
+`MIOPAGES_DATABASE_NAME`, `MIOPAGES_RUNTIME_ROLE`, `MIOPAGES_MIGRATION_ROLE` and
+`MIOPAGES_BACKUP_ROLE` explicitly. Do not use a live runtime connection for these
+operator commands or record connection strings in shell history.
+
+Initialization locks the journal and every inventoried application table in one
+transaction. The checked-in bootstrap identities/hashes/order, applied/pending
+status and PG17 receipt are verified before any row write. A baseline is derived
+only from that verified ledger plus empty customer tables; every other inventoried
+operational table, including hostname bindings, must be empty. Provider objects
+outside the inventory are excluded. Concurrent starts serialize; a failure rolls
+back the whole graph, canonical revisions and receipt.
+
+The existing customer receipt is extended with a fresh-hosted kind, migration
+lineage digest (including the exact ledger and compatibility receipt) and
+inventory digest. Exact reruns verify manifest/state/context
+digests and perform zero writes. Partial, foreign, customized, unreceipted or
+unexpected application state refuses; there is no reset, repair or adoption
+mode. Independent `verify` uses a read-only repeatable-read transaction and
+requires an already initialized graph. It does not try to create missing data.
+The original historical initializer still checks its original frozen baseline.
+
+With protected migration configuration already supplied, after review/checkpoint:
+
+```sh
+export MIOPAGES_DATABASE_OPERATION=fresh-hosted-c0
+MIOPAGES_C0_ACTION=create node --import tsx scripts/initialize-fresh-hosted-miopages-c0.ts
+MIOPAGES_C0_ACTION=verify node --import tsx scripts/initialize-fresh-hosted-miopages-c0.ts
+```
+
+Stop on either failure; retain only the bounded stage/SQLSTATE. Do not rerun
+bootstrap or migrations: the reported hosted source already has 16 applied,
+zero pending and a valid PG17 receipt. A lost connection during COMMIT is an
+unknown outcome: inspect using read-only verification before a deliberate retry.
+
+### Separate hostname operator
+
+Only after independent C0 verification, use the
+[generic hostname service](../scripts/db/managed-hostname.ts) through its
+[protected CLI](../scripts/manage-hostname-binding.ts). Binding is a separate
+routing/go-live action; it does not derive identity from hosting location or
+change C0 content. The command requires an exact normalized DNS hostname and
+explicit Web Presence / Managed Site UUIDs. The target and its Organization must
+be active, and site ownership must match. Bind locks the registry and target
+rows transactionally; conflicting or inactive bindings refuse. Exact reruns are
+zero-write, and `verify` is read-only. This generic operator checks active owned
+targets, not commercial/content approval; the preceding C0 verification is the
+hosted synthetic procedure's prerequisite.
+
+For the separately authorized synthetic hosted invocation only:
+
+```sh
+export MIOPAGES_DATABASE_OPERATION=managed-hostname
+export MIOPAGES_HOSTNAME=runtime.miopages.com
+export MIOPAGES_WEB_PRESENCE_ID=926cb772-7507-4542-8acd-e7e57ce71324
+export MIOPAGES_MANAGED_SITE_ID=312b8081-4582-47fa-bedb-a551fd6e2b36
+MIOPAGES_HOSTNAME_ACTION=bind node --import tsx scripts/manage-hostname-binding.ts
+MIOPAGES_HOSTNAME_ACTION=verify node --import tsx scripts/manage-hostname-binding.ts
+```
+
+Then verify the known hostname using the runtime connection and confirm an
+unknown Host still returns the fail-closed 404. The hostname is not embedded in
+generic platform code. Clear protected connection credentials after the operator
+session. Do not repeat fresh establishment after binding or subsequent operations:
+the fresh initializer intentionally refuses nonempty operational inventory.
+
+Customer establishment and a technical routing proof do not authorize commercial
+publication, approve provisional terms, or expand Commercial V1. All repository
+tests use disposable local databases; no hosted writes or DNS changes are implied.

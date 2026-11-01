@@ -96,6 +96,16 @@ function postcondition(graph:CustomerState, m:CustomerManifest) {
   }
 }
 
+// Shared read-only receipt verification. Baseline selection remains the caller's
+// explicit contract; the historical transition still supplies its frozen state.
+export function verifyCustomerInitialization(state: CustomerState, manifest: CustomerManifest, baseline: CustomerState) {
+  validate(manifest); preservation(state,manifest,baseline);
+  const graph=selected(state,manifest); postcondition(graph,manifest);
+  const receipt=(graph.organizations[0].metadata as Row).initialization as Row|undefined;
+  assert.ok(receipt); assert.equal(receipt.manifestDigest,fingerprint(manifest));
+  assert.equal(receipt.stateDigest,stateFingerprint(withoutReceipt(graph,manifest.organizationId)),"Customized customer state; no repair mode");
+}
+
 // Identity-only establishment deliberately creates no Knowledge, Offering or content.
 // The caller's authority and outer transaction remain the service's responsibility.
 async function initializeFoundation(pool: Pick<Pool,"connect">, manifest: CustomerFoundationManifest, baseline: CustomerState, options: { failAfter?: number }) {
@@ -137,9 +147,7 @@ export async function initializeCustomer(pool:Pick<Pool,"connect">, manifest:Cus
     await c.query(`LOCK TABLE ${customerTables.join(",")} IN SHARE ROW EXCLUSIVE MODE`);await c.query("LOCK TABLE drizzle.__drizzle_migrations IN SHARE MODE");
     const before=await readCustomerState(c);preservation(before,manifest,baseline);const graph=selected(before,manifest);
     if(Object.values(graph).some(rows=>rows.length)){
-      postcondition(graph,manifest);
-      const receipt=(graph.organizations[0].metadata as Row).initialization as Row|undefined;
-      assert.ok(receipt);assert.equal(receipt.manifestDigest,fingerprint(manifest));assert.equal(receipt.stateDigest,stateFingerprint(withoutReceipt(graph,manifest.organizationId)),"Customized customer state; no repair mode");
+      verifyCustomerInitialization(before,manifest,baseline);
       await c.query("COMMIT");return {inserted:0,updated:0,deleted:0};
     }
     assert.equal(stateFingerprint(before),stateFingerprint(baseline));
