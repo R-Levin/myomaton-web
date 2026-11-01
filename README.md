@@ -1,5 +1,7 @@
 # Myomaton Web
 
+> **MioPages development — mandatory current-status entry point:** Read [Development control and continuity](docs/development-control.md) from current GitHub `main` at the start of every new development chat. It records the current hosted boundary, evidence status and the return path to Commercial V1. If inaccessible or conflicting, stop before hosted mutation. This is a live checkpoint, not a substitute for verifying Git or provider state.
+
 Website and first reference implementation of the reusable Myomaton web platform.
 
 Current stack: Next.js, React, TypeScript, Tailwind CSS.
@@ -16,7 +18,7 @@ documented bounds. This does not authorize production operation.
 **100+ customer shared-runtime architecture is P0:** many hostnames → shared
 runtime → immutable request-scoped tenant context → shared PostgreSQL → strict
 isolation. C0/C1 same-process proof is implemented; hosted capacity is unproved.
-External provisioning for the hosted proof has **not begun**.
+**Historical README summary only:** External provisioning had not begun at the earlier baseline. Hosted 20i/Supabase provisioning later advanced; consult the current [development control](docs/development-control.md) and independently verify live state before acting.
 
 - [Architecture, principles, decisions and Human/AI charter](docs/platform-service-architecture.md)
   own the current 20i Managed Cloud + Supabase prototype direction, assumptions and
