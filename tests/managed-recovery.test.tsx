@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { supportedMajor, versionPolicy, applicationSemantic, managedDependencies, assertManagedLocale, assertManagedEquivalent, type ManagedState } from "../scripts/backup/managed";
+import { supportedMajor, versionPolicy, applicationSemantic, managedDependencies, withVerifiedManagedTransport, assertManagedLocale, assertManagedEquivalent, type ManagedState } from "../scripts/backup/managed";
 import { recoveryCatalog, type RecoveryCatalog } from "../scripts/backup/catalog";
 import ownership from "../scripts/backup/application-ownership.json";
 
@@ -44,6 +44,107 @@ function providerClient(locale: Record<string, unknown>) {
     return { rows: [{ daticurules: null, ...structuredClone(locale) }] };
   } };
 }
+
+const remoteProviderUrl = "postgresql://managed.invalid/synthetic?sslmode=verify-full";
+function transportClient(locale: Record<string, unknown> = icuLocale) {
+  const state: { pid: number; session: string; actor: string; xid: string | null; ssl: boolean | undefined } = { pid: 17, session: "provider_owner", actor: "provider_owner", xid: "4294967317", ssl: true };
+  const queries: string[] = [], provider = providerClient(locale);
+  const client = { query: async (sql: string) => {
+    queries.push(sql);
+    const { ssl, ...identity } = state;
+    if (sql.includes("pg_current_xact_id()")) return { rows: [{ ...identity, ssl: state.actor === state.session ? ssl : undefined }] };
+    if (sql.includes("pg_current_xact_id_if_assigned()")) return { rows: [{ ...identity }] };
+    if (sql.includes("pg_stat_ssl")) return { rows: state.actor !== state.session || ssl === undefined ? [] : [{ ssl }] };
+    return provider.query(sql);
+  } };
+  return { state, queries, client };
+}
+
+test("scoped transport positively verifies the source session and survives hidden SSL statistics only on its restricted backend", async () => {
+  const f = transportClient();
+  assert.equal((await managedDependencies(f.client as never, remoteProviderUrl)).transport, "tls-verify-full");
+  f.state.actor = "migration";
+  await assert.rejects(managedDependencies(f.client as never, remoteProviderUrl), /Positive backend SSL/);
+  f.state.actor = f.state.session;
+  await withVerifiedManagedTransport(f.client as never, remoteProviderUrl, "migration", async () => {
+    f.state.actor = "migration";
+    const before = f.queries.length;
+    const result = await managedDependencies(f.client as never, remoteProviderUrl);
+    assert.equal(result.transport, "tls-verify-full"); assert.deepEqual(result.locale, icuLocale);
+    assert.ok(!f.queries.slice(before).some(sql => sql.includes("pg_stat_ssl")));
+    assert.ok(f.queries.slice(before).some(sql => sql.includes("pg_current_xact_id_if_assigned()")));
+    // A different handle cannot borrow the proof even with identical identity.
+    const other = transportClient(); Object.assign(other.state, f.state);
+    await assert.rejects(managedDependencies(other.client as never, remoteProviderUrl), /Positive backend SSL/);
+  });
+  await assert.rejects(managedDependencies(f.client as never, remoteProviderUrl), /Positive backend SSL/);
+});
+
+test("transport proof refuses backend, session, transaction, assumed-role and URL changes", async () => {
+  for (const change of [{ pid: 18 }, { session: "other_session" }, { xid: "4294967318" }, { xid: null }, { actor: "other_role" }, { actor: "provider_owner" }]) {
+    const f = transportClient();
+    await withVerifiedManagedTransport(f.client as never, remoteProviderUrl, "migration", async () => {
+      f.state.actor = "migration"; Object.assign(f.state, change);
+      await assert.rejects(managedDependencies(f.client as never, remoteProviderUrl), /Scoped transport/);
+    });
+  }
+  const f = transportClient();
+  await withVerifiedManagedTransport(f.client as never, remoteProviderUrl, "migration", async () => {
+    f.state.actor = "migration";
+    await assert.rejects(managedDependencies(f.client as never, remoteProviderUrl + "&application_name=other"), /Scoped transport/);
+    await assert.rejects(managedDependencies(f.client as never, "postgresql://localhost/synthetic"), /Scoped transport/);
+    await assert.rejects(withVerifiedManagedTransport(f.client as never, remoteProviderUrl, "migration", async () => undefined), /Nested/);
+  });
+});
+
+test("direct-role transport and scope capture fail closed for absent/false SSL and unverified modes", async () => {
+  for (const ssl of [false, undefined]) {
+    const f = transportClient(); f.state.ssl = ssl;
+    await assert.rejects(managedDependencies(f.client as never, remoteProviderUrl), /Positive backend SSL/);
+    let ran = false;
+    await assert.rejects(withVerifiedManagedTransport(f.client as never, remoteProviderUrl, "migration", async () => { ran = true; }), /Positive backend SSL/);
+    assert.equal(ran, false);
+  }
+  for (const mode of ["disable", "require", "verify-ca", "prefer", ""]) {
+    const f = transportClient(), url = "postgresql://managed.invalid/synthetic" + (mode ? "?sslmode=" + mode : "");
+    await assert.rejects(managedDependencies(f.client as never, url), /verify-full/);
+    await assert.rejects(withVerifiedManagedTransport(f.client as never, url, "migration", async () => undefined), /verify-full/);
+    assert.equal(f.queries.filter(sql => sql.includes("pg_stat_ssl")).length, 0);
+  }
+  for (const role of ["runtime", "migration", "backup"]) {
+    const f = transportClient();
+    await withVerifiedManagedTransport(f.client as never, remoteProviderUrl, "migration", async () => {
+      const direct = transportClient(); direct.state.actor = direct.state.session = role; direct.state.ssl = undefined;
+      await assert.rejects(managedDependencies(direct.client as never, remoteProviderUrl), /Positive backend SSL/);
+      direct.state.ssl = true;
+      assert.equal((await managedDependencies(direct.client as never, remoteProviderUrl)).transport, "tls-verify-full");
+    });
+  }
+});
+
+test("transport scope is destroyed on callback failure and cannot be captured under an assumed role", async () => {
+  const f = transportClient();
+  await assert.rejects(withVerifiedManagedTransport(f.client as never, remoteProviderUrl, "migration", async () => {
+    f.state.actor = "migration";
+    throw Error("Synthetic callback refusal");
+  }), /Synthetic callback/);
+  await assert.rejects(managedDependencies(f.client as never, remoteProviderUrl), /Positive backend SSL/);
+  await assert.rejects(withVerifiedManagedTransport(f.client as never, remoteProviderUrl, "migration", async () => undefined));
+  f.state.actor = f.state.session;
+  await assert.rejects(withVerifiedManagedTransport(f.client as never, remoteProviderUrl, f.state.session, async () => undefined), /original session/);
+  f.state.xid = null;
+  await assert.rejects(withVerifiedManagedTransport(f.client as never, remoteProviderUrl, "migration", async () => undefined), /original session/);
+});
+
+test("scoped transport never bypasses ICU/provider dependency checks", async () => {
+  for (const locale of [{ ...icuLocale, datlocprovider: "x" }, { ...icuLocale, daticurules: "&a<b" }, { ...icuLocale, datcollversion: null }]) {
+    const f = transportClient(locale);
+    await withVerifiedManagedTransport(f.client as never, remoteProviderUrl, "migration", async () => {
+      f.state.actor = "migration";
+      await assert.rejects(managedDependencies(f.client as never, remoteProviderUrl));
+    });
+  }
+});
 
 test("managed PG17 provider accepts ICU and libc, retaining all six locale identity fields", async () => {
   for (const locale of [icuLocale, libcLocale]) {

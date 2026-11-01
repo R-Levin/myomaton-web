@@ -249,9 +249,11 @@ non-superuser CREATEROLE source owner, `pg_database_owner` ownership of `public`
 schema-local provider defaults (including source-owner grants), unrelated database
 CREATE grants, storage objects/defaults and broad application ACLs. These patterns
 alone do not reproduce the hosted refusal. The local Windows ICU environment is
-not an exact copy of the hosted Linux provider environment. The exact hosted
-assertion and root cause remain unproven; no permission correction is justified
-by this evidence, and successful hosted conversion is not yet established.
+not an exact copy of the hosted Linux provider environment. At that diagnostic
+checkpoint the exact hosted assertion and root cause remained unproven; those
+ACL patterns did not justify a permission correction. The later transport
+finding below identifies the failing assertion. Hosted conversion success still
+requires independent verification.
 
 The protected CLI now adds an allowlisted `reason` only for verification failures.
 It reports the last verification operation entered, never arbitrary assertion text,
@@ -303,6 +305,61 @@ credentials and provisioning secrets from the shell, including `DATABASE_URL`,
 `MIOPAGES_BACKUP_PASSWORD`. Do not rerun bootstrap or migrations: the reported
 hosted database already has 16 applied / 0 pending and a valid PG17 receipt.
 This documentation and its synthetic tests authorize no external execution.
+
+## Transport verification across provisioning SET ROLE
+
+The later hosted diagnostic isolated `verification` / `provider-dependencies`:
+the provider session positively observes SSL, but after `SET LOCAL ROLE` the
+restricted migration identity gets zero rows from `pg_stat_ssl` for that same
+backend. The individual version, extension, UUID, JSONB, UTC and ICU checks pass.
+This is statistics visibility under the changed current user, not evidence that
+the physical connection lost TLS. A local PG18 fixture reproduces the same
+refusal using real verified TLS and actual restricted statistics visibility;
+this behavior is not specific to Supabase. The failing hosted transaction and
+probe both rolled back, with no permanent application roles remaining.
+
+The [provisioner](../scripts/db/managed-roles.ts) now opens a bounded transport
+scope immediately before assuming the migration role. A single source-session
+statement requires positive backend SSL evidence and records backend PID,
+session identity and the full transaction ID (`xid8`). The remote URL must still
+specify `sslmode=verify-full`. The evidence stays in a private weak map keyed by
+the exact checked-out client, exists only during the awaited callback and is
+destroyed on either success or exception. It is not a serialized/reusable token
+and never enters a manifest, recovery comparison, pool configuration or log.
+
+Within that scope, dependency verification may use this already-proven physical
+transport only if client, exact URL, backend PID, session user, transaction ID
+and expected restricted current role still match. A different client, backend,
+session, transaction, URL or assumed role refuses. Reconnects and later
+transactions cannot reuse the evidence. Assigning the transaction ID is limited
+to this writable provisioning scope; read-only verification does not allocate
+one for transport. No application role receives statistics/provider authority.
+
+`managedDependencies` continues to require `verify-full` and positive SSL evidence
+for every remote direct connection outside this scope, including independent
+runtime, migration, backup and `verify` sessions. Missing, empty or false SSL
+evidence refuses. There is no `rejectUnauthorized:false`, certificate/hostname
+validation bypass or interpretation of an empty statistics result as SSL proof.
+All non-transport dependencies are queried again under the migration identity;
+role permissions, ACLs, ownership, defaults and exact recovery comparisons are
+unchanged. The existing safe reason codes remain intact.
+
+The TLS fixture uses a temporary local CA/certificate and a separate loopback
+address to exercise the remote contract. It proves the pre-fix refusal, successful
+conversion, late verifier rollback and retry, direct three-role TLS checks,
+independent read-only verification and plaintext refusal. Unit controls cover
+scope identity/lifetime invalidation, nested scope refusal, missing/false SSL,
+wrong SSL modes and unchanged provider/ICU refusals. Local integration requires
+`PG18_BIN_DIR` and `OPENSSL_BIN`; PG17 integration still requires `PG17_BIN_DIR`.
+
+After review/checkpoint, follow the protected procedure above for exactly one
+deliberate hosted `create` retry using the saved passwords. On failure stop and
+capture only safe stage/reason/SQLSTATE; do not repeat create before analysis.
+On success clear role passwords and administrative credentials, establish the
+independent protected verification connection, and run read-only `verify`.
+Do not rerun bootstrap or migrations (16 applied / 0 pending, valid PG17 receipt).
+The fix permits that guarded retry after confirmed rollback; it does not claim
+that hosted conversion has already succeeded.
 
 ## Archive and independent restore
 

@@ -1,15 +1,79 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { randomBytes, randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, appendFile } from "node:fs/promises";
+import path from "node:path";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { Pool } from "pg";
 import { disposableCluster } from "../../scripts/backup/disposable-cluster";
 import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
 import { provisionManagedRoles, roleProvisioningDiagnostic, type RoleProvisioning } from "../../scripts/db/managed-roles";
-import { managedSnapshot } from "../../scripts/backup/managed";
+import { managedSnapshot, managedDependencies, withVerifiedManagedTransport } from "../../scripts/backup/managed";
+import { native } from "../../scripts/backup/core";
 import { recoveryCatalog } from "../../scripts/backup/catalog";
 import { quote as q } from "../../scripts/backup/managed-permissions";
 import ownership from "../../scripts/backup/application-ownership.json";
+
+test("PG18 remote TLS survives restricted SET ROLE statistics visibility without sharing direct-login proof", { skip: !process.env.PG18_BIN_DIR || !process.env.OPENSSL_BIN, timeout: 180000 }, async () => {
+  const cluster = await disposableCluster(process.env.PG18_BIN_DIR!);
+  let admin: Pool | undefined;
+  try {
+    const cert = path.join(cluster.root, "server.crt"), key = path.join(cluster.root, "server.key");
+    await promisify(execFile)(process.env.OPENSSL_BIN!, ["req", "-x509", "-newkey", "rsa:2048", "-nodes", "-keyout", key, "-out", cert, "-days", "1", "-subj", "/CN=miopages-synthetic", "-addext", "subjectAltName=IP:127.0.0.2,DNS:localhost"], { windowsHide: true });
+    const pgPath = (value: string) => value.replaceAll("\\", "/").replaceAll("'", "''");
+    await appendFile(path.join(cluster.root, "data/postgresql.conf"), `\nssl=on\nssl_cert_file='${pgPath(cert)}'\nssl_key_file='${pgPath(key)}'\n`);
+    const remote = new URL(cluster.url); remote.hostname = "127.0.0.2";
+    await native(cluster.bin, "pg_ctl", ["--pgdata=" + path.join(cluster.root, "data"), "--log=" + path.join(cluster.root, "server.log"), "--options=" + `-h 127.0.0.1,127.0.0.2 -p ${remote.port}`, "--wait", "restart"]);
+    // A different loopback address deliberately exercises the remote contract.
+    // The temporary certificate is a trusted test CA with a matching IP SAN.
+    remote.searchParams.set("sslmode", "verify-full"); remote.searchParams.set("sslrootcert", cert);
+    admin = new Pool({ connectionString: remote.toString(), options: "-c timezone=UTC" });
+    await migrateWithBootstrapCompatibility(admin);
+    await admin.query("CREATE ROLE tls_visibility_probe NOLOGIN");
+    const c = await admin.connect();
+    try {
+      await c.query("BEGIN");
+      assert.equal((await managedDependencies(c, remote.toString())).transport, "tls-verify-full");
+      await c.query("SET LOCAL ROLE tls_visibility_probe");
+      assert.deepEqual((await c.query("SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()")).rows, []);
+      await assert.rejects(managedDependencies(c, remote.toString()));
+    } finally { await c.query("ROLLBACK"); c.release(); }
+    const roles = { runtime: "tls_runtime", migration: "tls_migration", backup: "tls_backup" };
+    const config: RoleProvisioning = { operation: "create", databaseUrl: remote.toString(), databaseName: remote.pathname.slice(1), sourceOwner: "postgres", roles, passwords: { runtime: randomBytes(32).toString("hex"), migration: randomBytes(32).toString("hex"), backup: randomBytes(32).toString("hex") } };
+    await admin.query("REVOKE EXECUTE ON FUNCTION pg_catalog.pg_advisory_lock(bigint) FROM PUBLIC");
+    try {
+      await assert.rejects(provisionManagedRoles(config), error => {
+        assert.equal(roleProvisioningDiagnostic(error).reason, "role-contract"); return true;
+      });
+      assert.equal((await admin.query("SELECT count(*)::int n FROM pg_roles WHERE rolname=ANY($1)", [Object.values(roles)])).rows[0].n, 0);
+    } finally { await admin.query("GRANT EXECUTE ON FUNCTION pg_catalog.pg_advisory_lock(bigint) TO PUBLIC"); }
+    assert.equal((await provisionManagedRoles(config)).verified, true);
+    for (const kind of ["runtime", "migration", "backup"] as const) {
+      const directUrl = new URL(remote); directUrl.username = roles[kind]; directUrl.password = config.passwords[kind];
+      const direct = new Pool({ connectionString: directUrl.toString(), options: "-c timezone=UTC" });
+      const client = await direct.connect();
+      try {
+        await client.query("BEGIN READ ONLY");
+        assert.equal((await client.query("SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()")).rows[0]?.ssl, true);
+        assert.equal((await managedDependencies(client, directUrl.toString())).transport, "tls-verify-full");
+      } finally { await client.query("ROLLBACK"); client.release(); await direct.end(); }
+      if (kind === "backup") assert.equal((await provisionManagedRoles({ ...config, operation: "verify", databaseUrl: directUrl.toString(), passwords: undefined })).verified, true);
+    }
+    const plaintext = new URL(cluster.url); plaintext.searchParams.set("sslmode", "disable");
+    const plain = new Pool({ connectionString: plaintext.toString() }), client = await plain.connect();
+    try {
+      await assert.rejects(managedDependencies(client, remote.toString()), /Positive backend SSL/);
+      await client.query("BEGIN");
+      await assert.rejects(withVerifiedManagedTransport(client, remote.toString(), roles.migration, async () => undefined), /Positive backend SSL/);
+      await client.query("ROLLBACK");
+    }
+    finally { client.release(); await plain.end(); }
+    const unverified = new URL(remote); unverified.username = roles.backup; unverified.password = config.passwords.backup; unverified.searchParams.set("sslmode", "disable");
+    await assert.rejects(provisionManagedRoles({ ...config, operation: "verify", databaseUrl: unverified.toString(), passwords: undefined }), /verify-full/);
+    assert.equal((await admin.query("SELECT count(*)::int n FROM pg_auth_members WHERE member=ANY(SELECT oid FROM pg_roles WHERE rolname=ANY($1))", [Object.values(roles)])).rows[0].n, 0);
+  } finally { await admin?.end(); await cluster.stop(); }
+});
 
 for (const major of [17, 18]) test(`PG${major} inventory-only provider ACL conversion, defaults and transaction refusal`, { skip: !process.env[`PG${major}_BIN_DIR`], timeout: 240000 }, async t => {
   const cluster = await disposableCluster(process.env[`PG${major}_BIN_DIR`]!);

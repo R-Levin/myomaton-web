@@ -58,10 +58,43 @@ export function assertManagedLocale(locale: Record<string, unknown>) {
     assert.ok(locale.datcollversion === null || typeof locale.datcollversion === "string", "Invalid libc collation version");
   }
 }
-export async function managedDependencies(c: Pick<PoolClient, "query">, url: string) {
-  const major = supportedMajor(Math.floor(Number((await c.query("SHOW server_version_num")).rows[0].server_version_num) / 10000));
+type TransportClient = Pick<PoolClient, "query">;
+type TransportIdentity = { pid: number; session: string; actor: string; xid: string };
+const transportScopes = new WeakMap<TransportClient, { url: string; identity: TransportIdentity; assumedRole: string }>();
+async function managedTransport(c: TransportClient, url: string) {
   const u = new URL(url), local = ["127.0.0.1", "localhost", "[::1]"].includes(u.hostname);
-  if (!local) { assert.equal(u.searchParams.get("sslmode"), "verify-full", "Remote managed connections require verify-full"); assert.equal((await c.query("SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()")).rows[0]?.ssl, true); }
+  const scope = transportScopes.get(c);
+  if (scope) assert.ok(url === scope.url, "Scoped transport connection URL changed");
+  if (!local) {
+    assert.equal(u.searchParams.get("sslmode"), "verify-full", "Remote managed connections require verify-full");
+    if (scope) {
+      const current = (await c.query("SELECT pg_backend_pid() pid,session_user session,current_user actor,pg_current_xact_id_if_assigned()::text xid")).rows[0];
+      assert.ok(current?.pid === scope.identity.pid && current.session === scope.identity.session && current.xid === scope.identity.xid && current.actor === scope.assumedRole, "Scoped transport backend/session/transaction/role changed");
+    } else assert.equal((await c.query("SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()")).rows[0]?.ssl, true, "Positive backend SSL evidence required");
+  }
+  return local;
+}
+// Provisioning alone uses this lexical scope before SET ROLE. No proof is passed
+// to callers or pooled connections: the exact client, backend, session, xid8,
+// URL and restricted current identity must match, and finally destroys the scope.
+// A transaction ID is assigned here only on the writable provisioning path.
+export async function withVerifiedManagedTransport<T>(c: TransportClient, url: string, assumedRole: string, work: () => Promise<T>): Promise<T> {
+  assert.ok(!transportScopes.has(c), "Nested transport scope refused");
+  const u = new URL(url), local = ["127.0.0.1", "localhost", "[::1]"].includes(u.hostname);
+  if (local) return work();
+  assert.equal(u.searchParams.get("sslmode"), "verify-full", "Remote managed connections require verify-full");
+  // Transport and its identity are observed in one statement on one backend.
+  const row = (await c.query("SELECT pg_backend_pid() pid,session_user session,current_user actor,pg_current_xact_id()::text xid,(SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()) ssl")).rows[0];
+  assert.equal(row?.ssl, true, "Positive backend SSL evidence required");
+  const { ssl: _ssl, ...identity } = row as TransportIdentity & { ssl: boolean };
+  void _ssl;
+  assert.ok(identity && Number.isInteger(identity.pid) && identity.pid > 0 && typeof identity.session === "string" && identity.session.length > 0 && identity.actor === identity.session && assumedRole !== identity.session && typeof identity.xid === "string" && /^\d+$/.test(identity.xid), "Transport scope requires the original session identity and a writable transaction");
+  transportScopes.set(c, { url, identity, assumedRole });
+  try { return await work(); } finally { transportScopes.delete(c); }
+}
+export async function managedDependencies(c: TransportClient, url: string) {
+  const major = supportedMajor(Math.floor(Number((await c.query("SHOW server_version_num")).rows[0].server_version_num) / 10000));
+  const local = await managedTransport(c, url);
   const extension = (await c.query("SELECT extversion FROM pg_extension WHERE extname='plpgsql'")).rows[0]; assert.ok(extension, "Provider must supply plpgsql");
   assert.ok((await c.query("SELECT to_regprocedure('pg_catalog.gen_random_uuid()') name")).rows[0].name, "Provider UUID capability missing");
   assert.equal((await c.query("SELECT ('{\"a\":1}'::jsonb @> '{\"a\":1}'::jsonb) ok")).rows[0].ok, true);

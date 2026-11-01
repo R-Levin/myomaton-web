@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash, createHmac, pbkdf2Sync, randomBytes } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import ownership from "../backup/application-ownership.json";
-import { managedSnapshot, managedDependencies, applicationSemantic, managedVerificationReasons, type ManagedVerificationReason } from "../backup/managed";
+import { managedSnapshot, managedDependencies, applicationSemantic, managedVerificationReasons, withVerifiedManagedTransport, type ManagedVerificationReason } from "../backup/managed";
 import { applyApplicationGrants, establishApplicationDefaults, normalizeOwnedSchemaGrants, quote as q, qualified, type Roles, type Sql } from "../backup/managed-permissions";
 import { recoveryCatalog } from "../backup/catalog";
 import { bootstrapFiles, bootstrapStatus } from "./bootstrap";
@@ -107,15 +107,19 @@ export async function provisionManagedRoles(input: RoleProvisioning) {
     }
     for (const fn of ownership.functions) await c.query(`ALTER FUNCTION ${qualified(fn)}() OWNER TO ${q(input.roles.migration)}`);
     for (const schema of ownership.schemas.filter(s => s !== "public")) await c.query(`ALTER SCHEMA ${q(schema)} OWNER TO ${q(input.roles.migration)}`);
-    await c.query(`SET LOCAL ROLE ${q(input.roles.migration)}`);
-    stage = "acl-normalization"; await applyApplicationGrants(c, input.roles);
-    for (const schema of ownership.schemas.filter(s => s !== "public")) await normalizeOwnedSchemaGrants(c, input.roles, schema);
-    stage = "default-privileges"; await establishApplicationDefaults(c, input.roles);
-    stage = "verification"; const state = await managedSnapshot(c, input.databaseUrl, input.roles, progress);
-    progress("semantic-equivalence"); assert.deepEqual(state.semantic, catalog, "Role provisioning changed application semantics");
-    progress("data-equivalence"); assert.deepEqual(await dataState(c), data, "Role provisioning changed data or sequence values");
-    progress("shared-provider-authority"); assert.deepEqual(await sharedAuthority(c, input.roles), shared, "Provider database/public authority changed");
-    progress("bootstrap-equivalence"); assert.deepEqual(await bootstrapStatus(c, bootstrapFiles()), bootstrap, "Bootstrap receipt/history changed");
+    stage = "dependencies";
+    const state = await withVerifiedManagedTransport(c, input.databaseUrl, input.roles.migration, async () => {
+      await c.query(`SET LOCAL ROLE ${q(input.roles.migration)}`);
+      stage = "acl-normalization"; await applyApplicationGrants(c, input.roles);
+      for (const schema of ownership.schemas.filter(s => s !== "public")) await normalizeOwnedSchemaGrants(c, input.roles, schema);
+      stage = "default-privileges"; await establishApplicationDefaults(c, input.roles);
+      stage = "verification"; const verified = await managedSnapshot(c, input.databaseUrl, input.roles, progress);
+      progress("semantic-equivalence"); assert.deepEqual(verified.semantic, catalog, "Role provisioning changed application semantics");
+      progress("data-equivalence"); assert.deepEqual(await dataState(c), data, "Role provisioning changed data or sequence values");
+      progress("shared-provider-authority"); assert.deepEqual(await sharedAuthority(c, input.roles), shared, "Provider database/public authority changed");
+      progress("bootstrap-equivalence"); assert.deepEqual(await bootstrapStatus(c, bootstrapFiles()), bootstrap, "Bootstrap receipt/history changed");
+      return verified;
+    });
     stage = "membership-cleanup"; await c.query("SET LOCAL ROLE NONE");
     await c.query(`REVOKE ${Object.values(input.roles).map(q).join(",")} FROM ${q(input.sourceOwner)}`);
     const membership = (await c.query("SELECT m.inherit_option,m.set_option FROM pg_auth_members m WHERE m.roleid=ANY(SELECT oid FROM pg_roles WHERE rolname=ANY($1))", [Object.values(input.roles)])).rows;
