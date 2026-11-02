@@ -2,7 +2,6 @@
 // Read-only deterministic structural fixture for WordPress adapter design.
 // Not a publishable release: bound content and managed asset bytes remain unresolved.
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -40,13 +39,11 @@ const fixture = {
   assets:{status:"asset-bytes-not-included",approvedRoles:data.asset_usages.map(u=>({role:u.role,assetId:u.asset_id})),unresolvedMediaRoles:5},
   constraints:{notForPublicDeployment:true,noFpoOrUnapprovedMedia:true,noOperationalReviewForm:true,canonicalProjectionRequired:true,assetByteVerificationRequired:true,approvalAndAuthorizationRequired:true}
 };
-const canonical = JSON.stringify(fixture);
-fixture.fixtureSha256 = createHash("sha256").update(canonical).digest("hex");
 const out = JSON.stringify(fixture,null,2)+"\n";
 if (process.argv[2] === "--write") {
   const target = resolve(root,"docs/wordpress-c0-v3-structural-fixture.json");
   writeFileSync(target,out,"utf8");
   process.stdout.write(target+"\n");
 } else {
-  process.stdout.write(JSON.stringify({fixtureSha256:fixture.fixtureSha256,pages:pages.map(p=>({path:p.path,sections:p.sections.length})),unresolvedSections:pages.flatMap(p=>p.sections).filter(s=>s.content.status!=="reviewed-inline").length,publishable:false})+"\n");
+  process.stdout.write(JSON.stringify({sourceDigest:frozen.sourceDigest,pages:pages.map(p=>({path:p.path,sections:p.sections.length})),unresolvedSections:pages.flatMap(p=>p.sections).filter(s=>s.content.status!=="reviewed-inline").length,publishable:false})+"\n");
 }
