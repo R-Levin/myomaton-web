@@ -44,3 +44,11 @@ The mapping to WordPress blocks is **provisional**: a dynamic block is an attrac
 5. Only then build a WordPress renderer that consumes the signed, approved publishable release and compare responsive results with the accepted v3 reference.
 
 No live site, database or customer changes are authorized by this mapping.
+
+## Canonical projection implementation checkpoint — 2026-11-02
+
+A guarded **read-only** exporter now exists at `scripts/project-wordpress-c0-v3.ts`. It loads the frozen, reviewed `after` graph, imports the production `normalizeBinding` and `projectContent` functions, resolves the five source-bound sections using the corresponding public-approved Knowledge/Offering row, and refuses any null projection. It validates all four routes, 23 sections, page-targeted actions and navigation references, and marks its JSON output `publishable:false`. It does not request live DB access, write by default, or include managed asset bytes. The `--write` option emits the proposed `docs/wordpress-c0-v3-public-projection-fixture.json` only after execution and review.
+
+**Validation limitation:** Repository source has been inspected and code committed through GitHub, but the new TypeScript script has **not been run against a local checkout** in this session. Its public projection fixture has therefore **not** been generated or marked validated. The existing structural fixture action and navigation target fields were corrected against the frozen graph, but a full local reproducibility test also remains pending.
+
+**Next exact operator/developer action in a checkout with dependencies installed:** run `node --import tsx scripts/project-wordpress-c0-v3.ts`, confirm 4/23/5 and no refusal, run twice and compare digests; run `node scripts/export-wordpress-c0-v3-fixture.mjs --write` only after reviewing the changed tracked structural fixture; then `node --import tsx scripts/project-wordpress-c0-v3.ts --write`, audit public text and secrets/media refusals, and commit the generated file only after review. No hosted database credentials are needed.
