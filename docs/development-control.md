@@ -109,6 +109,8 @@ Never promote historical evidence to live without an actual check. Add new evide
 - The exported record is deliberately **not** an approved distributable release: no media bytes or unapproved FPO, no pretense of enabled Review workflows, no exposure of private price amounts, and no central DB/hosted changes.
 - **Next bounded step:** validate exporter reproducibility and resolve public content through authorized existing canonical projections in a **local, read-only** fixture path; then specify signed release format and build WordPress page/section proof. Source module inventory is preliminary, not proof of code reuse.
 - Existing hosted 20i synthetic C0 and its DNS/SSL experiment remain untouched.
+- Added `scripts/project-wordpress-c0-v3.ts`: read-only local C0 v3 public canonical projection exporter using existing `normalizeBinding` / `projectContent`; correct action destination/navigation target mappings in earlier structural exporter and fixture. **New TS script not yet executed or reproducibility-validated** in this session. Next run it locally twice, audit data, then explicitly generate and review nonpublishable JSON; no hosted DB access.
+
 
 ## Return path: full MioPages Commercial V1
 
