@@ -23,7 +23,7 @@ This *reopens* the historical post-V1 WordPress placement in `docs/platform-serv
 | Knowledge and content | Structured knowledge, pages, sections, actions, assets and reviewed site recipes | Serializer that produces an adapter-neutral, versioned, immutable site release compatible with WordPress |
 | Approval | Distinct customer approval/release authorities are documented | Verify only approved release IDs can be synchronized; host-side publish acknowledgement cannot grant approval |
 | Current delivery | Next.js renderer and hostname routing already demonstrated for synthetic C0 at two hostnames | WordPress renderer/theme/block mapping; no requirement to reimplement tenant lookup inside each WP site |
-| Site content state | Hosted synthetic C0 currently 4 pages / 19 sections; later reviewed design 4 / 23 sections not hosted | Select an immutable approved **synthetic** fixture for tests; no direct production hosted C0 mutation |
+| Site content state | Hosted synthetic C0 currently 4 pages / 19 sections; later reviewed design 4 / 23 sections not hosted | Use the **accepted service-led v3 C0** (4 Pages / 23 Sections) as the immutable proof fixture, from verified development/frozen promotion sources; no direct hosted C0 mutation |
 | Release/recovery | Central revisions, release and rollback design/contracts | Remote staging, atomic activation, idempotent retry, last-good release, drift detection, remote reconciliation |
 | Media/SEO/integrations | Content architecture covers assets, analytics and discovery integration requirements | Media copy/link handling, SEO/meta/schema rendering, GA4 and verification integration; avoid arbitrary customer scripts |
 | Site provisioning | 20i Reseller infrastructure and operator familiarity | Live API entitlement/Blueprint capabilities, domain/SSL exceptions, mailbox preservation, alternate-host onboarding |
@@ -55,11 +55,15 @@ This is an architectural **gap analysis**, not a complete code-level inventory. 
 - An agency/connected-site mode, **deferred**, distinguishes local/agency-owned regions from named MioPages-managed sections and defines conflict/drift policy. Do not overwrite unrestricted existing theme content.
 - Code/theme customization rights cannot be taken away from a site owner who controls hosting; the architecture should fail closed on publish, detect divergent local state, and explain corrective options.
 
+## Chosen reference fixture: accepted service-led v3 C0
+
+Operator clarification (2026-11-02): the first WordPress rendering and transport proof **must use the newest human-accepted C0 design**, **A Business in Focus / service-led v3**, not the older synthetic C0 deployed on 20i. The authoritative review/promotion documentation is [reviewed canonical promotion](miopages-canonical-promotion.md), with frozen reviewed source at `scripts/customer-updates/miopages-focus-reviewed.json`. Expected four routes: `/` (5 Sections), `/service` (8), `/experience` (5), `/review` (5), totalling **23 Sections**; approved Source Sans 3 typography and palette; two eligible wordmark assets. The five unresolved media needs remain unapproved, so never fabricate/insert FPO imagery, historical proof, or a pretend functional Review form. The canonical release must enforce existing confirmed-content and media eligibility boundaries. The v3 promotion's frozen development preconditions **do not match** the hosted fresh PG17/16-migration C0 state; **do not replay its operator against the hosted database**. Construct and verify a read-only/exported deterministic fixture from reviewed code and development test data, with no hosted database changes. This tests visual fidelity and content semantics, not authorization for commercial public launch.
+
 ## Minimal prototype
 
 **Phase A: contract and static mapping** (no hosted writes)
 - Inventory current actual data schemas, existing release/approval gates and renderer input.
-- Produce example adapter-neutral release JSON for one approved synthetic C0 fixture; map one page with representative header, hero, services/benefits, CTA, navigation and SEO to one lightweight WordPress block/theme design.
+- Produce example adapter-neutral release JSON from the **accepted C0 A Business in Focus / service-led v3** (4 Pages / 23 Sections), not the older hosted 4/19 state. Inspect the reviewed frozen promotion source and development canonical graph, ensure exact identity/sections/design-system/approved wordmarks and preserve unresolved-media refusal. Map a representative page with header, hero, services/benefits, CTA, navigation and SEO to a lightweight WordPress block/theme design.
 - Specify compatibility versioning, URL/canonical behavior, media and rollback mechanism. Avoid arbitrary generated HTML and introducing a general page builder.
 
 **Phase B: isolated 20i proof** (explicit authorization for provisioning and writes required)
