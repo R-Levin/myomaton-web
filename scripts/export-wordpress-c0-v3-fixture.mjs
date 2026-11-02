@@ -14,7 +14,7 @@ assert.equal(data.sections.length, 23);
 const routes = ["/", "/service", "/experience", "/review"];
 const expectedCounts = { "/": 5, "/service": 8, "/experience": 5, "/review": 5 };
 const allowedTypes = new Set(["hero", "intro", "relationship", "collection", "cta"]);
-const actions = Object.fromEntries(data.actions.map(a => [a.id, { label: a.label, destinationPageId: a.target_page_id ?? a.page_id ?? null }]));
+const actions = Object.fromEntries(data.actions.map(a => { assert.ok(data.pages.some(p => p.id === a.destination)); return [a.id, { label: a.label, destinationPageId: a.destination }]; }));
 const pages = routes.map(route => {
   const page = data.pages.find(p => p.slug === route);
   assert.ok(page, "missing route " + route);
@@ -35,7 +35,7 @@ const fixture = {
   identity:{organizationId:frozen.target.organizationId,webPresenceId:frozen.target.webPresenceId,managedSiteId:frozen.target.managedSiteId},
   design:{presentation:"service-led",version:3,designSystem:data.design_systems[0].configuration,font:"Source Sans 3", managedSitePresentation:data.managed_sites[0].configuration.presentation ?? null},
   pages, actions,
-  navigation:{items:data.navigation_items.map(n=>({id:n.id,label:n.label,targetPageId:n.target_page_id ?? null,sortOrder:n.sort_order}))},
+  navigation:{items:data.navigation_items.map(n=>{ assert.ok(data.pages.some(p=>p.id===n.target_reference)); return {id:n.id,label:n.label,targetPageId:n.target_reference,sortOrder:n.sort_order}; })},
   assets:{status:"asset-bytes-not-included",approvedRoles:data.asset_usages.map(u=>({role:u.role,assetId:u.asset_id})),unresolvedMediaRoles:5},
   constraints:{notForPublicDeployment:true,noFpoOrUnapprovedMedia:true,noOperationalReviewForm:true,canonicalProjectionRequired:true,assetByteVerificationRequired:true,approvalAndAuthorizationRequired:true}
 };
