@@ -112,6 +112,10 @@ Never promote historical evidence to live without an actual check. Add new evide
 - Added `scripts/project-wordpress-c0-v3.ts`: read-only local C0 v3 public canonical projection exporter using existing `normalizeBinding` / `projectContent`; correct action destination/navigation target mappings in earlier structural exporter and fixture. **New TS script not yet executed or reproducibility-validated** in this session. Next run it locally twice, audit data, then explicitly generate and review nonpublishable JSON; no hosted DB access.
 
 
+## WordPress operator-editor inbound proposal track — 2026-11-03
+
+Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an editing interface for content-form business knowledge instead of building a rich-text editor from scratch. Added to [WordPress delivery feasibility](wordpress-delivery-feasibility.md#operator-gutenberg-editing-as-an-inbound-knowledge-proposal-channel-2026-11-03) as a separate **inbound editorial adapter**. Edits create authenticated tenant-scoped **pending proposals** with actor, base version, source revision and provenance; approval and public release stay in core MioPages. Do not conflate with the **outbound** WordPress delivery release, hosted WordPress page locks or the 20i service adapter. Begin with a single restricted article/CPT editorial proof; do not establish 100 per-customer editing workflows or a central editorial WP hub without subsequent evidence. This decision adds design/proof scope, not a completed feature or authorization for live writes.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
