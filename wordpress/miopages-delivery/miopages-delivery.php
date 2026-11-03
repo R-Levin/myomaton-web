@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MioPages Delivery (Development Proof)
  * Description: Restricted, read-only C0 fixture preview for the MioPages WordPress delivery feasibility proof.
- * Version: 0.0.2
+ * Version: 0.0.3
  * Requires PHP: 8.3
  * Text Domain: miopages-delivery
  */
@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 }
 
 require_once __DIR__ . '/includes/class-miopages-fixture-preview.php';
+require_once __DIR__ . '/includes/class-miopages-environment-check.php';
 
 add_action('admin_menu', static function (): void {
     add_management_page(
@@ -20,6 +21,14 @@ add_action('admin_menu', static function (): void {
         'manage_options',
         'miopages-development-preview',
         'miopages_render_development_preview'
+    );
+
+    add_management_page(
+        'MioPages Hosting Readiness',
+        'MioPages Environment',
+        'manage_options',
+        'miopages-environment-check',
+        'miopages_render_environment_check'
     );
 });
 
@@ -81,4 +90,25 @@ function miopages_render_development_preview(): void
     }
 
     echo '</div>';
+}
+
+/**
+ * Read-only capability report; not a staging/enrollment setup screen.
+ */
+function miopages_render_environment_check(): void
+{
+    if (!current_user_can('manage_options')) {
+        wp_die(esc_html__('Permission denied.', 'miopages-delivery'));
+    }
+    echo '<div class="wrap"><h1>MioPages — Hosting Environment Check</h1>';
+    echo '<p>Administrator-only, read-only hosting readiness diagnostics. '
+        . 'No release files, filesystem writes, WordPress pages, API calls or signing keys are created. '
+        . 'Function availability does not establish filesystem atomicity or production readiness.</p>';
+    echo '<table class="widefat striped" style="max-width:900px"><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody>';
+    foreach (MioPages_Environment_Check::report() as $label => $result) {
+        echo '<tr><th scope="row">' . esc_html($label) . '</th><td>'
+            . esc_html($result) . '</td></tr>';
+    }
+    echo '</tbody></table><p><strong>Do not share server paths or credentials.</strong> '
+        . 'This screen intentionally does not display paths, secrets, enrollment IDs or private keys.</p></div>';
 }
