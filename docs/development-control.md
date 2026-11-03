@@ -171,6 +171,12 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **Next:** rebuild with portable `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`, inspect ZIP entries, replace only the development plugin in password-protected WordPress, and verify the styled administrator preview. Do not enable public release, import pages or change the canonical database.
 
+## WordPress v0.0.2 visual preview acceptance observation — 2026-11-03
+
+**User-reported visual outcome:** Following successful local PHP lint and smoke tests, the user reported that the v0.0.2 styled WordPress preview **"looks very good. Pretty much as I remember it."** This is encouraging initial qualitative validation of the password-protected admin-only renderer, but **not** an independently captured screenshot comparison against the accepted service-led v3 reference, responsive/accessibility evaluation, public WordPress page publishing, or production approval. The installed v0.0.2 version and full content inventory were not independently inspected by the assistant in this report. Preserve nonpublishable C0 fixture restrictions, unverified logos/media, unimplemented review form and release transport.
+
+**Next bounded technical operation:** capture reproducible visual-fidelity observations (desktop/mobile screenshots, content mapping/spacing, missing media), then design the versioned provider-neutral outbound release contract and protected staging/activation *without* publishing the nonpublishable fixture. In parallel, plan one restricted WordPress editorial draft-to-pending-proposal path; read-only 20i API inventory remains separate and no credentials should enter Git.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
