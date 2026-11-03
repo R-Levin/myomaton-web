@@ -199,6 +199,16 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **Next bounded task:** review and design protected staging storage plus race-safe activation/rollback semantics, including immutable staged objects, monotonic revision and compare-and-swap; write a local/offline proof before any WordPress write integration. Keep the existing password-protected WP visual preview operational and C0 v3 fixture nonpublishable. No 20i API or hosted DB operations authorized by this evidence.
 
+## Offline release staging and activation first slice — 2026-11-03
+
+**Committed source, NOT YET runtime tested:** `docs/wordpress-release-staging-v0.1.md` sets the private immutable-object and guarded active-marker design. Added `wordpress/miopages-delivery/includes/class-miopages-release-store.php` and `tests/release-staging-smoke.php`. This is an **offline, PHP-only** store: requires an existing caller-supplied private directory, stages exact signed envelope bytes in digest-addressed objects, uses a cooperative exclusive file lock, checks immutable object integrity, and conditionally advances an `active.json` marker only after signature/tenant/approval/sequence/time revalidation. It has NO WordPress hooks, public routes, site rendering, imported WP posts, database writes, live HTTP transport or 20i credentials. `miopages.org` plugin v0.0.2 requires **no update** for this slice.
+
+**Rollback design:** Directly rewinding the active marker is forbidden; controlled restoration means a **new centrally signed, approved forward-sequence release** with previously approved desired content. This is not proof of deployed rollback; central authority and signer, release transport, staged asset coherence and actual public serving remain unimplemented.
+
+**Safety/portability gaps:** Required outside-webroot storage, correct OS-level permissions, no symlink escapes, lock semantics on target filesystem, crash durability, cross-process/cross-host concurrency, staging retention and recovery have not been security-audited. PHP hard-link and atomic-rename behavior must be validated on intended environments (including local Windows and 20i Linux). This is a feasibility proof, not a production persistence implementation. The marker does not switch a working WordPress website.
+
+**Next exact action:** In `C:\Users\mplxs\Projects\myomaton-web` fetch active branch, run `php -l wordpress/miopages-delivery/includes/class-miopages-release-store.php`, `php -l wordpress/miopages-delivery/tests/release-staging-smoke.php`, and `php wordpress/miopages-delivery/tests/release-staging-smoke.php`. Only record a PASS if observed; otherwise stop, inspect and repair offline. Rerun earlier release-contract smoke test to detect regression. Do not deploy staging code on WordPress or create public pages.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
