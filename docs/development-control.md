@@ -246,6 +246,12 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **After hosted results:** Assess whether 20i permits a suitable actual off-webroot private directory and separately test host PHP sodium, lock, link, rename, isolation/permissions and recovery. Keep signer private keys only centrally. Do not infer trust/enrollment from a diagnostic.
 
+## WordPress environment diagnostic path classification fix — 2026-11-03
+
+**User-reported local test:** After fast-forward to `c6ed48f`, PHP syntax lint passed for the plugin, `class-miopages-environment-check.php` and `environment-check-smoke.php`; existing `preview-smoke.php` passed. New environment test returned **`FAIL: same root can identify possible parent`**. Root cause: `candidateStatus()` incorrectly required WordPress root to be a *strict child* of document root, rejecting a common installation where WordPress root **equals** document root. Code corrected in `class-miopages-environment-check.php` to allow equality while still refusing candidates inside document root and treating unexpected path relationships as unknown.
+
+**Verification not yet received after fix.** Next: `git pull --ff-only`; run `php -l wordpress/miopages-delivery/includes/class-miopages-environment-check.php`, `php wordpress/miopages-delivery/tests/environment-check-smoke.php` and `php wordpress/miopages-delivery/tests/preview-smoke.php`. Require both smoke suites PASS. **Do not upgrade WordPress v0.0.2 to v0.0.3 before these checks pass.** No hosted PHP, private directory, activation, signer or 20i API work performed by this fix.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
