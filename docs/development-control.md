@@ -252,6 +252,12 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **Verification not yet received after fix.** Next: `git pull --ff-only`; run `php -l wordpress/miopages-delivery/includes/class-miopages-environment-check.php`, `php wordpress/miopages-delivery/tests/environment-check-smoke.php` and `php wordpress/miopages-delivery/tests/preview-smoke.php`. Require both smoke suites PASS. **Do not upgrade WordPress v0.0.2 to v0.0.3 before these checks pass.** No hosted PHP, private directory, activation, signer or 20i API work performed by this fix.
 
+## Environment-classification repair verified locally — 2026-11-03
+
+User-reported after fast-forward to `5e2e829`: `php wordpress/miopages-delivery/tests/environment-check-smoke.php` returned **`PASS: WordPress environment read-only diagnostic (root classification and capabilities).`** Separately, `php wordpress/miopages-delivery/tests/preview-smoke.php` returned **`PASS: C0 private preview smoke tests (structure, visual shells, publication gate, section allowlist, HTML escaping).`** This closes the local path-classification test failure. Original new-plugin syntax checks had also passed before the fix; code change is a single path-condition adjustment. No hosted v0.0.3 installation result yet.
+
+**Next authorized operator action:** Build portable plugin ZIP with `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`; replace plugin on protected `miopages.org` WordPress development site; verify v0.0.3 and visit Tools → MioPages Environment. Record only descriptive diagnostic outcomes (PHP/Sodium, available filesystem functions, open_basedir, off-webroot-candidate classification), no absolute paths or secrets. Do not create private storage, issue signing keys, enable public publishing, or touch MioPages core.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
