@@ -147,6 +147,16 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **Next bounded action:** Run the three PHP syntax checks and `php wordpress/miopages-delivery/tests/preview-smoke.php` on the existing Windows repo (CLI available only if installed); capture exact outcomes. Confirm `miopages.org` WordPress installation and private access protection before **any** staging upload. Do not claim WordPress installed or site protected yet. Then test the administrator-only preview on the isolated dev site. Independently implement the inbound editorial proposal proof and read-only 20i API inventory in later guarded slices; do not conflate those with the current preview.
 
+## WordPress hosted private-preview field result — 2026-11-03
+
+**User-reported interactive result, not an independent content/fidelity audit:** On `miopages.org` (20i Linux Unlimited Reseller, PHP 8.3, WordPress version reported 7.1.4), user installed WordPress and confirmed 20i `public_html` directory password protection works when opening the site in a private browser window. Experimental `MioPages Delivery (Development Proof)` plugin was installed and activated. Under WP Tools → MioPages Preview, user pasted `docs/wordpress-c0-v3-public-projection-fixture.json` and reported the simplified private preview rendered properly. This is **a preliminary successful admin-preview smoke proof**, not verified pixel/design parity, production authorization, actual WP page publishing, central authority, release transport or full automated tests.
+
+**Packaging failure and resolution:** Original Windows `Compress-Archive` ZIP listed plausible entries under `tar -tf` but 20i extraction produced literal filenames with backslash-separated path components in a randomized plugin directory; WP reported “Plugin file does not exist.” Rebuilt using `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`; user reported successful plugin activation. Preserve portable ZIP entry-path guidance in later deployment packaging.
+
+**Independent local tests reported by user:** All three `php -l` checks passed; `php wordpress/miopages-delivery/tests/preview-smoke.php` returned PASS for 4/23 inventory, publication gate, section allowlist and HTML escaping. These are reported user terminal outputs, not new CI proof. No evidence of hosting/central DB/API writes from the preview tool. Nonpublishable fixture remains `publishable:false`.
+
+**Next bounded development step:** Design and implement a provider-neutral, restricted section/theme renderer using the accepted v3 fixture **only in protected development preview**; verify content mapping, styles and responsive fidelity; enforce nonpublishable and unresolved media/publication gates. Use reproducible platform-safe packaging. Keep inbound WordPress→MioPages editorial proposal and read-only 20i API adapter as separate tracks, and do not prematurely publish managed pages or enable public releases.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
