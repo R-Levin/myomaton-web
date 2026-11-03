@@ -92,6 +92,16 @@ Authoritative procedure: [C0 canonical state / fresh-hosted synthetic establishm
 
 Never promote historical evidence to live without an actual check. Add new evidence here or in a reviewed linked committed ledger after each operational boundary, with date, SHA, environment, action, sanitized outcome and any unknowns.
 
+## Active development branch alert — WordPress editorial/delivery and 20i adapter (2026-11-03)
+
+**First-read continuity routing:** The latest *approved evaluation direction* is documented in [WordPress delivery PR #5](https://github.com/R-Levin/myomaton-web/pull/5), branch `docs/wordpress-delivery-feasibility-2026-11-02`. **Read that branch's `docs/development-control.md` and `docs/wordpress-delivery-feasibility.md` before making WordPress architecture decisions or starting WP adapter implementation.** This `main` document contains historical hosted C0 recovery and may omit newer branch work. Do not infer branch changes are merged, production-ready or deployed.
+
+- **Core/adapter separation:** MioPages remains canonical knowledge, approvals and releases; WordPress is both an outbound managed-site renderer and a possible *inbound* operator/editorial proposal surface; 20i API is an optional hosting/service-delivery adapter only.
+- **Two-role workflow:** WordPress Editorial Operator can propose a post, page, service/location or other mapped content revision. MioPages Reviewing Operator can suggest alternatives, request customer factual confirmation, return for revision, approve/reject. Canonical approval, impact assessment for affected presence surfaces, and per-channel publication/release are separate decisions; no automatic cascade.
+- **Bounded first proofs:** controlled nonpublic WP C0 v3 rendering; one inbound authenticated editorial proposal and structured knowledge example; conflict/loop/provenance protection and impact preview; parallel read-only 20i package inventory. WordPress feature code and 20i API execution are **not yet proven**. C0 v3 fixture on branch has 4 pages/23 sections and is `publishable:false`.
+- **Safety:** No customer publication, hosted DB mutation, migrations, API credentials in Git, silent roadmap changes or production migration approval. Existing 20i Next.js hosted C0 4/19 remains separate.
+- **Handoff:** Before implementation check current `main`, active branch head and PR status; inspect branch's latest documentation and actual test evidence. After each material step record nonsecret Git evidence. The Commercial V1 roadmap remains unchanged pending explicit reconciliation.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
