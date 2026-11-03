@@ -141,6 +141,12 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **Continuity constraint:** Source of truth for active branch work is [PR #5](https://github.com/R-Levin/myomaton-web/pull/5); ensure `main` has a navigational link until merged. Do not merge or silently change canonical roadmap/production deployment authority as part of this checkpoint. Current development spec and this record reflect agreed direction and research/proof gates, not a delivered WordPress plugin or operational 20i integration.
 
+## First WordPress plugin source checkpoint — 2026-11-03
+
+**GitHub-source verified, execution/deployment unverified:** Added `wordpress/miopages-delivery/miopages-delivery.php`, `includes/class-miopages-fixture-preview.php`, `tests/preview-smoke.php` and README on the active WordPress development branch. The experimental plugin has a *WordPress-administrator-only* Tools preview that accepts pasted **nonpublishable** C0 v3 JSON, verifies the 4-route/23-section schema and allowlisted five section types, renders escaped content and nonclickable action labels. It performs no content or database writes, has no public route, does not transmit to MioPages or 20i, and cannot publish the frozen fixture. This is a structural proof, **not design fidelity, authenticated release delivery, or the promised bidirectional integration**. Its schema gate is not a cryptographic signature/source digest validation.
+
+**Next bounded action:** Run the three PHP syntax checks and `php wordpress/miopages-delivery/tests/preview-smoke.php` on the existing Windows repo (CLI available only if installed); capture exact outcomes. Confirm `miopages.org` WordPress installation and private access protection before **any** staging upload. Do not claim WordPress installed or site protected yet. Then test the administrator-only preview on the isolated dev site. Independently implement the inbound editorial proposal proof and read-only 20i API inventory in later guarded slices; do not conflate those with the current preview.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
