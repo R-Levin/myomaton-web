@@ -20,6 +20,11 @@ function esc_html(string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+function esc_attr(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
 require dirname(__DIR__) . '/includes/class-miopages-fixture-preview.php';
 
 function check(bool $condition, string $message): void
