@@ -61,6 +61,9 @@ final class MioPages_Fixture_Preview
     }
 
     /**
+     * Visual proof only: deterministic, escaped HTML based on reviewed section types,
+     * palette surfaces and recipes. This remains admin-only and nonpublishable.
+     *
      * @param array<string,mixed> $data
      */
     public static function render(array $data): string
@@ -74,53 +77,120 @@ final class MioPages_Fixture_Preview
             }
         }
 
-        $html = '<div class="miopages-fixture-preview" style="max-width:1100px">';
-        $html .= '<p><strong>Read-only prototype:</strong> WordPress content storage, theme parity, assets, signatures, approvals and publication have not been implemented.</p>';
+        $html = '<div class="miopages-fixture-preview">';
+        $html .= '<p class="miopages-proof-warning">Protected development preview — not an approved release. '
+            . 'Navigation and calls to action are illustrative and not clickable. '
+            . 'Wordmark assets, illustrations, forms, publication and release transport are not implemented.</p>';
+
         foreach ($data['pages'] as $page) {
-            $html .= '<article style="margin:24px 0;padding:18px;border:1px solid #aaa;background:#fff">';
-            $html .= '<h2>' . esc_html($page['title']) . ' <small>(' . esc_html($page['path']) . ')</small></h2>';
+            $recipe = $page['recipe']['id'] ?? 'unknown';
+            $recipe = is_string($recipe) && in_array($recipe, ['arrival', 'service', 'evidence', 'assessment'], true)
+                ? $recipe : 'unknown';
+
+            $html .= '<article class="miopages-proof-page miopages-recipe-' . esc_attr($recipe) . '">';
+            $html .= '<header class="miopages-proof-header"><div class="miopages-proof-brand">MioPages'
+                . '<span>Wordmark pending verified asset</span></div>';
+            $html .= '<nav aria-label="Illustrative site navigation"><span class="miopages-proof-navitem">Home</span>';
+            foreach ($data['navigation'] as $nav) {
+                if (is_array($nav) && is_string($nav['label'] ?? null)
+                    && in_array($nav['path'] ?? '', ['/service', '/experience', '/review'], true)) {
+                    $html .= '<span class="miopages-proof-navitem">' . esc_html($nav['label']) . '</span>';
+                }
+            }
+            $html .= '</nav></header>';
+            $html .= '<div class="miopages-proof-meta">Private page preview · ' . esc_html($page['path'])
+                . ' · ' . esc_html($recipe) . ' recipe</div>';
+
             foreach ($page['sections'] as $section) {
                 $type = $section['type'];
                 $body = $section['content'];
-                $html .= '<section style="margin:12px 0;padding:15px;border-left:4px solid #6f56a2;background:#f7f5fb">';
-                $html .= '<p style="margin:0;font-size:11px;letter-spacing:.07em;text-transform:uppercase">'
-                    . esc_html($type) . '</p>';
-                foreach (['eyebrow', 'heading', 'text'] as $field) {
-                    if (isset($body[$field]) && is_string($body[$field]) && $body[$field] !== '') {
-                        $tag = $field === 'heading' ? 'h3' : 'p';
-                        $html .= '<' . $tag . '>' . nl2br(esc_html($body[$field]), false) . '</' . $tag . '>';
-                    }
+                $presentation = is_array($section['presentation'] ?? null) ? $section['presentation'] : [];
+                $surface = $presentation['surface'] ?? 'light';
+                $allowedSurfaces = ['light', 'strong', 'tonal', 'brand', 'supporting', 'contrast'];
+                if (!is_string($surface) || !in_array($surface, $allowedSurfaces, true)) {
+                    $surface = 'light';
+                }
+                $region = $presentation['region'] ?? 'connected';
+                $allowedRegions = ['connected', 'emphasized', 'closing'];
+                if (!is_string($region) || !in_array($region, $allowedRegions, true)) {
+                    $region = 'connected';
+                }
+                $html .= '<section class="miopages-proof-section miopages-section-' . esc_attr($type)
+                    . ' miopages-surface-' . esc_attr($surface)
+                    . ' miopages-region-' . esc_attr($region) . '">';
+                $html .= '<div class="miopages-proof-inner">';
+                if (!empty($body['eyebrow']) && is_string($body['eyebrow'])) {
+                    $html .= '<p class="miopages-proof-eyebrow">' . esc_html($body['eyebrow']) . '</p>';
+                }
+                if (!empty($body['heading']) && is_string($body['heading'])) {
+                    $tag = $type === 'hero' ? 'h1' : 'h2';
+                    $html .= '<' . $tag . '>' . esc_html($body['heading']) . '</' . $tag . '>';
+                }
+                if (!empty($body['text']) && is_string($body['text'])) {
+                    $html .= '<p class="miopages-proof-body">' . nl2br(esc_html($body['text']), false) . '</p>';
                 }
 
                 foreach (['items', 'extensions'] as $field) {
                     if (!is_array($body[$field] ?? null)) {
                         continue;
                     }
-                    $html .= '<ul>';
+                    $html .= '<ul class="miopages-proof-cards ' . ($field === 'extensions' ? 'miopages-proof-extensions' : '') . '">';
                     foreach ($body[$field] as $item) {
                         if (!is_array($item)) {
                             continue;
                         }
                         $heading = is_string($item['heading'] ?? null) ? $item['heading'] : '';
                         $text = is_string($item['text'] ?? null) ? $item['text'] : '';
-                        $html .= '<li><strong>' . esc_html($heading) . '</strong> '
-                            . nl2br(esc_html($text), false) . '</li>';
+                        $html .= '<li class="miopages-proof-card"><h3>' . esc_html($heading) . '</h3><p>'
+                            . nl2br(esc_html($text), false) . '</p></li>';
                     }
                     $html .= '</ul>';
                 }
 
+                if (is_array($body['rows'] ?? null) && is_array($body['parties'] ?? null)) {
+                    $parties = [];
+                    foreach ($body['parties'] as $party) {
+                        if (is_array($party) && is_string($party['id'] ?? null)
+                            && is_string($party['label'] ?? null)) {
+                            $parties[$party['id']] = $party['label'];
+                        }
+                    }
+                    $html .= '<div class="miopages-proof-responsibilities">';
+                    foreach ($body['rows'] as $row) {
+                        if (!is_array($row) || !is_array($row['cells'] ?? null)) {
+                            continue;
+                        }
+                        $label = is_string($row['label'] ?? null) ? $row['label'] : '';
+                        $html .= '<div class="miopages-proof-responsibility"><h3>' . esc_html($label) . '</h3>';
+                        $html .= '<div class="miopages-proof-responsibility-cells">';
+                        foreach ($row['cells'] as $cell) {
+                            if (!is_array($cell) || !is_string($cell['text'] ?? null)
+                                || !is_string($cell['partyId'] ?? null)
+                                || !isset($parties[$cell['partyId']])) {
+                                continue;
+                            }
+                            $html .= '<p><strong>' . esc_html($parties[$cell['partyId']]) . '</strong>'
+                                . nl2br(esc_html($cell['text']), false) . '</p>';
+                        }
+                        $html .= '</div></div>';
+                    }
+                    $html .= '</div>';
+                }
+
+                $html .= '<div class="miopages-proof-actions">';
                 foreach (['actionId', 'secondaryActionId'] as $field) {
                     $id = $body[$field] ?? null;
                     if (is_string($id) && isset($actions[$id])) {
                         $action = $actions[$id];
-                        // Display intent, but do not expose a clickable link to an unapproved target.
-                        $html .= '<p><em>Proposed action: ' . esc_html($action['label'])
-                            . ' (' . esc_html($action['path']) . ')</em></p>';
+                        $html .= '<span class="miopages-proof-action" aria-label="Illustrative action only">'
+                            . esc_html($action['label']) . '<span class="miopages-proof-action-path">'
+                            . esc_html($action['path']) . '</span></span>';
                     }
                 }
-                $html .= '</section>';
+                $html .= '</div></div></section>';
             }
-            $html .= '</article>';
+            $html .= '<footer class="miopages-proof-footer">MioPages · Private C0 v3 visual-development proof · '
+                . esc_html($page['path']) . '</footer></article>';
         }
 
         return $html . '</div>';
