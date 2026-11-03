@@ -185,6 +185,12 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **Next bounded step:** locally run `php -l wordpress/miopages-delivery/includes/class-miopages-release-validator.php`, `php -l wordpress/miopages-delivery/tests/release-contract-smoke.php`, and `php wordpress/miopages-delivery/tests/release-contract-smoke.php`; require `PASS`, not `SKIP`. Investigate failures and review crypto/key pinning and schema before any staging storage implementation. No WordPress ZIP update is needed/authorized for this offline-only slice. After tests, specify an atomic storage plan and enrollment boundary for a protected test installation; do not connect to production or public pages.
 
+## Release-contract offline test blocker — 2026-11-03
+
+**User-reported local Windows results:** `php -l wordpress/miopages-delivery/includes/class-miopages-release-validator.php` and `php -l wordpress/miopages-delivery/tests/release-contract-smoke.php` both returned "No syntax errors detected". Running `php wordpress/miopages-delivery/tests/release-contract-smoke.php` returned **`SKIP: libsodium is unavailable; do not deploy without it.`** This is **not a passing security test** and does not verify signatures/refusals. No workaround should weaken Ed25519 verification or change the release contract until the local PHP extension environment is investigated.
+
+**Next bounded action:** inspect Windows CLI PHP with `php -v`, `php --ini`, and `php -m | findstr /i sodium` to identify the loaded configuration and whether the Sodium extension is available/enabled. Enable supported libsodium in the user's local PHP environment if present, then rerun the offline tests. Do not deploy the validator or connect it to WordPress while the test is skipped. The 20i hosted PHP 8.3 and Windows CLI PHP are separate environments; neither site's sodium availability has been verified.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
