@@ -53,7 +53,7 @@ final class MioPages_Environment_Check
         }
         // An ancestor of the document root is NOT automatically private:
         // it may contain sibling sites or be user-accessible.
-        if (!self::within($doc, $parent) || !self::within($root, $doc)) {
+        if (!self::within($doc, $parent) || ($root !== $doc && !self::within($root, $doc))) {
             return 'Unknown — unexpected WordPress/document-root arrangement';
         }
         return 'Potential off-webroot parent detected; private subdirectory, rights and access are NOT verified';
