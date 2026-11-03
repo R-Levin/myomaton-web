@@ -1,14 +1,14 @@
 # MioPages WordPress Delivery — first code proof
 
-**State:** Initial experimental plugin files committed to the WordPress evaluation branch. **Not a functioning production renderer, not customer-ready and not approved for public installation/content publishing.** No signed transport, activation, rollback, governance/role mapping or editorial inbound changes exist yet.
+**State:** Experimental private preview plugin with initial visual renderer committed to the WordPress evaluation branch. **Not a functioning production renderer, not customer-ready and not approved for public installation/content publishing.** No signed transport, activation, rollback, governance/role mapping or editorial inbound changes exist yet.
 
 ## What it does now
 
-The `miopages-delivery.php` plugin adds **Tools → MioPages Preview** to a WordPress administrator's interface. An authorized administrator can paste the repo's `docs/wordpress-c0-v3-public-projection-fixture.json` into a temporary form and render its text structure: **4 pages, 23 sections**, using only `hero`, `intro`, `relationship`, `collection` and `cta`. Input is bounded at 1 MiB and guarded by the WordPress administrator capability and nonce.
+The `miopages-delivery.php` plugin adds **Tools → MioPages Preview** to a WordPress administrator's interface. An authorized administrator can paste the repo's `docs/wordpress-c0-v3-public-projection-fixture.json` into a temporary form and render its section/page structure in a scoped visual shell: **4 pages, 23 sections**, using only `hero`, `intro`, `relationship`, `collection` and `cta`. Input is bounded at 1 MiB and guarded by the WordPress administrator capability and nonce.
 
-The proof requires the `miopages.wordpress.public-projection-fixture` schema, version 1, reviewed four routes/section count and `publishable:false`. It renders escaped text, restricted item lists and **nonclickable** proposed action labels. It deliberately does **not** import media or logos, write WP posts or options, call external services, expose a public route, register a CPT, publish a release, or modify MioPages canonical data. No generated output should be treated as approved public content.
+The proof requires the `miopages.wordpress.public-projection-fixture` schema, version 1, reviewed four routes/section count and `publishable:false`. It renders escaped text, restricted item lists, structured responsibility comparisons, reviewed surface colors, basic responsive layouts and **nonclickable** proposed action labels. CSS is loaded only on the administrator-only preview screen. It deliberately does **not** import media or logos, write WP posts or options, call external services, expose a public route, register a CPT, publish a release, or modify MioPages canonical data. No generated output should be treated as approved public content.
 
-**Caution:** The current guard checks structural eligibility for the preview tool, not the frozen source digest or a cryptographic signature. It is not a production release verifier, and it must not be repurposed as one. It does not assert visual fidelity to the approved C0 design.
+**Caution:** The current guard checks structural eligibility for the preview tool, not the frozen source digest or a cryptographic signature. It is not a production release verifier, and it must not be repurposed as one. The 0.0.2 visual slice uses the reviewed C0 v3 palette and selected layout rules, but it does not assert visual fidelity to the approved C0 design: no verified logos/media, accurate graphic layers, font files or screenshot comparison.
 
 ## Local source check
 
@@ -27,7 +27,7 @@ The smoke test covers the 4/23 inventory, nonpublishable preview gate, rejection
 
 1. Independently verify that the `miopages.org` WordPress site is installed and **protected from public access** (HTTP authentication, allowlist or equivalent; `noindex` alone is not access protection).
 2. Package only the `wordpress/miopages-delivery` directory as a plugin ZIP and install it into that isolated test instance; the checked-in fixture must **not** be copied into the public web root. Keep test/customer credentials outside source control.
-3. In WP admin, visit **Tools → MioPages Preview**, paste the locally opened C0 v3 public projection JSON, and inspect the four read-only views. This is a low-fidelity structural preview, not the final block/theme rendering.
+3. In WP admin, visit **Tools → MioPages Preview**, paste the locally opened C0 v3 public projection JSON, and inspect the four read-only views. This is now a styled visual-development preview, **not** the final block/theme rendering. The plugin version is 0.0.2; existing 0.0.1 installations must be replaced using the portable ZIP procedure below.
 4. Record nonsecret results in Git. Stop if the package attempts any public content changes, side effects, or unexpected permissions.
 
 ## Next engineering boundaries
@@ -38,3 +38,23 @@ The smoke test covers the 4/23 inventory, nonpublishable preview gate, rejection
 - Integrate optional **20i service adapter** strictly for provisioning and operations, beginning with read-only inventory.
 
 Refer to `docs/wordpress-delivery-feasibility.md` and `docs/development-control.md` before extending scope.
+
+## Upgrade from private-preview v0.0.1 to visual-preview v0.0.2
+
+From the Windows repository root, first fetch and fast-forward the active branch, then run the PHP syntax/smoke checks above. **Do not upload if they fail.** Build the plugin ZIP with correct directory separators:
+
+```powershell
+git switch docs/wordpress-delivery-feasibility-2026-11-02
+git pull --ff-only
+php -l .\wordpress\miopages-delivery\miopages-delivery.php
+php -l .\wordpress\miopages-delivery\includes\class-miopages-fixture-preview.php
+php -l .\wordpress\miopages-delivery\tests\preview-smoke.php
+php .\wordpress\miopages-delivery\tests\preview-smoke.php
+Remove-Item .\miopages-delivery.zip -Force -ErrorAction SilentlyContinue
+tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery
+tar -tf .\miopages-delivery.zip
+```
+
+On the **password-protected development WordPress instance only**, upload the replacement ZIP using the existing plugin update/replace flow and confirm version 0.0.2; if WordPress cannot safely replace it, back up and use a controlled manual directory replacement. Do not delete other plugins or disable directory protection. Visit **Tools → MioPages Preview**, paste the same nonpublishable fixture and verify that all 4 pages / 23 sections appear with purple/cream/peach/lavender styling. Check at a desktop and narrow viewport. The preview must remain entirely inside wp-admin, not as public pages.
+
+**Known issues / unproven:** Font loads from installed system fallback unless Source Sans 3 is already present; brand labels are explicitly textual placeholders, not approved wordmark images. Nonclickable navigation/actions do not establish routing. Layered illustrations and real media are intentionally omitted. CSS is scoped to the admin preview and does not style public WP pages. No local PHP execution, screenshot-based parity comparison, WordPress update test or rendered visual review is proven solely by committing the code.
