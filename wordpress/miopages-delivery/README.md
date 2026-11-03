@@ -58,3 +58,23 @@ tar -tf .\miopages-delivery.zip
 On the **password-protected development WordPress instance only**, upload the replacement ZIP using the existing plugin update/replace flow and confirm version 0.0.2; if WordPress cannot safely replace it, back up and use a controlled manual directory replacement. Do not delete other plugins or disable directory protection. Visit **Tools → MioPages Preview**, paste the same nonpublishable fixture and verify that all 4 pages / 23 sections appear with purple/cream/peach/lavender styling. Check at a desktop and narrow viewport. The preview must remain entirely inside wp-admin, not as public pages.
 
 **Known issues / unproven:** Font loads from installed system fallback unless Source Sans 3 is already present; brand labels are explicitly textual placeholders, not approved wordmark images. Nonclickable navigation/actions do not establish routing. Layered illustrations and real media are intentionally omitted. CSS is scoped to the admin preview and does not style public WP pages. No local PHP execution, screenshot-based parity comparison, WordPress update test or rendered visual review is proven solely by committing the code.
+
+## v0.0.3 — read-only hosting/environment capability diagnostic
+
+This update adds **Tools → MioPages Environment** for administrators, separate from the existing private visual preview. It reports the installed WordPress PHP runtime, Ed25519 verification availability, whether `flock`, `link` and `rename` functions exist, whether `open_basedir` restrictions are configured, and whether the parent of the WP installation appears outside the web document root. It deliberately **does not display absolute paths, configuration secrets or keys**, create directories, write marker files, access the 20i API, or touch existing WP content.
+
+**Do not interpret a “Potential off-webroot parent detected” result as permission to store files there.** We must confirm actual hosting layout, filesystem access, private subdirectory permissions, HTTP non-exposure, backup treatment, and lock/hard-link/rename behavior before any protected staging. The diagnostic reports *function availability only*, not successful filesystem operations. No installation ID, signing key enrollment, site release transport or publication controls are configured.
+
+Local checks after fetching the active branch:
+
+```powershell
+php -l .\wordpress\miopages-delivery\miopages-delivery.php
+php -l .\wordpress\miopages-delivery\includes\class-miopages-environment-check.php
+php -l .\wordpress\miopages-delivery\tests\environment-check-smoke.php
+php .\wordpress\miopages-delivery\tests\environment-check-smoke.php
+php .\wordpress\miopages-delivery\tests\preview-smoke.php
+```
+
+After those pass, create the portable ZIP with `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery` (remove the previous ZIP first), replace the plugin **only on the existing password-protected `miopages.org` development WordPress installation**, and visit Tools → MioPages Environment. Report the descriptive check results, **not** paths or credentials. Ensure Tools → MioPages Preview still renders the nonpublishable C0 v3 fixture after upgrade.
+
+**Important:** This plugin version is `0.0.3` and still does not load or invoke the offline release store/validator; those classes remain disconnected from WP activation/public serving.
