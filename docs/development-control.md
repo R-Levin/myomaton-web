@@ -258,6 +258,12 @@ User-reported after fast-forward to `5e2e829`: `php wordpress/miopages-delivery/
 
 **Next authorized operator action:** Build portable plugin ZIP with `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`; replace plugin on protected `miopages.org` WordPress development site; verify v0.0.3 and visit Tools → MioPages Environment. Record only descriptive diagnostic outcomes (PHP/Sodium, available filesystem functions, open_basedir, off-webroot-candidate classification), no absolute paths or secrets. Do not create private storage, issue signing keys, enable public publishing, or touch MioPages core.
 
+## 20i WordPress hosted diagnostic observed — 2026-11-03
+
+**User-reported output from Tools → MioPages Environment on protected `miopages.org` (v0.0.3 update implied by presence of screen):** PHP **8.4.27 (fpm-fcgi)**; `sodium_crypto_sign_verify_detached` **available**; `flock`, `link`, `rename` **functions available**, actual behavior **unverified**; `Private storage candidate: Potential off-webroot parent detected; private subdirectory, rights and access are NOT verified`; `open_basedir` **not detected**; diagnostic reports **no filesystem writes** and **no WordPress publication**. Exact runtime diagnostics supplied by user; not independently probed by developer. Do not confuse PHP 8.4 hosted with local Windows PHP 8.3.27.
+
+**Assessment:** Basic host capabilities support proceeding to a bounded private filesystem proof; **not production-ready**. Outstanding: verify actual physically isolated off-webroot private subdirectory (including no HTTP access, permissions, symlink handling), true `flock`/`link`/`rename` behavior on the hosting filesystem, write failure/uncertain pointer state reconciliation, backups and recovery. Next bounded implementation should be a restricted admin-only or CLI-only synthetic diagnostic, gated independently and NOT invoked by normal site requests; one-shot cleanup; no real release data, no private signing key, no publication. Do not automatically create directories in unverified locations or claim that `open_basedir` absence means filesystem security. Existing offline staging code not yet deployed/connected.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
