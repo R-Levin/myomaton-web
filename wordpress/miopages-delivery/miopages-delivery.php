@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MioPages Delivery (Development Proof)
  * Description: Restricted, read-only C0 fixture preview for the MioPages WordPress delivery feasibility proof.
- * Version: 0.0.1
+ * Version: 0.0.2
  * Requires PHP: 8.3
  * Text Domain: miopages-delivery
  */
@@ -20,6 +20,21 @@ add_action('admin_menu', static function (): void {
         'manage_options',
         'miopages-development-preview',
         'miopages_render_development_preview'
+    );
+});
+
+// Only load development preview styling on its administrator-only Tools screen.
+add_action('admin_enqueue_scripts', static function ($hook): void {
+    if ($hook !== 'tools_page_miopages-development-preview'
+        || !current_user_can('manage_options')) {
+        return;
+    }
+
+    wp_enqueue_style(
+        'miopages-private-preview',
+        plugin_dir_url(__FILE__) . 'assets/preview.css',
+        [],
+        '0.0.2'
     );
 });
 
