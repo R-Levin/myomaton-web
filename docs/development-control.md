@@ -209,6 +209,14 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **Next exact action:** In `C:\Users\mplxs\Projects\myomaton-web` fetch active branch, run `php -l wordpress/miopages-delivery/includes/class-miopages-release-store.php`, `php -l wordpress/miopages-delivery/tests/release-staging-smoke.php`, and `php wordpress/miopages-delivery/tests/release-staging-smoke.php`. Only record a PASS if observed; otherwise stop, inspect and repair offline. Rerun earlier release-contract smoke test to detect regression. Do not deploy staging code on WordPress or create public pages.
 
+## Offline staging/recovery local test PASS — 2026-11-03
+
+**User-reported Windows CLI evidence:** `php -l wordpress/miopages-delivery/includes/class-miopages-release-store.php` and `php -l wordpress/miopages-delivery/tests/release-staging-smoke.php` both returned **No syntax errors detected**. `php wordpress/miopages-delivery/tests/release-staging-smoke.php` returned **`PASS: offline immutable staging proof (signed stage, retry, tamper refusal, activation order, forward restoration).`** This completes the intended first local *offline functional* smoke proof. Existing release-contract Ed25519 checks passed separately earlier.
+
+**Interpretation and remaining boundaries:** The smoke test demonstrates the basic lock-protected immutable object store, stage-without-activation, integrity refusal, forward sequence and signed restoration behavior *on the local Windows PHP environment*. It does **not** prove crash-safe durability, security of filesystem permissions, concurrent multi-process behavior, hostile filesystem/symlink attacks, cross-host storage, 20i Linux runtime support, WordPress durable publication, actual backup restoration or centrally authorized signer/enrollment. The installed WordPress v0.0.2 visual preview is unchanged and does not invoke this storage code. No live hosted writes or API operations have been reported.
+
+**Next bounded engineering sequence:** Review the offline store for file/symlink race and failed/unknown-write handling, validate full concurrency/retention/error recovery with separate test processes and the target 20i filesystem in an isolated nonpublic proof only when explicitly authorized. Design WordPress-specific protected private location and transactional serving/activation state before adding WordPress integration. Preserve nonpublishable C0 fixture and signed approval authority. Continue parallel inbound editorial proposal and read-only 20i service-adapter track without conflating them.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
