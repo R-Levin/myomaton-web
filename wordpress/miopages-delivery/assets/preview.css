@@ -1,0 +1,177 @@
+/* Scoped to WordPress admin-only, nonpublishable C0 v3 visual proof.
+   Colors and basic typography mapped from reviewed design configuration.
+   No media, wordmarks, forms, routes or publication are supplied. */
+.miopages-fixture-preview {
+  --mp-bg: #fbf7ef;
+  --mp-text: #26212d;
+  --mp-muted: #62586a;
+  --mp-brand: #322f7e;
+  --mp-tonal: #e8e2f2;
+  --mp-peach: #e9ba8e;
+  --mp-border: #9b8ea7;
+  max-width: 1260px;
+  font-family: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--mp-text);
+}
+.miopages-fixture-preview * {box-sizing:border-box}
+.miopages-fixture-preview .miopages-proof-warning {
+  max-width: 920px;
+  background: #fff7df;
+  border-left: 4px solid #8b691d;
+  padding: 12px 18px;
+  font-size: 14px;
+}
+.miopages-fixture-preview .miopages-proof-page {
+  margin: 32px 0 52px;
+  overflow: hidden;
+  border: 1px solid var(--mp-border);
+  border-radius: 6px;
+  background: var(--mp-bg);
+  box-shadow: 0 15px 34px rgba(36,29,53,.09);
+}
+.miopages-fixture-preview .miopages-proof-header {
+  display: flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap: 16px;
+  padding: 22px clamp(22px,5vw,66px);
+  background: var(--mp-bg);
+}
+.miopages-fixture-preview .miopages-proof-brand {
+  color: var(--mp-brand);
+  font-weight: 800;
+  font-size: 27px;
+  line-height: 1.1;
+  letter-spacing: -.04em;
+}
+.miopages-fixture-preview .miopages-proof-brand span {
+  display:block;
+  margin-top:5px;
+  font-size:10px;
+  font-weight:400;
+  letter-spacing:0;
+}
+.miopages-fixture-preview .miopages-proof-header nav {
+  display:flex;
+  flex-wrap:wrap;
+  gap:clamp(12px,2vw,27px);
+  color:var(--mp-brand);
+  font-weight:650;
+  font-size:14px;
+}
+.miopages-fixture-preview .miopages-proof-navitem {cursor:default}
+.miopages-fixture-preview .miopages-proof-meta {
+  padding: 7px clamp(22px,5vw,66px);
+  background: #eae5df;
+  color: var(--mp-muted);
+  font-size: 11px;
+  letter-spacing:.035em;
+}
+.miopages-fixture-preview .miopages-proof-section {
+  padding: clamp(38px,5vw,76px) clamp(24px,7vw,100px);
+  color:var(--mp-text);
+  background:var(--mp-bg);
+}
+.miopages-fixture-preview .miopages-proof-inner {max-width:1040px;margin:auto}
+.miopages-fixture-preview .miopages-proof-section h1,
+.miopages-fixture-preview .miopages-proof-section h2,
+.miopages-fixture-preview .miopages-proof-section h3 {
+  color:inherit;
+  font-family:inherit;
+  line-height:1.12;
+  letter-spacing:-.035em;
+  margin:0 0 23px;
+  font-weight:750;
+}
+.miopages-fixture-preview .miopages-proof-section h1 {
+  font-size:clamp(38px,4.9vw,66px);
+  max-width:840px;
+}
+.miopages-fixture-preview .miopages-proof-section h2 {font-size:clamp(29px,3.3vw,45px);max-width:800px}
+.miopages-fixture-preview .miopages-proof-section h3 {font-size:21px;margin-bottom:10px}
+.miopages-fixture-preview .miopages-proof-eyebrow {
+  color:inherit;
+  opacity:.86;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  margin:0 0 16px;
+}
+.miopages-fixture-preview .miopages-proof-body {
+  max-width:790px;
+  white-space:normal;
+  font-size:clamp(17px,1.8vw,21px);
+  line-height:1.57;
+  margin:0 0 20px;
+}
+.miopages-fixture-preview .miopages-surface-light {background:#fbf7ef;color:#26212d}
+.miopages-fixture-preview .miopages-surface-tonal {background:#e8e2f2;color:#322f7e}
+.miopages-fixture-preview .miopages-surface-strong {background:#e9ba8e;color:#26212d}
+.miopages-fixture-preview .miopages-surface-brand {background:#322f7e;color:#fbf7ef}
+.miopages-fixture-preview .miopages-surface-supporting {background:#555ccc;color:#fff}
+.miopages-fixture-preview .miopages-surface-contrast {background:#241d35;color:#fbf7ef}
+.miopages-fixture-preview .miopages-region-emphasized {padding-top:clamp(55px,7vw,106px);padding-bottom:clamp(55px,7vw,106px)}
+.miopages-fixture-preview .miopages-region-closing {padding-top:clamp(44px,6vw,84px);padding-bottom:clamp(44px,6vw,84px)}
+.miopages-fixture-preview .miopages-proof-cards {
+  padding:0;
+  margin:32px 0 0;
+  list-style:none;
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(min(230px,100%),1fr));
+  gap:18px;
+}
+.miopages-fixture-preview .miopages-proof-card {
+  padding:26px;
+  margin:0;
+  border:1px solid rgba(80,68,103,.19);
+  background:rgba(255,255,255,.78);
+  color:#26212d;
+  border-radius:6px;
+}
+.miopages-fixture-preview .miopages-proof-card p {margin:0;font-size:16px;line-height:1.6}
+.miopages-fixture-preview .miopages-proof-extensions {margin-top:16px;grid-template-columns:1fr}
+.miopages-fixture-preview .miopages-proof-extensions .miopages-proof-card {
+  background:transparent;
+  border-style:dashed;
+  color:inherit;
+}
+.miopages-fixture-preview .miopages-proof-actions {display:flex;gap:12px;flex-wrap:wrap;margin-top:29px}
+.miopages-fixture-preview .miopages-proof-actions:empty {display:none}
+.miopages-fixture-preview .miopages-proof-action {
+  display:inline-flex;align-items:center;gap:10px;
+  border:1px solid currentColor;border-radius:6px;
+  padding:12px 20px;font-size:15px;font-weight:700;
+  cursor:default;user-select:none;
+}
+.miopages-fixture-preview .miopages-proof-action:first-child {
+  background:#e9ba8e;color:#26212d;border-color:#e9ba8e;
+}
+.miopages-fixture-preview .miopages-proof-action-path {font-size:11px;opacity:.7;font-weight:400}
+.miopages-fixture-preview .miopages-proof-responsibilities {display:grid;gap:15px;margin-top:26px}
+.miopages-fixture-preview .miopages-proof-responsibility {
+  padding:22px;border:1px solid var(--mp-border);border-radius:6px;
+}
+.miopages-fixture-preview .miopages-proof-responsibility-cells {
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;
+}
+.miopages-fixture-preview .miopages-proof-responsibility-cells p {
+  margin:0;font-size:16px;line-height:1.55;
+}
+.miopages-fixture-preview .miopages-proof-responsibility-cells strong {
+  display:block;font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;
+}
+.miopages-fixture-preview .miopages-proof-footer {
+  background:#241d35;color:#fbf7ef;
+  padding:24px clamp(24px,7vw,100px);
+  font-size:12px;
+}
+@media(max-width:782px){
+  .miopages-fixture-preview .miopages-proof-header{align-items:flex-start;flex-direction:column}
+  .miopages-fixture-preview .miopages-proof-responsibility-cells{grid-template-columns:1fr}
+  .miopages-fixture-preview .miopages-proof-action{width:100%;justify-content:space-between}
+  .miopages-fixture-preview .miopages-proof-cards{grid-template-columns:1fr}
+}
