@@ -168,4 +168,34 @@ checkStage(is_file($root . '/objects/' . $s1['objectSha256'] . '.json'),
 checkStage(is_file($root . '/objects/' . $s3['objectSha256'] . '.json'),
     'restoration object retained');
 
-echo "PASS: offline immutable staging proof (signed stage, retry, tamper refusal, activation order, forward restoration).\n";
+// Interrupted/uncertain activation: inspect persisted state before any retry.
+// Fault injection and restoration are confined to this test's private temporary root.
+$markerPath = $root . DIRECTORY_SEPARATOR . 'active.json';
+$originalMarker = file_get_contents($markerPath);
+checkStage(is_string($originalMarker), 'active marker available for fault injection');
+file_put_contents($markerPath, '{incomplete-write');
+checkStage($store->status() instanceof WP_Error, 'corrupt active marker refused');
+checkStage($store->stage(makeEnvelope($r3Payload, $secret), $now) instanceof WP_Error,
+    'corrupt active marker blocks staging');
+checkStage($store->activate($s3['objectSha256'], $now) instanceof WP_Error,
+    'corrupt active marker blocks activation');
+checkStage(file_get_contents($markerPath) === '{incomplete-write',
+    'store does not silently reset a corrupted marker');
+file_put_contents($markerPath, $originalMarker);
+checkStage(is_array($store->status()) && $store->status()['sequence'] === 3,
+    'test-only restoration permits read-only reconciliation');
+
+// Missing active object must not be treated as an empty installation.
+$activePath = $root . DIRECTORY_SEPARATOR . 'objects' . DIRECTORY_SEPARATOR
+    . $s3['objectSha256'] . '.json';
+$originalObject = file_get_contents($activePath);
+checkStage(is_string($originalObject), 'active immutable object exists');
+unlink($activePath);
+checkStage($store->status() instanceof WP_Error, 'missing active object refused');
+checkStage($store->stage(makeEnvelope($r3Payload, $secret), $now) instanceof WP_Error,
+    'missing active object blocks staging');
+file_put_contents($activePath, $originalObject);
+checkStage(is_array($store->status()) && $store->status()['sequence'] === 3,
+    'test-only object restoration returns consistent state');
+
+echo "PASS: offline immutable staging proof (signed stage, retry, tamper refusal, activation order, forward restoration, corrupt-state refusal).\n";
