@@ -165,6 +165,12 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **Next technical boundary after validation:** Compare rendered layouts with accepted service-led v3 reference; address verified design tokens, local font/media ownership and section visual grammar without violating unresolved asset gates; then move to a real provider-neutral release contract and separately scoped inbound operator-proposal/20i read-only API proofs. Continue recording actual versus planned states in Git.
 
+## Visual-preview v0.0.2 local validation report — 2026-11-03
+
+**User-reported Windows PowerShell checks:** All three PHP lint commands for `miopages-delivery.php`, `includes/class-miopages-fixture-preview.php`, and `tests/preview-smoke.php` returned `No syntax errors detected`. The CLI smoke command `php wordpress/miopages-delivery/tests/preview-smoke.php` returned `PASS: C0 private preview smoke tests (structure, visual shells, publication gate, section allowlist, HTML escaping).` This is user-provided local evidence; WordPress v0.0.2 upgrade, styling and visual fidelity are **not yet independently verified**.
+
+**Next:** rebuild with portable `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`, inspect ZIP entries, replace only the development plugin in password-protected WordPress, and verify the styled administrator preview. Do not enable public release, import pages or change the canonical database.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
