@@ -225,6 +225,17 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **Exact next bounded action:** In Windows repo, fetch/fast-forward WordPress development branch and run syntax for release store, updated staging smoke, new concurrency test; execute updated staging smoke, concurrency test and original signature contract regression smoke. Preserve output and **stop on failure or skip**. Do not upload WordPress plugin. After tests, review errors and design explicit private storage and read-only post-uncertain-commit reconciliation before any host integration.
 
+## Offline release hardening regression checks PASSED — 2026-11-03
+
+**User-reported Windows PowerShell evidence:** Active development branch `docs/wordpress-delivery-feasibility-2026-11-02` fast-forwarded from `81c9ae4` to `1ed3130` (30 Git objects, 5 tracked files changed). Three syntax checks returned **No syntax errors detected** for `class-miopages-release-store.php`, `release-staging-smoke.php`, and `release-staging-concurrency.php`. All three executable smoke tests returned explicit **PASS**:
+- `release-staging-smoke.php`: `PASS: offline immutable staging proof (signed stage, retry, tamper refusal, activation order, forward restoration, corrupt-state refusal).`
+- `release-staging-concurrency.php`: `PASS: two-process release activation race (one winner, one refused, single monotonic active pointer).`
+- `release-contract-smoke.php`: `PASS: offline release-contract smoke tests (signature, targets, approval, replay, time, content gates).`
+
+**Scope:** These are successful **local Windows/PHP 8.3 + sodium** tests, based on exact user terminal output, not CI or 20i runtime proof. They demonstrate fail-closed recovery behavior on malformed/missing active state, cooperative two-process local filesystem locking, and regression coverage for detached signature/tenant/approval/order gates. They do **not** establish crash-durable atomicity, defense against hostile path races, reliable distributed locking, hosted Linux filesystem semantics, centrally governed signing/enrollment, or public WordPress publication and rollback. The existing 20i WP v0.0.2 visual-preview plugin remains unchanged by this step.
+
+**Next bounded action:** Before wiring the offline store into WordPress, design and validate (read-only where possible) a private off-webroot storage location and installation identity/key enrollment on the 20i Linux Unlimited package, plus a consistent marker read/reconciliation plan after uncertain write outcomes. Verify that hosted PHP 8.3 has sodium and that storage supports required filesystem operations. Do **not** copy signing private keys to WordPress or activate any public release. Separately retain inbound operator-edit proposal and 20i API inventory tracks.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
