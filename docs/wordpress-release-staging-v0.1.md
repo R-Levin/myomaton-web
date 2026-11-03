@@ -35,3 +35,23 @@ The empty active state is `releaseId:null`, `sequence:0`, `objectSha256:null`. E
 The script `wordpress/miopages-delivery/tests/release-staging-smoke.php` creates a **new local temporary directory** and ephemeral Ed25519 keypair. Test the full valid signed envelope path: empty state → stage 1 (no activation) → activate 1 → reject replay/stale/foreign target → stage 2 → reject bad digest or stage tampering → activate 2 → reject rewind; allow rollback *content* through signed release 3 with fresh monotonic identity. Confirm independent stored objects unchanged and marker tracks latest. Finally remove only its own private temporary directory. No WordPress, central API, 20i API or public DNS writes.
 
 **Operational instruction:** Run locally with PHP 8.3 + Sodium, then record exact CLI results in Git. Do not wire the library into the live plugin until the physical storage/security and transaction model have been reviewed.
+
+## Hardening test slice — 2026-11-03
+
+The offline store now rejects nonregular object, active-marker and lock paths, checks for symlinked root ancestors where PHP can detect them, and suppresses expected filesystem warnings so failures return structured refusals instead of proceeding. These checks are **defense in depth, not proof against adversarial TOCTOU filesystem races or a writable untrusted directory**; a private root controlled exclusively by the service user remains mandatory.
+
+The existing `release-staging-smoke.php` additionally injects a malformed active marker and a temporarily missing active object. It requires that `status()`, `stage()` and `activate()` refuse unsafe/inconsistent state, rather than resetting to sequence 0. The script then restores its own test fixture bytes only to finish the smoke run. **Production recovery must not manually repair active state from guessed data.**
+
+A separate `release-staging-concurrency.php` launches two independent PHP processes against one private root, both attempting the same signed first release. Expected result: exactly one worker activates sequence 1 and the other refuses; the active marker remains at sequence 1. Worker contention exercises cooperative local `flock` semantics; it does not establish distributed safety or crash durability.
+
+To validate after fetching the branch:
+```powershell
+php -l .\wordpress\miopages-delivery\includes\class-miopages-release-store.php
+php -l .\wordpress\miopages-delivery\tests\release-staging-smoke.php
+php -l .\wordpress\miopages-delivery\tests\release-staging-concurrency.php
+php .\wordpress\miopages-delivery\tests\release-staging-smoke.php
+php .\wordpress\miopages-delivery\tests\release-staging-concurrency.php
+php .\wordpress\miopages-delivery\tests\release-contract-smoke.php
+```
+
+**Stop on any failed or skipped test.** Do not deploy these offline-only files into the hosted WordPress plugin or treat passed smoke tests as authorization to publish.
