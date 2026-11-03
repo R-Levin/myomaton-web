@@ -191,6 +191,14 @@ Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an
 
 **Next bounded action:** inspect Windows CLI PHP with `php -v`, `php --ini`, and `php -m | findstr /i sodium` to identify the loaded configuration and whether the Sodium extension is available/enabled. Enable supported libsodium in the user's local PHP environment if present, then rerun the offline tests. Do not deploy the validator or connect it to WordPress while the test is skipped. The 20i hosted PHP 8.3 and Windows CLI PHP are separate environments; neither site's sodium availability has been verified.
 
+## Release Contract v0.1 offline security validation PASSED — 2026-11-03
+
+**User-reported direct Windows CLI evidence:** `C:\php\php.ini` is the active PHP 8.3.27 CLI config; `C:\php\ext\php_sodium.dll` exists. After enabling the sodium extension, `php -m | findstr /i sodium` returned `sodium`. Running `php wordpress/miopages-delivery/tests/release-contract-smoke.php` returned **`PASS: offline release-contract smoke tests (signature, targets, approval, replay, time, content gates).`** Both validator and smoke-test PHP syntax lint previously passed. This closes the **local missing-sodium test blocker**; it does **not** prove that the hosted 20i PHP process loads sodium or that signed release staging is operational.
+
+**Scope of proof:** The isolated pure-PHP test accepts a synthetic valid signed envelope and rejects bad signature/hash, wrong tenant/installation, unapproved claim, replay/order error, expired/overlong release, external route, unsupported section and HTML content. It uses ephemeral in-memory test keys and no deployed signing key. The validator is deliberately disconnected from WordPress hooks, persistent storage, API transport and publication. The central signer approval authority, secure enrollment/key rotation, durable atomic stage/activation/rollback, and production tests remain open.
+
+**Next bounded task:** review and design protected staging storage plus race-safe activation/rollback semantics, including immutable staged objects, monotonic revision and compare-and-swap; write a local/offline proof before any WordPress write integration. Keep the existing password-protected WP visual preview operational and C0 v3 fixture nonpublishable. No 20i API or hosted DB operations authorized by this evidence.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
