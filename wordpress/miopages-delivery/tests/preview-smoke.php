@@ -1,0 +1,60 @@
+<?php
+/**
+ * Local CLI smoke tests for the private C0 fixture preview.
+ * Run from the repository root:
+ * php wordpress/miopages-delivery/tests/preview-smoke.php
+ */
+
+declare(strict_types=1);
+
+define('ABSPATH', __DIR__ . '/');
+
+class WP_Error
+{
+    public function __construct(public string $code, public string $message) {}
+    public function get_error_message(): string { return $this->message; }
+}
+
+function esc_html(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+require dirname(__DIR__) . '/includes/class-miopages-fixture-preview.php';
+
+function check(bool $condition, string $message): void
+{
+    if (!$condition) {
+        fwrite(STDERR, "FAIL: {$message}\n");
+        exit(1);
+    }
+}
+
+$path = dirname(__DIR__, 3) . '/docs/wordpress-c0-v3-public-projection-fixture.json';
+$json = file_get_contents($path);
+check(is_string($json), 'C0 v3 fixture exists');
+
+$parsed = MioPages_Fixture_Preview::parse($json);
+check(is_array($parsed), 'reviewed nonpublishable fixture accepted for private preview');
+$html = MioPages_Fixture_Preview::render($parsed);
+check(substr_count($html, '<article ') === 4, 'renders four page previews');
+check(substr_count($html, '<section ') === 23, 'renders 23 bounded section previews');
+check(strpos($html, '<a ') === false, 'no live clickable CTA published');
+
+$modified = $parsed;
+$modified['publishable'] = true;
+check(MioPages_Fixture_Preview::parse(json_encode($modified)) instanceof WP_Error, 'publishable input rejected in preview-only proof');
+
+$modified = $parsed;
+$modified['pages'][0]['sections'][0]['type'] = 'unapproved';
+check(MioPages_Fixture_Preview::parse(json_encode($modified)) instanceof WP_Error, 'unknown section rejected');
+
+$modified = $parsed;
+$modified['pages'][0]['sections'][0]['content']['heading'] = '<script>alert(1)</script>';
+$parsedInjection = MioPages_Fixture_Preview::parse(json_encode($modified));
+check(is_array($parsedInjection), 'text payload parsed as data');
+$escaped = MioPages_Fixture_Preview::render($parsedInjection);
+check(strpos($escaped, '<script>') === false, 'HTML injection escaped');
+check(strpos($escaped, '&lt;script&gt;') !== false, 'escaped string remains visible');
+
+echo "PASS: C0 private preview smoke tests (structure, publication gate, section allowlist, HTML escaping).\n";
