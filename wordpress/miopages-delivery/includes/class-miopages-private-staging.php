@@ -24,6 +24,13 @@ final class MioPages_Private_Staging
             return self::fail('oversized_envelope');
         }
 
+        // Extra synthetic-only refusal before any storage write. The parsed
+        // claims are NOT trusted here; the store independently verifies the
+        // signature, identity, approval and release order under its lock.
+        $claims = self::syntheticClaims($envelope);
+        if ($claims instanceof WP_Error) {
+            return $claims;
+        }
         $identity = $checked['identity'];
         $store = new MioPages_Release_Store($checked['directory'], $identity);
         // No signed payload can be trusted until verified; storage must independently
@@ -36,6 +43,35 @@ final class MioPages_Private_Staging
         // This facade does NOT call activate(). No WordPress posts, options,
         // pages or frontend routes are written, and no release signer exists here.
         return $result;
+    }
+
+    /** Extra non-authoritative test namespace filter; signature checking occurs in the store. */
+    private static function syntheticClaims(string $envelope)
+    {
+        try {
+            $envelopeData = json_decode($envelope, true, 32, JSON_THROW_ON_ERROR);
+            if (!is_array($envelopeData)
+                || !isset($envelopeData['payloadBase64'])
+                || !is_string($envelopeData['payloadBase64'])) {
+                return self::fail('synthetic_envelope_required');
+            }
+            $raw = base64_decode($envelopeData['payloadBase64'], true);
+            if (!is_string($raw) || strlen($raw) > 786432) {
+                return self::fail('synthetic_payload_invalid');
+            }
+            $payload = json_decode($raw, true, 32, JSON_THROW_ON_ERROR);
+            if (!is_array($payload)
+                || !is_string($payload['releaseId'] ?? null)
+                || !str_starts_with($payload['releaseId'], 'synthetic-')
+                || !is_array($payload['approval'] ?? null)
+                || !is_string($payload['approval']['approvalId'] ?? null)
+                || !str_starts_with($payload['approval']['approvalId'], 'synthetic-')) {
+                return self::fail('synthetic_release_required');
+            }
+            return true;
+        } catch (JsonException $exception) {
+            return self::fail('invalid_synthetic_json');
+        }
     }
 
     /**
@@ -67,8 +103,13 @@ final class MioPages_Private_Staging
      */
     public static function checkedConfig($config, string $wordpressRoot, string $documentRoot)
     {
-        if (!is_array($config) || array_keys($config) !== ['directory', 'identity']
-            || !is_string($config['directory']) || !is_array($config['identity'])) {
+        if (!is_array($config) || !is_string($config['directory'] ?? null)
+            || !is_array($config['identity'] ?? null)) {
+            return self::fail('no_explicit_enrollment');
+        }
+        $configKeys = array_keys($config);
+        sort($configKeys);
+        if ($configKeys !== ['directory', 'identity']) {
             return self::fail('no_explicit_enrollment');
         }
         $identity = $config['identity'];
