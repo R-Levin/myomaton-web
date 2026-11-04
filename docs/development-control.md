@@ -278,6 +278,12 @@ User-reported after fast-forward to `5e2e829`: `php wordpress/miopages-delivery/
 
 **Next step:** rerun `php wordpress/miopages-delivery/tests/preview-smoke.php` and verify explicit PASS before packaging/deploying v0.0.4. Keep the hosted private filesystem probe disabled until an independently inspected off-webroot directory is configured. None of the successful local checks establishes hosted write behavior.
 
+## Filesystem probe v0.0.4 local test gate CLEARED — 2026-11-03
+
+User separately reran `php wordpress/miopages-delivery/tests/preview-smoke.php` and received **`PASS: C0 private preview smoke tests (structure, visual shells, publication gate, section allowlist, HTML escaping).`** Combined with previous three successful PHP lint checks and both successful filesystem/environment test suites, **all six local checks are now user-reported PASS**. This supersedes the prior partial-output checkpoint; no failures remain in that bounded smoke gate.
+
+**Next authorized operator action:** fast-forward branch, build plugin ZIP with portable `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`, replace plugin on protected `miopages.org`, confirm installed v0.0.4 and new Tools → MioPages Filesystem Probe displays **Disabled: no private path has been explicitly configured**; confirm existing Tools → MioPages Preview and Environment work. **Do not set `MIOPAGES_PROBE_PRIVATE_DIR` or click Run** until 20i private path/permissions/HTTP access are independently reviewed. Source commit is not proof of hosted installation or filesystem writes.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
