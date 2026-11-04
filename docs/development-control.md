@@ -296,6 +296,12 @@ User separately reran `php wordpress/miopages-delivery/tests/preview-smoke.php` 
 
 **Next operator check:** Confirm whether File Manager exposes a **Create Folder/New Folder** action at the same level as `public_html`, without using it yet. If yes, separately plan a narrowly scoped `miopages-private` sibling, verifying host ownership, restrictive permissions, nonpublic URL access and PHP access before enabling any one-shot synthetic probe; avoid sharing absolute paths or credentials. Do not create files inside `public_html`, do not publish customer content or insert signer private keys.
 
+## 20i private sibling folder created; permissions 0700 — 2026-11-04
+
+**User-reported:** In the 20i File Manager for protected `miopages.org` WordPress, a sibling directory `miopages-private` was created at the same level as `public_html`. Its initial permissions were `755`; operator changed them to **`700`**. This is a useful filesystem permission boundary but is **not proof** of PHP runtime access, owner identity, web non-exposure, or hosted lock/link/rename behavior. The v0.0.4 probe remains disabled pending explicit trusted config.
+
+**Next bounded operator check:** In File Manager, open `public_html` and confirm `wp-config.php` is located there (without showing its contents or credentials). After confirming actual config location, provide a safe backup-first instruction to define `MIOPAGES_PROBE_PRIVATE_DIR` as a path derived from that known location, with no paths pasted in chat; then run only the nonce-gated synthetic filesystem probe. Do not put secrets in Git, create public probe files, stage real releases, or infer HTTP isolation solely from mode 0700.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
