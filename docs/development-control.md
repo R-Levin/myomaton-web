@@ -393,6 +393,12 @@ This establishes basic two-process cooperative filesystem locking and rejection/
 
 **Next bounded operation:** Via existing authenticated 20i SSH, create an isolated child `~/miopages-private/synthetic-staging` using `mkdir -m 700`, then verify `ls -ld` reports `drwx------`. Do not install staging enrollment constants or keys yet. Subsequently devise a synthetic-only test issuer with secret key kept off WordPress/hosted webroot/Git and a pinned public key in reviewed non-Git configuration. No central approval authorization claim is made by the synthetic signer.
 
+## Isolated hosted synthetic staging storage verified — November 4, 2026
+
+**User-reported 20i SSH evidence:** Under the dedicated WordPress hosting account, `mkdir -m 700 ~/miopages-private/synthetic-staging` completed and `ls -ld` showed `drwx------`, owned by the hosting user. This is an isolated child of the previously verified off-webroot private sibling. No release staged, identity enrolled or signing keys created; hosted v0.0.5 admin interface remains disabled as last confirmed.
+
+**Next bounded check:** In **local Windows PowerShell**, verify `php -r "echo function_exists('sodium_crypto_sign_keypair') ? 'Sodium available' : 'Sodium unavailable';"`. Then design an isolated synthetic Ed25519 issuer with a protected private signing key stored outside the repository and WordPress/20i, separate public-key enrollment and a strictly synthetic test envelope. Never paste the private key into chat, Git, WordPress or CLI history. No real customer content, release activation or publication.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
