@@ -411,6 +411,12 @@ This establishes basic two-process cooperative filesystem locking and rejection/
 
 **Next bounded step:** Prepare protected WordPress server-side configuration. Find existing `public_html/wp-config.php` and create a permission-restricted backup **outside public_html**, preferably under existing off-webroot `miopages-private`. Do not put backups containing DB credentials under publicly reachable paths, print file contents, or add new enrollment constants yet. Next, insert the synthetic-only `MIOPAGES_SYNTHETIC_STAGE_CONFIG` with pinned *public* verification key and explicitly agreed synthetic identity IDs and private staging directory, with a test release using exactly matching identifiers. Do not enable real publication or import signing private key.
 
+## Protected wp-config backup confirmed — November 4, 2026
+
+**User-reported 20i SSH evidence:** Before any WordPress enrollment edit, the existing `public_html/wp-config.php` was copied using `cp -p` to `~/miopages-private/wp-config-before-staging.php`, then `chmod 600`. `ls -l` confirmed the backup exists (2,955 bytes) and permissions `-rw-------`, owned by the hosting account. The source configuration remained unmodified as of this step. This backup contains sensitive WordPress configuration and must never be placed in a public web directory, committed to Git, or printed in chat.
+
+**Next operator step:** Transfer **only** the locally verified 44-byte Ed25519 public verification key `synthetic-signing-public.b64` from protected Windows issuer storage to `~/miopages-private/` using dedicated SSH identity and legacy `scp -O`. Verify chmod 600 and `wc -c` = 44 under SSH. The synthetic signing **secret** stays on the Windows developer machine. Do not edit wp-config or configure actual staged release until public-key transfer is verified and an agreed synthetic identity config is ready.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
