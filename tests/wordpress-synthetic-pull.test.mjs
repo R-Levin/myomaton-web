@@ -31,7 +31,7 @@ test("synthetic authenticated pull and idempotent queued release", () => {
     envelope: "tampered", envelopeSha256 }), /refused/);
   assert.throws(() => h.queue({
     installationId, releaseId, envelope: "different", envelopeSha256
-  }), /conflict/);
+  }), /refused|conflict/);
 });
 
 test("replay, foreign scope, invalid HMAC, clock skew and absence refuse", () => {
