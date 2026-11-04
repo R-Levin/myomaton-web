@@ -186,6 +186,12 @@ final class MioPages_Release_Store
                 return $this->fail('lock_failed');
             }
             try {
+                // fopen('c+b') creates files using process umask, which may leave
+                // a new lock world-readable. Tighten permissions while locked;
+                // refuse operations if the file cannot be secured.
+                if (!@chmod($lockFile, 0600)) {
+                    return $this->fail('lock_permissions');
+                }
                 return $callback();
             } finally {
                 flock($handle, LOCK_UN);
