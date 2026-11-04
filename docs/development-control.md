@@ -272,6 +272,12 @@ User-reported after fast-forward to `5e2e829`: `php wordpress/miopages-delivery/
 
 **Remaining risk:** PHP path checks are defense in depth, not proof against malicious symlink/TOCTOU races, shared hosting account exposure, crash durability or cross-process locking on 20i. Physical ACL, open_basedir, permissions, URL accessibility and backup rules need independent review before using release storage.
 
+## Filesystem probe v0.0.4 local checks — partial user results, 2026-11-03
+
+**User-reported PowerShell output:** `php -l` passed for `miopages-delivery.php`, `class-miopages-filesystem-probe.php` and `filesystem-probe-smoke.php`. `filesystem-probe-smoke.php` returned **`PASS: synthetic filesystem probe (off-webroot guard, lock, hard link, rename, cleanup).`** `environment-check-smoke.php` returned **`PASS: WordPress environment read-only diagnostic (root classification and capabilities).`** The user supplied the command invocation for `preview-smoke.php` but **no output**; do not mark that regression check PASS until separately confirmed.
+
+**Next step:** rerun `php wordpress/miopages-delivery/tests/preview-smoke.php` and verify explicit PASS before packaging/deploying v0.0.4. Keep the hosted private filesystem probe disabled until an independently inspected off-webroot directory is configured. None of the successful local checks establishes hosted write behavior.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
