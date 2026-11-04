@@ -70,23 +70,48 @@ export async function integratePrivateStage(db: PoolClient, canonicalSchema = "p
 }
 
 async function main() {
-  if (process.env.MIOPAGES_WP_SCHEMA_ACTION !== "apply-private-stage") throw Error("Explicit schema operation required");
+  const action = process.env.MIOPAGES_WP_SCHEMA_ACTION;
+  if (action !== "apply-private-stage" && action !== "preflight-private-stage") {
+    throw Error("Explicit schema operation required");
+  }
+  const readOnly = action === "preflight-private-stage";
   const pool = protectedPool(process.env.MIOPAGES_WP_MIGRATION_URL ?? "", migrationRole, process.env.MIOPAGES_WP_DATABASE_CA);
-  const db = await pool.connect();
   try {
-    await db.query("BEGIN");
-    await protectedConnection(db, migrationRole);
-    const expected = process.env.MIOPAGES_WP_EXPECTED_DATABASE;
-    const actual = (await db.query("SELECT current_database() AS name")).rows[0].name;
-    if (!expected || expected !== actual) throw Error("Explicit rehearsal database identity required");
-    await db.query("SET LOCAL search_path=public");
-    const baseline = await bootstrapStatus(db);
-    if (baseline.pending || baseline.applied !== 16) throw Error("Exact canonical migration baseline required");
-    await integratePrivateStage(db);
-    await db.query("COMMIT");
-    console.log(JSON.stringify({ privateStageMigrations: migrations.length, verified: true }));
-  } catch (error) { await db.query("ROLLBACK"); throw error; }
-  finally { db.release(); await pool.end(); }
+    const db = await pool.connect();
+    try {
+      await db.query(readOnly ? "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY" : "BEGIN");
+      await protectedConnection(db, migrationRole);
+      const expected = process.env.MIOPAGES_WP_EXPECTED_DATABASE;
+      const actual = (await db.query("SELECT current_database() AS name")).rows[0].name;
+      if (!expected || expected !== actual) throw Error("Explicit rehearsal database identity required");
+      await db.query("SET LOCAL search_path=public");
+      const baseline = await bootstrapStatus(db);
+      if (baseline.pending || baseline.applied !== 16) throw Error("Exact canonical migration baseline required");
+      if (readOnly) {
+        const roles = (await db.query(`SELECT r.rolname AS role,
+          r.rolcanlogin AND NOT (r.rolsuper OR r.rolbypassrls OR r.rolcreaterole OR r.rolcreatedb OR r.rolreplication)
+          AND NOT EXISTS (SELECT 1 FROM pg_auth_members WHERE member=r.oid)
+          AND has_database_privilege(r.oid,current_database(),'CONNECT')
+          AND has_schema_privilege(r.oid,'public','USAGE')
+          AND NOT has_schema_privilege(r.oid,'public','CREATE')
+          AND NOT has_database_privilege(r.oid,current_database(),'CREATE') AS restricted
+          FROM pg_roles r WHERE r.rolname=ANY($1) ORDER BY r.rolname`,
+        [[operatorRole, pullRole, backup, runtime]])).rows;
+        const namespace = (await db.query(`SELECT nspowner=(SELECT oid FROM pg_roles WHERE rolname=current_user) AS owned
+          FROM pg_namespace WHERE nspname=$1`, [adapterSchema])).rows[0];
+        const canCreateSchema = (await db.query("SELECT has_database_privilege(current_database(),'CREATE') AS allowed")).rows[0].allowed;
+        await db.query("ROLLBACK");
+        console.log(JSON.stringify({ readOnly: true, verifiedTls: true, canonicalMigrations: baseline.applied,
+          pgMajor: baseline.major, pg17CompatibilityReceipt: baseline.receipt !== null, roles,
+          adapterSchema: !namespace ? "absent" : namespace.owned ? "present-owned" : "unexpected-owner", canCreateSchema }));
+        return;
+      }
+      await integratePrivateStage(db);
+      await db.query("COMMIT");
+      console.log(JSON.stringify({ privateStageMigrations: migrations.length, verified: true }));
+    } catch (error) { await db.query("ROLLBACK"); throw error; }
+    finally { db.release(); }
+  } finally { await pool.end(); }
 }
 
 if (process.argv[1]?.replaceAll("\\", "/").endsWith("/scripts/db/wordpress-private-stage.ts")) {

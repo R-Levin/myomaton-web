@@ -541,6 +541,14 @@ The opt-in migration and restricted PostgreSQL grants are prepared. The authenti
 
 The next bounded operation is the single isolated HTTPS acceptance test in the [protected rehearsal handoff](wordpress-private-stage-rehearsal.md), after external identity and mandate verification, scoped role and credential provisioning, and review of adapter recovery. Preserve the canonical managed-backup boundary and verify the adapter schema against the matching canonical snapshot.
 
+## Isolated HTTPS rehearsal preflight — November 4, 2026
+
+Verified public TLS and HTTP status from the local workspace. Core root 200, delivery pull and receipt HEAD 404, protected WordPress root 401. No authenticated hosted session was available. Hosted checkout, database and fixture identity, role grants, WordPress CLI, private directory and active state remain to be verified by the operator. The historical session pooler does not meet the current direct-role URL guard.
+
+Prepared a strict Next.js ingress adapter for the protected proxy, a PostgreSQL read-only preflight operation and a local WordPress 0.0.7 rehearsal package. The consolidated gate passed with 339 repository tests, seven synthetic tests, the PHP offline suites and both disposable PostgreSQL/PHP integrations. The POSIX mode assertion still requires Linux. The rehearsal package contains the plugin code and assets and has SHA-256 `6f25e75a4e5255cea51fc11240abb235e5950f23e23b1047ae1ddc0f2d88c5c6`.
+
+The next bounded action is to return sanitized protected preflight evidence for an isolated origin and database, then review the exact rollout before any hosted change. The real HTTPS stage and receipt acceptance is pending. The [rehearsal handoff](wordpress-private-stage-rehearsal.md) records the single acceptance sequence and return to Commercial V1.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
