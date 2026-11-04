@@ -290,6 +290,12 @@ User separately reran `php wordpress/miopages-delivery/tests/preview-smoke.php` 
 
 **Next bounded operator action:** Through 20i StackCP File Manager for the `miopages.org` Linux hosting package, inspect only whether the account root contains `public_html` and whether nonpublic sibling folders/private directory placement are possible. Do not create/edit/delete yet and do not share absolute home paths. 20i documentation confirms File Manager is a standard StackCP feature and the package home directory is distinguished from `public_html` (see https://docs.20i.com/reseller-guide/reseller-hosting-stackcp and https://docs.20i.com/migrations-and-transfers/transfer-files-with-rsync). Avoid inferring directory HTTP privacy solely from it appearing outside `public_html`. Only after manually reviewing package layout and actual permissions/design can a dedicated private test directory be authorized. Then a separate explicit action may set `MIOPAGES_PROBE_PRIVATE_DIR` server-locally. No real releases or signer keys allowed in probe.
 
+## 20i package directory layout observed — 2026-11-04
+
+**User-reported read-only File Manager observation:** In the `miopages.org` 20i hosting package File Manager, the operator can see the `public_html` folder from the current directory level. This suggests (but does not prove) that a separate sibling directory for private test storage may be possible. No folder has been created or written, no permissions or HTTP inaccessibility verified, and the filesystem probe remains disabled.
+
+**Next operator check:** Confirm whether File Manager exposes a **Create Folder/New Folder** action at the same level as `public_html`, without using it yet. If yes, separately plan a narrowly scoped `miopages-private` sibling, verifying host ownership, restrictive permissions, nonpublic URL access and PHP access before enabling any one-shot synthetic probe; avoid sharing absolute paths or credentials. Do not create files inside `public_html`, do not publish customer content or insert signer private keys.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
