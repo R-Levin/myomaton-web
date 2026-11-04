@@ -437,6 +437,12 @@ This establishes basic two-process cooperative filesystem locking and rejection/
 
 **Next explicit operator action:** From Windows PowerShell, copy the generated `%USERPROFILE%/.config/miopages/wp-synthetic-issuer/synthetic-release-envelope.json` to the clipboard with `Get-Content ... -Raw | Set-Clipboard`. In password-protected WordPress admin Tools → MioPages Private Staging, paste into the signed synthetic envelope JSON form and submit **Validate and stage synthetic release (no publication)** exactly once. Report only success/error message and digest (no need to share full envelope). Expected: private stage succeeds, active sequence remains **0**, publication remains disabled. Stop and investigate any error; do not activate, publish, submit customer data or move signer secret to 20i. Generated envelope has short expiry; do not reuse after expiry.
 
+## Hosted synthetic private staging completed — November 4, 2026
+
+User-confirmed result from protected WordPress admin: synthetic signed test release was staged privately, digest `709f5cc55421abe260b14c160913a38cd56ceb3dba39bde48fb94e9aace85e3f`. The interface indicated publication disabled and active sequence 0. This verifies an initial hosted signed synthetic staging success, not live content publication, real central signer approval, or a full recovery guarantee.
+
+Next: read-only SSH inspection of staged object integrity, private storage permissions, and absence of an active marker; do not print envelope or key material. Production authorization, key rotation, public activation and rollback, and 100+ tenant load testing remain separate acceptance gates.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
