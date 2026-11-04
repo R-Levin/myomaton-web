@@ -284,6 +284,12 @@ User separately reran `php wordpress/miopages-delivery/tests/preview-smoke.php` 
 
 **Next authorized operator action:** fast-forward branch, build plugin ZIP with portable `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`, replace plugin on protected `miopages.org`, confirm installed v0.0.4 and new Tools → MioPages Filesystem Probe displays **Disabled: no private path has been explicitly configured**; confirm existing Tools → MioPages Preview and Environment work. **Do not set `MIOPAGES_PROBE_PRIVATE_DIR` or click Run** until 20i private path/permissions/HTTP access are independently reviewed. Source commit is not proof of hosted installation or filesystem writes.
 
+## Hosted v0.0.4 filesystem probe safe default confirmed — 2026-11-03
+
+**User-reported:** On protected `miopages.org`, new Tools → MioPages Filesystem Probe screen **shows Disabled**. This is positive proof that the explicit `MIOPAGES_PROBE_PRIVATE_DIR` opt-in gate has not been armed on that installation, and strongly indicates v0.0.4 diagnostic screen was deployed. User has not separately reconfirmed version number or both earlier admin screens. No hosted filesystem write test was run and no private directory was configured.
+
+**Next bounded operator action:** Through 20i StackCP File Manager for the `miopages.org` Linux hosting package, inspect only whether the account root contains `public_html` and whether nonpublic sibling folders/private directory placement are possible. Do not create/edit/delete yet and do not share absolute home paths. 20i documentation confirms File Manager is a standard StackCP feature and the package home directory is distinguished from `public_html` (see https://docs.20i.com/reseller-guide/reseller-hosting-stackcp and https://docs.20i.com/migrations-and-transfers/transfer-files-with-rsync). Avoid inferring directory HTTP privacy solely from it appearing outside `public_html`. Only after manually reviewing package layout and actual permissions/design can a dedicated private test directory be authorized. Then a separate explicit action may set `MIOPAGES_PROBE_PRIVATE_DIR` server-locally. No real releases or signer keys allowed in probe.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
