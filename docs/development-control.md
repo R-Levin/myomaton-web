@@ -431,6 +431,12 @@ This establishes basic two-process cooperative filesystem locking and rejection/
 
 **Next bounded action:** From Windows repo, `git pull --ff-only`, then `php -l .\scripts\wordpress-create-synthetic-release.php`; stop on lint error. Then `php .\scripts\wordpress-create-synthetic-release.php` and request only PASS/FAIL messages without pasting key or envelope data. Do not submit envelope to WordPress until generated and checked; later step will paste only the signed JSON envelope into the admin-only synthetic staging form, then verify unchanged active sequence 0 and no public page changes. Generated envelope expires in ~2 hours; on expiration, do not blindly reuse it. No WordPress signer or public activation.
 
+## Local signed synthetic release envelope generated and self-verified — November 4, 2026
+
+**User-reported PowerShell result:** `php .\\scripts\\wordpress-create-synthetic-release.php` reported both `PASS: Signed synthetic envelope created in local protected issuer directory.` and `PASS: Signature self-verification completed.` Script confirmed synthetic approval claim only, local signing secret retained and no WordPress submission. No envelope or key material was shared. This verifies generation and local signature self-check, **not** hosted ingestion.
+
+**Next explicit operator action:** From Windows PowerShell, copy the generated `%USERPROFILE%/.config/miopages/wp-synthetic-issuer/synthetic-release-envelope.json` to the clipboard with `Get-Content ... -Raw | Set-Clipboard`. In password-protected WordPress admin Tools → MioPages Private Staging, paste into the signed synthetic envelope JSON form and submit **Validate and stage synthetic release (no publication)** exactly once. Report only success/error message and digest (no need to share full envelope). Expected: private stage succeeds, active sequence remains **0**, publication remains disabled. Stop and investigate any error; do not activate, publish, submit customer data or move signer secret to 20i. Generated envelope has short expiry; do not reuse after expiry.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
