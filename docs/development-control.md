@@ -473,6 +473,12 @@ Next bounded host check: create `~/miopages-private/lock-test/{tests,includes}` 
 
 **Next:** The plugin header version has been incremented to **0.0.6** to package the lock-permission code hardening. This version bump has been committed but is **not yet locally retested or deployed**. Pull branch, lint plugin header, store and lock-test PHP; rerun lock, private staging, release staging, release-contract and preview suites. On PASS, rebuild ZIP with the established `tar -a` packaging procedure, replace v0.0.5 on protected `miopages.org`, then verify version 0.0.6, synthetic staging still enabled with active sequence 0 and publication disabled. Do not submit a new envelope, activate, or publish. Avoid including the local signing secret or wp-config in plugin ZIP. Review additional hosting readiness checks before wider availability.
 
+## v0.0.6 local regression suites passed — November 4, 2026
+
+User-reported local Windows PowerShell output after prior v0.0.6 instructions: isolated lock regression PASS (explicit POSIX mode NOT VERIFIED on Windows; Linux 20i mode 0600 passed previously), private synthetic staging PASS, offline immutable staging PASS, release-contract smoke PASS, and C0 private preview PASS. PHP lint for plugin header was not included in the pasted excerpt and should be confirmed before packaging. No new hosted plugin deployment yet.
+
+Next: confirm `php -l wordpress/miopages-delivery/miopages-delivery.php`, rebuild plugin zip with `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`, inspect archive entry listing, install/replace on protected WordPress, confirm version 0.0.6 and staging still enabled with active sequence 0/publication disabled. Do not stage new envelopes, change signer credentials or activate content. Verify original stored release still present via read-only checks if needed.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
