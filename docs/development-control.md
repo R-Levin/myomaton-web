@@ -344,6 +344,12 @@ Next: plan a bounded concurrency and interrupted-operation recovery proof before
 
 **Next step:** Determine whether 20i SSH Access for `miopages.org` supports key-based authentication, password authentication or both; do not disclose credentials or private keys. Prefer protected key-based authentication and then verify shell connection before copying any test script. The existing private directory and WordPress plugin remain unchanged.
 
+## 20i WordPress SSH connection succeeded — November 4, 2026
+
+**User-reported:** After the initial 20i SSH activation delay (provider indicated up to 30 minutes), the dedicated WordPress key `miopages_wp_20i` successfully connects to the hosting account. The earlier debug trace had accepted public-key authentication but temporarily denied shell authorization; this is now resolved **without key changes or 20i support**. Preserve the separate `miopages_20i` runtime server key; never commit private key material.
+
+**Next read-only step:** From the newly connected SSH shell, run `pwd`, `ls -ld public_html miopages-private`, and `php -v`, share only nonsecret results and omit absolute home path if desired. Confirm directory visibility, restricted permissions and PHP CLI before uploading/executing `scripts/wordpress-host-filesystem-recovery-proof.php`. No hosted test was run yet.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
