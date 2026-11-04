@@ -497,6 +497,14 @@ Next: confirm `php -l wordpress/miopages-delivery/miopages-delivery.php`, rebuil
 
 **Immediate next step:** Review existing canonical Core approval and release authority and installation targeting in repository, then implement Batch 1 as a cohesive bounded branch increment with consolidated automated tests and a single operator acceptance gate. Do not imply production signer exists already or enable public publication during Batch 1.
 
+## Streamlined Batch 1 implementation kickoff — November 4, 2026
+
+Reviewed actual `lib/platform/content-editing/releases.ts`, `release.ts`, canonical activation and `docs/wordpress-delivery-feasibility.md`. The current `SiteReleaseService` includes approval/revision/preview evidence and tenant-scoped durable release history, but `releaseEnvironment()` explicitly **blocks anything except disposable development databases**. Thus Core-to-WordPress production authorization is NOT present; never bypass this guard or treat the synthetic approved payload as a real publication permit.
+
+**Committed source, not yet test-verified:** `docs/wordpress-delivery-batch1.md` defines the cohesive Core authorization + enrolled signing + authenticated pull + staged receipt + audit acceptance matrix (publication explicitly excluded). `scripts/test-wordpress-delivery.php` runs all existing WordPress offline PHP regressions in one command. `scripts/wordpress-cross-runtime-signature-proof.mjs` signs a synthetic release using an ephemeral Node Ed25519 private key held in memory, and `wordpress/miopages-delivery/tests/node-issuer-compat.php` runs the actual PHP verifier against its envelope with wrong-installation, replay and tamper refusals. No credentials, private keys, external services or production sources are accessed by these fixtures. `.github/workflows/wordpress-delivery.yml` runs the consolidated gate on matching pushes/PRs using Node 22 and PHP 8.4. GitHub Actions status has NOT yet been confirmed; tests are NOT claimed to pass until execution.
+
+**Next meaningful gate:** Execute `php scripts/test-wordpress-delivery.php` from Windows repository (or inspect CI workflow execution) and resolve any failures as one batch. Continue implementing central trusted entitlement, issuer enrollment, authenticated transport and receipt reconciliation against explicit sources before requesting any new WordPress deployment. The installed protected WordPress v0.0.6 remains enabled for synthetic private staging only, active sequence 0, public publication disabled. Revisit broader Commercial V1 priority alignment before formal release architecture migration.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
