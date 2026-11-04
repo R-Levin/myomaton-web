@@ -350,6 +350,12 @@ Next: plan a bounded concurrency and interrupted-operation recovery proof before
 
 **Next read-only step:** From the newly connected SSH shell, run `pwd`, `ls -ld public_html miopages-private`, and `php -v`, share only nonsecret results and omit absolute home path if desired. Confirm directory visibility, restricted permissions and PHP CLI before uploading/executing `scripts/wordpress-host-filesystem-recovery-proof.php`. No hosted test was run yet.
 
+## WordPress 20i SSH CLI runtime and private directory confirmed — November 4, 2026
+
+**User-reported read-only SSH shell evidence:** Account root contains sibling `miopages-private` (directory mode **0700**, owner account user) and `public_html` (mode 0711). Hosted PHP CLI version is **8.4.27** (NTS), consistent with earlier PHP-FPM version. This confirms actual SSH shell access, folder visibility and restrictive mode; no host concurrency test has yet run. Do not store account home absolute path in Git.
+
+**Next bounded operation:** From local Windows PowerShell, upload only `scripts/wordpress-host-filesystem-recovery-proof.php` using the dedicated WordPress SSH key to `miopages-private/` by SCP. From the already open SSH shell, run `ls -l miopages-private/wordpress-host-filesystem-recovery-proof.php` and `php -l miopages-private/wordpress-host-filesystem-recovery-proof.php`. Require file present and syntax PASS before executing the synthetic worker test. Preserve WordPress pages, central database, and release signer credentials unchanged.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
