@@ -505,6 +505,16 @@ Reviewed actual `lib/platform/content-editing/releases.ts`, `release.ts`, canoni
 
 **Next meaningful gate:** Execute `php scripts/test-wordpress-delivery.php` from Windows repository (or inspect CI workflow execution) and resolve any failures as one batch. Continue implementing central trusted entitlement, issuer enrollment, authenticated transport and receipt reconciliation against explicit sources before requesting any new WordPress deployment. The installed protected WordPress v0.0.6 remains enabled for synthetic private staging only, active sequence 0, public publication disabled. Revisit broader Commercial V1 priority alignment before formal release architecture migration.
 
+## GitHub Actions CI failure diagnosed and corrected — November 4, 2026
+
+**Original workflow failure confirmed directly from GitHub job log:** Workflow run `41882677201` at commit `ca8c88c` failed with `PHP Parse error: syntax error, unexpected single-quoted string "tests/node-issuer-compat.php", expecting "]"` on line 10 of `scripts/test-wordpress-delivery.php`. The defect was an incorrectly inserted literal escape sequence in the consolidated test runner, not a WordPress hosted deployment or live staging problem.
+
+**Fix committed:** `7a92432a6100ec2dc93247ec3fd8875f4f154a6d` cleanly rewrote the consolidated runner and ensured the Node-to-PHP proof actually runs.
+
+**Confirmed CI PASS, direct GitHub Actions evidence:** Replacement workflow run `41885205129` completed with conclusion **success**, `offline-adapter-contracts` job PASS. Job log explicitly reports all five PHP lint checks, eight offline smoke suites (including two-worker race and POSIX 0600 lock mode), and Node Ed25519 envelope accepted by PHP with foreign/replay/tamper refused; final line `PASS: consolidated WordPress offline gate (5 lints, 8 smoke suites, 1 Node-to-PHP compatibility test).` No need for manual Windows rerun of this same CI gate. The protected 20i WordPress v0.0.6 plugin remains unchanged: synthetic staging only, active sequence 0 and publication disabled.
+
+**Next:** Continue Batch 1 central trusted entitlement, proper issuer-enrollment and authenticated pull/receipts with cohesive commits and automatic CI. Do not turn off disposable-only Core authority guard, claim real production approval or deploy public publication.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
