@@ -308,6 +308,12 @@ User separately reran `php wordpress/miopages-delivery/tests/preview-smoke.php` 
 
 **Immediate next step:** User checks public URL `https://miopages.org/miopages-private/` in incognito, reporting status only and not credentials/paths. A 403 or 404 is preliminary supporting evidence only, **not a complete proof** of isolation against aliases, alternate virtual hosts or direct access. If directory listing or private file appears, stop, disable probe, review server document root. Before running one-shot probe, verify separately that 20i document root is `public_html` and there are no aliases to private storage; run only synthetic test after boundary review. No live releases or signer key provisioning.
 
+## Private storage preliminary URL check — 2026-11-04
+
+**User-provided screenshot:** An incognito visit to `https://miopages.org/miopages-private/` displayed the ordinary WordPress "Page not found" template, with no directory listing or files exposed. This is consistent with the sibling `miopages-private` directory (mode 0700) lying outside the web document root. **It is not a comprehensive HTTP isolation or alternate-vhost/alias/security audit.**
+
+**Next bounded action authorized in chat:** Run exactly one one-shot synthetic filesystem probe in protected WP admin via Tools → MioPages Filesystem Probe (path guard and config already visibly armed); report descriptive results only. Probe tests one-host write/read, nonblocking lock, hard link, rename, and cleanup in randomly named temporary child. If any result FAIL or cleanup incomplete, stop and inspect; do not blindly repeat. This is still not approved release staging, central signing enrollment or public publication.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
