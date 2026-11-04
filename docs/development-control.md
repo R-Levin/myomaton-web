@@ -417,6 +417,12 @@ This establishes basic two-process cooperative filesystem locking and rejection/
 
 **Next operator step:** Transfer **only** the locally verified 44-byte Ed25519 public verification key `synthetic-signing-public.b64` from protected Windows issuer storage to `~/miopages-private/` using dedicated SSH identity and legacy `scp -O`. Verify chmod 600 and `wc -c` = 44 under SSH. The synthetic signing **secret** stays on the Windows developer machine. Do not edit wp-config or configure actual staged release until public-key transfer is verified and an agreed synthetic identity config is ready.
 
+## Synthetic public verification key present on 20i; enrollment proposed — November 4, 2026
+
+**User-reported 20i SSH verification:** The local synthetic issuer's **public only** `synthetic-signing-public.b64` was transferred through legacy SCP (44 bytes, status 0); hosted `chmod 600`, `wc -c` and `ls -l` confirmed 44 bytes, mode `-rw-------`, hosting-account ownership, and storage in `~/miopages-private` outside the webroot. The protected `wp-config.php` backup and separate `0700` `synthetic-staging` directory are already verified. Private signing key remains local Windows only.
+
+**Next operator action proposed, NOT yet verified:** In the existing `public_html/wp-config.php`, add `MIOPAGES_SYNTHETIC_STAGE_CONFIG` above WordPress's 'stop editing' line. Its `directory` is `dirname(__DIR__) . '/miopages-private/synthetic-staging'`; `identity.publicKeyBase64` uses `trim(file_get_contents(dirname(__DIR__) . '/miopages-private/synthetic-signing-public.b64'))` (public key only). Exact test identifiers: `keyId=synthetic-test-key`, `organizationId=synthetic-org`, `webPresenceId=synthetic-presence`, `managedSiteId=synthetic-site`, `installationId=synthetic-installation`. Preserve existing `MIOPAGES_PROBE_PRIVATE_DIR` setting. Save, then check Tools → MioPages Private Staging for **Enabled for synthetic test releases only**, active sequence **0**, publication **disabled**. Do NOT submit an envelope yet. No real customer keys, canonical approval or publication is enabled by this configuration.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
