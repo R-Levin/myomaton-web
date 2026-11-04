@@ -338,6 +338,12 @@ Next: plan a bounded concurrency and interrupted-operation recovery proof before
 
 **Next bounded user action:** From Windows repo, `git pull --ff-only` and `php -l scripts/wordpress-host-filesystem-recovery-proof.php`. Then inspect 20i SSH Access activation/connection options without sharing passwords, private SSH keys or account secrets. Prefer key-based authentication if supported. Do not upload/execute the script or change WordPress content until syntax review and SSH access are verified. See `docs/wordpress-host-cli-recovery-proof.md`.
 
+## Hosted CLI recovery script syntax validation — 2026-11-04
+
+**User-reported Windows terminal output:** `php -l .\\scripts\\wordpress-host-filesystem-recovery-proof.php` returned `No syntax errors detected in .\\scripts\\wordpress-host-filesystem-recovery-proof.php`. This validates PHP syntax only; no test execution or 20i deployment has taken place.
+
+**Next step:** Determine whether 20i SSH Access for `miopages.org` supports key-based authentication, password authentication or both; do not disclose credentials or private keys. Prefer protected key-based authentication and then verify shell connection before copying any test script. The existing private directory and WordPress plugin remain unchanged.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
