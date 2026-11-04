@@ -443,6 +443,12 @@ User-confirmed result from protected WordPress admin: synthetic signed test rele
 
 Next: read-only SSH inspection of staged object integrity, private storage permissions, and absence of an active marker; do not print envelope or key material. Production authorization, key rotation, public activation and rollback, and 100+ tenant load testing remain separate acceptance gates.
 
+## Hosted synthetic storage permissions confirmed — November 4, 2026
+
+User verified the hosted synthetic release SHA256 matches the staging receipt, directories are mode 0700, object is mode 0600, no active marker exists, and the lock file is now manually changed to mode 0600 (confirmed by `ls -l`). This completes the initial synthetic hosted staging proof without public activation. The lock-file mode had originally been 0644 due to creation umask.
+
+Development branch also contains a source-only hardening edit in `class-miopages-release-store.php`: after acquiring the file lock, operations call `chmod(..., 0600)` and refuse when hardening fails. This edit has **not been validated locally or deployed**, so the installed v0.0.5 code remains as previously tested. Next action: pull branch, lint the store and run offline release-staging and private-staging smoke tests; only then consider a plugin upgrade. Real central signing authority, publishing, rollback and 100+ tenant loading remain open gates.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
