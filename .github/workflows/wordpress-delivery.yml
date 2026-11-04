@@ -6,6 +6,8 @@ on:
       - 'wordpress/miopages-delivery/**'
       - 'scripts/test-wordpress-delivery.php'
       - 'scripts/wordpress-cross-runtime-signature-proof.mjs'
+      - 'lib/platform/wordpress-delivery/**'
+      - 'tests/wordpress-synthetic-gateway.test.mjs'
       - '.github/workflows/wordpress-delivery.yml'
   pull_request:
     paths:
@@ -31,5 +33,7 @@ jobs:
           php-version: '8.4'
           extensions: sodium
           coverage: none
+      - name: Run Core synthetic delivery entitlement and receipt checks
+        run: node --test tests/wordpress-synthetic-gateway.test.mjs
       - name: Run all offline PHP and Node interoperability checks
         run: php scripts/test-wordpress-delivery.php
