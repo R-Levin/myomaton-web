@@ -302,6 +302,12 @@ User separately reran `php wordpress/miopages-delivery/tests/preview-smoke.php` 
 
 **Next bounded operator check:** In File Manager, open `public_html` and confirm `wp-config.php` is located there (without showing its contents or credentials). After confirming actual config location, provide a safe backup-first instruction to define `MIOPAGES_PROBE_PRIVATE_DIR` as a path derived from that known location, with no paths pasted in chat; then run only the nonce-gated synthetic filesystem probe. Do not put secrets in Git, create public probe files, stage real releases, or infer HTTP isolation solely from mode 0700.
 
+## Hosted filesystem probe visibly armed; public isolation check pending — 2026-11-04
+
+**User-reported:** In password-protected `miopages.org`, after adding `MIOPAGES_PROBE_PRIVATE_DIR` via relative `dirname(__DIR__) . '/miopages-private'` expression in `public_html/wp-config.php`, Tools → MioPages Filesystem Probe now **shows the run button**. This means the plugin's preliminary `safeDirectory` check passed, not that private HTTP isolation, owner identity, or hosted filesystem semantics have been independently verified. The sibling `miopages-private` was set to mode 0700. No hosted synthetic write was reported yet.
+
+**Immediate next step:** User checks public URL `https://miopages.org/miopages-private/` in incognito, reporting status only and not credentials/paths. A 403 or 404 is preliminary supporting evidence only, **not a complete proof** of isolation against aliases, alternate virtual hosts or direct access. If directory listing or private file appears, stop, disable probe, review server document root. Before running one-shot probe, verify separately that 20i document root is `public_html` and there are no aliases to private storage; run only synthetic test after boundary review. No live releases or signer key provisioning.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
