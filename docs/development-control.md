@@ -356,6 +356,10 @@ Next: plan a bounded concurrency and interrupted-operation recovery proof before
 
 **Next bounded operation:** From local Windows PowerShell, upload only `scripts/wordpress-host-filesystem-recovery-proof.php` using the dedicated WordPress SSH key to `miopages-private/` by SCP. From the already open SSH shell, run `ls -l miopages-private/wordpress-host-filesystem-recovery-proof.php` and `php -l miopages-private/wordpress-host-filesystem-recovery-proof.php`. Require file present and syntax PASS before executing the synthetic worker test. Preserve WordPress pages, central database, and release signer credentials unchanged.
 
+## Hosted CLI test script ready — November 4, 2026
+
+The operator confirmed successful transfer of the isolated synthetic recovery script into the private hosting directory, and PHP 8.4 CLI syntax validation passed. The script has NOT been executed yet. Next: run it from within that private directory and record the complete PASS, FAIL, and cleanup outcome. Stop on any failure; publication and real release storage remain disabled.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
