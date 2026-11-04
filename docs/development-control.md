@@ -461,6 +461,12 @@ Development branch also contains a source-only hardening edit in `class-miopages
 
 **Next operator step:** `git pull --ff-only`, then run `php -l .\\wordpress\\miopages-delivery\\tests\\lock-permissions-smoke.php` and `php .\\wordpress\\miopages-delivery\\tests\\lock-permissions-smoke.php` on Windows. Require PASS for lock creation and explicit acknowledgement that Linux permission behavior remains untested. After local checks, transfer **only this isolated test file** (and a reviewed copy of the current release-store class or plugin packaging) for a 20i PHP CLI Linux mode check in a synthetic temporary directory, with no interaction with existing staged releases. Do not claim Linux permission PASS or deploy plugin hardening until that gate is completed.
 
+## Local Windows isolated lock-file test passed — November 4, 2026
+
+User-reported local PowerShell results: syntax check for `wordpress/miopages-delivery/tests/lock-permissions-smoke.php` passed; script printed `PASS: isolated new lock created; no activation or release files.` and `NOT VERIFIED: POSIX mode requires a Linux CLI run (Windows ACL semantics).` The actual POSIX lock-file mode of newly created files remains unverified.
+
+Next bounded host check: create `~/miopages-private/lock-test/{tests,includes}` under the existing off-webroot 0700 directory; transfer the exact Git-tracked `tests/lock-permissions-smoke.php` and `includes/class-miopages-release-store.php` into matching relative paths, verify PHP CLI lint and run the isolated test on Linux. It creates/deletes only a random temporary store under PHP's temporary directory. Do not touch the hosted synthetic staging folder, active marker or installed WordPress plugin until this proof passes. Only then package reviewed versioned plugin update.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
