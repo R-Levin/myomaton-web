@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MioPages Delivery (Development Proof)
  * Description: Restricted, read-only C0 fixture preview for the MioPages WordPress delivery feasibility proof.
- * Version: 0.0.3
+ * Version: 0.0.4
  * Requires PHP: 8.3
  * Text Domain: miopages-delivery
  */
@@ -13,6 +13,7 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/includes/class-miopages-fixture-preview.php';
 require_once __DIR__ . '/includes/class-miopages-environment-check.php';
+require_once __DIR__ . '/includes/class-miopages-filesystem-probe.php';
 
 add_action('admin_menu', static function (): void {
     add_management_page(
@@ -111,4 +112,70 @@ function miopages_render_environment_check(): void
     }
     echo '</tbody></table><p><strong>Do not share server paths or credentials.</strong> '
         . 'This screen intentionally does not display paths, secrets, enrollment IDs or private keys.</p></div>';
+}
+
+/**
+ * The probe is opt-in, and no private directory is selected automatically.
+ * The operator must configure MIOPAGES_PROBE_PRIVATE_DIR outside the document
+ * root in server-local wp-config.php, and only then explicitly submit a nonce.
+ */
+add_action('admin_menu', static function (): void {
+    add_management_page(
+        'MioPages Private Filesystem Proof',
+        'MioPages Filesystem Probe',
+        'manage_options',
+        'miopages-filesystem-probe',
+        'miopages_render_filesystem_probe'
+    );
+});
+
+function miopages_render_filesystem_probe(): void
+{
+    if (!current_user_can('manage_options')) {
+        wp_die(esc_html__('Permission denied.', 'miopages-delivery'));
+    }
+    echo '<div class="wrap"><h1>MioPages — Private Filesystem Probe (development only)</h1>';
+    echo '<p>This one-shot synthetic test creates a random child directory only within an '
+        . 'already configured private directory. It does not stage real releases, publish WordPress '
+        . 'pages, or transmit filesystem paths. Do not run on an unprotected public installation.</p>';
+
+    if (!defined('MIOPAGES_PROBE_PRIVATE_DIR') || !is_string(MIOPAGES_PROBE_PRIVATE_DIR)
+        || MIOPAGES_PROBE_PRIVATE_DIR === '') {
+        echo '<p><strong>Disabled:</strong> no private path has been explicitly configured. '
+            . 'The existing outside-webroot directory must be manually verified before enabling.</p></div>';
+        return;
+    }
+
+    $docRoot = isset($_SERVER['DOCUMENT_ROOT']) && is_string($_SERVER['DOCUMENT_ROOT'])
+        ? $_SERVER['DOCUMENT_ROOT'] : '';
+    if (!MioPages_Filesystem_Probe::safeDirectory(
+        MIOPAGES_PROBE_PRIVATE_DIR, ABSPATH, $docRoot
+    )) {
+        echo '<p><strong>Refused:</strong> the configured directory is missing or fails '
+            . 'private-path safety checks. No writes attempted.</p></div>';
+        return;
+    }
+
+    if (isset($_POST['miopages_run_filesystem_probe'])) {
+        check_admin_referer('miopages_run_filesystem_probe');
+        if ($_POST['miopages_run_filesystem_probe'] !== 'run') {
+            wp_die(esc_html__('Invalid action.', 'miopages-delivery'));
+        }
+        $results = MioPages_Filesystem_Probe::run(
+            MIOPAGES_PROBE_PRIVATE_DIR, ABSPATH, $docRoot
+        );
+        echo '<h2>One-shot results</h2><table class="widefat striped" style="max-width:900px"><tbody>';
+        foreach ($results as $label => $value) {
+            echo '<tr><th scope="row">' . esc_html($label) . '</th><td>' . esc_html($value) . '</td></tr>';
+        }
+        echo '</tbody></table>';
+    }
+
+    echo '<p>The configured directory passes preliminary structural checks. '
+        . 'This does not verify permissions, HTTP isolation or filesystem crash durability.</p>';
+    echo '<form method="post">';
+    wp_nonce_field('miopages_run_filesystem_probe');
+    echo '<input type="hidden" name="miopages_run_filesystem_probe" value="run">';
+    submit_button('Run one-shot synthetic filesystem probe', 'secondary');
+    echo '</form></div>';
 }
