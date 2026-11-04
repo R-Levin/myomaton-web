@@ -479,6 +479,12 @@ User-reported local Windows PowerShell output after prior v0.0.6 instructions: i
 
 Next: confirm `php -l wordpress/miopages-delivery/miopages-delivery.php`, rebuild plugin zip with `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`, inspect archive entry listing, install/replace on protected WordPress, confirm version 0.0.6 and staging still enabled with active sequence 0/publication disabled. Do not stage new envelopes, change signer credentials or activate content. Verify original stored release still present via read-only checks if needed.
 
+## Hosted staging guard remains unchanged after attempted plugin upgrade — November 4, 2026
+
+**User-provided WordPress admin output:** Tools → MioPages Private Staging continues to show **Enabled for synthetic test releases only**, **Public publication: disabled**, and **Active sequence: 0**. The view retains the statement that no central release signer or production enrollment is installed. This establishes the hosted staging guard remains intact after the operator's plugin-update workflow, but the pasted output alone does **not** prove the installed plugin version is 0.0.6.
+
+**Next bounded verification:** In WordPress Plugins → Installed Plugins, check **MioPages Delivery (Development Proof)** explicitly reports **0.0.6** active. If so, lock-file hardening integration milestone may close, anchored in the prior 20i Linux POSIX mode-0600 isolated test and local regression passes. Do not claim staged object rehash was repeated after update (previous independent on-disk hash proof remains valid unless contradicted). Public release activation, central approval, signer credential management and 100+ tenant capacity remain out of scope.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
