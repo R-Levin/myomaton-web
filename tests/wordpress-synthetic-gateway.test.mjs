@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { generateKeyPairSync } from "node:crypto";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 import {
   syntheticEnrollment, syntheticEligibility, createSyntheticEnvelope,
   reconcileSyntheticStage
@@ -98,4 +101,20 @@ test("wrong issuer key, false receipt, and foreign receipt are refused", () => {
     { ...base, sequence: 2 },
     { ...base, unexpected: true },
   ]) assert.throws(() => reconcileSyntheticStage(signed, e, receipt));
+});
+
+test("real PHP validator accepts the gateway-issued exact synthetic envelope", () => {
+  const e = enrolled();
+  const proof = syntheticEligibility(e, {
+    ...eligible(), releaseId: "synthetic-node-cross-runtime"
+  }, 0);
+  const signed = createSyntheticEnvelope(e, proof, pages, keys.privateKey);
+  const path = resolve(dirname(fileURLToPath(import.meta.url)),
+    "../wordpress/miopages-delivery/tests/node-issuer-compat.php");
+  const result = spawnSync("php", [path], {
+    input: JSON.stringify({ envelope: signed.envelope, publicKeyBase64 }),
+    encoding: "utf8", timeout: 15000
+  });
+  assert.equal(result.status, 0, result.stderr || result.error?.message);
+  assert.match(result.stdout, /PASS: Node Ed25519 envelope accepted by PHP/);
 });
