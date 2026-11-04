@@ -45,9 +45,9 @@ final class MioPages_Release_Store
     /**
      * @return array<string,mixed>|WP_Error
      */
-    public function stage(string $envelope, ?int $now = null)
+    public function stage(string $envelope, ?int $now = null, ?string $expectedReleaseId = null)
     {
-        return $this->locked(function () use ($envelope, $now) {
+        return $this->locked(function () use ($envelope, $now, $expectedReleaseId) {
             $active = $this->readActive();
             if ($active instanceof WP_Error) {
                 return $active;
@@ -56,6 +56,11 @@ final class MioPages_Release_Store
             if ($validated instanceof WP_Error) {
                 return $validated;
             }
+            if ($expectedReleaseId !== null
+                && ($validated['releaseId'] !== $expectedReleaseId || $validated['sequence'] !== 1)) {
+                return $this->fail('unexpected_delivery');
+            }
+
             $digest = hash('sha256', $envelope);
             if (!$this->objectFolderReady()) {
                 return $this->fail('object_directory');

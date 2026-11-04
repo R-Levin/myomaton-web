@@ -13,6 +13,8 @@ $lint = [
     'includes/class-miopages-release-validator.php',
     'includes/class-miopages-release-store.php',
     'includes/class-miopages-private-staging.php',
+    'includes/class-miopages-release-pull.php',
+    'tests/core-pull-compat.php',
     'tests/node-issuer-compat.php',
 ];
 $suites = [
@@ -49,4 +51,4 @@ if ($failures > 0) {
     echo "FAIL: consolidated WordPress offline gate ({$failures} failed checks).\n";
     exit(1);
 }
-echo "PASS: consolidated WordPress offline gate (5 lints, 8 smoke suites, 1 Node-to-PHP compatibility test).\n";
+echo "PASS: consolidated WordPress offline gate (7 lints, 8 smoke suites, 1 Node-to-PHP compatibility test).\n";

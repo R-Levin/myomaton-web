@@ -18,6 +18,7 @@
     "db:bootstrap-photo": "tsx --env-file=.env.local scripts/bootstrap-myomaton-photo.ts",
     "assets:import": "tsx --env-file=.env.local scripts/import-managed-assets.ts",
     "test": "tsx --test tests/*.test.tsx",
+    "test:wordpress-delivery": "tsc --noEmit && npm test && node --test tests/wordpress-synthetic-gateway.test.mjs tests/wordpress-synthetic-pull.test.mjs && php scripts/test-wordpress-delivery.php && tsx --test tests/integration/wordpress-delivery.test.ts",
     "test:postgres": "tsx --test tests/integration/*.test.ts"
   },
   "dependencies": {

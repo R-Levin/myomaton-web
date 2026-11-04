@@ -527,6 +527,12 @@ Reviewed actual `lib/platform/content-editing/releases.ts`, `release.ts`, canoni
 
 GitHub Actions workflow run `41889067645` at commit `863eb96e4cd61dffdaeabe8e0aad49e4e4c51927` completed with conclusion **success**. The workflow includes the new synthetic Core enrollment/issuer/receipt suite and authenticated-pull/replay suite, plus consolidated PHP staging and Node-to-PHP verifier tests. Earlier transient failed runs were from an overly narrow test error-message expectation after adding stricter digest rejection; that test was corrected. CI success is for synthetic/offline code only, not real central approval credentials, live network pull, WordPress activation or 100+ capacity. Latest source is committed to the active development branch, not deployed.
 
+## Batch 1 private delivery integration checkpoint — November 4, 2026
+
+Issue #6 development branch now has a disposable integration proof through private staging. Scoped operator enrollment, key generation and revocation, exact Core release evidence and projection checks, authenticated pull, WordPress private storage and exact receipt reconciliation ran against disposable PostgreSQL 18 and PHP 8.3. The consolidated `npm run test:wordpress-delivery` gate passed on Windows. The Linux-only 0600 assertion belongs to the independent CI gate.
+
+The production authority adapter defaults to deny. No hosted schema, application routes or WordPress caller were enabled. The opt-in adapter schema and rollback constraints are recorded in [Batch 1 delivery](wordpress-delivery-batch1.md). The next milestone is reviewed production identity and publishable release authority, followed by migration and credential review and one isolated HTTPS private-stage rehearsal. Public activation is a later milestone.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.

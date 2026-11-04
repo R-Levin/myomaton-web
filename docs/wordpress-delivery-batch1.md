@@ -1,6 +1,6 @@
 # Batch 1 — governed Core → WordPress release delivery
 
-Status: **implementation boundary and acceptance contract**, not completed integration.
+Status: **local integration verified**. Production authority, route composition and hosting remain gated.
 Development branch: `docs/wordpress-delivery-feasibility-2026-11-02`.
 The existing v0.0.6 WordPress private staging proof remains installed; public publication is disabled.
 
@@ -38,6 +38,24 @@ One cohesive engineering batch, avoiding iterative plugin installs:
 - Only request operator input when an external credential/authority decision or actual hosted acceptance is required. Avoid one-message-per-file upload workflows.
 - Never remove or bypass the development-only restriction of `releaseEnvironment()` as an expedient shortcut. Until a production release-authority implementation is reviewed, keep the entire Core-to-WordPress flow synthetic/offline and publication disabled.
 
-## Current status / next engineering action
+## Implemented and verified locally
 
-The initial consolidated local PHP test runner is checked in at `scripts/test-wordpress-delivery.php`, **not yet executed**. The next implementation work is the central entitlement/issuer boundary and cross-runtime cryptographic contract tests, followed by authenticated pull and receipt reconciliation in one reviewed batch. Do not call this integration complete based on the successful synthetic manual stage.
+- The server-only service in `lib/platform/wordpress-delivery/service.ts` authorizes enrollment, rotation, revocation and issuance through an injected site-scoped operator check. The PostgreSQL registry binds one immutable installation ID to an organization, Web Presence, Managed Site and HTTPS origin. It retains key generations and credential IDs, with separate audit rows for operator and authenticated transport activity. Only the credential resolver receives a credential ID. The database contains public verification pins and references to externally held credentials.
+- `authority.ts` defaults to denying issuance and delivery. An internal authority implementation must supply a reviewed, explicitly publishable version 1 projection. The service independently checks the latest hash-chained Core release, its exact approval event and revision, its preview digest, the current canonical source fingerprint and the reviewed pages digest. Core's existing release guard still permits only disposable development databases. The integration test supplies authority only inside the disposable fixture.
+- The Core handler accepts bodyless HTTPS POSTs to the fixed pull and receipt paths. The HMAC binds the Core origin, operation, enrolled WordPress origin, installation, credential generation by ID, release, timestamp, nonce and receipt. The stored nonce window is two minutes either side of the timestamp, with at most 60 live nonces per installation. Retry transient failures using a new nonce. The handler signs and returns bounded v1 release bytes only while the enrolled issuer, approved current source and exact projection still match.
+- The WordPress client uses the safe HTTP API with TLS verification, no redirects and a bounded response. It checks the envelope digest and stages through the existing locked v1 store using a protected, off-webroot directory and pinned identity. It sends the stage receipt only after storage succeeds. Core records an authenticated receipt for the exact pulled release, installation, sequence 1 and envelope digest. An exact retry leaves the first stage timestamp intact. The receipt represents an installation's report of private staging.
+- Batch 1 permits one release per installation while active sequence is zero. First receipt acceptance ends at envelope expiry. Exact receipts already reconciled can be retried while the credential remains current. Rotation retains earlier public pins and disables the older credential. Pending unreconciled deliveries require review before rotation or recovery. Revocation blocks new pulls and receipts. Neither the Core request handler nor the WordPress pull caller is registered in a live application.
+
+## Schema and rollback boundary
+
+`lib/platform/wordpress-delivery/0016_wordpress_delivery.sql` is an opt-in adapter schema exercised in a disposable PostgreSQL database. It is outside the hosted bootstrap journal because that journal and its ownership and recovery contracts are pinned to 16 migrations. The adapter schema requires the existing canonical and site-content tables in the intended search path. Production schema ownership, grants, migration sequencing, backup and recovery need review before enrollment. No hosted migration was applied.
+
+Before any hosted schema rollout, code rollback can simply disable the adapter. After enrollment, preserve the registry, key history, exact envelopes and audit when disabling service. Do not drop the tables, rewind WordPress state or replay old credentials as a rollback procedure.
+
+## Consolidated local acceptance
+
+Set `WORDPRESS_TEST_PG_BIN` to the PostgreSQL 18 binary directory and run `npm run test:wordpress-delivery`. On Windows this passed using Node 24, PHP 8.3 with Sodium and a freshly created disposable PostgreSQL 18 cluster. The gate ran TypeScript checking, 337 repository tests, seven synthetic transport tests, seven PHP lints, eight PHP suites, Node-to-PHP signature compatibility and one durable Core/PHP integration suite. The PHP suites include corrupt-state recovery and a two-process stage/activation lock regression. Windows verified lock creation. The POSIX 0600 assertion requires the Linux CI gate. WordPress HTTP functions are stubbed in the integration test, which exercises real PHP signature verification and storage and sends captured authenticated headers to the real Core handler.
+
+## Next milestone
+
+Implement and review production operator identity, current publishable projection and release approval authority. Then review the adapter migration and grants, provision scoped credentials and mount the Core and WordPress entry points for an isolated HTTPS private-stage rehearsal. Require evidence from that rehearsal before considering activation or publication.
