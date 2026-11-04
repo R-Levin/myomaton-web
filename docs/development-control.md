@@ -455,6 +455,12 @@ Development branch also contains a source-only hardening edit in `class-miopages
 
 **Next boundary:** Add a targeted test to assert mode 0600 on newly created `.release.lock` (where POSIX filesystem mode can be observed). Then lint and rerun local suites before packaging and deploying a version-bumped WordPress plugin on the protected test host. Do not claim a production-ready signer or public publication capability. Already-staged hosted synthetic object remains inactive and private.
 
+## Dedicated lock-file permission regression added — November 4, 2026
+
+**Source committed, execution pending:** `wordpress/miopages-delivery/tests/lock-permissions-smoke.php` creates its own random temporary store, calls the store read-only status method (thereby creating the advisory lock), and verifies the lock is a regular zero-byte file while no active marker or objects folder exists. On **Linux**, it checks POSIX mode bits are exactly `0600` and fails otherwise. On **Windows**, it reports that POSIX mode is **not verified** because NTFS ACLs rather than Unix mode bits govern access. It does not use any real WP installation or live staging path. This augments earlier passing release-staging and private-staging smoke suites.
+
+**Next operator step:** `git pull --ff-only`, then run `php -l .\\wordpress\\miopages-delivery\\tests\\lock-permissions-smoke.php` and `php .\\wordpress\\miopages-delivery\\tests\\lock-permissions-smoke.php` on Windows. Require PASS for lock creation and explicit acknowledgement that Linux permission behavior remains untested. After local checks, transfer **only this isolated test file** (and a reviewed copy of the current release-store class or plugin packaging) for a 20i PHP CLI Linux mode check in a synthetic temporary directory, with no interaction with existing staged releases. Do not claim Linux permission PASS or deploy plugin hardening until that gate is completed.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
