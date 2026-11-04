@@ -523,6 +523,10 @@ Reviewed actual `lib/platform/content-editing/releases.ts`, `release.ts`, canoni
 
 **Next substantive Batch 1 work:** replace synthetic-only evidence input with a real centrally validated release entitlement that reads durable, operator-approved canonical release history; implement installation enrollment/revocation storage and secure pull transport with exact stage receipt reconciliation. Do not weaken existing development-only release boundary or enable publication. Keep WP v0.0.6 unchanged until reviewed deployable components and tests are complete, then one batch deployment.
 
+## Latest Batch 1 automated gate PASS — November 4, 2026
+
+GitHub Actions workflow run `41889067645` at commit `863eb96e4cd61dffdaeabe8e0aad49e4e4c51927` completed with conclusion **success**. The workflow includes the new synthetic Core enrollment/issuer/receipt suite and authenticated-pull/replay suite, plus consolidated PHP staging and Node-to-PHP verifier tests. Earlier transient failed runs were from an overly narrow test error-message expectation after adding stricter digest rejection; that test was corrected. CI success is for synthetic/offline code only, not real central approval credentials, live network pull, WordPress activation or 100+ capacity. Latest source is committed to the active development branch, not deployed.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
