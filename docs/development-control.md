@@ -332,6 +332,12 @@ Next: plan a bounded concurrency and interrupted-operation recovery proof before
 
 **Upcoming major milestone:** privately stage a canonical-authorized signed test release in WordPress, with verified installation-scoped public-key enrollment, safe storage and an end-to-end no-publication rejection/acceptance rehearsal. Controlled public activation/rollback is a **subsequent** milestone. Crash durability and PHP-FPM/CLI differences require further review even after a CLI concurrency PASS.
 
+## SSH option confirmed for 20i miopages.org — 2026-11-04
+
+**User-reported:** The SSH Access feature is visible for the `miopages.org` package in 20i. This confirms the hosting panel offers the feature, **not** that it is activated, credentials are configured, CLI PHP permits `proc_open`, or the hosted concurrency proof has run.
+
+**Next bounded user action:** From Windows repo, `git pull --ff-only` and `php -l scripts/wordpress-host-filesystem-recovery-proof.php`. Then inspect 20i SSH Access activation/connection options without sharing passwords, private SSH keys or account secrets. Prefer key-based authentication if supported. Do not upload/execute the script or change WordPress content until syntax review and SSH access are verified. See `docs/wordpress-host-cli-recovery-proof.md`.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
