@@ -449,6 +449,12 @@ User verified the hosted synthetic release SHA256 matches the staging receipt, d
 
 Development branch also contains a source-only hardening edit in `class-miopages-release-store.php`: after acquiring the file lock, operations call `chmod(..., 0600)` and refuse when hardening fails. This edit has **not been validated locally or deployed**, so the installed v0.0.5 code remains as previously tested. Next action: pull branch, lint the store and run offline release-staging and private-staging smoke tests; only then consider a plugin upgrade. Real central signing authority, publishing, rollback and 100+ tenant loading remain open gates.
 
+## Lock permission hardening local regressions passed — November 4, 2026
+
+**User-reported Windows PowerShell results after pulling branch:** `php -l wordpress/miopages-delivery/includes/class-miopages-release-store.php` found no syntax errors. `release-staging-smoke.php` PASS (immutable signed staging, retry/tamper rejection, activation ordering, forward restoration, corrupt state refusal). `private-staging-smoke.php` PASS (signed synthetic staging, tenant refusal, no activation or publication). These validate existing regression coverage for the store's new chmod(0600) under lock, **not** a dedicated assertion of newly created lock-file mode or a hosted deployment.
+
+**Next boundary:** Add a targeted test to assert mode 0600 on newly created `.release.lock` (where POSIX filesystem mode can be observed). Then lint and rerun local suites before packaging and deploying a version-bumped WordPress plugin on the protected test host. Do not claim a production-ready signer or public publication capability. Already-staged hosted synthetic object remains inactive and private.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
