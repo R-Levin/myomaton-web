@@ -100,3 +100,9 @@ php .\wordpress\miopages-delivery\tests\preview-smoke.php
 Once passing, package using `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery` after removing previous ZIP and verify `tar -tf`; install/update to **0.0.4** on password-protected dev `miopages.org` only. Confirm the existing visual-preview/environment pages still work and that the new probe screen says **Disabled** by default. **Do not set the private-directory constant or click Run** until the actual private directory is manually inspected and verified with 20i.
 
 This remains outside core and the signed-release store classes are still disconnected from all WordPress hooks.
+
+## v0.0.5 — disabled-by-default synthetic private staging
+
+Adds a separate **Tools → MioPages Private Staging** screen and a limited facade that uses the existing signed validator and immutable release store. The screen defaults to **Disabled** unless a separate `MIOPAGES_SYNTHETIC_STAGE_CONFIG` constant is explicitly provided through server-local configuration. The existing `MIOPAGES_PROBE_PRIVATE_DIR` constant **does not** enable staging. Even when configured, the admin can only stage signed **synthetic** content in a protected off-webroot directory; there is no activation, publishing, WordPress post import, automatic network transport or real central signer enrollment.
+
+**Do not configure signing or staging yet.** Review [synthetic private staging specification](../../docs/wordpress-private-staging-v0.1.md), including authorization boundary, separation of the test key from production keys, and the explicit local test gate before building or deploying a v0.0.5 ZIP. The existing v0.0.4 hosting diagnostics/preview remain available.
