@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MioPages Delivery (Development Proof)
  * Description: Restricted, read-only C0 fixture preview for the MioPages WordPress delivery feasibility proof.
- * Version: 0.0.4
+ * Version: 0.0.5
  * Requires PHP: 8.3
  * Text Domain: miopages-delivery
  */
@@ -14,6 +14,9 @@ if (!defined('ABSPATH')) {
 require_once __DIR__ . '/includes/class-miopages-fixture-preview.php';
 require_once __DIR__ . '/includes/class-miopages-environment-check.php';
 require_once __DIR__ . '/includes/class-miopages-filesystem-probe.php';
+require_once __DIR__ . '/includes/class-miopages-release-validator.php';
+require_once __DIR__ . '/includes/class-miopages-release-store.php';
+require_once __DIR__ . '/includes/class-miopages-private-staging.php';
 
 add_action('admin_menu', static function (): void {
     add_management_page(
@@ -177,5 +180,84 @@ function miopages_render_filesystem_probe(): void
     wp_nonce_field('miopages_run_filesystem_probe');
     echo '<input type="hidden" name="miopages_run_filesystem_probe" value="run">';
     submit_button('Run one-shot synthetic filesystem probe', 'secondary');
+    echo '</form></div>';
+}
+
+/**
+ * Synthetic-only private release staging; never exposed as a public or REST route.
+ * Deliberately no stage-to-activate controls, Cron hooks, imports, or WP writes.
+ */
+add_action('admin_menu', static function (): void {
+    add_management_page(
+        'MioPages Synthetic Staging',
+        'MioPages Private Staging',
+        'manage_options',
+        'miopages-private-staging',
+        'miopages_render_private_staging'
+    );
+});
+
+function miopages_render_private_staging(): void
+{
+    if (!current_user_can('manage_options')) {
+        wp_die(esc_html__('Permission denied.', 'miopages-delivery'));
+    }
+
+    echo '<div class="wrap"><h1>MioPages — Synthetic Private Staging</h1>';
+    echo '<p>Development-only, administrator-triggered storage for synthetic signed releases. '
+        . 'No central release signer or production enrollment is installed. '
+        . 'This screen does not activate releases, create WordPress posts, or publish web pages.</p>';
+
+    if (!defined('MIOPAGES_SYNTHETIC_STAGE_CONFIG')) {
+        echo '<p><strong>Disabled:</strong> separately enrolled synthetic test identity and '
+            . 'private staging directory have not been configured.</p></div>';
+        return;
+    }
+
+    $docRoot = isset($_SERVER['DOCUMENT_ROOT']) && is_string($_SERVER['DOCUMENT_ROOT'])
+        ? $_SERVER['DOCUMENT_ROOT'] : '';
+    $configuration = MIOPAGES_SYNTHETIC_STAGE_CONFIG;
+    $valid = MioPages_Private_Staging::checkedConfig($configuration, ABSPATH, $docRoot);
+    if (is_wp_error($valid)) {
+        echo '<p><strong>Refused:</strong> synthetic enrollment or staging directory is invalid. '
+            . 'No writes performed.</p></div>';
+        return;
+    }
+
+    $status = MioPages_Private_Staging::status($configuration, ABSPATH, $docRoot);
+    if (is_wp_error($status)) {
+        echo '<p><strong>Refused:</strong> private release store failed integrity checks. '
+            . 'Do not repeat writes until investigated.</p></div>';
+        return;
+    }
+
+    echo '<p><strong>Enabled for synthetic test releases only.</strong> '
+        . 'Public publication: disabled. Active sequence: '
+        . esc_html((string) $status['activeSequence']) . '.</p>';
+
+    if (isset($_POST['miopages_synthetic_release'])) {
+        check_admin_referer('miopages_stage_synthetic_release');
+        $input = wp_unslash($_POST['miopages_synthetic_release']);
+        if (!is_string($input) || strlen($input) > 1048576) {
+            echo '<div class="notice notice-error"><p>Invalid or oversized release envelope.</p></div>';
+        } else {
+            $result = MioPages_Private_Staging::stage($input, $configuration, ABSPATH, $docRoot);
+            if (is_wp_error($result)) {
+                echo '<div class="notice notice-error"><p>Release refused: '
+                    . esc_html($result->get_error_message()) . '</p></div>';
+            } else {
+                echo '<div class="notice notice-success"><p>Synthetic release staged privately; '
+                    . 'not activated or published. Digest: '
+                    . esc_html($result['objectSha256']) . '</p></div>';
+            }
+        }
+    }
+
+    echo '<form method="post">';
+    wp_nonce_field('miopages_stage_synthetic_release');
+    echo '<label for="miopages_synthetic_release"><strong>Signed synthetic envelope JSON</strong></label>';
+    echo '<textarea id="miopages_synthetic_release" name="miopages_synthetic_release" '
+        . 'rows="7" class="large-text code" spellcheck="false"></textarea>';
+    submit_button('Validate and stage synthetic release (no publication)', 'secondary');
     echo '</form></div>';
 }
