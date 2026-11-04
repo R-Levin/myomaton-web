@@ -387,6 +387,12 @@ This establishes basic two-process cooperative filesystem locking and rejection/
 
 **Next bounded operator step:** Package v0.0.5 using portable `tar` ZIP from the WordPress directory, replace the existing plugin on password-protected `miopages.org`, confirm version 0.0.5 and Tools → MioPages Private Staging shows **Disabled** with no `MIOPAGES_SYNTHETIC_STAGE_CONFIG` configured. Confirm existing Tools Preview/Environment/Filesystem Probe screens remain available. **Do not** configure synthetic enrollment, generate or install keys, stage any test data or publish until a separate reviewed test-issuer and private subdirectory plan is ready. Production signer and 100+ tenant load proof remain open.
 
+## Hosted WordPress v0.0.5 disabled staging screen confirmed — November 4, 2026
+
+**User-confirmed hosted UI state:** After v0.0.5 deployment to protected `miopages.org`, Tools → MioPages Private Staging displayed exactly `Disabled: separately enrolled synthetic test identity and private staging directory have not been configured.` This confirms the new admin screen is present and its default-off enrollment guard is effective. No stage/activate operation or public publication occurred. Existing other Tools screens were not reverified in this step.
+
+**Next bounded operation:** Via existing authenticated 20i SSH, create an isolated child `~/miopages-private/synthetic-staging` using `mkdir -m 700`, then verify `ls -ld` reports `drwx------`. Do not install staging enrollment constants or keys yet. Subsequently devise a synthetic-only test issuer with secret key kept off WordPress/hosted webroot/Git and a pinned public key in reviewed non-Git configuration. No central approval authorization claim is made by the synthetic signer.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
