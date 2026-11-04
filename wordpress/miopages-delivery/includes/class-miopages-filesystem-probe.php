@@ -54,7 +54,7 @@ final class MioPages_Filesystem_Probe
                 $report['Write and read'] = 'PASS';
             } else {
                 $report['Write and read'] = 'FAIL';
-                return $report;
+                return;
             }
             $handle = @fopen($lockPath, 'x+b');
             if (is_resource($handle) && @flock($handle, LOCK_EX | LOCK_NB)) {
@@ -62,14 +62,14 @@ final class MioPages_Filesystem_Probe
                 $report['Exclusive lock'] = 'PASS — single-process lock only; contention unverified';
             } else {
                 $report['Exclusive lock'] = 'FAIL';
-                return $report;
+                return;
             }
             if (@link($a, $b) && is_file($b)
                 && @file_get_contents($b) === $bytes) {
                 $report['Immutable hard link'] = 'PASS — same-filesystem hard link';
             } else {
                 $report['Immutable hard link'] = 'FAIL';
-                return $report;
+                return;
             }
             if (@file_put_contents($temp, '{"probe":"synthetic"}', LOCK_EX) === 21
                 && @rename($temp, $marker)
