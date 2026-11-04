@@ -78,3 +78,25 @@ php .\wordpress\miopages-delivery\tests\preview-smoke.php
 After those pass, create the portable ZIP with `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery` (remove the previous ZIP first), replace the plugin **only on the existing password-protected `miopages.org` development WordPress installation**, and visit Tools → MioPages Environment. Report the descriptive check results, **not** paths or credentials. Ensure Tools → MioPages Preview still renders the nonpublishable C0 v3 fixture after upgrade.
 
 **Important:** This plugin version is `0.0.3` and still does not load or invoke the offline release store/validator; those classes remain disconnected from WP activation/public serving.
+
+## v0.0.4 — manually armed one-shot **synthetic** private filesystem proof
+
+The plugin adds **Tools → MioPages Filesystem Probe**, available only to users with `manage_options`. This is disabled unless a trusted operator explicitly defines `MIOPAGES_PROBE_PRIVATE_DIR` in local, non-Git `wp-config.php` to an **existing directory outside the WordPress installation and HTTP document root**. The operator must first verify the directory is private, is owned/accessible only by the required service account, has no HTTP access and is supported by 20i hosting. Do not set this constant to `public_html`, `wp-content`, `uploads`, a publicly reachable sibling site, the account's home directory, or an arbitrary guessed directory. Never paste private paths, server credentials or key material into chat/Git.
+
+After configuration, administrator must explicitly click **Run one-shot synthetic filesystem probe** with a WordPress nonce. The probe creates a random, clearly prefixed temporary child *under that already verified private directory* and tests synthetic write/read, single-process `flock`, same-filesystem `link`, `rename`, then removes its own child and files in `finally`. It reports status text only, not full paths. A failure of cleanup requires local filesystem inspection. It **does not** run production staging, install keys, modify public pages or verify that PHP filesystem operations survive crashes; it also does not prove HTTP inaccessibility or multi-process locking on the host. The existing environment-check screen remains read-only and does not require this setting.
+
+**Local regression prerequisite** (do not upload the new ZIP unless all pass):
+
+```powershell
+git pull --ff-only
+php -l .\wordpress\miopages-delivery\miopages-delivery.php
+php -l .\wordpress\miopages-delivery\includes\class-miopages-filesystem-probe.php
+php -l .\wordpress\miopages-delivery\tests\filesystem-probe-smoke.php
+php .\wordpress\miopages-delivery\tests\filesystem-probe-smoke.php
+php .\wordpress\miopages-delivery\tests\environment-check-smoke.php
+php .\wordpress\miopages-delivery\tests\preview-smoke.php
+```
+
+Once passing, package using `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery` after removing previous ZIP and verify `tar -tf`; install/update to **0.0.4** on password-protected dev `miopages.org` only. Confirm the existing visual-preview/environment pages still work and that the new probe screen says **Disabled** by default. **Do not set the private-directory constant or click Run** until the actual private directory is manually inspected and verified with 20i.
+
+This remains outside core and the signed-release store classes are still disconnected from all WordPress hooks.
