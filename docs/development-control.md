@@ -324,6 +324,14 @@ Evidence is limited to the reported single-process hosted test. Concurrent PHP-p
 
 Next: plan a bounded concurrency and interrupted-operation recovery proof before enabling private release staging. Keep public publication disabled.
 
+## Hosted two-process recovery proof source — 2026-11-04
+
+**Source committed; no CLI execution claimed:** New `scripts/wordpress-host-filesystem-recovery-proof.php` is a standalone PHP CLI-only, synthetic filesystem test for the existing protected `miopages.org` 20i package. See [operator/recovery notes](wordpress-host-cli-recovery-proof.md). It requires execution from a directory named `miopages-private`, with a sibling `public_html`, and uses an isolated random child, two distinct PHP worker processes and cooperative file locks. The test checks one marker activation and one refused replay, abandoned temporary-write isolation, malformed test marker refusal and bounded cleanup. It never stages real signed releases, touches WP content, accesses MioPages Core or installs keys. Not deployed to hosting.
+
+**First prerequisites:** confirm **My20i → Manage Hosting → miopages.org → Security → SSH Access** is available (provider documentation states reseller hosting can use SSH, but account support remains unverified). Run local syntax check `php -l scripts/wordpress-host-filesystem-recovery-proof.php` and review before uploading anything. If 20i SSH and CLI process spawning are permitted, use a protected SSH session to run the test within the existing private sibling directory only, not the webroot. Stop on failed/missing runtime dependencies or incomplete cleanup. The existing v0.0.4 admin probe and WordPress visual preview remain as-is.
+
+**Upcoming major milestone:** privately stage a canonical-authorized signed test release in WordPress, with verified installation-scoped public-key enrollment, safe storage and an end-to-end no-publication rejection/acceptance rehearsal. Controlled public activation/rollback is a **subsequent** milestone. Crash durability and PHP-FPM/CLI differences require further review even after a CLI concurrency PASS.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
