@@ -405,6 +405,12 @@ This establishes basic two-process cooperative filesystem locking and rejection/
 
 **Next bounded step:** Verify the private key and public key match locally using PHP/libsodium without printing secrets or public-key contents, then review restricted server-local WordPress enrollment of **public key only** against the verified 0700 off-webroot synthetic staging directory. Do not install or transmit the secret signing key to WordPress, 20i or Git, and do not stage data until the separate synthetic issuer preparation and enrollment are confirmed. Real central authorization remains unimplemented.
 
+## Synthetic signing key consistency check PASSED — November 4, 2026
+
+**User-reported local result:** PHP/libsodium matched the 64-byte protected local synthetic Ed25519 signing secret to the decoded 32-byte public verification key, reporting `PASS: Synthetic signing keys match.` Temporary verifier script was removed by the supplied PowerShell command (removal not independently verified). No key contents were shared and no private signing key was placed on 20i or in Git.
+
+**Next bounded step:** Prepare protected WordPress server-side configuration. Find existing `public_html/wp-config.php` and create a permission-restricted backup **outside public_html**, preferably under existing off-webroot `miopages-private`. Do not put backups containing DB credentials under publicly reachable paths, print file contents, or add new enrollment constants yet. Next, insert the synthetic-only `MIOPAGES_SYNTHETIC_STAGE_CONFIG` with pinned *public* verification key and explicitly agreed synthetic identity IDs and private staging directory, with a test release using exactly matching identifiers. Do not enable real publication or import signing private key.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
