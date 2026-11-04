@@ -314,6 +314,16 @@ User separately reran `php wordpress/miopages-delivery/tests/preview-smoke.php` 
 
 **Next bounded action authorized in chat:** Run exactly one one-shot synthetic filesystem probe in protected WP admin via Tools → MioPages Filesystem Probe (path guard and config already visibly armed); report descriptive results only. Probe tests one-host write/read, nonblocking lock, hard link, rename, and cleanup in randomly named temporary child. If any result FAIL or cleanup incomplete, stop and inspect; do not blindly repeat. This is still not approved release staging, central signing enrollment or public publication.
 
+## Hosted filesystem probe results, November 4, 2026
+
+The operator reported seven successful checks from the private filesystem probe on the password-protected miopages.org WordPress development installation. The configured sibling directory is miopages-private, outside the document root; the directory was previously set to permissions 0700.
+
+Results: directory boundary PASS; temporary subdirectory creation PASS; write/read PASS; exclusive single-process lock PASS; same-filesystem hard link PASS; rename PASS; cleanup PASS. The probe reported that synthetic files were removed. Earlier, a browser request to /miopages-private/ displayed a WordPress not-found page.
+
+Evidence is limited to the reported single-process hosted test. Concurrent PHP-process locking, crash durability, comprehensive HTTP isolation and recovery remain unverified. No approved release was staged or published, and no central signing keys were installed.
+
+Next: plan a bounded concurrency and interrupted-operation recovery proof before enabling private release staging. Keep public publication disabled.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
