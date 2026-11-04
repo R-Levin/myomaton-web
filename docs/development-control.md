@@ -360,6 +360,19 @@ Next: plan a bounded concurrency and interrupted-operation recovery proof before
 
 The operator confirmed successful transfer of the isolated synthetic recovery script into the private hosting directory, and PHP 8.4 CLI syntax validation passed. The script has NOT been executed yet. Next: run it from within that private directory and record the complete PASS, FAIL, and cleanup outcome. Stop on any failure; publication and real release storage remain disabled.
 
+## Hosted concurrency and interrupted-write proof PASSED — November 4, 2026
+
+**User-reported direct 20i SSH CLI execution:** From the dedicated nonpublic WordPress sibling directory, `php wordpress-host-filesystem-recovery-proof.php` completed with:
+
+```text
+PASS: 20i CLI synthetic concurrency (one winner), orphan write isolation, corrupt marker refusal.
+NOTE: Process contention verified; crash-durable fsync and real WordPress activation remain unverified.
+```
+
+This establishes basic two-process cooperative filesystem locking and rejection/recovery inspection against synthetic test markers on the 20i SSH/PHP 8.4 CLI filesystem, building on seven earlier hosted FPM-admin filesystem checks and local signed-release tests. It is not evidence of real signing authorization, HTTP publication, FPM concurrent process equivalence, power-loss durability, network/distributed locking, full filesystem security audit, or installed release staging. No real canonical/customer content or WordPress posts were changed.
+
+**Next major milestone:** **Private signed-release staging in WordPress**, without public page effects. Plan enrollment (pinned verification public key, scoped installation identity, centrally governed signing), protected private release storage, administrator-gated stage/inspect flow, signature/tenant/approval/order validation and synthetic rejection/acceptance rehearsals. Preserve `publishable:false` C0 v3 preview fixture. Keep release signer private key entirely outside WordPress and Git. No automatic release activation/public routing until separately designed and authorized. Treat crash-durability, hosted PHP-FPM concurrency and last-known-good public serving as open gates.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
