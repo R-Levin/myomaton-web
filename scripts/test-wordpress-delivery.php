@@ -7,7 +7,7 @@ $lint = [
     'miopages-delivery.php',
     'includes/class-miopages-release-validator.php',
     'includes/class-miopages-release-store.php',
-    'includes/class-miopages-private-staging.php',
+    'includes/class-miopages-private-staging.php',\n    'tests/node-issuer-compat.php',
 ];
 $suites = [
     'tests/preview-smoke.php',
