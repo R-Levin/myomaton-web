@@ -27,6 +27,8 @@ test("synthetic authenticated pull and idempotent queued release", () => {
   assert.equal(result.installationId, installationId);
   assert.deepEqual(h.pull(pull(), now), result);
   h.queue({ installationId, releaseId, envelope, envelopeSha256 });
+  assert.throws(() => h.queue({ installationId, releaseId: "synthetic-other",
+    envelope: "tampered", envelopeSha256 }), /refused/);
   assert.throws(() => h.queue({
     installationId, releaseId, envelope: "different", envelopeSha256
   }), /conflict/);
