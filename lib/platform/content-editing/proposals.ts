@@ -12,7 +12,7 @@ import { proposalPreview } from "./proposal-preview";
 export class SiteProposalService {
   constructor(private pool: Pool, private authority: ProposalAuthority, private persistence: ProposalPersistence = localProposalPersistence) {}
   private async actor(context: unknown, operation: Permission, scope: Scope) {
-    proposalExecution(this.persistence.kind); const grant = await this.authority.authorize(context, operation, structuredClone(scope));
+    if (this.persistence.kind !== "protected-postgres") proposalExecution(this.persistence.kind); const grant = await this.authority.authorize(context, operation, structuredClone(scope));
     object(grant, ["operatorId", "authorityReference", "customer"]);
     const actor: Actor = { operatorId: text(grant.operatorId), authorityReference: text(grant.authorityReference, 300) };
     let customer: CustomerAuthority | undefined;
@@ -43,7 +43,7 @@ export class SiteProposalService {
         const body = { at: new Date().toISOString(), author: actor, page, resolved, candidate, base };
         const revision: Revision = { ...body, binding: { ...identity, digest: revisionDigest(body, identity) } };
         return append({ requestId, requestDigest: digest, action: "revise", actor, at: revision.at, revision });
-      }, { durable: this.persistence.kind === "postgres", client });
+      }, { durable: this.persistence.kind !== "local", protectedTransaction: this.persistence.kind === "protected-postgres", client });
     });
   }
   async inspect(context: unknown, id: string, selection: Scope) {
@@ -54,7 +54,7 @@ export class SiteProposalService {
         const stale = fingerprint(base) !== state.revisions.at(-1)!.binding.baseFingerprint;
         const previewMatches = state.approval !== null && fingerprint(proposalPreview(state.revisions.at(-1)!)) === state.approval.previewDigest;
         return { ...state, stale, approvalValid: state.state === "APPROVED" && !stale && previewMatches, published: false as const };
-      }, { durable: this.persistence.kind === "postgres", client });
+      }, { durable: this.persistence.kind !== "local", protectedTransaction: this.persistence.kind === "protected-postgres", client });
     });
   }
   async preview(context: unknown, expectedValue: Binding, requestId: string) {
@@ -70,7 +70,7 @@ export class SiteProposalService {
         const event = retry ?? await append({ requestId, requestDigest, action: "preview", actor, at: new Date().toISOString(), preview: { binding: expected, digest } });
         if (event.preview?.digest !== digest) throw Error("Preview renderer changed; new preview required");
         return { html, digest, event: event.hash, binding: expected };
-      }, { durable: this.persistence.kind === "postgres", client });
+      }, { durable: this.persistence.kind !== "local", protectedTransaction: this.persistence.kind === "protected-postgres", client });
     });
   }
   async approve(context: unknown, value: { binding: Binding; requestId: string; previewDigest: string; previewEvent: string; reference: string }) {
@@ -90,7 +90,7 @@ export class SiteProposalService {
         if (retry) return retry;
         const at = new Date().toISOString();
         return append({ requestId, requestDigest, action: "approve", actor, at, approval: { binding: expected, previewDigest, previewEvent, recordedBy: actor, customer: customer!, reference, at } });
-      }, { durable: this.persistence.kind === "postgres", client });
+      }, { durable: this.persistence.kind !== "local", protectedTransaction: this.persistence.kind === "protected-postgres", client });
     });
   }
   async publish(): Promise<never> { throw Error("Publication is not implemented or authorized by site proposals"); }

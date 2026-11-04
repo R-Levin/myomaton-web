@@ -18,6 +18,31 @@ require_once __DIR__ . '/includes/class-miopages-release-validator.php';
 require_once __DIR__ . '/includes/class-miopages-release-store.php';
 require_once __DIR__ . '/includes/class-miopages-private-staging.php';
 
+if (defined('WP_CLI') && WP_CLI && defined('MIOPAGES_PRIVATE_PULL') && is_array(MIOPAGES_PRIVATE_PULL)) {
+    require_once __DIR__ . '/includes/class-miopages-release-pull.php';
+    WP_CLI::add_command('miopages private-stage', static function (): void {
+        $config = MIOPAGES_PRIVATE_PULL;
+        foreach (['coreOrigin', 'credentialId', 'secretHex', 'releaseId', 'directory', 'documentRoot'] as $name) {
+            if (!is_string($config[$name] ?? null)) {
+                WP_CLI::error('Invalid private-stage configuration.');
+            }
+        }
+        if (!preg_match('/^[a-f0-9]{64}$/D', $config['secretHex']) || !is_array($config['identity'] ?? null)) {
+            WP_CLI::error('Invalid private-stage configuration.');
+        }
+        $site = wp_parse_url(home_url());
+        $origin = ($site['scheme'] ?? '') . '://' . ($site['host'] ?? '') . (isset($site['port']) ? ':' . $site['port'] : '');
+        $result = MioPages_Release_Pull::stage($config['coreOrigin'], $origin, $config['credentialId'],
+            hex2bin($config['secretHex']), $config['releaseId'], $config['identity'], $config['directory'],
+            ABSPATH, $config['documentRoot']);
+        if ($result instanceof WP_Error) {
+            WP_CLI::error('Private staging or receipt failed. Verify state before retry.');
+        }
+        WP_CLI::success('Private release staged and reconciled: ' . $result['objectSha256']);
+    });
+}
+
+
 add_action('admin_menu', static function (): void {
     add_management_page(
         'MioPages Development Preview',

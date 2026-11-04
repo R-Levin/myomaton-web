@@ -9,14 +9,16 @@ import { proposalExecution, type Candidate, type Copy, type PageProposal, type R
 
 // Local reads use a read-only snapshot; durable reads share the store transaction.
 // Neither path has a site/content writer.
-export async function proposalSnapshot<T>(pool: Pool, scope: Scope, fn: (c: PoolClient, base: Awaited<ReturnType<typeof siteBase>>) => Promise<T>, options: { durable?: boolean; client?: PoolClient } = {}) {
-  proposalExecution(options.durable ? "postgres" : "local"); const c = options.client ?? await pool.connect();
+export async function proposalSnapshot<T>(pool: Pool, scope: Scope, fn: (c: PoolClient, base: Awaited<ReturnType<typeof siteBase>>) => Promise<T>, options: { durable?: boolean; protectedTransaction?: boolean; client?: PoolClient } = {}) {
+  if (options.protectedTransaction && !options.client) throw Error("Protected proposal transaction required");
+  if (!options.protectedTransaction) proposalExecution(options.durable ? "postgres" : "local");
+  const c = options.client ?? await pool.connect();
   try {
     if (!options.client) await c.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
     const schema = (await c.query("SELECT current_schema() s")).rows[0].s;
     const isolated = /^canonical_test_[a-f0-9]{32}_intake$/.test(schema);
-    if (!isolated && !(options.durable && schema === "public" && process.env.MIOPAGES_SITE_PROPOSALS === "shared-development")) throw Error("Site proposals require isolated disposable schema or explicitly configured durable shared-development execution");
-    await c.query(`SET LOCAL search_path="${schema}"`);
+    if (!options.protectedTransaction && !isolated && !(options.durable && schema === "public" && process.env.MIOPAGES_SITE_PROPOSALS === "shared-development")) throw Error("Site proposals require isolated disposable schema or explicitly configured durable shared-development execution");
+    if (!options.protectedTransaction) await c.query(`SET LOCAL search_path="${schema}"`);
     await c.query("SET LOCAL TIME ZONE 'UTC'");
     return await fn(c, await siteBase(c, scope));
   } finally { if (!options.client) { await c.query("ROLLBACK"); c.release(); } }

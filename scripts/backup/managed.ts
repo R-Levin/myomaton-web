@@ -8,6 +8,8 @@ import { recoveryCatalog, type RecoveryCatalog } from "./catalog";
 import { native, connectionEnv, hashFile, safeFile, openRoot, type Config } from "./core";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { readManagedObject, provisionManagedObject } from "../../lib/platform/assets/local-storage";
+import { adapterSchema, operatorRole, pullRole } from "../../lib/platform/wordpress-delivery/protected-connection";
+import { allowedPrivateStageCanonicalGrant } from "../../lib/platform/wordpress-delivery/permissions";
 import { bootstrapStatus } from "../db/bootstrap";
 
 import { applyApplicationGrants, assertApplicationDefaults, allowedPrivileges, type Roles } from "./managed-permissions";
@@ -154,9 +156,20 @@ async function privileges(c: PoolClient, roles: Roles, progress?: VerificationPr
   const acl = (await c.query(`SELECT n.nspname||'.'||r.relname object,'' field,a.grantee,a.grantor,a.privilege_type,a.is_grantable FROM pg_class r JOIN pg_namespace n ON n.oid=r.relnamespace CROSS JOIN LATERAL aclexplode(r.relacl) a WHERE (n.nspname||'.'||r.relname)=ANY($1)
     UNION ALL SELECT n.nspname||'.'||r.relname,col.attname,a.grantee,a.grantor,a.privilege_type,a.is_grantable FROM pg_attribute col JOIN pg_class r ON r.oid=col.attrelid JOIN pg_namespace n ON n.oid=r.relnamespace CROSS JOIN LATERAL aclexplode(col.attacl) a WHERE (n.nspname||'.'||r.relname)=ANY($1)
     UNION ALL SELECT n.nspname||'.'||p.proname,'()',a.grantee,a.grantor,a.privilege_type,a.is_grantable FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(p.proacl) a WHERE (n.nspname||'.'||p.proname)=ANY($2)`, [[...ownership.tables, ...ownership.sequences], ownership.functions])).rows;
-  const roleRows = (await c.query("SELECT oid,rolname FROM pg_roles WHERE rolname=ANY($1)", [Object.values(roles)])).rows;
+  const roleRows = (await c.query("SELECT oid,rolname FROM pg_roles WHERE rolname=ANY($1)", [[...Object.values(roles), operatorRole, pullRole]])).rows;
   const roleName = (oid: number) => roleRows.find(r => r.oid === oid)?.rolname;
-  const edges = acl.map(a => { const name = roleName(a.grantee); assert.ok(name, "Unowned/PUBLIC application ACL grant"); assert.equal(roleName(a.grantor), roles.migration, "Unreviewed application ACL grantor"); assert.ok(name === roles.migration || a.is_grantable === false, "Application privilege delegation refused");
+  const adapterOwner = (await c.query("SELECT pg_get_userbyid(nspowner) AS owner FROM pg_namespace WHERE nspname=$1", [adapterSchema])).rows[0]?.owner;
+  // Canonical backups remain independently restorable. Verify the adapter ACL
+  // exception but preserve only canonical edges in the canonical manifest.
+  const canonicalAcl = acl.filter(edge => {
+    const role = roleName(edge.grantee);
+    if (role !== operatorRole && role !== pullRole) return true;
+    assert.ok(adapterOwner === roles.migration && roleName(edge.grantor) === roles.migration
+      && edge.is_grantable === false
+      && allowedPrivateStageCanonicalGrant(role, edge.object, edge.field, edge.privilege_type), "Unexpected private-stage canonical ACL");
+    return false;
+  });
+  const edges = canonicalAcl.map(a => { const name = roleName(a.grantee); assert.ok(name, "Unowned/PUBLIC application ACL grant"); assert.equal(roleName(a.grantor), roles.migration, "Unreviewed application ACL grantor"); assert.ok(name === roles.migration || a.is_grantable === false, "Application privilege delegation refused");
     assert.ok(a.field === "" || a.field === "()", "Column ACLs require explicit review");
     const kind = Object.entries(roles).find(([, value]) => value === name)![0] as keyof Roles;
     const type = a.field === "()" ? "FUNCTION" : ownership.sequences.includes(a.object) ? "SEQUENCE" : "TABLE";

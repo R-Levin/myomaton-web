@@ -4,7 +4,7 @@ import { createHash, generateKeyPairSync, randomBytes, randomUUID } from "node:c
 import { mkdir, mkdtemp, readFile, readdir, realpath, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { Pool } from "pg";
+import { Pool, type PoolClient } from "pg";
 import test from "node:test";
 import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
 import { mioPagesIntakeOwner } from "../../lib/platform/intake/availability";
@@ -12,7 +12,24 @@ import { disposableCluster } from "../../scripts/backup/disposable-cluster";
 import { siteReleaseFixture } from "../../scripts/site-releases/disposable";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import type { ReviewedProjection } from "../../lib/platform/wordpress-delivery/authority";
+import { integratePrivateStage } from "../../scripts/db/wordpress-private-stage";
+import { operatorRole, pullRole } from "../../lib/platform/wordpress-delivery/protected-connection";
+import { protectedOperatorServices } from "../../lib/platform/wordpress-delivery/protected-services";
+import { inspectCanonical, writeCanonical } from "../../lib/platform/canonical/writes";
 import { requestMac, WordPressDelivery } from "../../lib/platform/wordpress-delivery/service";
+
+async function initializeWordPressTestBaseline(url: string) {
+  const baseline = new Pool({ connectionString: url });
+  try {
+    await migrateWithBootstrapCompatibility(baseline);
+    const organization = randomUUID();
+    await baseline.query("INSERT INTO organizations(id,name) VALUES($1,'Synthetic intake organization')", [organization]);
+    await baseline.query("INSERT INTO web_presences(id,organization_id,name) VALUES($1,$2,'Synthetic intake presence')",
+      [mioPagesIntakeOwner.webPresenceId, organization]);
+    await baseline.query("INSERT INTO managed_sites(id,web_presence_id,name) VALUES($1,$2,'Synthetic intake site')",
+      [mioPagesIntakeOwner.managedSiteId, mioPagesIntakeOwner.webPresenceId]);
+  } finally { await baseline.end(); }
+}
 
 test("WordPress private delivery through Core evidence, durable enrollment and exact PHP receipt", { timeout: 120_000 }, async () => {
   const bin = process.env.WORDPRESS_TEST_PG_BIN;
@@ -21,16 +38,7 @@ test("WordPress private delivery through Core evidence, durable enrollment and e
     MIOPAGES_SITE_RELEASES: "disposable-operator", MIOPAGES_REVIEW_SYNTHESIS: "local-operator" });
   const cluster = await disposableCluster(bin);
   try {
-    const baseline = new Pool({ connectionString: cluster.url });
-    try {
-      await migrateWithBootstrapCompatibility(baseline);
-      const organization = randomUUID();
-      await baseline.query("INSERT INTO organizations(id,name) VALUES($1,'Synthetic intake organization')", [organization]);
-      await baseline.query("INSERT INTO web_presences(id,organization_id,name) VALUES($1,$2,'Synthetic intake presence')",
-        [mioPagesIntakeOwner.webPresenceId, organization]);
-      await baseline.query("INSERT INTO managed_sites(id,web_presence_id,name) VALUES($1,$2,'Synthetic intake site')",
-        [mioPagesIntakeOwner.managedSiteId, mioPagesIntakeOwner.webPresenceId]);
-    } finally { await baseline.end(); }
+    await initializeWordPressTestBaseline(cluster.url);
     const fixture = await siteReleaseFixture(cluster.url);
     try {
       await fixture.pool.query(await readFile("lib/platform/wordpress-delivery/0016_wordpress_delivery.sql", "utf8"));
@@ -145,6 +153,168 @@ test("WordPress private delivery through Core evidence, durable enrollment and e
         assert.equal(path.dirname(root), await realpath(tmpdir()));
         await rm(root, { recursive: true });
       }
+    } finally { await fixture.stop(); }
+  } finally { await cluster.stop(); }
+});
+
+test("Protected operator and reviewed private release with restricted PostgreSQL roles", { timeout: 120_000 }, async () => {
+  const bin = process.env.WORDPRESS_TEST_PG_BIN;
+  assert.ok(bin);
+  const cluster = await disposableCluster(bin);
+  try {
+    await initializeWordPressTestBaseline(cluster.url);
+    const fixture = await siteReleaseFixture(cluster.url);
+    try {
+      const admin = fixture.pool;
+      const password = randomBytes(32).toString("hex");
+      for (const role of [operatorRole, pullRole, "miopages_runtime", "miopages_backup"]) {
+        await admin.query(`CREATE ROLE "${role}" LOGIN PASSWORD '${password}'`);
+      }
+      await admin.query(`GRANT USAGE ON SCHEMA "${fixture.schema}" TO ${operatorRole},${pullRole}`);
+      const migrate = async () => {
+        const db = await admin.connect();
+        try {
+          await db.query("BEGIN");
+          await integratePrivateStage(db, fixture.schema);
+          await db.query("COMMIT");
+        } catch (error) { await db.query("ROLLBACK"); throw error; }
+        finally { db.release(); }
+      };
+      await migrate();
+      await migrate();
+
+      const login = (role: string) => {
+        const url = new URL(cluster.url);
+        url.username = role;
+        url.password = password;
+        return new Pool({ connectionString: url.toString(), options: `-c search_path=miopages_wp,${fixture.schema} -c timezone=UTC` });
+      };
+      const operatorDb = login(operatorRole), pullDb = login(pullRole), runtimeDb = login("miopages_runtime");
+      const boundary = (role: string) => async (db: PoolClient) => {
+        assert.equal((await db.query("SELECT session_user AS actor")).rows[0].actor, role);
+      };
+      try {
+        await assert.rejects(pullDb.query("SELECT * FROM wordpress_operator_credentials"), /permission denied/);
+        await assert.rejects(pullDb.query("UPDATE wordpress_installations SET status='active'"), /permission denied/);
+        await assert.rejects(pullDb.query("UPDATE wordpress_deliveries SET envelope='x'"), /permission denied/);
+        await assert.rejects(runtimeDb.query("SELECT * FROM miopages_wp.wordpress_private_releases"), /permission denied/);
+        await assert.rejects(operatorDb.query("UPDATE pages SET title='x'"), /permission denied/);
+        await assert.rejects(operatorDb.query("UPDATE wordpress_operator_grants SET revoked_at=NULL"), /permission denied/);
+
+        const site = { ...fixture.scope, organizationId: (await admin.query("SELECT organization_id FROM web_presences WHERE id=$1",
+          [fixture.scope.webPresenceId])).rows[0].organization_id };
+        const provision = async (permissions: string[], expires = new Date(Date.now() + 60_000)) => {
+          const id = randomUUID(), token = randomBytes(32).toString("hex");
+          await admin.query("INSERT INTO miopages_wp.wordpress_operator_credentials VALUES($1,$2,$3)",
+            [id, createHash("sha256").update(Buffer.from(token, "hex")).digest("hex"), expires]);
+          for (const permission of permissions) {
+            await admin.query(`INSERT INTO miopages_wp.wordpress_operator_grants
+              (id,operator_id,web_presence_id,managed_site_id,permission,customer) VALUES($1,$2,$3,$4,$5,$6)`,
+            [randomUUID(), id, site.webPresenceId, site.managedSiteId, permission, permission === "approve-site-proposal"
+              ? { kind: "accepted-authority", subjectId: "disposable-customer", authorityReference: "Test exact mandate" } : null]);
+          }
+          return { id, token };
+        };
+        const approver = await provision(["approve-site-proposal", "review-private-stage"]);
+        const author = await provision(["prepare-site-proposal", "preview-site-proposal"]);
+        const reviewer = await provision(["review-private-stage", "enroll", "issue"]);
+        const expired = await provision(["enroll"], new Date(0));
+        const origin = "https://core.example.test";
+        const protectedServices = protectedOperatorServices(operatorDb, boundary(operatorRole), origin);
+        await assert.rejects(protectedServices.operator.authenticate(expired.token), /authentication refused/);
+        await assert.rejects(protectedServices.operator.authorize({ operatorId: reviewer.id }, "issue", site), /authorization refused/);
+        const reviewerContext = await protectedServices.operator.authenticate(reviewer.token);
+        const authorContext = await protectedServices.operator.authenticate(author.token);
+        const approverContext = await protectedServices.operator.authenticate(approver.token);
+        await assert.rejects(protectedServices.operator.authorize(reviewerContext, "issue", { ...site, managedSiteId: randomUUID() }), /authorization refused/);
+
+        const approvePage = async (page = fixture.page) => {
+          const proposed = await protectedServices.proposals(authorContext).prepare(authorContext, randomUUID(), fixture.scope, randomUUID(), page);
+          const binding = proposed.revision!.binding;
+          const preview = await protectedServices.proposals(authorContext).preview(authorContext, binding, randomUUID());
+          const approval = await protectedServices.proposals(approverContext).approve(approverContext, {
+            binding, requestId: randomUUID(), previewDigest: preview.digest, previewEvent: preview.event, reference: "Test customer review",
+          });
+          return { site, proposalId: binding.proposalId, approvalId: approval.hash };
+        };
+        const internal = await approvePage();
+        await assert.rejects(protectedServices.review.review(reviewerContext, internal), /not approved for public projection/);
+
+        // Seed the authorized public source through the existing writer, with the
+        // disposable presence temporarily active. The adapter itself cannot write it.
+        const now = new Date().toISOString(), knowledgeId = fixture.confirmed[0].confirmation.recordId;
+        const priorKnowledge = await inspectCanonical(admin, "knowledge", site.webPresenceId, knowledgeId);
+        assert.ok(priorKnowledge);
+        await admin.query("UPDATE web_presences SET status='active' WHERE id=$1", [site.webPresenceId]);
+        try {
+          await writeCanonical(admin, { domain: "knowledge", id: knowledgeId, webPresenceId: site.webPresenceId,
+            expectedVersion: priorKnowledge.row.version, expectedFingerprint: priorKnowledge.fingerprint, responsibleIdentity: "test-public-fact-reviewer",
+            changeReason: "Disposable fixture", payload: { ...priorKnowledge.row.payload, entries: [
+              ...priorKnowledge.row.payload.entries,
+              { key: "public-fact", kind: "audience", value: "Independent businesses",
+                evidence: { sourceKind: "operator", sourceReference: "Disposable approved source", confirmation: "confirmed",
+                  visibility: "public", confirmedBy: "test-public-fact-reviewer", confirmedAt: now } },
+            ], approval: { by: "test-public-fact-reviewer", at: now, scope: "public" } } });
+        } finally { await admin.query("UPDATE web_presences SET status='inactive' WHERE id=$1", [site.webPresenceId]); }
+        const canonical = await inspectCanonical(admin, "knowledge", site.webPresenceId, knowledgeId);
+        assert.ok(canonical);
+        const page = { ...fixture.page, sections: [{ id: randomUUID(), type: "intro" as const,
+          heading: fixture.editorial("Who this is for"), text: { kind: "canonical" as const,
+            source: { domain: "knowledge" as const, recordId: knowledgeId, revision: canonical.row.version,
+              fingerprint: canonical.fingerprint, field: "public-fact" } } }] };
+        const review = await approvePage(page);
+        await assert.rejects(protectedServices.review.review(approverContext, review), /Independent/);
+        const preview = await protectedServices.review.review(reviewerContext, review);
+        assert.equal(preview.pages[0].sections[0].content.text, "Independent businesses");
+        const releaseId = randomUUID(), commit = { releaseId, projectionDigest: preview.projectionDigest };
+        await assert.rejects(protectedServices.review.review(reviewerContext, { ...review, commit: { ...commit, projectionDigest: "0".repeat(64) } }), /digest mismatch/);
+        await protectedServices.review.review(reviewerContext, { ...review, commit });
+        await protectedServices.review.review(reviewerContext, { ...review, commit });
+
+        const key = generateKeyPairSync("ed25519"), secret = randomBytes(32), credentialId = randomUUID(), installationId = randomUUID();
+        const wpOrigin = "https://wp.example.test";
+        await protectedServices.delivery.enroll(reviewerContext, { ...site, installationId, origin: wpOrigin, credentialId,
+          keyId: "private", publicKeyBase64: Buffer.from(key.publicKey.export({ format: "jwk" }).x!, "base64url").toString("base64") });
+        const issued = await protectedServices.delivery.issue(reviewerContext, installationId, releaseId, key.privateKey);
+        assert.ok(issued);
+        const handler = new WordPressDelivery(pullDb, async () => null, async id => id === credentialId ? secret : null,
+          origin, undefined, boundary(pullRole));
+        const request = (operation: string, receipt = "") => {
+          const nonce = randomBytes(16).toString("hex"), time = String(Date.now());
+          const mac = requestMac(secret, [origin, operation, installationId, wpOrigin, credentialId, releaseId, nonce, time, receipt]);
+          const headers = { origin: wpOrigin, installation: installationId, credential: credentialId, release: releaseId, nonce, time, receipt, mac };
+          return new Request(origin + "/api/wordpress-delivery/" + operation, { method: "POST",
+            headers: Object.fromEntries(Object.entries(headers).map(([k, v]) => ["X-MioPages-" + k, v])) });
+        };
+        const pulled = await handler.handle(request("pull"));
+        assert.equal(pulled.status, 200);
+        const envelope = await pulled.text();
+        const root = await realpath(await mkdtemp(path.join(tmpdir(), "miopages-wordpress-pull-")));
+        try {
+          const directory = path.join(root, "private"), webroot = path.join(root, "public");
+          await mkdir(directory, { mode: 0o700 });
+          await mkdir(webroot, { mode: 0o700 });
+          const identity = { ...site, installationId, keyId: "private",
+            publicKeyBase64: Buffer.from(key.publicKey.export({ format: "jwk" }).x!, "base64url").toString("base64") };
+          const php = spawnSync("php", ["wordpress/miopages-delivery/tests/core-pull-compat.php"], { encoding: "utf8",
+            input: JSON.stringify({ core: origin, origin: wpOrigin, credentialId, secret: secret.toString("hex"),
+              releaseId, identity, directory, webroot, envelope, digest: issued.envelopeSha256 }) });
+          assert.equal(php.status, 0, php.stderr || php.error?.message);
+          const staged = JSON.parse(php.stdout);
+          assert.equal(staged.result.state, "staged");
+          const { url, headers } = staged.requests[1];
+          assert.equal((await handler.handle(new Request(url, { method: "POST", headers }))).status, 204);
+          assert.deepEqual(await readdir(directory), [".release.lock", "objects"]);
+        } finally {
+          assert.match(path.basename(root), /^miopages-wordpress-pull-/);
+          assert.equal(path.dirname(root), await realpath(tmpdir()));
+          await rm(root, { recursive: true });
+        }
+        await admin.query("UPDATE miopages_wp.wordpress_operator_grants SET revoked_at=now() WHERE operator_id=$1 AND permission='approve-site-proposal'", [approver.id]);
+        assert.equal((await handler.handle(request("pull"))).status, 409);
+        assert.equal((await admin.query("SELECT count(*)::int n FROM pages WHERE id=$1", [page.pageId])).rows[0].n, 0);
+        assert.equal((await admin.query("SELECT count(*)::int n FROM site_content_events")).rows[0].n, 0);
+      } finally { await Promise.all([operatorDb.end(), pullDb.end(), runtimeDb.end()]); }
     } finally { await fixture.stop(); }
   } finally { await cluster.stop(); }
 });

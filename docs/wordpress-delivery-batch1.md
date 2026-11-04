@@ -1,6 +1,6 @@
 # Batch 1 — governed Core → WordPress release delivery
 
-Status: **local integration verified**. Production authority, route composition and hosting remain gated.
+Status: **local integration verified**. The subsequent protected operator and route composition is recorded in [the private-stage rehearsal handoff](wordpress-private-stage-rehearsal.md).
 Development branch: `docs/wordpress-delivery-feasibility-2026-11-02`.
 The existing v0.0.6 WordPress private staging proof remains installed; public publication is disabled.
 

@@ -533,6 +533,14 @@ Issue #6 development branch now has a disposable integration proof through priva
 
 The production authority adapter defaults to deny. No hosted schema, application routes or WordPress caller were enabled. The opt-in adapter schema and rollback constraints are recorded in [Batch 1 delivery](wordpress-delivery-batch1.md). The next milestone is reviewed production identity and publishable release authority, followed by migration and credential review and one isolated HTTPS private-stage rehearsal. Public activation is a later milestone.
 
+## Protected Core authority and WordPress rehearsal checkpoint — November 4, 2026
+
+Built on Batch 1 commit `021c1af`. The protected Core command authenticates an individual operator and requires an exact scoped grant. It reuses the durable proposal and approval ledger, records protected approval provenance in the same transaction, and records independent review of the exact WordPress projection digest. Core rederives the private release from public-scope canonical facts when issuing or serving it. The existing disposable canonical release service remains guarded.
+
+The opt-in migration and restricted PostgreSQL grants are prepared. The authenticated Core HTTPS routes and WP-CLI staging command are disabled by default. The local consolidated gate passed, including both disposable PostgreSQL/PHP integrations with exact stage reconciliation. The managed PostgreSQL 18 backup and restore regression also passed. No hosted migration, credential installation, activation or publication was performed.
+
+The next bounded operation is the single isolated HTTPS acceptance test in the [protected rehearsal handoff](wordpress-private-stage-rehearsal.md), after external identity and mandate verification, scoped role and credential provisioning, and review of adapter recovery. Preserve the canonical managed-backup boundary and verify the adapter schema against the matching canonical snapshot.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.

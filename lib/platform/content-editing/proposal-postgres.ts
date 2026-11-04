@@ -5,16 +5,31 @@ import { proposalExecution, proposalScope, type Event } from "./proposal";
 import { nextProposalEvent, replayProposal, type AppendProposalEvent, type ProposalPersistence, type ProposalStore } from "./proposal-history";
 
 export const proposalRendererIdentity = "site-proposal-section-renderer/1";
+type ProtectedBoundary = { connect(c: PoolClient): Promise<void>; appended(c: PoolClient, event: Event): Promise<void> };
 type TransactionBoundary = { beforeBegin(c: PoolClient): Promise<void>; afterBegin(c: PoolClient): Promise<void> };
+export async function readProposalState(c: PoolClient, id: string, scope: Scope, createdAt: Date) {
+  const rows = (await c.query("SELECT e.*,r.data revision_data FROM site_change_events e JOIN site_change_revisions r ON r.proposal_id=e.proposal_id AND r.revision=e.revision WHERE e.proposal_id=$1 ORDER BY e.sequence", [id])).rows;
+  const events = rows.map(row => {
+    const event = { ...row.data, ...(row.operation === "revise" ? { revision: row.revision_data } : {}) } as Event;
+    if (event.hash !== row.digest || event.sequence !== row.sequence || event.requestId !== row.request_id || event.requestDigest !== row.request_digest || event.action !== row.operation) throw Error("Durable proposal event differs from stored identity");
+    return event;
+  });
+  const state = replayProposal(id, scope, events);
+  if (!events.length || createdAt.toISOString() !== state.createdAt) throw Error("Incomplete durable proposal identity/history");
+  return state;
+}
+
 export class PostgresProposalPersistence implements ProposalPersistence {
-  readonly kind = "postgres" as const;
-  constructor(private pool: Pool, private boundary?: TransactionBoundary) {}
-  open(id: string, scope: Scope): ProposalStore { return new PostgresProposalStore(this.pool, uuid(id), proposalScope(scope), this.boundary); }
+  readonly kind: "postgres" | "protected-postgres";
+  constructor(private pool: Pool, private boundary?: TransactionBoundary, private protectedBoundary?: ProtectedBoundary) {
+    this.kind = protectedBoundary ? "protected-postgres" : "postgres";
+  }
+  open(id: string, scope: Scope): ProposalStore { return new PostgresProposalStore(this.pool, uuid(id), proposalScope(scope), this.boundary, this.protectedBoundary); }
 }
 class PostgresProposalStore implements ProposalStore {
-  constructor(private pool: Pool, private id: string, private scope: Scope, private boundary?: TransactionBoundary) {}
+  constructor(private pool: Pool, private id: string, private scope: Scope, private boundary?: TransactionBoundary, private protectedBoundary?: ProtectedBoundary) {}
   async locked<T>(create: boolean, fn: Parameters<ProposalStore["locked"]>[1]): Promise<T> {
-    proposalExecution("postgres");
+    if (!this.protectedBoundary) proposalExecution("postgres");
     for (let attempt = 0; ; attempt++) {
       const c = await this.pool.connect();
       try {
@@ -26,20 +41,15 @@ class PostgresProposalStore implements ProposalStore {
         // Utility LOCK commands run before the first snapshot-bearing SELECT.
         // Only the separate disposable release service supplies this boundary.
         await this.boundary?.afterBegin(c);
+        await this.protectedBoundary?.connect(c);
         const schema = (await c.query("SELECT current_schema() s")).rows[0].s;
-        if (!/^canonical_test_[a-f0-9]{32}_intake$/.test(schema) && !(schema === "public" && process.env.MIOPAGES_SITE_PROPOSALS === "shared-development")) throw Error("Durable proposals require disposable schema or explicit shared-development execution");
-        await c.query(`SET LOCAL search_path="${schema}"`);
-        const identity = (await c.query("SELECT * FROM site_change_proposals WHERE id=$1 FOR UPDATE", [this.id])).rows[0];
+        if (!this.protectedBoundary && !/^canonical_test_[a-f0-9]{32}_intake$/.test(schema) && !(schema === "public" && process.env.MIOPAGES_SITE_PROPOSALS === "shared-development")) throw Error("Durable proposals require disposable schema or explicit shared-development execution");
+        if (!this.protectedBoundary) await c.query(`SET LOCAL search_path="${schema}"`);
+        const identity = (await c.query("SELECT * FROM site_change_proposals WHERE id=$1" + (this.protectedBoundary ? "" : " FOR UPDATE"), [this.id])).rows[0];
         if (!identity && !create) throw Error("Missing proposal");
         if (identity && (identity.web_presence_id !== this.scope.webPresenceId || identity.managed_site_id !== this.scope.managedSiteId)) throw Error("Foreign proposal scope");
-        const rows = identity ? (await c.query("SELECT e.*,r.data revision_data FROM site_change_events e JOIN site_change_revisions r ON r.proposal_id=e.proposal_id AND r.revision=e.revision WHERE e.proposal_id=$1 ORDER BY e.sequence", [this.id])).rows : [];
-        const events = rows.map(row => {
-          const event = { ...row.data, ...(row.operation === "revise" ? { revision: row.revision_data } : {}) } as Event;
-          if (event.hash !== row.digest || event.sequence !== row.sequence || event.requestId !== row.request_id || event.requestDigest !== row.request_digest || event.action !== row.operation) throw Error("Durable proposal event differs from stored identity");
-          return event;
-        });
-        const state = replayProposal(this.id, this.scope, events);
-        if (identity && (!events.length || identity.created_at.toISOString() !== state.createdAt)) throw Error("Incomplete durable proposal identity/history");
+        const state = identity ? await readProposalState(c, this.id, this.scope, identity.created_at) : replayProposal(this.id, this.scope, []);
+        const events = state.events;
         const append: AppendProposalEvent = async value => {
           const next = nextProposalEvent(state, value); replayProposal(this.id, this.scope, [...events, next]);
           const revision = next.revision ?? state.revisions.at(-1); if (!revision) throw Error("Proposal revision required");
@@ -53,6 +63,7 @@ class PostgresProposalStore implements ProposalStore {
           const a = next.approval;
           await c.query(`INSERT INTO site_change_events(proposal_id,sequence,request_id,request_digest,operation,revision,proposal_digest,base_fingerprint,previous,digest,preview_digest,preview_event,renderer,actor,authority_reference,customer,approval_reference,at,data)
             VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`, [this.id, next.sequence, next.requestId, next.requestDigest, next.action, revision.binding.revision, revision.binding.digest, revision.binding.baseFingerprint, next.previous, next.hash, next.preview?.digest ?? a?.previewDigest ?? null, a?.previewEvent ?? null, next.action === "revise" ? null : proposalRendererIdentity, next.actor.operatorId, next.actor.authorityReference, a?.customer ?? null, a?.reference ?? null, next.at, data]);
+          await this.protectedBoundary?.appended(c, next);
           return next;
         };
         const result = await fn(state, append, c); await c.query("COMMIT"); return result as T;

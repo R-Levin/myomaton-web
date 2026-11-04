@@ -8,7 +8,7 @@ export interface ProposalStore {
   locked<T>(create: boolean, fn: (state: ProposalState, append: AppendProposalEvent, client?: PoolClient) => Promise<T>): Promise<T>;
 }
 export interface ProposalPersistence {
-  readonly kind: "local" | "postgres";
+  readonly kind: "local" | "postgres" | "protected-postgres";
   open(id: string, scope: Scope): ProposalStore;
 }
 export function nextProposalEvent(state: ProposalState, event: Parameters<AppendProposalEvent>[0]): Event {

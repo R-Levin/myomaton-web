@@ -31,7 +31,7 @@ const exact = (value: object, keys: string) => Object.keys(value).sort().join(",
 const text = (value: string, limit: number) =>
   typeof value === "string" && Buffer.byteLength(value) <= limit && !/[<>\x00]/.test(value);
 
-function validatePages(pages: Page[]) {
+export function validatePages(pages: Page[]) {
   const paths = new Set<string>(), pageIds = new Set<string>(), sectionIds = new Set<string>();
   if (!Array.isArray(pages) || pages.length < 1 || pages.length > 16) throw Error("Projection pages refused");
   for (const page of pages) {
