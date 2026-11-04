@@ -485,6 +485,12 @@ Next: confirm `php -l wordpress/miopages-delivery/miopages-delivery.php`, rebuil
 
 **Next bounded verification:** In WordPress Plugins → Installed Plugins, check **MioPages Delivery (Development Proof)** explicitly reports **0.0.6** active. If so, lock-file hardening integration milestone may close, anchored in the prior 20i Linux POSIX mode-0600 isolated test and local regression passes. Do not claim staged object rehash was repeated after update (previous independent on-disk hash proof remains valid unless contradicted). Public release activation, central approval, signer credential management and 100+ tenant capacity remain out of scope.
 
+## Installed plugin v0.0.6 confirmed — storage hardening milestone closed — November 4, 2026
+
+**User explicitly confirmed** WordPress Plugins → Installed Plugins reports MioPages Delivery (Development Proof) **v0.0.6** active on protected `miopages.org`. The preceding hosted Tools → MioPages Private Staging view continued to report synthetic-only enrollment enabled, active sequence **0**, and public publication **disabled**. This completes the narrow WordPress plugin lock-permission hardening deployment checkpoint, backed by hosted Linux CLI isolated new-lock `0600` PASS, Windows/local regression PASS, and the earlier independent synthetic staged-object SHA-256 integrity proof.
+
+**Next scoped milestone:** MioPages Core → WordPress centrally governed signed release delivery design and implementation. Begin by reviewing existing canonical approval/release authority and tenant-target mapping in Git; define trusted issuer enrollment, key rotation/revocation, transport provenance/idempotency and operator audit before permitting any real approval claims. Preserve synthetic-only plugin behavior and publication disabled. Do not confuse this future authorized workflow with the already successful synthetic manual staging proof. The existing broader Commercial V1 architecture and 100+ tenant readiness gate remain authoritative.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
