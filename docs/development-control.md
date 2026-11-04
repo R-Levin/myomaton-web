@@ -491,6 +491,12 @@ Next: confirm `php -l wordpress/miopages-delivery/miopages-delivery.php`, rebuil
 
 **Next scoped milestone:** MioPages Core → WordPress centrally governed signed release delivery design and implementation. Begin by reviewing existing canonical approval/release authority and tenant-target mapping in Git; define trusted issuer enrollment, key rotation/revocation, transport provenance/idempotency and operator audit before permitting any real approval claims. Preserve synthetic-only plugin behavior and publication disabled. Do not confuse this future authorized workflow with the already successful synthetic manual staging proof. The existing broader Commercial V1 architecture and 100+ tenant readiness gate remain authoritative.
 
+## Development efficiency policy for remaining WordPress delivery work — November 4, 2026
+
+**User preference / active execution direction:** Streamline remaining work to reduce redundant commands, chat turns, piecemeal plugin upgrades and time spent on narrow substeps. Preserve security, tenant isolation, and explicit acceptance evidence. Organize work into four cohesive batches: (1) canonical Core authorization + installation enrollment + secure signed-release transport; (2) controlled WordPress publication/update/rollback; (3) recovery, monitoring and operational hardening; (4) 100+ tenant scalability and end-to-end acceptance. Use automated consolidated test scripts/CI where possible, implement/review related changes together, and deploy the plugin at batch boundaries rather than on every minor change. Prefer Codex for substantial repository development; require the operator only for credentials, hosting configuration, outside-Git privileged actions, and milestone acceptance. Maintain Git-tracked continuity at meaningful checkpoints and stop on unexpected security or integrity failures.
+
+**Immediate next step:** Review existing canonical Core approval and release authority and installation targeting in repository, then implement Batch 1 as a cohesive bounded branch increment with consolidated automated tests and a single operator acceptance gate. Do not imply production signer exists already or enable public publication during Batch 1.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
