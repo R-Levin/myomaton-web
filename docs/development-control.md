@@ -467,6 +467,12 @@ User-reported local PowerShell results: syntax check for `wordpress/miopages-del
 
 Next bounded host check: create `~/miopages-private/lock-test/{tests,includes}` under the existing off-webroot 0700 directory; transfer the exact Git-tracked `tests/lock-permissions-smoke.php` and `includes/class-miopages-release-store.php` into matching relative paths, verify PHP CLI lint and run the isolated test on Linux. It creates/deletes only a random temporary store under PHP's temporary directory. Do not touch the hosted synthetic staging folder, active marker or installed WordPress plugin until this proof passes. Only then package reviewed versioned plugin update.
 
+## 20i Linux lock-file hardening PASS — November 4, 2026
+
+**Direct operator-reported SSH CLI output:** Both `includes/class-miopages-release-store.php` and isolated `tests/lock-permissions-smoke.php` passed PHP syntax checks on 20i PHP 8.4. The isolated test reported `PASS: new lock created with mode 0600 and no activation/publication state.` These files ran from a separate off-webroot `lock-test` folder, not the installed plugin or previously staged synthetic release. The Windows version of the same test passed lock creation earlier; POSIX mode was specifically verified on 20i Linux here.
+
+**Next:** The plugin header version has been incremented to **0.0.6** to package the lock-permission code hardening. This version bump has been committed but is **not yet locally retested or deployed**. Pull branch, lint plugin header, store and lock-test PHP; rerun lock, private staging, release staging, release-contract and preview suites. On PASS, rebuild ZIP with the established `tar -a` packaging procedure, replace v0.0.5 on protected `miopages.org`, then verify version 0.0.6, synthetic staging still enabled with active sequence 0 and publication disabled. Do not submit a new envelope, activate, or publish. Avoid including the local signing secret or wp-config in plugin ZIP. Review additional hosting readiness checks before wider availability.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
