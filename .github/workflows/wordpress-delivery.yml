@@ -1,0 +1,35 @@
+name: WordPress delivery offline checks
+
+on:
+  push:
+    paths:
+      - 'wordpress/miopages-delivery/**'
+      - 'scripts/test-wordpress-delivery.php'
+      - 'scripts/wordpress-cross-runtime-signature-proof.mjs'
+      - '.github/workflows/wordpress-delivery.yml'
+  pull_request:
+    paths:
+      - 'wordpress/miopages-delivery/**'
+      - 'scripts/test-wordpress-delivery.php'
+      - 'scripts/wordpress-cross-runtime-signature-proof.mjs'
+      - '.github/workflows/wordpress-delivery.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline-adapter-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: sodium
+          coverage: none
+      - name: Run all offline PHP and Node interoperability checks
+        run: php scripts/test-wordpress-delivery.php
