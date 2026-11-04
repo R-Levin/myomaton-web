@@ -1,13 +1,19 @@
 <?php
-/** One-command offline smoke tests for experimental WordPress delivery. */
+/** Consolidated offline WordPress delivery regression gate. */
 declare(strict_types=1);
-if (PHP_SAPI !== 'cli') { exit(2); }
-$base = dirname(__DIR__) . '/wordpress/miopages-delivery/';
+
+if (PHP_SAPI !== 'cli') {
+    fwrite(STDERR, "FAIL: CLI required.\n");
+    exit(2);
+}
+$root = dirname(__DIR__);
+$base = $root . '/wordpress/miopages-delivery/';
 $lint = [
     'miopages-delivery.php',
     'includes/class-miopages-release-validator.php',
     'includes/class-miopages-release-store.php',
-    'includes/class-miopages-private-staging.php',\n    'tests/node-issuer-compat.php',
+    'includes/class-miopages-private-staging.php',
+    'tests/node-issuer-compat.php',
 ];
 $suites = [
     'tests/preview-smoke.php',
@@ -20,14 +26,27 @@ $suites = [
     'tests/lock-permissions-smoke.php',
 ];
 $failures = 0;
-foreach (array_merge(array_map(static fn($p) => ['-l', $base . $p], $lint),
-                      array_map(static fn($p) => [$base . $p], $suites)) as $args) {
-    $cmd = implode(' ', array_map('escapeshellarg', array_merge([PHP_BINARY], $args)));
-    passthru($cmd, $status);
+
+$run = static function (array $args, string $label) use (&$failures): void {
+    $command = implode(' ', array_map('escapeshellarg', $args));
+    passthru($command, $status);
     if ($status !== 0) {
         $failures++;
-        echo "FAIL: " . basename(end($args)) . " status {$status}\n";
+        echo "FAIL: {$label} exited {$status}\n";
     }
+};
+
+foreach ($lint as $path) {
+    $run([PHP_BINARY, '-l', $base . $path], 'lint ' . $path);
 }
-echo $failures ? "FAIL: {$failures} checks failed.\n" : "PASS: consolidated WordPress offline regression gate.\n";
-exit($failures ? 1 : 0);
+foreach ($suites as $path) {
+    $run([PHP_BINARY, $base . $path], $path);
+}
+$run(['node', $root . '/scripts/wordpress-cross-runtime-signature-proof.mjs'],
+    'Node-to-PHP signed envelope compatibility');
+
+if ($failures > 0) {
+    echo "FAIL: consolidated WordPress offline gate ({$failures} failed checks).\n";
+    exit(1);
+}
+echo "PASS: consolidated WordPress offline gate (5 lints, 8 smoke suites, 1 Node-to-PHP compatibility test).\n";
