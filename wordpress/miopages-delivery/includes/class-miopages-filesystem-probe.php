@@ -47,7 +47,7 @@ final class MioPages_Filesystem_Probe
         $handle = null;
         $locked = false;
 
-        try {
+        $exercise = static function () use (&$report, &$handle, &$locked, $a, $b, $temp, $marker, $lockPath, $suffix): void {
             $bytes = 'MioPages synthetic filesystem probe ' . $suffix;
             if (@file_put_contents($a, $bytes, LOCK_EX) === strlen($bytes)
                 && @file_get_contents($a) === $bytes) {
@@ -78,7 +78,9 @@ final class MioPages_Filesystem_Probe
             } else {
                 $report['Atomic rename candidate'] = 'FAIL';
             }
-            return $report;
+        };
+        try {
+            $exercise();
         } finally {
             if (is_resource($handle)) {
                 if ($locked) {
@@ -96,9 +98,8 @@ final class MioPages_Filesystem_Probe
                 $complete = false;
             }
             $report['Cleanup'] = $complete ? 'PASS — synthetic files removed' : 'FAIL — manual private-directory inspection required';
-            // PHP's return in try evaluates its value before finally changes it;
-            // do not return until cleanup has completed (fixed below with one exit).
         }
+        return $report;
     }
 
     public static function safeDirectory(string $configuredDirectory, string $wordpressRoot, string $documentRoot): bool
@@ -115,11 +116,9 @@ final class MioPages_Filesystem_Probe
         $candidate = self::normal($candidate);
         $wp = self::normal($wp);
         $doc = self::normal($doc);
-        if (self::contains($wp, $candidate) || self::contains($doc, $candidate)) {
-            return false;
-        }
-        // Also refuse directories *inside* WordPress/public roots.
-        if (self::contains($candidate, $wp) || self::contains($candidate, $doc)) {
+        // Both public descendants and public ancestors are unsuitable.
+        if (self::contains($wp, $candidate) || self::contains($doc, $candidate)
+            || self::contains($candidate, $wp) || self::contains($candidate, $doc)) {
             return false;
         }
         // Reject root volumes, home/account ancestors and symbolic-link components.
