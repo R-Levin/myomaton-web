@@ -515,6 +515,14 @@ Reviewed actual `lib/platform/content-editing/releases.ts`, `release.ts`, canoni
 
 **Next:** Continue Batch 1 central trusted entitlement, proper issuer-enrollment and authenticated pull/receipts with cohesive commits and automatic CI. Do not turn off disposable-only Core authority guard, claim real production approval or deploy public publication.
 
+## Batch 1 synthetic Core entitlement and authenticated pull rehearsal — November 4, 2026
+
+**Implemented in Git development branch only (NOT deployed to WordPress/Core runtime):** `lib/platform/wordpress-delivery/synthetic-gateway.mjs` and `tests/wordpress-synthetic-gateway.test.mjs` cover explicit synthetic installation enrollment, exact matching tenant/site/installation IDs, refusal of nonpublishable source, fake authority, sequence mismatch, foreign issuer key and incorrect stage receipts. A Node Ed25519 gateway-issued envelope is checked by the actual existing PHP v1 validator (including target/replay/tamper checks). `lib/platform/wordpress-delivery/synthetic-pull.mjs` and `tests/wordpress-synthetic-pull.test.mjs` simulate installation-scoped authenticated pulls and nonce-replay/expiry/refusal, revocation and exact envelope digest checks in memory. They have **no network endpoint, real approval, durable enrollment registry, HTTP credentials, DB connection or public publication**. Production `releaseEnvironment()` restriction remains intact. This is an engineering rehearsal, not a production-ready Core delivery system.
+
+**Automated tests:** `.github/workflows/wordpress-delivery.yml` now runs both Node suites plus the consolidated existing PHP/Node offline adapter gate. GitHub Actions run `41888799759` passed for initial Node-to-PHP cross-runtime issuer test. After adding queue digest refusal, runs `41888952969` and `41888990504` failed because the prior test still expected a conflict exception rather than the earlier strict rejection; test expectation corrected in commit `863eb96e4cd61dffdaeabe8e0aad49e4e4c51927`. **Do not mark the latest CI passing unless the newest run `41889067645` completes successfully.**
+
+**Next substantive Batch 1 work:** replace synthetic-only evidence input with a real centrally validated release entitlement that reads durable, operator-approved canonical release history; implement installation enrollment/revocation storage and secure pull transport with exact stage receipt reconciliation. Do not weaken existing development-only release boundary or enable publication. Keep WP v0.0.6 unchanged until reviewed deployable components and tests are complete, then one batch deployment.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
