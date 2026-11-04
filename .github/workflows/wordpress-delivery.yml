@@ -15,7 +15,14 @@ on:
       - 'wordpress/miopages-delivery/**'
       - 'scripts/test-wordpress-delivery.php'
       - 'scripts/wordpress-cross-runtime-signature-proof.mjs'
+      - 'lib/platform/wordpress-delivery/**'
+      - 'tests/wordpress-synthetic-gateway.test.mjs'
+      - 'tests/wordpress-synthetic-pull.test.mjs'
       - '.github/workflows/wordpress-delivery.yml'
+
+concurrency:
+  group: wordpress-delivery-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
