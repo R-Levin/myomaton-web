@@ -11,7 +11,7 @@ This milestone composes Core's durable proposal, preview, approval and canonical
 
 ## Database rollout and permissions
 
-Current status: the shared-database inventory, inactive synthetic fixture and database-only rollout are complete, with all nine hosted receipts validated in [development control](development-control.md#hosted-wordpress-database-only-rollout-complete--november-5-2026). The database provisioning/migration instructions below record completed prerequisites and must not be blindly rerun. The next milestone requires separate approval for the protected HTTPS listener and temporary WordPress v0.0.7 rehearsal on the existing environments. No listener or plugin deployment is authorized by the database-only PASS.
+Current status: the shared-database inventory, inactive synthetic fixture and database-only rollout are complete, with all nine hosted receipts validated in [development control](development-control.md#hosted-wordpress-database-only-rollout-complete--november-5-2026). The database provisioning/migration instructions below record completed prerequisites and must not be blindly rerun. The owner has now separately authorized one protected HTTPS rehearsal, including the required operator/installation configuration, temporary private listener, exact proxy routes and temporary v0.0.7 plugin, subject to the preflight, exact owner approval and rollback gates below. This is rehearsal authorization only, with no public publication or canonical content changes.
 
 Review on an isolated rehearsal database with the existing 16 canonical migrations and their verified ledger. Provision dedicated `miopages_wp_operator` and `miopages_wp_pull` LOGIN roles with no provider administration flags or role memberships. They need database CONNECT and public schema USAGE, and must have no schema CREATE privileges. Use individual operator tokens in the protected command environment. Keep the pull role and its credentials out of the operator and migration provisioning workflow.
 
@@ -64,7 +64,21 @@ The report contains counts and checks without content or credentials. PASS still
 
 **20i RESELLER.** In the existing WordPress account, confirm the plugin version and the exact configured synthetic staging root. Inspect its `active.json` without calling the plugin status method, which may acquire or create a lock. Absence at the exact verified root means sequence 0. Stop for a present, unreadable, symlinked or inconsistent marker. Confirm the proposed new child under `~/miopages-private` will be owned by the WP-CLI account, mode 0700, and outside every served root or alias. Capture the logged-out access challenge and a stable authenticated page-content baseline. Confirm the exact v0.0.6 rollback package can be preserved outside the webroot.
 
+The existing Reseller account's default `php` is 8.0.30 without Sodium. Read-only inspection verified `/usr/php84/usr/bin/php` is already installed as PHP 8.4.27 with Sodium and cURL, and runs the existing WP-CLI 2.5.0 PHAR. Use this temporary shell function for the Reseller commands below; do not change PHP defaults or the site's configuration:
+
+```bash
+wp_rehearsal() {
+  /usr/php84/usr/bin/php /usr/local/bin/wp --path=/home/sites/36a/9/9fe7ae6df4/public_html "$@"
+}
+```
+
+For the authenticated HTTP baseline, the local Windows launcher is `C:\Python314\python.exe scripts/wordpress-http-baseline.py`. It uses the existing Reseller agent key, prompts for the existing HTTP Basic Auth credential, sends it only over encrypted stdin to PHP8.4, and requires two identical HTTP 200 page responses with TLS verification and redirects disabled. Only sanitized status/size/hash evidence is saved under the existing ignored `runtime-content` directory. A failed login or unstable response stops without retry, password reset or hosted writes. No PowerShell execution-policy change is required. Keep the receipt for comparison after rollback.
+
 ### 2. Approval boundary
+
+For this authorized synthetic technical run, the owner selected `rehearsal-owner-approver` (owner makes the exact approval decision) and `rehearsal-technical-reviewer` (Codex reviews the projection). These are proposed nonsecret references, not already-enrolled accounts. Provision and independently authenticate distinct random-token principals through the existing Core credential/grant tables, and report actual operator UUIDs and grant references before use. Bind every grant only to Organization `b3b46645-0364-4329-83c7-86a6ea9e56c4`, Web Presence `819d007a-595d-4374-a2f0-96b900d46559` and Managed Site `1d92a248-416f-4e22-baaf-d2f1fca70352`. Record functional separation of authenticated test principals; do not claim independent human governance, real customer identity evidence or a real customer mandate. Prepare and preview the durable candidate before requesting the owner's exact digest-bound approval. Preserve the existing different-operator review check.
+
+**Privileged routing handoff, pending provider confirmation.** The account has no `.htaccess` or account-owned proxy controls. The owner identified 20i support or a privileged operator as the route manager; no provider confirmation or scheduled change has been received yet. Request only reversible overrides on the existing `runtime.miopages.com` HTTPS vhost for exact POST paths `/api/wordpress-delivery/pull` and `/api/wordpress-delivery/receipt` to `http://127.0.0.1:8081`, preserving paths, bodies and authentication headers. Overwrite upstream Host with `runtime.miopages.com` and X-Forwarded-Proto with `https`. Disable caching and credential-header logging for these routes, preserve all other routes on port 8080, and do not expose 8081 externally. Confirm the actual provider-specific installation/removal method and responsible operator before enabling anything. This contract is a support handoff, not a claim that arbitrary proxy directives are writable from the account. Do not use application rediscovery to replace the public runtime.
 
 Review one change set naming the chosen database, synthetic fixture, role grants, recovery point, listener, proxy route and the temporary v0.0.7 replacement on the existing protected WordPress installation. The following commands are for that approved window.
 
@@ -98,16 +112,16 @@ If the provider proxy cannot reach loopback, stop and review the binding rather 
 **20i RESELLER — temporary upgrade and stage.** Preserve and verify the v0.0.6 rollback ZIP before replacing the plugin. Confirm the v0.0.7 ZIP SHA-256 is `6f25e75a4e5255cea51fc11240abb235e5950f23e23b1047ae1ddc0f2d88c5c6`. From the verified WordPress root:
 
 ```bash
-wp plugin install "$REHEARSAL_ZIP" --force
-wp plugin get miopages-delivery --field=version
+wp_rehearsal plugin install "$REHEARSAL_ZIP" --force
+wp_rehearsal plugin get miopages-delivery --field=version
 ```
 
 Require 0.0.7 and verify the existing access challenge. Provision the approved private child and supply `MIOPAGES_PRIVATE_PULL` through a protected CLI-only configuration. Pin the approved Core origin, release and installation identity, real document root and private child. WordPress receives the installation secret and public verification key only. Run twice within envelope expiry:
 
 ```bash
-wp miopages private-stage
+wp_rehearsal miopages private-stage
 # Pause for CLOUD to record the first staged_at and envelope_sha256.
-wp miopages private-stage
+wp_rehearsal miopages private-stage
 sha256sum "$REHEARSAL_STAGE_DIR/objects/$EXPECTED_ENVELOPE_SHA256.json"
 test ! -e "$REHEARSAL_STAGE_DIR/active.json" && test ! -L "$REHEARSAL_STAGE_DIR/active.json"
 ```
@@ -117,8 +131,8 @@ test ! -e "$REHEARSAL_STAGE_DIR/active.json" && test ! -L "$REHEARSAL_STAGE_DIR/
 **20i RESELLER — refusal and restore.** Repeat the same stage command and require refusal. Confirm the prior object digest, absence of the active marker, unchanged public baseline and untouched synthetic storage. Remove the temporary pull configuration and restore the preserved plugin:
 
 ```bash
-wp plugin install "$ROLLBACK_V006_ZIP" --force
-wp plugin get miopages-delivery --field=version
+wp_rehearsal plugin install "$ROLLBACK_V006_ZIP" --force
+wp_rehearsal plugin get miopages-delivery --field=version
 ```
 
 Require 0.0.6 active and the original access challenge. **20i CLOUD:** remove the temporary route, stop only the rehearsal listener, clear rehearsal credentials and verify the port-8080 Core still serves the baseline. Retain the private object, audit and recovery evidence. Stop on any mismatch or uncertain commit outcome and verify exact state before retrying. After the first successful test, close the rehearsal and return to Commercial V1, prioritizing Media-to-Publication.
