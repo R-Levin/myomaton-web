@@ -1,3 +1,5 @@
+import assert from "node:assert/strict";
+import { verifyWordPressRoles } from "./wordpress-roles";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import type { PoolClient } from "pg";
@@ -71,6 +73,68 @@ export async function integratePrivateStage(db: PoolClient, canonicalSchema = "p
   if (forbidden.rowCount) throw Error("Excess private-stage privileges");
 }
 
+export async function verifyPrivateStageAdapter(db: PoolClient) {
+  await verifyWordPressRoles(db);
+  const recorded = (await db.query("SELECT name,sha256 FROM miopages_wp.wordpress_schema_migrations ORDER BY name")).rows;
+  const expectedMigrations = await Promise.all(migrations.map(async name => ({ name, sha256: createHash("sha256")
+    .update((await readFile("lib/platform/wordpress-delivery/" + name + ".sql", "utf8")).replaceAll("\r\n", "\n")).digest("hex") })));
+  assert.deepEqual(recorded, expectedMigrations, "Private-stage migration checksum mismatch");
+  const owned = (await db.query(`SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname='miopages_wp' AND c.relkind IN ('r','p') AND pg_get_userbyid(c.relowner)=$1 ORDER BY c.relname`, [migrationRole])).rows;
+  assert.deepEqual(owned.map(row => row.relname), [...tables].sort(), "Private-stage table ownership mismatch");
+  assert.equal((await db.query("SELECT pg_get_userbyid(nspowner) AS owner FROM pg_namespace WHERE nspname='miopages_wp'")).rows[0]?.owner, migrationRole);
+  const expected = new Set<string>();
+  const add = (role: string, table: string, privilege: string, column = "") => expected.add([role, table, privilege, column].join("|"));
+  for (const role of [operatorRole, pullRole]) for (const table of privateStageSource) add(role, "public." + table, "SELECT");
+  for (const table of privateStageProposalTables) add(operatorRole, "public." + table, "INSERT");
+  add(operatorRole, "public.site_change_proposals", "UPDATE", "id");
+  for (const table of tables.filter(table => table !== "wordpress_schema_migrations")) add(operatorRole, "miopages_wp." + table, "SELECT");
+  for (const table of ["wordpress_installations", "wordpress_installation_keys", "wordpress_delivery_events",
+    "wordpress_deliveries", "wordpress_proposal_approvals", "wordpress_private_releases"]) add(operatorRole, "miopages_wp." + table, "INSERT");
+  for (const column of ["status", "generation"]) add(operatorRole, "miopages_wp.wordpress_installations", "UPDATE", column);
+  for (const table of ["wordpress_installations", "wordpress_installation_keys", "wordpress_delivery_events",
+    "wordpress_deliveries", "wordpress_request_nonces", "wordpress_operator_grants", "wordpress_private_releases",
+    "wordpress_proposal_approvals"]) add(pullRole, "miopages_wp." + table, "SELECT");
+  for (const table of ["wordpress_delivery_events", "wordpress_request_nonces"]) add(pullRole, "miopages_wp." + table, "INSERT");
+  add(pullRole, "miopages_wp.wordpress_installations", "UPDATE", "request_epoch");
+  add(pullRole, "miopages_wp.wordpress_deliveries", "UPDATE", "staged_at");
+  add(pullRole, "miopages_wp.wordpress_request_nonces", "DELETE");
+
+  const acl = (await db.query(`SELECT pg_get_userbyid(a.grantee) role,n.nspname||'.'||c.relname object,a.privilege_type privilege,
+    '' AS field,pg_get_userbyid(a.grantor) grantor,a.is_grantable
+    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(c.relacl) a
+    WHERE n.nspname IN ('public','miopages_wp') AND a.grantee=ANY(SELECT oid FROM pg_roles WHERE rolname=ANY($1))
+    UNION ALL SELECT pg_get_userbyid(a.grantee),n.nspname||'.'||c.relname,a.privilege_type,col.attname,
+      pg_get_userbyid(a.grantor),a.is_grantable FROM pg_attribute col JOIN pg_class c ON c.oid=col.attrelid
+      JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(col.attacl) a
+      WHERE n.nspname IN ('public','miopages_wp') AND col.attnum>0 AND NOT col.attisdropped
+      AND a.grantee=ANY(SELECT oid FROM pg_roles WHERE rolname=ANY($1))`, [[operatorRole, pullRole]])).rows;
+  for (const edge of acl) {
+    assert.equal(edge.grantor, migrationRole, "Unexpected adapter grantor");
+    assert.equal(edge.is_grantable, false);
+  }
+  assert.deepEqual(new Set(acl.map(edge => [edge.role, edge.object, edge.privilege, edge.field].join("|"))), expected,
+    "WordPress table/column grants differ");
+  const fn = (await db.query(`SELECT pg_get_userbyid(p.proowner) owner,p.prosecdef,
+    (SELECT array_agg(pg_get_userbyid(a.grantee)::text ORDER BY pg_get_userbyid(a.grantee)::text)
+      FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+      WHERE a.privilege_type='EXECUTE' AND a.grantee<>p.proowner) AS callers
+    FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='miopages_wp'
+      AND p.proname='wordpress_delivery_release_reference' AND pg_get_function_identity_arguments(p.oid)=''`)).rows;
+  assert.equal(fn.length, 1);
+  assert.equal(fn[0].owner, migrationRole);
+  assert.equal(fn[0].prosecdef, false);
+  assert.deepEqual(fn[0].callers, [operatorRole]);
+  for (const table of tables) {
+    const rights = (await db.query(`SELECT has_table_privilege($1,$3,'SELECT') AS backup_read,
+      has_any_column_privilege($1,$3,'INSERT,UPDATE') OR has_table_privilege($1,$3,'DELETE,TRUNCATE,REFERENCES,TRIGGER') AS backup_write,
+      has_any_column_privilege($2,$3,'SELECT,INSERT,UPDATE,REFERENCES') OR has_table_privilege($2,$3,'DELETE,TRUNCATE,TRIGGER') AS runtime_access`,
+    [backup, runtime, "miopages_wp." + table])).rows[0];
+    assert.deepEqual(rights, { backup_read: true, backup_write: false, runtime_access: false });
+  }
+  return { verified: true, privateStageMigrations: recorded.length, checksumsVerified: true, grantsVerified: true };
+}
+
 const diagnosticStages = {
   configuration: ["WP_CONFIGURATION", "Check the schema action and expected database setting."],
   connection_configuration: ["WP_CONNECTION_CONFIGURATION", "Check the role-specific URL format. Session Pooler requires port 5432, role.project-ref and sslmode=verify-full."],
@@ -125,8 +189,9 @@ async function main(stage: (value: DiagnosticStage) => void) {
   const action = process.env.MIOPAGES_WP_SCHEMA_ACTION;
   const probeRole = action === "probe-pull-session" ? pullRole : action === "probe-operator-session" ? operatorRole : null;
   const fixtureOperation = action === "create-rehearsal-fixture" ? "create" : action === "verify-rehearsal-fixture" ? "verify" : null;
+  const verifyAdapter = action === "verify-private-stage";
   const inventory = action === "inventory-private-stage";
-  if (!fixtureOperation && !inventory && !probeRole && action !== "apply-private-stage" && action !== "preflight-private-stage") {
+  if (!verifyAdapter && !fixtureOperation && !inventory && !probeRole && action !== "apply-private-stage" && action !== "preflight-private-stage") {
     throw Error("Explicit schema operation required");
   }
   const expected = process.env.MIOPAGES_WP_EXPECTED_DATABASE;
@@ -141,6 +206,15 @@ async function main(stage: (value: DiagnosticStage) => void) {
     const db = await pool.connect();
     try {
       stage("role_database_identity");
+      if (verifyAdapter) {
+        await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+        await protectedConnection(db, migrationRole, expected);
+        stage("adapter_validation");
+        const result = await verifyPrivateStageAdapter(db);
+        await db.query("ROLLBACK");
+        console.log(JSON.stringify({ ...result, readOnly: true }));
+        return;
+      }
       if (fixtureOperation) {
         if (fixtureOperation === "create" && process.env.MIOPAGES_WP_FIXTURE_APPROVAL !== "create-synthetic-rehearsal") {
           throw Error("Explicit fixture creation approval required");

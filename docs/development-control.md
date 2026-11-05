@@ -559,6 +559,12 @@ Operator-reported hosted evidence confirms C0 and both hostname bindings, 38 C0 
 
 The [guarded fixture procedure](wordpress-rehearsal-fixture.md) prepares one inactive synthetic graph, a valid activation binding and one revision-linked public Knowledge fact. It reuses the existing intake, activation, foundation and canonical writers in one transaction with an independent read-only verify command. Hosted writes have not been executed. The next approval is for this fixed fixture operation, followed by the existing restricted-role, migration and HTTPS acceptance sequence. Close the proof after acceptance and return to Commercial V1 Media-to-Publication.
 
+## Database-only rehearsal rollout approved — November 5, 2026
+
+The operator reports successful creation and independent verification of the inactive fixture. Organization b3b46645-0364-4329-83c7-86a6ea9e56c4, Web Presence 819d007a-595d-4374-a2f0-96b900d46559 and Managed Site 1d92a248-416f-4e22-baaf-d2f1fca70352 are the accepted rehearsal target. C0 and both public bindings remain preserved according to the accepted inventory.
+
+Operator approval now covers creation of only miopages_wp_operator and miopages_wp_pull, followed by adapter 0016/0017 and the reviewed grants. The [sequential database procedure](wordpress-database-rollout.md) starts with the existing managed recovery bundle and an independent verification. A dedicated two-role helper refuses existing or partial role sets, preserves the three Core roles and uses the established SCRAM and verified-TLS conventions. A new read-only verifier checks adapter migration checksums, ownership and exact grants. Hosted database setup has not been executed by Codex. WordPress replacement and Core listener changes remain outside this approval.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
