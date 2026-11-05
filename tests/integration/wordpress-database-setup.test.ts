@@ -10,7 +10,7 @@ import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
 import { provisionManagedRoles } from "../../scripts/db/managed-roles";
 import { createWordPressRoles, verifyWordPressRoles } from "../../scripts/db/wordpress-roles";
 import { integratePrivateStage, verifyPrivateStageAdapter } from "../../scripts/db/wordpress-private-stage";
-import { managedBackup, verifyManagedBundle, managedSnapshot, assertManagedEquivalent } from "../../scripts/backup/managed";
+import { managedBackup, managedBackupStages, verifyManagedBundle, managedSnapshot, assertManagedEquivalent, type ManagedBackupStage } from "../../scripts/backup/managed";
 import { hashFile } from "../../scripts/backup/core";
 
 test("two WordPress roles are created independently and adapter checksums and exact grants verify", { timeout: 120000 }, async () => {
@@ -46,8 +46,10 @@ test("two WordPress roles are created independently and adapter checksums and ex
     const backupUrl = new URL(cluster.url); backupUrl.username = roles.backup; backupUrl.password = passwords.backup;
     const assets = path.join(work, "assets"); await mkdir(assets);
     const recoveryRoot = path.join(work, "recovery");
+    const progress: ManagedBackupStage[] = [];
     const bundle = await managedBackup({ mode: "managed-postgres", root: recoveryRoot, databaseUrl: backupUrl.toString(),
-      objectsRoot: assets, pgBin: process.env.WORDPRESS_TEST_PG_BIN, repository: process.cwd(), roles });
+      objectsRoot: assets, pgBin: process.env.WORDPRESS_TEST_PG_BIN, repository: process.cwd(), roles }, stage => { progress.push(stage); });
+    assert.deepEqual(progress, managedBackupStages);
     assert.equal(bundle.state.migrations.length, 16);
     const checksum = await hashFile(path.join(recoveryRoot, "checksums.json"));
     const verified = await verifyManagedBundle(recoveryRoot);

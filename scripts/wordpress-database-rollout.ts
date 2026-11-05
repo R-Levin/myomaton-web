@@ -6,7 +6,8 @@ import { access, lstat, mkdir, open, readFile, realpath, rename } from "node:fs/
 import path from "node:path";
 import { protectedPool, verifyProtectedSession } from "../lib/platform/wordpress-delivery/protected-connection";
 import { assertBackupRoot } from "./backup/policy";
-import { hashFile } from "./backup/core";
+import { hashFile, native } from "./backup/core";
+import { managedBackupStages } from "./backup/managed";
 import { privateStageDiagnostic } from "./db/wordpress-private-stage";
 
 const exec = promisify(execFile);
@@ -15,6 +16,14 @@ export type RolloutStage = typeof rolloutStages[number];
 const roles = ["miopages_wp_operator", "miopages_wp_pull"];
 type Receipt = Record<string, unknown>;
 type Environment = Record<string, string | undefined>;
+
+export function backupErrorDetails(error: unknown) {
+  const source = error as { backupStage?: unknown; nativeExitCode?: unknown };
+  return {
+    ...(managedBackupStages.some(stage => stage === source?.backupStage) ? { backupStage: source.backupStage } : {}),
+    ...(Number.isInteger(source?.nativeExitCode) && Number(source.nativeExitCode) >= 0 && Number(source.nativeExitCode) <= 255 ? { nativeExitCode: source.nativeExitCode } : {}),
+  };
+}
 
 // Return only fixed, verified evidence. Never copy arbitrary child output to logs.
 export function checkedReceipt(stage: RolloutStage, value: Receipt): Receipt {
@@ -72,12 +81,16 @@ export function childEnvironment(parent: Environment, common: Environment, scope
 const backupCode = `
 const assert = require('node:assert/strict');
 const {managedBackup} = require('./scripts/backup/managed.ts');
+let backupStage='backup-root';
 (async()=>{
  const e=process.env;
- const bundle=await managedBackup({mode:'managed-postgres',root:e.MIOPAGES_WP_RECOVERY_ROOT,databaseUrl:e.MIOPAGES_WP_BACKUP_URL,objectsRoot:e.MIOPAGES_WP_OBJECTS_ROOT,pgBin:e.PG_BIN_DIR,repository:process.cwd(),roles:{runtime:'miopages_runtime',migration:'miopages_migration',backup:'miopages_backup'}});
+ const bundle=await managedBackup({mode:'managed-postgres',root:e.MIOPAGES_WP_RECOVERY_ROOT,databaseUrl:e.MIOPAGES_WP_BACKUP_URL,objectsRoot:e.MIOPAGES_WP_OBJECTS_ROOT,pgBin:e.PG_BIN_DIR,repository:process.cwd(),roles:{runtime:'miopages_runtime',migration:'miopages_migration',backup:'miopages_backup'}},stage=>{backupStage=stage;});
  assert.equal(bundle.state.migrations.length,16);
  console.log(JSON.stringify({recoveryPointCreated:true,bundleVerified:true,canonicalMigrations:16}));
-})().catch(error=>{console.error(JSON.stringify(require('./scripts/db/wordpress-private-stage.ts').privateStageDiagnostic('adapter_validation',error)));process.exitCode=1;});`;
+})().catch(error=>{
+ const {backupErrorDetails}=require('./scripts/wordpress-database-rollout.ts');
+ console.error(JSON.stringify({...require('./scripts/db/wordpress-private-stage.ts').privateStageDiagnostic('managed_recovery',error),...backupErrorDetails({backupStage,nativeExitCode:error?.nativeExitCode})}));process.exitCode=1;
+});`;
 const verifyCode = `
 const assert=require('node:assert/strict');
 require('./scripts/backup/managed.ts').verifyManagedBundle(process.env.MIOPAGES_WP_RECOVERY_ROOT).then(b=>{
@@ -124,7 +137,8 @@ async function main() {
     if (action === "recover") {
       assets = await realpath(required("MIOPAGES_WP_OBJECTS_ROOT")); await access(assets);
       pgBin = await realpath(required("PG_BIN_DIR"));
-      for (const tool of ["pg_dump", "pg_restore"]) assert.match((await exec(path.join(pgBin, tool), ["--version"])).stdout, /PostgreSQL\) 17\./);
+      stage = "client-validation";
+      for (const tool of ["pg_dump", "pg_restore"]) assert.match(await native(pgBin, tool, ["--version"]), /PostgreSQL\) 17\./);
     }
     const root = assertBackupRoot(required("WP_DB_RUN_ROOT"), [repository, path.join(home, "public_html"), path.join(home, ".config"),
       ...(action === "recover" ? [assets, path.dirname(pgBin)] : [])]);
@@ -145,8 +159,9 @@ async function main() {
       } catch (error) {
         // Existing CLIs have safe JSON diagnostics, but still allowlist the code.
         let code: unknown;
-        try { code = JSON.parse(String((error as { stderr?: string }).stderr ?? "").trim()).code; } catch { /* No raw output. */ }
-        throw Object.assign(new Error("Database rollout step refused or uncertain"), { code });
+        let details = {};
+        try { const parsed = JSON.parse(String((error as { stderr?: string }).stderr ?? "").trim()); code = parsed.code; details = backupErrorDetails(parsed); } catch { /* No raw output. */ }
+        throw Object.assign(new Error("Database rollout step refused or uncertain"), { code, ...details });
       }
     };
     if (action === "recover") {
@@ -234,9 +249,11 @@ async function main() {
     await saveEvidence();
     console.log(JSON.stringify({ status: "PASS", evidence: path.join(root, "database-rollout-evidence.json"), credentialsStored: true, recoveryRetained: true }));
   } catch (error) {
-    const diagnostic = privateStageDiagnostic("adapter_validation", error);
+    const diagnostic = privateStageDiagnostic(stage === "backup" || stage === "client-validation" ? "managed_recovery" : "adapter_validation", error);
     evidence.failedStage = stage; evidence.code = diagnostic.code;
-    if (stage === "backup-credential" || stage === "backup") evidence.credential = "miopages_backup: existing MioPages backup-role password";
+    evidence.detail = diagnostic.detail;
+    Object.assign(evidence, backupErrorDetails(error));
+    if (stage === "backup-credential" || stage === "backup" && ["28P01", "28000"].includes(String(diagnostic.code))) evidence.credential = "miopages_backup: existing MioPages backup-role password";
     if (stage === "migration-credential") evidence.credential = "miopages_migration: existing MioPages migration-role password";
     if (stage === "provider-credential") evidence.credential = "postgres: original Supabase project database administrator password, separate from dedicated MioPages passwords";
     evidence.requirement = "Stop. Preserve recovery and saved credentials. An uncertain write requires independent verification before any retry; never reset or recreate existing roles.";

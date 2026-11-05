@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import test from "node:test";
-import { checkedReceipt, childEnvironment, databaseSequence, rolloutStages, sessionUrl, verifiedCheckpoint, type RolloutStage } from "../scripts/wordpress-database-rollout";
+import { backupErrorDetails, checkedReceipt, childEnvironment, databaseSequence, rolloutStages, sessionUrl, verifiedCheckpoint, type RolloutStage } from "../scripts/wordpress-database-rollout";
+import { privateStageDiagnostic } from "../scripts/db/wordpress-private-stage";
+import { nativeFailure } from "../scripts/backup/core";
 
 const receipts: Record<RolloutStage, Record<string, unknown>> = {
   "backup-credential": { role: "miopages_backup", verifiedTls: true, sessionVerified: true },
@@ -85,6 +87,18 @@ test("durable recovery checkpoint remains reusable after provider failure and re
   assert.throws(() => verifiedCheckpoint(failedSetup, connection, "c".repeat(64)));
   assert.throws(() => verifiedCheckpoint({ ...failedSetup, recovery: { ...recovery, verified: false } }, connection, checksum));
   assert.throws(() => verifiedCheckpoint({ ...failedSetup, recovery: { ...recovery, gates: recovery.gates.slice(1) } }, connection, checksum));
+});
+
+test("native recovery errors cross the child boundary with safe stage and exit status only", () => {
+  const native = nativeFailure("pg_dump", { code: 127, stderr: "symbol lookup error: undefined symbol: PQmblenBounded password=private-secret" });
+  const diagnostic = { ...privateStageDiagnostic("managed_recovery", native), ...backupErrorDetails({ ...native, backupStage: "pg-dump", password: "private-secret" }) };
+  assert.equal(diagnostic.code, "PG_NATIVE_LIBRARY_MISMATCH");
+  assert.equal(diagnostic.backupStage, "pg-dump"); assert.equal(diagnostic.nativeExitCode, 127);
+  assert.equal(JSON.stringify(diagnostic).includes("private-secret"), false);
+  assert.deepEqual(backupErrorDetails({ backupStage: "private-secret", nativeExitCode: "password" }), {});
+  assert.deepEqual(backupErrorDetails({ backupStage: "pg-dump", nativeExitCode: 999 }), { backupStage: "pg-dump" });
+  assert.equal(privateStageDiagnostic("managed_recovery", Error("secret details")).code, "WP_RECOVERY_FAILED");
+  assert.match(privateStageDiagnostic("managed_recovery", { code: "ERR_ASSERTION", message: "private assertion data" }).detail, /managed recovery invariant/);
 });
 
 test("role-specific child environments exclude runtime, provider and inherited libpq credentials", () => {

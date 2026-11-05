@@ -214,28 +214,39 @@ async function snapshot(config: ManagedConfig, callback?: (c: PoolClient, state:
   try { await c.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY"); const state = await managedSnapshot(c, config.databaseUrl, config.roles); if (callback) await callback(c, state); return state; }
   finally { await c.query("ROLLBACK"); c.release(); await pool.end(); }
 }
-export async function managedBackup(config: ManagedConfig) {
+export const managedBackupStages = ["backup-root", "snapshot", "client-validation", "export-snapshot", "pg-dump", "functions", "managed-assets", "manifest", "bundle-verification"] as const;
+export type ManagedBackupStage = typeof managedBackupStages[number];
+export async function managedBackup(config: ManagedConfig, progress?: (stage: ManagedBackupStage) => void) {
   assert.equal(config.mode, "managed-postgres", "Explicit recovery mode required");
   // Reuse private-root/reparse/ACL controls, but never infer managed mode from a
   // controlled-cluster failure. A dedicated empty bundle root is required.
+  progress?.("backup-root");
   await openRoot(config, true); assert.deepEqual((await readdir(config.root)).sort(), ["backup-root.json"]);
   const archive = path.join(config.root, "application.dump");
   const objects: { owner: string; key: string; file: string; sha256: string; size: number }[] = [];
+  progress?.("snapshot");
   const state = await snapshot(config, async (c, current) => {
+    progress?.("client-validation");
     versionPolicy(current.provider.major, await binaryMajor(config.pgBin, "pg_dump"));
+    progress?.("export-snapshot");
     const token = (await c.query("SELECT pg_export_snapshot() token")).rows[0].token;
+    progress?.("pg-dump");
     await native(config.pgBin, "pg_dump", ["--no-password", "--format=custom", "--no-owner", "--no-privileges", `--snapshot=${token}`, `--file=${archive}`, ...[...ownership.tables, ...ownership.sequences].map(t => `--table=${t}`)], connectionEnv(config.databaseUrl, true));
     // pg_dump -t intentionally omits dependency functions. They are separately
     // selected by the explicit inventory, never by all of public/provider schemas.
+    progress?.("functions");
     const functions = current.semantic.functions.map(f => String(f.definition));
     await writeFile(path.join(config.root, "functions.sql"), functions.map(f => f.trimEnd() + ";\n").join("\n"), { flag: "wx", mode: 0o600 });
+    progress?.("managed-assets");
     for (const item of current.media) { const owner = String(item.web_presence_id), key = String(item.source_reference), bytes = await readManagedObject(config.objectsRoot, owner, key); await provisionManagedObject(path.join(config.root, "objects"), owner, key, bytes); const file = `objects/${owner}/${key}`; objects.push({ owner, key, file, sha256: await hashFile(await safeFile(config.root, file)), size: bytes.length }); }
   });
+  progress?.("manifest");
   await writeFile(path.join(config.root, "manifest.json"), json({ kind: "miopages-managed-recovery/1", mode: config.mode, createdAt: new Date().toISOString(), ownership, state, objects }), { flag: "wx", mode: 0o600 });
   const files = ["application.dump", "functions.sql", "manifest.json", ...objects.map(o => o.file)];
   const checksums = Object.fromEntries(await Promise.all(files.map(async f => [f, await hashFile(await safeFile(config.root, f))])));
   await writeFile(path.join(config.root, "checksums.json"), json(checksums), { flag: "wx", mode: 0o600 });
   await writeFile(path.join(config.root, "COMPLETE"), json({ checksum: await hashFile(path.join(config.root, "checksums.json")) }), { flag: "wx", mode: 0o600 });
+  progress?.("bundle-verification");
   return verifyManagedBundle(config.root);
 }
 export async function verifyManagedBundle(root: string) {

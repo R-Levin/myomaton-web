@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { mkdtemp, mkdir, writeFile, readFile, symlink, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, readFile, realpath, symlink, rm } from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
 import { assertBackupRoot, checkedRelative, contained, isDisposableSchema, pointId, retentionPlan, rootKind } from "../scripts/backup/policy";
-import { connectionEnv, safeFile, hashFile, verify, native, type Config, type Manifest } from "../scripts/backup/core";
+import { connectionEnv, safeFile, hashFile, verify, native, nativeEnvironment, nativeFailure, type Config, type Manifest } from "../scripts/backup/core";
 import { normalizedCheck, assertRecoveryEquivalent, type RecoveryCatalog } from "../scripts/backup/catalog";
 
 test("backup roots reject live/project/tool overlap, volume roots and relative paths",()=>{
@@ -74,6 +74,45 @@ test("incomplete manifests, altered checksums, archive corruption and unknown ar
 });
 test("native tool failures produce a non-success error without command/credential output",async()=>{
   await assert.rejects(native(path.join(os.tmpdir(),"missing-backup-tool"),"pg_dump",["synthetic-secret-argument"]),e=>e instanceof Error&&/pg_dump failed/.test(e.message)&&!e.message.includes("synthetic-secret-argument"));
+});
+
+test("portable Linux clients select their own libpq and eagerly bind symbols without changing TLS or parent environment", async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "backup-native-libs-"));
+  try {
+    const bin = path.join(root, "bin"), lib = path.join(root, "lib");
+    await mkdir(bin); await mkdir(lib); await writeFile(path.join(lib, "libpq.so.5"), "synthetic library fixture");
+    const parent: NodeJS.ProcessEnv = { NODE_ENV: "test", LD_LIBRARY_PATH: "/existing/libs", PGSSLMODE: "verify-full", PGSSLROOTCERT: "/trusted/ca.crt", PGPASSWORD: "synthetic-secret", PGOPTIONS: "-c default_transaction_read_only=on" };
+    const env = await nativeEnvironment(bin, "pg_dump", parent, "linux");
+    assert.equal(env.LD_LIBRARY_PATH, await realpath(lib) + ":/existing/libs");
+    assert.equal(env.LD_BIND_NOW, "1");
+    for (const key of ["PGSSLMODE", "PGSSLROOTCERT", "PGPASSWORD", "PGOPTIONS"]) assert.equal(env[key], parent[key]);
+    assert.equal(parent.LD_LIBRARY_PATH, "/existing/libs"); assert.equal(parent.LD_BIND_NOW, undefined);
+    assert.equal(await nativeEnvironment(bin, "pg_dump", parent, "win32"), parent);
+    assert.equal(await nativeEnvironment(bin, "unrelated-program", parent, "linux"), parent);
+  } finally { assert.equal(path.dirname(root), path.resolve(os.tmpdir())); await rm(root, { recursive: true }); }
+});
+
+test("system clients still eagerly bind; a bundled libpq escaping its client prefix refuses", async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "backup-native-path-"));
+  try {
+    const prefix = path.join(root, "client"), bin = path.join(prefix, "bin"), external = path.join(root, "outside");
+    await mkdir(bin, { recursive: true }); await mkdir(external); await writeFile(path.join(external, "libpq.so.5"), "fixture");
+    const parent: NodeJS.ProcessEnv = { NODE_ENV: "test" };
+    assert.deepEqual(await nativeEnvironment(bin, "pg_restore", parent, "linux"), { ...parent, LD_BIND_NOW: "1" });
+    await symlink(external, path.join(prefix, "lib"), "junction");
+    await assert.rejects(nativeEnvironment(bin, "pg_dump", parent, "linux"), (error: unknown) => (error as { code: string }).code === "PG_NATIVE_LIBRARY_PATH");
+  } finally { assert.equal(path.dirname(root), path.resolve(os.tmpdir())); await rm(root, { recursive: true }); }
+});
+
+test("native loader diagnostics retain only a safe category and numeric exit code", () => {
+  const error = nativeFailure("pg_dump", { code: 127, stderr: "pg_dump: symbol lookup error: undefined symbol: PQmblenBounded\npostgresql://secret-user:secret-password@private.example/db" });
+  assert.equal(error.code, "PG_NATIVE_LIBRARY_MISMATCH"); assert.equal(error.nativeExitCode, 127);
+  assert.equal(JSON.stringify(error).includes("secret-password"), false);
+  assert.equal(error.message.includes("private.example"), false);
+  assert.equal(nativeFailure("pg_restore", { code: "ENOENT" }).code, "PG_NATIVE_NOT_FOUND");
+  assert.equal(nativeFailure("pg_dump", { killed: true }).code, "PG_NATIVE_TIMEOUT");
+  const unknown = nativeFailure("secret-command", { code: "secret-code", stderr: "secret-output" });
+  assert.equal(unknown.code, "PG_NATIVE_FAILED"); assert.equal(unknown.message.includes("secret-command"), false);
 });
 test("artifact paths, schema exclusion and point identities are strictly bounded",()=>{
   for(const relative of ["../outside","a/../../outside","/absolute","C:/outside","a\\outside","a/..hidden"])assert.throws(()=>checkedRelative(relative));

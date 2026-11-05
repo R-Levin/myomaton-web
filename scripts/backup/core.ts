@@ -34,7 +34,38 @@ export function connectionEnv(databaseUrl: string, readOnly: boolean) {
   }
   return env;
 }
+const postgresTools = ["pg_dump", "pg_restore", "psql", "pg_ctl", "initdb"];
+// A portable client can otherwise silently load an older system libpq. Scope
+// library selection and eager symbol validation to this native child only.
+export async function nativeEnvironment(bin: string, command: string, env: NodeJS.ProcessEnv = process.env, platform: NodeJS.Platform = process.platform) {
+  if (platform !== "linux" || !postgresTools.includes(command)) return env;
+  let library: string | undefined;
+  const candidate = path.resolve(bin, "..", "lib");
+  try {
+    const resolved = await realpath(path.join(candidate, "libpq.so.5"));
+    const prefix = await realpath(path.resolve(bin, ".."));
+    assert.ok(contained(prefix, resolved), "Portable libpq must remain inside the client prefix");
+    assert.ok((await lstat(resolved)).isFile());
+    library = await realpath(candidate);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw Object.assign(Error("PostgreSQL client library path refused"), { code: "PG_NATIVE_LIBRARY_PATH" });
+  }
+  return { ...env, LD_BIND_NOW: "1", ...(library ? { LD_LIBRARY_PATH: library + (env.LD_LIBRARY_PATH ? ":" + env.LD_LIBRARY_PATH : "") } : {}) };
+}
+
+export function nativeFailure(command: string, error: unknown) {
+  const source = error as { code?: unknown; stderr?: unknown; killed?: unknown };
+  const stderr = typeof source?.stderr === "string" ? source.stderr : "";
+  const code = /symbol lookup error[^\n]*undefined symbol:/.test(stderr) || /error while loading shared libraries:/.test(stderr)
+    ? "PG_NATIVE_LIBRARY_MISMATCH" : source?.code === "ENOENT" ? "PG_NATIVE_NOT_FOUND" : source?.killed === true ? "PG_NATIVE_TIMEOUT" : "PG_NATIVE_FAILED";
+  const tool = postgresTools.includes(command) ? command : "PostgreSQL utility";
+  return Object.assign(Error(`${tool} failed; no successful backup/restore claimed (native output suppressed to protect data)`), {
+    code, ...(Number.isInteger(source?.code) && Number(source.code) >= 0 && Number(source.code) <= 255 ? { nativeExitCode: source.code as number } : {}),
+  });
+}
+
 export async function native(bin: string, command: string, args: string[], env = process.env) {
+  env = await nativeEnvironment(bin, command, env);
   const executable=path.join(bin,command+(process.platform==="win32"?".exe":""));
   if(command==="pg_ctl") {
     // A background postmaster can inherit capture pipes on Windows. Wait for the
@@ -47,7 +78,7 @@ export async function native(bin: string, command: string, args: string[], env =
     });return "";
   }
   try { return (await exec(executable, args, { env, windowsHide: true, timeout: 300000, maxBuffer: 16 * 1024 * 1024 })).stdout; }
-  catch { throw Error(`${command} failed; no successful backup/restore claimed (native output suppressed to protect data)`); }
+  catch (error) { throw nativeFailure(command, error); }
 }
 export async function safeFile(root: string, relative: string) {
   const resolved = path.join(root, checkedRelative(relative)); assert.ok(contained(root, resolved));

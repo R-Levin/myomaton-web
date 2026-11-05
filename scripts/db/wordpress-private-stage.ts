@@ -145,6 +145,7 @@ const diagnosticStages = {
   fixture_initialization: ["WP_FIXTURE_CHECK_FAILED", "Verify the fixed rehearsal fixture and baseline. Inspect committed state before any create retry."],
   shared_inventory: ["WP_INVENTORY_FAILED", "Inspect read-only inventory access and the approved graph inputs."],
   adapter_validation: ["WP_ADAPTER_VALIDATION_FAILED", "Check access to role and adapter-schema metadata."],
+  managed_recovery: ["WP_RECOVERY_FAILED", "Managed recovery failed. Preserve partial artifacts and stop before database setup."],
   migration: ["WP_MIGRATION_FAILED", "Verify migration state before retrying."],
 } as const;
 
@@ -153,6 +154,11 @@ type DiagnosticStage = keyof typeof diagnosticStages;
 // Allowlisted codes and constant descriptions only. Driver messages, assertion
 // diffs, error details and stacks can contain credentials or private data.
 const safeErrors = new Map<string, string>([
+  ["PG_NATIVE_LIBRARY_MISMATCH", "The PostgreSQL client could not load its required native library or symbols. Check its matching bundled libpq."],
+  ["PG_NATIVE_LIBRARY_PATH", "The bundled PostgreSQL client library path failed validation."],
+  ["PG_NATIVE_NOT_FOUND", "The required PostgreSQL client executable was not found."],
+  ["PG_NATIVE_TIMEOUT", "The PostgreSQL client timed out; no successful backup is claimed."],
+  ["PG_NATIVE_FAILED", "The PostgreSQL client failed. No successful backup is claimed; raw native output remains suppressed."],
   ["ENOTFOUND", "The database hostname did not resolve."],
   ["EAI_AGAIN", "DNS lookup failed temporarily."],
   ["ENETUNREACH", "The database network was unreachable."],
@@ -180,6 +186,9 @@ const safeErrors = new Map<string, string>([
 
 export function privateStageDiagnostic(stage: DiagnosticStage, error: unknown) {
   const candidate = error && typeof error === "object" && "code" in error ? error.code : undefined;
+  if (stage === "managed_recovery" && candidate === "ERR_ASSERTION") return {
+    stage, code: candidate, detail: "A managed recovery invariant failed at the reported backup stage. Preserve artifacts and verify that stage before retrying.",
+  };
   const known = typeof candidate === "string" ? safeErrors.get(candidate) : undefined;
   const [fallbackCode, fallbackDetail] = diagnosticStages[stage];
   return { stage, code: known ? candidate : fallbackCode, detail: known ?? fallbackDetail };
