@@ -4,6 +4,20 @@ Use PowerShell 2's existing SSH session on 20i CLOUD and the separate rehearsal 
 
 ## Protected configuration
 
+### Consolidated interactive launcher
+
+Use `bash scripts/wordpress-database-rollout.sh` in PowerShell 2's already authenticated **20i CLOUD** shell, from the separate rehearsal worktree at the commit containing this launcher. Do not source it. The public application's `runtime.env` is never loaded. This is the consolidated execution of steps 1–7 below, not a second provisioning path.
+
+The launcher asks for the already verified Session Pooler hostname, project reference, database name, provider-owner role, CA path, PG17 binary path and actual managed asset root. It constructs only port-5432, `verify-full`, `role.project-ref` connections. Enter the existing backup, migration and provider-owner passwords at hidden `read -s` prompts. They never enter command arguments or saved files. A blank password stops with the specific missing role, without guessing, rotation or additional provisioning. Authentication failures stop at the corresponding credential/backup gate.
+
+Approve the displayed new private off-webroot directory by typing `STORE`. The directory is created exclusively with mode 0700. After independent recovery verification and **before** any role creation, the launcher generates two distinct random passwords and durably saves only the new WordPress role credentials in `wordpress-role-credentials.json` with mode 0600, then independently reads them back. This explicit local-file approval is required. Keep that file protected for later approved use, including after a failed or ambiguous create. No existing password is persisted. If this storage method is unsuitable, stop at the approval prompt.
+
+The launcher checks the supplied migration/provider identities, creates the recovery bundle under that directory, verifies it in a fresh Node process, then uses the existing two-role and adapter commands in order. The provisioner's own recovery-equivalence gate remains mandatory. Child environments receive only their own connections; the operator and pull probes receive neither migration nor provider credentials. Temporary shell secrets are cleared on exit or interruption. No WordPress or listener operation is included.
+
+Every result must match the expected receipt, not merely exit successfully. Any error or uncertain result stops the sequence without an automatic write retry. Preserve the run directory and use the existing independent verification commands before deciding how to resume; a new run must never reset an existing role or overwrite saved credentials.
+
+`database-rollout-evidence.json` in the private run directory contains only fixed gate receipts, source commit, status and an allowlisted failure code. It contains no URLs, passwords, CA contents or raw command output. On PASS it records all eight recovery, role, migration, grant and session gates. It proves bundle integrity, not an additional restore rehearsal. Supply only its nonsecret path to Codex, which can retrieve the sanitized receipts over the established SSH connection, update `docs/development-control.md` and commit/push that checkpoint from the development repository. The launcher does not write Git from the detached hosted worktree or alter the shared public checkout. Until those receipts are collected, Git continuity must describe the launcher as prepared and the hosted gates as pending.
+
 Use the established Session Pooler host and port 5432 with verify-full, the expected database and existing CA. Keep DATABASE_URL and the public runtime environment intact.
 
 Load the following through the operator's protected secret procedure. Do not echo values or put credentials in command arguments.
