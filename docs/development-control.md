@@ -549,6 +549,10 @@ Prepared a strict Next.js ingress adapter for the protected proxy, a PostgreSQL 
 
 The next bounded action is to return sanitized protected preflight evidence for an isolated origin and database, then review the exact rollout before any hosted change. The real HTTPS stage and receipt acceptance is pending. The [rehearsal handoff](wordpress-private-stage-rehearsal.md) records the single acceptance sequence and return to Commercial V1.
 
+## Rehearsal scope refinement
+
+Reuse the existing 20i Cloud server, protected miopages.org installation and Supabase project. Keep public Core on port 8080. The next read-only gate is direct database reachability from Cloud and confirmation of safe rehearsal role visibility. The [operator procedure](wordpress-private-stage-rehearsal.md#operator-procedure-on-the-existing-20i-environments) supersedes the earlier separate WordPress installation assumption and includes restoration to v0.0.6. Return to Commercial V1 and Media-to-Publication after acceptance.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.

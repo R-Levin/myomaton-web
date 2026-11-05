@@ -25,25 +25,82 @@ The canonical managed backup verifier recognizes the exact adapter grants on can
 - Both Core entry points require `MIOPAGES_WP_PRIVATE_STAGE=enabled` and `MIOPAGES_WP_CORE_ORIGIN`. The operator process uses `MIOPAGES_WP_OPERATOR_URL` and receives the Ed25519 private key as `MIOPAGES_WP_SIGNING_KEY` only for issuance. The HTTPS pull process uses `MIOPAGES_WP_PULL_URL` and a separate 32-byte installation secret resolved from `MIOPAGES_WP_CREDENTIAL_<UUID_WITH_UNDERSCORES>` as lowercase hex. Database URLs require `sslmode=verify-full`. Keep the signer key, operator tokens and migration credentials out of the pull process and WordPress. Preserve the exact HTTPS origin through the reverse proxy and redact authentication headers.
 - WordPress registers `wp miopages private-stage` only when WP-CLI is active and protected local configuration defines `MIOPAGES_PRIVATE_PULL`. The configuration pins `coreOrigin`, `credentialId`, `secretHex`, `releaseId`, `identity`, `directory` and `documentRoot`. The installation origin comes from WordPress's configured home URL. The directory must be private and outside both the WordPress and web document roots. The command stages and reconciles only.
 
-## Read-only preflight checkpoint
+## Operator procedure on the existing 20i environments
 
-On November 4, 2026, unauthenticated HTTPS HEAD requests verified TLS for both existing 20i hosts. The Core root at runtime.miopages.com returned 200. Both Core delivery paths returned 404 to HEAD. The WordPress root at miopages.org returned 401. These results confirm edge reachability and the WordPress access challenge. They establish neither the deployed Core SHA nor the POST handler, origin forwarding, database state, WordPress checkout or staging state.
+Use the existing Cloud server, the protected miopages.org WordPress installation and the existing Supabase project. The public Core checkout at `~/public_html` and its listener on port 8080 stay in service throughout. Reuse the existing off-webroot WordPress parent directory, with a dedicated private child for this release so its objects and lock are separate from the v0.0.6 synthetic store. The operator reported Core `5b94a1d`, Node 22.23.2, and WordPress v0.0.6 with WP-CLI and Sodium. Treat these as reported baseline evidence.
 
-The previous 20i operator evidence identifies a Supabase PostgreSQL 17 session pooler, a 16-migration Core baseline and a protected WordPress v0.0.6 installation at sequence 0. Verify these independently in the operator environment. This workspace had no configured authenticated 20i or PostgreSQL session for that verification. The existing Core origin serves public content and is a baseline only. The rehearsal requires an isolated Core listener and database with no live customer data. Reuse the hosting account or package only if it can provide that separation without altering public routing.
+### 1. Read-only preflight
 
-Return the following sanitized observations from the existing operator sessions. Keep provider addresses, URLs containing credentials, paths, page bodies, identity records and tokens inside the protected environments.
+**20i CLOUD.** From the Cloud shell, use the **Direct connection** hostname shown in the existing Supabase project's Connect panel. Check DNS and TCP 5432 from the Cloud host using, for example, `getent ahosts "$REHEARSAL_DIRECT_HOST"` and `nc -vz -w 5 "$REHEARSAL_DIRECT_HOST" 5432`. With an already authorized migration login, verify TLS, database and role using a direct connection and the provider CA. Keep the URL in the protected session. From a checkout of the reviewed branch outside `~/public_html`, with dependencies already present, run:
 
-1. **20i Core.** Record the checkout SHA, whether tracked changes exist, Node major, and whether the delivery flag is unset. Confirm whether the hosting package can supply a protected rehearsal origin with a private Next.js listener. Verify its proxy can overwrite `Host` and `X-Forwarded-Proto` with the exact rehearsal host and `https`, allow only the required POST routes to the WordPress client, and redact `X-MioPages-*` headers. The Next.js ingress adapter accounts for the internal listener URL and rejects requests carrying a body, foreign host or invalid forwarding metadata.
-2. **Managed PostgreSQL.** Confirm a dedicated disposable or isolated rehearsal database and run `node --import tsx scripts/db/wordpress-private-stage.ts` with `MIOPAGES_WP_SCHEMA_ACTION=preflight-private-stage` in the existing protected migration session. Use the intended database name and direct, verified-TLS URL described above. The command uses a read-only transaction and reports exact canonical migration baseline, PG major and compatibility receipt, restricted-role prerequisites and adapter schema ownership. The historical session-pooler login is not accepted by the current protected connection guard. Confirm a reachable direct endpoint or stop for a separately reviewed session-pooler change. Confirm the fixture has a bound inactive Organization/Web Presence/Managed Site and an authorized public-scope fact. Do not change visibility or temporarily activate a live tenant to prepare it. Before issuing, approve a recovery point containing the adapter and matching canonical snapshot.
-3. **WordPress.** Confirm the installed plugin version, WP-CLI and PHP with Sodium, whether the protected pull command is disabled, and whether the dedicated 0700 off-webroot directory is owned by the CLI account and excluded from web aliases. Inspect the active marker without invoking any routine that may create a lock file. Record sequence 0 or marker absent. Confirm outbound verified HTTPS from the WordPress host to the proposed Core origin after that origin has been explicitly approved.
+```bash
+MIOPAGES_WP_SCHEMA_ACTION=preflight-private-stage \
+  node --import tsx scripts/db/wordpress-private-stage.ts
+```
 
-## Review and acceptance sequence
+Supply `MIOPAGES_WP_EXPECTED_DATABASE`, `MIOPAGES_WP_MIGRATION_URL` and, if needed, the CA PEM through `MIOPAGES_WP_DATABASE_CA`. Require 16 exact canonical migrations, the compatibility receipt on PG17, the expected restricted existing roles and migration ownership, and an absent or correctly owned adapter schema. Missing new rehearsal roles can be recorded for the approval step. Confirm a distinct local port and a temporary HTTPS route limited to the two delivery POST paths. The proxy must overwrite `Host` and `X-Forwarded-Proto`, keep the listener private and redact `X-MioPages-*` headers. Use a prebuilt compatible Linux checkout or a separately scheduled build if Cloud memory is constrained.
 
-Only after the preflight passes, approve a single rollout covering the isolated Core checkout and proxy, the adapter migration and scoped PostgreSQL grants in the isolated database, and the version 0.0.7 plugin replacement on the protected WordPress installation. For 0.0.7 the review ZIP is built from the main plugin file, includes and assets. Tests and credentials are excluded. Preserve the previous plugin package, private objects and a record of the public baseline. Enable only the rehearsal routes and command. Keep the signing key and operator tokens in the protected operator process. WordPress receives only its installation secret and public verification pin. Use distinct approver and reviewer identities, with verified scope and customer mandate.
+Keep normal Core on its existing Session Pooler URL. The current adapter supports direct connections for migration, operator and pull. The migration command can run from another approved host if direct access is available there. The pull process needs its own verified connection from Cloud. If Cloud cannot reach the direct endpoint, separately review Session Pooler **only for the rehearsal operator and pull roles**, using the dashboard's exact pooler host, port 5432 and `role.project-ref` login. Any patch must preserve certificate and hostname verification, verify the expected database plus backend `session_user` and `current_user`, prove the required search path and session advisory locks survive the pooler, and reject transaction mode and wrong roles. Keep migration and recovery on direct connections. Do not proceed with a pooler URL under the current adapter or change the live Core URL. See [Supabase connection modes](https://supabase.com/docs/guides/database/connecting-to-postgres).
 
-1. Prepare a single text-only Page on the isolated inactive site. Preview and approve the exact revision. Independently inspect and record the WordPress projection digest. Enroll one installation to the protected WordPress origin and issue sequence 1. Record release ID, issued envelope digest and expiry.
-2. Run `wp miopages private-stage` over HTTPS from the protected WordPress account. Verify the issuer digest equals the WordPress private object digest and Core's receipt. Read the exact stage timestamp and audit action under read-only access. A 2xx response alone does not establish stage success.
-3. Repeat the command within expiry. Require the same object digest and stage timestamp, one stage event and one receipt retry. Verify WordPress active sequence remains 0 and the recorded public access behavior and published page content remain unchanged.
-4. Revoke the installation, repeat the same command and confirm authentication refusal with the prior staged object and receipt intact. Disable the rehearsal entry points, retain the evidence and return to the canonical Commercial V1 roadmap.
+**Database isolation decision.** Use a distinct bound inactive synthetic Organization, Web Presence and Managed Site with an authorized public-scope fact and no hostname binding. The current grants include SELECT on shared canonical tables and allow the operator role to append to the shared proposal ledger. Use the existing database only if its relevant inventory is verified synthetic-only and the owner expressly approves those database-wide grants for these restricted service logins. The application's site grants do not constrain direct SQL by those logins. If the database contains live customer records or the grants cannot be accepted, use a separately permissioned database within the existing service where supported. A new service is unnecessary unless the existing service cannot supply the required boundary. Record the matching canonical and adapter recovery plan before rollout.
 
-Stop on any identity, role, digest, TLS, isolation or recovery mismatch. If an operation may have committed, inspect the exact release, receipt or revocation before retrying.
+**20i RESELLER.** In the existing WordPress account, confirm the plugin version and the exact configured synthetic staging root. Inspect its `active.json` without calling the plugin status method, which may acquire or create a lock. Absence at the exact verified root means sequence 0. Stop for a present, unreadable, symlinked or inconsistent marker. Confirm the proposed new child under `~/miopages-private` will be owned by the WP-CLI account, mode 0700, and outside every served root or alias. Capture the logged-out access challenge and a stable authenticated page-content baseline. Confirm the exact v0.0.6 rollback package can be preserved outside the webroot.
+
+### 2. Approval boundary
+
+Review one change set naming the chosen database, synthetic fixture, role grants, recovery point, listener, proxy route and the temporary v0.0.7 replacement on the existing protected WordPress installation. The following commands are for that approved window.
+
+**20i CLOUD — migration and listener.** On the approved direct migration connection, provision the scoped roles and synthetic fixture, take the agreed recovery point, and rerun the read-only preflight. Apply the adapter schema from the rehearsal checkout:
+
+```bash
+MIOPAGES_WP_SCHEMA_ACTION=apply-private-stage \
+  node --import tsx scripts/db/wordpress-private-stage.ts
+```
+
+Verify checksums and grants. Install only the rehearsal role credentials in their respective processes. In the isolated Core process load `MIOPAGES_WP_CORE_ORIGIN`, `MIOPAGES_WP_PULL_URL`, the CA as needed, and the installation credential. Use the approved private port and start the prebuilt application from its separate checkout:
+
+```bash
+MIOPAGES_WP_PRIVATE_STAGE=enabled \
+  npm run start -- --hostname 127.0.0.1 --port "$REHEARSAL_PORT"
+```
+
+If the provider proxy cannot reach loopback, stop and review the binding rather than exposing the listener. Confirm a bodyless unauthenticated POST to each exact HTTPS path is rejected before sending credentials.
+
+**20i CLOUD — protected operator session.** Use the separate operator-role URL, the approved Core origin and MIOPAGES_WP_PRIVATE_STAGE=enabled in the protected operator session. For each operation send a single `{token,operation,input}` object on stdin to `node --import tsx scripts/wordpress-private-operator.ts`. Supply the token interactively or through the approved secret channel, never in command arguments or a saved request file. Prepare, preview and approve the exact revision, then review the derived WordPress projection with a different operator. The input fields, in order, are:
+
+| Operation | Input keys |
+|---|---|
+| `prepare` | `scope` (Web Presence and Managed Site IDs), `proposalId`, `requestId`, `page` |
+| `preview` | returned `binding`, new `requestId` |
+| `approve` | `binding`, new `requestId`, `previewDigest`, `previewEvent`, `reference` |
+| `review` | `site` (Organization, Web Presence and Managed Site IDs), `proposalId`, `approvalId`. Repeat after inspection with `commit: {releaseId, projectionDigest}`. |
+| `enroll` | `organizationId`, `webPresenceId`, `managedSiteId`, `installationId`, `origin`, `keyId`, `publicKeyBase64`, `credentialId` |
+| `issue` | `installationId`, `releaseId`. Supply the signing key to this command only. |
+
+**20i RESELLER — temporary upgrade and stage.** Preserve and verify the v0.0.6 rollback ZIP before replacing the plugin. Confirm the v0.0.7 ZIP SHA-256 is `6f25e75a4e5255cea51fc11240abb235e5950f23e23b1047ae1ddc0f2d88c5c6`. From the verified WordPress root:
+
+```bash
+wp plugin install "$REHEARSAL_ZIP" --force
+wp plugin get miopages-delivery --field=version
+```
+
+Require 0.0.7 and verify the existing access challenge. Provision the approved private child and supply `MIOPAGES_PRIVATE_PULL` through a protected CLI-only configuration. Pin the approved Core origin, release and installation identity, real document root and private child. WordPress receives the installation secret and public verification key only. Run twice within envelope expiry:
+
+```bash
+wp miopages private-stage
+# Pause for CLOUD to record the first staged_at and envelope_sha256.
+wp miopages private-stage
+sha256sum "$REHEARSAL_STAGE_DIR/objects/$EXPECTED_ENVELOPE_SHA256.json"
+test ! -e "$REHEARSAL_STAGE_DIR/active.json" && test ! -L "$REHEARSAL_STAGE_DIR/active.json"
+```
+
+**20i CLOUD — reconcile and revoke.** Use a read-only query by installation and release ID to compare `miopages_wp.wordpress_deliveries.envelope_sha256` and `staged_at` with the private object digest and the first stage timestamp. Require one `staged` event and one `receipt-retry` event in `miopages_wp.wordpress_delivery_events`. Run protected `revoke` with the installation ID.
+
+**20i RESELLER — refusal and restore.** Repeat the same stage command and require refusal. Confirm the prior object digest, absence of the active marker, unchanged public baseline and untouched synthetic storage. Remove the temporary pull configuration and restore the preserved plugin:
+
+```bash
+wp plugin install "$ROLLBACK_V006_ZIP" --force
+wp plugin get miopages-delivery --field=version
+```
+
+Require 0.0.6 active and the original access challenge. **20i CLOUD:** remove the temporary route, stop only the rehearsal listener, clear rehearsal credentials and verify the port-8080 Core still serves the baseline. Retain the private object, audit and recovery evidence. Stop on any mismatch or uncertain commit outcome and verify exact state before retrying. After the first successful test, close the rehearsal and return to Commercial V1, prioritizing Media-to-Publication.
