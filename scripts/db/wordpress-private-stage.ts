@@ -69,7 +69,55 @@ export async function integratePrivateStage(db: PoolClient, canonicalSchema = "p
   if (forbidden.rowCount) throw Error("Excess private-stage privileges");
 }
 
-async function main() {
+const diagnosticStages = {
+  configuration: ["WP_CONFIGURATION", "Check the schema action and expected database setting."],
+  connection_configuration: ["WP_CONNECTION_CONFIGURATION", "Check the role-specific URL format. Session Pooler requires port 5432, role.project-ref and sslmode=verify-full."],
+  connection_tls: ["WP_CONNECTION_FAILED", "Check the authorized login, Session Pooler reachability and trusted CA."],
+  role_database_identity: ["WP_IDENTITY_CHECK_FAILED", "Check the backend login, effective role, expected database and backend TLS evidence."],
+  session_behavior: ["WP_SESSION_CHECK_FAILED", "The advisory lock, backend identity or session settings could not be verified across a read-only transaction and rollback."],
+  canonical_migration_baseline: ["WP_BASELINE_CHECK_FAILED", "Check the exact 16 canonical migrations, ledger access and the PG17 compatibility receipt if applicable."],
+  adapter_validation: ["WP_ADAPTER_VALIDATION_FAILED", "Check access to role and adapter-schema metadata."],
+  migration: ["WP_MIGRATION_FAILED", "Verify migration state before retrying."],
+} as const;
+
+type DiagnosticStage = keyof typeof diagnosticStages;
+
+// Allowlisted codes and constant descriptions only. Driver messages, assertion
+// diffs, error details and stacks can contain credentials or private data.
+const safeErrors = new Map<string, string>([
+  ["ENOTFOUND", "The database hostname did not resolve."],
+  ["EAI_AGAIN", "DNS lookup failed temporarily."],
+  ["ENETUNREACH", "The database network was unreachable."],
+  ["ECONNREFUSED", "The database connection was refused."],
+  ["ETIMEDOUT", "The database connection timed out."],
+  ["ECONNRESET", "The connection was reset."],
+  ["ERR_TLS_CERT_ALTNAME_INVALID", "The certificate did not match the configured hostname."],
+  ["CERT_HAS_EXPIRED", "The certificate has expired."],
+  ["UNABLE_TO_VERIFY_LEAF_SIGNATURE", "The certificate chain could not be verified."],
+  ["SELF_SIGNED_CERT_IN_CHAIN", "The certificate chain contains an untrusted self-signed certificate."],
+  ["UNABLE_TO_GET_ISSUER_CERT_LOCALLY", "The certificate issuer is not trusted."],
+  ["ERR_OSSL_PEM_NO_START_LINE", "Check that the configured CA contains valid PEM."],
+  ["28P01", "PostgreSQL rejected the supplied login credentials."],
+  ["28000", "PostgreSQL rejected the authorization request."],
+  ["3D000", "PostgreSQL rejected the requested database."],
+  ["42501", "The role lacks permission for this check."],
+  ["42704", "A required PostgreSQL object is missing."],
+  ["42P01", "A required table is missing."],
+  ["ERR_ASSERTION", "The canonical migration ledger or compatibility receipt failed validation."],
+  ["WP_BACKEND_TLS_UNVERIFIED", "The authenticated backend did not report positive TLS evidence."],
+  ["WP_ROLE_MISMATCH", "The backend session or effective role did not match the expected restricted role."],
+  ["WP_ROLE_PRIVILEGES", "The backend role has disallowed privileges or role membership."],
+  ["WP_DATABASE_MISMATCH", "The backend database did not match the expected rehearsal database."],
+]);
+
+export function privateStageDiagnostic(stage: DiagnosticStage, error: unknown) {
+  const candidate = error && typeof error === "object" && "code" in error ? error.code : undefined;
+  const known = typeof candidate === "string" ? safeErrors.get(candidate) : undefined;
+  const [fallbackCode, fallbackDetail] = diagnosticStages[stage];
+  return { stage, code: known ? candidate : fallbackCode, detail: known ?? fallbackDetail };
+}
+
+async function main(stage: (value: DiagnosticStage) => void) {
   const action = process.env.MIOPAGES_WP_SCHEMA_ACTION;
   const probeRole = action === "probe-pull-session" ? pullRole : action === "probe-operator-session" ? operatorRole : null;
   if (!probeRole && action !== "apply-private-stage" && action !== "preflight-private-stage") {
@@ -80,21 +128,27 @@ async function main() {
   const readOnly = action === "preflight-private-stage";
   const url = probeRole === pullRole ? process.env.MIOPAGES_WP_PULL_URL :
     probeRole === operatorRole ? process.env.MIOPAGES_WP_OPERATOR_URL : process.env.MIOPAGES_WP_MIGRATION_URL;
+  stage("connection_configuration");
   const pool = protectedPool(url ?? "", probeRole ?? migrationRole, process.env.MIOPAGES_WP_DATABASE_CA);
   try {
+    stage("connection_tls");
     const db = await pool.connect();
     try {
-      await verifyProtectedSession(db, probeRole ?? migrationRole, expected);
+      stage("role_database_identity");
+      await verifyProtectedSession(db, probeRole ?? migrationRole, expected, () => stage("session_behavior"));
       if (probeRole) {
         console.log(JSON.stringify({ role: probeRole, verifiedTls: true, sessionVerified: true }));
         return;
       }
       await db.query(readOnly ? "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY" : "BEGIN");
-      await protectedConnection(db, migrationRole, expected);
+      stage("role_database_identity");
+      await protectedConnection(db, migrationRole, expected, () => stage("session_behavior"));
       await db.query("SET LOCAL search_path=public");
+      stage("canonical_migration_baseline");
       const baseline = await bootstrapStatus(db);
       if (baseline.pending || baseline.applied !== 16) throw Error("Exact canonical migration baseline required");
       if (readOnly) {
+        stage("adapter_validation");
         const roles = (await db.query(`SELECT r.rolname AS role,
           r.rolcanlogin AND NOT (r.rolsuper OR r.rolbypassrls OR r.rolcreaterole OR r.rolcreatedb OR r.rolreplication)
           AND NOT EXISTS (SELECT 1 FROM pg_auth_members WHERE member=r.oid)
@@ -113,14 +167,19 @@ async function main() {
           adapterSchema: !namespace ? "absent" : namespace.owned ? "present-owned" : "unexpected-owner", canCreateSchema }));
         return;
       }
+      stage("migration");
       await integratePrivateStage(db);
       await db.query("COMMIT");
       console.log(JSON.stringify({ privateStageMigrations: migrations.length, verified: true }));
-    } catch (error) { await db.query("ROLLBACK"); throw error; }
+    } catch (error) { await db.query("ROLLBACK").catch(() => {}); throw error; }
     finally { db.release(); }
   } finally { await pool.end(); }
 }
 
 if (process.argv[1]?.replaceAll("\\", "/").endsWith("/scripts/db/wordpress-private-stage.ts")) {
-  main().catch(() => { console.error("Private-stage migration refused or failed. Verify state before retry."); process.exitCode = 1; });
+  let failedStage: DiagnosticStage = "configuration";
+  main(value => { failedStage = value; }).catch(error => {
+    console.error(JSON.stringify(privateStageDiagnostic(failedStage, error)));
+    process.exitCode = 1;
+  });
 }

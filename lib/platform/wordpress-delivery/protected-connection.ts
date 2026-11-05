@@ -25,24 +25,26 @@ export function protectedPool(connectionString: string, role: string, ca?: strin
     max: 4, connectionTimeoutMillis: 5000 });
 }
 
-export async function protectedConnection(db: PoolClient, role: string, expectedDatabase?: string) {
+export async function protectedConnection(db: PoolClient, role: string, expectedDatabase?: string, onIdentityVerified?: () => void) {
   const row = (await db.query(`SELECT session_user::text AS login, current_user::text AS actor, current_database() AS database,
     (SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()) AS tls,
     r.rolsuper OR r.rolbypassrls OR r.rolcreaterole OR r.rolcreatedb OR r.rolreplication AS privileged,
     EXISTS (SELECT 1 FROM pg_auth_members WHERE member=r.oid) AS inherits_other_role
     FROM pg_roles r WHERE r.rolname=current_user`)).rows[0];
-  if (row?.login !== role || row.actor !== role || !row.tls || row.privileged || row.inherits_other_role
-    || (expectedDatabase !== undefined && row.database !== expectedDatabase)) {
-    throw Error("Protected PostgreSQL role, database or TLS refused");
-  }
+  const refusal = !row?.tls ? "WP_BACKEND_TLS_UNVERIFIED" :
+    row.login !== role || row.actor !== role ? "WP_ROLE_MISMATCH" :
+    row.privileged || row.inherits_other_role ? "WP_ROLE_PRIVILEGES" :
+    expectedDatabase !== undefined && row.database !== expectedDatabase ? "WP_DATABASE_MISMATCH" : null;
+  if (refusal) throw Object.assign(new Error("Protected PostgreSQL role, database or TLS refused"), { code: refusal });
+  onIdentityVerified?.();
   // Configure the verified session with SQL rather than pooler startup options.
   await db.query("SELECT set_config('search_path',$1,false), set_config('TimeZone','UTC',false)", [adapterSchema + ",public"]);
 }
 
 // Use a dedicated checked-out client outside any transaction. The lock must
 // survive BEGIN/ROLLBACK on the same backend and be explicitly releasable.
-export async function verifyProtectedSession(db: PoolClient, role: string, expectedDatabase: string) {
-  await protectedConnection(db, role, expectedDatabase);
+export async function verifyProtectedSession(db: PoolClient, role: string, expectedDatabase: string, onIdentityVerified?: () => void) {
+  await protectedConnection(db, role, expectedDatabase, onIdentityVerified);
   const lock = randomBytes(8).readBigInt64BE().toString();
   const acquired = (await db.query("SELECT pg_backend_pid() AS pid, pg_try_advisory_lock($1::bigint) AS locked", [lock])).rows[0];
   if (!acquired?.locked) throw Error("Protected PostgreSQL session lock refused");
