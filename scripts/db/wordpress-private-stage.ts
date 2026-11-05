@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import type { PoolClient } from "pg";
 import { bootstrapStatus } from "./bootstrap";
-import { adapterSchema, migrationRole, operatorRole, protectedConnection, protectedPool, pullRole } from "../../lib/platform/wordpress-delivery/protected-connection";
+import { adapterSchema, migrationRole, operatorRole, protectedConnection, protectedPool, pullRole, verifyProtectedSession } from "../../lib/platform/wordpress-delivery/protected-connection";
 import { privateStageSource, privateStageProposalTables } from "../../lib/platform/wordpress-delivery/permissions";
 import { quote } from "../backup/managed-permissions";
 
@@ -71,19 +71,26 @@ export async function integratePrivateStage(db: PoolClient, canonicalSchema = "p
 
 async function main() {
   const action = process.env.MIOPAGES_WP_SCHEMA_ACTION;
-  if (action !== "apply-private-stage" && action !== "preflight-private-stage") {
+  const probeRole = action === "probe-pull-session" ? pullRole : action === "probe-operator-session" ? operatorRole : null;
+  if (!probeRole && action !== "apply-private-stage" && action !== "preflight-private-stage") {
     throw Error("Explicit schema operation required");
   }
+  const expected = process.env.MIOPAGES_WP_EXPECTED_DATABASE;
+  if (!expected) throw Error("Explicit rehearsal database identity required");
   const readOnly = action === "preflight-private-stage";
-  const pool = protectedPool(process.env.MIOPAGES_WP_MIGRATION_URL ?? "", migrationRole, process.env.MIOPAGES_WP_DATABASE_CA);
+  const url = probeRole === pullRole ? process.env.MIOPAGES_WP_PULL_URL :
+    probeRole === operatorRole ? process.env.MIOPAGES_WP_OPERATOR_URL : process.env.MIOPAGES_WP_MIGRATION_URL;
+  const pool = protectedPool(url ?? "", probeRole ?? migrationRole, process.env.MIOPAGES_WP_DATABASE_CA);
   try {
     const db = await pool.connect();
     try {
+      await verifyProtectedSession(db, probeRole ?? migrationRole, expected);
+      if (probeRole) {
+        console.log(JSON.stringify({ role: probeRole, verifiedTls: true, sessionVerified: true }));
+        return;
+      }
       await db.query(readOnly ? "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY" : "BEGIN");
-      await protectedConnection(db, migrationRole);
-      const expected = process.env.MIOPAGES_WP_EXPECTED_DATABASE;
-      const actual = (await db.query("SELECT current_database() AS name")).rows[0].name;
-      if (!expected || expected !== actual) throw Error("Explicit rehearsal database identity required");
+      await protectedConnection(db, migrationRole, expected);
       await db.query("SET LOCAL search_path=public");
       const baseline = await bootstrapStatus(db);
       if (baseline.pending || baseline.applied !== 16) throw Error("Exact canonical migration baseline required");
@@ -101,7 +108,7 @@ async function main() {
           FROM pg_namespace WHERE nspname=$1`, [adapterSchema])).rows[0];
         const canCreateSchema = (await db.query("SELECT has_database_privilege(current_database(),'CREATE') AS allowed")).rows[0].allowed;
         await db.query("ROLLBACK");
-        console.log(JSON.stringify({ readOnly: true, verifiedTls: true, canonicalMigrations: baseline.applied,
+        console.log(JSON.stringify({ readOnly: true, verifiedTls: true, sessionVerified: true, canonicalMigrations: baseline.applied,
           pgMajor: baseline.major, pg17CompatibilityReceipt: baseline.receipt !== null, roles,
           adapterSchema: !namespace ? "absent" : namespace.owned ? "present-owned" : "unexpected-owner", canCreateSchema }));
         return;

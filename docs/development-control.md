@@ -551,7 +551,7 @@ The next bounded action is to return sanitized protected preflight evidence for 
 
 ## Rehearsal scope refinement
 
-Reuse the existing 20i Cloud server, protected miopages.org installation and Supabase project. Keep public Core on port 8080. The next read-only gate is direct database reachability from Cloud and confirmation of safe rehearsal role visibility. The [operator procedure](wordpress-private-stage-rehearsal.md#operator-procedure-on-the-existing-20i-environments) supersedes the earlier separate WordPress installation assumption and includes restoration to v0.0.6. Return to Commercial V1 and Media-to-Publication after acceptance.
+Reuse the existing 20i Cloud server, protected miopages.org installation and Supabase project. Keep public Core on port 8080. Cloud direct IPv6 reachability failed with ENETUNREACH. The next read-only gate is the adapter's Session Pooler preflight on port 5432, followed by dedicated operator and pull role probes before rehearsal enablement. The [operator procedure](wordpress-private-stage-rehearsal.md#operator-procedure-on-the-existing-20i-environments) supersedes the earlier separate WordPress installation assumption and includes restoration to v0.0.6. Return to Commercial V1 and Media-to-Publication after acceptance.
 
 ## Return path: full MioPages Commercial V1
 

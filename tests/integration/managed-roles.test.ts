@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { randomBytes, randomUUID } from "node:crypto";
-import { mkdir, writeFile, appendFile } from "node:fs/promises";
+import { mkdir, writeFile, appendFile, readFile } from "node:fs/promises";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { Pool } from "pg";
+import { protectedPool, verifyProtectedSession } from "../../lib/platform/wordpress-delivery/protected-connection";
 import { disposableCluster } from "../../scripts/backup/disposable-cluster";
 import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
 import { provisionManagedRoles, roleProvisioningDiagnostic, type RoleProvisioning } from "../../scripts/db/managed-roles";
@@ -49,6 +50,24 @@ test("PG18 remote TLS survives restricted SET ROLE statistics visibility without
       assert.equal((await admin.query("SELECT count(*)::int n FROM pg_roles WHERE rolname=ANY($1)", [Object.values(roles)])).rows[0].n, 0);
     } finally { await admin.query("GRANT EXECUTE ON FUNCTION pg_catalog.pg_advisory_lock(bigint) TO PUBLIC"); }
     assert.equal((await provisionManagedRoles(config)).verified, true);
+    const probeUrl = new URL(remote);
+    probeUrl.searchParams.delete("sslrootcert");
+    probeUrl.username = roles.runtime;
+    probeUrl.password = config.passwords.runtime;
+    const ca = await readFile(cert, "utf8");
+    const probe = protectedPool(probeUrl.toString(), roles.runtime, ca);
+    try {
+      const client = await probe.connect();
+      try {
+        await verifyProtectedSession(client, roles.runtime, probeUrl.pathname.slice(1));
+        await assert.rejects(verifyProtectedSession(client, roles.migration, probeUrl.pathname.slice(1)), /role, database or TLS/);
+        await assert.rejects(verifyProtectedSession(client, roles.runtime, "foreign"), /role, database or TLS/);
+      } finally { client.release(); }
+    } finally { await probe.end(); }
+    probeUrl.hostname = "127.0.0.1";
+    const wrongHost = protectedPool(probeUrl.toString(), roles.runtime, ca);
+    try { await assert.rejects(wrongHost.connect(), { code: "ERR_TLS_CERT_ALTNAME_INVALID" }); }
+    finally { await wrongHost.end(); }
     for (const kind of ["runtime", "migration", "backup"] as const) {
       const directUrl = new URL(remote); directUrl.username = roles[kind]; directUrl.password = config.passwords[kind];
       const direct = new Pool({ connectionString: directUrl.toString(), options: "-c timezone=UTC" });
