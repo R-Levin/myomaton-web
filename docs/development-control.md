@@ -565,6 +565,14 @@ The operator reports successful creation and independent verification of the ina
 
 Operator approval now covers creation of only miopages_wp_operator and miopages_wp_pull, followed by adapter 0016/0017 and the reviewed grants. The [sequential database procedure](wordpress-database-rollout.md) starts with the existing managed recovery bundle and an independent verification. A dedicated two-role helper refuses existing or partial role sets, preserves the three Core roles and uses the established SCRAM and verified-TLS conventions. A new read-only verifier checks adapter migration checksums, ownership and exact grants. Hosted database setup has not been executed by Codex. WordPress replacement and Core listener changes remain outside this approval.
 
+## Database-only execution access checkpoint — November 5, 2026
+
+Resume from `044825b` on the existing WordPress development branch, using the separate Cloud rehearsal checkout, never `public_html`. The operator confirms both backup scripts match their committed versions, PostgreSQL 17.11 `pg_dump`/`pg_restore` work, the managed asset root is readable and empty, and 44 GB is free. These are operator-reported prerequisites, not a completed recovery gate. The existing `DATABASE_URL` authenticates as `miopages_runtime` and must not be used for the backup connection.
+
+Codex attempted the operator-provided Cloud SSH endpoint and key. The server accepted the public key, but noninteractive authentication could not complete signing. The local Windows SSH agent was stopped and disabled. No authenticated Cloud command ran, no protected database configuration was loaded, and no hosted writes were attempted. Recovery creation and independent verification, both WordPress role creations, migrations 0016/0017, grant/checksum verification and restricted-session probes remain pending.
+
+The immediate external requirement is an interactively unlocked SSH key available to the command runner, or operator execution in the existing authenticated Cloud shell. Keep passphrases and database credentials in the established protected process. After access is restored, use the [existing sequential procedure](wordpress-database-rollout.md): establish the actual `miopages_backup` connection, create and independently verify the bundle, then run the approved two-role provisioner and independent role verification, adapter migration, exact grant/checksum verification and both session probes. Stop on any failed or ambiguous gate. The database-only approval remains in force. WordPress deployment and a Core listener remain outside this boundary.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
