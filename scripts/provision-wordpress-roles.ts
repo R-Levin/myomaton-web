@@ -29,8 +29,26 @@ async function main() {
         assert.ok(identity?.login === owner && identity.actor === owner && identity.database === expected && identity.tls,
           "Provider-owner identity and TLS required");
         const recovery = await verifyManagedBundle(required("MIOPAGES_WP_RECOVERY_ROOT"));
-        assertManagedEquivalent(recovery.state, await managedSnapshot(db, url,
-          { runtime: "miopages_runtime", migration: migrationRole, backup: "miopages_backup" }));
+        // Provider authority creates LOGIN roles; the existing migration reader
+        // verifies application state. Do not grant canonical SELECT to the owner.
+        const migrationUrl = normalizeInventoryUrl(required("MIOPAGES_WP_MIGRATION_URL"), expected);
+        const target = (value: string) => {
+          const u = new URL(value);
+          return { host: u.hostname, port: u.port || "5432", database: u.pathname,
+            project: u.hostname.endsWith(".pooler.supabase.com") ? decodeURIComponent(u.username).split(".").slice(1).join(".") : "" };
+        };
+        assert.deepEqual(target(migrationUrl), target(url), "Recovery reader and provider must use the same database endpoint");
+        const reader = protectedPool(migrationUrl, migrationRole, process.env.MIOPAGES_WP_DATABASE_CA);
+        try {
+          const c = await reader.connect();
+          try {
+            await c.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+            await c.query("SET LOCAL lock_timeout='5s'; SET LOCAL statement_timeout='30s'");
+            await protectedConnection(c, migrationRole, expected);
+            assertManagedEquivalent(recovery.state, await managedSnapshot(c, migrationUrl,
+              { runtime: "miopages_runtime", migration: migrationRole, backup: "miopages_backup" }));
+          } finally { await c.query("ROLLBACK").catch(() => {}); c.release(); }
+        } finally { await reader.end(); }
         const result = await createWordPressRoles(db, owner, { operator: required("MIOPAGES_WP_OPERATOR_PASSWORD"),
           pull: required("MIOPAGES_WP_PULL_PASSWORD") });
         await db.query("COMMIT");

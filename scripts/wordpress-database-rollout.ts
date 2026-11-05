@@ -2,14 +2,15 @@ import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { access, lstat, mkdir, open, readFile, realpath, rename, writeFile } from "node:fs/promises";
+import { access, lstat, mkdir, open, readFile, realpath, rename } from "node:fs/promises";
 import path from "node:path";
 import { protectedPool, verifyProtectedSession } from "../lib/platform/wordpress-delivery/protected-connection";
 import { assertBackupRoot } from "./backup/policy";
+import { hashFile } from "./backup/core";
 import { privateStageDiagnostic } from "./db/wordpress-private-stage";
 
 const exec = promisify(execFile);
-export const rolloutStages = ["backup", "recovery-verify", "roles-create", "roles-verify", "migrate", "grants-verify", "operator-probe", "pull-probe"] as const;
+export const rolloutStages = ["backup-credential", "backup", "recovery-verify", "roles-create", "roles-verify", "migrate", "grants-verify", "operator-probe", "pull-probe"] as const;
 export type RolloutStage = typeof rolloutStages[number];
 const roles = ["miopages_wp_operator", "miopages_wp_pull"];
 type Receipt = Record<string, unknown>;
@@ -19,6 +20,7 @@ type Environment = Record<string, string | undefined>;
 export function checkedReceipt(stage: RolloutStage, value: Receipt): Receipt {
   const expect = (fields: Receipt) => { for (const [key, expected] of Object.entries(fields)) assert.deepEqual(value[key], expected); return fields; };
   switch (stage) {
+    case "backup-credential": return expect({ role: "miopages_backup", verifiedTls: true, sessionVerified: true });
     case "backup": return expect({ recoveryPointCreated: true, bundleVerified: true, canonicalMigrations: 16 });
     case "recovery-verify": return expect({ recoveryVerified: true, canonicalMigrations: 16 });
     case "roles-create":
@@ -31,8 +33,21 @@ export function checkedReceipt(stage: RolloutStage, value: Receipt): Receipt {
   }
 }
 
-export async function databaseSequence(run: (stage: RolloutStage) => Promise<Receipt>, record: (stage: RolloutStage, receipt: Receipt) => Promise<void>) {
-  for (const stage of rolloutStages) await record(stage, checkedReceipt(stage, await run(stage)));
+export async function databaseSequence(run: (stage: RolloutStage) => Promise<Receipt>, record: (stage: RolloutStage, receipt: Receipt) => Promise<void>, operation: "recover" | "setup" | "all" = "all") {
+  const selected = operation === "recover" ? rolloutStages.slice(0, 3) : operation === "setup" ? rolloutStages.slice(2) : rolloutStages;
+  for (const stage of selected) await record(stage, checkedReceipt(stage, await run(stage)));
+}
+
+export function verifiedCheckpoint(value: Receipt, connection: Receipt, checksum: string) {
+  assert.deepEqual(value.connection, connection, "Recovery connection identity changed");
+  const checkpoint = value.recovery as Receipt;
+  assert.equal(checkpoint?.verified, true, "Verified recovery checkpoint required");
+  assert.match(String(checkpoint.sourceCommit), /^[a-f0-9]{40}$/);
+  assert.match(checksum, /^[a-f0-9]{64}$/);
+  assert.equal(checkpoint.checksum, checksum, "Recovery bundle differs from saved checkpoint");
+  const gates = checkpoint.gates as { stage: RolloutStage; receipt: Receipt }[];
+  assert.deepEqual(gates.map(g => g.stage), rolloutStages.slice(0, 3));
+  return { verified: true, sourceCommit: checkpoint.sourceCommit, checksum, gates: gates.map(g => ({ stage: g.stage, receipt: checkedReceipt(g.stage, g.receipt) })) };
 }
 
 export function sessionUrl(host: string, project: string, database: string, role: string, password: string) {
@@ -57,11 +72,8 @@ export function childEnvironment(parent: Environment, common: Environment, scope
 const backupCode = `
 const assert = require('node:assert/strict');
 const {managedBackup} = require('./scripts/backup/managed.ts');
-const {protectedPool,verifyProtectedSession} = require('./lib/platform/wordpress-delivery/protected-connection.ts');
 (async()=>{
  const e=process.env;
- const pool=protectedPool(e.MIOPAGES_WP_BACKUP_URL,'miopages_backup',e.MIOPAGES_WP_DATABASE_CA);
- try { const c=await pool.connect(); try {await verifyProtectedSession(c,'miopages_backup',e.MIOPAGES_WP_EXPECTED_DATABASE);} finally {c.release();} } finally {await pool.end();}
  const bundle=await managedBackup({mode:'managed-postgres',root:e.MIOPAGES_WP_RECOVERY_ROOT,databaseUrl:e.MIOPAGES_WP_BACKUP_URL,objectsRoot:e.MIOPAGES_WP_OBJECTS_ROOT,pgBin:e.PG_BIN_DIR,repository:process.cwd(),roles:{runtime:'miopages_runtime',migration:'miopages_migration',backup:'miopages_backup'}});
  assert.equal(bundle.state.migrations.length,16);
  console.log(JSON.stringify({recoveryPointCreated:true,bundleVerified:true,canonicalMigrations:16}));
@@ -76,46 +88,52 @@ require('./scripts/backup/managed.ts').verifyManagedBundle(process.env.MIOPAGES_
 async function main() {
   let stage: string = "configuration";
   let runRoot: string | undefined;
+  let retainEvidence = false;
   const gates: { stage: RolloutStage; receipt: Receipt }[] = [];
   const evidence: Record<string, unknown> = { status: "BLOCKED", gates };
   const saveEvidence = async () => {
-    if (!runRoot) return;
+    if (!runRoot || !retainEvidence) return;
     const temporary = path.join(runRoot, "evidence.tmp");
-    await writeFile(temporary, JSON.stringify(evidence, null, 2) + "\n", { mode: 0o600 });
+    const handle = await open(temporary, "wx", 0o600);
+    try { await handle.writeFile(JSON.stringify(evidence, null, 2) + "\n"); await handle.sync(); } finally { await handle.close(); }
     await rename(temporary, path.join(runRoot, "database-rollout-evidence.json"));
+    const directory = await open(runRoot, "r");
+    try { await directory.sync(); } finally { await directory.close(); }
   };
   try {
     const e = process.env;
     const required = (name: string) => { assert.ok(e[name]); return e[name]!; };
     assert.equal(process.platform, "linux");
-    assert.equal(required("WP_DB_STORAGE_APPROVAL"), "private-file-0600");
+    const action = required("WP_DB_ACTION");
+    assert.ok(["recover", "verify-recovery", "check-migration", "setup"].includes(action));
     const home = path.resolve(required("HOME"));
     const repository = await realpath(process.cwd());
     assert.equal(repository, "/home/virtual/vps-bef564/5/53b4381d42/miopages-wp-rehearsal");
     await exec("git", ["diff", "--exit-code", "HEAD", "--", "scripts", "lib/platform"], { cwd: repository });
     evidence.sourceCommit = (await exec("git", ["rev-parse", "HEAD"], { cwd: repository })).stdout.trim();
     const expected = required("MIOPAGES_WP_EXPECTED_DATABASE");
-    const owner = required("MIOPAGES_WP_PROVIDER_OWNER");
-    assert.ok(!["miopages_runtime", "miopages_backup", "miopages_migration", ...roles].includes(owner));
+    const connection = { host: required("WP_DB_HOST"), project: required("WP_DB_PROJECT"), database: expected };
+    // Reject accidental URLs or secret-bearing input before retaining evidence.
+    sessionUrl(connection.host, connection.project, expected, "miopages_backup", "validation-only");
+    evidence.connection = connection;
     const url = (role: string, password: string) => sessionUrl(required("WP_DB_HOST"), required("WP_DB_PROJECT"), expected, role, password);
-    const backupUrl = url("miopages_backup", required("WP_DB_BACKUP_PASSWORD"));
-    const migrationUrl = url("miopages_migration", required("WP_DB_MIGRATION_PASSWORD"));
-    const providerUrl = url(owner, required("WP_DB_PROVIDER_PASSWORD"));
-    // Originals stay only in this temporary process and are never stored.
-    delete e.WP_DB_BACKUP_PASSWORD; delete e.WP_DB_MIGRATION_PASSWORD; delete e.WP_DB_PROVIDER_PASSWORD;
     const caFile = required("MIOPAGES_WP_DATABASE_CA_FILE");
     assert.equal(e.NODE_EXTRA_CA_CERTS, caFile); assert.equal(e.PGSSLROOTCERT, caFile);
     const ca = await readFile(caFile, "utf8");
-    const assets = await realpath(required("MIOPAGES_WP_OBJECTS_ROOT"));
-    await access(assets);
-    const pgBin = await realpath(required("PG_BIN_DIR"));
-    for (const tool of ["pg_dump", "pg_restore"]) assert.match((await exec(path.join(pgBin, tool), ["--version"])).stdout, /PostgreSQL\) 17\./);
-    const root = assertBackupRoot(required("WP_DB_RUN_ROOT"), [repository, path.join(home, "public_html"), assets, path.dirname(pgBin), path.join(home, ".config")]);
+    let assets = "", pgBin = "";
+    if (action === "recover") {
+      assets = await realpath(required("MIOPAGES_WP_OBJECTS_ROOT")); await access(assets);
+      pgBin = await realpath(required("PG_BIN_DIR"));
+      for (const tool of ["pg_dump", "pg_restore"]) assert.match((await exec(path.join(pgBin, tool), ["--version"])).stdout, /PostgreSQL\) 17\./);
+    }
+    const root = assertBackupRoot(required("WP_DB_RUN_ROOT"), [repository, path.join(home, "public_html"), path.join(home, ".config"),
+      ...(action === "recover" ? [assets, path.dirname(pgBin)] : [])]);
     assert.equal(await realpath(path.dirname(root)), path.dirname(root));
-    await mkdir(root, { mode: 0o700 }); // Never reuse a partial run or overwrite saved credentials.
+    if (action === "recover") await mkdir(root, { mode: 0o700 }); // Never overwrite an existing recovery run.
     runRoot = root;
     const rootStat = await lstat(root);
     assert.ok(rootStat.isDirectory() && !rootStat.isSymbolicLink() && (rootStat.mode & 0o077) === 0 && rootStat.uid === process.getuid!());
+    retainEvidence = action === "recover";
     const recoveryRoot = path.join(root, "recovery");
     const common = { MIOPAGES_WP_EXPECTED_DATABASE: expected, MIOPAGES_WP_DATABASE_CA: ca,
       NODE_EXTRA_CA_CERTS: caFile, PGSSLROOTCERT: caFile };
@@ -131,10 +149,47 @@ async function main() {
         throw Object.assign(new Error("Database rollout step refused or uncertain"), { code });
       }
     };
+    if (action === "recover") {
+      const backupUrl = url("miopages_backup", required("WP_DB_BACKUP_PASSWORD"));
+      delete e.WP_DB_BACKUP_PASSWORD;
+      await databaseSequence(async next => {
+        stage = next;
+        if (next === "backup-credential") {
+          const pool = protectedPool(backupUrl, "miopages_backup", ca);
+          try { const c = await pool.connect(); try { await verifyProtectedSession(c, "miopages_backup", expected); } finally { c.release(); } } finally { await pool.end(); }
+          return { role: "miopages_backup", verifiedTls: true, sessionVerified: true };
+        }
+        return next === "backup" ? child(["-e", backupCode], { MIOPAGES_WP_BACKUP_URL: backupUrl, MIOPAGES_WP_RECOVERY_ROOT: recoveryRoot, MIOPAGES_WP_OBJECTS_ROOT: assets, PG_BIN_DIR: pgBin })
+          : child(["-e", verifyCode], { MIOPAGES_WP_RECOVERY_ROOT: recoveryRoot });
+      }, async (next, receipt) => { gates.push({ stage: next, receipt }); await saveEvidence(); console.log(JSON.stringify({ stage: next, ...receipt })); }, "recover");
+      evidence.recovery = { verified: true, sourceCommit: evidence.sourceCommit, checksum: await hashFile(path.join(recoveryRoot, "checksums.json")), gates: [...gates] };
+      evidence.status = "RECOVERY_VERIFIED";
+      await saveEvidence();
+      console.log(JSON.stringify({ status: "RECOVERY_VERIFIED", runRoot: root, evidence: path.join(root, "database-rollout-evidence.json") }));
+      return;
+    }
+    stage = "recovery-checkpoint";
+    const saved = await lstat(path.join(root, "database-rollout-evidence.json"));
+    assert.ok(saved.isFile() && !saved.isSymbolicLink() && (saved.mode & 0o077) === 0 && saved.uid === process.getuid!());
+    evidence.recovery = verifiedCheckpoint(JSON.parse(await readFile(path.join(root, "database-rollout-evidence.json"), "utf8")), connection,
+      await hashFile(path.join(recoveryRoot, "checksums.json")));
+    gates.push(...(evidence.recovery as { gates: typeof gates }).gates);
+    checkedReceipt("recovery-verify", await child(["-e", verifyCode], { MIOPAGES_WP_RECOVERY_ROOT: recoveryRoot }));
+    if (action === "verify-recovery") {
+      console.log(JSON.stringify({ status: "RECOVERY_VERIFIED", recoveryVerified: true, runRoot: root })); return;
+    }
+    retainEvidence = action === "setup";
     stage = "migration-credential";
+    const migrationUrl = url("miopages_migration", required("WP_DB_MIGRATION_PASSWORD"));
+    delete e.WP_DB_MIGRATION_PASSWORD;
     const migrationPool = protectedPool(migrationUrl, "miopages_migration", ca);
     try { const c = await migrationPool.connect(); try { await verifyProtectedSession(c, "miopages_migration", expected); } finally { c.release(); } } finally { await migrationPool.end(); }
+    if (action === "check-migration") { console.log(JSON.stringify({ role: "miopages_migration", verifiedTls: true, sessionVerified: true })); return; }
+    assert.equal(required("WP_DB_STORAGE_APPROVAL"), "private-file-0600");
     stage = "provider-credential";
+    const owner = required("MIOPAGES_WP_PROVIDER_OWNER"); assert.equal(owner, "postgres");
+    const providerUrl = url(owner, required("WP_DB_PROVIDER_PASSWORD"));
+    delete e.WP_DB_PROVIDER_PASSWORD;
     const providerPool = protectedPool(providerUrl, owner, ca);
     try {
       const c = await providerPool.connect();
@@ -149,7 +204,8 @@ async function main() {
     await databaseSequence(async next => {
       stage = next;
       switch (next) {
-        case "backup": return child(["-e", backupCode], { MIOPAGES_WP_BACKUP_URL: backupUrl, MIOPAGES_WP_RECOVERY_ROOT: recoveryRoot, MIOPAGES_WP_OBJECTS_ROOT: assets, PG_BIN_DIR: pgBin });
+        case "backup-credential":
+        case "backup": throw Error("Setup must not repeat recovery creation");
         case "recovery-verify": return child(["-e", verifyCode], { MIOPAGES_WP_RECOVERY_ROOT: recoveryRoot });
         case "roles-create": {
           const operatorPassword = randomBytes(32).toString("hex"), pullPassword = randomBytes(32).toString("hex");
@@ -164,7 +220,7 @@ async function main() {
           const directory = await open(root, "r");
           try { await directory.sync(); } finally { await directory.close(); }
           return child(["scripts/provision-wordpress-roles.ts"], { MIOPAGES_WP_ROLE_ACTION: "create", MIOPAGES_WP_PROVIDER_OWNER: owner,
-            MIOPAGES_WP_PROVIDER_URL: providerUrl, MIOPAGES_WP_OPERATOR_PASSWORD: operatorPassword, MIOPAGES_WP_PULL_PASSWORD: pullPassword, MIOPAGES_WP_RECOVERY_ROOT: recoveryRoot });
+            MIOPAGES_WP_PROVIDER_URL: providerUrl, MIOPAGES_WP_MIGRATION_URL: migrationUrl, MIOPAGES_WP_OPERATOR_PASSWORD: operatorPassword, MIOPAGES_WP_PULL_PASSWORD: pullPassword, MIOPAGES_WP_RECOVERY_ROOT: recoveryRoot });
         }
         case "roles-verify": return child(["scripts/provision-wordpress-roles.ts"], { MIOPAGES_WP_ROLE_ACTION: "verify", MIOPAGES_WP_MIGRATION_URL: migrationUrl });
         case "migrate":
@@ -172,7 +228,7 @@ async function main() {
         case "operator-probe": return child(["scripts/db/wordpress-private-stage.ts"], { MIOPAGES_WP_SCHEMA_ACTION: "probe-operator-session", MIOPAGES_WP_OPERATOR_URL: operatorUrl });
         case "pull-probe": return child(["scripts/db/wordpress-private-stage.ts"], { MIOPAGES_WP_SCHEMA_ACTION: "probe-pull-session", MIOPAGES_WP_PULL_URL: pullUrl });
       }
-    }, async (next, receipt) => { gates.push({ stage: next, receipt }); await saveEvidence(); console.log(JSON.stringify({ stage: next, ...receipt })); });
+    }, async (next, receipt) => { if (next !== "recovery-verify") gates.push({ stage: next, receipt }); await saveEvidence(); console.log(JSON.stringify({ stage: next, ...receipt })); }, "setup");
     evidence.status = "PASS";
     evidence.nextBoundary = "Database-only setup complete; Core listener and WordPress deployment require separate approval.";
     await saveEvidence();
@@ -180,6 +236,9 @@ async function main() {
   } catch (error) {
     const diagnostic = privateStageDiagnostic("adapter_validation", error);
     evidence.failedStage = stage; evidence.code = diagnostic.code;
+    if (stage === "backup-credential" || stage === "backup") evidence.credential = "miopages_backup: existing MioPages backup-role password";
+    if (stage === "migration-credential") evidence.credential = "miopages_migration: existing MioPages migration-role password";
+    if (stage === "provider-credential") evidence.credential = "postgres: original Supabase project database administrator password, separate from dedicated MioPages passwords";
     evidence.requirement = "Stop. Preserve recovery and saved credentials. An uncertain write requires independent verification before any retry; never reset or recreate existing roles.";
     await saveEvidence().catch(() => {});
     console.error(JSON.stringify(evidence));

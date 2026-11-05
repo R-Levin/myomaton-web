@@ -29,22 +29,35 @@ password() {
   [[ -n "${!name}" ]] || { printf 'BLOCKED: existing %s password unavailable. No guessing, rotation or provisioning.\n' "$role" >&2; exit 1; }
   export "$name"
 }
+prompt WP_DB_MODE 'Operation: all (recover then setup), recover, or setup (resume)' all
+[[ "$WP_DB_MODE" == all || "$WP_DB_MODE" == recover || "$WP_DB_MODE" == setup ]] || exit 1
 prompt WP_DB_HOST 'Established Supabase Session Pooler hostname (no URL)'
 prompt WP_DB_PROJECT 'Established Supabase project reference'
 prompt MIOPAGES_WP_EXPECTED_DATABASE 'Verified database name'
-prompt MIOPAGES_WP_PROVIDER_OWNER 'Authorized existing provider-owner role'
 prompt MIOPAGES_WP_DATABASE_CA_FILE 'Existing trusted CA file' "$HOME/supabase-ca.crt"
-prompt PG_BIN_DIR 'PostgreSQL 17 binary directory' "$HOME/.local/pgsql17/usr/pgsql-17/bin"
-prompt MIOPAGES_WP_OBJECTS_ROOT 'Actual existing MANAGED_ASSET_ROOT (do not source runtime.env)'
-prompt WP_DB_RUN_ROOT 'New private off-webroot run directory' "$HOME/miopages-wp-db-$(date -u +%Y%m%dT%H%M%SZ)"
-printf 'Store ONLY the generated WordPress role URLs/passwords in %s/wordpress-role-credentials.json (directory 0700, file 0600).\n' "$WP_DB_RUN_ROOT"
-read -r -p 'Approve this private local credential storage method by typing STORE: ' storage </dev/tty
-[[ "$storage" == STORE ]] || { printf 'Storage not approved. Stopped.\n' >&2; exit 1; }
-export WP_DB_STORAGE_APPROVAL=private-file-0600
-password WP_DB_BACKUP_PASSWORD miopages_backup
-password WP_DB_MIGRATION_PASSWORD miopages_migration
-password WP_DB_PROVIDER_PASSWORD "$MIOPAGES_WP_PROVIDER_OWNER"
 export NODE_EXTRA_CA_CERTS="$MIOPAGES_WP_DATABASE_CA_FILE"
 export PGSSLROOTCERT="$MIOPAGES_WP_DATABASE_CA_FILE"
-# The helper and its children load no shared environment files.
-node --import tsx scripts/wordpress-database-rollout.ts
+if [[ "$WP_DB_MODE" != setup ]]; then
+  prompt PG_BIN_DIR 'PostgreSQL 17 binary directory' "$HOME/.local/pgsql17/usr/pgsql-17/bin"
+  prompt MIOPAGES_WP_OBJECTS_ROOT 'Actual existing MANAGED_ASSET_ROOT (do not source runtime.env)'
+  prompt WP_DB_RUN_ROOT 'New private off-webroot recovery run directory' "$HOME/miopages-wp-db-$(date -u +%Y%m%dT%H%M%SZ)"
+  password WP_DB_BACKUP_PASSWORD 'miopages_backup: existing MioPages backup-role'
+  WP_DB_ACTION=recover node --import tsx scripts/wordpress-database-rollout.ts
+  unset WP_DB_BACKUP_PASSWORD
+  printf 'Verified recovery checkpoint retained at %s\n' "$WP_DB_RUN_ROOT"
+  [[ "$WP_DB_MODE" != recover ]] || exit 0
+else
+  prompt WP_DB_RUN_ROOT 'Existing verified recovery run directory (not its recovery child)'
+fi
+# Verify the saved checkpoint without database credentials before prompting for setup.
+WP_DB_ACTION=verify-recovery node --import tsx scripts/wordpress-database-rollout.ts
+printf 'Setup can be resumed later with operation setup and this same directory.\n'
+printf 'Store ONLY generated WordPress role credentials in %s/wordpress-role-credentials.json (directory 0700, file 0600).\n' "$WP_DB_RUN_ROOT"
+read -r -p 'Approve this private local credential storage method by typing STORE: ' storage </dev/tty
+[[ "$storage" == STORE ]] || { printf 'Storage not approved. Verified recovery retained.\n' >&2; exit 1; }
+export WP_DB_STORAGE_APPROVAL=private-file-0600
+password WP_DB_MIGRATION_PASSWORD 'miopages_migration: existing MioPages migration-role'
+WP_DB_ACTION=check-migration node --import tsx scripts/wordpress-database-rollout.ts
+password WP_DB_PROVIDER_PASSWORD 'postgres: ORIGINAL Supabase project database administrator, separate from dedicated MioPages roles'
+export MIOPAGES_WP_PROVIDER_OWNER=postgres
+WP_DB_ACTION=setup node --import tsx scripts/wordpress-database-rollout.ts

@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import test from "node:test";
-import { checkedReceipt, childEnvironment, databaseSequence, rolloutStages, sessionUrl, type RolloutStage } from "../scripts/wordpress-database-rollout";
+import { checkedReceipt, childEnvironment, databaseSequence, rolloutStages, sessionUrl, verifiedCheckpoint, type RolloutStage } from "../scripts/wordpress-database-rollout";
 
 const receipts: Record<RolloutStage, Record<string, unknown>> = {
+  "backup-credential": { role: "miopages_backup", verifiedTls: true, sessionVerified: true },
   backup: { recoveryPointCreated: true, bundleVerified: true, canonicalMigrations: 16 },
   "recovery-verify": { recoveryVerified: true, canonicalMigrations: 16 },
   "roles-create": { created: 2, verified: true, recoveryVerified: true, roles: ["miopages_wp_operator", "miopages_wp_pull"].map(role => ({ role, restricted: true })) },
@@ -21,8 +22,8 @@ test("rollout cannot reach role creation before independent recovery succeeds", 
     attempted.push(stage);
     return stage === "recovery-verify" ? { ...receipts[stage], recoveryVerified: false } : receipts[stage];
   }, async stage => { recorded.push(stage); }));
-  assert.deepEqual(attempted, ["backup", "recovery-verify"]);
-  assert.deepEqual(recorded, ["backup"]);
+  assert.deepEqual(attempted, ["backup-credential", "backup", "recovery-verify"]);
+  assert.deepEqual(recorded, ["backup-credential", "backup"]);
 });
 
 test("every uncertain operation or evidence write stops without retry or later operations", async () => {
@@ -42,12 +43,48 @@ test("every uncertain operation or evidence write stops without retry or later o
 test("consolidated sequence accepts exact receipts and strips arbitrary child data", async () => {
   const evidence: unknown[] = [];
   await databaseSequence(async stage => ({ ...receipts[stage], secret: "must-never-be-recorded" }), async (stage, receipt) => { evidence.push({ stage, receipt }); });
-  assert.equal(evidence.length, 8);
+  assert.equal(evidence.length, 9);
   assert.equal(JSON.stringify(evidence).includes("must-never-be-recorded"), false);
   assert.throws(() => checkedReceipt("backup", { ...receipts.backup, canonicalMigrations: 15 }));
   assert.throws(() => checkedReceipt("roles-create", { ...receipts["roles-create"], recoveryVerified: false }));
   assert.throws(() => checkedReceipt("grants-verify", { ...receipts["grants-verify"], checksumsVerified: false }));
   assert.throws(() => checkedReceipt("pull-probe", receipts["operator-probe"]));
+});
+
+test("recovery completes with only backup operations, independently of administrator availability", async () => {
+  const called: RolloutStage[] = [];
+  await databaseSequence(async stage => {
+    called.push(stage);
+    if (["roles-create", "migrate"].includes(stage)) throw Object.assign(Error("Administrator unavailable"), { code: "28P01" });
+    return receipts[stage];
+  }, async () => {}, "recover");
+  assert.deepEqual(called, ["backup-credential", "backup", "recovery-verify"]);
+});
+
+test("setup resume independently rechecks recovery and never reauthenticates backup or creates a backup", async () => {
+  const called: RolloutStage[] = [];
+  await databaseSequence(async stage => { called.push(stage); return receipts[stage]; }, async () => {}, "setup");
+  assert.deepEqual(called, rolloutStages.slice(2));
+  const refused: RolloutStage[] = [];
+  await assert.rejects(databaseSequence(async stage => {
+    refused.push(stage); return { ...receipts[stage], recoveryVerified: false };
+  }, async () => {}, "setup"));
+  assert.deepEqual(refused, ["recovery-verify"]);
+});
+
+test("durable recovery checkpoint remains reusable after provider failure and refuses changed or incomplete state", () => {
+  const connection = { host: "aws-0-us-east-1.pooler.supabase.com", project: "ref", database: "postgres" };
+  const checksum = "a".repeat(64);
+  const recovery = { verified: true, sourceCommit: "b".repeat(40), checksum,
+    gates: rolloutStages.slice(0, 3).map(stage => ({ stage, receipt: receipts[stage] })) };
+  const failedSetup = { connection, recovery, status: "BLOCKED", failedStage: "provider-credential", code: "28P01", privateData: "not-evidence" };
+  const checkpoint = verifiedCheckpoint(failedSetup, connection, checksum);
+  assert.equal(checkpoint.verified, true);
+  assert.equal(JSON.stringify(checkpoint).includes("not-evidence"), false);
+  assert.throws(() => verifiedCheckpoint(failedSetup, { ...connection, project: "other" }, checksum));
+  assert.throws(() => verifiedCheckpoint(failedSetup, connection, "c".repeat(64)));
+  assert.throws(() => verifiedCheckpoint({ ...failedSetup, recovery: { ...recovery, verified: false } }, connection, checksum));
+  assert.throws(() => verifiedCheckpoint({ ...failedSetup, recovery: { ...recovery, gates: recovery.gates.slice(1) } }, connection, checksum));
 });
 
 test("role-specific child environments exclude runtime, provider and inherited libpq credentials", () => {
