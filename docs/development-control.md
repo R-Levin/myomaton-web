@@ -553,6 +553,12 @@ The next bounded action is to return sanitized protected preflight evidence for 
 
 Reuse the existing 20i Cloud server, protected miopages.org installation and Supabase project. Keep public Core on port 8080. Cloud direct IPv6 reachability failed with ENETUNREACH. The next read-only gate is the adapter's Session Pooler preflight on port 5432, followed by dedicated operator and pull role probes before rehearsal enablement. The [operator procedure](wordpress-private-stage-rehearsal.md#operator-procedure-on-the-existing-20i-environments) supersedes the earlier separate WordPress installation assumption and includes restoration to v0.0.6. Return to Commercial V1 and Media-to-Publication after acceptance.
 
+## Shared inventory accepted and bounded rehearsal fixture prepared — November 5, 2026
+
+Operator-reported hosted evidence confirms C0 and both hostname bindings, 38 C0 records over 21 canonical grant tables, zero unknown/real records, acceptable PUBLIC permissions and no separate rehearsal fixture. PostgreSQL 17 verified-TLS Session Pooler preflight and its compatibility receipt already passed.
+
+The [guarded fixture procedure](wordpress-rehearsal-fixture.md) prepares one inactive synthetic graph, a valid activation binding and one revision-linked public Knowledge fact. It reuses the existing intake, activation, foundation and canonical writers in one transaction with an independent read-only verify command. Hosted writes have not been executed. The next approval is for this fixed fixture operation, followed by the existing restricted-role, migration and HTTPS acceptance sequence. Close the proof after acceptance and return to Commercial V1 Media-to-Publication.
+
 ## Return path: full MioPages Commercial V1
 
 The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.

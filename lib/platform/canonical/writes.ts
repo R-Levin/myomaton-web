@@ -31,6 +31,22 @@ export async function writeOnboardingCanonical(pool:Pool,input:WriteInput,owner:
   if(payload.approval.scope!=="internal")throw Error("Onboarding information is internal only");
   return write(pool,input,{},owner);
 }
+// Explicit private operator use for approved Knowledge on an inactive bound
+// foundation. The existing onboarding writer remains internal-only.
+export async function writeApprovedInactiveKnowledge(pool: Pool, input: WriteInput, owner: OnboardingOwner) {
+  object(owner, ["caseId", "organizationId", "webPresenceId", "managedSiteId"]);
+  for (const value of Object.values(owner)) uuid(value);
+  if (input.domain !== "knowledge" || input.webPresenceId !== owner.webPresenceId || input.image || input.offering) {
+    throw Error("Bound inactive Knowledge owner required");
+  }
+  const payload = normalizeKnowledge(input.payload);
+  if (payload.approval.scope !== "public" || payload.entries.length !== 1 || payload.identityEvidence.length
+    || payload.entries.some(entry => entry.evidence.confirmation !== "confirmed" || entry.evidence.visibility !== "public")) {
+    throw Error("One explicitly approved public Knowledge fact required");
+  }
+  return write(pool, input, {}, owner);
+}
+
 async function write(pool:Pool,input:WriteInput,options:{failAfterCurrent?:boolean},foundation?:OnboardingOwner) {
   object(input,["domain","id","webPresenceId","expectedVersion","expectedFingerprint","payload","offering","image","responsibleIdentity","changeReason"]);
   if(input.offering)object(input.offering,["key","type","name","status"]);

@@ -5,6 +5,7 @@ import { bootstrapStatus } from "./bootstrap";
 import { adapterSchema, migrationRole, operatorRole, protectedConnection, protectedPool, pullRole, verifyProtectedSession } from "../../lib/platform/wordpress-delivery/protected-connection";
 import { privateStageSource, privateStageProposalTables } from "../../lib/platform/wordpress-delivery/permissions";
 import { inventorySite, normalizeInventoryUrl, sharedInventory } from "./wordpress-shared-inventory";
+import { wordpressRehearsalFixture } from "../customer-initializers/wordpress-rehearsal";
 import { quote } from "../backup/managed-permissions";
 
 const migrations = ["0016_wordpress_delivery", "0017_private_stage_authority"];
@@ -77,6 +78,7 @@ const diagnosticStages = {
   role_database_identity: ["WP_IDENTITY_CHECK_FAILED", "Check the backend login, effective role, expected database and backend TLS evidence."],
   session_behavior: ["WP_SESSION_CHECK_FAILED", "The advisory lock, backend identity or session settings could not be verified across a read-only transaction and rollback."],
   canonical_migration_baseline: ["WP_BASELINE_CHECK_FAILED", "Check the exact 16 canonical migrations, ledger access and the PG17 compatibility receipt if applicable."],
+  fixture_initialization: ["WP_FIXTURE_CHECK_FAILED", "Verify the fixed rehearsal fixture and baseline. Inspect committed state before any create retry."],
   shared_inventory: ["WP_INVENTORY_FAILED", "Inspect read-only inventory access and the approved graph inputs."],
   adapter_validation: ["WP_ADAPTER_VALIDATION_FAILED", "Check access to role and adapter-schema metadata."],
   migration: ["WP_MIGRATION_FAILED", "Verify migration state before retrying."],
@@ -122,8 +124,9 @@ export function privateStageDiagnostic(stage: DiagnosticStage, error: unknown) {
 async function main(stage: (value: DiagnosticStage) => void) {
   const action = process.env.MIOPAGES_WP_SCHEMA_ACTION;
   const probeRole = action === "probe-pull-session" ? pullRole : action === "probe-operator-session" ? operatorRole : null;
+  const fixtureOperation = action === "create-rehearsal-fixture" ? "create" : action === "verify-rehearsal-fixture" ? "verify" : null;
   const inventory = action === "inventory-private-stage";
-  if (!inventory && !probeRole && action !== "apply-private-stage" && action !== "preflight-private-stage") {
+  if (!fixtureOperation && !inventory && !probeRole && action !== "apply-private-stage" && action !== "preflight-private-stage") {
     throw Error("Explicit schema operation required");
   }
   const expected = process.env.MIOPAGES_WP_EXPECTED_DATABASE;
@@ -132,12 +135,28 @@ async function main(stage: (value: DiagnosticStage) => void) {
   const url = probeRole === pullRole ? process.env.MIOPAGES_WP_PULL_URL :
     probeRole === operatorRole ? process.env.MIOPAGES_WP_OPERATOR_URL : process.env.MIOPAGES_WP_MIGRATION_URL;
   stage("connection_configuration");
-  const pool = protectedPool(inventory ? normalizeInventoryUrl(url ?? "", expected) : url ?? "", probeRole ?? migrationRole, process.env.MIOPAGES_WP_DATABASE_CA);
+  const pool = protectedPool(inventory || fixtureOperation ? normalizeInventoryUrl(url ?? "", expected) : url ?? "", probeRole ?? migrationRole, process.env.MIOPAGES_WP_DATABASE_CA);
   try {
     stage("connection_tls");
     const db = await pool.connect();
     try {
       stage("role_database_identity");
+      if (fixtureOperation) {
+        if (fixtureOperation === "create" && process.env.MIOPAGES_WP_FIXTURE_APPROVAL !== "create-synthetic-rehearsal") {
+          throw Error("Explicit fixture creation approval required");
+        }
+        await db.query(fixtureOperation === "verify" ? "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY" : "BEGIN");
+        await protectedConnection(db, migrationRole, expected);
+        await db.query("SET LOCAL search_path=public");
+        stage("canonical_migration_baseline");
+        const baseline = await bootstrapStatus(db);
+        if (baseline.applied !== 16 || baseline.pending) throw Error("Exact canonical migration baseline required");
+        stage("fixture_initialization");
+        const result = await wordpressRehearsalFixture(db, fixtureOperation);
+        await db.query(fixtureOperation === "verify" ? "ROLLBACK" : "COMMIT");
+        console.log(JSON.stringify({ ...result, operation: fixtureOperation, readOnly: fixtureOperation === "verify" }));
+        return;
+      }
       if (inventory) {
         await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
         await protectedConnection(db, migrationRole, expected);

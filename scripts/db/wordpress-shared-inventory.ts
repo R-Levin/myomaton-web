@@ -106,6 +106,11 @@ export async function sharedInventory(db: PoolClient, synthetic: Site[], fixture
   if ((await db.query("SHOW transaction_read_only")).rows[0]?.transaction_read_only !== "on") {
     throw Error("Read-only inventory transaction required");
   }
+  return sharedInventorySnapshot(db, synthetic, fixture);
+}
+
+// Read-only queries shared with the guarded initializer's locked transaction.
+export async function sharedInventorySnapshot(db: PoolClient, synthetic: Site[], fixture?: Site) {
   const c0Row = (await db.query(graph + " WHERE " + exact, ids(c0))).rows[0];
   const c0Graph = c0Row?.organization_status === "active" && c0Row.presence_status === "active" && c0Row.site_status === "active";
   const c0Bindings: Record<string, boolean> = {};
