@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
+import { normalizeInventoryUrl } from "../scripts/db/wordpress-shared-inventory";
 import { privateStageDiagnostic } from "../scripts/db/wordpress-private-stage";
 
 test("preflight reports a stage and safe code without rendering driver or assertion data", () => {
@@ -31,4 +32,13 @@ test("preflight CLI exits nonzero and redacts an invalid connection URL", () => 
   assert.equal(result.stdout, "");
   assert.doesNotMatch(result.stderr, /sentinel-password|invalid host|postgresql:\/\//);
   assert.equal(JSON.parse(result.stderr).stage, "connection_configuration");
+});
+
+test("inventory URL normalizes only the known trailing database-path backslash", () => {
+  const prefix = "postgresql://role.project:fixture%5C@pool.example.test";
+  const query = "?sslmode=verify-full";
+  for (const suffix of ["\\", "%5C", "%5c%5C"]) {
+    assert.equal(normalizeInventoryUrl(prefix + "/postgres" + suffix + query, "postgres"), prefix + "/postgres" + query);
+  }
+  assert.equal(normalizeInventoryUrl(prefix + "/other%5C" + query, "postgres"), prefix + "/other%5C" + query);
 });

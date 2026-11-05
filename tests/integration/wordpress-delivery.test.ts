@@ -12,6 +12,7 @@ import { disposableCluster } from "../../scripts/backup/disposable-cluster";
 import { siteReleaseFixture } from "../../scripts/site-releases/disposable";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import type { ReviewedProjection } from "../../lib/platform/wordpress-delivery/authority";
+import { sharedInventory } from "../../scripts/db/wordpress-shared-inventory";
 import { integratePrivateStage } from "../../scripts/db/wordpress-private-stage";
 import { operatorRole, pullRole } from "../../lib/platform/wordpress-delivery/protected-connection";
 import { protectedOperatorServices } from "../../lib/platform/wordpress-delivery/protected-services";
@@ -39,6 +40,36 @@ test("WordPress private delivery through Core evidence, durable enrollment and e
   const cluster = await disposableCluster(bin);
   try {
     await initializeWordPressTestBaseline(cluster.url);
+    const inventoryPool = new Pool({ connectionString: cluster.url });
+    try {
+      const original = (await inventoryPool.query("SELECT organization_id FROM web_presences WHERE id=$1",
+        [mioPagesIntakeOwner.webPresenceId])).rows[0].organization_id;
+      const c0 = "152aebd3-00b3-4296-a64e-e281522e64f0";
+      await inventoryPool.query("INSERT INTO organizations(id,name) VALUES($1,'Synthetic C0')", [c0]);
+      await inventoryPool.query("UPDATE web_presences SET organization_id=$1 WHERE id=$2", [c0, mioPagesIntakeOwner.webPresenceId]);
+      await inventoryPool.query("INSERT INTO managed_site_hostnames(id,hostname,web_presence_id,managed_site_id) VALUES($1,$2,$5,$6),($3,$4,$5,$6)",
+        ["bfd0daa1-3a9d-429d-8b60-b2d9851f9603", "runtime.miopages.com", "46bbd56e-9f28-4006-8bc0-df70c955cda3",
+          "domain-test.miopages.com", mioPagesIntakeOwner.webPresenceId, mioPagesIntakeOwner.managedSiteId]);
+      await inventoryPool.query("GRANT SELECT(name) ON public.organizations TO PUBLIC");
+      const db = await inventoryPool.connect();
+      try {
+        await assert.rejects(sharedInventory(db, []), /Read-only inventory transaction required/);
+        await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+        const inventory = await sharedInventory(db, []);
+        assert.equal(inventory.status, "BLOCKED");
+        assert.equal(inventory.c0.graph, true);
+        assert.ok(Object.values(inventory.c0.bindings).every(Boolean));
+        assert.equal(inventory.inventory.c0, 3);
+        assert.equal(inventory.inventory.unknownOrReal, 1);
+        assert.equal(inventory.publicGrants.column_grants, 1);
+        assert.equal(inventory.publicGrants.acceptable, false);
+        assert.equal(inventory.fixture.inactiveUnhostedActivationBoundCandidates, 0);
+      } finally { await db.query("ROLLBACK"); db.release(); }
+      await inventoryPool.query("REVOKE SELECT(name) ON public.organizations FROM PUBLIC");
+      await inventoryPool.query("DELETE FROM managed_site_hostnames WHERE managed_site_id=$1", [mioPagesIntakeOwner.managedSiteId]);
+      await inventoryPool.query("UPDATE web_presences SET organization_id=$1 WHERE id=$2", [original, mioPagesIntakeOwner.webPresenceId]);
+      await inventoryPool.query("DELETE FROM organizations WHERE id=$1", [c0]);
+    } finally { await inventoryPool.end(); }
     const fixture = await siteReleaseFixture(cluster.url);
     try {
       await fixture.pool.query(await readFile("lib/platform/wordpress-delivery/0016_wordpress_delivery.sql", "utf8"));

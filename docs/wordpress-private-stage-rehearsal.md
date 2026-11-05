@@ -46,6 +46,18 @@ The adapter migration uses session mode only if this probe and the exact databas
 
 **Database isolation decision.** Use a distinct bound inactive synthetic Organization, Web Presence and Managed Site with an authorized public-scope fact and no hostname binding. The current grants include SELECT on shared canonical tables and allow the operator role to append to the shared proposal ledger. Use the existing database only if its relevant inventory is verified synthetic-only and the owner expressly approves those database-wide grants for these restricted service logins. The application's site grants do not constrain direct SQL by those logins. If the database contains live customer records or the grants cannot be accepted, use a separately permissioned database within the existing service where supported. A new service is unnecessary unless the existing service cannot supply the required boundary. Record the matching canonical and adapter recovery plan before rollout.
 
+**Shared-database inventory.** After the verified PostgreSQL preflight, use the same protected migration environment from the separate Cloud checkout:
+
+```bash
+MIOPAGES_WP_SCHEMA_ACTION=inventory-private-stage \
+  node --import tsx scripts/db/wordpress-private-stage.ts
+```
+
+The command verifies the recorded C0 graph and both hostname bindings, counts rows by canonical ownership over the adapter SELECT allowlist, and checks PUBLIC database and application ACLs. If a separate synthetic fixture is already known, set MIOPAGES_WP_REHEARSAL_SITE to the reviewed JSON object with organizationId, webPresenceId and managedSiteId. Optionally supply MIOPAGES_WP_SYNTHETIC_SITES as an array of other reviewed synthetic graph objects. Ownership and operator attestations drive classification. The command cannot determine whether individual contents under an attested graph are real customer data. Only attest graphs verified synthetic. An unclassified record blocks the shared grants.
+
+The report contains counts and checks without content or credentials. PASS still requires database-owner approval for rollout. BLOCKED lists the remaining conditions. If the fixture is absent, separately review one narrowly scoped inactive, unhosted synthetic graph and activation binding with one revision-linked public-scope fact. The existing hosted operator command has no fixture initializer. Preserve C0 and its routes.
+
+
 **20i RESELLER.** In the existing WordPress account, confirm the plugin version and the exact configured synthetic staging root. Inspect its `active.json` without calling the plugin status method, which may acquire or create a lock. Absence at the exact verified root means sequence 0. Stop for a present, unreadable, symlinked or inconsistent marker. Confirm the proposed new child under `~/miopages-private` will be owned by the WP-CLI account, mode 0700, and outside every served root or alias. Capture the logged-out access challenge and a stable authenticated page-content baseline. Confirm the exact v0.0.6 rollback package can be preserved outside the webroot.
 
 ### 2. Approval boundary

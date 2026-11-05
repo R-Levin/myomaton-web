@@ -4,6 +4,7 @@ import type { PoolClient } from "pg";
 import { bootstrapStatus } from "./bootstrap";
 import { adapterSchema, migrationRole, operatorRole, protectedConnection, protectedPool, pullRole, verifyProtectedSession } from "../../lib/platform/wordpress-delivery/protected-connection";
 import { privateStageSource, privateStageProposalTables } from "../../lib/platform/wordpress-delivery/permissions";
+import { inventorySite, normalizeInventoryUrl, sharedInventory } from "./wordpress-shared-inventory";
 import { quote } from "../backup/managed-permissions";
 
 const migrations = ["0016_wordpress_delivery", "0017_private_stage_authority"];
@@ -76,6 +77,7 @@ const diagnosticStages = {
   role_database_identity: ["WP_IDENTITY_CHECK_FAILED", "Check the backend login, effective role, expected database and backend TLS evidence."],
   session_behavior: ["WP_SESSION_CHECK_FAILED", "The advisory lock, backend identity or session settings could not be verified across a read-only transaction and rollback."],
   canonical_migration_baseline: ["WP_BASELINE_CHECK_FAILED", "Check the exact 16 canonical migrations, ledger access and the PG17 compatibility receipt if applicable."],
+  shared_inventory: ["WP_INVENTORY_FAILED", "Inspect read-only inventory access and the approved graph inputs."],
   adapter_validation: ["WP_ADAPTER_VALIDATION_FAILED", "Check access to role and adapter-schema metadata."],
   migration: ["WP_MIGRATION_FAILED", "Verify migration state before retrying."],
 } as const;
@@ -120,7 +122,8 @@ export function privateStageDiagnostic(stage: DiagnosticStage, error: unknown) {
 async function main(stage: (value: DiagnosticStage) => void) {
   const action = process.env.MIOPAGES_WP_SCHEMA_ACTION;
   const probeRole = action === "probe-pull-session" ? pullRole : action === "probe-operator-session" ? operatorRole : null;
-  if (!probeRole && action !== "apply-private-stage" && action !== "preflight-private-stage") {
+  const inventory = action === "inventory-private-stage";
+  if (!inventory && !probeRole && action !== "apply-private-stage" && action !== "preflight-private-stage") {
     throw Error("Explicit schema operation required");
   }
   const expected = process.env.MIOPAGES_WP_EXPECTED_DATABASE;
@@ -129,12 +132,27 @@ async function main(stage: (value: DiagnosticStage) => void) {
   const url = probeRole === pullRole ? process.env.MIOPAGES_WP_PULL_URL :
     probeRole === operatorRole ? process.env.MIOPAGES_WP_OPERATOR_URL : process.env.MIOPAGES_WP_MIGRATION_URL;
   stage("connection_configuration");
-  const pool = protectedPool(url ?? "", probeRole ?? migrationRole, process.env.MIOPAGES_WP_DATABASE_CA);
+  const pool = protectedPool(inventory ? normalizeInventoryUrl(url ?? "", expected) : url ?? "", probeRole ?? migrationRole, process.env.MIOPAGES_WP_DATABASE_CA);
   try {
     stage("connection_tls");
     const db = await pool.connect();
     try {
       stage("role_database_identity");
+      if (inventory) {
+        await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+        await protectedConnection(db, migrationRole, expected);
+        await db.query("SET LOCAL search_path=public");
+        stage("shared_inventory");
+        const synthetic: unknown = JSON.parse(process.env.MIOPAGES_WP_SYNTHETIC_SITES ?? "[]");
+        if (!Array.isArray(synthetic) || synthetic.length > 32) throw Error("Bounded synthetic graph list required");
+        const fixtureInput = process.env.MIOPAGES_WP_REHEARSAL_SITE;
+        const result = await sharedInventory(db, synthetic.map(inventorySite),
+          fixtureInput ? inventorySite(JSON.parse(fixtureInput)) : undefined);
+        await db.query("ROLLBACK");
+        console.log(JSON.stringify(result));
+        if (result.status === "BLOCKED") process.exitCode = 2;
+        return;
+      }
       await verifyProtectedSession(db, probeRole ?? migrationRole, expected, () => stage("session_behavior"));
       if (probeRole) {
         console.log(JSON.stringify({ role: probeRole, verifiedTls: true, sessionVerified: true }));
@@ -179,7 +197,9 @@ async function main(stage: (value: DiagnosticStage) => void) {
 if (process.argv[1]?.replaceAll("\\", "/").endsWith("/scripts/db/wordpress-private-stage.ts")) {
   let failedStage: DiagnosticStage = "configuration";
   main(value => { failedStage = value; }).catch(error => {
-    console.error(JSON.stringify(privateStageDiagnostic(failedStage, error)));
+    const diagnostic = privateStageDiagnostic(failedStage, error);
+    console.error(JSON.stringify(process.env.MIOPAGES_WP_SCHEMA_ACTION === "inventory-private-stage"
+      ? { status: "BLOCKED", ...diagnostic } : diagnostic));
     process.exitCode = 1;
   });
 }
