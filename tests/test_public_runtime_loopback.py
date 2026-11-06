@@ -33,8 +33,8 @@ class LoopbackTests(unittest.TestCase):
         self.assertEqual(m.resource_failure(0, m.MIN_AVAILABLE, 115), "DEADLINE")
 
     def test_foreign_or_absent_session_is_never_signaled(self):
-        with patch.object(m, "group_members", return_value={}), patch.object(m.os, "killpg") as kill:
-            m.terminate_group(123, m.signal.SIGKILL)
+        with patch.object(m, "group_members", return_value={}), patch.object(m.os, "killpg", create=True) as kill:
+            m.terminate_group(123, m.signal.SIGTERM)
             kill.assert_not_called()
 
 
