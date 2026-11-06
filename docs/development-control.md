@@ -3,6 +3,38 @@
 Status: **active Git continuity checkpoint**. Originally recorded 2026-11-01; updated after hosted synthetic C0 verification on 2026-11-01.
 This file is the first-read **navigation and operational handoff** when merged to `main`. It does not supersede source code, immutable database state, approved product contracts or live provider evidence. Do not claim current runtime/database state from Git alone.
 
+## Latest WordPress checkpoint — independently authenticated, durable candidate preview ready for owner review
+
+The owner reported enrollment PASS and authorized independent authentication followed by durable preparation/preview only. Hosted enrollment evidence `/home/virtual/vps-bef564/5/53b4381d42/miopages-wp-principals-20261106T144226Z/principals-evidence.json` was independently collected, strictly validated against the reviewed manifest and protected ownership/modes, SHA-256 `f87cd010f269de6c56326d0725978867d1a20bef7b51b4914e25b2956339ccbf`. This supersedes the earlier enrollment-pending statements below. The actual enrolled principals are:
+
+| Principal | Operator UUID | Exact scoped grant references |
+| --- | --- | --- |
+| rehearsal-owner-approver | `72bb2f38-28d7-4d3c-bea6-72540bf3d603` | inspect `7f444272-73e3-45e4-9ea3-e8496f6a5011`; preview `eb438c3f-395b-4980-9758-f507048f9990`; approve `da70a65e-a89e-4b38-938f-87290bf1447e` |
+| rehearsal-technical-reviewer | `c606cd74-b587-4248-8cba-3df6718fefec` | prepare `761eeade-0d4b-479b-97a6-f847936179ad`; inspect `449f7c04-7534-4f89-8483-c571e3224426`; preview `bf9f0cac-4ca4-4118-af2a-296605c0ea00`; review `dd627df4-58b8-480d-8ac2-bdde7c3577b7`; enroll `0ac7484a-f076-4e9c-a59b-af077bc749d4`; issue `f9b1db32-5c88-4bc9-868b-f81ace5f87b1`; revoke `8b097b11-0b61-4d70-b1fb-35d246bda3a6` |
+
+Both distinct raw tokens separately passed the existing `ProtectedOperator.authenticate` and every exact grant check over the verified-TLS restricted operator connection. Each was denied the opposite approval/review permission and C0 scope. No identity was asserted instead of authenticated. This is a functional separation of independently authenticated test principals, not independent human governance or real customer identity/mandate. Grants remain limited to the accepted inactive synthetic Organization/Web Presence/Managed Site. Credentials expire November7,2026 at15:40:31.259UTC (owner) and15:40:31.289UTC (reviewer); no extension or rotation occurred.
+
+The reviewer prepared exactly one proposal through the existing protected `SiteProposalService` and append-only PostgreSQL persistence, then rendered its preview through the unchanged shared Section renderer. An independent read-only connection replayed and validated the stored event history, resolved the current owned revision-linked canonical fact, checked its approved public-projection eligibility and reproduced the exact preview digest. The local downloaded HTML independently reproduces that digest too. It has no scripts, forms, media, external resources or operational links and retains noindex,nofollow.
+
+| Exact candidate identity | Value |
+| --- | --- |
+| Proposal / revision | `b6beda24-564c-4e19-9de0-09861ec32f24` / **1** |
+| Candidate binding digest | `fce4a96bd33a4d6ff2e7e50b380e735fe4d1e636a7dd98b2a57f2c40c335662c` |
+| Base fingerprint | `8ffe7283ada7fa2da60ac9848dea557a9189a069183bd44ae72f175e27005bc1` |
+| Preview approval digest | `10692cea76d3afb3eb825d7eaabfa53fbf73c8b4f7e9abdf07dda86c38548bd3` |
+| Preview event | `e2d0f346e4060bef9f0c83e3e10268cc3d91ac452c71bc735da8a9c6cb7a3190` |
+| Prepare event | `b07a8e48f744d4d275675722c663b3f90e37850c668369709a1a17216596ae97` |
+| Raw HTML SHA-256 / size | `816c135718cb1c06c62ec72ad61cf9301729ae8f133ced929853b750f0017bb1` /10,923bytes |
+| Prospective projection digest, not an approved/reviewed release | `f71a65739ec0b18d75516b27584d4042446e9c4df8721f0d49b346cef5f1327e` |
+
+Candidate: one proposed Page `/`, ID `29796cfe-a70b-4ca0-a05b-d5febdedc221`, title **MioPages private staging rehearsal**; one intro Section `514c00b4-4f93-4e10-9f5e-4633a3cd5f3b`, heading **Synthetic acceptance fixture**, body **Synthetic content used only for the private MioPages HTTPS staging rehearsal.** Title/heading are explicit technical editorial labels; the body resolves the existing Knowledge record `52f23cfc-b690-447e-9475-0c3d8324d929`, revision1, field rehearsal-purpose, fingerprint `39b61a6ed33835b70af3631830940221f405d147ca354476a41679fe1d080768`. No canonical Page or Section was created.
+
+Private hosted artifacts in the same0700 enrollment directory: `candidate-before.json`, `candidate-prepared.json`, exact `candidate-preview.html`, and `candidate-preview.json` (receipt SHA-256 `6feef09c0b96b5ae89be4f577b7a4186abef3c2239f8bea4f522ae137d27cf91`), files0600. Exact local review copies remain ignored: `runtime-content/wordpress-private-candidate-b6beda24.html` and `.json`. These synthetic review artifacts are not public content and are not published to GitHub Pages or WordPress.
+
+Preservation checks passed: all18 non-proposal canonical source tables have identical before/after counts and row digests, aggregate `27f19d657cb8c27c1ea5ae9f8a3358718ffce14feb2cc7b38472dbab19f9fb33`. The only proposal changes are one proposal, one revision and two events (prepare/preview). Adapter approval markers, private releases, installations and deliveries remain zero. State is PROPOSED with approval null. No release issuance, staging, public publication, database migration, role/grant change, WordPress deployment, listener or hosting change was performed. Patched public HEAD62439fc, existing app pid224900/restart count0 and both accepted public HTTPS hashes remain unchanged. Sanitized `candidate-public-preservation.json` SHA-256 `fab19a01029e166640ead45ab306a13f59b845e751d00f5cf50c4df9c9693f6f` records that independent check.
+
+**Next boundary:** present the exact HTML and digest above for the owner's explicit synthetic-only private-staging approval. No approval has been recorded or inferred. Recheck current base, renderer, exact binding, preview event, credential validity and grants before any subsequent approval. The current local memory-only token holder implements authentication/prepare/preview only; it cannot run approval, projection review or issuance. A reviewed credential-continuation correction is therefore also required before those later commands. Keep the two token verifiers/IDs/grants intact unless an explicit reviewed change is authorized; do not extract tokens through debugging, fabricate authentication, silently rotate them or mint replacement principals. Raw tokens remain only in the existing process memory, not files or chat. Losing that process or reaching expiry is a genuine credential gate, not permission to reset credentials. No new provisioning or architectural system was added in this phase. After explicit approval and resolved credential continuation, perform the existing separate technical projection review and remaining already-authorized HTTPS rehearsal; then full cleanup and Commercial V1 Media-to-Publication.
+
 ## Latest verified operational checkpoint — public security deployment PASS, November 6, 2026
 
 This checkpoint supersedes earlier statements below that public Core is still at vulnerable `5b94a1d`, that public remediation is pending, or that WordPress must wait for that remediation. Historical proofs remain historical. The owner explicitly authorized this one corrected deployment after checkpoint `1479308`.
