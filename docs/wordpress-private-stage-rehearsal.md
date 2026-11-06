@@ -1,5 +1,7 @@
 # Protected WordPress private-stage rehearsal
 
+Current public preservation boundary (November 6, 2026): the separately approved security deployment is verified PASS at exact dependency-only `62439fc0c8bde7fe98339625d33a845102a7995a`, Next16.4.5 on the existing8080 app. Preserve that patched deployment during this rehearsal. Use the new public Core root hashes and evidence in [development control](development-control.md#latest-verified-operational-checkpoint--public-security-deployment-pass-november-6-2026); the old5b94 public rollback is historical security-recovery material and must not be invoked as WordPress cleanup. The authenticated WordPress baseline and v0.0.6 rollback boundary are unchanged. Resume at scoped test-principal enrollment through the existing protected migration credential process, then prepare/inspect the candidate before separate owner exact approval. No WordPress acceptance has yet been claimed.
+
 This milestone composes Core's durable proposal, preview, approval and canonical projection checks with the Batch 1 delivery adapter. A private release is an independently reviewed, exact text-only projection of an approved proposal for a bound, inactive Managed Site. The release ID is an adapter record. The existing disposable canonical release service retains its original guard, and the protected operator role cannot write canonical Pages, Sections or routing state.
 
 ## Identity and evidence

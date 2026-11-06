@@ -437,7 +437,7 @@ def prepare(root, archive_sha):
     root, web = state_paths(root)
     assert not (root / "state.json").exists(), "Existing deployment checkpoint; do not repeat prepare"
     assert command(["git", "rev-parse", "HEAD"], web).decode().strip() == PREVIOUS
-    assert not command(["git", "status", "--porcelain", "--untracked-files=no"], web)
+    assert not command(["git", "--no-optional-locks", "status", "--porcelain", "--untracked-files=no"], web)
     cli = pm2_cli()
     before_app = app(cli)
     assert before_app["status"] == "online"
@@ -490,7 +490,7 @@ def finish_prepare(root, archive_sha):
     root, web = state_paths(root)
     assert not (root / "state.json").exists(), "Existing checkpoint requires inspection"
     assert command(["git", "rev-parse", "HEAD"], web).decode().strip() == PREVIOUS
-    assert not command(["git", "status", "--porcelain", "--untracked-files=no"], web)
+    assert not command(["git", "--no-optional-locks", "status", "--porcelain", "--untracked-files=no"], web)
     assert re.fullmatch(r"[a-f0-9]{64}", archive_sha)
     assert file_sha(root / "public-security-62439fc-linux-x64.tar.gz") == archive_sha
     candidate = json.loads((root / "public-security-build.json").read_text())
@@ -587,7 +587,7 @@ def apply(root):
     manifest = json.loads((root / "public-security-build.json").read_text())
     installed(root / "candidate", manifest)
     assert command(["git", "rev-parse", "HEAD"], web).decode().strip() == PREVIOUS
-    assert not command(["git", "status", "--porcelain", "--untracked-files=no"], web)
+    assert not command(["git", "--no-optional-locks", "status", "--porcelain", "--untracked-files=no"], web)
     live_manifest = "live-before-files.json" if state.get("verifiedLoopbackRelease") else "rollback-files.json"
     assert tree(backup_roots(web)) == json.loads((root / live_manifest).read_text()), "Live application changed after recovery verification"
     assert protected_tree(web) == state["protected"]
@@ -621,7 +621,7 @@ def apply(root):
         assets = public_build_assets(root, manifest)
         running = public_process_health(cli)
         assert native(web) == VERSIONS
-        assert not command(["git", "status", "--porcelain", "--untracked-files=no"], web)
+        assert not command(["git", "--no-optional-locks", "status", "--porcelain", "--untracked-files=no"], web)
         state["phase"] = "PASS"
         save(root / "state.json", state)
         evidence = {"status": "PASS", "sourceCommit": APPROVED, "previousCommit": PREVIOUS, "versions": VERSIONS,
