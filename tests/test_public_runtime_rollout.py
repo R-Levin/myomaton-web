@@ -5,6 +5,7 @@ from pathlib import Path
 import tarfile
 import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location("rollout", Path(__file__).parents[1] / "scripts/public-runtime-rollout.py")
 rollout = importlib.util.module_from_spec(spec)
@@ -17,6 +18,17 @@ class RolloutTests(unittest.TestCase):
         result = rollout.diagnostic(RuntimeError("postgresql://user:secret@host/db"))
         self.assertNotIn("secret", json.dumps(result))
         self.assertEqual(result["code"], "ROLLOUT_VALIDATION_FAILED")
+
+    def test_failed_http_stability_check_retains_both_observations(self):
+        first = {"status": 200, "sha256": "first", "content": [], "links": []}
+        second = {**first, "sha256": "second"}
+        with tempfile.TemporaryDirectory() as directory:
+            receipt = Path(directory) / "observations.json"
+            with patch.object(rollout, "HOSTS", ("example.test",)), patch.object(rollout, "response", side_effect=[first, second]):
+                with self.assertRaisesRegex(AssertionError, "Unstable public baseline"):
+                    rollout.http_snapshot({"example.test": ["/"]}, receipt)
+            saved = json.loads(receipt.read_text())
+            self.assertEqual(saved["example.test"]["/"], {"first": first, "second": second})
 
     def content(self, text):
         parser = rollout.Content()

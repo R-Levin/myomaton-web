@@ -404,6 +404,11 @@ def rollback(root, state, cli):
         command(["git", "switch", branch], web)
     else:
         command(["git", "switch", "--detach", PREVIOUS], web)
+    original_files = json.loads((root / "rollback-files.json").read_text())
+    for name in ("package.json", "package-lock.json"):
+        metadata = original_files["public_html/" + name]
+        assert file_sha(web / name) == metadata["sha256"]
+        os.chmod(web / name, metadata["mode"])
     assert protected_tree(web) == state["protected"]
     command(["node", cli, "restart", "miopages-runtime"])
     healthy(root, state, cli, restored=True)
