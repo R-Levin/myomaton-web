@@ -29,7 +29,11 @@ The canonical managed backup verifier recognizes the exact adapter grants on can
 
 ## Operator procedure on the existing 20i environments
 
-### Preferred self-service package plan — pending change approval
+### Preferred self-service package plan — approved implementation
+
+The owner explicitly approved the bounded change set in `cba52f3`: only the temporary package/hostname on the existing server, zero additional charge, isolated listener, scoped test identities, temporary v0.0.7 and full rollback. Exact candidate approval remains separate after durable preparation and digest inspection. Stop on unexpected cost, limitation or failed security/integrity/rollback gates. This supersedes the pending-approval wording in the historical planning checkpoint.
+
+Build preparation now uses root `proxy.ts` with no matcher, so private-stage mode denies unrelated pages, APIs and assets before rendering while normal Core remains unchanged. The existing endpoint ingress and authentication remain mandatory. `.github/workflows/wordpress-rehearsal-build.yml` builds Linux x64 on Node 22.23.2 without hosted credentials, then runs `scripts/wordpress-rehearsal-artifact.mjs`. The smoke runtime has no normal DATABASE_URL; both exact delivery POSTs must reach the existing missing-authentication refusal, and unrelated paths/methods must return 404. Only a successful smoke produces the checksummed runtime archive and source/file manifest. Artifacts expire after seven days; no CI deployment access is configured. Dependency installation belongs only in the new package; do not compile Next.js on the shared server.
 
 The owner completed read-only My20i inspection: the existing server is Node.js Optimised (1 CPU, 2 GB RAM, 50 GB SSD), with one package, runtime.miopages.com. Add Hosting permits another domain on this same server and shows no additional charge; subdomains have independent document roots. The original app was registered from its package public_html using `.env`, `ecosystem.config.js` and Node Application Manager discovery. A **separate temporary package on this server is feasible and preferred**. No new server or database service is required. This supersedes the earlier request for two path-specific proxy overrides on runtime.miopages.com; do not request those from Support unless the self-service approach actually fails a verified requirement.
 
