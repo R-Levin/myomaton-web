@@ -2,36 +2,11 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { lstat, readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { PoolClient } from "pg";
-import { fingerprint } from "../lib/platform/canonical/model";
-import { readProposalState } from "../lib/platform/content-editing/proposal-postgres";
-import { siteBase, resolvePage } from "../lib/platform/content-editing/proposal-context";
-import { proposalPreview } from "../lib/platform/content-editing/proposal-preview";
+import { verifyExactRehearsalCandidate as candidate } from "./db/wordpress-rehearsal-candidate";
 import { migrationRole, operatorRole, protectedPool, verifyProtectedSession } from "../lib/platform/wordpress-delivery/protected-connection";
 import { sessionUrl } from "./wordpress-database-rollout";
 import { principalManifest, rehearsalPrincipals, rehearsalSite, replaceRehearsalTokenVerifiers } from "./db/wordpress-rehearsal-principals";
 import { privateStageDiagnostic } from "./db/wordpress-private-stage";
-
-async function candidate(db: PoolClient) {
-  const scope = { webPresenceId: rehearsalSite.webPresenceId, managedSiteId: rehearsalSite.managedSiteId };
-  const id = "b6beda24-564c-4e19-9de0-09861ec32f24";
-  const row = (await db.query("SELECT * FROM site_change_proposals WHERE id=$1", [id])).rows[0];
-  assert.equal(row?.organization_id, rehearsalSite.organizationId);
-  const state = await readProposalState(db, id, scope, row.created_at);
-  assert.equal(state.state, "PROPOSED"); assert.equal(state.approval, null);
-  assert.equal(state.revisions.length, 1); assert.deepEqual(state.events.map(e => e.action), ["revise", "preview"]);
-  const r = state.revisions[0], base = await siteBase(db, scope);
-  assert.equal(r.binding.revision, 1);
-  assert.equal(r.binding.digest, "fce4a96bd33a4d6ff2e7e50b380e735fe4d1e636a7dd98b2a57f2c40c335662c");
-  assert.equal(fingerprint(base), "8ffe7283ada7fa2da60ac9848dea557a9189a069183bd44ae72f175e27005bc1");
-  assert.equal(r.binding.baseFingerprint, fingerprint(base));
-  const resolved = await resolvePage(db, scope, r.page, base);
-  assert.deepEqual(resolved.candidate, r.candidate); assert.deepEqual(resolved.resolved, r.resolved);
-  const digest = fingerprint(proposalPreview(r));
-  assert.equal(digest, "10692cea76d3afb3eb825d7eaabfa53fbf73c8b4f7e9abdf07dda86c38548bd3");
-  assert.equal(state.events[1].preview?.digest, digest);
-  assert.equal(state.events[1].hash, "e2d0f346e4060bef9f0c83e3e10268cc3d91ac452c71bc735da8a9c6cb7a3190");
-}
 
 async function main() {
   let stage = "configuration";
