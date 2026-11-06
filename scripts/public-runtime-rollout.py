@@ -196,9 +196,16 @@ def verify_archive(archive, manifest, rollback=False):
     with tarfile.open(archive, "r:*") as stream:
         for entry in stream:
             name = entry.name[2:] if entry.name.startswith("./") else entry.name
+            # PAX long-path headers can retain the directory's terminal slash.
+            if entry.isdir():
+                name = name.rstrip("/")
             if name == ".":
                 continue
             assert not PurePosixPath(name).is_absolute() and ".." not in PurePosixPath(name).parts, "Unsafe archive path"
+            if rollback:
+                attributes = manifest[name]
+                assert stat.S_IMODE(entry.mode) == attributes["mode"]
+                assert entry.uid == attributes["uid"] and entry.gid == attributes["gid"]
             if entry.isdir():
                 if rollback:
                     assert manifest[name]["kind"] == "directory"
@@ -330,6 +337,36 @@ def prepare(root, archive_sha):
     print(json.dumps({"status": "PREPARED", "recoveryVerified": True, "nativeProbe": "PASS", "sourceCommit": APPROVED, "rollbackSha256": recovery["archiveSha256"], "runDirectory": str(root)}))
 
 
+def finish_prepare(root, archive_sha):
+    """Complete a retained recovery verification; never recreate its archive."""
+    checkpoint("retained_recovery_verification")
+    root, web = state_paths(root)
+    assert not (root / "state.json").exists(), "Existing checkpoint requires inspection"
+    assert command(["git", "rev-parse", "HEAD"], web).decode().strip() == PREVIOUS
+    assert not command(["git", "status", "--porcelain", "--untracked-files=no"], web)
+    assert re.fullmatch(r"[a-f0-9]{64}", archive_sha)
+    assert file_sha(root / "public-security-62439fc-linux-x64.tar.gz") == archive_sha
+    candidate = json.loads((root / "public-security-build.json").read_text())
+    assert candidate["sourceCommit"] == APPROVED and candidate["versions"] == VERSIONS
+    installed(root / "candidate", candidate)
+    assert native(root / "candidate") == VERSIONS
+    previous = json.loads((root / "rollback-files.json").read_text())
+    assert tree(backup_roots(web)) == previous, "Live tree changed since retained backup"
+    verify_archive(root / "rollback.tar", previous, True)
+    recovery = {"archiveSha256": file_sha(root / "rollback.tar"), "treeDigest": canonical(previous), "entries": len(previous), "independentlyVerified": True}
+    before = json.loads((root / "http-before.json").read_text())
+    compare_http(before, http_snapshot({host: list(routes) for host, routes in before.items()}), exact=True)
+    cli = pm2_cli()
+    process = app(cli)
+    assert process["status"] == "online"
+    save(root / "recovery-verified.json", recovery)
+    state = {"phase": "prepared", "sourceCommit": APPROVED, "previousCommit": PREVIOUS, "artifactSha256": archive_sha,
+             "protected": protected_tree(web), "app": process, "recovery": recovery, "moved": [],
+             "previousBranch": command(["git", "branch", "--show-current"], web).decode().strip()}
+    save(root / "state.json", state)
+    print(json.dumps({"status": "PREPARED", "recoveryVerified": True, "retainedBackupReused": True, "rollbackSha256": recovery["archiveSha256"], "runDirectory": str(root)}))
+
+
 def rollback(root, state, cli):
     checkpoint("rollback_matching_previous_release")
     web = ACCOUNT / "public_html"
@@ -444,7 +481,7 @@ def apply(root):
 def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser()
-    parser.add_argument("operation", choices=("prepare", "apply"))
+    parser.add_argument("operation", choices=("prepare", "finish-prepare", "apply"))
     parser.add_argument("root", type=Path)
     parser.add_argument("--archive-sha256")
     args = parser.parse_args()
@@ -454,6 +491,8 @@ def main():
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         if args.operation == "prepare":
             prepare(root, args.archive_sha256)
+        elif args.operation == "finish-prepare":
+            finish_prepare(root, args.archive_sha256)
         else:
             apply(root)
 

@@ -70,6 +70,20 @@ class RolloutTests(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 rollout.verify_archive(archive, manifest)
 
+    def test_pax_long_directory_is_verified_with_its_original_attributes(self):
+        name = "public_html/" + "long-package-name/" * 12 + "directory"
+        manifest = {name: {"kind": "directory", "mode": 0o755, "uid": 123, "gid": 456}}
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "test.tar"
+            with tarfile.open(archive, "w", format=tarfile.PAX_FORMAT) as tar:
+                info = tarfile.TarInfo(name + "/")
+                info.type, info.mode, info.uid, info.gid = tarfile.DIRTYPE, 0o755, 123, 456
+                tar.addfile(info)
+            rollout.verify_archive(archive, manifest, True)
+            manifest[name]["uid"] = 999
+            with self.assertRaises(AssertionError):
+                rollout.verify_archive(archive, manifest, True)
+
 
 if __name__ == "__main__":
     unittest.main()
