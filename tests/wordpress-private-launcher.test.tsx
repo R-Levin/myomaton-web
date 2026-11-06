@@ -3,6 +3,18 @@ import { createRequire } from "node:module";
 import test from "node:test";
 const require = createRequire(import.meta.url);
 const { configuration, childEnvironment, procStat, resourceGate, ownedMembers } = require("../scripts/wordpress-private-listener.cjs");
+const { safeProbeFailure } = require("../scripts/wordpress-private-pull-probe.cjs");
+
+test("read-only probe diagnostics identify connection refusal without exporting nested error secrets", () => {
+  const result = safeProbeFailure({ code: "ECONNREFUSED", message: "never-export-password", connectionString: "never-export-url",
+    errors: [{ code: "ECONNREFUSED", address: "never-export-address", message: "never-export-token" }] }, "connection-tls");
+  assert.equal(result.stage, "connection-tls"); assert.equal(result.code, "ECONNREFUSED");
+  assert.deepEqual(result.connectionErrors, [{ code: "ECONNREFUSED" }]);
+  assert.ok(!JSON.stringify(result).includes("never-export"));
+  assert.equal(safeProbeFailure({ code: "never-export-url" }, "never-export-configuration").stage, "configuration");
+  assert.equal(safeProbeFailure({ code: "never-export-url" }, "configuration").code, "PRIVATE_PULL_PROBE_REFUSED");
+  assert.equal(safeProbeFailure({ code: "28P01" }, "connection-tls").code, "28P01");
+});
 
 function config() {
   return { pullUrl: "postgresql://miopages_wp_pull.syntheticref:synthetic-password@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=verify-full",
