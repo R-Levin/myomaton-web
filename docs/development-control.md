@@ -3,6 +3,39 @@
 Status: **active Git continuity checkpoint**. Originally recorded 2026-11-01; updated after hosted synthetic C0 verification on 2026-11-01.
 This file is the first-read **navigation and operational handoff** when merged to `main`. It does not supersede source code, immutable database state, approved product contracts or live provider evidence. Do not claim current runtime/database state from Git alone.
 
+## Read-only account network comparison — November 6, 2026; self-service check pending
+
+The owner requested self-service diagnosis **before provider escalation**, with no firewall/DNS/proxy/database/hosting changes or application registration. This supersedes the earlier instruction below to ask Support immediately. No provider was contacted and no hosted configuration was changed during this investigation. No database credential or protected configuration file was read by the network diagnostics; no database session or transaction-pooler session was opened.
+
+One bounded, contemporaneous SSH comparison of both accounts established:
+
+| Observation | runtime.miopages.com | wp-acceptance.miopages.com |
+| --- | --- | --- |
+| Actual Unix UID |3318461|3326411|
+| Server boot identity / hostname |same vps-bef564|same vps-bef564|
+| Network namespace |net:[4026531840]|net:[4026531840]|
+| DNS resolvers and Session Pooler answers |8.8.8.8/8.8.4.4; same three IPv4s|identical|
+| Visible route to every destination |eth0 via10.5.68.250, source10.5.69.12|identical, except caller UID|
+| Policy routing |local/main/default|identical|
+| TCP5432, each of three pooler IPs |3 connected|3 ECONNREFUSED|
+| TCP6543, each of three pooler IPs |3 connected|3 ECONNREFUSED|
+| HTTPS443 TCP control |connected|connected|
+| Public IPv4 observed by verified HTTPS request |194.38.52.241|194.38.52.241|
+| Effective capabilities / seccomp filters |none / none|none / none|
+| iptables filter/mangle OUTPUT read |permission denied|permission denied|
+
+Port6543 was tested only with connect-and-close TCP sockets to compare the operator-reported pre-existing exceptions. It remains prohibited for the adapter and was not used for PostgreSQL authentication. The public egress observation used [ipify's documented HTTPS IPv4 endpoint](https://www.ipify.org/), with system certificate verification, no proxy/redirect, cookies or credentials. That443 observation does **not** prove PostgreSQL-specific post-routing NAT behavior. Visible routing is identical; hidden NAT/mark/cgroup policies remain unreadable. Different SSH cgroup identities are expected and do not establish a cgroup denial rule by themselves.
+
+**Verified finding:** behavior depends on account context, on the same host/network namespace and visible source route, before TLS or database authentication. **Strong hypothesis, not proven rule:** the original outbound port exception is scoped to the original UID/account (or a related cgroup/security policy) and does not include the temporary account. DNS disagreement, a separate visible network namespace, a different visible route/source IP, and a general HTTPS egress outage were not observed. Do not assert the exact firewall rule, original exception scope, packet rejection origin or provider ownership from these tests alone.
+
+Both accounts expose iptables1.8.10 using the nf_tables backend but cannot list OUTPUT rules; nft/ufw/firewall-cmd/csf tools are unavailable. `/etc/sysconfig/iptables` exists but is neither readable nor writable. `sudo -n -l` requires a password, so no passwordless administrative path was established and no privileged command was attempted. There is no demonstrated SSH self-service firewall correction. Do not request a root password, change identity, bind a different source IP or tunnel around the restriction.
+
+**My20i access limitation:** both supported UI runtimes again failed before opening a page because their launcher encountered the intentionally locked backup drive. No drive/security change or workaround was attempted. The owner reviewed public documentation: Managed Cloud Server Manage Services/Settings and package SSH/SSL/Hotlink/Password/Directory Indexing/Malware controls, with no documented outbound PostgreSQL rule editor. The owner explicitly states this was **not an authenticated inspection** of the server controls or existing exceptions. Therefore neither availability nor absence of a customer-managed outbound-rule control is proven. Remote MySQL Access is unrelated. A focused question remains pending for the operator to inspect the actual existing server's Options → Manage → Manage Services and Settings read-only, report visible network controls and5432/6543 scope, and save/toggle nothing. Do not escalate before completing that available control-plane check or documenting that its access is unavailable.
+
+**Smallest proposed correction, conditional on the actual control:** if a package/UID-scoped outbound exception editor exists and its current rule confirms the mismatch, review one temporary allow entry for account e494602172/UID3326411 to the established Session Pooler on TCP5432, preserving the original rule and default-deny policy. No6543 expansion, public inbound port, DNS/proxy change, new service or credential rotation is needed. This is a proposal only; do not execute it without review. If the authenticated page has no such control, the remaining privileged work is inspection of the enforcing UID/cgroup/NAT rule and a package-only5432 correction; that would explain precisely what requires provider intervention, without assuming it now.
+
+Sanitized local evidence remains in ignored `runtime-content/wordpress-network-diagnosis`: eight account comparison/access/egress/restriction receipts and `network-assessment.json`, SHA-256 `3c1c980442350e7e3e7911687e7405a34f4031827da57b8eaf9dc964a85bb8ba`. Independent comparative assertions and diagnostic Python syntax checks passed. No application source/dependency changed, so the existing374 application/eight custody/TypeScript/lint gates were retained rather than repeated. Holder2644 again reports both identities authenticated and approval/review/enrollment retained; no token, grant, expiry or candidate was changed. Keep the prepared runtime stopped, WordPress006 and public Core unchanged, and the exact candidate approval valid. Resume the existing rehearsal only after the network gate is resolved and reviewed; do not redo completed database or approval groundwork.
+
 ## Current stop gate — new account's Session Pooler TCP refusal
 
 The isolated runtime was installed only in new account `e494602172` after independently verifying/extracting all308 private runtime files,32,657 matching dependency files and37 links. Actual installed Next16.4.5, React/ReactDOM19.2.8, sharp0.35.5 and DOMPurify3.4.17 match the pinned artifacts; native image and jsdom/DOMPurify probes passed. No build or package installation ran on the server. Only nonsecret PORT8081/NODE_ENV discovery metadata was created; **no ecosystem entry, application registration, listener startup or WordPress swap occurred**.
