@@ -2,9 +2,10 @@
 import assert from "node:assert/strict";
 import { spawn, execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { cp, lstat, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, lstat, mkdir, readdir, readFile, readlink, rm, symlink, unlink, writeFile } from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
+import { portableDependencyLink } from "./wordpress-artifact-links.mjs";
 
 assert.equal(process.platform, "linux", "Build the rehearsal artifact on Linux, never on the hosted server");
 assert.equal(process.arch, "x64");
@@ -23,8 +24,10 @@ const request = (url, method, headers = {}) => new Promise((resolve, reject) => 
   req.end();
 });
 
+async function smoke(directory) {
 // Explicit environment: importantly no DATABASE_URL, operator credentials or signer.
-const child = spawn(process.execPath, ["--max-old-space-size=256", "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", "8081"], {
+const child = spawn(process.execPath, ["--max-old-space-size=256", path.resolve("node_modules/next/dist/bin/next"), "start", "--hostname", "127.0.0.1", "--port", "8081"], {
+  cwd: directory,
   env: { PATH: process.env.PATH, HOME: process.env.HOME, NODE_ENV: "production", NEXT_TELEMETRY_DISABLED: "1",
     MIOPAGES_ROUTING_MODE: "shared-hostnames",
     MIOPAGES_WP_PRIVATE_STAGE: "enabled", MIOPAGES_WP_CORE_ORIGIN: origin,
@@ -61,6 +64,7 @@ try {
   const stopped = await Promise.race([exited.then(() => true), new Promise(resolve => setTimeout(() => resolve(false), 5000))]);
   if (!stopped) { child.kill("SIGKILL"); await exited; }
 }
+}
 
 const output = "runtime-content/wordpress-rehearsal-artifact";
 const staging = path.join(output, "application");
@@ -69,9 +73,15 @@ await mkdir(output, { recursive: true });
 await rm(staging, { recursive: true, force: true });
 await mkdir(staging);
 const hashes = {};
+const links = {};
 async function copyEntry(source, relative = source) {
   const info = await lstat(source);
-  assert.ok(!info.isSymbolicLink(), "No symlinks in artifact: " + relative);
+  if (info.isSymbolicLink()) {
+    const portable = await portableDependencyLink(process.cwd(), relative, staging);
+    await symlink(portable, path.join(staging, relative));
+    links[relative] = portable;
+    return;
+  }
   if (relative === ".next/cache") return;
   if (info.isDirectory()) {
     await mkdir(path.join(staging, relative), { recursive: true });
@@ -83,13 +93,22 @@ async function copyEntry(source, relative = source) {
   }
 }
 for (const item of [".next", "public", "package.json", "package-lock.json", "next.config.ts"]) await copyEntry(item);
+// Emulate npm ci at the destination, then test the relocated bytes and rewritten
+// links. This temporary dependency link is removed before creating the archive.
+await symlink(path.resolve("node_modules"), path.join(staging, "node_modules"), "dir");
+try { await smoke(path.resolve(staging)); }
+finally { await unlink(path.join(staging, "node_modules")); }
+for (const [file, digest] of Object.entries(hashes)) {
+  assert.equal(createHash("sha256").update(await readFile(path.join(staging, file))).digest("hex"), digest, "Smoke changed packaged file: " + file);
+}
+for (const [file, target] of Object.entries(links)) assert.equal(await readlink(path.join(staging, file)), target);
 const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
 assert.match(sourceCommit, /^[a-f0-9]{40}$/);
 const manifest = { sourceCommit, node: process.version, platform: process.platform, arch: process.arch,
-  isolatedRuntimeSmoke: "PASS", normalCoreDatabaseCredential: false, files: hashes };
+  isolatedRuntimeSmoke: "PASS", normalCoreDatabaseCredential: false, files: hashes, symlinks: links };
 await writeFile(path.join(staging, "rehearsal-build.json"), JSON.stringify(manifest, null, 2) + "\n");
 const archive = path.join(output, "wordpress-rehearsal-linux-x64.tar.gz");
-execFileSync("tar", ["-czf", archive, "-C", staging, "."]);
+execFileSync("tar", ["--exclude=./.next/cache", "-czf", archive, "-C", staging, "."]);
 const sha256 = createHash("sha256").update(await readFile(archive)).digest("hex");
 await writeFile(archive + ".sha256", sha256 + "  " + path.basename(archive) + "\n");
 await writeFile(path.join(output, "rehearsal-build.json"), JSON.stringify(manifest, null, 2) + "\n");
