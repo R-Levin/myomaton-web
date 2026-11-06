@@ -183,6 +183,14 @@ def tree(roots):
     return manifest
 
 
+def backup_roots(web):
+    return [web, ACCOUNT / ".config/miopages", ACCOUNT / "supabase-ca.crt"]
+
+
+def protected_tree(web):
+    return tree([ACCOUNT / ".config/miopages", ACCOUNT / "supabase-ca.crt", web / ".env", web / "ecosystem.config.js"])
+
+
 def verify_archive(archive, manifest, rollback=False):
     seen = set()
     with tarfile.open(archive, "r:*") as stream:
@@ -303,15 +311,14 @@ def prepare(root, archive_sha):
     checkpoint("https_and_application_baseline")
     baseline = http_snapshot()
     save(root / "http-before.json", baseline)
-    protected_roots = [ACCOUNT / ".config/miopages", web / ".env", web / "ecosystem.config.js"]
-    protected = tree(protected_roots)
+    protected = protected_tree(web)
     checkpoint("complete_rollback_archive")
-    rollback_manifest = tree([web, ACCOUNT / ".config/miopages"])
+    rollback_manifest = tree(backup_roots(web))
     save(root / "rollback-files.json", rollback_manifest)
     rollback = root / "rollback.tar"
-    command(["tar", "--create", "--file", str(rollback), "--directory", str(ACCOUNT), "public_html", ".config/miopages"])
+    command(["tar", "--create", "--file", str(rollback), "--directory", str(ACCOUNT), "public_html", ".config/miopages", "supabase-ca.crt"])
     os.chmod(rollback, 0o600)
-    assert tree([web, ACCOUNT / ".config/miopages"]) == rollback_manifest, "Application changed during backup"
+    assert tree(backup_roots(web)) == rollback_manifest, "Application changed during backup"
     checkpoint("independent_rollback_verification")
     verify_archive(rollback, rollback_manifest, True)
     recovery = {"archiveSha256": file_sha(rollback), "treeDigest": canonical(rollback_manifest), "entries": len(rollback_manifest), "independentlyVerified": True}
@@ -342,7 +349,7 @@ def rollback(root, state, cli):
         command(["git", "switch", branch], web)
     else:
         command(["git", "switch", "--detach", PREVIOUS], web)
-    assert tree([ACCOUNT / ".config/miopages", web / ".env", web / "ecosystem.config.js"]) == state["protected"]
+    assert protected_tree(web) == state["protected"]
     command(["node", cli, "restart", "miopages-runtime"])
     healthy(root, state, cli, restored=True)
     state["phase"] = "ROLLED_BACK_VULNERABLE"
@@ -367,7 +374,7 @@ def healthy(root, state, cli, restored=False):
     result = http_snapshot({host: list(routes) for host, routes in baseline.items()})
     compare_http(baseline, result, exact=restored)
     save(root / ("http-restored.json" if restored else "http-after.json"), result)
-    assert tree([ACCOUNT / ".config/miopages", ACCOUNT / "public_html/.env", ACCOUNT / "public_html/ecosystem.config.js"]) == state["protected"]
+    assert protected_tree(ACCOUNT / "public_html") == state["protected"]
     assert current["id"] == state["app"]["id"] and current["rss"] < 512 * 1024 * 1024
     return current, result
 
@@ -384,8 +391,8 @@ def apply(root):
     installed(root / "candidate", manifest)
     assert command(["git", "rev-parse", "HEAD"], web).decode().strip() == PREVIOUS
     assert not command(["git", "status", "--porcelain", "--untracked-files=no"], web)
-    assert tree([web, ACCOUNT / ".config/miopages"]) == json.loads((root / "rollback-files.json").read_text()), "Live application changed after recovery verification"
-    assert tree([ACCOUNT / ".config/miopages", web / ".env", web / "ecosystem.config.js"]) == state["protected"]
+    assert tree(backup_roots(web)) == json.loads((root / "rollback-files.json").read_text()), "Live application changed after recovery verification"
+    assert protected_tree(web) == state["protected"]
     baseline = json.loads((root / "http-before.json").read_text())
     compare_http(baseline, http_snapshot({host: list(routes) for host, routes in baseline.items()}), exact=True)
     cli = pm2_cli()
