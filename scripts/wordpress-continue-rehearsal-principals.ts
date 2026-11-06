@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { lstat, readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -7,40 +6,54 @@ import { migrationRole, operatorRole, protectedPool, verifyProtectedSession } fr
 import { sessionUrl } from "./wordpress-database-rollout";
 import { principalManifest, rehearsalPrincipals, rehearsalSite, replaceRehearsalTokenVerifiers } from "./db/wordpress-rehearsal-principals";
 import { privateStageDiagnostic } from "./db/wordpress-private-stage";
+import { configurationCheck, rehearsalConfigurationDiagnostic, rehearsalHome, rehearsalManifestPath, type RehearsalConfigurationCheck } from "./db/wordpress-rehearsal-paths";
 
 async function main() {
   let stage = "configuration";
+  let check: RehearsalConfigurationCheck = "platform";
+  let manifest: "original" | "prepared" | undefined;
   try {
-    assert.equal(process.platform, "linux");
-    const home = process.env.HOME!;
-    assert.equal(await realpath(process.cwd()), path.join(home, "miopages-wp-rehearsal"));
-    const [oldFile, oldHash, nextFile, nextHash, approval] = process.argv.slice(2);
-    assert.equal(approval, "REKEY-EXISTING-TEST-TOKENS");
-    assert.equal(oldFile, path.join(home, "miopages-wp-principals-20261106T144226Z/manifest.json"));
-    assert.equal(oldHash, "6c7cb17cfd45b4fb48c63e17e1327455ed09981e0f1d03cde45b13b753644384");
+    configurationCheck(process.platform === "linux", check);
+    const home = rehearsalHome(process.env.HOME);
+    check = "repository_location";
+    configurationCheck(await realpath(process.cwd()) === path.join(home, "miopages-wp-rehearsal"), check);
+    const [oldArgument, oldHash, nextArgument, nextHash, approval] = process.argv.slice(2);
+    configurationCheck(approval === "REKEY-EXISTING-TEST-TOKENS", "continuation_flag");
+    const oldFile = rehearsalManifestPath(home, oldArgument, true), nextFile = rehearsalManifestPath(home, nextArgument);
+    configurationCheck(oldHash === "6c7cb17cfd45b4fb48c63e17e1327455ed09981e0f1d03cde45b13b753644384", "original_manifest_checksum");
     const load = async (file: string, hash: string) => {
-      assert.equal(path.dirname(path.dirname(file)), home);
-      assert.match(path.basename(path.dirname(file)), /^miopages-wp-principals-[0-9TZ]+$/);
       for (const [p, mode] of [[file, 0o600], [path.dirname(file), 0o700]] as const) {
-        const s = await lstat(p); assert.ok(!s.isSymbolicLink() && s.uid === process.getuid!() && (s.mode & 0o777) === mode);
+        check = mode === 0o600 ? "manifest_file_protection" : "manifest_directory_protection";
+        const s = await lstat(p);
+        configurationCheck(!s.isSymbolicLink() && (mode === 0o600 ? s.isFile() : s.isDirectory()) && s.uid === process.getuid!() && (s.mode & 0o777) === mode, check);
       }
-      assert.match(hash, /^[a-f0-9]{64}$/);
-      const b = await readFile(file); assert.equal(createHash("sha256").update(b).digest("hex"), hash);
+      configurationCheck(/^[a-f0-9]{64}$/.test(hash ?? ""), "manifest_checksum_format");
+      check = "manifest_checksum";
+      const b = await readFile(file); configurationCheck(createHash("sha256").update(b).digest("hex") === hash, check);
+      check = "manifest_structure";
       return principalManifest(JSON.parse(b.toString("utf8")));
     };
-    const previous = await load(oldFile, oldHash), next = await load(nextFile, nextHash);
-    assert.notEqual(oldFile, nextFile);
+    manifest = "original"; const previous = await load(oldFile, oldHash);
+    manifest = "prepared"; const next = await load(nextFile, nextHash); manifest = undefined;
+    configurationCheck(oldFile !== nextFile, "distinct_manifests");
     const roleFile = path.join(home, "miopages-wp-db-20261105T181534Z/wordpress-role-credentials.json");
-    const stat = await lstat(roleFile); assert.ok(!stat.isSymbolicLink() && stat.uid === process.getuid!() && (stat.mode & 0o777) === 0o600);
+    check = "role_file_protection";
+    const stat = await lstat(roleFile); configurationCheck(stat.isFile() && !stat.isSymbolicLink() && stat.uid === process.getuid!() && (stat.mode & 0o777) === 0o600, check);
+    check = "role_file_format";
     const saved = JSON.parse(await readFile(roleFile, "utf8"));
     const existing = new URL(saved.operator.url), login = decodeURIComponent(existing.username);
-    assert.ok(login.startsWith(operatorRole + "."));
-    assert.equal(existing.port, "5432"); assert.equal(existing.search, "?sslmode=verify-full"); assert.equal(existing.hash, "");
+    configurationCheck(login.startsWith(operatorRole + "."), "role_login");
+    configurationCheck(existing.port === "5432", "session_pooler_port");
+    configurationCheck(existing.search === "?sslmode=verify-full", "verify_full_query");
+    configurationCheck(existing.hash === "", "url_fragment");
     const database = existing.pathname.slice(1), password = process.env.WP_REHEARSAL_MIGRATION_PASSWORD;
-    assert.ok(password);
+    configurationCheck(password, "migration_password_presence");
+    check = "connection_parameters";
     const url = sessionUrl(existing.hostname, login.slice(operatorRole.length + 1), database, migrationRole, password);
     delete process.env.WP_REHEARSAL_MIGRATION_PASSWORD;
+    check = "ca_readability";
     const ca = await readFile(path.join(home, "supabase-ca.crt"), "utf8");
+    check = "connection_parameters";
     const pool = protectedPool(url, migrationRole, ca);
     let replacement;
     try {
@@ -76,7 +89,8 @@ async function main() {
       } finally { db.release(); }
     } finally { await independent.end(); }
   } catch (error) {
-    console.error(JSON.stringify({ ...privateStageDiagnostic("adapter_validation", error), operationStage: stage,
+    console.error(JSON.stringify({ ...(stage === "configuration" ? rehearsalConfigurationDiagnostic(error, check) : privateStageDiagnostic("adapter_validation", error)), operationStage: stage,
+      ...(stage === "configuration" && manifest ? { manifest } : {}),
       requirement: "Stop and preserve both manifests. Independently inspect an uncertain commit; no automatic retry, reset, expiry extension or replacement provisioning." }));
     process.exitCode = 1;
   }

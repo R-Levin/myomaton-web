@@ -11,6 +11,7 @@ import { reviewedPrivateSource } from "../lib/platform/wordpress-delivery/privat
 import { childEnvironment } from "./wordpress-database-rollout";
 import { rehearsalPermissions, rehearsalSite } from "./db/wordpress-rehearsal-principals";
 import { exactRehearsal, rehearsalOperators, verifyExactRehearsalCandidate } from "./db/wordpress-rehearsal-candidate";
+import { configurationCheck, rehearsalConfigurationDiagnostic, rehearsalHome, rehearsalPrivateRoot } from "./db/wordpress-rehearsal-paths";
 
 type Permission = Parameters<ProtectedOperator["authorize"]>[1];
 export const rehearsalGrantRefs = [
@@ -93,13 +94,12 @@ async function privateFile(file: string) {
 }
 
 async function main() {
-  assert.equal(process.platform, "linux");
-  const home = process.env.HOME!, repository = path.join(home, "miopages-wp-rehearsal");
-  assert.equal(await realpath(process.cwd()), repository);
-  const root = process.env.WP_REHEARSAL_PRIVATE_ROOT!;
-  assert.equal(path.dirname(root), home); assert.match(path.basename(root), /^miopages-wp-principals-[0-9TZ]+$/);
+  configurationCheck(process.platform === "linux", "platform");
+  const home = rehearsalHome(process.env.HOME), repository = path.join(home, "miopages-wp-rehearsal");
+  configurationCheck(await realpath(process.cwd()) === repository, "repository_location");
+  const root = rehearsalPrivateRoot(home, process.env.WP_REHEARSAL_PRIVATE_ROOT);
   const stat = await lstat(root);
-  assert.ok(stat.isDirectory() && !stat.isSymbolicLink() && stat.uid === process.getuid!() && (stat.mode & 0o777) === 0o700);
+  configurationCheck(stat.isDirectory() && !stat.isSymbolicLink() && stat.uid === process.getuid!() && (stat.mode & 0o777) === 0o700, "private_root_protection");
   let length = 0; const chunks: Buffer[] = [];
   for await (const chunk of process.stdin) { const b = Buffer.from(chunk); length += b.length; assert.ok(length <= 65536); chunks.push(b); }
   const command = JSON.parse(Buffer.concat(chunks).toString("utf8"));
@@ -143,5 +143,9 @@ async function main() {
 }
 
 if (process.argv[1]?.replaceAll("\\", "/").endsWith("/wordpress-rehearsal-dispatch.ts")) {
-  main().catch(() => { console.error("Fixed rehearsal operation refused. Stop and inspect before retry."); process.exitCode = 1; });
+  main().catch(error => {
+    console.error(error?.code === "WP_REHEARSAL_CONFIGURATION_INVALID" ? JSON.stringify(rehearsalConfigurationDiagnostic(error))
+      : "Fixed rehearsal operation refused. Stop and inspect before retry.");
+    process.exitCode = 1;
+  });
 }
