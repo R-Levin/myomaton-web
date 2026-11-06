@@ -7,6 +7,10 @@ import { wordpressRehearsalFixture } from "../../scripts/customer-initializers/w
 import { sharedInventory } from "../../scripts/db/wordpress-shared-inventory";
 import { ActivationService } from "../../lib/platform/activation/service";
 import ownership from "../../scripts/backup/application-ownership.json";
+import { readFile } from "node:fs/promises";
+import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { rehearsalPermissions, rehearsalPrincipals } from "../../scripts/db/wordpress-rehearsal-principals";
+import { ProtectedOperator } from "../../lib/platform/wordpress-delivery/operator";
 
 const c0 = { organizationId: "152aebd3-00b3-4296-a64e-e281522e64f0",
   webPresenceId: "926cb772-7507-4542-8acd-e7e57ce71324", managedSiteId: "312b8081-4582-47fa-bedb-a551fd6e2b36" };
@@ -71,6 +75,48 @@ test("one protected rehearsal fixture creates atomically and independently verif
       } finally { db.release(); }
     } finally { await independent.end(); }
     assert.deepEqual(await state(pool), after);
+
+    // Exercise the actual narrow enrollment SQL only against disposable data.
+    await pool.query("CREATE SCHEMA miopages_wp; SET search_path=miopages_wp,public");
+    await pool.query(await readFile("lib/platform/wordpress-delivery/0016_wordpress_delivery.sql", "utf8"));
+    await pool.query(await readFile("lib/platform/wordpress-delivery/0017_private_stage_authority.sql", "utf8"));
+    const tokens = [randomBytes(32).toString("hex"), randomBytes(32).toString("hex")];
+    const manifest = { version: 1, principals: Object.entries(rehearsalPermissions).map(([reference, permissions], i) => ({
+      reference, id: randomUUID(), tokenSha256: createHash("sha256").update(Buffer.from(tokens[i], "hex")).digest("hex"),
+      grants: permissions.map(permission => ({ id: randomUUID(), permission })),
+    })) };
+    const enroll = async (action: "create" | "verify", value: unknown = manifest) => {
+      const db = await pool.connect();
+      try {
+        await db.query(action === "verify" ? "BEGIN READ ONLY" : "BEGIN");
+        const result = await rehearsalPrincipals(db, value, created.site, action);
+        await db.query("COMMIT"); return result;
+      } catch (error) { await db.query("ROLLBACK"); throw error; } finally { db.release(); }
+    };
+    await assert.rejects(enroll("verify"), /Missing, expired or conflicting/);
+    assert.equal((await enroll("create")).created, 2);
+    assert.equal((await enroll("create")).created, 0);
+    assert.equal((await enroll("verify")).readOnly, true);
+    assert.deepEqual(await state(pool), after, "Enrollment must not change canonical/C0 data");
+    await pool.query("UPDATE public.managed_sites SET status='active' WHERE id=$1", [created.site.managedSiteId]);
+    await assert.rejects(enroll("verify"), /Inactive rehearsal graph/);
+    await pool.query("UPDATE public.managed_sites SET status='inactive' WHERE id=$1", [created.site.managedSiteId]);
+    await pool.query("INSERT INTO public.managed_site_hostnames(id,hostname,web_presence_id,managed_site_id) VALUES($1,'forbidden-rehearsal.example.test',$2,$3)",
+      [randomUUID(), created.site.webPresenceId, created.site.managedSiteId]);
+    await assert.rejects(enroll("verify"), /Unhosted rehearsal/);
+    await pool.query("DELETE FROM public.managed_site_hostnames WHERE managed_site_id=$1", [created.site.managedSiteId]);
+    const identity = new ProtectedOperator(pool, async db => { await db.query("SET search_path=miopages_wp,public"); });
+    const owner = await identity.authenticate(tokens[0]), reviewer = await identity.authenticate(tokens[1]);
+    assert.equal((await identity.authorize(owner, "approve-site-proposal", created.site)).operatorId, manifest.principals[0].id);
+    assert.equal((await identity.authorize(reviewer, "review-private-stage", created.site)).operatorId, manifest.principals[1].id);
+    await assert.rejects(identity.authorize(owner, "review-private-stage", created.site), /refused/);
+    await assert.rejects(identity.authorize(reviewer, "approve-site-proposal", created.site), /refused/);
+    await assert.rejects(identity.authorize(reviewer, "prepare-site-proposal", c0), /refused/);
+    const altered = structuredClone(manifest); altered.principals[0].tokenSha256 = "a".repeat(64);
+    await assert.rejects(enroll("create", altered), /conflicting/);
+    await pool.query("UPDATE miopages_wp.wordpress_operator_credentials SET expires_at=now()-interval '1 second' WHERE id=$1", [manifest.principals[0].id]);
+    await assert.rejects(enroll("create"), /expired/);
+    await pool.query("DELETE FROM miopages_wp.wordpress_operator_grants; DELETE FROM miopages_wp.wordpress_operator_credentials; SET search_path=public");
 
     const service = new ActivationService(pool, { authorize: async () => ({
       operatorId: "synthetic-test", authorityReference: "synthetic-test",
