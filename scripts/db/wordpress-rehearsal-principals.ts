@@ -46,6 +46,10 @@ export async function rehearsalPrincipals(db: PoolClient, value: unknown, site: 
   assert.equal(readOnly, action === "verify" ? "on" : "off");
   await db.query("SET LOCAL lock_timeout='5s'; SET LOCAL statement_timeout='30s'");
   if (action === "create") await db.query("SELECT pg_advisory_xact_lock(hashtextextended('wordpress-rehearsal-principals/1',0))");
+  return principalState(db, manifest, site, action === "create", action === "verify");
+}
+
+async function principalState(db: PoolClient, manifest: ReturnType<typeof principalManifest>, site: typeof rehearsalSite, create: boolean, readOnly: boolean) {
   const graph = (await db.query(`SELECT o.status AS organization_status,w.status AS presence_status,s.status AS site_status,w.primary_domain
     FROM public.organizations o JOIN public.web_presences w ON w.organization_id=o.id
     JOIN public.managed_sites s ON s.web_presence_id=w.id WHERE o.id=$1 AND w.id=$2 AND s.id=$3`,
@@ -62,7 +66,7 @@ export async function rehearsalPrincipals(db: PoolClient, value: unknown, site: 
   [ids, manifest.principals.flatMap(p => p.grants.map(g => g.id)), site.webPresenceId, site.managedSiteId]);
   let existing = (await grants()).rows;
   let created = 0;
-  if (credentials.length === 0 && existing.length === 0 && action === "create") {
+  if (credentials.length === 0 && existing.length === 0 && create) {
     for (const p of manifest.principals) {
       await db.query(`INSERT INTO miopages_wp.wordpress_operator_credentials(id,token_sha256,expires_at)
         VALUES($1,$2,clock_timestamp()+interval '24 hours')`, [p.id, p.tokenSha256]);
@@ -81,7 +85,35 @@ export async function rehearsalPrincipals(db: PoolClient, value: unknown, site: 
     web_presence_id: site.webPresenceId, managed_site_id: site.managedSiteId, permission: g.permission,
     customer: g.permission === "approve-site-proposal" ? mandate : null, revoked_at: null }))).sort((a, b) => a.id.localeCompare(b.id)),
   "Conflicting grants; do not broaden or repair automatically");
-  return { status: "PASS", created, readOnly: action === "verify", scope: site,
+  return { status: "PASS", created, readOnly, scope: site,
     principals: manifest.principals.map(({ reference, id, grants }) => ({ reference, id, grants })),
     independentHumanGovernance: false, publicPublicationAuthorized: false };
+}
+
+// Explicitly approved continuation only, never a login-failure fallback. The
+// caller owns BEGIN/COMMIT and independently verifies using a fresh connection.
+export async function replaceRehearsalTokenVerifiers(db: PoolClient, previousValue: unknown, nextValue: unknown, site: typeof rehearsalSite) {
+  const previous = principalManifest(previousValue), next = principalManifest(nextValue);
+  const identity = (m: ReturnType<typeof principalManifest>) => m.principals.map(({ reference, id, grants }) => ({ reference, id, grants }));
+  assert.deepEqual(identity(next), identity(previous), "Operator identities and every grant must remain exact");
+  const hashes = [...previous.principals, ...next.principals].map(p => p.tokenSha256);
+  assert.equal(new Set(hashes).size, 4, "Fresh distinct token verifiers required");
+  assert.equal((await db.query("SHOW transaction_read_only")).rows[0].transaction_read_only, "off");
+  await db.query("SET LOCAL lock_timeout='5s'; SET LOCAL statement_timeout='30s'");
+  await db.query("SELECT pg_advisory_xact_lock(hashtextextended('wordpress-rehearsal-principals/1',0))");
+  const ids = previous.principals.map(p => p.id);
+  assert.equal((await db.query("SELECT id FROM miopages_wp.wordpress_operator_credentials WHERE id=ANY($1::uuid[]) ORDER BY id FOR UPDATE", [ids])).rowCount, 2, "Both original principals must exist");
+  await db.query("LOCK TABLE miopages_wp.wordpress_operator_grants IN SHARE MODE");
+  // Inspection cannot create rows, even inside this locked write transaction.
+  await principalState(db, previous, site, false, false);
+  const before = (await db.query("SELECT id,expires_at,revoked_at FROM miopages_wp.wordpress_operator_credentials WHERE id=ANY($1::uuid[]) ORDER BY id", [ids])).rows;
+  for (let i = 0; i < 2; i++) {
+    const changed = await db.query(`UPDATE miopages_wp.wordpress_operator_credentials SET token_sha256=$1
+      WHERE id=$2 AND token_sha256=$3 AND revoked_at IS NULL AND expires_at>clock_timestamp()`,
+    [next.principals[i].tokenSha256, previous.principals[i].id, previous.principals[i].tokenSha256]);
+    assert.equal(changed.rowCount, 1, "Stale or expired verifier; rollback without retry");
+  }
+  const after = (await db.query("SELECT id,expires_at,revoked_at FROM miopages_wp.wordpress_operator_credentials WHERE id=ANY($1::uuid[]) ORDER BY id", [ids])).rows;
+  assert.deepEqual(after, before, "Credential lifetime and revocation must not change");
+  return { verifierReplacements: 2, identitiesUnchanged: true, grantsUnchanged: true, expiryUnchanged: true };
 }

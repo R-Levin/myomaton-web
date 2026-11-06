@@ -5,7 +5,13 @@ set -euo pipefail
 umask 077
 ulimit -c 0
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
-[[ -t 0 && -t 1 && $# == 2 ]] || { printf 'Use the authenticated interactive Cloud shell, reviewed manifest path and SHA256.\n' >&2; exit 1; }
+[[ -t 0 && -t 1 && ( $# == 2 || $# == 5 ) ]] || { printf 'Use the authenticated interactive Cloud shell and reviewed manifest arguments.\n' >&2; exit 1; }
+entry=scripts/wordpress-enroll-rehearsal-principals.ts
+if [[ $# == 5 ]]; then
+  [[ "$5" == REKEY-EXISTING-TEST-TOKENS ]] || exit 1
+  printf 'Explicit continuation: replace only two short-lived token verifiers; preserve operator IDs, grants and original expiry.\n'
+  entry=scripts/wordpress-continue-rehearsal-principals.ts
+fi
 [[ "$(pwd -P)" == /home/virtual/vps-bef564/5/53b4381d42/miopages-wp-rehearsal ]] || exit 1
 git diff --quiet HEAD -- scripts lib/platform
 trap 'unset WP_REHEARSAL_MIGRATION_PASSWORD' EXIT
@@ -20,4 +26,4 @@ while IFS= read -r name; do
   case "$name" in HOME|PATH|LANG|WP_REHEARSAL_MIGRATION_PASSWORD) ;; *) unset "$name" ;; esac
 done < <(compgen -e)
 export NODE_ENV=production NODE_EXTRA_CA_CERTS="$HOME/supabase-ca.crt"
-node --import tsx scripts/wordpress-enroll-rehearsal-principals.ts "$1" "$2"
+node --import tsx "$entry" "$@"

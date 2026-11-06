@@ -9,7 +9,7 @@ import { ActivationService } from "../../lib/platform/activation/service";
 import ownership from "../../scripts/backup/application-ownership.json";
 import { readFile } from "node:fs/promises";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { rehearsalPermissions, rehearsalPrincipals } from "../../scripts/db/wordpress-rehearsal-principals";
+import { rehearsalPermissions, rehearsalPrincipals, replaceRehearsalTokenVerifiers } from "../../scripts/db/wordpress-rehearsal-principals";
 import { ProtectedOperator } from "../../lib/platform/wordpress-delivery/operator";
 
 const c0 = { organizationId: "152aebd3-00b3-4296-a64e-e281522e64f0",
@@ -112,6 +112,37 @@ test("one protected rehearsal fixture creates atomically and independently verif
     await assert.rejects(identity.authorize(owner, "review-private-stage", created.site), /refused/);
     await assert.rejects(identity.authorize(reviewer, "approve-site-proposal", created.site), /refused/);
     await assert.rejects(identity.authorize(reviewer, "prepare-site-proposal", c0), /refused/);
+    const replacement = structuredClone(manifest), replacementTokens = [randomBytes(32).toString("hex"), randomBytes(32).toString("hex")];
+    replacement.principals.forEach((p, i) => { p.tokenSha256 = createHash("sha256").update(Buffer.from(replacementTokens[i], "hex")).digest("hex"); });
+    const metadata = async () => (await pool.query("SELECT id,expires_at,revoked_at FROM miopages_wp.wordpress_operator_credentials ORDER BY id")).rows;
+    const beforeReplacement = await metadata();
+    const replace = async (next: unknown, rollback = false) => {
+      const db = await pool.connect();
+      try {
+        await db.query("BEGIN");
+        const result = await replaceRehearsalTokenVerifiers(db, manifest, next, created.site);
+        await db.query(rollback ? "ROLLBACK" : "COMMIT"); return result;
+      } catch (error) { await db.query("ROLLBACK"); throw error; } finally { db.release(); }
+    };
+    const wrongIdentity = structuredClone(replacement); wrongIdentity.principals[0].id = randomUUID();
+    await assert.rejects(replace(wrongIdentity), /identities and every grant/);
+    await assert.rejects(replace(manifest), /Fresh distinct/);
+    await replace(replacement, true);
+    assert.equal((await enroll("verify")).readOnly, true, "Rollback retains both old verifiers");
+    assert.equal((await replace(replacement)).verifierReplacements, 2);
+    assert.deepEqual(await metadata(), beforeReplacement, "No extension of expiry or revocation changes");
+    await assert.rejects(identity.authenticate(tokens[0]), /refused/);
+    await assert.rejects(identity.authenticate(tokens[1]), /refused/);
+    await assert.rejects(identity.authorize(owner, "approve-site-proposal", created.site), /refused/);
+    for (let i = 0; i < 2; i++) {
+      const authenticated = await identity.authenticate(replacementTokens[i]);
+      const permission = i ? "review-private-stage" : "approve-site-proposal";
+      assert.equal((await identity.authorize(authenticated, permission, created.site)).operatorId, manifest.principals[i].id);
+    }
+    await assert.rejects(replace(replacement), /conflicting/, "Do not automatically repeat a replacement");
+    manifest.principals.forEach((p, i) => { p.tokenSha256 = replacement.principals[i].tokenSha256; });
+    assert.equal((await enroll("verify")).readOnly, true);
+    assert.deepEqual(await state(pool), after);
     const altered = structuredClone(manifest); altered.principals[0].tokenSha256 = "a".repeat(64);
     await assert.rejects(enroll("create", altered), /conflicting/);
     await pool.query("UPDATE miopages_wp.wordpress_operator_credentials SET expires_at=now()-interval '1 second' WHERE id=$1", [manifest.principals[0].id]);
