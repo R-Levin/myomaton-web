@@ -12,6 +12,12 @@ spec.loader.exec_module(rollout)
 
 
 class RolloutTests(unittest.TestCase):
+    def test_failure_reporting_keeps_safe_invariant_and_never_arbitrary_secret_text(self):
+        self.assertEqual(rollout.diagnostic(AssertionError("Public app content changed"))["code"], "PUBLIC_CONTENT_MISMATCH")
+        result = rollout.diagnostic(RuntimeError("postgresql://user:secret@host/db"))
+        self.assertNotIn("secret", json.dumps(result))
+        self.assertEqual(result["code"], "ROLLOUT_VALIDATION_FAILED")
+
     def content(self, text):
         parser = rollout.Content()
         parser.feed(text)

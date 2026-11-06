@@ -21,6 +21,18 @@ ACCOUNT = Path("/home/virtual/vps-bef564/5/53b4381d42")
 HOSTS = ("runtime.miopages.com", "domain-test.miopages.com")
 VERSIONS = {"next": "16.4.5", "sharp": "0.35.5", "dompurify": "3.4.17", "react": "19.2.8", "react-dom": "19.2.8"}
 STAGE = "configuration"
+SAFE_FAILURES = {
+    "Unstable public baseline": "HTTP_RESPONSE_UNSTABLE",
+    "Public app content changed": "PUBLIC_CONTENT_MISMATCH",
+    "HTTP status changed": "HTTP_STATUS_MISMATCH",
+    "Public root unhealthy": "PUBLIC_ROOT_UNHEALTHY",
+    "Existing route unhealthy": "PUBLIC_ROUTE_UNHEALTHY",
+    "Rollback response differs": "ROLLBACK_RESPONSE_MISMATCH",
+}
+
+
+def diagnostic(error):
+    return {"stage": STAGE, "category": type(error).__name__, "code": SAFE_FAILURES.get(str(error), "ROLLOUT_VALIDATION_FAILED")}
 
 
 def checkpoint(stage):
@@ -130,10 +142,13 @@ def response(host, route):
     return {"status": status, "bytes": len(body), "sha256": hashlib.sha256(body).hexdigest(), "content": parser.tokens, "links": sorted(parser.links)}
 
 
-def http_snapshot(routes=None):
-    data = {}
+def http_snapshot(routes=None, receipt=None):
+    data, observations = {}, {}
     for host in HOSTS:
         root = response(host, "/")
+        observations[host] = {"/": {"first": root}}
+        if receipt:
+            save(receipt, observations)
         assert root["status"] == 200, "Public root unhealthy"
         paths = routes[host] if routes else sorted({"/", "/api/intake", "/api/contact", "/media/assets/invalid", *root["links"]})
         assert len(paths) <= 16
@@ -141,6 +156,9 @@ def http_snapshot(routes=None):
         for route in paths:
             first = root if route == "/" else response(host, route)
             second = response(host, route)
+            observations[host][route] = {"first": first, "second": second}
+            if receipt:
+                save(receipt, observations)
             assert first == second, "Unstable public baseline"
             assert first["status"] < 500 or route == "/api/intake" and first["status"] == 503, "Existing route unhealthy"
             data[host][route] = first
@@ -408,7 +426,8 @@ def healthy(root, state, cli, restored=False):
         time.sleep(1)
     else:
         raise RuntimeError("Public process readiness failed")
-    result = http_snapshot({host: list(routes) for host, routes in baseline.items()})
+    result = http_snapshot({host: list(routes) for host, routes in baseline.items()}, root / ("http-restoration-observations.json" if restored else "http-candidate-observations.json"))
+    save(root / ("http-restoration-candidate.json" if restored else "http-candidate.json"), result)
     compare_http(baseline, result, exact=restored)
     save(root / ("http-restored.json" if restored else "http-after.json"), result)
     assert protected_tree(ACCOUNT / "public_html") == state["protected"]
@@ -467,7 +486,8 @@ def apply(root):
                     "http": {host: {route: {"status": item["status"], "sha256": item["sha256"], "contentDigest": canonical(item["content"])} for route, item in routes.items()} for host, routes in http.items()}}
         save(root / "deployment-evidence.json", evidence)
         print(json.dumps({"status": "PASS", "sourceCommit": APPROVED, "evidence": str(root / "deployment-evidence.json"), "evidenceSha256": file_sha(root / "deployment-evidence.json")}))
-    except BaseException:
+    except BaseException as error:
+        save(root / "failure-diagnostic.json", diagnostic(error))
         try:
             rollback(root, state, cli)
             print(json.dumps({"status": "ROLLED_BACK", "previousVersionRemainsVulnerable": True, "evidence": str(root / "deployment-evidence.json")}))
@@ -502,5 +522,5 @@ if __name__ == "__main__":
         main()
     except BaseException as error:
         # No arbitrary subprocess/HTTP/environment strings in operator output.
-        print(json.dumps({"status": "BLOCKED", "stage": STAGE, "category": type(error).__name__}))
+        print(json.dumps({"status": "BLOCKED", **diagnostic(error)}))
         raise SystemExit(1)

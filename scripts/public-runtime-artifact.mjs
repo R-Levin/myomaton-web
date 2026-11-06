@@ -18,6 +18,7 @@ assert.equal(process.version, "v22.23.2");
 assert.equal((await readdir(repository)).some(n => n.startsWith(".env")), false);
 await assert.rejects(lstat("app/api/wordpress-delivery"));
 await assert.rejects(lstat("proxy.ts"));
+assert.ok((await lstat(".next/server/webpack-runtime.js")).isFile(), "Match the existing public deployment's Webpack build contract");
 const output = path.join(repository, "runtime-content/public-security-release");
 const staging = path.join(output, "application");
 await mkdir(staging, { recursive: true });
@@ -96,7 +97,7 @@ try {
 for (const [name, info] of Object.entries(files)) assert.equal(digest(await readFile(path.join(staging, name))), info.sha256, name);
 for (const [name, target] of Object.entries(links)) assert.equal(await readlink(path.join(staging, name)), target);
 const manifest = { sourceCommit: approved, node: process.version, platform: process.platform, arch: process.arch,
-  versions, packagedRuntimeSmoke: "PASS", nativeProbe: "PASS", hostedChanges: 0, files, symlinks: links };
+  bundler: "webpack", versions, packagedRuntimeSmoke: "PASS", nativeProbe: "PASS", hostedChanges: 0, files, symlinks: links };
 await writeFile(path.join(output, "public-security-build.json"), JSON.stringify(manifest) + "\n");
 await writeFile(path.join(staging, "public-security-build.json"), JSON.stringify(manifest) + "\n");
 const archive = path.join(output, "public-security-62439fc-linux-x64.tar.gz");

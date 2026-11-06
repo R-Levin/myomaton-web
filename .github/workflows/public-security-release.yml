@@ -33,7 +33,7 @@ jobs:
           cache-dependency-path: candidate/package-lock.json
       - run: npm ci && npm audit --omit=dev --audit-level=low && npm test
         working-directory: candidate
-      - run: npm run build
+      - run: npm run build -- --webpack
         working-directory: candidate
         env:
           DATABASE_URL: postgresql://build:unused@127.0.0.1:1/build_only
