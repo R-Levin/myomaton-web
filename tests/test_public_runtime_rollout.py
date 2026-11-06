@@ -13,6 +13,20 @@ spec.loader.exec_module(rollout)
 
 
 class RolloutTests(unittest.TestCase):
+    def test_build_asset_refs_preserve_exact_paths_and_refuse_traversal(self):
+        parser = rollout.BuildAssets()
+        parser.feed('<script src="/_next/static/chunks/app/%5Bpath%5D/a.js"></script><link href="/_next/static/css/a.css" rel="stylesheet"><a href="https://unrelated.test">x</a>')
+        self.assertEqual(parser.paths, {"/_next/static/chunks/app/%5Bpath%5D/a.js", "/_next/static/css/a.css"})
+        with self.assertRaises(AssertionError):
+            parser.feed('<script src="/_next/static/%2e%2e/private"></script>')
+
+    def test_runtime_recovery_comparison_excludes_only_git_audit_metadata(self):
+        before = {"public_html/.git/HEAD": {"sha256": "old"}, "public_html/package.json": {"sha256": "same"}}
+        after = {**before, "public_html/.git/HEAD": {"sha256": "audit"}}
+        self.assertEqual(rollout.application_entries(before), rollout.application_entries(after))
+        after["public_html/package.json"] = {"sha256": "changed"}
+        self.assertNotEqual(rollout.application_entries(before), rollout.application_entries(after))
+
     def test_failure_reporting_keeps_safe_invariant_and_never_arbitrary_secret_text(self):
         self.assertEqual(rollout.diagnostic(AssertionError("Public app content changed"))["code"], "PUBLIC_CONTENT_MISMATCH")
         result = rollout.diagnostic(RuntimeError("postgresql://user:secret@host/db"))

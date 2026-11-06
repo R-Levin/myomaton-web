@@ -11,6 +11,7 @@ import stat
 import subprocess
 import tarfile
 import time
+import shutil
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -20,6 +21,8 @@ PREVIOUS = "5b94a1d118b8ea7da0087fcab76786c5be9c0c13"
 ACCOUNT = Path("/home/virtual/vps-bef564/5/53b4381d42")
 HOSTS = ("runtime.miopages.com", "domain-test.miopages.com")
 VERSIONS = {"next": "16.4.5", "sharp": "0.35.5", "dompurify": "3.4.17", "react": "19.2.8", "react-dom": "19.2.8"}
+WEBPACK_SHA = "24e0bff248ae1ff377c253925a91b84cebc1138b46fd11faaec9cc01a1f3ee08"
+PRESERVED_RUN = ACCOUNT / "miopages-public-security-20261106T023853Z"
 STAGE = "configuration"
 SAFE_FAILURES = {
     "Unstable public baseline": "HTTP_RESPONSE_UNSTABLE",
@@ -142,6 +145,69 @@ def response(host, route):
     return {"status": status, "bytes": len(body), "sha256": hashlib.sha256(body).hexdigest(), "content": parser.tokens, "links": sorted(parser.links)}
 
 
+class BuildAssets(html.parser.HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.paths = set()
+
+    def handle_starttag(self, tag, attrs):
+        row = dict(attrs)
+        value = row.get("src") if tag == "script" else row.get("href") if tag == "link" else None
+        if value and value.startswith("/_next/static/"):
+            path = urllib.parse.urlsplit(value).path
+            assert ".." not in PurePosixPath(urllib.parse.unquote(path)).parts
+            self.paths.add(path)
+
+
+def public_build_assets(root, manifest):
+    observations = []
+    for host in HOSTS:
+        request = urllib.request.Request("https://" + host + "/", headers={"Cache-Control": "no-cache"})
+        with urllib.request.build_opener(NoRedirect()).open(request, timeout=20) as page:
+            parser = BuildAssets()
+            parser.feed(page.read(4 * 1024 * 1024).decode("utf-8"))
+        assert parser.paths, "No public build asset references"
+        for path in sorted(parser.paths):
+            key = ".next" + urllib.parse.unquote(path[len("/_next"):])
+            assert key in manifest["files"], "Public HTML references a different build"
+            request = urllib.request.Request("https://" + host + path, headers={"Cache-Control": "no-cache", "Accept-Encoding": "identity"})
+            try:
+                reply = urllib.request.build_opener(NoRedirect()).open(request, timeout=20)
+            except urllib.error.HTTPError as error:
+                reply = error
+            with reply:
+                body = reply.read(16 * 1024 * 1024 + 1)
+                entry = {"host": host, "path": path, "status": reply.code, "bytes": len(body), "sha256": hashlib.sha256(body).hexdigest()}
+            observations.append(entry)
+            save(root / "public-build-asset-observations.json", observations)
+            assert entry["status"] == 200 and entry["sha256"] == manifest["files"][key]["sha256"], "Public build asset checksum/status mismatch"
+    return observations
+
+
+def public_process_health(cli):
+    current = app(cli)
+    output = command(["ss", "-H", "-ltnp", "sport = :8080"]).decode()
+    listeners = set(re.findall(r"pid=(\d+)", output))
+    assert len(output.strip().splitlines()) == 1 and len(listeners) == 1, "Unexpected public listener"
+    pid = int(next(iter(listeners)))
+    assert Path("/proc", str(pid)).stat().st_uid == os.getuid()
+    original = pid
+    for _ in range(8):
+        if pid == current["pid"]:
+            break
+        fields = Path("/proc", str(pid), "stat").read_text().rsplit(")", 1)[1].split()
+        pid = int(fields[1])
+    else:
+        raise AssertionError("Public listener is outside the registered application")
+    title = Path("/proc", str(original), "cmdline").read_bytes().split(b"\0", 1)[0].decode()
+    version = re.search(r"next-server \(v([0-9.]+)\)", title)
+    assert version and version[1] == VERSIONS["next"], "Running Next version mismatch"
+    status = Path("/proc", str(original), "status").read_text()
+    rss = re.search(r"^VmRSS:\s+(\d+) kB$", status, re.M)
+    assert rss and int(rss[1]) * 1024 < 512 * 1024 * 1024, "Public server memory gate failed"
+    return {"pid": original, "nextVersion": version[1], "rssBytes": int(rss[1]) * 1024}
+
+
 def http_snapshot(routes=None, receipt=None):
     data, observations = {}, {}
     for host in HOSTS:
@@ -207,6 +273,69 @@ def backup_roots(web):
 
 def protected_tree(web):
     return tree([ACCOUNT / ".config/miopages", ACCOUNT / "supabase-ca.crt", web / ".env", web / "ecosystem.config.js"])
+
+
+def application_entries(manifest):
+    # Git's retained audit log records the previous attempt; runtime files must
+    # match the archive exactly. Do not overwrite that Git audit history.
+    return {name: value for name, value in manifest.items()
+            if name != "public_html/.git" and not name.startswith("public_html/.git/")}
+
+
+def resources():
+    found = re.search(r"^MemAvailable:\s+(\d+) kB$", Path("/proc/meminfo").read_text(), re.M)
+    assert found and int(found[1]) * 1024 >= 512 * 1024 * 1024, "Insufficient deployment memory headroom"
+    free = shutil.disk_usage(ACCOUNT).free
+    assert free >= 4 * 1024 ** 3, "Insufficient deployment disk headroom"
+    return {"availableMemoryBytes": int(found[1]) * 1024, "freeDiskBytes": free}
+
+
+def prepare_loopback_release(root):
+    checkpoint("verified_loopback_release_and_preserved_recovery")
+    root, web = state_paths(root)
+    assert not (root / "state.json").exists(), "Existing attempt checkpoint; no automatic retry"
+    proof_path = root / "loopback-evidence.json"
+    assert file_sha(proof_path) == "346ff5cec02db382516836a4846446231a8764f92534aaf092c68c66f8094046"
+    proof = json.loads(proof_path.read_text())
+    assert proof["status"] == "PASS" and proof["sourceCommit"] == APPROVED and proof["artifactSha256"] == WEBPACK_SHA
+    assert len(proof["comparisons"]) == 14 and all(c["normalizedMatch"] and c["candidateRawStable"] for c in proof["comparisons"])
+    assert proof["cleanup"] == {"processGone": True, "portUnused": True}
+    assert len(command(["ss", "-ltn", "sport = :8081"]).decode().splitlines()) == 1
+    headroom = resources()
+    manifest = json.loads((root / "public-security-build.json").read_text())
+    assert manifest["sourceCommit"] == APPROVED and manifest["bundler"] == "webpack" and manifest["versions"] == VERSIONS
+    assert file_sha(root / "public-security-62439fc-linux-x64.tar.gz") == WEBPACK_SHA
+    verify_archive(root / "public-security-62439fc-linux-x64.tar.gz", manifest)
+    installed(root / "candidate", manifest)
+    assert command(["git", "rev-parse", "HEAD"], web).decode().strip() == PREVIOUS
+    assert not command(["git", "--no-optional-locks", "status", "--porcelain", "--untracked-files=no"], web)
+    assert set(command(["git", "diff", "--name-only", PREVIOUS, APPROVED], web).decode().splitlines()) == {"package.json", "package-lock.json"}
+    checkpoint("independent_preserved_archive_verification")
+    original = json.loads((PRESERVED_RUN / "rollback-files.json").read_text())
+    recovery = json.loads((PRESERVED_RUN / "recovery-verified.json").read_text())
+    assert recovery["independentlyVerified"] and recovery["archiveSha256"] == "eeefab07a5afbf43f0aefa17c8b5b62b8de882222dee2a35016723cb0857f5eb"
+    assert file_sha(PRESERVED_RUN / "rollback.tar") == recovery["archiveSha256"]
+    assert canonical(original) == recovery["treeDigest"]
+    verify_archive(PRESERVED_RUN / "rollback.tar", original, True)
+    current = tree(backup_roots(web))
+    assert application_entries(current) == application_entries(original), "Previous deployment differs from preserved recovery"
+    checkpoint("fresh_public_https_baselines")
+    baseline = http_snapshot()
+    old_baseline = json.loads((PRESERVED_RUN / "http-before.json").read_text())
+    compare_http(old_baseline, baseline, exact=True)
+    cli = pm2_cli()
+    process = app(cli)
+    assert process["status"] == "online" and process["id"] == proof["liveUnchanged"]["process"]["id"]
+    os.link(PRESERVED_RUN / "rollback.tar", root / "rollback.tar")
+    save(root / "rollback-files.json", original)
+    save(root / "live-before-files.json", current)
+    save(root / "recovery-verified.json", recovery)
+    save(root / "http-before.json", baseline)
+    state = {"phase": "prepared", "sourceCommit": APPROVED, "previousCommit": PREVIOUS, "artifactSha256": WEBPACK_SHA,
+             "protected": protected_tree(web), "app": process, "recovery": recovery, "moved": [], "verifiedLoopbackRelease": True,
+             "resources": headroom, "previousBranch": command(["git", "branch", "--show-current"], web).decode().strip()}
+    save(root / "state.json", state)
+    print(json.dumps({"status": "PREPARED", "sourceCommit": APPROVED, "preservedRecoveryVerified": True, "resources": headroom, "runDirectory": str(root)}), flush=True)
 
 
 def verify_archive(archive, manifest, rollback=False):
@@ -409,6 +538,8 @@ def rollback(root, state, cli):
         metadata = original_files["public_html/" + name]
         assert file_sha(web / name) == metadata["sha256"]
         os.chmod(web / name, metadata["mode"])
+    expected = json.loads((root / "live-before-files.json").read_text()) if state.get("verifiedLoopbackRelease") else original_files
+    assert application_entries(tree(backup_roots(web))) == application_entries(expected), "Complete previous deployment restoration mismatch"
     assert protected_tree(web) == state["protected"]
     command(["node", cli, "restart", "miopages-runtime"])
     healthy(root, state, cli, restored=True)
@@ -419,12 +550,16 @@ def rollback(root, state, cli):
 
 def healthy(root, state, cli, restored=False):
     baseline = json.loads((root / "http-before.json").read_text())
+    readiness = []
     for attempt in range(30):
         current = app(cli)
         if current["status"] == "online" and current["pid"]:
             try:
                 for host in HOSTS:
-                    assert response(host, "/")["status"] == 200
+                    actual = response(host, "/")
+                    readiness.append({"attempt": attempt, "host": host, "status": actual["status"], "sha256": actual["sha256"]})
+                    save(root / "readiness-observations.json", readiness)
+                    assert actual["status"] == 200
                 break
             except (AssertionError, OSError):
                 pass
@@ -447,12 +582,14 @@ def apply(root):
     assert state["phase"] == "prepared", "Inspect existing checkpoint before resuming"
     assert file_sha(root / "rollback.tar") == state["recovery"]["archiveSha256"]
     assert json.loads((root / "recovery-verified.json").read_text()) == state["recovery"]
+    state["resourcesAtApply"] = resources()
     assert file_sha(root / "public-security-62439fc-linux-x64.tar.gz") == state["artifactSha256"]
     manifest = json.loads((root / "public-security-build.json").read_text())
     installed(root / "candidate", manifest)
     assert command(["git", "rev-parse", "HEAD"], web).decode().strip() == PREVIOUS
     assert not command(["git", "status", "--porcelain", "--untracked-files=no"], web)
-    assert tree(backup_roots(web)) == json.loads((root / "rollback-files.json").read_text()), "Live application changed after recovery verification"
+    live_manifest = "live-before-files.json" if state.get("verifiedLoopbackRelease") else "rollback-files.json"
+    assert tree(backup_roots(web)) == json.loads((root / live_manifest).read_text()), "Live application changed after recovery verification"
     assert protected_tree(web) == state["protected"]
     baseline = json.loads((root / "http-before.json").read_text())
     compare_http(baseline, http_snapshot({host: list(routes) for host, routes in baseline.items()}), exact=True)
@@ -480,12 +617,16 @@ def apply(root):
         command(["node", cli, "restart", "miopages-runtime"])
         checkpoint("post_deployment_https_content_configuration_and_health")
         current, http = healthy(root, state, cli)
+        checkpoint("public_build_assets_and_running_process_identity")
+        assets = public_build_assets(root, manifest)
+        running = public_process_health(cli)
         assert native(web) == VERSIONS
         assert not command(["git", "status", "--porcelain", "--untracked-files=no"], web)
         state["phase"] = "PASS"
         save(root / "state.json", state)
         evidence = {"status": "PASS", "sourceCommit": APPROVED, "previousCommit": PREVIOUS, "versions": VERSIONS,
-                    "process": current, "recovery": state["recovery"], "artifactSha256": state["artifactSha256"],
+                    "process": current, "runningServer": running, "resourcesAtApply": state["resourcesAtApply"],
+                    "publicBuildAssetsVerified": len(assets), "recovery": state["recovery"], "artifactSha256": state["artifactSha256"],
                     "protectedConfigurationUnchanged": True, "databaseWrites": 0, "migrationsRun": 0,
                     "registrationChanged": False, "publicationChanged": False,
                     "http": {host: {route: {"status": item["status"], "sha256": item["sha256"], "contentDigest": canonical(item["content"])} for route, item in routes.items()} for host, routes in http.items()}}
@@ -506,7 +647,7 @@ def apply(root):
 def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser()
-    parser.add_argument("operation", choices=("prepare", "finish-prepare", "apply"))
+    parser.add_argument("operation", choices=("prepare", "finish-prepare", "prepare-loopback-release", "apply"))
     parser.add_argument("root", type=Path)
     parser.add_argument("--archive-sha256")
     args = parser.parse_args()
@@ -518,6 +659,8 @@ def main():
             prepare(root, args.archive_sha256)
         elif args.operation == "finish-prepare":
             finish_prepare(root, args.archive_sha256)
+        elif args.operation == "prepare-loopback-release":
+            prepare_loopback_release(root)
         else:
             apply(root)
 
