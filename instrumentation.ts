@@ -1,5 +1,6 @@
-import { routingMode } from "./lib/platform/managed-sites/hostname";
-
-export function register() {
-  if (process.env.NEXT_RUNTIME === "nodejs") routingMode();
+export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    const { routingMode } = await import("./lib/platform/managed-sites/hostname");
+    routingMode();
+  }
 }

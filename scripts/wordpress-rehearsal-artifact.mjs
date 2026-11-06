@@ -26,6 +26,7 @@ const request = (url, method, headers = {}) => new Promise((resolve, reject) => 
 // Explicit environment: importantly no DATABASE_URL, operator credentials or signer.
 const child = spawn(process.execPath, ["--max-old-space-size=256", "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", "8081"], {
   env: { PATH: process.env.PATH, HOME: process.env.HOME, NODE_ENV: "production", NEXT_TELEMETRY_DISABLED: "1",
+    MIOPAGES_ROUTING_MODE: "shared-hostnames",
     MIOPAGES_WP_PRIVATE_STAGE: "enabled", MIOPAGES_WP_CORE_ORIGIN: origin,
     MIOPAGES_WP_PULL_URL: "postgresql://miopages_wp_pull:build-only@127.0.0.1:1/build_only?sslmode=verify-full" },
   stdio: "ignore",

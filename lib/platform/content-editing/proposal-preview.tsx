@@ -1,4 +1,7 @@
-import { renderToStaticMarkup } from "react-dom/server";
+// This is a standalone Node HTML artifact, including when revalidated by the
+// delivery Route Handler. Select React's same Node renderer explicitly rather
+// than the framework's Server Component entry; never change approved markup.
+import { renderToStaticMarkup } from "react-dom/server.node";
 import { SectionRenderer } from "../../../components/managed-sites/section-renderer";
 import type { Revision } from "./proposal";
 import { record } from "../presentation/content";

@@ -1,0 +1,461 @@
+{
+  "provenance": "Retained synthetic disposable site-proposal proof, November 1 2026; not hosted WordPress owner approval",
+  "revision": {
+    "at": "2026-11-01T01:35:53.522Z",
+    "base": {
+      "graph": {
+        "site": {
+          "id": "c4a1304a-ccc7-4df8-985c-4fa41d393bbc",
+          "name": "Changed disposable baseline",
+          "status": "inactive",
+          "version": 1,
+          "metadata": {},
+          "created_at": "2026-11-01T01:35:52.959037+00:00",
+          "updated_at": "2026-11-01T01:35:52.959037+00:00",
+          "configuration": {},
+          "web_presence_id": "2a2d7a70-f0d3-41c7-b8c9-32fe9efb282e"
+        },
+        "binding": {
+          "case_id": "8852b1c4-0983-4afd-a8e0-f95a174b8071",
+          "identity": {
+            "confirmation": {
+              "reference": "Synthetic identity confirmation",
+              "confirmedAt": "2026-11-01T01:35:52.958Z",
+              "confirmedBy": "synthetic-activation-operator"
+            },
+            "managedSiteName": "Synthetic inactive site",
+            "webPresenceName": "Synthetic presence",
+            "organizationName": "Synthetic confirmed business"
+          },
+          "event_version": 3,
+          "identity_digest": "d3450768f896e9ed6c3bfcd206d3f8f4d588e3f5f08b6182a5f565dd0c388180",
+          "managed_site_id": "c4a1304a-ccc7-4df8-985c-4fa41d393bbc",
+          "organization_id": "e18de19e-c10e-4305-ad37-94a71802eec4",
+          "web_presence_id": "2a2d7a70-f0d3-41c7-b8c9-32fe9efb282e"
+        },
+        "presence": {
+          "id": "2a2d7a70-f0d3-41c7-b8c9-32fe9efb282e",
+          "name": "Synthetic presence",
+          "locale": "en-US",
+          "status": "inactive",
+          "version": 1,
+          "metadata": {},
+          "timezone": "UTC",
+          "created_at": "2026-11-01T01:35:52.959037+00:00",
+          "updated_at": "2026-11-01T01:35:52.959037+00:00",
+          "configuration": {},
+          "primary_domain": null,
+          "organization_id": "e18de19e-c10e-4305-ad37-94a71802eec4"
+        },
+        "organization": {
+          "id": "e18de19e-c10e-4305-ad37-94a71802eec4",
+          "name": "Synthetic confirmed business",
+          "type": "standard",
+          "status": "inactive",
+          "version": 1,
+          "metadata": {
+            "initialization": {
+              "kind": "customer-foundation/1",
+              "stateDigest": "44f2786b33a864147059b7319ec7420b104b11c847559f346c919ab7e6675ae7",
+              "confirmation": {
+                "reference": "Synthetic identity confirmation",
+                "confirmedAt": "2026-11-01T01:35:52.958Z",
+                "confirmedBy": "synthetic-activation-operator"
+              },
+              "manifestDigest": "b07bfb2817992a9e37c0dfcc72f3daf0bd1b262b10e3ea2a48a4619fa918baa7",
+              "sourceReference": "activation-case:8852b1c4-0983-4afd-a8e0-f95a174b8071"
+            }
+          },
+          "created_at": "2026-11-01T01:35:52.959037+00:00",
+          "updated_at": "2026-11-01T01:35:52.959037+00:00",
+          "configuration": {}
+        }
+      },
+      "pages": [],
+      "assets": [],
+      "actions": [],
+      "sections": [],
+      "subjects": [],
+      "offerings": [
+        {
+          "id": "6526207b-7ec8-435c-b245-0eded806ac8a",
+          "key": "advisory",
+          "name": "Business advisory",
+          "type": "service",
+          "status": "inactive",
+          "payload": {
+            "detail": "Confirmed business planning and operational advice.",
+            "summary": "Practical advice for independent businesses.",
+            "approval": {
+              "at": "2026-11-01T01:35:53.042Z",
+              "by": "synthetic-activation-operator",
+              "scope": "internal"
+            },
+            "evidence": {
+              "sourceKind": "operator",
+              "visibility": "internal",
+              "confirmedAt": "2026-11-01T01:35:53.042Z",
+              "confirmedBy": "synthetic-activation-operator",
+              "confirmation": "confirmed",
+              "sourceReference": "{\"kind\":\"onboarding-information/1\",\"caseId\":\"8852b1c4-0983-4afd-a8e0-f95a174b8071\",\"requestId\":\"4a9e0a2a-d72a-473f-a58f-a2692b447eba\",\"source\":{\"kind\":\"onboarding\",\"reference\":\"Synthetic customer fact confirmation\",\"suppliedAt\":\"2026-11-01T01:35:53.042Z\",\"confirmedValueDigest\":\"3eb1970904424a517ec0af23ccb008ff17666a9b0e6d0ca90a099aad3f7ab804\"},\"confirmation\":{\"by\":\"synthetic-activation-operator\",\"reference\":\"Synthetic customer attestation\",\"at\":\"2026-11-01T01:35:53.042Z\"}}"
+            },
+            "outcomes": [],
+            "actionIds": [],
+            "audiences": [],
+            "components": [],
+            "exclusions": [],
+            "inclusions": [],
+            "thirdPartyCosts": []
+          },
+          "version": 1,
+          "created_at": "2026-11-01T01:35:53.043Z",
+          "updated_at": "2026-11-01T01:35:53.043Z",
+          "web_presence_id": "2a2d7a70-f0d3-41c7-b8c9-32fe9efb282e",
+          "contract_version": 1
+        }
+      ],
+      "navigations": [],
+      "asset_usages": [],
+      "design_systems": [],
+      "navigationItems": [],
+      "business_knowledge": [
+        {
+          "id": "a53b570b-2baf-4c03-9984-75d740364081",
+          "payload": {
+            "entries": [
+              {
+                "key": "audience",
+                "kind": "audience",
+                "value": "Independent regional businesses",
+                "evidence": {
+                  "sourceKind": "operator",
+                  "visibility": "internal",
+                  "confirmedAt": "2026-11-01T01:35:53.020Z",
+                  "confirmedBy": "synthetic-activation-operator",
+                  "confirmation": "confirmed",
+                  "sourceReference": "{\"kind\":\"onboarding-information/1\",\"caseId\":\"8852b1c4-0983-4afd-a8e0-f95a174b8071\",\"requestId\":\"a4211e9b-508f-4192-abcc-fb1752036adf\",\"source\":{\"kind\":\"onboarding\",\"reference\":\"Synthetic customer fact confirmation\",\"suppliedAt\":\"2026-11-01T01:35:53.020Z\",\"confirmedValueDigest\":\"f76867220723db0ddfd93f78d0af57783eb890423bb6c656ab4784066222f5ce\"},\"confirmation\":{\"by\":\"synthetic-activation-operator\",\"reference\":\"Synthetic customer attestation\",\"at\":\"2026-11-01T01:35:53.020Z\"}}"
+                }
+              }
+            ],
+            "approval": {
+              "at": "2026-11-01T01:35:53.020Z",
+              "by": "synthetic-activation-operator",
+              "scope": "internal"
+            },
+            "identityEvidence": []
+          },
+          "version": 1,
+          "created_at": "2026-11-01T01:35:53.021Z",
+          "updated_at": "2026-11-01T01:35:53.021Z",
+          "web_presence_id": "2a2d7a70-f0d3-41c7-b8c9-32fe9efb282e",
+          "contract_version": 1
+        }
+      ],
+      "contact_definitions": []
+    },
+    "page": {
+      "slug": "/",
+      "title": {
+        "kind": "editorial",
+        "text": "Revised editorial direction",
+        "rationale": "Editorial framing only; not a new business fact"
+      },
+      "pageId": "9f7ed26c-8e22-4d6a-9710-d1d93ea9dde9",
+      "purpose": "Representative synthetic page to prove proposal mechanics; not a real Home direction",
+      "sections": [
+        {
+          "id": "fc0ac526-2868-4996-9850-20f08d2f45ba",
+          "text": {
+            "kind": "canonical",
+            "source": {
+              "field": "summary",
+              "domain": "offering",
+              "recordId": "6526207b-7ec8-435c-b245-0eded806ac8a",
+              "revision": 1,
+              "fingerprint": "807f2e463322b4e936ef636c29eb0eee9df733fc7a71615cc9ef84c901f53ffb"
+            }
+          },
+          "type": "hero",
+          "heading": {
+            "kind": "canonical",
+            "source": {
+              "field": "name",
+              "domain": "offering",
+              "recordId": "6526207b-7ec8-435c-b245-0eded806ac8a",
+              "revision": 1,
+              "fingerprint": "807f2e463322b4e936ef636c29eb0eee9df733fc7a71615cc9ef84c901f53ffb"
+            }
+          }
+        },
+        {
+          "id": "d7ae659d-9c07-45a6-bff0-1d62a0789d53",
+          "text": {
+            "kind": "canonical",
+            "source": {
+              "field": "audience",
+              "domain": "knowledge",
+              "recordId": "a53b570b-2baf-4c03-9984-75d740364081",
+              "revision": 1,
+              "fingerprint": "e76c575a5f6781b22f65884f73283863e3c1949cd80339aa9c9e7dec4a2f5077"
+            }
+          },
+          "type": "intro",
+          "heading": {
+            "kind": "editorial",
+            "text": "Who this is for",
+            "rationale": "Editorial framing only; not a new business fact"
+          }
+        },
+        {
+          "id": "789e9da9-256f-4412-9ba6-0ea6f11a6c69",
+          "text": {
+            "kind": "canonical",
+            "source": {
+              "field": "detail",
+              "domain": "offering",
+              "recordId": "6526207b-7ec8-435c-b245-0eded806ac8a",
+              "revision": 1,
+              "fingerprint": "807f2e463322b4e936ef636c29eb0eee9df733fc7a71615cc9ef84c901f53ffb"
+            }
+          },
+          "type": "intro",
+          "heading": {
+            "kind": "editorial",
+            "text": "A focused starting point",
+            "rationale": "Editorial framing only; not a new business fact"
+          }
+        }
+      ],
+      "operation": "create-page"
+    },
+    "author": {
+      "operatorId": "synthetic-proposal-operator",
+      "authorityReference": "synthetic-capability"
+    },
+    "binding": {
+      "scope": {
+        "managedSiteId": "c4a1304a-ccc7-4df8-985c-4fa41d393bbc",
+        "webPresenceId": "2a2d7a70-f0d3-41c7-b8c9-32fe9efb282e"
+      },
+      "digest": "1c09da7a9cc5fe1bdab47c76501b3aa83c39b7b3c16167c079c23f3ed25cecdf",
+      "revision": 2,
+      "proposalId": "38d71b16-d501-43cd-9240-a00181e61bc2",
+      "baseFingerprint": "eea53915d83868f2338addd6b78260fb89958e016f0bbe4498fcefe8193cf017"
+    },
+    "resolved": [
+      {
+        "path": "title",
+        "value": "Revised editorial direction",
+        "origin": {
+          "kind": "editorial",
+          "text": "Revised editorial direction",
+          "rationale": "Editorial framing only; not a new business fact"
+        }
+      },
+      {
+        "path": "sections/0/heading",
+        "value": "Business advisory",
+        "origin": {
+          "kind": "canonical",
+          "source": {
+            "field": "name",
+            "domain": "offering",
+            "recordId": "6526207b-7ec8-435c-b245-0eded806ac8a",
+            "revision": 1,
+            "fingerprint": "807f2e463322b4e936ef636c29eb0eee9df733fc7a71615cc9ef84c901f53ffb"
+          }
+        },
+        "evidence": {
+          "sourceKind": "operator",
+          "visibility": "internal",
+          "confirmedAt": "2026-11-01T01:35:53.042Z",
+          "confirmedBy": "synthetic-activation-operator",
+          "confirmation": "confirmed",
+          "sourceReference": "{\"kind\":\"onboarding-information/1\",\"caseId\":\"8852b1c4-0983-4afd-a8e0-f95a174b8071\",\"requestId\":\"4a9e0a2a-d72a-473f-a58f-a2692b447eba\",\"source\":{\"kind\":\"onboarding\",\"reference\":\"Synthetic customer fact confirmation\",\"suppliedAt\":\"2026-11-01T01:35:53.042Z\",\"confirmedValueDigest\":\"3eb1970904424a517ec0af23ccb008ff17666a9b0e6d0ca90a099aad3f7ab804\"},\"confirmation\":{\"by\":\"synthetic-activation-operator\",\"reference\":\"Synthetic customer attestation\",\"at\":\"2026-11-01T01:35:53.042Z\"}}"
+        }
+      },
+      {
+        "path": "sections/0/text",
+        "value": "Practical advice for independent businesses.",
+        "origin": {
+          "kind": "canonical",
+          "source": {
+            "field": "summary",
+            "domain": "offering",
+            "recordId": "6526207b-7ec8-435c-b245-0eded806ac8a",
+            "revision": 1,
+            "fingerprint": "807f2e463322b4e936ef636c29eb0eee9df733fc7a71615cc9ef84c901f53ffb"
+          }
+        },
+        "evidence": {
+          "sourceKind": "operator",
+          "visibility": "internal",
+          "confirmedAt": "2026-11-01T01:35:53.042Z",
+          "confirmedBy": "synthetic-activation-operator",
+          "confirmation": "confirmed",
+          "sourceReference": "{\"kind\":\"onboarding-information/1\",\"caseId\":\"8852b1c4-0983-4afd-a8e0-f95a174b8071\",\"requestId\":\"4a9e0a2a-d72a-473f-a58f-a2692b447eba\",\"source\":{\"kind\":\"onboarding\",\"reference\":\"Synthetic customer fact confirmation\",\"suppliedAt\":\"2026-11-01T01:35:53.042Z\",\"confirmedValueDigest\":\"3eb1970904424a517ec0af23ccb008ff17666a9b0e6d0ca90a099aad3f7ab804\"},\"confirmation\":{\"by\":\"synthetic-activation-operator\",\"reference\":\"Synthetic customer attestation\",\"at\":\"2026-11-01T01:35:53.042Z\"}}"
+        }
+      },
+      {
+        "path": "sections/1/heading",
+        "value": "Who this is for",
+        "origin": {
+          "kind": "editorial",
+          "text": "Who this is for",
+          "rationale": "Editorial framing only; not a new business fact"
+        }
+      },
+      {
+        "path": "sections/1/text",
+        "value": "Independent regional businesses",
+        "origin": {
+          "kind": "canonical",
+          "source": {
+            "field": "audience",
+            "domain": "knowledge",
+            "recordId": "a53b570b-2baf-4c03-9984-75d740364081",
+            "revision": 1,
+            "fingerprint": "e76c575a5f6781b22f65884f73283863e3c1949cd80339aa9c9e7dec4a2f5077"
+          }
+        },
+        "evidence": {
+          "sourceKind": "operator",
+          "visibility": "internal",
+          "confirmedAt": "2026-11-01T01:35:53.020Z",
+          "confirmedBy": "synthetic-activation-operator",
+          "confirmation": "confirmed",
+          "sourceReference": "{\"kind\":\"onboarding-information/1\",\"caseId\":\"8852b1c4-0983-4afd-a8e0-f95a174b8071\",\"requestId\":\"a4211e9b-508f-4192-abcc-fb1752036adf\",\"source\":{\"kind\":\"onboarding\",\"reference\":\"Synthetic customer fact confirmation\",\"suppliedAt\":\"2026-11-01T01:35:53.020Z\",\"confirmedValueDigest\":\"f76867220723db0ddfd93f78d0af57783eb890423bb6c656ab4784066222f5ce\"},\"confirmation\":{\"by\":\"synthetic-activation-operator\",\"reference\":\"Synthetic customer attestation\",\"at\":\"2026-11-01T01:35:53.020Z\"}}"
+        }
+      },
+      {
+        "path": "sections/2/heading",
+        "value": "A focused starting point",
+        "origin": {
+          "kind": "editorial",
+          "text": "A focused starting point",
+          "rationale": "Editorial framing only; not a new business fact"
+        }
+      },
+      {
+        "path": "sections/2/text",
+        "value": "Confirmed business planning and operational advice.",
+        "origin": {
+          "kind": "canonical",
+          "source": {
+            "field": "detail",
+            "domain": "offering",
+            "recordId": "6526207b-7ec8-435c-b245-0eded806ac8a",
+            "revision": 1,
+            "fingerprint": "807f2e463322b4e936ef636c29eb0eee9df733fc7a71615cc9ef84c901f53ffb"
+          }
+        },
+        "evidence": {
+          "sourceKind": "operator",
+          "visibility": "internal",
+          "confirmedAt": "2026-11-01T01:35:53.042Z",
+          "confirmedBy": "synthetic-activation-operator",
+          "confirmation": "confirmed",
+          "sourceReference": "{\"kind\":\"onboarding-information/1\",\"caseId\":\"8852b1c4-0983-4afd-a8e0-f95a174b8071\",\"requestId\":\"4a9e0a2a-d72a-473f-a58f-a2692b447eba\",\"source\":{\"kind\":\"onboarding\",\"reference\":\"Synthetic customer fact confirmation\",\"suppliedAt\":\"2026-11-01T01:35:53.042Z\",\"confirmedValueDigest\":\"3eb1970904424a517ec0af23ccb008ff17666a9b0e6d0ca90a099aad3f7ab804\"},\"confirmation\":{\"by\":\"synthetic-activation-operator\",\"reference\":\"Synthetic customer attestation\",\"at\":\"2026-11-01T01:35:53.042Z\"}}"
+        }
+      }
+    ],
+    "candidate": {
+      "title": "Revised editorial direction",
+      "sections": [
+        {
+          "id": "fc0ac526-2868-4996-9850-20f08d2f45ba",
+          "name": "Business advisory",
+          "type": "hero",
+          "content": {
+            "text": "Practical advice for independent businesses.",
+            "heading": "Business advisory"
+          },
+          "variant": "default",
+          "configuration": {
+            "width": "standard",
+            "divider": "rule",
+            "spacing": "normal",
+            "surface": "default",
+            "mediaFit": "natural",
+            "alignment": "left"
+          }
+        },
+        {
+          "id": "d7ae659d-9c07-45a6-bff0-1d62a0789d53",
+          "name": "Who this is for",
+          "type": "intro",
+          "content": {
+            "text": "Independent regional businesses",
+            "heading": "Who this is for"
+          },
+          "variant": "stack",
+          "configuration": {
+            "width": "standard",
+            "divider": "rule",
+            "spacing": "normal",
+            "surface": "default",
+            "mediaFit": "natural",
+            "alignment": "left"
+          }
+        },
+        {
+          "id": "789e9da9-256f-4412-9ba6-0ea6f11a6c69",
+          "name": "A focused starting point",
+          "type": "intro",
+          "content": {
+            "text": "Confirmed business planning and operational advice.",
+            "heading": "A focused starting point"
+          },
+          "variant": "stack",
+          "configuration": {
+            "width": "standard",
+            "divider": "rule",
+            "spacing": "normal",
+            "surface": "default",
+            "mediaFit": "natural",
+            "alignment": "left"
+          }
+        }
+      ]
+    }
+  },
+  "approvalEvent": {
+    "requestId": "6efc3b13-4165-4920-9847-bcc673ceb6db",
+    "requestDigest": "f7f12748465ec37f2fab335de508f5219458abe25e7307263a1674c285eed7d0",
+    "action": "approve",
+    "actor": {
+      "operatorId": "synthetic-proposal-operator",
+      "authorityReference": "synthetic-capability"
+    },
+    "at": "2026-11-01T01:35:53.627Z",
+    "approval": {
+      "binding": {
+        "proposalId": "38d71b16-d501-43cd-9240-a00181e61bc2",
+        "scope": {
+          "webPresenceId": "2a2d7a70-f0d3-41c7-b8c9-32fe9efb282e",
+          "managedSiteId": "c4a1304a-ccc7-4df8-985c-4fa41d393bbc"
+        },
+        "revision": 2,
+        "digest": "1c09da7a9cc5fe1bdab47c76501b3aa83c39b7b3c16167c079c23f3ed25cecdf",
+        "baseFingerprint": "eea53915d83868f2338addd6b78260fb89958e016f0bbe4498fcefe8193cf017"
+      },
+      "previewDigest": "0936664b74f1aeca9a06e77e1062287ae99e641e888fe8d65fc2057189891e0d",
+      "previewEvent": "586a94b979197b13989742123e9cf89300c742b2d06c01fdb8b011a1e5e8e036",
+      "recordedBy": {
+        "operatorId": "synthetic-proposal-operator",
+        "authorityReference": "synthetic-capability"
+      },
+      "customer": {
+        "kind": "business-representative",
+        "subjectId": "synthetic-customer-representative",
+        "authorityReference": "Synthetic verified representative mandate"
+      },
+      "reference": "Synthetic human inspected this exact full preview",
+      "at": "2026-11-01T01:35:53.627Z"
+    },
+    "sequence": 7,
+    "previous": "586a94b979197b13989742123e9cf89300c742b2d06c01fdb8b011a1e5e8e036",
+    "hash": "4fa34ef40cc62568ff67407845cc65d5acefc6880f8ba465d8ef7a0dec33f964"
+  },
+  "previewDigest": "0936664b74f1aeca9a06e77e1062287ae99e641e888fe8d65fc2057189891e0d"
+}

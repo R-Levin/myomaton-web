@@ -12,6 +12,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'next.config.ts'
+      - 'instrumentation.ts'
       - 'scripts/wordpress-rehearsal-artifact.mjs'
       - '.github/workflows/wordpress-rehearsal-build.yml'
 
@@ -37,10 +38,15 @@ jobs:
           node-version: '22.23.2'
           cache: npm
       - run: npm ci
+      - name: Reject production dependency advisories
+        run: npm audit --omit=dev --audit-level=low
+      - name: Verify retained approved rendering on Linux
+        run: npx tsx --test tests/proposal-preview-compatibility.test.tsx
       - name: Build without hosted credentials
         run: npm run build
         env:
           DATABASE_URL: postgresql://build:unused@127.0.0.1:1/build_only
+          MIOPAGES_ROUTING_MODE: shared-hostnames
       - name: Prove isolated runtime and package checksummed artifact
         run: node scripts/wordpress-rehearsal-artifact.mjs
       - uses: actions/upload-artifact@v4
@@ -52,3 +58,23 @@ jobs:
             runtime-content/wordpress-rehearsal-artifact/rehearsal-build.json
           if-no-files-found: error
           retention-days: 7
+
+  public-security-compatibility:
+    # Compile the deployed source plus dependency changes ONLY. Never deploy
+    # the WordPress development branch to the public app as a security update.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      DATABASE_URL: postgresql://build:unused@127.0.0.1:1/build_only
+      MIOPAGES_ROUTING_MODE: shared-hostnames
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 62439fc0c8bde7fe98339625d33a845102a7995a
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.2'
+          cache: npm
+      - run: npm ci && npm audit --omit=dev --audit-level=low && npm test && npm run build
