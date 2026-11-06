@@ -53,7 +53,8 @@ for (const name of tracked) {
 for (const name of [".next", "node_modules"]) await copy(path.join(repository, name), name);
 
 const require = createRequire(path.join(staging, "package.json"));
-const versions = Object.fromEntries(["next", "sharp", "dompurify", "react", "react-dom"].map(name => [name, require(name + "/package.json").version]));
+const versions = Object.fromEntries(await Promise.all(["next", "sharp", "dompurify", "react", "react-dom"].map(async name =>
+  [name, JSON.parse(await readFile(path.join(staging, "node_modules", name, "package.json"), "utf8")).version])));
 assert.deepEqual(versions, { next: "16.4.5", sharp: "0.35.5", dompurify: "3.4.17", react: "19.2.8", "react-dom": "19.2.8" });
 assert.equal(typeof require("@next/swc-linux-x64-gnu").transformSync, "function");
 assert.ok((await require("sharp")({ create: { width: 1, height: 1, channels: 3, background: "white" } }).png().toBuffer()).length > 0);
