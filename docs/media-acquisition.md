@@ -13,17 +13,26 @@ The pilot details below retain their original disposable scope and approval rule
 
 Commercial V1 requires completion of two practical acquisition/use paths:
 
-- **Customer-supplied media:** logo/image upload, safe validation/ingestion, canonical
-  Asset creation and AssetUsage metadata, tenant isolation and approved use in the
-  generated site; retain alt/caption/crop/intended-use context as supported.
-- **Stock/source media:** a practical provider-neutral stock sourcing path. Pexels is
-  a sensible first provider candidate, not a hard architectural dependency. Preserve
-  source/provenance/licensing and appropriate rights/use evidence, with review,
-  ingestion, approval and eligible production delivery under the existing gates.
+- **Customer-supplied media:** uploads, existing website assets and previously
+  authorized media. Verify authority to acquire and use them, validate and ingest
+  safely, and retain ownership, provenance, tenant scope and supported presentation
+  and accessibility metadata.
+- **Permissioned stock:** practical provider-neutral stock sourcing. Pexels is the
+  first candidate. Unsplash and other suitable sources remain options pending
+  licensing, integration and operating review. Retain source, rights and usage
+  conditions before ingestion or placement.
+- **AI-generated media:** extend the bounded image-generation pilot, preserving
+  generation and transformation provenance, Operator review, cost controls and
+  applicable rights and disclosure review.
 
-Both paths remain incomplete for production. Provider search/download success is
-not approval or an eligible canonical Asset. Extend the existing acquisition and
-Asset boundaries, preserving safe ingestion, authority, isolation and refusal.
+All paths converge on protected staging, validation, source and rights review,
+canonical Asset, proposed AssetUsage and placement, page-context preview, exact
+approval, release, verification and rollback or revocation as applicable. Reuse
+the existing acquisition and Asset boundaries and approval machinery. Customer
+upload and practical stock acquisition remain required V1 completion work.
+The [disposable Intro proof](content-authority-and-editing.md#media-to-publication-handoff)
+covers the integration from an already prepared and permissioned fixture through
+release and rollback. The generated Hero pilot retains its existing context checks.
 A multi-provider marketplace/ecosystem and deterministic graphics expansion are
 later capabilities, not V1 requirements. Media recommendations belong in generation
 orchestration; unresolved visual gaps must remain explicit until safely resolved.

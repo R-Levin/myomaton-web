@@ -120,7 +120,10 @@ For standardized delivery and later adoption, use P1/P2/P3/P7/P13 as applicable
 to specify edit ownership before implementing WordPress visual refinement.
 Before enabling it, verify that managed releases preserve authorized presentation
 and detect unauthorized divergence. The [presentation contract](wordpress-delivery-feasibility.md#content-ownership-and-gutenberg-protection)
-owns the design questions.
+owns the design questions. The [pending media delivery decision](wordpress-delivery-feasibility.md#pending-media-delivery-architecture)
+compares Core masters with verified local delivery copies against externally
+served media. Review rights, attachment mapping, update/rollback/revocation,
+storage economics and usable exit before implementing WordPress synchronization.
 
 ## REQUIRED: Assets
 

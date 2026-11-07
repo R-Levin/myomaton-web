@@ -5,7 +5,8 @@ import type { Scope } from "./authority";
 import { binding, hash, pageProposal, proposalScope, type Binding } from "./proposal";
 import { proposalPreview } from "./proposal-preview";
 import { PostgresProposalPersistence } from "./proposal-postgres";
-import { resolvePage, siteBase } from "./proposal-context";
+import { siteBase } from "./proposal-context";
+import { releasedUsage, requireDisposableMedia, resolveProposalCandidate, verifiedProposalImage, writeProposalUsage } from "./proposal-media";
 import { candidateContent, contentSnapshot, exactContent, releaseActor, releaseBase, releaseEnvironment, writeContent, type ContentSnapshot, type ReleaseAuthority, type ReleasePermission } from "./release";
 
 export type ReleaseRecord = {
@@ -31,7 +32,7 @@ async function append(c: PoolClient, value: Omit<ReleaseRecord, "digest">) {
 // No HTTP mutation surface. A durable proposal store owns the serializable
 // transaction; canonical writes and immutable release evidence commit together.
 export class SiteReleaseService {
-  constructor(private pool: Pool, private authority: ReleaseAuthority) {}
+  constructor(private pool: Pool, private authority: ReleaseAuthority, private disposableMediaRoot?: string) {}
   private persistence() {
     return new PostgresProposalPersistence(this.pool, {
       beforeBegin: c => releaseEnvironment(c, false),
@@ -61,13 +62,16 @@ export class SiteReleaseService {
       if (!["business-representative", "accepted-authority"].includes(String(customer.kind))) throw Error("Customer mandate required"); text(customer.subjectId); text(customer.authorityReference, 500);
       const base = await siteBase(c, scope);
       if (fingerprint(base) !== expected.baseFingerprint) throw Error("Stale canonical site base");
-      const resolved = await resolvePage(c, scope, pageProposal(revision.page), base);
-      if (fingerprint(resolved.candidate) !== fingerprint(revision.candidate) || fingerprint(resolved.resolved) !== fingerprint(revision.resolved) || fingerprint(proposalPreview(revision)) !== previewDigest) throw Error("Changed canonical source/candidate/renderer");
+      const resolved = await resolveProposalCandidate(c, scope, pageProposal(revision.page), base, this.disposableMediaRoot);
+      if (fingerprint(resolved.candidate) !== fingerprint(revision.candidate) || fingerprint(resolved.resolved) !== fingerprint(revision.resolved) || fingerprint(proposalPreview(revision, resolved.image)) !== previewDigest) throw Error("Changed canonical source/candidate/renderer");
       const exactBase = await releaseBase(c, scope), at = new Date().toISOString(), before = contentSnapshot(exactBase, revision.page.pageId), after = candidateContent(revision, before, at);
-      // Candidate previews do not include managed media. Refuse hidden rendering additions.
-      const ids = [revision.page.pageId, ...before.sections.map(s => s.id), ...after.sections.map(s => s.id)];
-      if ((await c.query("SELECT 1 FROM asset_usages WHERE entity_id=ANY($1::uuid[])", [ids])).rowCount) throw Error("Media-bound Page/Sections need a separately reviewed proposal contract");
+      const media = resolved.candidate.media;
+      if (!media) {
+        const ids = [revision.page.pageId, ...before.sections.map(s => s.id), ...after.sections.map(s => s.id)];
+        if ((await c.query("SELECT 1 FROM asset_usages WHERE entity_id=ANY($1::uuid[])", [ids])).rowCount) throw Error("Media-bound Page/Sections need a separately reviewed proposal contract");
+      }
       await writeContent(c, revision.page.pageId, before, after);
+      if (media) await writeProposalUsage(c, media.priorUsage, releasedUsage(scope, media, at));
       const current = await releaseBase(c, scope);
       if (!exactContent(contentSnapshot(current, revision.page.pageId), after)) throw Error("Released canonical content differs from candidate");
       return append(c, { id: randomUUID(), web_presence_id: scope.webPresenceId, managed_site_id: scope.managedSiteId, sequence: history.length + 1, operation: "release", request_id: requestId, request_digest: requestDigest, proposal_id: expected.proposalId, revision: expected.revision, proposal_digest: expected.digest, base_fingerprint: expected.baseFingerprint, approval_event: approvalEvent, preview_digest: previewDigest, rollback_of: null, page_id: revision.page.pageId, before_fingerprint: fingerprint(exactBase), after_fingerprint: fingerprint(current), before_content: before, after_content: after, actor, reference, at, previous_digest: previous?.digest ?? null });
@@ -80,7 +84,7 @@ export class SiteReleaseService {
     const lookup = await this.pool.connect(); let proposalId: string;
     try { await lookup.query("BEGIN READ ONLY"); await releaseEnvironment(lookup); const row = (await lookup.query("SELECT proposal_id FROM site_content_events WHERE id=$1 AND managed_site_id=$2 AND web_presence_id=$3 AND operation='release'", [id, scope.managedSiteId, scope.webPresenceId])).rows[0]; if (!row) throw Error("Missing/foreign release"); proposalId = row.proposal_id; }
     finally { await lookup.query("ROLLBACK"); lookup.release(); }
-    return this.persistence().open(proposalId, scope).locked(false, async (_state, _append, c) => {
+    return this.persistence().open(proposalId, scope).locked(false, async (state, _append, c) => {
       if (!c) throw Error("Durable transaction required"); await releaseEnvironment(c);
       await c.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", ["site-content:" + scope.managedSiteId]);
       const history = await releaseHistory(c, scope), retry = history.find(e => e.request_id === requestId);
@@ -89,6 +93,15 @@ export class SiteReleaseService {
       if (!release || history.at(-1)?.id !== id || release.operation !== "release") throw Error("Only current latest release may be rolled back");
       const base = await releaseBase(c, scope);
       if (fingerprint(base) !== expected || expected !== release.after_fingerprint || !exactContent(contentSnapshot(base, release.page_id), release.after_content)) throw Error("Unrelated canonical edit/stale rollback base");
+      const revision = state.revisions.find(r => r.binding.revision === release.revision);
+      if (!revision || revision.binding.digest !== release.proposal_digest) throw Error("Missing exact released revision");
+      const media = revision.candidate.media;
+      if (media) {
+        if (!this.disposableMediaRoot) throw Error("Disposable proposal media is unavailable");
+        await requireDisposableMedia(c);
+        if (media.priorUsage) await verifiedProposalImage(this.disposableMediaRoot, scope, media);
+        await writeProposalUsage(c, releasedUsage(scope, media, release.at), media.priorUsage);
+      }
       await writeContent(c, release.page_id, release.after_content, release.before_content);
       const restored = await releaseBase(c, scope);
       if (fingerprint(restored) !== release.before_fingerprint) throw Error("Exact prior canonical state was not restored");

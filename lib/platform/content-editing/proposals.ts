@@ -2,7 +2,8 @@ import type { Pool } from "pg";
 import { choice, fingerprint, object, text, uuid } from "../canonical/model";
 import type { Scope } from "./authority";
 import { binding, hash, pageProposal, proposalExecution, proposalScope, revisionDigest, type Actor, type Binding, type CustomerAuthority, type PageProposal, type Permission, type ProposalAuthority, type ProposalState, type Revision } from "./proposal";
-import { proposalSnapshot, resolvePage } from "./proposal-context";
+import { proposalSnapshot } from "./proposal-context";
+import { resolveProposalCandidate } from "./proposal-media";
 import { localProposalPersistence } from "./proposal-store";
 import type { ProposalPersistence } from "./proposal-history";
 import { proposalPreview } from "./proposal-preview";
@@ -10,7 +11,10 @@ import { proposalPreview } from "./proposal-preview";
 // Trusted private composition root only. No default grant, HTTP/Server Action,
 // canonical/content writer, release operation or production authentication claim.
 export class SiteProposalService {
-  constructor(private pool: Pool, private authority: ProposalAuthority, private persistence: ProposalPersistence = localProposalPersistence) {}
+  constructor(private pool: Pool, private authority: ProposalAuthority, private persistence: ProposalPersistence = localProposalPersistence, private disposableMediaRoot?: string) {}
+  private get mediaRoot() {
+    return this.persistence.kind === "postgres" ? this.disposableMediaRoot : undefined;
+  }
   private async actor(context: unknown, operation: Permission, scope: Scope) {
     if (this.persistence.kind !== "protected-postgres") proposalExecution(this.persistence.kind); const grant = await this.authority.authorize(context, operation, structuredClone(scope));
     object(grant, ["operatorId", "authorityReference", "customer"]);
@@ -38,7 +42,7 @@ export class SiteProposalService {
       const retry = this.retry(state, requestId, digest, actor); if (retry) return retry;
       if (before) this.exact(state, before); else if (state.events.length) throw Error("Existing proposal requires exact revision");
       return proposalSnapshot(this.pool, scope, async (c, base) => {
-        const { candidate, resolved, baseFingerprint } = await resolvePage(c, scope, page, base);
+        const { candidate, resolved, baseFingerprint } = await resolveProposalCandidate(c, scope, page, base, this.mediaRoot);
         const identity = { proposalId: id, scope, revision: state.revisions.length + 1, baseFingerprint };
         const body = { at: new Date().toISOString(), author: actor, page, resolved, candidate, base };
         const revision: Revision = { ...body, binding: { ...identity, digest: revisionDigest(body, identity) } };
@@ -50,9 +54,14 @@ export class SiteProposalService {
     const scope = proposalScope(selection); await this.actor(context, "inspect-site-proposal", scope);
     return this.persistence.open(uuid(id), scope).locked(false, async (state, _append, client) => {
       if (!state.revisions.length) throw Error("Missing proposal");
-      return proposalSnapshot(this.pool, scope, async (_c, base) => {
-        const stale = fingerprint(base) !== state.revisions.at(-1)!.binding.baseFingerprint;
-        const previewMatches = state.approval !== null && fingerprint(proposalPreview(state.revisions.at(-1)!)) === state.approval.previewDigest;
+      return proposalSnapshot(this.pool, scope, async (c, base) => {
+        const revision = state.revisions.at(-1)!;
+        const stale = fingerprint(base) !== revision.binding.baseFingerprint;
+        const resolved = state.approval && !stale && revision.candidate.media
+          ? await resolveProposalCandidate(c, scope, revision.page, base, this.mediaRoot) : undefined;
+        const previewMatches = state.approval !== null && !stale
+          && (!resolved || fingerprint(resolved.candidate) === fingerprint(revision.candidate))
+          && fingerprint(proposalPreview(revision, resolved?.image)) === state.approval.previewDigest;
         return { ...state, stale, approvalValid: state.state === "APPROVED" && !stale && previewMatches, published: false as const };
       }, { durable: this.persistence.kind !== "local", protectedTransaction: this.persistence.kind === "protected-postgres", client });
     });
@@ -64,9 +73,9 @@ export class SiteProposalService {
       const retry = this.retry(state, requestId, requestDigest, actor); this.exact(state, expected);
       return proposalSnapshot(this.pool, expected.scope, async (c, base) => {
         if (fingerprint(base) !== expected.baseFingerprint) throw Error("Stale site base; explicit refresh/new revision required");
-        const r = state.revisions.at(-1)!, resolved = await resolvePage(c, expected.scope, r.page, base);
-        if (fingerprint(resolved.candidate) !== fingerprint(r.candidate) || fingerprint(resolved.resolved) !== fingerprint(r.resolved)) throw Error("Changed proposal canonical source");
-        const html = proposalPreview(r), digest = fingerprint(html);
+        const r = state.revisions.at(-1)!, resolved = await resolveProposalCandidate(c, expected.scope, r.page, base, this.mediaRoot);
+        if (fingerprint(resolved.candidate) !== fingerprint(r.candidate) || fingerprint(resolved.resolved) !== fingerprint(r.resolved)) throw Error("Changed proposal canonical source or media");
+        const html = proposalPreview(r, resolved.image), digest = fingerprint(html);
         const event = retry ?? await append({ requestId, requestDigest, action: "preview", actor, at: new Date().toISOString(), preview: { binding: expected, digest } });
         if (event.preview?.digest !== digest) throw Error("Preview renderer changed; new preview required");
         return { html, digest, event: event.hash, binding: expected };
@@ -85,8 +94,8 @@ export class SiteProposalService {
       if (!preview?.preview || preview.preview.digest !== previewDigest || fingerprint(preview.preview.binding) !== fingerprint(expected)) throw Error("Exact reviewed preview required");
       return proposalSnapshot(this.pool, expected.scope, async (c, base) => {
         if (fingerprint(base) !== expected.baseFingerprint) throw Error("Stale site base; explicit refresh/new revision required");
-        const r = state.revisions.at(-1)!, resolved = await resolvePage(c, expected.scope, r.page, base);
-        if (fingerprint(resolved.candidate) !== fingerprint(r.candidate) || fingerprint(resolved.resolved) !== fingerprint(r.resolved) || fingerprint(proposalPreview(r)) !== previewDigest) throw Error("Changed candidate/renderer; inspect a new preview");
+        const r = state.revisions.at(-1)!, resolved = await resolveProposalCandidate(c, expected.scope, r.page, base, this.mediaRoot);
+        if (fingerprint(resolved.candidate) !== fingerprint(r.candidate) || fingerprint(resolved.resolved) !== fingerprint(r.resolved) || fingerprint(proposalPreview(r, resolved.image)) !== previewDigest) throw Error("Changed candidate/renderer; inspect a new preview");
         if (retry) return retry;
         const at = new Date().toISOString();
         return append({ requestId, requestDigest, action: "approve", actor, at, approval: { binding: expected, previewDigest, previewEvent, recordedBy: actor, customer: customer!, reference, at } });

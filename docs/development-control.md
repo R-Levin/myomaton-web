@@ -44,13 +44,42 @@ Source is the owner-provided November 4–7 recovery handoff supplied after `51d
 
 The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
+## Commercial V1 disposable Intro media release verified
+
+The owner approved one project-created raster with explicit synthetic permission in
+an existing Intro slot. The proposal revision binds the verified prepared bytes,
+source and rights evidence, intended AssetUsage and accessibility metadata. The
+private preview renders the image in context and the existing exact approval
+binds the revision and HTML. Release revalidates eligibility and atomically writes
+the usage and content under the existing separate mandate. Rollback removes a
+new usage or restores its exact predecessor. The local slice uses the existing
+proposal and release records without a migration. The generated Hero policy
+retains its existing context-bound eligibility.
+
+TypeScript, targeted lint, 375 repository tests and 40 disposable loopback
+PostgreSQL 18 checks passed. Coverage includes the historical text approval
+digest, media-bound text refusal, image placement and bytes, changed rights
+and bytes, stale rollback, authority, concurrent retries, atomic failure and
+microsecond-accurate prior usage restoration. The first integration run needed
+a synthetic foreign canonical fact for an existing persistence test. It passed
+after the fixture was seeded through the canonical writer in the disposable cluster.
+There were no hosted writes, paid provider calls or public releases.
+
+Customer upload and practical permissioned stock sourcing remain required
+Commercial V1 work. The next bounded step is to define the first customer-supplied
+media intake and rights evidence path against the common lifecycle. WordPress
+storage and synchronization remain pending, with Core-owned masters plus verified
+Media Library copies recommended for review. [Media proposal and release](content-authority-and-editing.md#media-to-publication-handoff),
+[acquisition](media-acquisition.md#commercial-v1-completion-boundary) and
+[WordPress media decision](wordpress-delivery-feasibility.md#pending-media-delivery-architecture).
+
 ## WordPress private delivery acceptance closed
 
 The owner accepted the signed delivery, private staging, idempotent retry, revocation, v0.0.6 restoration, authenticated rollback output and scoped resource cleanup. The final bounded read-only inspection confirmed an empty test webroot and saved PM2 list, absent supervisor and child, removed pull configuration, and unused port8081. Production port8080 still belonged to UID3318461 and both public HTTPS body digests matched. The test hostname root and former pull path returned identical generic nginx502 bodies with no redirect. The result is consistent with the intentionally absent upstream. The account evidence does not establish nginx's configured upstream. This inspection found no indication of cross-package routing or credential exposure.
 
 The retained package resolves to185.146.167.100 and serves valid hostname-verified TLS. The observed certificate SHA-256 is `0cc3b524a416235bc6935239744eb0c98898814d73d1aa0fc8e5b41769667638`, differing from the earlier capture. The certificate validity window is November6,2026 19:28:20UTC to February4,2027 19:28:19UTC. The cause of the fingerprint difference is unverified. The idle502 is a test-host maintenance item for the next time the account needs an idle landing response. Acceptance is closed under the owner's explicit disposition. The package, DNS and SSL remain available for future testing.
 
-Commercial V1 resumed at the local Media-to-Publication slice. The first disposable integration check verified the existing release refusal for a media-bound Page and preserved its content, AssetUsage and release history. The historical exact-preview check also passed. The media-aware proposal contract is pending review in the canonical content authority document. The signed delivery proof provides the transport foundation for the planned WordPress integration. Later WordPress capabilities and their approval gates remain on the roadmap. [Media-to-Publication handoff](content-authority-and-editing.md#media-to-publication-handoff) and [Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence).
+Commercial V1 resumed at the local Media-to-Publication slice. The first disposable integration check verified the existing release refusal for a media-bound Page and preserved its content, AssetUsage and release history. The historical exact-preview check also passed. This was the pre-implementation baseline for the disposable Intro proof recorded above. The signed delivery proof provides the transport foundation for the planned WordPress integration. Later WordPress capabilities and their approval gates remain on the roadmap. [Media-to-Publication handoff](content-authority-and-editing.md#media-to-publication-handoff) and [Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence).
 
 ## Scoped rehearsal cleanup passed on host. Retained HTTPS route verification (historical)
 

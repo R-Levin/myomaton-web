@@ -84,8 +84,9 @@ Section text-edit journal. The latter remains useful for individual text edits.
 This first representative-page slice accepts create/replace of one exact Page and
 one to six ordered `hero`, `intro` or `cta` Sections with bounded heading/body text.
 Existing eligible owned Actions may be referenced, not edited; preview CTAs are
-shown with labels/destinations but are inert. Assets, arbitrary HTML/CSS, new
-Section types, navigation edits and broad structural CRUD are outside this slice.
+shown with labels/destinations but are inert. Arbitrary HTML/CSS, new Section
+types, navigation edits and broad structural CRUD are outside this slice. The
+[disposable Intro extension](#media-to-publication-handoff) supports one exact image.
 Page/Section UUIDs identify proposed destinations only and are never inserted.
 
 Each textual field is either an exact confirmed canonical reference (Knowledge
@@ -279,8 +280,9 @@ Active Page rows on an inactive site do not make that site publicly available.
 Only existing create/replace-one-Page proposals with one to six supported Sections
 are accepted. Existing eligible Actions remain unchanged references. Navigation,
 site identity/status, business sources, media and other Pages remain untouched.
-Media-bound targets and deletion of referenced Page/Sections refuse rather than
-silently remove dependencies. This is intentionally not broad site CRUD.
+Text-only releases refuse media-bound targets. Deletion of referenced Pages or
+Sections also refuses. The single disposable media exception below uses the same
+authority and release path.
 
 ### Media-to-Publication handoff
 
@@ -294,13 +296,44 @@ exactly approved text proposal refused release of a Page with a synthetic media
 attachment. The Page, Sections, AssetUsage and release history were preserved.
 The release and historical preview checks passed together (13 tests).
 
-The media-aware proposal contract is pending review. Resolve how the exact preview
-and approval bind prepared bytes, current rights and provenance, the intended
-AssetUsage and presentation metadata. Define the release-time eligibility check
-and the prior usage that rollback restores. Preserve historical text-only preview
-digests and the existing separate release mandate. The current refusal stays in
-force while those decisions are open. This record gives no new hosted write,
-provider spend or publication authority.
+The owner approved the bounded Intro proof on November 7, 2026. The durable
+proposal may name one existing active Intro Section on the exact replacement
+Page, one owned project-created PNG, one singular AssetUsage ID and a contextual
+informative alt. The existing stack layout is fixed for the proof. Canonical
+Asset metadata supplies explicit fixture-only permission and source evidence.
+The prepared object key supplies the SHA-256 of the reviewed bytes. The revision
+binds the source digest and reference, permission, prepared digest, dimensions,
+MIME, target, role, accessibility configuration and exact prior usage, if any.
+A prior usage must already refer to this same fixture image and slot. All other
+media usages on the affected Page or Sections are out of scope and cause refusal.
+
+Preparation, preview, approval and release re-read the owned Asset and verify
+the managed object's hash, format and dimensions. The private preview embeds
+the verified raster in the existing Section renderer and displays its evidence
+reference and digest. The immutable approval binds the full candidate revision
+and exact rendered HTML. A changed base, permission, prior usage, or prepared
+object requires refusal and explicit review. Existing text-only revisions retain
+their original schema, rendering and digest. The generated Hero acquisition
+pilot retains its separate context-bound eligibility and revocation semantics.
+
+The separate disposable release mandate applies unchanged. The existing locks
+cover the usage write, Page/Section mutation, and release evidence in one
+transaction. An exact retry returns the original event. Rollback checks the
+current full site fingerprint, resolves the original immutable proposal revision,
+and removes a newly added usage or restores the exact prior usage row, including
+timestamp precision and presentation metadata. If a predecessor image would
+be restored, verify its bytes again. Changed canonical eligibility or unrelated
+edits block rollback. Rollback cannot restore permissions or rewrite Assets.
+
+No database migration is required for this proof. Media evidence lives inside
+the existing candidate JSON, the existing release trigger continues to check
+exact Page/Section rows, and the application verifies the usage write under the
+same transaction. Before production, review database-level AssetUsage evidence
+enforcement, trusted rights/revocation, concurrency and delivery contracts.
+Media-aware execution requires an explicit fixture storage root, durable
+proposal storage, an inactive bound fixture, and the existing nondefault-port
+disposable release boundary on loopback PostgreSQL. WordPress private staging
+v1 continues to refuse media-bound proposals.
 
 The PostgreSQL proposal transaction serializes proposal changes and site release
 requests. The private release adapter conservatively takes canonical-table

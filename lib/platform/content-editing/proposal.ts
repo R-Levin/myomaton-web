@@ -1,19 +1,21 @@
 import { choice, fingerprint, key, object, text, uuid } from "../canonical/model";
 import { canonicalPagePath } from "../managed-sites/paths";
 import type { Scope } from "./authority";
+import type { ProposalMedia } from "./proposal-media";
 
 export type Source = { domain: "knowledge" | "offering"; recordId: string; revision: number; fingerprint: string; field: string };
 export type Copy = { kind: "canonical"; source: Source } | { kind: "editorial"; text: string; rationale: string };
 // An envelope around existing Page/Section content, not a replacement content model.
+export type ProposedImage = { assetId: string; usageId: string; altText: string };
 export type PageProposal = { operation: "create-page" | "replace-page"; pageId: string; slug: string; title: Copy; purpose: string;
-  sections: { id: string; type: "hero" | "intro" | "cta"; heading: Copy; text?: Copy; actionId?: string }[] };
+  sections: { id: string; type: "hero" | "intro" | "cta"; heading: Copy; text?: Copy; actionId?: string; image?: ProposedImage }[] };
 export type Actor = { operatorId: string; authorityReference: string };
 export type CustomerAuthority = { kind: "business-representative" | "accepted-authority"; subjectId: string; authorityReference: string };
 export type Permission = "prepare-site-proposal" | "inspect-site-proposal" | "revise-site-proposal" | "preview-site-proposal" | "approve-site-proposal";
 export interface ProposalAuthority { authorize(context: unknown, operation: Permission, scope: Scope): Promise<Actor & { customer?: CustomerAuthority }> }
 export type Binding = { proposalId: string; scope: Scope; revision: number; digest: string; baseFingerprint: string };
 export type ResolvedCopy = { path: string; value: string; origin: Copy; evidence?: unknown };
-export type Candidate = { title: string; sections: { id: string; type: string; variant: string; name: string; content: { heading: string; text?: string; actionId?: string }; configuration: unknown; action?: { id: string; name: string; type: "link" | "section" | "contact" | "page"; label: string; destination: string } }[] };
+export type Candidate = { title: string; media?: ProposalMedia; sections: { id: string; type: string; variant: string; name: string; content: { heading: string; text?: string; actionId?: string }; configuration: unknown; action?: { id: string; name: string; type: "link" | "section" | "contact" | "page"; label: string; destination: string } }[] };
 export type Revision = { binding: Binding; at: string; author: Actor; page: PageProposal; resolved: ResolvedCopy[]; candidate: Candidate; base: unknown };
 export type Approval = { binding: Binding; previewDigest: string; previewEvent: string; recordedBy: Actor; customer: CustomerAuthority; reference: string; at: string };
 export type Event = { sequence: number; previous: string | null; requestId: string; requestDigest: string; action: "revise" | "preview" | "approve"; at: string; actor: Actor; revision?: Revision; preview?: { binding: Binding; digest: string }; approval?: Approval; hash: string };
@@ -45,9 +47,17 @@ export function pageProposal(value: unknown): PageProposal {
   const slug = canonicalPagePath(p.slug); if (!slug) throw Error("Supported Page path required");
   if (!Array.isArray(p.sections) || p.sections.length < 1 || p.sections.length > 6) throw Error("One to six supported Sections required");
   const sections = p.sections.map(value => {
-    const s = object(value, ["id", "type", "heading", "text", "actionId"]);
-    return { id: uuid(s.id), type: choice(s.type, ["hero", "intro", "cta"]), heading: copy(s.heading, 300), ...(s.text === undefined ? {} : { text: copy(s.text, 2000) }), ...(s.actionId === undefined ? {} : { actionId: uuid(s.actionId) }) };
+    const s = object(value, ["id", "type", "heading", "text", "actionId", "image"]);
+    const type = choice(s.type, ["hero", "intro", "cta"]);
+    let image: ProposedImage | undefined;
+    if (s.image !== undefined) {
+      if (type !== "intro" || p.operation !== "replace-page") throw Error("Media requires an existing Intro slot");
+      const input = object(s.image, ["assetId", "usageId", "altText"]);
+      image = { assetId: uuid(input.assetId), usageId: uuid(input.usageId), altText: text(input.altText, 500) };
+    }
+    return { id: uuid(s.id), type, heading: copy(s.heading, 300), ...(s.text === undefined ? {} : { text: copy(s.text, 2000) }), ...(s.actionId === undefined ? {} : { actionId: uuid(s.actionId) }), ...(image ? { image } : {}) };
   });
+  if (sections.filter(s => s.image).length > 1) throw Error("Only one proposed Intro image is supported");
   if (new Set(sections.map(s => s.id)).size !== sections.length) throw Error("Duplicate Section identity");
   return { operation: choice(p.operation, ["create-page", "replace-page"]), pageId: uuid(p.pageId), slug, title: copy(p.title, 300), purpose: text(p.purpose, 500), sections };
 }

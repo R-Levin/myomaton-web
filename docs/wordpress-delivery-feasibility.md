@@ -82,6 +82,42 @@ preservation remains to be designed and verified.
 - An agency/connected-site mode, **deferred**, distinguishes local/agency-owned regions from named MioPages-managed sections and defines conflict/drift policy. Do not overwrite unrestricted existing theme content.
 - Code/theme customization rights cannot be taken away from a site owner who controls hosting; the architecture should fail closed on publish, detect divergent local state, and explain corrective options.
 
+## Pending media delivery architecture
+
+Recommended for review. Keep authoritative Asset identity, approved master bytes,
+provenance, rights, usage and release/synchronization history in Core. Evaluate
+optimized WordPress Media Library delivery copies for Gutenberg workflows and a
+usable independently hosted exit. WordPress already provides attachment identity,
+media metadata and URLs. A standard WXR export omits attachment bytes, so a usable
+exit must include authorized media files and resolved references.
+[WordPress Media reference](https://developer.wordpress.org/rest-api/reference/media/)
+and [WP-CLI export reference](https://developer.wordpress.org/cli/commands/export/).
+
+Local copies add storage, rendition/backup costs, attachment drift and
+synchronization work. Externally served media avoids duplicating bytes and can
+make centrally enforced withdrawal simpler. It also makes rendering dependent
+on a reachable authorized origin and requires an explicit export/rewrite for
+portable exit. Prefer testing the hybrid path for managed images whose rights
+permit copying. Evaluate externally served media where size, licensing or
+delivery policy favors it. Measure actual storage, operator effort and portability
+before choosing the production policy.
+
+A future contract should map installation and attachment IDs to Core Asset IDs,
+approved usage, exact derivative digests and release versions. Signed releases
+should declare media expectations and verify bytes before staging completes.
+Replacements need distinct byte identities and atomic binding changes. Rollback
+may restore eligible prior mappings only. Revocation must withdraw affected
+managed references and copies under an explicit cache/retention policy. Once a
+copy leaves managed custody, Core cannot guarantee its removal. Authorized
+WordPress-originated uploads can be source inputs through the same staged
+validation, rights and approval lifecycle. Attachment edits or uploads do not
+establish canonical authority. Preserve customer-controlled media on connected
+sites and respect the [usable exit contract](web-presence-service-model.md#customer-ownership-and-understandable-exit).
+
+Production storage, attachment synchronization and inbound editorial scope
+remain pending. This decision review leaves the existing text-only WordPress
+staging gate in place.
+
 ## Chosen reference fixture: accepted service-led v3 C0
 
 Operator clarification (2026-11-02): the first WordPress rendering and transport proof **must use the newest human-accepted C0 design**, **A Business in Focus / service-led v3**, not the older synthetic C0 deployed on 20i. The authoritative review/promotion documentation is [reviewed canonical promotion](miopages-canonical-promotion.md), with frozen reviewed source at `scripts/customer-updates/miopages-focus-reviewed.json`. Expected four routes: `/` (5 Sections), `/service` (8), `/experience` (5), `/review` (5), totalling **23 Sections**; approved Source Sans 3 typography and palette; two eligible wordmark assets. The five unresolved media needs remain unapproved, so never fabricate/insert FPO imagery, historical proof, or a pretend functional Review form. The canonical release must enforce existing confirmed-content and media eligibility boundaries. The v3 promotion's frozen development preconditions **do not match** the hosted fresh PG17/16-migration C0 state; **do not replay its operator against the hosted database**. Construct and verify a read-only/exported deterministic fixture from reviewed code and development test data, with no hosted database changes. This tests visual fidelity and content semantics, not authorization for commercial public launch.

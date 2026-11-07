@@ -195,6 +195,9 @@ The initial accessibility contract satisfies the intentional-reuse metadata gate
 This adds no metadata editing API, caption, crop/focal-point editor, filters,
 rendition management or per-usage CSS. Existing writers retain their behavior;
 future usage writers must preserve this contract and A1/A2 attachment integrity.
+The [disposable Intro proposal proof](content-authority-and-editing.md#media-to-publication-handoff)
+binds this existing accessibility configuration to exact review and uses the
+release transaction for its singular AssetUsage and rollback.
 
 ### Eligibility and bytes
 

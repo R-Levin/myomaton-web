@@ -30,6 +30,9 @@ async function approvedProjection(db: PoolClient, site: Site, proposalId: string
   if (base.graph.organization.id !== site.organizationId || fingerprint(base) !== revision.binding.baseFingerprint) {
     throw Error("Stale canonical source");
   }
+  if (revision.candidate.media || revision.page.sections.some(section => section.image)) {
+    throw Error("Private staging v1 excludes media-bound content");
+  }
   const resolved = await resolvePage(db, scope, pageProposal(revision.page), base);
   if (fingerprint(resolved.candidate) !== fingerprint(revision.candidate)
     || fingerprint(resolved.resolved) !== fingerprint(revision.resolved)
