@@ -3,7 +3,24 @@
 Status: **active Git continuity checkpoint**. Originally recorded 2026-11-01; updated after hosted synthetic C0 verification on 2026-11-01.
 This file is the first-read **navigation and operational handoff** when merged to `main`. It does not supersede source code, immutable database state, approved product contracts or live provider evidence. Do not claim current runtime/database state from Git alone.
 
-## Bounded stability and actual private HTTPS refusals — PASS; exact secret-transfer approval pending
+## Private HTTPS delivery acceptance passed. Final cleanup verification pending
+
+The owner explicitly approved the exact encrypted transfer described at3652bac. The relay ran once and verified readback equality in memory, account UID3322659, destination mode0600, parent mode0700, and exact installation9a511424/release7c3c0030 binding. The CLI-only WordPress config contained the installation HMAC and public pins. Verification evidence contains no secret values. Listener supervisor250119 and child250164 kept their recorded start identities, with restart count1 across transfer, plugin swap, staging, retry and revocation. The earlier8:46p.m. Eastern restart remains an unresolved operational observation.
+
+Both protected plugin archives passed checksum and ZIP integrity checks. Active WordPress0.0.7 matched all nine reviewed files and registered the private-stage command only with its protected CLI bootstrap. The existing memory-only holder issued the exact reviewed release `7c3c0030-ac9d-42ca-8222-3412b282da95` through its issuance-only signer path. The signed envelope SHA-256 is `fad631197bae6ec2a6876c0f4172a63b68f351b745c46ca9a6db931dbe2ba94e`. Independent read-only PostgreSQL verification under the restricted role confirmed the Ed25519 signature, approved event `e610fbb465226d352c0e33839f907693b2ec1376759d69b7dc2832c65f9d2e75`, exact installation and site IDs, source/projection digests and sequence1.
+
+| Acceptance step | Verified result |
+| --- | --- |
+| First authenticated HTTPS pull and receipt | WordPress staged one 1,492-byte immutable object. Its digest matched Core's envelope and the first durable `staged_at` was `2026-11-07T05:11:02.865Z`. |
+| Retry with fresh request nonces | The same object digest, inode and modification timestamp persisted. The original `staged_at` was preserved and Core recorded one `receipt-retry` event. |
+| Installation revocation and refusal | The holder reported revocation and independent PostgreSQL readback confirmed revoked status. The same WordPress adapter made an authenticated HTTPS pull and observed HTTP403. The object and `staged_at` remained intact. |
+| Final audit | One enrolled, one issued, two pulled, one staged, one receipt-retry and one revoked. Both the rehearsal and original synthetic `active.json` markers remained absent. |
+| WordPress restoration | Active0.0.6 matched all17 rollback archive files. The temporary Reseller pull config and bootstrap were removed. The protected staged object and rollback archives were retained. The unauthenticated Basic Auth401 remained in effect. |
+| Public Core preservation | Both original public hostname responses matched their accepted HTTP200 body digests after WordPress restoration. |
+
+The application still needs scoped My20i unregistration and final SSH verification/cleanup. The owner also needs to collect the authenticated post-rollback WordPress receipt using the existing hidden-prompt launcher. Preserve the reusable account and DNS/SSL, existing DB roles and schema, release audit and recovery evidence. After those cleanup gates pass, close this milestone and return to Commercial V1 Media-to-Publication. No application source changed during this operational checkpoint.
+
+## Bounded stability and actual private HTTPS refusals — PASS (transfer later approved above)
 
 The owner reviewed3dcf0c2 and authorized continuation after one bounded stability check if no additional restart occurred. My20i's `unknown` label and the clean8:46p.m. Eastern restart remain unresolved operational observations, not blockers by themselves. Do not attribute their cause, rediscover, unregister or alter metadata to investigate the label. Stop on another unexpected restart or an actual security/integrity/acceptance failure.
 
