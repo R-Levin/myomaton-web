@@ -135,6 +135,15 @@ the existing content workflow rather than forcing a second editorial state machi
 An evaluation may be recorded as inconclusive while observation continues; it must
 not imply that sufficient evidence of effect exists or force closure.
 
+The [account attention workflow](service-operations-model.md#exception-driven-attention-queue)
+can draw on opportunity evidence and ranking alongside customer requests and
+operational signals. Keep opportunity selection and evaluation here. Route issues
+through the existing attention model only when a prompt, decision or action is
+needed. Link related observations to the same issue and reuse opportunity rationale
+and evidence when relevant. Customer concerns, technical incidents and requests
+for fact confirmation can require attention without becoming optimization
+opportunities. The handoff mechanics and timing remain open.
+
 The customer sees a compact **Now / Later / Watching / Campaign** view with reasons
 and simple next steps, not the full internal lifecycle. A Campaign candidate must
 be distinguishable from an approved paid Campaign. Existing Approve / Request change /

@@ -12,10 +12,15 @@ and what its customers need, turns that knowledge into a professionally presente
 public presence, and continuously improves that presence through content,
 measurement and guided optimization.
 
-The service is a managed business outcome. Website/page building, bespoke agency
-labor, hosting resale and autonomous AI content generation do not define the
-product. Customers should be able to concentrate on their business while retaining
-authority over its facts, claims and publication decisions.
+The service helps attract suitable prospects, communicate the customer's value and
+convert qualified leads into new business. Customers should experience one
+coordinated service with little technical or routine administrative work. They
+retain authority over business facts, claims and required approvals. Success
+includes better-fit prospects, clearer positioning, conversion, trust, reliability
+and less customer effort. A healthy account that needs little day-to-day Operator
+work is a desirable outcome. Human judgment and relationships matter most where
+exceptions, consequential decisions or meaningful improvements justify attention.
+See the [account operating model](service-operations-model.md#exception-driven-attention-queue).
 
 This is the reusable model, independent of the prospective commercial brand or
 hosting provider. The [MioPages C0 model](miopages-c0-product-model.md) is one
@@ -208,10 +213,11 @@ remain open under P5/P6 before applicable customer commitments or offboarding.
 | Operator / platform service | Organizes and presents knowledge; recommends, drafts, measures, maintains, optimizes and coordinates supporting technical services within authorized scope. Human operators retain responsibility for service operations. |
 | AI/system assistance | Provides synthesis, structure, pattern identification, drafting and coordination leverage; has no independent approval authority or business responsibility. |
 
-Reduce customer workload without removing customer authority. Preserve important
-state and approvals in reviewable platform records rather than human memory or
-provider conversation history. Knowledge changes, publishing and external account
-operations require their appropriate permission and current-state checks. Contact
+Reduce customer workload while preserving customer authority. Ordinary customers
+interact with the managed service and can provide input and review decisions without
+using WordPress Admin. Preserve important state and approvals in reviewable platform
+records. Knowledge changes, publishing and external account operations require
+their appropriate permission and current-state checks. Contact
 input is visitor input, not automatically confirmed business truth.
 
 ## Initial fit and non-fit

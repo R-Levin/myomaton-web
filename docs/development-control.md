@@ -9,6 +9,22 @@ The owner approved this operating practice on November 7, 2026. Record material 
 
 This practice keeps approval boundaries and work in progress visible while evidence is still current. Capture a small entry as soon as a material decision is made, including its date, source, scope and status. A pending entry records the alternatives and who must decide before dependent work starts. Assign one editor per affected canonical file and review overlapping edits before staging. Review the decision diff with the implementation diff in the same cycle. Git is the durable continuity record. Conversation evidence informs the record, and approval authority stays with the authorized decision maker. Documentation cannot grant additional implementation authority or override an existing approval gate.
 
+### November 7 customer account operations clarification
+
+The owner superseded the earlier Gutenberg/customer-interaction framing. Use
+WordPress tools for most visual execution on WordPress delivery, with practical
+authorized refinement and Core-owned facts, approvals and releases. Ordinary
+customers interact with the service without WordPress Admin. Extend the existing
+account cadence, opportunity management and attention workflow toward low routine
+work and selective, evidence-backed prompts. The goal is better customer outcomes
+and sustainable service effort. These are approved design directions. Review and
+routing mechanics, customer channels, presentation persistence and V1 phasing
+remain open. The native inbound editing decision and existing implementation,
+publication and authority gates still apply. The authorized local Media-to-Publication
+slice can proceed independently. [Presentation](wordpress-delivery-feasibility.md#content-ownership-and-gutenberg-protection),
+[account operations](service-operations-model.md#exception-driven-attention-queue)
+and [implementation gates](deferred-architecture.md#opportunity-and-evaluation-completion-under-existing-gates).
+
 ### November 4–7 deferred decision recovery
 
 Source is the owner-provided November 4–7 recovery handoff supplied after `51d9041`, reconciled against this branch's canonical contracts. The operational checkpoints `8988ff5`, `833bd30`, `1ccba08` and `51d9041` establish delivery acceptance, the authenticated rollback, scoped cleanup and final closeout. The handoff supplies product and commercial intent where original messages were unavailable. ChatGPT history listing was rate-limited. Exact original wording, complete conversation links and unrecorded alternatives remain unverified. The service expression is reproduced from the supplied handoff. This is a bounded recovery. The pending gates in the canonical destinations govern where historical entries describe earlier proposals.

@@ -304,6 +304,16 @@ The customer reports the business fact, not which Pages or Sections to edit. The
 categories do not assert that every domain already has an implemented structured
 contract; unsupported domains require a supported model before canonical writing.
 
+Distinguish a simple correction from redirection of the account. A customer request
+or [account review](service-operations-model.md#exception-driven-attention-queue)
+may reveal that audience, service priorities, positioning, business model or lead
+qualification assumptions have changed. Treat observed signals as evidence to
+confirm with the customer. Keep ordinary corrections simple under existing
+authority. For strategic redirection, check the effect on messaging, site structure,
+content priorities, conversion paths, qualification and optimization. Reassess
+related opportunities and measurement context after the approved change. Existing
+generated content does not fix earlier business assumptions in place.
+
 ### Impact planning and change sets
 
 The conceptual workflow is:

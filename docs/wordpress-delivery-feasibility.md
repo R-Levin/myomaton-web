@@ -7,7 +7,7 @@ Scope: alternate Managed Site delivery adapter using standard WordPress sites, i
 
 The operator approved proceeding under the WordPress Delivery Feasibility Specification v0.1 and subsequent clarifications:
 - 100 customers would use standardized copies of one controlled WordPress distribution, **not 100 bespoke themes**.
-- Customers normally **do not receive WordPress credentials**. MioPages portal is their normal interface.
+- Ordinary customers can participate in the managed service without WordPress Admin. The [customer interaction contract](service-operations-model.md#minimal-commercial-v1-customer-experience) owns the channel decisions. Authorized Operators and designers may use WordPress tools within scoped permissions.
 - Even when authorized administrators/agencies have WordPress access, **MioPages-owned pages/blocks/releases need protection and divergence detection**. Gutenberg block locking is not sufficient authorization.
 - Prefer a very small plugin footprint and reuse existing 20i Reseller features including reported 30-day WordPress backup retention; do not assume that backups replace release rollback.
 - A future agency/connected-WordPress channel should be enabled by a host-independent transport, without broadening the first commercial prototype.
@@ -56,8 +56,28 @@ This is an architectural **gap analysis**, not a complete code-level inventory. 
 
 ## Content ownership and Gutenberg protection
 
-- Turnkey managed sites: central platform owns the page tree, managed blocks and published configuration. Customers use the MioPages portal, **no WP login by default**.
-- WordPress roles/capabilities prohibit routine editing of managed pages, plugin deployment config, REST endpoints and release markers. Review capability checks for all write entry points, including Gutenberg, REST, XML-RPC where enabled, CLI and imports.
+The owner clarified the presentation direction on November 7, 2026. For WordPress
+delivery, use Gutenberg, native themes, patterns, templates, blocks and styling
+tools for most visual composition and refinement. The native renderer established
+useful business, content and structural concepts. Keep those in Core and use
+WordPress's existing tools for visual execution. A proprietary Core page builder
+is outside this direction. Authorized Operators and designers need practical latitude to refine presentation within supported ownership and
+service boundaries. MioPages offers managed outcomes without a pixel-perfect
+customization commitment.
+
+Core retains canonical content and business knowledge, approvals, optimization
+intelligence and release coordination. Define which presentation changes may be
+made locally, which regions are Core-managed and what authority applies to each.
+Before implementing the affected editing flow, define the preservation and
+conflict contract. Before enabling the flow, verify that legitimate refinements
+survive a managed update and rollback, that unauthorized changes are refused or
+surfaced as divergence, and that stale or conflicting changes have a review path.
+The ownership mapping, synchronization and V1 placement remain open. Signed
+private staging established transport and delivery controls. Presentation
+preservation remains to be designed and verified.
+
+- Turnkey managed sites: Core owns the managed page tree, managed content and approved release configuration. Evaluate explicit presentation boundaries for authorized local refinements.
+- Use server-side WordPress capability checks to protect managed content, plugin configuration and release markers. Review all write entry points, including Gutenberg, REST, XML-RPC where enabled, CLI and imports.
 - Use Gutenberg `templateLock` / block locking for **operator ergonomics only**; the plugin must validate content ownership in server-side permissions and publish actions. Prefer immutable managed renderer/blocks or plugin-controlled post types as appropriate to avoid uncontrolled block HTML drift.
 - An agency/connected-site mode, **deferred**, distinguishes local/agency-owned regions from named MioPages-managed sections and defines conflict/drift policy. Do not overwrite unrestricted existing theme content.
 - Code/theme customization rights cannot be taken away from a site owner who controls hosting; the architecture should fail closed on publish, detect divergent local state, and explain corrective options.
@@ -72,8 +92,9 @@ Operator clarification (2026-11-02): the first WordPress rendering and transport
 before starting inbound native editing development. Compare deferral with a bounded
 operator workflow for an editorial draft and one structured knowledge-backed type.
 Resolve editable posts, pages and descriptions, edit ownership, review authority,
-dependent surfaces, version conflicts and synchronization. Outbound delivery retains
-its own authorization. Native edits can propose a change for review. Changes to
+dependent surfaces, version conflicts and synchronization. The approved presentation
+direction leaves this inbound editorial scope decision open. Outbound delivery
+retains its own authorization. Native edits can propose a change for review. Changes to
 canonical knowledge require existing trusted authority and approval.
 
 **Historical exploration.** Evaluate WordPress's native editor for authorized MioPages operator-authored content-form knowledge (posts, pages, CPT entries). This proposed editorial adapter preserves Core's canonical authority and managed-page protection.

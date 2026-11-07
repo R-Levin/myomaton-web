@@ -116,6 +116,12 @@ delivery has a closed private staging proof, with production launch placement an
 inbound editing scope pending in the [WordPress contract](wordpress-delivery-feasibility.md#decision-and-boundaries).
 The existing Commercial V1 scope and authorization gates remain authoritative.
 
+For standardized delivery and later adoption, use P1/P2/P3/P7/P13 as applicable
+to specify edit ownership before implementing WordPress visual refinement.
+Before enabling it, verify that managed releases preserve authorized presentation
+and detect unauthorized divergence. The [presentation contract](wordpress-delivery-feasibility.md#content-ownership-and-gutenberg-protection)
+owns the design questions.
+
 ## REQUIRED: Assets
 
 Satisfied for the first managed site slice: **A1/A2** for transactional `intro` Section
@@ -280,6 +286,7 @@ following requirements refine existing gates when the corresponding slice is bui
 
 | Existing gate | Required completion / trigger |
 | --- | --- |
+| P7/P11/P12/P13/P15, D6 | Before extending the small V1 attention workflow, specify account-review inputs and triggers, routine policy scope, classification, deduplication, ownership and escalation, customer interaction channels, opportunity handoff and V1/later phasing. Reuse the [operations and attention model](service-operations-model.md#exception-driven-attention-queue). Verify useful routing and actual effort alongside security and approval controls. |
 | P1/P2/P3, P13 | Before persistent opportunity/recommendation workflows: retain customer-scoped evidence, rationale, expected value/effort, lifecycle, approval and resulting action; separate surface assessment from opportunity/result/attention states. Use explainable stable factors, customer capacity and context-based weights; preserve guarded writes and protected truth. |
 | P15, D6 | Before operating effort-budget/ranking policy: define permitted policy scope, bounded internal effort envelope and escalation without implying hours-included entitlements or unlimited labor. Observe actual system/operator/customer burden and maintenance; C0 calibrates, not a universal numeric limit. |
 | P12, P2/P4/P7 | Before post-action evaluation: persist the approved action's measurement contract, actual timing, baseline/gaps, metric meaning, evaluation window, evidence requirements, result and next decision. Distinguish sparse/confounded evidence from neutral/zero; use business-change markers and customer-specific learning with bounded provenance/access/retention. |

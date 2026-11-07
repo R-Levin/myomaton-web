@@ -235,6 +235,17 @@ where practical, with capability/authority proof before promises. Do not build
 native billing, CRM, sophisticated account administration, unrestricted page
 building or broad infrastructure self-service for V1.
 
+Ordinary customers can use the service without WordPress Admin. Keep the customer
+experience simple for reporting new or corrected facts, answering targeted
+questions, sharing changes to priorities, goals and audiences, requesting content,
+presentation or operational changes, raising account concerns, reporting lead
+quality or business outcomes, and reviewing recommendations and approvals.
+Evaluate simple portal interactions, guided requests, structured updates,
+asynchronous communication and Operator mediation. The exact channel and workflow
+mix remains open. Capture source and context once, route to the appropriate owner
+and use the [existing fact and change review](customer-journey-and-change-management.md#business-change-is-expected).
+Requests and feedback carry no implied authority to change facts or publish.
+
 Commercial V1 also needs operational communications sufficient for onboarding,
 approvals and support; one reliable visitor conversion path, durable Contact/lead
 acceptance/delivery state and verified customer/operator handoff, with appropriate
@@ -328,18 +339,44 @@ do not require customers to navigate the internal team structure.
 
 ### Exception-driven attention queue
 
-Operator work should be driven by attention needs, not a checklist requiring routine
-inspection of every account. Conceptual account/item attention states are **no
-action**, **customer prompt**, **operator review**, and **urgent operator attention**.
-No action need not create a task. Distinguish attention class/severity from workflow
-status; these are concepts, not prescribed enums or existing dashboard states.
+**Approved direction, November 7, 2026.** Internal customer account review extends
+the existing cadences, opportunity management and attention queue. It considers
+customer requests, supported account and operational signals, business context and
+emerging opportunities, including significant developments the customer has not
+raised. The aim is to reduce day-to-day Operator work for healthy accounts and
+reserve human effort for decisions, relationships and meaningful exceptions.
 
-An item may eventually carry customer, type/severity, trigger/evidence, recommended
-action, assigned operator/role, status, due/context and bounded audit history. Group
-duplicates and give each actionable item a clear owner; escalation should not silently
-become everyone's responsibility. Customer questions and operational issues need
-appropriate routing without exposing private facts to unrelated operators. Urgency
-does not bypass approval. Response commitments remain future service-policy decisions.
+Review importance to the customer's objectives, business performance, trust or
+service continuity, likely effort to investigate or act, urgency, whether the
+activity is ordinary or exceptional, confidence in the evidence, and who can act.
+Use those factors to choose an appropriate response.
+
+| Condition | Intended handling |
+| --- | --- |
+| Routine and predictable | Use an established, appropriately authorized routine where practical. Ordinary activity can complete without a manual task. |
+| Useful and nonurgent | Record and consolidate related observations. Revisit in the appropriate operating cadence or when evidence changes. |
+| Important, unusual or consequential | Prompt the responsible Operator or customer with evidence, business context, likely impact and a proposed action or decision. |
+
+Retain conceptual routing states of **no action**, **customer prompt**, **operator
+review** and **urgent operator attention**. Keep severity and routing separate from
+workflow status. Group related observations around the underlying issue. An
+actionable item should identify the account, evidence, why it matters, what
+decision or action is needed, likely effort and owner, with timing and bounded
+provenance as applicable. Keep prompts concise and evidence scoped to the
+recipient's authorized account and role. Reuse established workflows and avoid
+duplicate entry, noisy alerts and a general-purpose administration dashboard.
+
+Use the [opportunity model](opportunity-and-optimization-model.md#opportunity-lifecycle-and-customer-view)
+for optimization candidates and the [business-change process](customer-journey-and-change-management.md#business-change-is-expected)
+when evidence suggests the account needs redirection. Consequential publishing,
+authoritative knowledge changes and other protected actions require their existing
+approvals regardless of urgency or recommendation.
+
+Detailed design remains open, including review triggers and timing, which routines
+may execute under policy, classification, prompt cadence, assignment and escalation,
+integration with opportunity management and V1 phasing. The existing small V1
+attention workflow remains the planned baseline. The broader review direction has
+no implementation, new response commitment or authority to automate protected actions.
 
 ## Service economics and planning hypotheses
 
@@ -367,6 +404,14 @@ Future acquisition cost can supplement these. Service minutes are the strongest
 operating workload metric: human time should concentrate where judgment adds value,
 not where software can reliably do the work. Capture exceptional time as well as
 routine time rather than hide it from averages.
+
+Evaluate efficiency with routine Operator minutes per active account, effort and
+elapsed time per meaningful request, avoidable interventions, attention-item volume
+and usefulness, missed consequential exceptions, effectiveness of approved routines,
+customer effort to maintain accurate knowledge, and observed outcomes and customer
+satisfaction. These are candidate measures. A larger account base should be able to
+benefit from centralized capabilities and reusable workflows without requiring a
+proportional increase in routine human work. Set any future targets from evidence.
 
 | Non-canonical planning target | Current hypothesis to test |
 | --- | --- |

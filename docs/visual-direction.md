@@ -344,10 +344,11 @@ fallback for invalid values. The runtime does not guess whether a stored field w
 bootstrap intent. Operators make any reviewed presentation changes explicitly in
 isolated state before a separately authorized customer transition.
 
-The product remains outside the Gutenberg/Divi editing model: no arbitrary HTML,
-CSS, grids, pixel mechanics or drag/drop canvas. External references influence
-traits and art direction without copying layouts or branded assets. Customers and
-operators approve outcomes rather than author animation or spacing mechanics.
+The native MioPages renderer uses semantic recipes instead of exposing arbitrary
+HTML, CSS, grids, pixel mechanics or a drag/drop canvas. External references
+influence traits and art direction without copying layouts or branded assets.
+These are native renderer constraints. WordPress delivery uses its own
+[authorized presentation tools and ownership boundaries](wordpress-delivery-feasibility.md#content-ownership-and-gutenberg-protection).
 External-reference intake and automated approval/writing workflows remain planned.
 
 ## Reference v2 expression contract

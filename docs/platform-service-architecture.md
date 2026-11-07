@@ -111,6 +111,10 @@ The operator console is the operating interface for prospects/intake, Reviews,
 evidence/QC, customer/Web Presence administration, content, Managed Sites,
 analytics/results, provisioning/service state and operational controls. Appropriate
 roles and authorization govern actions; infrastructure access alone is insufficient.
+Use targeted WordPress Admin workflows for authorized presentation and supported
+editorial work. Keep Core and WordPress responsibilities distinct while avoiding
+duplicate entry, routine inspection of healthy accounts and unnecessary movement
+between interfaces.
 
 ### MioPages Customer
 
@@ -123,7 +127,9 @@ its actual capabilities and integration still need verification.
 
 Full native billing, CRM, sophisticated account administration, unrestricted page
 building and broad self-service infrastructure administration are outside V1.
-Customers manage business information and outcomes. Portal access requires scoped
+Customers manage business information and outcomes without needing WordPress Admin.
+The [operations model](service-operations-model.md#minimal-commercial-v1-customer-experience)
+owns evaluation of request and communication channels. Portal access requires scoped
 customer authentication/authorization; a prospect or provider login does not
 establish customer authority. The [customer journey](customer-journey-and-change-management.md)
 and [onboarding contract](progressive-onboarding-and-launch-readiness.md) retain
@@ -319,11 +325,13 @@ cost. Revisit separation when measured capacity, cost, reliability or isolation
 justifies it, preserving provider-neutral contracts.
 
 The closed private delivery proof establishes signed transport and staging.
-Standardized Managed Site delivery comes first. Curated Gutenberg patterns,
-templates and essential managed blocks allow bounded presentation flexibility.
-Designer Extensibility is a later path for Connected Presence, designers and
-agencies. Specify permitted edits, ownership and supported designs before building
-it. General page building and unrestricted pixel control are outside this direction.
+Standardized Managed Site delivery comes first. Use WordPress and Gutenberg for
+most visual composition and refinement on WordPress delivery, with substantial
+practical latitude for authorized Operators and designers within supported
+ownership boundaries. Core supplies the business and content model, approval and
+release coordination. The [WordPress ownership contract](wordpress-delivery-feasibility.md#content-ownership-and-gutenberg-protection)
+owns presentation persistence and drift questions. Broader Connected Presence,
+designer and agency adoption remains later expansion.
 
 The designer/agency retains control of the WordPress theme, surrounding layout and
 non-MioPages content. MioPages may own explicitly designated conversion blocks and
