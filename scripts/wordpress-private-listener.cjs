@@ -95,7 +95,7 @@ async function main() {
   assert.deepEqual(fs.readdirSync(WEB).filter(name => name.startsWith('.env')), ['.env']);
   const env = childEnvironment(JSON.parse(privateFile(PRIVATE + '/pull-config.json')));
   assert.ok(resourceGate(process.memoryUsage().rss, availableMemory()));
-  const child = spawn('/usr/bin/node', ['--max-old-space-size=256', WEB + '/node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', '8081'],
+  const child = spawn('/usr/bin/node', ['--max-old-space-size=256', WEB + '/.rehearsal/private-server.cjs'],
     { cwd: WEB, env, detached: true, stdio: 'ignore' });
   const known = new Map();
   try { const first = procStat(fs.readFileSync('/proc/' + child.pid + '/stat', 'utf8')); known.set(child.pid, first.started); } catch { /* No broad signal without verified identity. */ }

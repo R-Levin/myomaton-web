@@ -15,6 +15,10 @@ on:
       - 'instrumentation.ts'
       - 'scripts/wordpress-rehearsal-artifact.mjs'
       - 'scripts/wordpress-artifact-links.mjs'
+      - 'scripts/wordpress-private-server.cjs'
+      - 'scripts/wordpress-routing-smoke.mjs'
+      - 'tests/wordpress-private-server.test.mjs'
+      - 'tests/wordpress-private-build-config.test.tsx'
       - 'tests/wordpress-artifact-links.test.mjs'
       - '.github/workflows/wordpress-rehearsal-build.yml'
 
@@ -43,14 +47,17 @@ jobs:
       - name: Reject production dependency advisories
         run: npm audit --omit=dev --audit-level=low
       - name: Verify retained approved rendering on Linux
-        run: npx tsx --test tests/proposal-preview-compatibility.test.tsx
+        run: npx tsx --test tests/proposal-preview-compatibility.test.tsx tests/wordpress-private-build-config.test.tsx
       - name: Verify portable artifact dependency boundary
         run: node --test tests/wordpress-artifact-links.test.mjs
+      - name: Verify raw routing boundary and sanitized diagnostics
+        run: node --test tests/wordpress-private-server.test.mjs
       - name: Build without hosted credentials
         run: npm run build
         env:
           DATABASE_URL: postgresql://build:unused@127.0.0.1:1/build_only
           MIOPAGES_ROUTING_MODE: shared-hostnames
+          MIOPAGES_WP_PRIVATE_STAGE: enabled
       - name: Prove isolated runtime and package checksummed artifact
         run: node scripts/wordpress-rehearsal-artifact.mjs
       - uses: actions/upload-artifact@v4
