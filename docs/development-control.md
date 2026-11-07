@@ -44,6 +44,30 @@ Source is the owner-provided November 4–7 recovery handoff supplied after `51d
 
 The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
+## First real stock selection and Home placement review
+
+The owner accepted the quality of the first live search and approved Pixabay as
+the preferred initial stock source, subject to image-specific licensing and
+delivery review. The accepted C0 service-led v3 Home has a suitable supporting
+placement after the first Intro copy. The conceptual Hero and the Review report
+retain their existing purposes. TiBine’s workbench photo, Pixabay `384740`, is
+recommended for this placement. The decision to download it is pending.
+
+The local review in `runtime-content/pixabay-placement-review/review.html`
+shows the exact reviewed Intro copy, a proportioned placement marker and the
+accepted full Home capture. Its source links open on demand. The review uses the
+existing private search receipt and made zero additional search or download
+requests. A bounded download path was prepared and exercised with disposable
+JPEG bytes only. All 384 repository tests, TypeScript and targeted lint passed.
+Chrome verified the review and full capture at 1440 px and 390 px without
+external requests. No canonical media or release state was changed.
+
+Next, approve or decline the exact local acquisition plan. If approved while
+the cached representation is current, prepare the exact JPEG and render it in
+the private Home Intro review. An expired representation requires a separate
+owner decision before a fresh provider request. See the
+[placement and rights record](media-acquisition.md#first-real-pixabay-selection-and-page-context-review).
+
 ## First live Pixabay search verified
 
 On November 7, 2026 at 18:49 UTC the owner completed the single authorized
@@ -64,9 +88,8 @@ and one-attempt tests. This closeout verifies live discovery and updates only
 documentation. There were no selected-image downloads, canonical Asset or
 AssetUsage writes, or hosted changes.
 
-Next, review the returned source pages and pin one candidate's exact result and
-intended placement. A download or release still requires separate authorization
-and a review of source rights, permitted use, credit, retention and exit.
+The first placement and candidate are recorded above. A download or release
+still requires separate authorization for that use.
 [Trial and review boundary](media-acquisition.md#one-authorized-local-live-search).
 
 ## Pixabay priority and first owner-visible review
