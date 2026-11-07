@@ -142,8 +142,13 @@ export function c0PixabaySearch(directory: string, key: string, send: Send = sen
 
 async function main() {
   const args = process.argv.slice(2);
-  if (args.length && (args.length !== 1 || args[0] !== "--c0-home")) throw Error("unsupported_search_trial");
-  const trial = args.length ? c0Trial : technicalTrial;
+  if (args.length === 1 && args[0] === "--c0-home") {
+    console.log('{"status":"BLOCKED","code":"c0_search_closed"}');
+    process.exitCode = 1;
+    return;
+  }
+  if (args.length) throw Error("unsupported_search_trial");
+  const trial = technicalTrial;
   if (["NODE_OPTIONS", "NODE_DEBUG", "NODE_DEBUG_NATIVE", "NODE_USE_ENV_PROXY", "SSLKEYLOGFILE"].some(name => process.env[name])) {
     throw Error("unsafe_node_diagnostics_or_proxy_configuration");
   }

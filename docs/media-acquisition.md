@@ -146,6 +146,12 @@ Its results and the previously proposed placement at `9a638b2` are historical.
 The old exact download plan is withdrawn. Its guarded local transport and
 safe ingestion remain reusable.
 
+After reviewing the second search, the owner also declined Cleanly’s laundry-shop
+photo (`6389104`) and F1Digitals’ freelancer photo (`7642551`). Both fell short
+of improving the accepted Home. C0 stock discovery is closed and neither image
+is approved for acquisition. The validated Pixabay capability remains available
+for separately scoped use on suitable customer sites.
+
 The accepted service-led v3 Home offers a clearer web presence with less work
 to manage. The first Intro recognizes owners who are busy serving customers.
 The later Intro, “Your business judgment. Our web responsibility.”, explains

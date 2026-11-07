@@ -372,6 +372,11 @@ when evidence suggests the account needs redirection. Consequential publishing,
 authoritative knowledge changes and other protected actions require their existing
 approvals regardless of urgency or recommendation.
 
+The [local Operator overview](development-control.md#local-operator-overview-and-c0-account-review)
+applies this attention-first layout to the reviewed C0 snapshot. It groups a
+recorded evidence decision above the account directory and links to a page
+preview. Live attention routing and queue persistence remain planned.
+
 Detailed design remains open, including review triggers and timing, which routines
 may execute under policy, classification, prompt cadence, assignment and escalation,
 integration with opportunity management and V1 phasing. The existing small V1

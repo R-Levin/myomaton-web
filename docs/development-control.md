@@ -44,6 +44,34 @@ Source is the owner-provided November 4–7 recovery handoff supplied after `51d
 
 The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
+## Local Operator overview and C0 account review
+
+The first integrated Operator view groups actionable evidence ahead of the
+account directory. It reads the checked-in, human-reviewed C0 service-led v3
+graph and opens actual read-only previews through the existing v3 renderer.
+The next action points to the Experience page because permission for the
+featured historical work remains unresolved in the snapshot. Other recorded
+visual needs stay in the account detail. This is a display rule for the local
+review, not a new persisted task, escalation or approval workflow.
+
+From the repository root, run `node --import tsx scripts/operator-overview.ts`
+and open `http://127.0.0.1:4317/`. Follow **Open account review** and then
+**Preview Experience**. All four snapshot pages can be inspected. The preview
+uses reviewed copy, canonical source projections and design tokens. Asset
+delivery and visitor interactions are outside its scope. Content proposal,
+release, activity and monitoring records are outside this snapshot, so the
+view makes no claim about current health, pending approvals or live delivery.
+The script has no database connection or mutation routes.
+
+All 387 repository tests, TypeScript and targeted lint passed. Focused checks
+verified account ownership, quiet-account rendering, four scoped v3 previews,
+method refusal and host checks. Chrome followed overview → account → Experience
+→ Home at desktop and mobile widths.
+
+Next, connect the existing proposal revision and exact preview evidence to a
+read-only, authenticated, tenant-scoped account detail. Preserve the existing
+approval and release authorities when that connection is reviewed.
+
 ## Corrected C0 stock image review
 
 The owner rejected the TiBine workbench photo (Pixabay `384740`) for MioPages
@@ -76,7 +104,9 @@ laundry-shop source page still needs visual confirmation. Neither candidate
 clearly conveys the managed-service handoff. Keeping the current page remains
 a valid outcome. Chrome verified the review at 1440 and 390 px with no external
 requests. There was no image acquisition, canonical write or hosted change.
-Owner selection, if any, precedes exact download authorization.
+The owner declined both photos and closed further C0 stock searches. The C0
+search command now refuses before reading credentials. The validated Pixabay
+discovery adapter remains available for future scoped customer use.
 
 ## First live Pixabay search verified
 
