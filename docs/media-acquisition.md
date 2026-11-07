@@ -37,6 +37,56 @@ A multi-provider marketplace/ecosystem and deterministic graphics expansion are
 later capabilities, not V1 requirements. Media recommendations belong in generation
 orchestration; unresolved visual gaps must remain explicit until safely resolved.
 
+## Operator-assisted customer-supplied raster
+
+The disposable intake extends the same work, candidate and append-only review
+records as the generated pilot. An authenticated capability adapter supplies
+scoped receive, review and revoke authority for the exact Web Presence, Managed
+Site, Page and existing Intro Section. The test adapter grants synthetic
+capabilities only. Supplier identity is recorded as reported by the Operator and
+is separate from the Operator's authenticated identity.
+
+| Source kind | Accepted input in this proof |
+| --- | --- |
+| Upload | Supplied bytes and an identifiable submission record. |
+| Website reuse | A supplied copy and source/permission reference. The intake does no network fetching. |
+| Authorized Asset reuse | An exact owned, active managed PNG and its recorded authority. The source Asset stays intact. Previously acquired lineage requires its own eligibility path and is outside this reuse branch. |
+
+Record the ownership, license or permission claim, supplier reference, any
+supporting record reference and the exact Intro image placement. The bounded
+raster validator decodes the actual file, enforces dimensions and byte limits,
+prepares a single PNG and records the source and prepared SHA-256 and
+transformation identity. Existing prepared Asset reuse validates and pins the
+owned source and uses its exact bytes. The prepared candidate stays in a separate
+private root. Exact retries under the same scoped submission ID return the same
+candidate. Conflicting bytes, claims or placement refuse.
+
+The Operator inspects the staged bytes and current placement, then records
+suitability, contextual alt text and a reason against the candidate digest.
+Approval distinguishes acceptance of the supplied attestation from independent
+verification, which requires its own evidence reference. An attestation reference
+must match the supplied record. This is an attributable review of referenced
+evidence and is limited to the disposable proof. The service cannot authenticate
+the supplier or independently interpret a license.
+
+Approval and Asset preparation commit with the existing acquisition evidence.
+The Asset is unattached and marked with acquisition lineage so legacy delivery
+cannot use it. The separate page preview and approval bind the reviewed bytes,
+placement, rights review and exact AssetUsage. The existing release operation
+installs the usage. Candidate withdrawal, expiry, changed managed bytes or
+a changed original Asset blocks a new release. Rejected candidates never create
+an Asset. The existing release fingerprint and rollback checks apply.
+
+The subtype is enabled only by the guarded fixture setup on loopback PostgreSQL.
+It adds no table and changes no installed migration or production schema.
+The generated Hero policy remains context-bound. Before production, review
+the shared migration and permission surface, authenticated supplier/tenant
+binding, who may accept attestations and when independent evidence is mandatory,
+permitted-use and withdrawal policy, expiry, retention and abuse safeguards.
+Customer upload UI and authenticated submissions and practical stock sourcing
+remain required Commercial V1 work. WordPress storage and synchronization
+remain separate pending decisions.
+
 ## Schema review before migration
 
 The existing nineteen customer tables have no durable external job, private

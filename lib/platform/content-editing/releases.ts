@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { fingerprint, object, text, uuid } from "../canonical/model";
 import type { Scope } from "./authority";
+import { approvedSuppliedEvidence } from "../acquisition/supplied-evidence";
 import { binding, hash, pageProposal, proposalScope, type Binding } from "./proposal";
 import { proposalPreview } from "./proposal-preview";
 import { PostgresProposalPersistence } from "./proposal-postgres";
@@ -99,7 +100,13 @@ export class SiteReleaseService {
       if (media) {
         if (!this.disposableMediaRoot) throw Error("Disposable proposal media is unavailable");
         await requireDisposableMedia(c);
-        if (media.priorUsage) await verifiedProposalImage(this.disposableMediaRoot, scope, media);
+        if (media.priorUsage) {
+          if (media.evidence.source === "customer-supplied") {
+            await approvedSuppliedEvidence(c, { ...scope, pageId: release.page_id, sectionId: media.sectionId }, media.assetId,
+              media.evidence.lineage, { ...media, altText: media.configuration.image.altText });
+          }
+          await verifiedProposalImage(this.disposableMediaRoot, scope, media);
+        }
         await writeProposalUsage(c, releasedUsage(scope, media, release.at), media.priorUsage);
       }
       await writeContent(c, release.page_id, release.after_content, release.before_content);

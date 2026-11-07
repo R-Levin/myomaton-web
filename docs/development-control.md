@@ -44,6 +44,33 @@ Source is the owner-provided November 4–7 recovery handoff supplied after `51d
 
 The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
+## Commercial V1 customer-supplied media intake verified
+
+The owner authorized one disposable operator-assisted image. The supplied-image
+subtype reuses the acquisition work, candidate and review records, private
+content-addressed storage, and existing Asset and page release path. The
+Operator records the supplier and claimed rights separately from the review
+basis. An exact approved candidate produces one unattached Asset. A separately
+approved page release can use it only for the reviewed placement while evidence
+and bytes are current. The guarded fixture adds the subtype only on disposable
+loopback PostgreSQL. The canonical migration ledger and hosted schemas were
+outside this checkpoint.
+
+TypeScript, targeted lint, 375 repository tests and nine disposable PostgreSQL 18
+checks passed. The supplied-media integration covered scoped authority, invalid
+inputs, evidence conflicts, changed bytes and placement, reject/revoke, duplicate
+receive and review, atomic ingestion failure and retry, authorized reuse, and
+compatibility with exact preview, release and rollback. Revocation invalidated
+an otherwise current page approval at release. Existing Intro and historical
+preview regressions passed.
+
+Next, review the authenticated upload contract and acceptance rules for
+customer attestations, then connect one bounded upload to the same intake.
+Production identity/authority, reviewed shared schema and grants, retention
+and abuse handling remain gated. Practical stock sourcing is still required.
+WordPress storage and synchronization remain pending. [Media intake contract](media-acquisition.md#operator-assisted-customer-supplied-raster)
+and [exact approval and release](content-authority-and-editing.md#media-to-publication-handoff).
+
 ## Commercial V1 disposable Intro media release verified
 
 The owner approved one project-created raster with explicit synthetic permission in

@@ -40,7 +40,7 @@ export async function ingestDisposable(service:AcquisitionService,owner:string,w
 }
 export async function cleanupCandidates(service:AcquisitionService,owner:string) {
   return transaction(service.pool,async db=>{
-    const r=await db.query("SELECT * FROM media_candidates WHERE web_presence_id=$1 AND state IN ('rejected','expired') AND updated_at<now()-interval '30 days' FOR UPDATE",[owner]);
+    const r=await db.query("SELECT * FROM media_candidates WHERE web_presence_id=$1 AND source_kind='generated-illustrated' AND state IN ('rejected','expired') AND updated_at<now()-interval '30 days' FOR UPDATE",[owner]);
     const removed:string[]=[];
     for(const c of r.rows as Candidate[]){
       const retained=await db.query("SELECT id FROM media_candidates WHERE web_presence_id=$1 AND quarantine_key=$2 AND NOT(state IN ('rejected','expired') AND updated_at<now()-interval '30 days')",[owner,c.quarantine_key]);

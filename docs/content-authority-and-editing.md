@@ -335,6 +335,15 @@ proposal storage, an inactive bound fixture, and the existing nondefault-port
 disposable release boundary on loopback PostgreSQL. WordPress private staging
 v1 continues to refuse media-bound proposals.
 
+The [customer-supplied intake extension](media-acquisition.md#operator-assisted-customer-supplied-raster)
+provides a second eligible evidence source for the same disposable Intro slot.
+The Asset lineage pins the approved candidate and exact Operator decision.
+Preparation, preview, approval and release verify current ingestion and rights
+evidence, exact placement and contextual alt. Release serializes with candidate
+revocation. Rollback rechecks rights before restoring a predecessor that uses
+supplied media. The project-created fixture contract and text-only hashes retain
+their existing semantics.
+
 The PostgreSQL proposal transaction serializes proposal changes and site release
 requests. The private release adapter conservatively takes canonical-table
 `SHARE ROW EXCLUSIVE` locks before its first snapshot-bearing SELECT. This blocks

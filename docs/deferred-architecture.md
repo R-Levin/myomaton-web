@@ -467,6 +467,11 @@ Asset reuse, permissioned stock integration
 such as Pexels, deterministic SVG/chart-like graphics, and generated illustration/image
 providers. All paths need provenance/licensing, explicit approval, production
 eligibility and customer ownership; unresolved visual intent is not an eligible Asset.
+The [operator-assisted supplied raster proof](media-acquisition.md#operator-assisted-customer-supplied-raster)
+reuses the acquisition ledger and exact release. Before shared use, review its
+schema extension, P7 authenticated submissions, A1/A2/A6 ownership and rights,
+P13 scoped decisions and production delivery/revocation behavior. Keep the upload
+UI, authenticated customer submission and practical stock acquisition in V1 scope.
 
 Use an OpenAI/API provider abstraction where appropriate, with bounded cost,
 logging, retry, error/refusal behavior and audit records. Provider output and external

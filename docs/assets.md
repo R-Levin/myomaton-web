@@ -198,6 +198,10 @@ future usage writers must preserve this contract and A1/A2 attachment integrity.
 The [disposable Intro proposal proof](content-authority-and-editing.md#media-to-publication-handoff)
 binds this existing accessibility configuration to exact review and uses the
 release transaction for its singular AssetUsage and rollback.
+[Operator-assisted intake](media-acquisition.md#operator-assisted-customer-supplied-raster)
+can prepare an unattached Asset with reviewed acquisition lineage. Exact site
+approval and release own placement. Acquired Assets remain ineligible through
+legacy Intro and logo delivery paths.
 
 ### Eligibility and bytes
 

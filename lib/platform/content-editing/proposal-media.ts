@@ -4,8 +4,9 @@ import { and, eq } from "drizzle-orm";
 import { readManagedObject } from "../assets/local-storage";
 import { validateStoredMedia } from "../assets/media-validation";
 import { presentImage } from "../assets/source";
-import { choice, fingerprint, object, text } from "../canonical/model";
+import { choice, fingerprint, object, text, uuid } from "../canonical/model";
 import { assets } from "../db/schema/assets";
+import { approvedSuppliedEvidence, type SuppliedEvidence } from "../acquisition/supplied-evidence";
 import type { Scope } from "./authority";
 import { hash, type PageProposal } from "./proposal";
 import { resolvePage } from "./proposal-context";
@@ -35,7 +36,7 @@ export type ProposalMedia = {
   mimeType: "image/png";
   width: number;
   height: number;
-  evidence: { source: "synthetic-project-raster"; sourceDigest: string; permission: "disposable-preview-release"; reference: string };
+  evidence: { source: "synthetic-project-raster"; sourceDigest: string; permission: "disposable-preview-release"; reference: string } | SuppliedEvidence;
   priorUsage: Usage | null;
 };
 
@@ -65,17 +66,28 @@ export async function resolveProposalCandidate(c: PoolClient, scope: Scope, page
   if (!image || asset.mimeType !== "image/png" || (priorUsage && !presentImage(asset, priorUsage.configuration))) {
     throw Error("Eligible owned fixture raster required");
   }
-  const metadata = object(asset.metadata, ["proposalFixture"]);
-  const raw = object(metadata.proposalFixture, ["source", "sourceDigest", "permission", "reference"]);
-  const evidence = {
-    source: choice(raw.source, ["synthetic-project-raster"]),
-    sourceDigest: hash(raw.sourceDigest),
-    permission: choice(raw.permission, ["disposable-preview-release"]),
-    reference: text(raw.reference, 300),
-  };
+  const metadata = object(asset.metadata, ["proposalFixture", "acquisition"]);
+  const preparedDigest = asset.sourceReference.slice("objects/".length);
+  let evidence: ProposalMedia["evidence"];
+  if (Object.hasOwn(metadata, "acquisition")) {
+    if (Object.hasOwn(metadata, "proposalFixture") || (priorUsage && presentImage(asset, priorUsage.configuration)?.alt !== altText)) {
+      throw Error("Conflicting supplied-media placement evidence");
+    }
+    const raw = object(metadata.acquisition, ["candidateId", "subjectDigest", "reviewDigest"]);
+    const lineage = { candidateId: uuid(raw.candidateId), subjectDigest: hash(raw.subjectDigest), reviewDigest: hash(raw.reviewDigest) };
+    evidence = await approvedSuppliedEvidence(c, { ...scope, pageId: page.pageId, sectionId: target.id }, assetId, lineage,
+      { preparedDigest, width: image.width, height: image.height, altText });
+  } else {
+    const raw = object(metadata.proposalFixture, ["source", "sourceDigest", "permission", "reference"]);
+    evidence = {
+      source: choice(raw.source, ["synthetic-project-raster"]),
+      sourceDigest: hash(raw.sourceDigest),
+      permission: choice(raw.permission, ["disposable-preview-release"]),
+      reference: text(raw.reference, 300),
+    };
+  }
   const media: ProposalMedia = {
-    sectionId: target.id, usageId, assetId, role: "image", configuration,
-    preparedDigest: asset.sourceReference.slice("objects/".length), mimeType: asset.mimeType,
+    sectionId: target.id, usageId, assetId, role: "image", configuration, preparedDigest, mimeType: asset.mimeType,
     width: image.width, height: image.height, evidence, priorUsage,
   };
   return {

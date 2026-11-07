@@ -31,14 +31,23 @@ export async function escalationEvidence(db:Pick<Pool|PoolClient,"query">,w:Work
     ||p.limits?.maxPaidIterations!==3||p.limits.additionalAttempts!==1||p.limits.additionalReservedMicros!==500000||p.limits.budgetMicros!==1500000||p.limits.maxRetries!==0)return null;
   return {eventId:event.id as string,digest:fingerprint(p)};
 }
+export async function recordCandidateDecision(
+  db: PoolClient, work: Pick<Work, "id" | "web_presence_id">, candidateId: string,
+  decision: { decision: Decision["decision"] },
+) {
+  await appendEvent(db, work, "decision", decision, candidateId);
+  const state = { approve: "approved", reject: "rejected", revoke: "revoked" }[decision.decision];
+  await db.query("UPDATE media_candidates SET state=$2,version=version+1,updated_at=now() WHERE id=$1", [candidateId, state]);
+}
+
 async function ownedWork(db:PoolClient,owner:string,id:string):Promise<Work> {
-  const r=await db.query("SELECT * FROM external_work WHERE web_presence_id=$1 AND id=$2 FOR UPDATE",[requireAssetUuid(owner),requireAssetUuid(id)]);
+  const r=await db.query("SELECT * FROM external_work WHERE web_presence_id=$1 AND id=$2 AND capability<>'supplied-raster' FOR UPDATE",[requireAssetUuid(owner),requireAssetUuid(id)]);
   if(r.rows.length!==1)throw Error("Unknown owned work");return r.rows[0];
 }
 export class AcquisitionService {
   constructor(readonly pool:Pool,readonly quarantineRoot:string) {}
   async list(owner:string) {
-    const rows=await this.pool.query("SELECT id,capability,status,version,iteration,attempts,retries,reserved_micros,actual_micros,created_at FROM external_work WHERE web_presence_id=$1 ORDER BY created_at DESC,id DESC LIMIT 100",[requireAssetUuid(owner)]);
+    const rows=await this.pool.query("SELECT id,capability,status,version,iteration,attempts,retries,reserved_micros,actual_micros,created_at FROM external_work WHERE web_presence_id=$1 AND capability<>'supplied-raster' ORDER BY created_at DESC,id DESC LIMIT 100",[requireAssetUuid(owner)]);
     return rows.rows;
   }
   async create(context:NeedContext,provider:ImageProvider,budgetMicros:number,iteration=1,templateVersion=TEMPLATE_VERSION) {
@@ -65,7 +74,7 @@ export class AcquisitionService {
     });
   }
   async inspect(owner:string,id:string) {
-    const work=await this.pool.query("SELECT * FROM external_work WHERE web_presence_id=$1 AND id=$2",[requireAssetUuid(owner),requireAssetUuid(id)]);
+    const work=await this.pool.query("SELECT * FROM external_work WHERE web_presence_id=$1 AND id=$2 AND capability<>'supplied-raster'",[requireAssetUuid(owner),requireAssetUuid(id)]);
     if(work.rows.length!==1)throw Error("Unknown owned work");
     const candidates=await this.pool.query("SELECT * FROM media_candidates WHERE web_presence_id=$1 AND work_id=$2",[owner,id]);
     const events=await this.pool.query("SELECT * FROM external_work_events WHERE web_presence_id=$1 AND work_id=$2 ORDER BY created_at,id",[owner,id]);
@@ -148,7 +157,7 @@ export class AcquisitionService {
   }
   async expireCandidates(owner:string) {
     return transaction(this.pool,async db=>{
-      const due=await db.query("SELECT work_id,id FROM media_candidates WHERE web_presence_id=$1 AND expires_at<=now() AND state IN ('proposed','approved','ingested') ORDER BY work_id,id",[requireAssetUuid(owner)]);
+      const due=await db.query("SELECT work_id,id FROM media_candidates WHERE web_presence_id=$1 AND source_kind<>'customer-supplied' AND expires_at<=now() AND state IN ('proposed','approved','ingested') ORDER BY work_id,id",[requireAssetUuid(owner)]);
       for(const c of due.rows){const w=await ownedWork(db,owner,c.work_id);
         const changed=await db.query("UPDATE media_candidates SET state='expired',version=version+1,updated_at=now() WHERE id=$1 AND state IN ('proposed','approved','ingested') RETURNING id",[c.id]);
         if(changed.rowCount)await appendEvent(db,w,"failure",{code:"candidate-expired"},c.id);
@@ -174,8 +183,7 @@ export class AcquisitionService {
       }else if(!["proposed","approved","ingested"].includes(c.state))throw Error("Candidate not revocable");
       const decision:Decision={actor,role:"operator",authority:"local-operator",decision:input.decision,subjectType:"media-candidate",candidateId:c.id,subjectDigest:c.subject_digest,revision:c.revision,
         scope:{webPresenceId:owner,sectionId:w.context.sectionId,role:"service-illustration"},at:new Date().toISOString(),reason};
-      await appendEvent(db,w,"decision",decision,c.id);
-      await db.query("UPDATE media_candidates SET state=$2,version=version+1,updated_at=now() WHERE id=$1",[c.id,input.decision==="approve"?"approved":input.decision==="reject"?"rejected":"revoked"]);
+      await recordCandidateDecision(db, w, c.id, decision);
       if(input.decision!=="approve"&&w.status==="awaiting-review"){
         await db.query("UPDATE external_work SET status='completed',version=version+1,result=result||$2::jsonb,updated_at=now() WHERE id=$1",[w.id,JSON.stringify({decision:input.decision})]);
         await appendEvent(db,w,"result",{from:"awaiting-review",to:"completed",decision:input.decision},c.id);
