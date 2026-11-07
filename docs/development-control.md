@@ -44,6 +44,32 @@ Source is the owner-provided November 4–7 recovery handoff supplied after `51d
 
 The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
+## Commercial V1 permissioned stock fixture verified locally
+
+The owner authorized a project-created PNG under synthetic stock permission.
+The disposable Operator intake reuses the acquisition candidate, decision and
+Asset preparation path. It binds the provider, source and creator reference,
+selected representation and exact source/prepared digests, separately recorded
+license and integration conditions, and reviewed Intro placement. Only the
+synthetic project grant can pass. Unknown, incompatible, expired or withdrawn
+permission prevents release. Exact page approval and rollback reuse the
+existing site release evidence.
+
+TypeScript, targeted lint, 375 repository tests and 30 disposable PostgreSQL 18
+checks passed. Coverage includes scoped intake, incompatible terms, duplicate
+and conflicting requests, altered bytes, stale placement, rejection, expiry and
+withdrawal after page approval, private staging, exact release and rollback.
+Customer upload, Operator-assisted intake, existing Intro media, text-only
+release and historical preview checks passed. The canonical migration ledger
+and hosted state were outside the fixture. No live provider request or
+credential was used.
+
+Official Pexels sources were reviewed on November 7, 2026. The provider reports
+a pause on issuing new keys. Prepare one search/credit adapter against recorded
+responses first. Live use needs approved access, provider-specific credit and
+an approved use, retention, withdrawal and exit policy. WordPress copy/storage
+remains pending. [Stock proof and Pexels integration gate](media-acquisition.md#permissioned-stock-fixture-and-provider-integration).
+
 ## Commercial V1 agreement-based customer upload verified locally
 
 The owner approved standing agreement rights evidence for routine customer

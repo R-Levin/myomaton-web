@@ -37,6 +37,76 @@ A multi-provider marketplace/ecosystem and deterministic graphics expansion are
 later capabilities, not V1 requirements. Media recommendations belong in generation
 orchestration; unresolved visual gaps must remain explicit until safely resolved.
 
+## Permissioned stock fixture and provider integration
+
+The disposable stock intake takes a normalized local selection and one
+project-created PNG under an explicit synthetic project grant. Its provider
+label and reserved source URL identify it as fixture data. Scoped Operator
+authority binds the exact Web Presence, Page and Intro slot. Record provider
+and source ID, source page, available creator credit, selected representation
+and source SHA-256, license and intended use, expiry, and the separate provider
+integration reference, copy mode and attribution requirement. Keep this evidence
+and the prepared SHA-256 in the existing acquisition ledger.
+
+The fixture permits only its reviewed local-copy license and optional
+attribution. A license that forbids copying, a provider-hosted-only rule,
+an obligation the renderer cannot fulfill, or unknown or expired permission
+refuses. The intake validates and privately stages the prepared bytes. An
+Operator approves the exact candidate digest, provider-license reference,
+suitability and contextual alt text before an unattached canonical Asset
+is prepared. The separate page preview displays synthetic provenance and
+the actual raster. It binds that evidence to exact approval and release.
+Expiry and recorded withdrawal block a new release, and rollback rechecks
+eligibility before restoring a prior stock association. No live provider
+adapter, external-image renderer or export permission is implied.
+
+### Pexels integration gate
+
+Official documentation reviewed November 7, 2026. The general content license
+allows uses including websites and gives conditional permission to copy and
+adapt covered content. Terms restrict standalone distribution, misleading
+endorsement, systematic copying and some depictions. Check third-party rights
+for the actual image and placement. General-license credit is optional.
+The API guidelines separately call for a prominent Pexels link and photographer
+credit where possible. Record the license and API terms separately. Confirm
+where attribution appears and what creator data may be retained for that purpose.
+See the [Pexels license](https://www.pexels.com/license/),
+[terms](https://www.pexels.com/terms-of-service/) and
+[API guidelines](https://www.pexels.com/api/documentation/#guidelines).
+
+1. Verify availability of a separately approved server-side key. The public
+   help center currently reports that new key issuance and rate increases are
+   paused. Default limits are 200/hour and 20,000/month. Keep credentials in
+   protected configuration. Budget and track quota from successful response
+   headers. See [API key status](https://help.pexels.com/hc/en-us/articles/900004904026-How-do-I-get-an-API-key),
+   [rate limits](https://help.pexels.com/hc/en-us/articles/900005852323-How-do-I-get-unlimited-requests)
+   and [request statistics](https://www.pexels.com/api/documentation/#request-statistics).
+2. Build one bounded photo search with recorded responses first. Derive a small
+   shortlist from the generated page's visual need, desired orientation,
+   available image area and context. Use one selected photo ID and representation.
+   Retain the source-page link and minimum permitted credit data. Reject misleading
+   documentary or endorsement cues, unsuitable crops and unresolved rights.
+   Add source links and credit on the reviewed selection surfaces.
+   See [photo resource and search](https://www.pexels.com/api/documentation/#the-photo-resource).
+3. After provider and license review, download only the chosen representation
+   from the approved media origin with redirect, size, MIME and time bounds.
+   Hash the bytes, run safe raster preparation and preserve the terms evidence.
+   Set a small search-response cache and a separately reviewed retention policy
+   for selected files. Confirm staging, optimization, managed serving, transfer,
+   withdrawal and customer exit under the selected terms before enabling those
+   uses. API cache guidance does not establish a long-term copy or export policy.
+   See [Pexels cache guidance](https://help.pexels.com/hc/en-us/articles/900006470063-What-steps-can-I-take-to-avoid-hitting-the-rate-limit).
+4. Treat credential and permission failures as blocked. Respect quota and
+   provider backoff on 429. Bound retries for transient failures, keep stable
+   request and representation identities, and require new review for a changed
+   selection or license. Refuse when required credit or delivery conditions
+   cannot be honored. Reuse the existing withdrawal and release gates.
+
+Owner review is required before live credential use and before approving
+the use, attribution, retention and exit policy. Unsplash and other providers
+can normalize the same fields under their own rules. WordPress copying,
+provider-hosted delivery and export remain separately gated.
+
 ## Standing customer media rights and authenticated upload
 
 The owner approved agreement-based rights evidence on November 7, 2026. For
@@ -266,7 +336,7 @@ Unresolved visuals stay canonical metadata; preview FPOs are not production
 Assets. Production-safe fallback omits unresolved visuals without revoking
 acceptance. A future eligible illustration fills only the Home Hero slot.
 
-The disposable pilot does not implement stock/Pexels sourcing. Practical stock
+The generated Hero pilot remains separate from stock selection. Live Pexels sourcing is pending. Practical stock
 acquisition and customer media upload are Commercial V1 completion work above;
 deterministic graphics and broader non-image intelligence remain later extensions.
 Editorial/canonical reconciliation remains a reusable non-image direction. Real

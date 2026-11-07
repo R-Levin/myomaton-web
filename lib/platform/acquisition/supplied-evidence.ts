@@ -4,6 +4,7 @@ import { record } from "../presentation/content";
 import { candidateSubject, type Candidate } from "./service";
 import type { Scope } from "../content-editing/authority";
 import { requireCurrentUploadAgreement, type UploadAgreement, type VerifyUploadAgreement } from "./customer-upload";
+import { eligibleStock, stockPolicy, type StockSelection } from "./stock";
 
 export const suppliedPolicy = "disposable-supplied-raster/1";
 
@@ -17,7 +18,8 @@ export type SuppliedSource = {
   existingAssetId: string | null;
 };
 export type SuppliedReceipt = { source: SuppliedSource; receivedBy: { operatorId: string; authorityReference: string } }
-  | { source: { kind: "authenticated-upload"; agreement: UploadAgreement; existingAssetId: null } };
+  | { source: { kind: "authenticated-upload"; agreement: UploadAgreement; existingAssetId: null } }
+  | { source: { kind: "permissioned-stock"; selection: StockSelection; existingAssetId: null }; receivedBy: { operatorId: string; authorityReference: string } };
 export type SuppliedProvenance = SuppliedReceipt & {
   sourceDigest: string;
   originalAssetDigest: string | null;
@@ -31,23 +33,23 @@ export type SuppliedDecision = {
   subjectDigest: string;
   actor: { operatorId: string; authorityReference: string };
   reason: string;
-  rights: { basis: "customer-attestation" | "service-agreement" | "independently-verified"; reference: string } | null;
+  rights: { basis: "customer-attestation" | "service-agreement" | "provider-license" | "independently-verified"; reference: string } | null;
   altText: string | null;
 };
 export type SuppliedLineage = { candidateId: string; subjectDigest: string; reviewDigest: string };
 export type SuppliedEvidence = {
-  source: "customer-supplied";
   sourceDigest: string;
   permission: "disposable-preview-release";
   reference: string;
   sourceKind: SuppliedReceipt["source"]["kind"];
-  agreement?: UploadAgreement;
   rightsBasis: NonNullable<SuppliedDecision["rights"]>["basis"];
   lineage: SuppliedLineage;
-};
+} & ({ source: "customer-supplied"; agreement?: UploadAgreement } | { source: "permissioned-stock"; stock: StockSelection });
 
 export function suppliedSubjectMatches(candidate: Candidate) {
-  return candidate.source_kind === "customer-supplied" && candidate.policy_version === suppliedPolicy
+  const stock = record(record(candidate.provenance).source).kind === "permissioned-stock";
+  return candidate.source_kind === (stock ? "permissioned-stock" : "customer-supplied")
+    && candidate.policy_version === (stock ? stockPolicy : suppliedPolicy)
     && candidate.quarantine_key === "objects/" + candidate.bytes_digest
     && candidate.subject_digest === candidateSubject(candidate)
     && candidate.provenance_digest === fingerprint(candidate.provenance)
@@ -101,6 +103,15 @@ export async function approvedSuppliedEvidence(db: PoolClient, placement: Suppli
   if (provenance.source.kind === "authenticated-upload") {
     await requireCurrentUploadAgreement(db, placement, provenance.source.agreement, verifyAgreement);
   }
-  return { source: "customer-supplied", sourceDigest: provenance.sourceDigest, permission: "disposable-preview-release",
-    reference: decision.rights.reference, rightsBasis: decision.rights.basis, sourceKind: provenance.source.kind, lineage, ...(agreement ? { agreement } : {}) };
+  const evidence = { sourceDigest: provenance.sourceDigest, permission: "disposable-preview-release" as const,
+    reference: decision.rights.reference, rightsBasis: decision.rights.basis, sourceKind: provenance.source.kind, lineage };
+  if (provenance.source.kind === "permissioned-stock") {
+    const stock = eligibleStock(provenance.source.selection);
+    if (stock.provider !== candidate.provider || stock.representation.sourceDigest !== provenance.sourceDigest
+      || decision.rights.basis !== "provider-license" || decision.rights.reference !== stock.license.reference) {
+      throw Error("Exact reviewed stock license and representation required");
+    }
+    return { ...evidence, source: "permissioned-stock", stock };
+  }
+  return { ...evidence, source: "customer-supplied", ...(agreement ? { agreement } : {}) };
 }

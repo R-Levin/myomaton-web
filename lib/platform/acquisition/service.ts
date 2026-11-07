@@ -157,7 +157,7 @@ export class AcquisitionService {
   }
   async expireCandidates(owner:string) {
     return transaction(this.pool,async db=>{
-      const due=await db.query("SELECT work_id,id FROM media_candidates WHERE web_presence_id=$1 AND source_kind<>'customer-supplied' AND expires_at<=now() AND state IN ('proposed','approved','ingested') ORDER BY work_id,id",[requireAssetUuid(owner)]);
+      const due=await db.query("SELECT work_id,id FROM media_candidates WHERE web_presence_id=$1 AND source_kind='generated-illustrated' AND expires_at<=now() AND state IN ('proposed','approved','ingested') ORDER BY work_id,id",[requireAssetUuid(owner)]);
       for(const c of due.rows){const w=await ownedWork(db,owner,c.work_id);
         const changed=await db.query("UPDATE media_candidates SET state='expired',version=version+1,updated_at=now() WHERE id=$1 AND state IN ('proposed','approved','ingested') RETURNING id",[c.id]);
         if(changed.rowCount)await appendEvent(db,w,"failure",{code:"candidate-expired"},c.id);

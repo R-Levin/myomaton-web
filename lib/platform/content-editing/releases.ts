@@ -102,7 +102,7 @@ export class SiteReleaseService {
         if (!this.disposableMediaRoot) throw Error("Disposable proposal media is unavailable");
         await requireDisposableMedia(c);
         if (media.priorUsage) {
-          if (media.evidence.source === "customer-supplied") {
+          if (media.evidence.source !== "synthetic-project-raster") {
             await approvedSuppliedEvidence(c, { ...scope, pageId: release.page_id, sectionId: media.sectionId }, media.assetId,
               media.evidence.lineage, { ...media, altText: media.configuration.image.altText }, this.verifyUploadAgreement);
           }

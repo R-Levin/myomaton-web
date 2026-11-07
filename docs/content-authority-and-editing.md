@@ -347,6 +347,10 @@ their existing semantics.
 also bind the trusted upload grant, agreement version and acceptance evidence
 to the revision. Current authorization and rights are rechecked at release,
 independent of the separate page consent and release mandates.
+The [permissioned stock fixture](media-acquisition.md#permissioned-stock-fixture-and-provider-integration)
+uses the same candidate and release evidence with an explicit provider license
+and integration policy. Private previews disclose synthetic provenance. Exact
+release and restoration check current stock permission for the reviewed slot.
 
 The PostgreSQL proposal transaction serializes proposal changes and site release
 requests. The private release adapter conservatively takes canonical-table

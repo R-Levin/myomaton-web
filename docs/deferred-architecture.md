@@ -472,6 +472,10 @@ reuses the acquisition ledger and exact release. Before shared use, review its
 schema extension, P7 authenticated submissions, A1/A2/A6 ownership and rights,
 P13 scoped decisions and production delivery/revocation behavior. Keep the upload
 UI, authenticated customer submission and practical stock acquisition in V1 scope.
+The [stock fixture and Pexels gate](media-acquisition.md#permissioned-stock-fixture-and-provider-integration)
+record local lifecycle proof and the pending live source, license, credit,
+retention and delivery decisions. Review the actual delivery target before
+granting provider-specific copy or export rights.
 
 Use an OpenAI/API provider abstraction where appropriate, with bounded cost,
 logging, retry, error/refusal behavior and audit records. Provider output and external

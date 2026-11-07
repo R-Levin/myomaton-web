@@ -14,6 +14,7 @@ import { appendEvent, candidateSubject, recordCandidateDecision, transaction, ty
 import { suppliedDecision, originalAsset, suppliedPolicy, suppliedSubjectMatches, type SuppliedDecision,
   type SuppliedLineage, type SuppliedPlacement, type SuppliedProvenance, type SuppliedReceipt, type SuppliedSource } from "./supplied-evidence";
 import { readUploadPng, requireCurrentUploadAgreement, uploadAgreement, uploadRequest, type CustomerUploadAuthority } from "./customer-upload";
+import { eligibleStock, stockPolicy, type StockSelection } from "./stock";
 
 type Operation = "receive-supplied-media" | "review-supplied-media" | "revoke-supplied-media";
 export interface SuppliedMediaAuthority {
@@ -100,6 +101,17 @@ export class SuppliedMediaIntake {
     return { candidateId: candidate.id, subjectDigest: candidate.subject_digest, state: candidate.state };
   }
 
+  async receiveStock(context: unknown, target: SuppliedPlacement, input: { submissionId: string; selection: StockSelection; bytes: Buffer }) {
+    const placement = placementInput(target), submissionId = uuid(input.submissionId);
+    const receivedBy = await this.actor(context, "receive-supplied-media", placement);
+    const selection = eligibleStock(input.selection);
+    if (!Buffer.isBuffer(input.bytes) || !input.bytes.length || input.bytes.length > MAX_MANAGED_BYTES) {
+      throw Error("Exact bounded stock raster required");
+    }
+    return this.stage(placement, submissionId, { source: { kind: "permissioned-stock", selection, existingAssetId: null }, receivedBy },
+      Buffer.from(input.bytes));
+  }
+
   private async stage(placement: SuppliedPlacement, submissionId: string, receipt: SuppliedReceipt, submitted?: Buffer) {
     const { source } = receipt;
     return transaction(this.pool, async db => {
@@ -112,7 +124,13 @@ export class SuppliedMediaIntake {
       }
       const original = source.existingAssetId ? await originalAsset(db, owner, source.existingAssetId) : null;
       const bytes = original ? await readManagedObject(this.managed, owner, original.source_reference) : submitted!;
-      const provenance: SuppliedProvenance = { ...receipt, sourceDigest: managedKey(bytes).slice(8),
+      const sourceDigest = managedKey(bytes).slice(8);
+      const stock = source.kind === "permissioned-stock" ? eligibleStock(source.selection) : null;
+      if (stock && stock.representation.sourceDigest !== sourceDigest) throw Error("Selected stock representation bytes changed");
+      const sourceKind = stock ? "permissioned-stock" : "customer-supplied";
+      const provider = stock?.provider ?? "operator-assisted";
+      const policy = stock ? stockPolicy : suppliedPolicy;
+      const provenance: SuppliedProvenance = { ...receipt, sourceDigest,
         originalAssetDigest: original && fingerprint(original), transformation: original ? "reuse-prepared/1" : "managed-raster-prepare/1",
         placement, role: "image" };
       const prior = (await db.query(`SELECT c.* FROM external_work w JOIN media_candidates c ON c.work_id=w.id AND c.web_presence_id=w.web_presence_id
@@ -131,18 +149,18 @@ export class SuppliedMediaIntake {
       await validateStoredMedia(prepared.bytes, prepared.mimeType, prepared);
       const key = managedKey(prepared.bytes);
       const work = (await db.query(`INSERT INTO external_work(web_presence_id,capability,identity,context_digest,context,provider,model,template_version,iteration,budget_micros)
-        VALUES($1,'supplied-raster',$2,$3,$4,'operator-assisted','supplied-raster',$5,1,0) RETURNING id,web_presence_id`,
-      [owner, identity, contextDigest, placement, suppliedPolicy])).rows[0];
+        VALUES($1,'supplied-raster',$2,$3,$4,$5,'supplied-raster',$6,1,0) RETURNING id,web_presence_id`,
+      [owner, identity, contextDigest, placement, provider, policy])).rows[0];
       await appendEvent(db, work, "queued", { submissionId, contextDigest });
       await db.query("UPDATE external_work SET status='running',version=version+1 WHERE id=$1", [work.id]);
       if (source.kind === "authenticated-upload") await provisionManagedObject(this.quarantine, owner, managedKey(bytes), bytes);
       await provisionManagedObject(this.quarantine, owner, key, prepared.bytes);
       const subject = { id: randomUUID(), web_presence_id: owner, revision: 1, bytes_digest: key.slice(8),
-        provenance_digest: fingerprint(provenance), width: prepared.width, height: prepared.height, mime_type: prepared.mimeType, policy_version: suppliedPolicy };
+        provenance_digest: fingerprint(provenance), width: prepared.width, height: prepared.height, mime_type: prepared.mimeType, policy_version: policy };
       const candidate = (await db.query(`INSERT INTO media_candidates(id,web_presence_id,work_id,source_kind,provider,model,quarantine_key,bytes_digest,subject_digest,provenance_digest,provenance,width,height,mime_type,policy_version,expires_at)
-        VALUES($1,$2,$3,'customer-supplied','operator-assisted','supplied-raster',$4,$5,$6,$7,$8,$9,$10,$11,$12,now()+interval '90 days') RETURNING *`,
-      [subject.id, owner, work.id, key, subject.bytes_digest, candidateSubject(subject), subject.provenance_digest, provenance,
-        subject.width, subject.height, subject.mime_type, suppliedPolicy])).rows[0] as Candidate;
+        VALUES($1,$2,$3,$4,$5,'supplied-raster',$6,$7,$8,$9,$10,$11,$12,$13,$14,now()+interval '90 days') RETURNING *`,
+      [subject.id, owner, work.id, sourceKind, provider, key, subject.bytes_digest, candidateSubject(subject), subject.provenance_digest, provenance,
+        subject.width, subject.height, subject.mime_type, policy])).rows[0] as Candidate;
       await db.query("UPDATE external_work SET status='awaiting-review',version=version+1 WHERE id=$1", [work.id]);
       await appendEvent(db, work, "result", { preparedDigest: subject.bytes_digest }, candidate.id);
       return candidate;
@@ -170,7 +188,7 @@ export class SuppliedMediaIntake {
     const decision = choice(input.decision, ["approve", "reject", "revoke"]);
     const actor = await this.actor(context, decision === "revoke" ? "revoke-supplied-media" : "review-supplied-media", placement);
     const rawRights = input.rights && object(input.rights, ["basis", "reference"]);
-    const rights = rawRights ? { basis: choice(rawRights.basis, ["customer-attestation", "service-agreement", "independently-verified"]), reference: text(rawRights.reference, 300) } : null;
+    const rights = rawRights ? { basis: choice(rawRights.basis, ["customer-attestation", "service-agreement", "provider-license", "independently-verified"]), reference: text(rawRights.reference, 300) } : null;
     const altText = input.altText === undefined ? null : text(input.altText, 500);
     if (decision === "approve" ? !rights || !altText : rights || altText) throw Error("Approval requires an exact rights basis and contextual alt text");
     const body = { decision, subjectDigest, actor, reason: text(input.reason, 500), rights, altText };
@@ -185,6 +203,13 @@ export class SuppliedMediaIntake {
       if (decision === "approve" && source.kind === "authenticated-upload") {
         await requireCurrentUploadAgreement(db, placement, source.agreement, this.agreementVerifier);
         await readManagedObject(this.quarantine, placement.webPresenceId, "objects/" + hash(provenance.sourceDigest));
+      }
+      if (decision === "approve" && source.kind === "permissioned-stock") {
+        const stock = eligibleStock(source.selection);
+        if (stock.provider !== candidate.provider || stock.representation.sourceDigest !== provenance.sourceDigest
+          || rights?.basis !== "provider-license" || rights.reference !== stock.license.reference) {
+          throw Error("Exact reviewed stock license and representation required");
+        }
       }
       const work = { id: candidate.work_id, web_presence_id: placement.webPresenceId };
       const previous = await suppliedDecision(db, candidate, decision);
@@ -202,7 +227,7 @@ export class SuppliedMediaIntake {
           fingerprint(await originalAsset(db, placement.webPresenceId, provenance.source.existingAssetId)) !== provenance.originalAssetDigest) {
           throw Error("Supplied-media source Asset changed");
         }
-        if (rights) {
+        if (rights && source.kind !== "permissioned-stock") {
           const assertion = source.kind === "authenticated-upload"
             ? { basis: "service-agreement", reference: source.agreement.acceptanceReference, references: [source.agreement.acceptanceReference] }
             : { basis: "customer-attestation", reference: source.evidenceReference ?? source.reference, references: [source.reference, source.evidenceReference] };

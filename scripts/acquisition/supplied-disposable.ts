@@ -21,7 +21,7 @@ export async function enableDisposableSuppliedMedia(pool: Pool) {
       ALTER TABLE media_candidates DROP CONSTRAINT media_candidates_format,
         ADD CONSTRAINT media_candidates_format CHECK (
           ((source_kind='generated-illustrated' AND mime_type IN ('image/png','image/jpeg','image/webp'))
-          OR (source_kind='customer-supplied' AND mime_type='image/png'))
+          OR (source_kind IN ('customer-supplied','permissioned-stock') AND mime_type='image/png'))
           AND width>0 AND height>0 AND width::bigint*height<=40000000 AND revision>0 AND version>0);
     `);
   });

@@ -23,7 +23,12 @@ export function proposalPreview(revision: Revision, image?: SectionImage): strin
     <h2>Changes from current destination</h2><p>{current ? `Page title: ${current.title} → ${revision.candidate.title}. The proposed ordered Sections replace the current list below.` : "No current Page exists at this destination. The title and all Sections below are new."}</p>
     {sections.length > 0 && <><h3>Current Section order and copy</h3><ol>{sections.map(s => <li key={String(s.id)}><strong>{String(record(s.content).heading ?? s.name ?? s.type)}</strong><p>{String(record(s.content).text ?? (record(s.content).source ? "Canonical-bound copy; inspect the exact baseline source." : "No body text"))}</p></li>)}</ol></>}
     <h2>Full proposed Page</h2><main>{revision.candidate.sections.map((s, i) => <div key={s.id}><SectionRenderer section={{ ...s, action: null, ...(media?.sectionId === s.id ? { image } : {}) }} index={i} />{s.action && <p>CTA: {s.action.label} → {s.action.destination} (inert preview)</p>}</div>)}</main>
-    {media && <aside><h2>Reviewed media</h2><p>{media.evidence.reference}{media.evidence.source === "customer-supplied" && ` · ${media.evidence.rightsBasis}`}</p><p>Prepared SHA-256: {media.preparedDigest}</p><p>Intro {media.sectionId} · {media.role} · {image?.alt}</p></aside>}
+    {media && <aside><h2>Reviewed media</h2><p>{media.evidence.reference}{media.evidence.source !== "synthetic-project-raster" && ` · ${media.evidence.rightsBasis}`}</p><p>Prepared SHA-256: {media.preparedDigest}</p><p>Intro {media.sectionId} · {media.role} · {image?.alt}</p></aside>}
+    {media?.evidence.source === "permissioned-stock" && <aside><h2>Synthetic stock evidence</h2>
+      <p>{media.evidence.stock.provider} · {media.evidence.stock.sourceId} · {media.evidence.stock.creator ?? "Creator unspecified"}</p>
+      <p>{media.evidence.stock.sourceUrl}</p>
+      <p>{media.evidence.stock.representation.id} · {media.evidence.stock.integration.reference} · Permission expires {media.evidence.stock.license.expiresAt}</p>
+    </aside>}
     <h2>Copy origin and editorial decisions</h2><ul>{revision.resolved.map(r => <li key={r.path}><strong>{r.path}</strong>: {r.value} — {r.origin.kind === "editorial" ? `Editorial judgment: ${r.origin.rationale}` : `Confirmed canonical ${r.origin.source.domain}, ${r.origin.source.recordId}, revision ${r.origin.source.revision}, field ${r.origin.source.field}, fingerprint ${r.origin.source.fingerprint}`}.</li>)}</ul>
     <details><summary>Current destination and exact proposed operations</summary><h3>Current site baseline</h3><pre>{JSON.stringify(revision.base, null, 2)}</pre><h3>Proposed Page / ordered Sections</h3><pre>{JSON.stringify(p, null, 2)}</pre></details>
   </body></html>);
