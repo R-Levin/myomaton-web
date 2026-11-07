@@ -353,7 +353,7 @@ and operational verification:
 - SMTP/outbound email.
 - Email deliverability/sender-domain setup.
 - Spam protection.
-- Preferred primary GA4 traffic/behavior/conversion and Search Console organic-search analysis when usable, backed by independent first-party fallback/platform events and direct lead/outcome evidence.
+- First-party activity, Action and lead evidence as the V1 baseline. GA4 and Search Console supply optional distinct evidence where authorized and verified.
 - SEO metadata.
 - Sitemap/robots/canonical URLs.
 - Structured data.
@@ -448,11 +448,9 @@ privacy/legal review before cross-customer learning. No new service tier is impl
 business knowledge, the preferred-primary/fallback measurement hierarchy and a continuous
 measure → analyze → recommend → approve/implement → measure-again loop.
 Operator-assisted intake can support initial production sales before full
-customer self-service automation. Properly connected/available GA4 is preferred
-primary for traffic/acquisition/behavior/conversion analysis; Search Console is
-preferred primary for organic-search evidence. Internal measurement provides independent
-fallback, platform events and corroboration; direct leads and customer feedback remain
-important. Google availability must not determine operational success. The
+customer self-service automation. First-party measurement is primary in V1.
+External traffic and organic-search evidence can enrich reports. Direct leads and
+customer feedback remain distinct. The core service works independently of Google. The
 [measurement architecture](measurement-and-analytics.md) defines source priority,
 normalized signals and explicit fallback reporting. Service-account
 access is an unproven near-term spike; GBP reporting remains future optional scope.

@@ -187,6 +187,18 @@ measure afterward; no automatic volume quota or promise of ranking improvement.
 AI should multiply useful human effort, not manufacture anonymous filler. Content
 quality checks are planned workflow safeguards, not implemented detector claims.
 
+For conventional SEO and AI-mediated discovery, favor clear answers, structured
+knowledge, useful original material and factual quality. Assess useful outcomes
+under the existing measurement and attribution limits. Rankings and AI citations
+remain uncertain.
+
+An older discussion raised disclosure and provenance for AI-assisted advertising
+and content, including a Pennsylvania applicability question. Keep that question
+pending. Before adopting a disclosure policy for an applicable publication or
+advertising use, obtain current legal review of the jurisdiction, medium, role,
+claims and provenance requirements. The historical discussion establishes no
+universal labeling rule or legal conclusion.
+
 ## Observation, measurement and uncertain attribution
 
 First-party measurement is the canonical product measurement system and must work

@@ -148,11 +148,9 @@ separate from this planned intake capability.
 
 ## Preferred analytical sources and independent measurement
 
-When properly connected and available, GA4 is preferred primary for traffic,
-acquisition, behavior and conversion analytics; Search Console is preferred primary
-for organic-search performance. MioPages first-party measurement supplies independent
-fallback/continuity, complementary platform events and verification. Direct lead/contact
-data and customer outcome feedback remain important even when Google works.
+MioPages first-party measurement supplies the primary V1 activity, Action and lead
+evidence. GA4 and Search Console can provide optional, distinct external signals.
+Direct Contact evidence and customer-confirmed outcomes retain separate meanings.
 Reporting/optimization must continue from available evidence when either provider
 is unavailable, delayed or disconnected. The [measurement architecture](measurement-and-analytics.md)
 owns source roles, normalized signals, service-account validation and graceful

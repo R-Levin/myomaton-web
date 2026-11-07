@@ -1,8 +1,26 @@
 # Protected WordPress private-stage rehearsal
 
-**Current cleanup override (November 6, 2026):** retain the reusable `wp-acceptance.miopages.com` hosting account and its existing DNS/SSL after this rehearsal. Earlier package/DNS/certificate deletion instructions are superseded. Remove only approved rehearsal-specific applications, credentials/configuration and test resources, retaining required recovery/audit evidence. Current execution status and stop gates are in [development control](development-control.md); completed principal enrollment and exact candidate approval must not be repeated.
+**Current status.** Private delivery acceptance is closed at `51d9041`. Retain
+`miopages.org` as the production-like reference WordPress installation and
+`wp-acceptance.miopages.com` as reusable test infrastructure, including its account,
+DNS and valid SSL. Temporary listeners, deployed credential copies and rehearsal files
+were removed. Retained audit and recovery artifacts have separate purposes. The idle
+502 is test-host maintenance. Testing and public publication require distinct
+authority. See the [closeout evidence](development-control.md#wordpress-private-delivery-acceptance-closed).
 
-Current public preservation boundary (November 6, 2026): the separately approved security deployment is verified PASS at exact dependency-only `62439fc0c8bde7fe98339625d33a845102a7995a`, Next16.4.5 on the existing8080 app. Preserve that patched deployment during this rehearsal. Use the new public Core root hashes and evidence in [development control](development-control.md#latest-verified-operational-checkpoint--public-security-deployment-pass-november-6-2026); the old5b94 public rollback is historical security-recovery material and must not be invoked as WordPress cleanup. The authenticated WordPress baseline and v0.0.6 rollback boundary are unchanged. Resume at scoped test-principal enrollment through the existing protected migration credential process, then prepare/inspect the candidate before separate owner exact approval. No WordPress acceptance has yet been claimed.
+The following procedure records the bounded rehearsal. Reuse its evidence and
+operating machinery for later authorized work. The public Core security deployment
+and WordPress v0.0.6 rollback were separately verified in the continuity record.
+
+20i documents that successful discovery starts the registered application. In this
+rehearsal My20i displayed an `unknown` row and later an empty list while SSH still
+found a live and saved PM2 application. The display cause remains unknown. Verify
+the package account, PM2 manager and socket owner, exact app name, executable, cwd,
+process identity and bound listener before any process action. Approved cleanup
+withdraws discovery files, deletes only that app through the package-local manager,
+verifies the live list is empty and saves the empty list. Verify both processes
+and the listener are gone independently. Retain the earlier clean restart as an
+unresolved observation. [20i registration documentation](https://docs.20i.com/managed-cloud-servers/using-the-nodejs-application-registration-tool).
 
 This milestone composes Core's durable proposal, preview, approval and canonical projection checks with the Batch 1 delivery adapter. A private release is an independently reviewed, exact text-only projection of an approved proposal for a bound, inactive Managed Site. The release ID is an adapter record. The existing disposable canonical release service retains its original guard, and the protected operator role cannot write canonical Pages, Sections or routing state.
 

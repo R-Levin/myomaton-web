@@ -343,6 +343,15 @@ does not bypass approval. Response commitments remain future service-policy deci
 
 ## Service economics and planning hypotheses
 
+The November 5 discussion explored roughly $200–$250/month for Ongoing, with $225
+used illustratively. The owner raised small-business acquisition resistance even
+at a defensible price. Keep this as a willingness-to-pay hypothesis alongside the
+existing working commercial model. Validate perceived value, acquisition friction,
+Launch costs, continuing obligations, sustainable service effort and margins before
+setting terms. The illustrative Ongoing figure is separate from the working Launch
+installment. Published pricing and customer entitlements require their own decision.
+See the [working commercial model](progressive-onboarding-and-launch-readiness.md#miopages-working-commercial-model).
+
 Use the [effort-budgeting model](opportunity-and-optimization-model.md#effort-budgeting-and-campaign-escalation)
 to distinguish value, next priority and the bounded internal service envelope.
 Include system/operator work, customer review, implementation and future maintenance.

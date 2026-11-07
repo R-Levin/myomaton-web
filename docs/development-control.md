@@ -7,7 +7,26 @@ This file is the first-read **navigation and operational handoff** when merged t
 
 The owner approved this operating practice on November 7, 2026. Record material product, commercial, architectural and operational decisions in Git during the development cycle that makes them. Update the canonical contract or mark a decision explicitly pending. Record the approved direction, rationale, implementation status and unresolved questions. Keep implementation and documentation moving together and coordinate ownership of shared files to avoid conflicting edits.
 
-This practice keeps approval boundaries and work in progress visible while evidence is still current. It applies immediately. A documented decision cannot grant additional implementation authority or override an existing approval gate. Earlier deferred discussions will be reconciled separately.
+This practice keeps approval boundaries and work in progress visible while evidence is still current. Capture a small entry as soon as a material decision is made, including its date, source, scope and status. A pending entry records the alternatives and who must decide before dependent work starts. Assign one editor per affected canonical file and review overlapping edits before staging. Review the decision diff with the implementation diff in the same cycle. Git is the durable continuity record. Conversation evidence informs the record, and approval authority stays with the authorized decision maker. Documentation cannot grant additional implementation authority or override an existing approval gate.
+
+### November 4–7 deferred decision recovery
+
+Source is the owner-provided November 4–7 recovery handoff supplied after `51d9041`, reconciled against this branch's canonical contracts. The operational checkpoints `8988ff5`, `833bd30`, `1ccba08` and `51d9041` establish delivery acceptance, the authenticated rollback, scoped cleanup and final closeout. The handoff supplies product and commercial intent where original messages were unavailable. ChatGPT history listing was rate-limited. Exact original wording, complete conversation links and unrecorded alternatives remain unverified. The service expression is reproduced from the supplied handoff. This is a bounded recovery. The pending gates in the canonical destinations govern where historical entries describe earlier proposals.
+
+| Handoff topics and source dates | Disposition and canonical destination |
+| --- | --- |
+| A (Nov 4), O (recent hosting discussion) | Approved shared Core and managed PostgreSQL with independently hosted WordPress. Representative 100–150-presence capacity gate remains unrun. [Architecture](platform-service-architecture.md#hosted-assumptions-and-proof-questions) |
+| B, D (Nov 4), H (Nov 5) | Approved bounded Gutenberg design direction, Managed Site first, Connected Presence second and substantial WordPress scope. Exact launch placement and designer specification remain open. [Delivery and designer adoption](platform-service-architecture.md#wordpress-delivery-and-designer-adoption), [service sequencing](web-presence-service-model.md), [WordPress scope](wordpress-delivery-feasibility.md#decision-and-boundaries) |
+| C (Nov 4) | Accepted usable website or static exit handoff. Export format, dependency treatment and rehearsal remain open. [Ownership and exit](web-presence-service-model.md#customer-ownership-and-understandable-exit) |
+| E (Nov 4), I, J (Nov 5–6) | Existing human approval safeguards retained. Appliance-like service and human expertise positioning captured. [C0 positioning](miopages-c0-product-model.md#positioning-and-intended-outcome), [content authority](content-growth-loop.md) |
+| F (Nov 5) | $200–$250 Ongoing hypothesis and acquisition resistance captured. No pricing decision. [Service economics](service-operations-model.md#service-economics-and-planning-hypotheses) |
+| G (Nov 5) | Owner decision required before inbound WordPress editing development. [Pending V1 scope](wordpress-delivery-feasibility.md#operator-gutenberg-editing-as-an-inbound-knowledge-proposal-channel-2026-11-03) |
+| K, L (Nov 6) | External comparison recorded. Existing bounded Review, illustrative mockup and onboarding authority preserved. [Free Review](free-review-synthesis.md#customer-facing-contract-and-quality) |
+| M, N (Nov 6) | Approved progressive real C0 learning and optional early GA4/Search Console comparison. Access, data interpretation and implementation evidence remain pending. [Measurement](measurement-and-analytics.md#early-real-c0-learning-cycle) |
+| P, Q, R, S (recent operating discussions) | Retained reference and test environments, observed PM2/panel discrepancy, evidence reuse and preference for low-friction self-service. Effective provider controls and a durable network policy remain unproven. [Rehearsal closeout](#wordpress-private-delivery-acceptance-closed), [procedure](wordpress-private-stage-rehearsal.md), [operations policy](security-operations.md#blast-radius-and-low-admin-operations) |
+| T (Nov 7) | Immediate same-cycle capture and reconciliation are active above. |
+
+The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
 ## WordPress private delivery acceptance closed
 
@@ -1136,9 +1155,9 @@ The canonical roadmap remains [Platform/service architecture — Commercial V1 s
 5. Safe authorized publication, Contact/leads and conversion delivery.
 6. First-party measurement, Performance Snapshot, improvement proposals, approved release and remeasurement.
 7. End-to-end Commercial V1 rehearsal.
-8. Real MioPages C0, then Customer #1 after readiness gates.
+8. Full real MioPages C0 cutover, then Customer #1 after readiness gates. Individually ready and authorized C0 capabilities can be exercised earlier.
 
-The approved Free Review Draft D Revision 3 remains approved **but undelivered** according to the latest recovery record; it is not a go-live or publication authorization. The future WordPress deployment/plugin path is explicitly **post-V1**.
+The approved Free Review Draft D Revision 3 remains approved **but undelivered** according to the latest recovery record. Delivery and publication retain separate authorization. Substantial WordPress integration remains committed. Its exact Commercial V1 launch placement and native editing scope await the [owner decisions in the WordPress contract](wordpress-delivery-feasibility.md#decision-and-boundaries).
 
 **Phase-exit rule:** when hosted foundation is accepted against its evidence, do not keep inventing infrastructure work. Open the canonical roadmap, record completed gates and move to the next applicable stage. Exceptions require explicit priority rationale and revised checkpoint.
 

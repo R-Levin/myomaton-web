@@ -301,7 +301,7 @@ return to Needed/In progress when dependencies, facts, credentials or scope chan
 | Area | What must be tracked and verified when applicable |
 | --- | --- |
 | Domain / DNS / HTTPS | Domain exists or needs registration; registrar owner; DNS owner/provider; MioPages- or customer-managed responsibility; authorized access; required changes; preserved email records; SSL/HTTPS preparation and cutover responsibility. Registration/transfer may be ancillary service, not an implemented provider integration. |
-| Measurement | MioPages-owned first-party visits/page activity, important Actions, Contact acceptance and delivery state, available referral/UTM attribution, baseline, useful trends and concise Performance Snapshot are Commercial V1 requirements. Verify collection and reporting with limits; distinguish clicks, inquiries, delivered inquiries and later-confirmed qualified/business outcomes. GA4/Search Console are optional later evidence, never V1 dependencies. |
+| Measurement | MioPages-owned first-party visits/page activity, important Actions, Contact acceptance and delivery state, available referral/UTM attribution, baseline, useful trends and concise Performance Snapshot are Commercial V1 requirements. Verify collection and reporting with limits; distinguish clicks, inquiries, delivered inquiries and later-confirmed qualified/business outcomes. GA4/Search Console are optional evidence for the early C0 comparison and later enrichment. V1 operation is independent of both. |
 | Lead handling | Visitor acts → request is received → correct person/system receives it → response expectation is known. Verify forms, phone numbers, booking destinations, CRM routing where applicable, recipients, transactional delivery, spam/abuse controls, visitor confirmation and customer-side responsibility. A rendered form or clicked link is not end-to-end success. |
 | Transactional email | MioPages-controlled forms, confirmations, Review delivery and system notifications; account messages later when accounts exist. Verify delivery and safe SPF/DKIM/DMARC coordination where necessary, preserving existing mail. Customer mailbox migration is not required merely for transactional mail. |
 | External systems | Applicable CRM, booking, ecommerce, payment provider, calendars, social/business profiles, maps/listings, external forms and specialized services. Verify required end-to-end behavior/ownership, not merely presence of a link or credentials. Do not imply every listed connector exists. |
@@ -398,7 +398,7 @@ suffice; automation is not the definition of ready.
 | Patching / updates | Partial | Centralized update policy exists; name owner, review cadence, validation and rollback before launch. |
 | Provider failure | Partial | Recovery/portability mechanics exist; verify environment replacement and authorized cutover before relying on hosted state. |
 | Credential rotation | Partial | Protected-storage policy exists; verify environment-specific recovery/revocation/rotation before production access. |
-| Customer exit / export | Deferred | Ownership/portability contract exists; supply usable data/media export and handoff procedure before applicable real-customer commitments/offboarding. |
+| Customer exit / export | Deferred implementation | Prove an independently usable website or practical static handoff with disclosed service dependencies before applicable commitments or offboarding. Follow the [ownership and exit contract](web-presence-service-model.md#customer-ownership-and-understandable-exit). |
 | Cancellation / suspension | Partial | Commercial direction exists; validate terms, authority, communications and restoration/exit treatment before offering them. |
 | Independent external backup | Deferred | AWS is available, not configured; authorize and verify an independent destination/retention/restore before relying on real hosted customer state. |
 | Hostname / domain changes | Partial | Registry and local isolation proven; establish authorized DNS/TLS/mail-preserving changes, reassignment and rollback before real domains. |
@@ -425,7 +425,7 @@ Reuse P11/P13/P14 for prospect/intake reuse, Review synthesis/operator approval 
 controlled delivery; P1/P2/P3/P7 for authorization, confirmed writes, reviewed
 direction and approval provenance; P26 for commitment/payment/exit terms; P5/P6 for
 export/ownership; P12 for primary first-party V1 measurement/reporting and P24/P25
-only for optional later Google evidence;
+only for optional C0 comparison or later Google enrichment;
 P9/P10/P16 for serving/URL/replacement continuity; P17/A1–A3 for media where applicable;
 P18–P20 for operation, readiness evidence, rollback/recovery and tenant safety; P21
 for supported direction; and C3/C7 for actual content review/publication. Bounded

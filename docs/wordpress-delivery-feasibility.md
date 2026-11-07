@@ -1,6 +1,6 @@
 # WordPress delivery feasibility and implementation gap analysis
 
-Status: **Approved for evaluation and bounded proof, not approved for production migration** (operator decision, 2026-11-02).
+Status: **Committed integration direction. Bounded private delivery acceptance closed.** Production migration and publication retain separate approval gates.
 Scope: alternate Managed Site delivery adapter using standard WordPress sites, initially 20i Reseller; existing Next.js delivery and hosted synthetic C0 preserved.
 
 ## Decision and boundaries
@@ -13,7 +13,14 @@ The operator approved proceeding under the WordPress Delivery Feasibility Specif
 - A future agency/connected-WordPress channel should be enabled by a host-independent transport, without broadening the first commercial prototype.
 - Maintain the existing Next.js renderer and Supabase database. Suspend speculative expansion of the current runtime's customer-domain hosting workaround during the feasibility proof.
 
-This *reopens* the historical post-V1 WordPress placement in `docs/platform-service-architecture.md`; that document's older release target is **not silently superseded**. A separate architecture/roadmap review is required before any formal Commercial V1 change. The existing `docs/development-control.md` Commercial V1 sequence remains authoritative until changed by an approved review.
+The recovered November 4–7 direction retains managed delivery, authorized publishing,
+editorial workflows, media, SEO, management and operations. Private HTTPS acceptance
+verified signed transport and staging. Remaining production capabilities have separate
+implementation and verification gates. Standardized Managed Site delivery comes first.
+Connected Presence may begin with bounded operator-assisted work for existing WordPress
+installations. Broader designer and agency support follows separately. Exact launch
+sequencing requires owner review under the
+[Commercial V1 architecture](platform-service-architecture.md#wordpress-delivery-and-designer-adoption).
 
 ## Source-derived existing capability versus proposed new work
 
@@ -61,7 +68,15 @@ Operator clarification (2026-11-02): the first WordPress rendering and transport
 
 ## Operator Gutenberg editing as an inbound knowledge proposal channel (2026-11-03)
 
-**Operator-requested scope addition:** Evaluate WordPress's native editor for authorized MioPages operator-authored *content-form knowledge* (posts, pages, CPT entries). This is a **proposed editorial adapter**, not WordPress becoming the canonical business-data authority and not an authorization to unlock generated Managed Site pages.
+**Pending owner decision recovered from November 5.** Decide Commercial V1 inclusion
+before starting inbound native editing development. Compare deferral with a bounded
+operator workflow for an editorial draft and one structured knowledge-backed type.
+Resolve editable posts, pages and descriptions, edit ownership, review authority,
+dependent surfaces, version conflicts and synchronization. Outbound delivery retains
+its own authorization. Native edits can propose a change for review. Changes to
+canonical knowledge require existing trusted authority and approval.
+
+**Historical exploration.** Evaluate WordPress's native editor for authorized MioPages operator-authored content-form knowledge (posts, pages, CPT entries). This proposed editorial adapter preserves Core's canonical authority and managed-page protection.
 
 - Distinguish **authoritative canonical knowledge** (structured Organization/Offering/knowledge, approved revisions) from **editorial documents** (articles, descriptions, FAQs, business profiles) and **derived presentation pages** (managed site output). Do not equate editing a paragraph with approving an externally asserted business fact.
 - Turnkey managed sites normally have no customer WordPress logins. Authorized operators may use a dedicated restricted WordPress editorial role, with CPT-specific permissions, drafts and native revisions. Generated MioPages-managed pages remain protected. WordPress administrators with filesystem/DB control cannot be physically prevented from overriding plugin protections; detect divergence.

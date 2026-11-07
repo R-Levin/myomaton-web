@@ -86,6 +86,20 @@ explains the business problem.
 
 ## Positioning and intended outcome
 
+The recovered November 5–6 positioning treats MioPages as an appliance-like managed
+service for small businesses. The owner supplied this working expression in the
+recovery handoff.
+
+> A tangled web behind the scenes. A beautifully simple experience for the customer.
+
+Customers provide business knowledge, goals, examples, assets and meaningful
+approvals. Skilled people use AI to interpret, draft, prepare designs and recommend
+improvements while owning judgment, execution, communication and maintenance. The
+customer sees one coordinated service. Reduce repeated customer effort, manual
+operator work and support burden. Prove useful outcomes through measurement and
+improvement. The direction supports experienced human-led service and retains the
+existing gates for facts, material design changes and publication.
+
 The intended middle ground is more capable and accountable than DIY, and more
 streamlined and measurable than a traditional agency engagement. Customers should
 not need to become webmasters or buy an overbuilt process with high cost,
@@ -175,10 +189,9 @@ A normal good-fit customer may receive:
 - Migration/normalization of a modest amount of useful existing content where
   applicable and a supported path exists; no automatic site cloning/import promise.
 - Domain/hosting/deployment handling where needed and external-presence inventory.
-- Measurement baseline with GA4 preferred primary for traffic/behavior/conversion
-  analysis and Search Console for organic search when usable; independent internal
-  fallback/platform events and direct lead/customer outcomes remain important.
-  Google access remains an unproven spike, not an operating dependency.
+- First-party measurement baseline for activity, Actions and leads, with distinct
+  customer-confirmed outcomes. The optional early C0 comparison with GA4 and Search
+  Console remains unrun. Google access is outside the ordinary V1 operating path.
 - Customer review/approval and Launch directly into the Ongoing managed service.
 
 The customer need not arrive with a sitemap, wireframes, design specification,
@@ -239,6 +252,12 @@ and customer FAQs. Preserve its substance and boundaries even when marketing
 wording changes. It establishes neither final prices nor contractual entitlements.
 
 ## What Customer 0 must prove
+
+Apply individually ready and authorized capabilities progressively to real C0.
+Capture genuine outcomes and recurring effort using representative customer rules.
+The [early measurement cycle](measurement-and-analytics.md#early-real-c0-learning-cycle)
+has its own evidence and approval boundaries. Full site migration retains its
+launch gate.
 
 Also test [progressive onboarding and Launch Readiness](progressive-onboarding-and-launch-readiness.md#existing-gates-and-c0-proving):
 shared foundational intake, operator-approved/private Review, optional teaser effort/

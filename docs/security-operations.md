@@ -183,10 +183,9 @@ capture must not expose secrets. Future forms consume shared canonical contact
 identity; current phone/email links and Contact Actions do not implement forms.
 First-party event endpoints are also untrusted input
 and need bounded collection, abuse protection and privacy controls (P12).
-The [measurement architecture](measurement-and-analytics.md) distinguishes the
-preferred primary GA4/Search Console analysis when usable from independent fallback
-and complementary platform/lead signals; it retains scoped access,
-protected credentials, source provenance and degraded-mode reporting requirements.
+The [measurement architecture](measurement-and-analytics.md) defines first-party
+measurement as the V1 baseline, with optional external evidence. It retains scoped
+access, protected credentials, source provenance and degraded-mode reporting requirements.
 
 The [Contact foundation](contact-forms.md) implements bounded validation, scoped
 submission persistence, a development abuse guard and provider boundaries. Its
@@ -248,6 +247,14 @@ readiness before this combined restore has succeeded. Backup is not long-term
 archive; P4, O1 and D1/D2 govern bounded retention and separate archival decisions.
 
 ## Blast radius and low-admin operations
+
+Prefer repeatable, auditable self-service diagnosis and configuration. Use read-only
+evidence to establish which controls and permissions exist before escalating to the
+provider. For network access, compare a securely scoped, durable server policy with
+package exceptions using isolation, secret handling, reliability, capacity, cost and
+recurring operator/support effort. The preferred operating model remains pending
+evidence about available controls and blast radius. This direction grants no change
+to firewall rules, privileges or production configuration.
 
 Reduce the consequences of a single failure through tenant isolation, deployment
 rollback, database recovery, durable Assets, scoped credentials and bounded

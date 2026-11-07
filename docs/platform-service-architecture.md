@@ -309,13 +309,21 @@ explicit URL/content ownership, forms and measurement coordination. Native Artic
 remain the intended baseline; optional external engines follow the
 [onboarding/content contract](onboarding-optimization.md#native-articles-and-optional-external-engines).
 
-### Post-V1 WordPress adoption for designers and agencies
+### WordPress delivery and designer adoption
 
-Preserve a future WordPress plugin/adoption path as an alternative deployment
-adapter. MioPages measurement, analysis, content intelligence, conversion components,
-approvals and improvement workflows must remain independent of the native MioPages
-renderer. This is an architectural separation requirement, not a claim that these
-capabilities or a WordPress integration already exist.
+WordPress is a committed integration direction. Initially, independently hosted
+WordPress installations connect over authenticated HTTPS to one shared Core and
+managed PostgreSQL service. Installation credentials are scoped to delivery. Core
+retains canonical state and approval authority. Shared operation reduces per-customer
+cost. Revisit separation when measured capacity, cost, reliability or isolation
+justifies it, preserving provider-neutral contracts.
+
+The closed private delivery proof establishes signed transport and staging.
+Standardized Managed Site delivery comes first. Curated Gutenberg patterns,
+templates and essential managed blocks allow bounded presentation flexibility.
+Designer Extensibility is a later path for Connected Presence, designers and
+agencies. Specify permitted edits, ownership and supported designs before building
+it. General page building and unrestricted pixel control are outside this direction.
 
 The designer/agency retains control of the WordPress theme, surrounding layout and
 non-MioPages content. MioPages may own explicitly designated conversion blocks and
@@ -332,10 +340,11 @@ options, not verified provider capabilities or provisioning decisions. Cohosting
 WordPress workloads on the core MioPages Node runtime is not an architectural
 requirement.
 
-This path is explicitly post-V1: it adds no Commercial V1 deliverable or launch
-dependency and must not delay launch or change its sequence. Do not implement a
-plugin, adapter framework, WordPress schema or hosting automation now. Revisit only
-under the [existing deferred gates](deferred-architecture.md#post-v1-wordpress-adoption-path).
+Designer and agency expansion remains later work. Exact launch placement of
+standardized WordPress capabilities remains an owner scope decision. Preserve the
+approved Commercial V1 sequence and existing production and publication gates.
+The broader scope and pending native-editing decision are in the
+[WordPress contract](wordpress-delivery-feasibility.md#decision-and-boundaries).
 
 ## Non-goals
 
@@ -434,9 +443,11 @@ Use this development sequence under the existing readiness and deferred gates:
    commitment → full intake → confirmed knowledge → near-finished generation →
    operator QA → customer approval → release → lead/action → reporting → improvement
    → rollback/recovery, with evidence for each applicable readiness gate.
-8. **C0 then Customer #1:** move real miopages.com onto MioPages only after hosted
-   proof/readiness; use C0 as the first real production proving ground, then onboard
-   the first external paying customer.
+8. **Full C0 cutover then Customer #1.** Progressively exercise individually ready
+   and authorized capabilities on real miopages.com before full cutover. C0 follows
+   representative customer boundaries. Full cutover and first paying customer
+   onboarding require their existing readiness and rehearsal gates. See the
+   [early C0 learning cycle](measurement-and-analytics.md#early-real-c0-learning-cycle).
 
 Ordinary sites should emerge near-finished. Operators review, correct/refine,
 resolve exceptional gaps, make judgment calls and prepare/approve the customer
@@ -470,14 +481,14 @@ provider entitlements or claims that hosted tests have run.
 
 The preferred synthetic proof remains **20i Managed Cloud → shared MioPages runtime
 → Supabase managed PostgreSQL**, with **AWS off-provider backup** as the independent
-recovery direction. No external resource has been provisioned for that proof.
+recovery direction. The bounded 20i/Supabase delivery and recovery evidence is recorded in [development control](development-control.md). Full Commercial V1 readiness remains gated.
 The 20i self-managed PostgreSQL VPS remains fallback; Cloudflare for SaaS is optional
 and self-managed ACME is deferred under the SSL policy above. These directions do
 not grant provisioning or spending authority.
 
 Commercial V1 requires MioPages-owned first-party measurement and a restrained
-Performance Snapshot. GA4/Search Console are optional later enrichment, outside
-the critical path. If separately pursued, measurement access direction belongs to the
+Performance Snapshot. GA4/Search Console are optional evidence for early C0 and
+later enrichment, outside the critical path. If separately pursued, measurement access direction belongs to the
 [measurement contract](measurement-and-analytics.md#service-accountproperty-grant-hypothesis):
 operator-assisted/server-to-server access first, customer-facing OAuth deferred,
 with external access proven separately from V1 reporting. The
@@ -535,7 +546,7 @@ verification evidence. Failures return for a decision rather than silent adaptat
 | Roles/default ACLs | Verify migration ownership, runtime/backup least privilege, default grants and future-object behavior. | Accept only a supported effective privilege model. | Hosted bootstrap and role proof. |
 | TLS/network/direct versus session-pooler | Verify trust and network path, transaction/session/advisory-lock behavior and dump/restore access for the chosen endpoint. | Choose a tested endpoint; unsupported pooler behavior refuses. | Before hosted workflows or recovery proof. |
 | Hosted recovery/provider exit | Export application-owned bundle plus media; independently restore and verify histories, privileges and C0/C1 isolation. | Accept recovery contract or review provider/fallback. | Before real hosted customer data. |
-| Latency/connection pressure/capacity | Measure representative traffic, pool multiplication, locks, resource limits and isolation under load. | Size/bound the shared runtime; two tenants do not prove 100-customer capacity. | Synthetic hosted load proof and material scaling changes. |
+| Latency/connection pressure/capacity | Exercise a representative 100–150 tenant/presence workload on shared Core. Observe concurrency, tenant isolation, latency, pool and lock pressure, resource use, operating cost and capacity headroom. | Commercial readiness requires evidence that more than 100 presences can be served securely and predictably without a separate Core per customer. Workload details and acceptance thresholds remain to be specified and tested. | Before commercial capacity claims and after material scaling changes. |
 | AWS backup integration | Verify protected access, independent destination, retention and usable restore with configuration/secrets recovery. | Accept off-provider resilience or review another destination. | Separately authorized backup setup, before relying on real hosted state. |
 | Transactional email | Verify sender identity, delivery/retry/reconciliation, recipients and mail-DNS preservation. | Enable only the proven delivery scope. | Before public lead/Review/system email promises. |
 | Production operator authentication | Verify caller identity, operation-specific authority, tenant isolation and credential/session lifecycle. | Keep management private until verified and authorized. | Before exposing production management. |

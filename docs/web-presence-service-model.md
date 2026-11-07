@@ -55,10 +55,10 @@ implemented/operational readiness:
 | --- | --- |
 | Structured onboarding and trusted knowledge | Confirm business facts, audience, goals and customer questions. Guided intake and general authorized updates are planned core. |
 | Professional Managed Site | Explain the business through supported Pages, Sections, Navigation, Design System and Visual Direction. Rendering foundations exist; repeatable customer delivery and production deployment are distinct work. |
-| Core service/product information | Help prospects understand relevant offerings and proof. Existing Subjects/content are usable within bounds; a general Offering/Testimonial domain is planned, not implied. |
+| Core service/product information | Structured service and product Offerings are the canonical source for listing and detail presentations under the existing review gates. Full e-commerce and a general Testimonial domain are separate capabilities. See the [canonical Offering model](canonical-foundation.md). |
 | Contact / lead path | Provide appropriate valid Actions and canonical contact methods. Contact has a bounded development foundation; production forms/delivery remain gated. |
 | Hosting/deployment and ongoing operation | Coordinate managed hosting where applicable, maintenance, media durability and recovery. Production readiness is not established merely by a working development site. |
-| Analytics/search configuration | GA4 preferred primary traffic/behavior/conversion analysis and Search Console preferred primary organic-search evidence when usable; independent internal fallback/platform events, direct leads/outcomes and discovery configuration. Analytics and full discovery contracts remain planned; operation must continue without Google availability. |
+| Analytics/search configuration | MioPages first-party activity, Action and lead evidence is the V1 baseline. GA4 and Search Console can add distinct, optional evidence. The early C0 comparison and broader enrichment follow the [measurement contract](measurement-and-analytics.md#decision-and-scope). |
 | External-presence inventory | Understand relevant public profiles, links and ownership/status. Bounded social-link presentation exists; richer inventory/integrations are planned. |
 | Initial content foundation | Appropriate conversion content and, when implemented, native Articles supporting discovery. Native Article/review/publish workflows are planned core. |
 
@@ -67,6 +67,13 @@ and operational responsibilities for each launch deployment. Full Presence,
 Adjunct and Campaign share the same architecture; coexistence requires explicit
 URL ownership, forms and analytics coordination, not automatic import of an
 existing website. The [operating model](onboarding-optimization.md) owns these details.
+
+The November 4 commercial direction leads with standardized **Managed Site**.
+**Connected Presence** is the second market, including work alongside established
+WordPress sites. Use bounded operator assistance where justified. Preserve that
+market without requiring connected-site workflows in every initial launch. Campaign
+remains a focused add-on mode. Exact launch sequencing for WordPress is pending in
+the [delivery contract](wordpress-delivery-feasibility.md#decision-and-boundaries).
 
 ## Ongoing service and value
 
@@ -125,19 +132,17 @@ in the [growth contract](content-growth-loop.md#distribution-and-deterministic-l
 
 ## Useful measurement, explicit uncertainty
 
-Use properly connected/available GA4 as preferred primary for traffic, acquisition,
-behavior and conversion analytics, and Search Console for organic-search performance.
-MioPages-owned measurement provides independent fallback/continuity, platform events
-and corroboration. Direct Contact/lead signals and customer outcome feedback remain
-important even when Google works. Available campaign/referral/content signals add
-context; no provider outage or disconnection should leave the service completely blind.
+MioPages-owned measurement supplies the primary V1 activity, Action and lead evidence.
+GA4 and Search Console can add distinct external context where access and coverage
+are proven. Contact and confirmed outcomes retain their own meanings. Campaign and
+referral evidence adds context where available. Reporting continues during provider
+outages or disconnection.
 
 Unknown or likely attribution stays explicitly uncertain. A click is not a
 qualified lead, and correlation is not proof of causal improvement. The objective
 is useful decision support, not a giant marketing analytics suite or perfect
 cross-channel attribution. The [measurement architecture](measurement-and-analytics.md)
-defines that preferred-primary/fallback hierarchy,
-normalized signals and degraded-mode reporting. P12 governs collection/ingestion;
+defines source roles, normalized signals and degraded-mode reporting. P12 governs collection/ingestion;
 service-account onboarding is unproven and GBP reporting remains future optional scope.
 
 ## 20i and infrastructure boundary
@@ -185,6 +190,15 @@ retention/deletion. Export is an existing product commitment gated by P5/P6, not
 implemented feature asserted here. Maintain separable customer state and Asset bytes
 so exit remains achievable. Infrastructure dependence is not a retention strategy;
 backup, usable export and permanent archive remain distinct concepts.
+
+The November 4 exit principle requires a usable website or practical independently
+hostable/static handoff. Preserve appropriate content, navigation, assets,
+presentation, SEO metadata and relevant customer-owned information. Identify forms,
+integrations and dynamic services that need substitution or an explicitly disclosed
+dependency. Define the exit behavior when designing each major capability. Customer
+rights, vendor licenses and applicable terms govern the handoff. The proprietary
+Core/backend remains a managed service. The format and a working export rehearsal
+remain open under P5/P6 before applicable customer commitments or offboarding.
 
 ## Responsibility split
 

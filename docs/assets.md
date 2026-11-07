@@ -59,8 +59,9 @@ representation, including sanitized SVG. Delivery rechecks MIME/content outside
 storage and rejects SVG that is no longer the canonical sanitized representation.
 Keep originals separately if needed; ingestion does not archive them.
 
-Managed video ingestion is disabled. The neutral source contract can accommodate
-future media after the required large-media policy decision (A7).
+Video is a first-class customer content type in the product direction. Managed
+video ingestion is disabled. Extend the neutral source contract only after A7
+resolves rights, storage, delivery, optimization, retention and service costs.
 
 The store is operator-controlled and must not be writable by untrusted processes.
 Filesystem checks are not an OS sandbox against a privileged process concurrently

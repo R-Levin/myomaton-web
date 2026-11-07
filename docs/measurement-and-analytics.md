@@ -8,14 +8,15 @@ Commercial V1 prioritizes MioPages-owned first-party measurement:
 PRIMARY MIOPAGES FIRST-PARTY ACTIVITY / ACTION / LEAD EVIDENCE
 → NORMALIZED METRICS → PERFORMANCE SNAPSHOT → RECOMMENDATION / APPROVED CHANGE
 → REMEASUREMENT
-+ OPTIONAL LATER GA4 / SEARCH CONSOLE ENRICHMENT
++ OPTIONAL GA4 / SEARCH CONSOLE ENRICHMENT
 ```
 
 This scope supersedes the earlier preferred-primary Google / first-party fallback
 hierarchy. Core collection, useful reporting and improvement must work without
-Google access. GA4 and Search Console are optional later external evidence sources,
-not Commercial V1 dependencies or critical-path integration work. Do not build a
-GA4 clone or claim first-party data reproduces unavailable search-query evidence.
+Google access. Broader GA4 and Search Console integration remains optional later
+enrichment. The early real C0 comparison below has its own bounded evidence gate.
+Neither path is a Commercial V1 dependency. First-party signals and external
+search-query evidence have different coverage.
 
 First-party observation, Contact acceptance/delivery, later-confirmed lead quality
 and business outcomes retain separate meanings and provenance. Available external
@@ -37,7 +38,7 @@ owns gates. Optional external sources never gate core V1 measurement/reporting.
 | Status | Actual boundary |
 | --- | --- |
 | Implemented now | Bounded development Contact submission persistence and delivery status; an optional best-effort `ContactEvents.accepted` hook emits `form_submit` after new durable acceptance. The hook is not durable analytics, a report or proof that an inquiry became a customer. |
-| Optional / later external spikes | Separately prove service-account/property-grant access to Search Console and GA4 on authorized properties if later justified. No connector proof or commercial onboarding promise exists; P24/P25 are outside the V1 critical path. |
+| Optional early C0 comparison and later enrichment | Separately prove service-account/property-grant access to Search Console and GA4 on authorized properties. The C0 experiment is approved in direction and awaits ready capabilities and access. P24/P25 remain outside the V1 critical path. |
 | Commercial V1 / incomplete | First-party visits/page/site activity, important Action events, Contact acceptance/delivery, available referral/UTM attribution, normalized useful trends, a concise Performance Snapshot and baseline → recommendation/change → remeasurement. Production privacy/security and event semantics must be implemented first. |
 | Future extensions | Optional GBP investigation, richer provider integrations, expanded technical-health automation and deeper attribution/reporting. Existing technical monitoring obligations still apply before production; this is not their deferral. |
 
@@ -46,6 +47,23 @@ normalized measurement store, outcome-confirmation UI or analytics dashboard is
 implemented today. Existing Action rendering is not click measurement. See
 [Contact measurement boundaries](contact-forms.md#delivery-and-measurement-boundaries)
 for the precise implemented hook and production activation limits.
+
+## Early real C0 learning cycle
+
+The November 6 recovered direction is to apply individually ready, authorized
+capabilities to real `miopages.com` as soon as practical. Use genuine first-party
+activity to report useful outcomes, identify an opportunity, propose an improvement,
+obtain human approval, implement through the existing release boundary and remeasure.
+Record real operator effort and customer-visible value. C0 remains a representative
+managed customer. Full public site cutover retains its own readiness gate.
+
+When relevant first-party capabilities and property access are ready, compare the
+MioPages evidence with GA4 and Search Console on C0. Test interpretation, data flow,
+coverage gaps and the operational burden of access. Retain each source's definitions,
+windows and limitations. Counts need not agree, incompatible metrics stay separate,
+and absent search-query evidence remains absent. The service-account/property-grant
+path below is a hypothesis. The experiment remains unrun and adds no customer OAuth,
+general connector or Google availability requirement to V1.
 
 ## Minimal first-party core
 
@@ -140,7 +158,7 @@ operationally reliable, grant a service-account identity access to the appropria
 customer-owned GA4/Search Console property. Prefer this to building per-customer
 interactive OAuth refresh-token infrastructure as the initial default.
 
-If pursued later, prefer operator-assisted/server-to-server access: use a MioPages
+For the C0 comparison and any later authorized adoption, prefer operator-assisted/server-to-server access: use a MioPages
 service account granted GA4 property access where practical, and test
 Search Console first with the same service-account/access-grant model. A dedicated
 MioPages operator Google account is an acceptable fallback with explicitly granted
@@ -167,8 +185,9 @@ Technical references were reviewed on 2026-10-05 and must be rechecked during th
 
 ### Spike acceptance and refusal boundaries
 
-These optional later spikes are not Commercial V1 prerequisites. Test Search
-Console and GA4 separately, first with Myomaton and MioPages. Confirm
+These optional access spikes are outside the Commercial V1 critical path. Test
+Search Console and GA4 separately on authorized properties. Prioritize real MioPages
+C0 for the early comparison. Myomaton remains a possible separate spike. Confirm
 actual property availability and customer authority; a site or reseller account
 is not a verified Google property. With explicit authorization, demonstrate:
 
