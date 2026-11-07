@@ -5,6 +5,7 @@ import type { StockSelection } from "./stock";
 
 export type StockSearchHit = Pick<StockSelection, "provider" | "sourceId" | "sourceUrl" | "creator"> & {
   previewUrl: string;
+  description?: string;
   representation: { id: string; url: string; width: number; height: number };
 };
 export interface StockSearchProvider {

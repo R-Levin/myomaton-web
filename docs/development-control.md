@@ -44,6 +44,26 @@ Source is the owner-provided November 4–7 recovery handoff supplied after `51d
 
 The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
+## First live Pixabay search prepared
+
+The owner has a standard project key and authorized one local read-only Pixabay
+search. The launcher uses the existing normalized discovery adapter and issues
+at most one TLS-verified request for `workshop workbench`. A private, exclusive
+attempt marker blocks duplicates even after a failed or interrupted request.
+The review file links to source pages, and opening it makes no automatic image
+requests. This checkpoint prepares discovery only. Candidate rights, download,
+Asset creation and publication retain their separate gates.
+
+The owner enters the key at the documented hidden PowerShell prompt. The
+dedicated ignored Windows DPAPI file and stdin path keep it outside command
+arguments, source control and public runtime configuration. TypeScript, targeted
+lint, PowerShell syntax, a synthetic DPAPI round trip and all 381 repository
+tests passed. Offline tests exercised the existing recorded adapter plus the
+one-attempt transport contract, private cache, redaction and inert review.
+At preparation the private attempt and result were absent. Live verification
+requires the operator to run the [one-search procedure](media-acquisition.md#one-authorized-local-live-search)
+and the resulting sanitized evidence to be checked.
+
 ## Pixabay priority and first owner-visible review
 
 The owner requested a provider transition and an inspectable product review.

@@ -2,7 +2,7 @@ import { text } from "../canonical/model";
 import { record } from "../presentation/content";
 import type { StockSearchHit, StockSearchProvider } from "./stock-discovery";
 
-// The composition root for this slice only supplies recorded API responses.
+// Transport is supplied by the composition root.
 type SearchResponse = { status: number; body: unknown };
 const pageSize = 8;
 
@@ -35,7 +35,8 @@ function normalizeResponse(value: unknown): StockSearchHit[] {
       !Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1 || width > 640 || height > 640) {
       throw Error("Unsupported Pixabay representation dimensions");
     }
-    return { provider: "pixabay", sourceId, sourceUrl: pixabayUrl(hit.pageURL, "source", sourceId),
+    const description = typeof hit.tags === "string" ? hit.tags.replace(/[<>\u0000-\u001f\u007f-\u009f]/g, " ").trim().slice(0, 240) : "";
+    return { ...(description ? { description } : {}), provider: "pixabay", sourceId, sourceUrl: pixabayUrl(hit.pageURL, "source", sourceId),
       creator: hit.user == null || hit.user === "" ? null : text(hit.user, 200),
       previewUrl: pixabayUrl(hit.previewURL, "image", sourceId),
       representation: { id: "webformat", url: pixabayUrl(hit.webformatURL, "image", sourceId), width, height } };
