@@ -44,25 +44,30 @@ Source is the owner-provided November 4–7 recovery handoff supplied after `51d
 
 The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
-## First live Pixabay search prepared
+## First live Pixabay search verified
 
-The owner has a standard project key and authorized one local read-only Pixabay
-search. The launcher uses the existing normalized discovery adapter and issues
-at most one TLS-verified request for `workshop workbench`. A private, exclusive
-attempt marker blocks duplicates even after a failed or interrupted request.
-The review file links to source pages, and opening it makes no automatic image
-requests. This checkpoint prepares discovery only. Candidate rights, download,
-Asset creation and publication retain their separate gates.
+On November 7, 2026 at 18:49 UTC the owner completed the single authorized
+`workshop workbench` photo search. The launcher recorded one provider request,
+HTTP 200 and eight unique normalized results. Independent local verification
+matched each result digest and source link, checked creator, tags and dimensions,
+confirmed the private 24-hour cache and verified that the review embeds no external
+resources. The sanitized result receipt SHA-256 is
+`74c3fd6f296a320ecf24eab16a9c18658245a5520512fdfe8b874df4d28295d4`.
+The receipt and linked HTML review remain in ignored local runtime storage.
 
-The owner enters the key at the documented hidden PowerShell prompt. The
-dedicated ignored Windows DPAPI file and stdin path keep it outside command
-arguments, source control and public runtime configuration. TypeScript, targeted
-lint, PowerShell syntax, a synthetic DPAPI round trip and all 381 repository
-tests passed. Offline tests exercised the existing recorded adapter plus the
-one-attempt transport contract, private cache, redaction and inert review.
-At preparation the private attempt and result were absent. Live verification
-requires the operator to run the [one-search procedure](media-acquisition.md#one-authorized-local-live-search)
-and the resulting sanitized evidence to be checked.
+The previously saved encrypted value failed local format validation before any
+network request. The successful run used a separate hidden PowerShell prompt and
+stdin, leaving the earlier encrypted file untouched. No usable persistent key
+was established by this run. Preparation at `e13b450` passed TypeScript, targeted
+lint, PowerShell syntax and 381 repository tests, including the recorded-response
+and one-attempt tests. This closeout verifies live discovery and updates only
+documentation. There were no selected-image downloads, canonical Asset or
+AssetUsage writes, or hosted changes.
+
+Next, review the returned source pages and pin one candidate's exact result and
+intended placement. A download or release still requires separate authorization
+and a review of source rights, permitted use, credit, retention and exit.
+[Trial and review boundary](media-acquisition.md#one-authorized-local-live-search).
 
 ## Pixabay priority and first owner-visible review
 

@@ -148,51 +148,19 @@ memory and exclude it from output, telemetry and receipts. The launcher follows
 no redirects and issues no retry. The local exclusive attempt marker survives
 interruptions and blocks a second request even after a failure or cache expiry.
 
-In Windows PowerShell on the development workstation, paste this whole block
-once. The prompt hides the key. Windows DPAPI protects the dedicated local
-configuration for the current user and computer. The plaintext passes by stdin
-and is excluded from command arguments, Git and the public runtime settings.
+The owner completed the trial on November 7, 2026. The verified evidence
+contains one request, HTTP 200 and eight results. It remains in the private,
+Git-ignored directory `runtime-content/pixabay-live/first-search-574c573`.
+The normalized cache is retained for the required 24 hours. Open its
+`review.html` to inspect provider tags, creators and representation dimensions.
+The source links open only when selected. The review loads no images
+automatically.
 
-```powershell
-Set-Location -LiteralPath 'C:\Users\mplxs\Projects\myomaton-web'
-git check-ignore -q -- runtime-content/pixabay-live/credential.dpapi
-if ($LASTEXITCODE -ne 0) { throw 'Pixabay credential location must be Git ignored.' }
-foreach ($name in 'NODE_OPTIONS','NODE_DEBUG','NODE_DEBUG_NATIVE','NODE_USE_ENV_PROXY','SSLKEYLOGFILE') {
-    if ([Environment]::GetEnvironmentVariable($name, 'Process')) { throw 'Open a normal PowerShell without Node tracing or proxy overrides.' }
-}
-$private = $PWD.Path
-foreach ($name in 'runtime-content','pixabay-live') {
-    $private = Join-Path $private $name
-    [IO.Directory]::CreateDirectory($private) | Out-Null
-    if ((Get-Item -LiteralPath $private -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Private directory is redirected.' }
-}
-if (Test-Path -LiteralPath (Join-Path $private 'first-search-574c573\attempt.json')) { throw 'Search attempt already recorded. Preserve its evidence.' }
-$credential = Join-Path $private 'credential.dpapi'
-if (Test-Path -LiteralPath $credential) {
-    if ((Get-Item -LiteralPath $credential -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Credential file is redirected.' }
-    $secret = ConvertTo-SecureString -String ([IO.File]::ReadAllText($credential))
-} else {
-    $secret = Read-Host 'Existing Pixabay API key (hidden)' -AsSecureString
-    if ($secret.Length -eq 0) { $secret.Dispose(); throw 'Blank key. Search not attempted.' }
-    [IO.File]::WriteAllText($credential, (ConvertFrom-SecureString -SecureString $secret))
-}
-$pointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secret)
-try {
-    [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer) | & node --import tsx scripts/pixabay-live-search.ts
-} finally {
-    [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer)
-    $secret.Dispose()
-}
-```
-
-The process prints a sanitized PASS or BLOCKED result. A PASS creates
-`runtime-content/pixabay-live/first-search-574c573/result.json` and
-`review.html` in the same private directory. The normalized response is
-retained for at least the required 24 hours. The review displays source,
-creator, provider tags and representation dimensions. Its links open the
-source photos only when the owner chooses to inspect them. The review loads
-no external resources by itself. Retain the attempt evidence and stop if the
-provider refuses or the result is uncertain. This trial ends at discovery.
+The successful credential handoff used a standalone hidden PowerShell prompt
+followed by a separate command passing the key through stdin. The previously
+saved encrypted value failed local validation before transport. It remains
+untouched, and this run established no reusable persistent key. The attempt
+marker records the consumed authorization. This trial ends at discovery.
 A later explicit selection would pin the result digest and exact placement
 before separate rights review and authorized media acquisition.
 
