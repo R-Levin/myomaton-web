@@ -44,6 +44,28 @@ Source is the owner-provided November 4–7 recovery handoff supplied after `51d
 
 The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
+## Human-centered Operator orchestration direction
+
+**Owner decision, November 7, 2026; direction approved, implementation pending.**
+Following review of the local C0 Operator interface, the owner approved an
+attention-first daily workspace, designed to remain legible with roughly
+50–150 accounts; protect Operators from mundane work, needless administration
+and overload; select the best permitted human, AI or deterministic resource for
+each outcome; use early bounded/cost-tracked API-assisted triage; support
+context-carrying guidance, escalation and reassignment without an Asana-style
+task-management clone; and work primarily through a consistent MioPages-owned
+browser experience. The owner may initially hold several roles under one
+login, with visible signed-in identity and active role, true server-enforced
+authorization, tenant boundaries and existing approval separation. Integrate
+media selection in the page workflow, preserving the completed Pixabay
+discovery proof and avoiding stock where unsuitable for the C0 brand.
+
+The governing detail, rationale, limits and implementation sequence are in
+[human-centered work orchestration and active-role context](service-operations-model.md#human-centered-work-orchestration-and-active-role-context).
+The current C0 console is local, unauthenticated and read-only; it does not yet
+provide role switching, live queues, AI triage or reassignment. No production
+deployment, API expenditure or protected action is authorized by this document.
+
 ## Local Operator overview and C0 account review
 
 The first integrated Operator view groups actionable evidence ahead of the
