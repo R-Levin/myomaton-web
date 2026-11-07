@@ -282,6 +282,26 @@ site identity/status, business sources, media and other Pages remain untouched.
 Media-bound targets and deletion of referenced Page/Sections refuse rather than
 silently remove dependencies. This is intentionally not broad site CRUD.
 
+### Media-to-Publication handoff
+
+The approved next Commercial V1 slice is one permissioned asset through the existing
+acquisition and AssetUsage boundary, operator QA, exact approval, and a disposable
+release and rollback. Acquisition already has a disposable proof of approval,
+ingestion, eligible delivery and revocation. The current content release preview
+omits managed media, so a text approval cannot stand in for review of an image or
+its placement. A disposable PostgreSQL 18 integration check verified that an
+exactly approved text proposal refused release of a Page with a synthetic media
+attachment. The Page, Sections, AssetUsage and release history were preserved.
+The release and historical preview checks passed together (13 tests).
+
+The media-aware proposal contract is pending review. Resolve how the exact preview
+and approval bind prepared bytes, current rights and provenance, the intended
+AssetUsage and presentation metadata. Define the release-time eligibility check
+and the prior usage that rollback restores. Preserve historical text-only preview
+digests and the existing separate release mandate. The current refusal stays in
+force while those decisions are open. This record gives no new hosted write,
+provider spend or publication authority.
+
 The PostgreSQL proposal transaction serializes proposal changes and site release
 requests. The private release adapter conservatively takes canonical-table
 `SHARE ROW EXCLUSIVE` locks before its first snapshot-bearing SELECT. This blocks

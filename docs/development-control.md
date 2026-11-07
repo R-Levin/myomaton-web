@@ -3,7 +3,21 @@
 Status: **active Git continuity checkpoint**. Originally recorded 2026-11-01; updated after hosted synthetic C0 verification on 2026-11-01.
 This file is the first-read **navigation and operational handoff** when merged to `main`. It does not supersede source code, immutable database state, approved product contracts or live provider evidence. Do not claim current runtime/database state from Git alone.
 
-## Scoped rehearsal cleanup passed on host. Retained HTTPS route verification remains open
+## Continuous decision documentation
+
+The owner approved this operating practice on November 7, 2026. Record material product, commercial, architectural and operational decisions in Git during the development cycle that makes them. Update the canonical contract or mark a decision explicitly pending. Record the approved direction, rationale, implementation status and unresolved questions. Keep implementation and documentation moving together and coordinate ownership of shared files to avoid conflicting edits.
+
+This practice keeps approval boundaries and work in progress visible while evidence is still current. It applies immediately. A documented decision cannot grant additional implementation authority or override an existing approval gate. Earlier deferred discussions will be reconciled separately.
+
+## WordPress private delivery acceptance closed
+
+The owner accepted the signed delivery, private staging, idempotent retry, revocation, v0.0.6 restoration, authenticated rollback output and scoped resource cleanup. The final bounded read-only inspection confirmed an empty test webroot and saved PM2 list, absent supervisor and child, removed pull configuration, and unused port8081. Production port8080 still belonged to UID3318461 and both public HTTPS body digests matched. The test hostname root and former pull path returned identical generic nginx502 bodies with no redirect. The result is consistent with the intentionally absent upstream. The account evidence does not establish nginx's configured upstream. This inspection found no indication of cross-package routing or credential exposure.
+
+The retained package resolves to185.146.167.100 and serves valid hostname-verified TLS. The observed certificate SHA-256 is `0cc3b524a416235bc6935239744eb0c98898814d73d1aa0fc8e5b41769667638`, differing from the earlier capture. The certificate validity window is November6,2026 19:28:20UTC to February4,2027 19:28:19UTC. The cause of the fingerprint difference is unverified. The idle502 is a test-host maintenance item for the next time the account needs an idle landing response. Acceptance is closed under the owner's explicit disposition. The package, DNS and SSL remain available for future testing.
+
+Commercial V1 resumed at the local Media-to-Publication slice. The first disposable integration check verified the existing release refusal for a media-bound Page and preserved its content, AssetUsage and release history. The historical exact-preview check also passed. The media-aware proposal contract is pending review in the canonical content authority document. The signed delivery proof provides the transport foundation for the planned WordPress integration. Later WordPress capabilities and their approval gates remain on the roadmap. [Media-to-Publication handoff](content-authority-and-editing.md#media-to-publication-handoff) and [Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence).
+
+## Scoped rehearsal cleanup passed on host. Retained HTTPS route verification (historical)
 
 The owner approved the exact `833bd30` cleanup. All SSH operations used only `wp-acceptance.miopages.com`. The account-local PM2 socket and manager248412/UID3326411, sole app name, cwd, executable, supervisor250119/child250164 and start ticks matched the reviewed evidence. Restart count remained1 before cleanup. The earlier8:46p.m. Eastern restart remains an unresolved observation.
 

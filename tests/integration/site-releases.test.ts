@@ -132,6 +132,23 @@ test("content release: exact approved canonical mutation, immutable evidence and
         await f.pool.query("DELETE FROM actions WHERE id=$1", [anchorAction]); await f.pool.query("UPDATE sections SET configuration='{}' WHERE id=$1", [removed]);
       }
     });
+    await t.test("exact text approval cannot release a media-bound replacement", async () => {
+      const assetId = randomUUID(), usageId = randomUUID();
+      await f.pool.query(`INSERT INTO assets(id,web_presence_id,name,mime_type,source_type,source_reference)
+        VALUES($1,$2,'Synthetic managed media','image/png','managed',$3)`,
+      [assetId, f.scope.webPresenceId, `${"a".repeat(64)}.png`]);
+      try {
+        await f.pool.query(`INSERT INTO asset_usages(id,web_presence_id,asset_id,entity_type,entity_id,role)
+          VALUES($1,$2,$3,'section',$4,'image')`, [usageId, f.scope.webPresenceId, assetId, removed]);
+        const approved = await f.approve(await f.prepare(page));
+        const current = await f.releases.inspect(f.inspectContext, f.scope);
+        await assert.rejects(f.releases.release(f.releaseContext, approved), /Media-bound Page\/Sections/);
+        assert.deepEqual(await f.releases.inspect(f.inspectContext, f.scope), current);
+      } finally {
+        await f.pool.query("DELETE FROM asset_usages WHERE id=$1", [usageId]);
+        await f.pool.query("DELETE FROM assets WHERE id=$1", [assetId]);
+      }
+    });
     await f.verify();
   } finally { await f.stop(); Object.assign(process.env, old); }
 });
