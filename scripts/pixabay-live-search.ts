@@ -4,12 +4,18 @@ import path from "node:path";
 import { fingerprint } from "../lib/platform/canonical/model";
 import { pixabaySearch } from "../lib/platform/acquisition/pixabay";
 import { StockDiscovery } from "../lib/platform/acquisition/stock-discovery";
+import reviewed from "./customer-updates/miopages-focus-reviewed.json";
 
-const query = "workshop workbench";
 const bodyLimit = 128 * 1024;
-const target = {
-  webPresenceId: "4bcd9832-8149-4a97-9552-553b8ad26e4a", managedSiteId: "4bcd9832-8149-4a97-9552-553b8ad26e4b",
-  pageId: "4bcd9832-8149-4a97-9552-553b8ad26e4c", sectionId: "4bcd9832-8149-4a97-9552-553b8ad26e4d",
+const technicalTrial = {
+  id: "first-search-574c573", query: "workshop workbench",
+  target: { webPresenceId: "4bcd9832-8149-4a97-9552-553b8ad26e4a", managedSiteId: "4bcd9832-8149-4a97-9552-553b8ad26e4b",
+    pageId: "4bcd9832-8149-4a97-9552-553b8ad26e4c", sectionId: "4bcd9832-8149-4a97-9552-553b8ad26e4d" },
+};
+export const c0Trial = {
+  id: "c0-home-editorial-9a638b2", query: "small business laptop",
+  target: { webPresenceId: reviewed.target.webPresenceId, managedSiteId: reviewed.target.managedSiteId,
+    pageId: "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d", sectionId: "c18776da-f19a-481a-a239-6644eda51f94" },
 };
 type Reply = { status: number; contentType?: string; body: AsyncIterable<Uint8Array> };
 type Send = (options: RequestOptions) => Promise<Reply>;
@@ -74,7 +80,8 @@ const networkFailures = new Set(["ENOTFOUND", "EAI_AGAIN", "ECONNREFUSED", "ECON
   "CERT_HAS_EXPIRED", "UNABLE_TO_VERIFY_LEAF_SIGNATURE", "DEPTH_ZERO_SELF_SIGNED_CERT", "SELF_SIGNED_CERT_IN_CHAIN", "ERR_TLS_CERT_ALTNAME_INVALID"]);
 const json = (value: unknown) => JSON.stringify(value, null, 2) + "\n";
 
-export async function firstPixabaySearch(directory: string, key: string, send: Send = sendHttps) {
+async function runPixabaySearch(directory: string, key: string, trial: typeof technicalTrial, send: Send) {
+  const { query, target } = trial;
   if (!/^[A-Za-z0-9_-]{12,128}$/.test(key)) return { status: "BLOCKED", code: "invalid_local_key_format" } as const;
   const attempt = path.join(directory, "attempt.json");
   try {
@@ -103,7 +110,7 @@ export async function firstPixabaySearch(directory: string, key: string, send: S
       if (context !== operator || operation !== "receive-supplied-media" || fingerprint(placement) !== fingerprint(target)) {
         throw Error("Local search authority required");
       }
-      return { operatorId: "local-operator", authorityReference: "first-pixabay-search" };
+      return { operatorId: "local-operator", authorityReference: trial.id };
     } });
     const result = await discovery.search(operator, target, query);
     stage = "private_evidence";
@@ -125,7 +132,18 @@ export async function firstPixabaySearch(directory: string, key: string, send: S
   }
 }
 
+export function firstPixabaySearch(directory: string, key: string, send: Send = sendHttps) {
+  return runPixabaySearch(directory, key, technicalTrial, send);
+}
+
+export function c0PixabaySearch(directory: string, key: string, send: Send = sendHttps) {
+  return runPixabaySearch(directory, key, c0Trial, send);
+}
+
 async function main() {
+  const args = process.argv.slice(2);
+  if (args.length && (args.length !== 1 || args[0] !== "--c0-home")) throw Error("unsupported_search_trial");
+  const trial = args.length ? c0Trial : technicalTrial;
   if (["NODE_OPTIONS", "NODE_DEBUG", "NODE_DEBUG_NATIVE", "NODE_USE_ENV_PROXY", "SSLKEYLOGFILE"].some(name => process.env[name])) {
     throw Error("unsafe_node_diagnostics_or_proxy_configuration");
   }
@@ -135,13 +153,13 @@ async function main() {
     if (key.length > 140) throw Error("invalid_local_key_format");
   }
   let directory = process.cwd();
-  for (const segment of ["runtime-content", "pixabay-live", "first-search-574c573"]) {
+  for (const segment of ["runtime-content", "pixabay-live", trial.id]) {
     directory = path.join(directory, segment);
     await mkdir(directory, { mode: 0o700 }).catch(error => { if (error.code !== "EEXIST") throw error; });
     const info = await lstat(directory);
     if (!info.isDirectory() || info.isSymbolicLink()) throw Error("unsafe_private_directory");
   }
-  const outcome = await firstPixabaySearch(directory, key.trim());
+  const outcome = await runPixabaySearch(directory, key.trim(), trial, sendHttps);
   key = "";
   console.log(JSON.stringify(outcome));
   if (outcome.status !== "PASS") process.exitCode = 1;

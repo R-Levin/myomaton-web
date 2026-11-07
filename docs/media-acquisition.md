@@ -138,73 +138,36 @@ presentation and permitted use, retention and exit before any selected download
 or release. Higher access, broad automation and new providers remain separately
 scoped.
 
-### First real Pixabay selection and page-context review
+### C0 brand imagery review
 
-On November 7, 2026 the owner accepted the imagery quality from the first live
-search and approved Pixabay as the preferred initial stock source, subject to
-image-specific licensing and delivery. The first C0 Home Intro, “Good at your
-work. Ready to hand over the web work.”, is an appropriate editorial placement
-for an illustrative photo of business expertise. Place it after the Intro copy
-and before the service explanation, in the existing managed-image position.
-The local composition keeps the full frame and caps the image at its native
-640 px width. Production display sizing remains a placement review question.
+The owner rejected TiBine’s workbench photo (Pixabay `384740`) for the C0 Home
+Intro. The first live `workshop workbench` search was a technical API proof.
+Its results and the previously proposed placement at `9a638b2` are historical.
+The old exact download plan is withdrawn. Its guarded local transport and
+safe ingestion remain reusable.
 
-- **Recommended** · TiBine, Pixabay `384740`, cached `webformat` JPEG, 640 × 426.
-  The workbench can give a concrete visual reference to the target audience's
-  work. Suggested alt text is “Hammer and pliers on a workbench”, pending a
-  check against the actual pixels. [Pixabay source page](https://pixabay.com/photos/tool-workbench-hammer-pliers-384740/)
-- **Alternative** · dbreen, Pixabay `1083796`, cached `webformat`, 640 × 480.
-  The antique tools put a stronger emphasis on traditional craft.
-  [Pixabay source page](https://pixabay.com/photos/tools-awl-pliers-antique-equipment-1083796/)
+The accepted service-led v3 Home offers a clearer web presence with less work
+to manage. The first Intro recognizes owners who are busy serving customers.
+The later Intro, “Your business judgment. Our web responsibility.”, explains
+the division of work between the business and MioPages. Consider a believable
+owner in a small-business setting with a meaningful digital touchpoint for the
+first Intro, or a natural consultation or handoff for the later one. Screen
+out generic office posing, unrelated trades, invented testimonials, client
+implications, readable branding and sensitive screen content. Keep the
+conceptual Hero and illustrative Review report. When the relationship or the
+process is the subject, consider keeping the text or using authored illustration.
 
-The workbench is illustrative. Preserve the conceptual Hero, evidence roles
-and example Review report. The reviewed binding is Home
-`f4155bb3-e2a0-4db1-b88f-9ec55de5af0d` v2 and Intro
-`c18776da-f19a-481a-a239-6644eda51f94` v2 in the accepted C0 snapshot.
-The exact normalized result digest is
-`131699b3f90fe8f5f3dbf05d5122784169ac7a239a5fb0fb8dd7da198d3e2c28`.
-The private review plan digest is
-`3f0df24f8de8fd3fa6816bcd323222ee8af0a278dbb5433f89f4f3ad1db75551`.
-The review shows the approved Intro text, a labeled placeholder and the prior
-full Home capture. There are no automatic provider requests. The image URL
-stays in the ignored cached search receipt, which expires at 18:49:31 UTC on
-November 8, 2026. Local review generation uses
-`node --import tsx scripts/pixabay-placement-review.ts` from the workspace root.
-
-The source page labels the photo with the Pixabay Content License and lists
-a 2014 publication date. Pixabay’s terms describe CC0 for pre-January 9, 2019
-images. Apply the narrower Content License restrictions for this proof and
-leave any wider transfer rights unresolved. The selected copy may be proposed
-for integration with the site's original copy and layout. Standalone
-redistribution remains restricted, including a detached file with only resizing
-or cropping. Show creator and Pixabay source credit in the Operator review.
-Ordinary Content License use generally makes attribution optional. Record any
-image-specific obligations before approving delivery. Inspect for recognizable
-people, marks and other third-party rights, and avoid any implication of customer
-work, endorsement or evidence. [Source page](https://pixabay.com/photos/tool-workbench-hammer-pliers-384740/),
-[Pixabay API conditions](https://pixabay.com/api/docs/) and
-[Pixabay terms](https://pixabay.com/service/terms/).
-
-The proposed approval is one bounded HTTPS GET of that cached representation
-and local preparation for the private review only. The launcher checks the
-exact plan and expiry, excludes redirects and additional attempts, validates the
-JPEG against the pinned dimensions, runs existing safe ingestion, and records
-the source and prepared byte digests. It retains the prepared bytes only in the
-ignored review HTML. Remove that HTML after review or within seven days,
-whichever is earlier, and remove it promptly on withdrawal. Retain only the
-sanitized provenance and attempt evidence. This retention limit is part of the
-proposed download scope. For later delivery, use an approved local managed copy
-in the integrated page and record any withdrawal so the affected placement can
-be removed or replaced. Customer exit still requires an image-specific decision
-about an integrated handoff, a separately cleared copy or a replacement. Master
-storage and WordPress Media Library synchronization stay open.
-
-Download is pending the owner's explicit approval of `384740`, the plan digest
-above and this private review use and retention. An expired representation or a
-provider redirect stops the attempt. Any refreshed search, different rendition
-or additional request needs a separate decision. Canonical Asset and AssetUsage
-creation, live eligibility, page approval and release remain under their existing
-gates. The synthetic-only eligibility policy is unchanged.
+The owner authorized one search for this brief. The fixed phrase
+`small business laptop` balances business context and a digital cue while
+leaving the provider room to return relevant settings. The launcher reuses
+the verified HTTPS, hidden key and one-attempt controls. Keep its result cache
+and editorial notes local and Git-ignored. The owner review links to the
+Pixabay source pages, identifies each creator and explains potential placement.
+The review uses the accepted Home capture as context. Candidate selection
+and any image-specific license, third-party rights and exact download
+authorization remain separate. See [Pixabay API conditions](https://pixabay.com/api/docs/),
+[Pixabay terms](https://pixabay.com/service/terms/) and the
+[accepted v3 design](miopages-business-focus.md).
 
 ### One authorized local live search
 

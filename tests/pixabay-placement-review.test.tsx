@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import sharp from "sharp";
-import { acquireForReview, placementReview, prepareSelectedJpeg } from "../scripts/pixabay-placement-review";
+import { acquireForReview, prepareSelectedJpeg } from "../scripts/pixabay-placement-review";
 
 const representation = { id: "webformat", url: "https://pixabay.com/get/fixture_640.jpg", width: 640, height: 426 };
 const jpeg = () => sharp({ create: { width: 640, height: 426, channels: 3, background: "#fbf7ef" } }).jpeg().toBuffer();
@@ -28,7 +28,6 @@ test("prepares exact selected JPEG through the existing safe image pipeline", as
 });
 
 test("refuses substituted endpoints, redirects, oversized replies and mismatched image content", async () => {
-  assert.throws(() => placementReview(Buffer.from("{}")), /unexpected_search_receipt/);
   for (const url of ["http://pixabay.com/get/fixture_640.jpg", "https://pixabay.com/get/fixture_640.jpg?key=fixture", "https://pixabay.com.evil.test/get/fixture_640.jpg"]) {
     await assert.rejects(prepareSelectedJpeg({ ...representation, url }, async () => assert.fail("network called")), /unexpected_image_endpoint/);
   }
@@ -42,7 +41,7 @@ test("refuses substituted endpoints, redirects, oversized replies and mismatched
 
 test("requires exact confirmation and live cached representation, with only one exclusive attempt", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "miopages-placement-"));
-  const review = { planDigest: "fixture", plan: { expiresAt: 50 }, hit: { representation } } as ReturnType<typeof placementReview>;
+  const review = { planDigest: "fixture", plan: { expiresAt: 50 }, hit: { representation } };
   let calls = 0;
   const send = async () => { calls++; return new Response(null, { status: 403 }); };
   try {

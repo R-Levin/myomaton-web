@@ -3,7 +3,7 @@ import { mkdtemp, readFile, readdir, realpath, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { firstPixabaySearch } from "../scripts/pixabay-live-search";
+import { c0PixabaySearch, firstPixabaySearch } from "../scripts/pixabay-live-search";
 
 const key = "fixture-Only-Test-Key-01234";
 const response = { hits: [{ id: 23, type: "photo", user: "Fixture Creator", tags: "workbench, tools",
@@ -71,6 +71,18 @@ test("refusals and redirects consume the attempt without reading provider error 
     assert.equal(calls, 1);
   });
 });
+
+test("C0 search uses its pinned human query and the same one-attempt gate", () => withDirectory(async directory => {
+  const run = () => c0PixabaySearch(directory, key, async options => {
+    const url = new URL(options.path!, "https://pixabay.com");
+    assert.equal(url.searchParams.get("q"), "small business laptop");
+    assert.equal(url.searchParams.get("safesearch"), "true");
+    return reply(200);
+  });
+  assert.equal((await run()).status, "PASS");
+  assert.deepEqual(await run(), { status: "BLOCKED", code: "attempt_already_recorded" });
+  assert.equal(JSON.parse(await readFile(path.join(directory, "attempt.json"), "utf8")).maximumRequests, 1);
+}));
 
 test("invalid key, reflected secret, invalid or oversized success response leave no result or review", async () => {
   await withDirectory(async directory => {
