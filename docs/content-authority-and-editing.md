@@ -343,6 +343,10 @@ evidence, exact placement and contextual alt. Release serializes with candidate
 revocation. Rollback rechecks rights before restoring a predecessor that uses
 supplied media. The project-created fixture contract and text-only hashes retain
 their existing semantics.
+[Authenticated uploads](media-acquisition.md#standing-customer-media-rights-and-authenticated-upload)
+also bind the trusted upload grant, agreement version and acceptance evidence
+to the revision. Current authorization and rights are rechecked at release,
+independent of the separate page consent and release mandates.
 
 The PostgreSQL proposal transaction serializes proposal changes and site release
 requests. The private release adapter conservatively takes canonical-table

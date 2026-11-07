@@ -11,7 +11,7 @@ provider-independent generated-image acquisition pilot already exist. They are
 reusable foundations, not proof of production customer upload or stock acquisition.
 The pilot details below retain their original disposable scope and approval rules.
 
-Commercial V1 requires completion of two practical acquisition/use paths:
+Commercial V1 requires these acquisition and use paths:
 
 - **Customer-supplied media:** uploads, existing website assets and previously
   authorized media. Verify authority to acquire and use them, validate and ingest
@@ -36,6 +36,61 @@ release and rollback. The generated Hero pilot retains its existing context chec
 A multi-provider marketplace/ecosystem and deterministic graphics expansion are
 later capabilities, not V1 requirements. Media recommendations belong in generation
 orchestration; unresolved visual gaps must remain explicit until safely resolved.
+
+## Standing customer media rights and authenticated upload
+
+The owner approved agreement-based rights evidence on November 7, 2026. For
+ordinary customer-owned submissions, use the standing media warranty and
+authorization accepted by an authorized customer representative. The upload
+records the applicable acceptance and avoids a per-image legal questionnaire.
+Operator acceptance of that basis is distinct from independently verified rights.
+Stock and generated sources require their own license, provider and provenance
+policies.
+
+The desired agreement covers the customer's representation and warranty that it
+owns or has sufficient rights for the intended uses, authorization for MioPages
+to store, reproduce, process, optimize, modify, distribute and publish as needed
+for the service, responsibility for accurate representations, appropriate defense
+and indemnification for specified claims, and notice of changed, expired or
+disputed permissions. Before commercial launch, qualified counsel must review
+the actual language, enforceability, DMCA applicability, insurance and relevant
+third-party rights. This direction settles product evidence handling. Legal terms,
+protections and liability remain open.
+
+Route known restricted third-party licenses, conflicting ownership claims, signs
+of unauthorized use, identifiable-person privacy or publicity questions, expired
+or limited commercial permissions, complaints and revocations for exception
+review. Ask for targeted evidence when needed. An active dispute or withdrawal
+blocks eligibility. Routine submission can proceed with standing agreement
+evidence, while the existing scoped Operator review, exact page approval and
+separate release mandate remain in force. Automation requires a separate decision.
+
+The disposable implementation handles a POST request carrying one raw PNG up
+to 1 MiB and a scoped submission ID. Authentication precedes body reads. A trusted
+adapter resolves the submitter, upload grant, exact Web Presence and placement,
+agreement version, acceptance reference, accepting representative and acceptance
+time. Request fields cannot establish that authority. The existing acquisition
+ledger records the submission identity and time, restricted Intro use, agreement
+evidence, source and prepared SHA-256 and subsequent review decisions. The original
+and prepared bytes are content-addressed in private staging. Credentials are
+excluded from evidence. Exact retries reuse the candidate, and conflicting
+bytes or agreement evidence refuse.
+
+The same authority adapter verifies the current grant and agreement in the
+intake, review and exact page proposal/release transactions. When rollback would
+restore a supplied image, its current eligibility is checked again. Image-specific
+revocation uses the existing candidate ledger. A missing verifier, stale
+acceptance, dispute or withdrawal refuses release. Preview and release verify
+the prepared bytes. The Operator review also verifies the privately retained
+original.
+
+Only the isolated fixture supplies authentication and agreement evidence. The
+request handler is exercised locally and has no registered app route. Production
+requires P7 identity, session and scoped delegation, durable representative
+acceptance and current-state checks that serialize with relevant writes, reviewed
+database permissions, upload deadline/rate and abuse limits, privacy, retention,
+dispute/withdrawal operations and a minimal customer interface. The shared
+authority and legal review gates remain open before real customer use.
 
 ## Operator-assisted customer-supplied raster
 
@@ -81,8 +136,9 @@ The subtype is enabled only by the guarded fixture setup on loopback PostgreSQL.
 It adds no table and changes no installed migration or production schema.
 The generated Hero policy remains context-bound. Before production, review
 the shared migration and permission surface, authenticated supplier/tenant
-binding, who may accept attestations and when independent evidence is mandatory,
-permitted-use and withdrawal policy, expiry, retention and abuse safeguards.
+binding, authorization to accept an agreement or resolve an exception, when
+independent evidence is required, permitted use, withdrawal, expiry, retention
+and abuse safeguards.
 Customer upload UI and authenticated submissions and practical stock sourcing
 remain required Commercial V1 work. WordPress storage and synchronization
 remain separate pending decisions.

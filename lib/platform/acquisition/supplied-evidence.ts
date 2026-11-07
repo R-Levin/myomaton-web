@@ -3,6 +3,7 @@ import { fingerprint } from "../canonical/model";
 import { record } from "../presentation/content";
 import { candidateSubject, type Candidate } from "./service";
 import type { Scope } from "../content-editing/authority";
+import { requireCurrentUploadAgreement, type UploadAgreement, type VerifyUploadAgreement } from "./customer-upload";
 
 export const suppliedPolicy = "disposable-supplied-raster/1";
 
@@ -15,12 +16,12 @@ export type SuppliedSource = {
   evidenceReference: string | null;
   existingAssetId: string | null;
 };
-export type SuppliedProvenance = {
-  source: SuppliedSource;
+export type SuppliedReceipt = { source: SuppliedSource; receivedBy: { operatorId: string; authorityReference: string } }
+  | { source: { kind: "authenticated-upload"; agreement: UploadAgreement; existingAssetId: null } };
+export type SuppliedProvenance = SuppliedReceipt & {
   sourceDigest: string;
   originalAssetDigest: string | null;
   transformation: "managed-raster-prepare/1" | "reuse-prepared/1";
-  receivedBy: { operatorId: string; authorityReference: string };
   placement: SuppliedPlacement;
   role: "image";
 };
@@ -30,7 +31,7 @@ export type SuppliedDecision = {
   subjectDigest: string;
   actor: { operatorId: string; authorityReference: string };
   reason: string;
-  rights: { basis: "customer-attestation" | "independently-verified"; reference: string } | null;
+  rights: { basis: "customer-attestation" | "service-agreement" | "independently-verified"; reference: string } | null;
   altText: string | null;
 };
 export type SuppliedLineage = { candidateId: string; subjectDigest: string; reviewDigest: string };
@@ -39,7 +40,8 @@ export type SuppliedEvidence = {
   sourceDigest: string;
   permission: "disposable-preview-release";
   reference: string;
-  sourceKind: SuppliedSource["kind"];
+  sourceKind: SuppliedReceipt["source"]["kind"];
+  agreement?: UploadAgreement;
   rightsBasis: NonNullable<SuppliedDecision["rights"]>["basis"];
   lineage: SuppliedLineage;
 };
@@ -66,7 +68,7 @@ export async function suppliedDecision(db: PoolClient, candidate: Candidate, dec
   return rows.rows[0]?.payload ?? null;
 }
 
-export async function approvedSuppliedEvidence(db: PoolClient, placement: SuppliedPlacement, assetId: string, lineage: SuppliedLineage, image: { preparedDigest: string; width: number; height: number; altText: string }): Promise<SuppliedEvidence> {
+export async function approvedSuppliedEvidence(db: PoolClient, placement: SuppliedPlacement, assetId: string, lineage: SuppliedLineage, image: { preparedDigest: string; width: number; height: number; altText: string }, verifyAgreement?: VerifyUploadAgreement): Promise<SuppliedEvidence> {
   // A concurrent revocation must serialize with a disposable release.
   const rows = await db.query(`SELECT c.* FROM media_candidates c JOIN external_work w
     ON w.id=c.work_id AND w.web_presence_id=c.web_presence_id
@@ -92,6 +94,13 @@ export async function approvedSuppliedEvidence(db: PoolClient, placement: Suppli
     fingerprint(await originalAsset(db, placement.webPresenceId, provenance.source.existingAssetId)) !== provenance.originalAssetDigest) {
     throw Error("Supplied-media source Asset changed");
   }
+  const agreement = provenance.source.kind === "authenticated-upload" ? provenance.source.agreement : undefined;
+  if (decision.rights.basis === "service-agreement" && decision.rights.reference !== agreement?.acceptanceReference) {
+    throw Error("Exact accepted service-agreement evidence required");
+  }
+  if (provenance.source.kind === "authenticated-upload") {
+    await requireCurrentUploadAgreement(db, placement, provenance.source.agreement, verifyAgreement);
+  }
   return { source: "customer-supplied", sourceDigest: provenance.sourceDigest, permission: "disposable-preview-release",
-    reference: decision.rights.reference, rightsBasis: decision.rights.basis, sourceKind: provenance.source.kind, lineage };
+    reference: decision.rights.reference, rightsBasis: decision.rights.basis, sourceKind: provenance.source.kind, lineage, ...(agreement ? { agreement } : {}) };
 }

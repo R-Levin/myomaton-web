@@ -158,6 +158,13 @@ customer bootstrap or old transitions. Preserve the [bootstrap boundary](bootstr
 
 ## Assets and customer uploads
 
+The [agreement-based upload proof](media-acquisition.md#standing-customer-media-rights-and-authenticated-upload)
+uses a synthetic scoped credential and verified acceptance inside the disposable
+boundary. Before exposing any route, verify production P7 grants, session
+revocation, agreement freshness, authenticated tenant selection, request deadlines,
+rate and storage limits, and private originals retention. Keep submission,
+media review, exact customer consent and release distinct.
+
 Before general customer uploads, review allowed types, actual byte/content
 validation rather than filename extensions, bounded byte/pixel/resource limits,
 ownership, non-executable storage and controlled delivery. Do not trust supplied

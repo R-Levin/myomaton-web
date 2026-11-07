@@ -44,6 +44,34 @@ Source is the owner-provided November 4–7 recovery handoff supplied after `51d
 
 The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
+## Commercial V1 agreement-based customer upload verified locally
+
+The owner approved standing agreement rights evidence for routine customer
+media, with targeted review of exceptions and qualified legal review before
+commercial launch. The disposable request adapter authenticates an upload-only
+customer credential, obtains the exact scoped grant and representative acceptance
+from a trusted synthetic adapter, and stages the original and prepared PNG with
+both digests in the existing acquisition ledger. Current evidence is rechecked
+at review and exact release. Image-specific revocation uses the same ledger.
+Customer submission, Operator review, page consent and release stay separate.
+
+TypeScript, targeted lint, 375 repository tests and ten disposable PostgreSQL 18
+checks passed. Coverage includes credential and tenant refusal, missing or
+unverified agreements, actual format and stream limits, conflicting retries,
+changed original and prepared bytes, superseded authority, dispute, withdrawal,
+rejection, revocation, exact approval and rollback. The historical preview digest
+and operator-assisted intake regressions passed. No customer route or production
+authority is installed. Hosted state and the canonical migration ledger were
+outside this checkpoint.
+
+The next practical slice is one provider-neutral, permissioned stock candidate
+through the same acquisition and approval path, using a local fixture until a
+provider/license review authorizes more. The production customer-upload route
+still needs P7 account and durable agreement integration, legal and exception
+policy approval, rate/retention safeguards and a minimal customer UI. Supported
+AI-generated media completion and the separate WordPress storage decision stay
+on the roadmap. [Standing rights and upload contract](media-acquisition.md#standing-customer-media-rights-and-authenticated-upload).
+
 ## Commercial V1 customer-supplied media intake verified
 
 The owner authorized one disposable operator-assisted image. The supplied-image

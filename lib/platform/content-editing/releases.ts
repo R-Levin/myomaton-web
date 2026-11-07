@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { fingerprint, object, text, uuid } from "../canonical/model";
 import type { Scope } from "./authority";
+import type { VerifyUploadAgreement } from "../acquisition/customer-upload";
 import { approvedSuppliedEvidence } from "../acquisition/supplied-evidence";
 import { binding, hash, pageProposal, proposalScope, type Binding } from "./proposal";
 import { proposalPreview } from "./proposal-preview";
@@ -33,7 +34,7 @@ async function append(c: PoolClient, value: Omit<ReleaseRecord, "digest">) {
 // No HTTP mutation surface. A durable proposal store owns the serializable
 // transaction; canonical writes and immutable release evidence commit together.
 export class SiteReleaseService {
-  constructor(private pool: Pool, private authority: ReleaseAuthority, private disposableMediaRoot?: string) {}
+  constructor(private pool: Pool, private authority: ReleaseAuthority, private disposableMediaRoot?: string, private verifyUploadAgreement?: VerifyUploadAgreement) {}
   private persistence() {
     return new PostgresProposalPersistence(this.pool, {
       beforeBegin: c => releaseEnvironment(c, false),
@@ -63,7 +64,7 @@ export class SiteReleaseService {
       if (!["business-representative", "accepted-authority"].includes(String(customer.kind))) throw Error("Customer mandate required"); text(customer.subjectId); text(customer.authorityReference, 500);
       const base = await siteBase(c, scope);
       if (fingerprint(base) !== expected.baseFingerprint) throw Error("Stale canonical site base");
-      const resolved = await resolveProposalCandidate(c, scope, pageProposal(revision.page), base, this.disposableMediaRoot);
+      const resolved = await resolveProposalCandidate(c, scope, pageProposal(revision.page), base, this.disposableMediaRoot, this.verifyUploadAgreement);
       if (fingerprint(resolved.candidate) !== fingerprint(revision.candidate) || fingerprint(resolved.resolved) !== fingerprint(revision.resolved) || fingerprint(proposalPreview(revision, resolved.image)) !== previewDigest) throw Error("Changed canonical source/candidate/renderer");
       const exactBase = await releaseBase(c, scope), at = new Date().toISOString(), before = contentSnapshot(exactBase, revision.page.pageId), after = candidateContent(revision, before, at);
       const media = resolved.candidate.media;
@@ -103,7 +104,7 @@ export class SiteReleaseService {
         if (media.priorUsage) {
           if (media.evidence.source === "customer-supplied") {
             await approvedSuppliedEvidence(c, { ...scope, pageId: release.page_id, sectionId: media.sectionId }, media.assetId,
-              media.evidence.lineage, { ...media, altText: media.configuration.image.altText });
+              media.evidence.lineage, { ...media, altText: media.configuration.image.altText }, this.verifyUploadAgreement);
           }
           await verifiedProposalImage(this.disposableMediaRoot, scope, media);
         }

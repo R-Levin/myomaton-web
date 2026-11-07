@@ -6,6 +6,7 @@ import { validateStoredMedia } from "../assets/media-validation";
 import { presentImage } from "../assets/source";
 import { choice, fingerprint, object, text, uuid } from "../canonical/model";
 import { assets } from "../db/schema/assets";
+import type { VerifyUploadAgreement } from "../acquisition/customer-upload";
 import { approvedSuppliedEvidence, type SuppliedEvidence } from "../acquisition/supplied-evidence";
 import type { Scope } from "./authority";
 import { hash, type PageProposal } from "./proposal";
@@ -40,7 +41,7 @@ export type ProposalMedia = {
   priorUsage: Usage | null;
 };
 
-export async function resolveProposalCandidate(c: PoolClient, scope: Scope, page: PageProposal, base: SiteBase, mediaRoot?: string) {
+export async function resolveProposalCandidate(c: PoolClient, scope: Scope, page: PageProposal, base: SiteBase, mediaRoot?: string, verifyAgreement?: VerifyUploadAgreement) {
   const resolved = await resolvePage(c, scope, page, base);
   const target = page.sections.find(section => section.image);
   if (!target?.image) return { ...resolved, image: undefined };
@@ -76,7 +77,7 @@ export async function resolveProposalCandidate(c: PoolClient, scope: Scope, page
     const raw = object(metadata.acquisition, ["candidateId", "subjectDigest", "reviewDigest"]);
     const lineage = { candidateId: uuid(raw.candidateId), subjectDigest: hash(raw.subjectDigest), reviewDigest: hash(raw.reviewDigest) };
     evidence = await approvedSuppliedEvidence(c, { ...scope, pageId: page.pageId, sectionId: target.id }, assetId, lineage,
-      { preparedDigest, width: image.width, height: image.height, altText });
+      { preparedDigest, width: image.width, height: image.height, altText }, verifyAgreement);
   } else {
     const raw = object(metadata.proposalFixture, ["source", "sourceDigest", "permission", "reference"]);
     evidence = {
