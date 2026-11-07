@@ -21,7 +21,7 @@ export interface SuppliedMediaAuthority {
   authorize(context: unknown, operation: Operation, placement: SuppliedPlacement): Promise<Actor>;
 }
 
-function placementInput(value: SuppliedPlacement): SuppliedPlacement {
+export function placementInput(value: SuppliedPlacement): SuppliedPlacement {
   const { webPresenceId, managedSiteId, pageId, sectionId } = object(value, ["webPresenceId", "managedSiteId", "pageId", "sectionId"]);
   return { ...proposalScope({ webPresenceId, managedSiteId }), pageId: uuid(pageId), sectionId: uuid(sectionId) };
 }

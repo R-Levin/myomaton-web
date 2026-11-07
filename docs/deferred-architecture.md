@@ -86,7 +86,7 @@ mechanisms and gate IDs remain unchanged. No gate closes by documenting intent.
 
 | Horizon | Scope and existing gates |
 | --- | --- |
-| Commercial V1 / incomplete | Hosted foundation/proof and production authority (P7/P9/P18–P20); full structured intake and confirmed knowledge (P1–P3/P7/P11); practical AI and near-finished multi-page generation orchestration/copy/SEO/revisions (P10/P13/P21, C2/C3); customer media upload and practical provider-neutral stock sourcing, Pexels first candidate (A1–A3/A6, P7/P17); minimal customer portal (P7/P11/P26); production approval/release/rollback and reliable lead/operational communications (P2/P7/P14/P18, C3); primary first-party measurement, Performance Snapshot and operator-approved improvement/remeasurement (P12/P13). Exercise individually ready and authorized capabilities on real C0 early. Complete the applicable full rehearsal and launch gates before C0 cutover and Customer #1. |
+| Commercial V1 / incomplete | Hosted foundation/proof and production authority (P7/P9/P18–P20); full structured intake and confirmed knowledge (P1–P3/P7/P11); practical AI and near-finished multi-page generation orchestration/copy/SEO/revisions (P10/P13/P21, C2/C3); customer media upload and practical provider-neutral stock sourcing, Pixabay first live candidate (A1–A3/A6, P7/P17); minimal customer portal (P7/P11/P26); production approval/release/rollback and reliable lead/operational communications (P2/P7/P14/P18, C3); primary first-party measurement, Performance Snapshot and operator-approved improvement/remeasurement (P12/P13). Exercise individually ready and authorized capabilities on real C0 early. Complete the applicable full rehearsal and launch gates before C0 cutover and Customer #1. |
 | Shortly-after-V1 / when evidence justifies | Refine portal usability, report presentation, repeated manual provider procedures and operator-effort reduction from actual C0/customer observations. Richer dashboards and automation do not defer the V1 baseline. Optional GA4/Search Console evidence may be considered here or later under P24/P25; no promised delivery date or V1 dependency. |
 | Later product expansion / deferred unless separately justified | CRM and Mailchimp/marketing automation integrations; full social-media management; sophisticated autonomous optimization; autonomous publication; multiple hosting-provider implementations; native billing where HostShop/external providers suffice; complex customer account administration; unrestricted site/page builder; broad media-provider ecosystem; cross-customer learning/benchmarking; predictive personalization. Existing safeguards and specific gates still apply if any capability is later promoted. |
 
@@ -464,7 +464,7 @@ Historically this was the next slice after canonical promotion. The bounded
 acquisition/production attachment remains gated. Extend the acquisition/provider
 boundary before broader approved media rendering. It must address customer/current-site
 Asset reuse, permissioned stock integration
-such as Pexels, deterministic SVG/chart-like graphics, and generated illustration/image
+such as Pixabay, deterministic SVG/chart-like graphics, and generated illustration/image
 providers. All paths need provenance/licensing, explicit approval, production
 eligibility and customer ownership; unresolved visual intent is not an eligible Asset.
 The [operator-assisted supplied raster proof](media-acquisition.md#operator-assisted-customer-supplied-raster)
@@ -472,7 +472,7 @@ reuses the acquisition ledger and exact release. Before shared use, review its
 schema extension, P7 authenticated submissions, A1/A2/A6 ownership and rights,
 P13 scoped decisions and production delivery/revocation behavior. Keep the upload
 UI, authenticated customer submission and practical stock acquisition in V1 scope.
-The [stock fixture and Pexels gate](media-acquisition.md#permissioned-stock-fixture-and-provider-integration)
+The [stock fixture and provider gate](media-acquisition.md#permissioned-stock-fixture-and-provider-integration)
 record local lifecycle proof and the pending live source, license, credit,
 retention and delivery decisions. Review the actual delivery target before
 granting provider-specific copy or export rights.

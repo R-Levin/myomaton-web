@@ -17,9 +17,10 @@ Commercial V1 requires these acquisition and use paths:
   authorized media. Verify authority to acquire and use them, validate and ingest
   safely, and retain ownership, provenance, tenant scope and supported presentation
   and accessibility metadata.
-- **Permissioned stock:** practical provider-neutral stock sourcing. Pexels is the
-  first candidate. Unsplash and other suitable sources remain options pending
-  licensing, integration and operating review. Retain source, rights and usage
+- **Permissioned stock:** practical provider-neutral stock sourcing. Pixabay is
+  the preferred first live candidate, subject to the gate below. Openverse is
+  the fallback for verified CC0 assets. Pexels is deferred while new keys are
+  paused and MioPages has no key. Retain source, rights and usage
   conditions before ingestion or placement.
 - **AI-generated media:** extend the bounded image-generation pilot, preserving
   generation and transformation provenance, Operator review, cost controls and
@@ -60,52 +61,85 @@ Expiry and recorded withdrawal block a new release, and rollback rechecks
 eligibility before restoring a prior stock association. No live provider
 adapter, external-image renderer or export permission is implied.
 
-### Pexels integration gate
+### Pixabay first, Openverse fallback
 
-Official documentation reviewed November 7, 2026. The general content license
-allows uses including websites and gives conditional permission to copy and
-adapt covered content. Terms restrict standalone distribution, misleading
-endorsement, systematic copying and some depictions. Check third-party rights
-for the actual image and placement. General-license credit is optional.
-The API guidelines separately call for a prominent Pexels link and photographer
-credit where possible. Record the license and API terms separately. Confirm
-where attribution appears and what creator data may be retained for that purpose.
-See the [Pexels license](https://www.pexels.com/license/),
-[terms](https://www.pexels.com/terms-of-service/) and
-[API guidelines](https://www.pexels.com/api/documentation/#guidelines).
+The owner requested a new provider evaluation on November 7, 2026. Prefer
+ordinary customer pages without per-image credits and providers without routine
+per-image usage reporting. Show source credit wherever an API requires it.
+Use a centralized customer credits page only when the applicable terms permit
+that placement. The [Pexels key notice](https://help.pexels.com/hc/en-us/articles/900004904026-How-do-I-get-an-API-key)
+reports a pause and MioPages has no Pexels key. The prior fixture continues to
+prove the shared lifecycle.
 
-1. Verify availability of a separately approved server-side key. The public
-   help center currently reports that new key issuance and rate increases are
-   paused. Default limits are 200/hour and 20,000/month. Keep credentials in
-   protected configuration. Budget and track quota from successful response
-   headers. See [API key status](https://help.pexels.com/hc/en-us/articles/900004904026-How-do-I-get-an-API-key),
-   [rate limits](https://help.pexels.com/hc/en-us/articles/900005852323-How-do-I-get-unlimited-requests)
-   and [request statistics](https://www.pexels.com/api/documentation/#request-statistics).
-2. Build one bounded photo search with recorded responses first. Derive a small
-   shortlist from the generated page's visual need, desired orientation,
-   available image area and context. Use one selected photo ID and representation.
-   Retain the source-page link and minimum permitted credit data. Reject misleading
-   documentary or endorsement cues, unsuitable crops and unresolved rights.
-   Add source links and credit on the reviewed selection surfaces.
-   See [photo resource and search](https://www.pexels.com/api/documentation/#the-photo-resource).
-3. After provider and license review, download only the chosen representation
-   from the approved media origin with redirect, size, MIME and time bounds.
-   Hash the bytes, run safe raster preparation and preserve the terms evidence.
-   Set a small search-response cache and a separately reviewed retention policy
-   for selected files. Confirm staging, optimization, managed serving, transfer,
-   withdrawal and customer exit under the selected terms before enabling those
-   uses. API cache guidance does not establish a long-term copy or export policy.
-   See [Pexels cache guidance](https://help.pexels.com/hc/en-us/articles/900006470063-What-steps-can-I-take-to-avoid-hitting-the-rate-limit).
-4. Treat credential and permission failures as blocked. Respect quota and
-   provider backoff on 429. Bound retries for transient failures, keep stable
-   request and representation identities, and require new review for a changed
-   selection or license. Refuse when required credit or delivery conditions
-   cannot be honored. Reuse the existing withdrawal and release gates.
+Pixabay fits the first low-volume, Operator-initiated pilot. The public API docs
+direct new users to join or log in and show the standard key under Search
+Images. Full-resolution fields require separate approval. The API is described
+as free, with a default quota of 100 requests per 60 seconds per key. The
+docs require caching requests for 24 hours, call for real human requests
+and prohibit systematic mass downloads. One explicit Operator search over a
+short editable phrase is the recommended boundary. A generated visual brief may
+suggest a phrase. Background searching, autonomous selection, scraping and
+batch acquisition are outside this policy. Confirm provider permission before
+expanding the use or assuming suitability across many customer accounts.
+[Pixabay API documentation](https://pixabay.com/api/docs/) and
+[developer API overview](https://pixabay.com/service/about/api/).
 
-Owner review is required before live credential use and before approving
-the use, attribution, retention and exit policy. Unsplash and other providers
-can normalize the same fields under their own rules. WordPress copying,
-provider-hosted delivery and export remain separately gated.
+Show Pixabay source credit and source-page links with Operator search results.
+The content license makes credit optional for ordinary licensed uses and permits
+copying and adapting covered images subject to its terms. The API requires local
+copies for ongoing image use rather than permanent Pixabay hotlinks. Use only
+selected images integrated into the customer site and review suitability,
+recognizable marks, people, implied endorsements and third-party rights.
+Avoid using hosted search thumbnails on customer pages. The reviewed public
+docs specify no routine per-image usage reports or tracking callbacks. Confirm
+any account-specific terms before live integration, including permitted creator
+metadata for attribution. [API documentation](https://pixabay.com/api/docs/),
+[license summary](https://pixabay.com/service/license-summary/) and
+[full terms](https://pixabay.com/service/terms/).
+
+Keep the search cache separate from licensed selected-image storage. For a
+live trial, approve exact source, representation, permitted-use evidence,
+bounded retention, withdrawal and audit rules. Use a controlled local copy
+only after reviewing the placement and term restrictions. Suppress withdrawn
+uses and record the action. Review exit delivery separately, because
+standalone redistribution is restricted and resizing alone does not remove
+that restriction. Where transfer is unavailable, plan a permitted replacement
+or a separately cleared copy. WordPress Media Library synchronization, master
+storage and exit packaging remain pending. [Pixabay full terms](https://pixabay.com/service/terms/)
+and [usable website handoff](web-presence-service-model.md#customer-ownership-and-understandable-exit).
+
+Openverse is the fallback for a small set of independently verified CC0
+images. The API supports anonymous, rate-limited access and authenticated
+application credentials with tiered quotas. Its catalog aggregates sources.
+Check the original work's license and host terms before download or copying.
+CC0 is compatible with the no-visible-credit preference where the original
+claim is verified and third-party rights permit the use. Other CC licenses
+may require attribution or restrict use and should stay outside the first
+fallback. No fallback connector was implemented. [Openverse licensing guidance](https://openverse.org/about),
+[API terms](https://docs.openverse.org/terms_of_service.html),
+[authentication](https://docs.openverse.org/api/reference/authentication_and_throttling.html)
+and [CC0 deed](https://creativecommons.org/publicdomain/zero/1.0/).
+
+The local recorded-response adapter builds one bounded safe-search photo request,
+normalizes source and creator credit, and exposes the selected web-sized
+representation. The provider-neutral search and selection layer authorizes
+the exact Operator and placement, caches successful responses for 24 hours
+in process, and pins a selected result by digest. The selected result is an
+unapproved draft for the acquisition workflow. It has no downloaded-byte
+digest or reviewed license grant. Existing staging still requires those
+bindings and accepts only the separately approved synthetic stock policy.
+The current adapter has no live transport, downloader or publication path.
+
+Before enabling one live search, have the owner authorize a project account
+and standard API key from the signed-in [Pixabay API documentation](https://pixabay.com/api/docs/).
+Keep the key server-side and out of logged query strings. Add protected
+transport, shared 24-hour cache and key-wide quota control, with limits for
+timeout, response bytes, allowed hosts and redirects. Respect provider backoff
+on 429 and surface credential refusals without retry loops. Separately review
+credit presentation and the allowed commercial use, retention and exit policy
+before any selected download or release. One live search and Operator review
+is the next useful proof. Higher access, broad automation and new providers
+remain separately scoped.
 
 ## Standing customer media rights and authenticated upload
 
@@ -336,7 +370,7 @@ Unresolved visuals stay canonical metadata; preview FPOs are not production
 Assets. Production-safe fallback omits unresolved visuals without revoking
 acceptance. A future eligible illustration fills only the Home Hero slot.
 
-The generated Hero pilot remains separate from stock selection. Live Pexels sourcing is pending. Practical stock
+The generated Hero pilot remains separate from stock selection. Live stock sourcing is pending. Practical stock
 acquisition and customer media upload are Commercial V1 completion work above;
 deterministic graphics and broader non-image intelligence remain later extensions.
 Editorial/canonical reconciliation remains a reusable non-image direction. Real

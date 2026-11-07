@@ -98,6 +98,28 @@ attachment, annotated artifacts, evidence provenance, font selection and product
 refusal. PostgreSQL tests cover canonical preservation, tenant/schema isolation,
 read-only runtime, managed delivery and real-state fingerprints.
 
+## Owner-visible review
+
+Start with the retained, browser-rendered Home captures from the accepted
+service-led v3 preview. On the development workstation, open
+`runtime-content/business-focus-final/miopages-desktop-home.png` and
+`runtime-content/business-focus-final/miopages-mobile-home.png`. These full-page
+captures show the native MioPages renderer, actual reference copy, typography,
+navigation and page layout alongside the illustrative Hero and Review report.
+They are static captures from the prior approved reference. The recorded
+loopback listener was unreachable during this review.
+
+The two illustrations are preview fixtures. The report is an example and its
+review call to action is not an operational intake. The captures do not show
+a live Pixabay result, a customer upload UI or WordPress delivery. Review
+whether the offer and next action are understandable, whether the visuals
+explain the service, and whether the phone layout feels usable. Record owner
+feedback separately from any exact-candidate approval.
+
+At material product milestones, link one reviewable surface and say what is
+functional, simulated or pending. Reuse this preview workflow or an existing
+approved reference before creating another review environment.
+
 ## Deferred and acceptance
 
 Production media selection/rights, contribution verification and permission-aware

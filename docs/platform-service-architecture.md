@@ -433,7 +433,7 @@ Use this development sequence under the existing readiness and deferred gates:
 3. **Commercial intake + generation completion:** full structured interview, confirmed
    knowledge/gaps, AI interpretation, site/page plan, near-finished multi-page
    generation, copy/SEO preparation, customer media upload, practical provider-neutral
-   stock sourcing (Pexels is the first candidate) and operator QA.
+   stock sourcing (Pixabay is the preferred first live candidate) and Operator QA.
 4. **Minimal customer portal:** onboarding, review/corrections, approvals, status,
    concise reporting, support/change requests and supported HostShop account/billing
    handoff. Customer access must satisfy P7 before exposure; later reporting and

@@ -44,6 +44,36 @@ Source is the owner-provided November 4–7 recovery handoff supplied after `51d
 
 The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
 
+## Pixabay priority and first owner-visible review
+
+The owner requested a provider transition and an inspectable product review.
+Pixabay is the preferred first live candidate for one human-initiated Operator
+search. Openverse with independently verified CC0 is the fallback. Pexels is
+deferred because new keys are paused and MioPages has no key. Prefer customer
+pages without per-image credits. Display required source attribution in
+Operator results. Use a centralized customer credits page only where the
+applicable terms permit it. Avoid routine per-image reporting obligations.
+
+The recorded-response adapter verified one authorized photo query, source and
+creator normalization, in-process 24-hour caching and exact result selection.
+A selected result is an unapproved draft. The adapter has no network
+composition, download, license grant or release write. TypeScript, targeted
+lint and 378 repository tests passed, including three new adapter tests.
+The existing stock lifecycle proof remains the release evidence.
+
+The first owner-visible review uses the accepted service-led v3 desktop and
+mobile Home captures. The prior loopback listener was unreachable. The captures
+show native rendering and real reference copy with simulated illustrative
+media and Review content. Record owner feedback on offer clarity, visual
+usefulness and mobile readability. Future material milestones should point to
+an inspectable result and distinguish functional, simulated and pending parts.
+[Owner-visible preview](miopages-business-focus.md#owner-visible-review).
+
+The next live boundary requires an authorized standard Pixabay key and review
+of protected transport, shared cache and quota, credit presentation, allowed
+use, retention, withdrawal and exit. No key was created or used. WordPress
+storage and synchronization remain pending. [Provider policy and live gate](media-acquisition.md#pixabay-first-openverse-fallback).
+
 ## Commercial V1 permissioned stock fixture verified locally
 
 The owner authorized a project-created PNG under synthetic stock permission.
@@ -64,11 +94,11 @@ release and historical preview checks passed. The canonical migration ledger
 and hosted state were outside the fixture. No live provider request or
 credential was used.
 
-Official Pexels sources were reviewed on November 7, 2026. The provider reports
+At the stock fixture checkpoint, official Pexels sources were reviewed on November 7, 2026. The provider reported
 a pause on issuing new keys. Prepare one search/credit adapter against recorded
 responses first. Live use needs approved access, provider-specific credit and
 an approved use, retention, withdrawal and exit policy. WordPress copy/storage
-remains pending. [Stock proof and Pexels integration gate](media-acquisition.md#permissioned-stock-fixture-and-provider-integration).
+remains pending. The later provider decision above supersedes this plan. [Stock proof and provider gate](media-acquisition.md#permissioned-stock-fixture-and-provider-integration).
 
 ## Commercial V1 agreement-based customer upload verified locally
 
