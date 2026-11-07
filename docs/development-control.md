@@ -63,8 +63,20 @@ approved. [Placement and search record](media-acquisition.md#c0-brand-imagery-re
 
 The C0 launcher passed the fixed-query and exclusive-attempt test, all 385
 repository tests, TypeScript and targeted lint. The withdrawn command refuses
-before any download. The C0 live request is pending the existing local hidden
-key handoff. The earlier technical receipt remains separate.
+before any download. The owner completed the C0 request through the existing
+hidden key handoff on November 7, 2026 at 20:50 UTC. The verified receipt records
+one request, HTTP 200 and eight unique normalized hits. All hit digests and the
+24-hour cache boundary matched. Receipt SHA-256 is
+`819489c0d9a1067000d1d9b68bb6ebe427e6e0ae1276d19848b1b31b08bdc08f`.
+
+The local owner review at `runtime-content/pixabay-live/c0-home-editorial-9a638b2/owner-review.html`
+shows two exploratory candidates beside excerpts and the accepted Home capture.
+The shortlist is based on provider metadata and accessible source pages. The
+laundry-shop source page still needs visual confirmation. Neither candidate
+clearly conveys the managed-service handoff. Keeping the current page remains
+a valid outcome. Chrome verified the review at 1440 and 390 px with no external
+requests. There was no image acquisition, canonical write or hosted change.
+Owner selection, if any, precedes exact download authorization.
 
 ## First live Pixabay search verified
 
