@@ -8,8 +8,13 @@ a:focus-visible,summary:focus-visible{outline:3px solid #5344a5;outline-offset:4
 .op-bar .op-wrap{display:flex;align-items:center;justify-content:space-between;gap:.65rem;min-height:4rem}
 .op-bar a{display:flex;align-items:center;gap:.55rem;color:#282243;font-weight:700;text-decoration:none}
 .op-mark{display:grid;place-items:center;background:#433588;color:#fff;border-radius:.45rem;width:1.9rem;height:1.9rem}
-.op-bar-label,.op-mode,.op-note,.op-lead{color:#615a73}
-.op-mode,.op-kicker,.op-note{font-size:.875rem}
+.op-bar-label,.op-note,.op-lead{color:#615a73}
+.op-kicker,.op-note,.op-identity{font-size:.875rem}
+.op-identity{position:relative;margin-block:.4rem;color:#51466e}
+.op-identity summary{display:grid;cursor:pointer;text-align:right}
+.op-identity[open] div{position:absolute;z-index:20;right:0;width:min(16rem,80vw);padding:.75rem 1rem;background:#fff;border:1px solid #ded9e8;border-radius:.45rem;box-shadow:0 .5rem 1rem #251f3c19}
+.op-identity p,.op-identity ul{margin:.25rem 0}
+.op-identity ul{padding-inline-start:1.2rem}
 .op-main{padding:2.4rem 0 4rem}
 .op-kicker{color:#615a73;margin:0 0 .45rem}
 .op-main h1,.op-main h2,.op-main h3{line-height:1.2;color:#251f3c;margin:0}
@@ -25,6 +30,10 @@ a:focus-visible,summary:focus-visible{outline:3px solid #5344a5;outline-offset:4
 .op-card{padding:1rem 1.2rem}
 .op-alert{display:flex;gap:1.1rem;align-items:center;justify-content:space-between;border-inline-start:4px solid #a77e2f}
 .op-card p{margin:0;color:#504960;max-width:62ch}
+.op-card .op-follow{margin-top:.5rem}
+.op-revisions{display:grid;gap:.75rem}
+.op-revisions dl{margin:.4rem 0}
+.op-revisions dd{margin:0 0 .4rem;overflow-wrap:anywhere}
 .op-button{flex:none;display:inline-block;padding:.58rem .85rem;border-radius:.4rem;background:#443989;color:#fff;font-weight:650;text-decoration:none}
 .op-button:hover{text-decoration:underline}
 .op-directory li+li,.op-decisions div+div{border-top:1px solid #e5e0ec}

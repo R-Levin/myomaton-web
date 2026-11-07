@@ -3,7 +3,8 @@ import { createServer } from "node:http";
 import reviewed from "./customer-updates/miopages-focus-reviewed.json";
 import { sourceSans } from "../lib/platform/presentation/fonts";
 import { accountPath, previewPath, snapshotAccount } from "./operator-overview/model";
-import { accountView, overview, pageView } from "./operator-overview/views";
+import { evidencePath, exactPreviewPath, loadProposalEvidence } from "./operator-overview/proposal-evidence";
+import { accountView, overview, pageView, proposalEvidenceView } from "./operator-overview/views";
 
 const host = "127.0.0.1";
 const port = 4317;
@@ -17,13 +18,23 @@ const headers = {
 
 export async function createOperatorOverview() {
   const account = snapshotAccount(reviewed.after, reviewed.target);
+  const evidence = await loadProposalEvidence();
+  if (evidence && (evidence.latest.scope.webPresenceId === account.id || evidence.latest.scope.managedSiteId === reviewed.target.managedSiteId)) {
+    throw Error("Synthetic proposal evidence must stay separate from the C0 account");
+  }
   const routes = new Map<string, { type: string; body: Buffer | string }>();
   const html = (path: string, body: string | null) => {
     if (!body) throw Error("Expected reviewed preview");
     routes.set(path, { type: "text/html; charset=utf-8", body });
   };
   html("/", overview([account]));
-  html(accountPath(account.id), accountView(account));
+  html(accountPath(account.id), accountView(account, evidence));
+  if (evidence) {
+    html(evidencePath(evidence), proposalEvidenceView(account, evidence));
+    for (const { revision, preview } of evidence.revisions) {
+      if (preview) html(exactPreviewPath(evidence, revision.binding.revision), preview.html);
+    }
+  }
   for (const page of account.pages) html(previewPath(account.id, String(page.id)), pageView(account, String(page.id)));
   routes.set("/operator.css", { type: "text/css; charset=utf-8", body: await readFile("scripts/operator-overview/operator.css") });
   const styles = await Promise.all(["app/presentation.css", "app/focus-presentation.css"].map(file => readFile(file, "utf8")));

@@ -62,9 +62,10 @@ discovery proof and avoiding stock where unsuitable for the C0 brand.
 
 The governing detail, rationale, limits and implementation sequence are in
 [human-centered work orchestration and active-role context](service-operations-model.md#human-centered-work-orchestration-and-active-role-context).
-The current C0 console is local, unauthenticated and read-only; it does not yet
-provide role switching, live queues, AI triage or reassignment. No production
-deployment, API expenditure or protected action is authorized by this document.
+The current C0 console is local, unauthenticated and read-only. Its identity
+and active-role panel is explicitly simulated. Real role switching, live
+queues, AI triage and reassignment remain pending. No production deployment,
+API expenditure or protected action is authorized by this document.
 
 ## Local Operator overview and C0 account review
 
@@ -90,9 +91,35 @@ verified account ownership, quiet-account rendering, four scoped v3 previews,
 method refusal and host checks. Chrome followed overview → account → Experience
 → Home at desktop and mobile widths.
 
-Next, connect the existing proposal revision and exact preview evidence to a
-read-only, authenticated, tenant-scoped account detail. Preserve the existing
-approval and release authorities when that connection is reviewed.
+### Proposal evidence and simulated active-role context
+
+The C0 account now links to a separately scoped synthetic proposal walkthrough.
+The console replays the retained disposable PostgreSQL proposal history when
+that exact known artifact is available. Three revisions are listed. Revisions
+2 and 3 have exact recorded previews and approval events. Revision 1 has no
+recorded preview. The earlier approval stays with revision 2. The exact HTML
+is checked against the preview event digest and the latest archived bytes.
+On a fresh checkout the known checked-in single-revision proof supplies the
+same review flow. Evidence with a changed binding, digest or archive is withheld.
+
+The two proof sources are pinned synthetic artifacts in their original Web
+Presence and Managed Site scopes. This console does not enumerate proposal
+stores or connect to PostgreSQL. C0 proposal status remains unknown, synthetic
+examples stay outside attention counts, and the recorded Experience issue
+remains the actionable item. The identity panel shows one simulated owner with
+two example roles and an active Content Reviewer display. It grants no access
+and supplies no approval or release action.
+
+All 388 repository tests, TypeScript and targeted lint passed. The focused
+checks exercised exact preview bytes, foreign-account refusal and the checked-in
+fallback. Desktop and mobile Chrome followed the role panel and C0 account
+through to the exact revision 3 preview.
+
+Next, connect the existing inspection authority to an authenticated,
+tenant-scoped, read-only account detail and show an exact revision from its
+authorized proposal ledger. Validate role visibility and account scope before
+adding role selection or any approval action. Keep approval and publication
+under their existing authorities.
 
 ## Corrected C0 stock image review
 
