@@ -192,6 +192,8 @@ through separate authorized abuse/safety measures, with an evidence
 trail and proportionate escalation. Do not silently de-prioritize
 requests based on unsupported AI judgments about customer character.
 
+**Evidence-led calibration (owner clarification, November 8, 2026).** The current discussion establishes **provisional operating principles**, not validated thresholds, escalation timing, request quotas, customer communication scripts or final staffing policies. Only real customer and Operator experience can establish which interventions are appropriate and economically sustainable. Prioritize hands-on Operator workflow proof and ordinary event capture; use observed volume, aging, outcomes, rework, escalation and customer feedback to refine procedures without burdening Operators with administrative measurement. Do not commit premature automatic service-fit judgments or autonomous expectation-setting messages. Human-reviewed drafting may be evaluated later if actual patterns justify it.
+
 **Implementation boundary:** Default to automatic trend awareness
 and actionable exceptions, not customer policing or a noisy quota
 dashboard. Precise thresholds, capacity models, customer language,
