@@ -391,6 +391,32 @@ continues to be unknown pending an authenticated tenant connection.
 
 **Provisional owner preference, November 8, 2026.** When an authorized Operator identifies several issues on one rendered WordPress page, prefer gathering those observations, annotations and supporting evidence in a **single contextual page-level review** so the Operator can discuss them together and the system can propose coherent resolutions. Keep individual issues distinguishable for ownership, scope, audit and necessary escalations; do not force a separate task for each observation. This grouping is a pragmatic initial workflow choice, **subject to adjustment after using the interface**, not a universal requirement that unrelated or materially different approvals share one decision.
 
+### Approval authority independent of active review perspective
+
+**Owner-approved direction, November 8, 2026.** The Operator's active
+interface role primarily determines what is emphasized and which specialist
+context is shown; **the authenticated Operator's actual scoped permissions
+determine which actions they may execute**. A founder/Superuser viewing a
+page as a Content Editor should be offered the relevant in-context
+Approve, Request Changes or Send for Customer Approval options when
+authorized, without a gratuitous switch to an Approver view or a separate
+task. Show a concise summary of remaining evidence, outstanding issues,
+affected site/release and applicable authorization before consequential
+decisions. A "Ready for Approval" state can be useful for an editor who
+lacks authority or cannot yet make the final decision, but must not
+introduce an unnecessary mandatory hop when the current actor is
+authorized to make the applicable decision.
+
+If a different Operator/authority is required, route the review and
+context to that person's queue and mark the original Operator's portion
+handed off when the transfer is accepted; the underlying approval remains
+pending. An authorized Superuser must not bypass required customer
+confirmation, separation-of-duties constraints, media/claim safeguards,
+release/publication gates or explicit approval scope. Approve-content,
+approve-design, request-customer-approval and authorize-publication are
+distinct capabilities even when one person has several. Enforce these
+permissions server-side rather than trusting a UI role selector.
+
 ### Role-aware section inspection
 
 **Owner clarification, November 8, 2026.** In the visual review of an actual WordPress-rendered page, selecting a section should expose contextual information and actions **appropriate to the Operator's active authorized role** rather than displaying a universal, crowded inspector. Content reviewers may see canonical supporting knowledge, provenance, draft claims, copy recommendations and factual issues; technical reviewers may see layout/CSS, observed WP configuration, drift/sync/release evidence and rendering issues. The same page and shared review interface underpin all roles, with permission-enforced actions and role-specific emphasis; presentation-role selection alone is not authentication or authorization. Operators can raise a concern beyond their specialty for conversational triage and scoped handoff instead of needing access to another role's controls. Preserve section/site identity across Core and WP tabs; defer exact per-role affordances until implementation review.
