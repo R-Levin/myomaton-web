@@ -151,6 +151,10 @@ force. Exact categories and implementation are deferred.
 
 ### Concise account next-action recommendations
 
+**Age-aware work prioritization (owner-approved, November 8, 2026).** Prioritize meaningful work using expected customer benefit, urgency, effort, risk, commitments and **elapsed time since a customer request or issue was raised**. Consider age as an explicit signal so older customer needs are not perpetually displaced by newer recommendations. Age should not mechanically trump safety-critical incidents, firm deadlines, consequential approvals, service commitments or higher-impact needs; use reasonable escalation/aging thresholds and explain exceptions briefly when relevant. Distinguish waiting on customer/third party, actively progressing, handed off, and actionable but unattended work to avoid misleading overdue status. Continue to minimize noise, manufactured work and manual timekeeping. Exact thresholds and ranking weights are to be validated in operation.
+
+
+
 **Owner-approved direction, November 8, 2026.** Within the brief
 account overview, MioPages should suggest the most useful next action
 when trustworthy customer, operational or performance evidence supports
