@@ -145,29 +145,41 @@ Canonical rationale:
 [whole-site launch approval versus ongoing delegated changes](service-operations-model.md#whole-site-launch-approval-versus-ongoing-delegated-changes).
 These are design decisions, not implemented production behavior.
 
-## Next proving focus: fresh end-to-end customer onboarding
+## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
-**Owner direction, November 8, 2026.** Stop relying solely on the
-read-only C0 Operator walkthrough as a stand-in for customer onboarding.
-The near-term major proving exercise should start at a **fresh actual
-interview** and test the entire real customer/Operator sequence through
-confirmed knowledge, direction, WordPress plugin generation, in-WP
-review/refinement and Core capture, complete-site customer acceptance,
-readiness, scoped launch, verified live operation and Ongoing.
-Preserve the existing C0 approved v3 site, source evidence and hosted
-records as a historical baseline; don't overwrite/reinterpret the
-earlier initial discovery (verbatim transcript not retained).
-Choose whether to use MioPages as a new intake with explicit prior
-knowledge provenance or a separately isolated representative small
-business. Do not assert the missing full interview, customer portal,
-real two-way WP appearance sync or launch path are already implemented.
-Use an isolated rehearsal with labeled blockers and explicit surrogate
-steps only; production gates remain in force.
+**Owner clarification, November 8, 2026; supersedes the earlier
+"fresh actual interview" instruction.** MioPages is the rehearsal
+customer. Its original early-October three-pass discovery was a real
+interview and the approved outcome survives in
+`docs/miopages-c0-business-brief.md`. **Reuse this evidence; do not
+repeat the interview.** No verbatim Q&A survived, so identify it
+truthfully as an approved discovery synthesis, not a fabricated
+transcript or the later Free Review interview.
 
-See [C0 fresh onboarding rehearsal](miopages-c0-product-model.md#fresh-end-to-end-onboarding-rehearsal-november-8-2026).
-Before another large console iteration, turn this into a bounded
-interface-driven test plan and record any observed pain points as a
-prioritized implementation backlog.
+Run a new, isolated and realistic C0 onboarding/build sequence
+without overwriting the already accepted C0 business state, service-led
+v3, historical site or hosted PG17/WordPress acceptance fixtures.
+Implement through actual customer/Operator surfaces: review and confirm
+existing discovery, Presence Direction, proposed pages/site design,
+Core-managed WordPress site generation, authorized Gutenberg edits
+automatically recorded back to Core, complete-site customer preview
+and approval, verified launch gates, then Ongoing. The existing
+WordPress plugin has guarded proof capabilities, not the completed
+bidirectional production workflow; expand it in tested slices, not by
+claiming that a preview is a complete build.
+
+**Next bounded implementation:** the interactive C0 onboarding
+resume + provenance/confirmation flow, with isolated durable data
+and actual Operator/customer interactions. Establish the plugin
+rendering seam and do a real WordPress Home/nav proof next. Label
+manual surrogates, missing UI/integration and approvals explicitly;
+no public deployment, hosted canonical writes or credential changes
+without existing separate approvals. Preserve actual acceptance
+evidence, operator effort and next gaps in Git.
+
+Authoritative executable plan:
+[C0 onboarding WordPress rebuild rehearsal](c0-onboarding-wordpress-rebuild-rehearsal.md).
+Review the relevant contracts and live repo/host state before coding.
 
 ## Local Operator overview and C0 account review
 
