@@ -433,6 +433,8 @@ major redesign and consequential publication remain governed by the
 relevant customer/Operator approvals. Customer preferences cannot
 override legal, contractual, security or release safeguards.
 
+**Onboarding defaults for standing authorizations (owner-approved, November 8, 2026).** MioPages should propose a **short, sensible, clearly explained default set** of low-risk ongoing-change permissions during onboarding, rather than confronting the customer with a long permission matrix. Let the customer accept the recommended package or expand and adjust individual categories, with clear examples of what is included and what still requires explicit approval. Record affirmative customer acceptance and changes as scoped, versioned and revocable authorizations; never silently grant sweeping permission, obscure materially consequential exceptions, or treat defaults as bypassing validation or release safeguards. Keep future adjustments available through the MioPages customer experience. The actual preset content and risk boundaries require separate design review before rollout.
+
 **Operational UX:** Most post-launch changes should be tested, recorded
 and handled by authorized Operators/Core under these defined rules
 without creating customer inbox noise. When a change falls outside
