@@ -383,6 +383,10 @@ continues to be unknown pending an authenticated tenant connection.
 
 **Performance-development use is later and separately governed.** The same appropriately retained work outcomes may someday inform supportive coaching or a structured performance discussion (e.g., escalation patterns, resolutions and context), but **no employee ranking, automatic performance scoring, surveillance dashboard or disciplinary inference is authorized now**. Raw escalation counts alone are not evidence of poor performance: raising difficult issues responsibly can be good judgment. Any future use requires explicit purpose, appropriate staff transparency, human interpretation, opportunity for context and suitable access/retention limits.
 
+### WordPress visual review and flexible workspace
+
+**Owner preference, November 8, 2026; pending implementation.** Operators reviewing a WordPress-delivered site should work against the **actual WordPress-rendered page** with MioPages context/recommendations available in a collapsible side panel when technically practical, so the page can be viewed unobstructed. Do not require an embedded WordPress frame or a single-tab interface. Operators will commonly use separate Core, WordPress frontend and authorized WP Admin/Gutenberg browser tabs/windows. Provide clear, securely scoped links between the matching customer, site, page/section and relevant review item, using stable identities and resumable context; avoid fragile reliance on window state or tab coordination. Preserve unsent notes and guard against conflicting concurrent updates by checking revisions. Keep actual editing and governed approval boundaries clear: the panel is a review aid, not a second page builder. Confirm implementation feasibility and browser restrictions before choosing embedded rendering versus linked tabs.
+
 ### Exception-driven attention queue
 
 **Approved direction, November 7, 2026.** Internal customer account review extends
