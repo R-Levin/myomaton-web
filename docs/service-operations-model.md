@@ -92,6 +92,42 @@ reviewed outcome; Launch approval is not blanket permission for later factual ed
 or AI-content publication. Handoff is a continuation of knowledge and responsibility,
 not a restart of discovery.
 
+### Verified launch confirmation, customer collateral and email continuity
+
+**Owner-approved direction, November 8, 2026.** When the approved site is
+actually deployed and its public operation verified, MioPages should
+automatically notify the customer of launch and transition the account
+into Ongoing service, measurement, reporting and improvement without
+adding a routine Operator handoff task. If verification, delivery or
+authorization has an actionable failure, surface that exception to the
+appropriate Operator rather than issuing a false "live" confirmation.
+The handoff should retain continuity of site version, approved knowledge,
+customer preferences, current risks, lead delivery and reporting baseline.
+
+Create clear, reusable **customer-facing collateral** accompanying the
+service lifecycle, including launch/orientation material explaining what
+has been delivered, how to review the live site, what MioPages manages,
+how to request changes or report issues, what approvals may be requested,
+how ongoing reporting and optimization will work, and appropriate points
+of contact. Collateral content, medium and exact launch packet require
+separate design/approval; do not silently promise unsupported features
+or service levels.
+
+**Email is a first-class communication channel throughout the customer
+journey**, not limited to launch: intake/onboarding follow-up, review
+invitations, clarifications, change requests, approvals, operational
+updates, customer support and reporting may use email where sensible.
+A customer portal and WordPress-rendered previews can coexist with
+email; do not require customers to monitor a portal for every routine
+interaction. MioPages Core should track the relevant correspondence,
+context, customer/account/site/work item, delivery status and decision
+outcome without duplicate Operator entry. An email link or reply does
+not by itself bypass verified identity, customer approval scope,
+consent/privacy safeguards or publication authority. Exact inbound
+reply capture, verified decision collection, notification preferences,
+templates and provider integration are implementation decisions,
+not capabilities already delivered.
+
 ## Expanded Launch
 
 Expanded Launch is a rare exception for materially unusual supported complexity,
