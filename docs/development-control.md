@@ -145,6 +145,37 @@ Canonical rationale:
 [whole-site launch approval versus ongoing delegated changes](service-operations-model.md#whole-site-launch-approval-versus-ongoing-delegated-changes).
 These are design decisions, not implemented production behavior.
 
+## First C0 build milestone: the full becoming-a-customer questionnaire
+
+**Owner-approved priority clarification, November 8, 2026.** Before
+starting the new C0 WordPress site, build and use the **complete
+client-entry and paid-onboarding process**: Review/direct-start
+foundational knowledge reuse → fit and scope confirmation → verified
+commercial commitment (explicit rehearsal surrogate in C0 until
+agreement/payment integration is approved) → full conditional,
+resumable customer questionnaire → confirmed business knowledge →
+one Presence Direction, then Core-managed WordPress generation.
+
+The earlier plan's narrow "view C0 interview summary and one correction"
+is **not sufficient as the first milestone**. C0 should exercise the
+same longer real customer onboarding questions a new client would,
+while preloading only verifiable prior authentic discovery answers
+and explicitly preserving original source/confirmation. The
+underlying full interview is not implemented yet, so Codex
+should inspect and extend existing intake/activation/knowledge
+systems rather than create a competing form or pretend the
+commercial gate is operational. Start with a scoped genuine
+interactive flow and expand in tested iterations. Prevent
+hosted writes, customer-status mutation, WordPress/public
+publication and fake payment assertions.
+
+Implementation spec:
+[full becoming-a-customer onboarding questionnaire](commercial-v1-full-onboarding-questionnaire.md);
+[revised C0 rehearsal](c0-onboarding-wordpress-rebuild-rehearsal.md);
+[recovery audit](c0-discovery-question-recovery-audit.md).
+Issue #9 is the initial executable task; align its acceptance
+with this updated priority before coding.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier
