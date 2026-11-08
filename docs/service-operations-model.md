@@ -499,6 +499,24 @@ permissions server-side rather than trusting a UI role selector.
 
 **Owner preference, November 8, 2026; pending implementation.** Operators reviewing a WordPress-delivered site should work against the **actual WordPress-rendered page** with MioPages context/recommendations available in a collapsible side panel when technically practical, so the page can be viewed unobstructed. Do not require an embedded WordPress frame or a single-tab interface. Operators will commonly use separate Core, WordPress frontend and authorized WP Admin/Gutenberg browser tabs/windows. Provide clear, securely scoped links between the matching customer, site, page/section and relevant review item, using stable identities and resumable context; avoid fragile reliance on window state or tab coordination. Preserve unsent notes and guard against conflicting concurrent updates by checking revisions. Keep actual editing and governed approval boundaries clear: the panel is a review aid, not a second page builder. Confirm implementation feasibility and browser restrictions before choosing embedded rendering versus linked tabs.
 
+### Direct or scheduled production launch
+
+**Owner-approved direction, November 8, 2026.** After a site is
+verified **Ready for Launch**, an appropriately authorized Operator may
+initiate an immediate launch or choose a scheduled launch window according
+to the customer's circumstances and operational needs; neither path is
+universally mandatory. Preserve the exact approved release/version,
+required authorizations and preflight status across either path.
+Scheduling is a deployment plan, not premature publication approval;
+revalidate time-sensitive checks and permissions when executing. Show
+the selected launch method, timing, responsibilities, ability to
+reschedule/cancel where safe, verification and any blocker without
+adding unnecessary Operator overhead. Do not mark a release **Live**
+until public delivery and applicable post-deployment verification
+have succeeded. Escalate meaningful failures with rollback/recovery
+context. Exact scheduler, operational controls and host/DNS specifics
+remain implementation decisions.
+
 ### Distinct customer-review and launch-readiness milestones
 
 **Owner-approved distinction, November 8, 2026.** Distinguish a site that
