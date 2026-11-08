@@ -258,10 +258,14 @@ interview):** Use MioPages itself as the realistic customer and begin with
 the **already completed, approved three-pass original C0 discovery** in
 `docs/miopages-c0-business-brief.md`. The interview was genuine
 customer/onboarding work, not a development fixture. Do **not** ask the
-owner to repeat it or treat the lack of verbatim Q&A as permission to
-invent questions/answers. The approved synthesis is the preserved
-customer input; subsequent corrections and confirmations are new events
-with their own provenance. The later Free Review Q&A is distinct.
+owner to repeat it. **Some original questions and answers are recoverable**
+from historical conversation context, alongside the preserved first-/second-pass
+syntheses; the complete verbatim transcript has not been verified. See the
+[question recovery audit](c0-discovery-question-recovery-audit.md). Never
+invent missing questions/answers. The approved synthesis and attributable
+original prompts are preserved input of different evidence types;
+subsequent corrections and confirmations are new events with their own
+provenance. The later Free Review Q&A is distinct.
 
 Create a **separate C0 rehearsal/onboarding run** to follow the real
 customer and Operator interfaces from interview outcome through
