@@ -174,6 +174,8 @@ Operator notifications and repeated customer approval steps.
 Distinguish an unresolved customer request from work intentionally
 queued, awaiting customer input, completed or formally handed off.
 
+**Early expectation-mismatch detection (owner clarification, November 8, 2026).** Consolidating a short burst of legitimate requests is normally appropriate, but **do not wait for a large queue or repeated complaints** when the customer's language, urgency expectations, repeated requests for immediate changes or ongoing response to proposed scheduling clearly reveals a mismatch with the managed-service model. Distinguish one-time high activity from a persistent pattern or explicit misunderstanding. Promptly flag the specific evidence and recommend a courteous, human-led conversation to clarify included scope, priorities, realistic service timing and available options; do not let misaligned expectations quietly persist or use a punitive automated "abuse" label. Track whether the understanding was clarified and whether the pattern continues, without extra Operator reporting chores. If a workable expectation cannot be reached, escalate service-fit or agreement questions through an authorized channel rather than making unapproved promises or silently denying requests.
+
 **Excessive request volume vs abuse:** Monitor aggregate incoming
 request volume, complexity and consumption of Operator/AI resources
 to detect unsustainable patterns. A customer asking for many
