@@ -62,8 +62,8 @@ discovery proof and avoiding stock where unsuitable for the C0 brand.
 
 The governing detail, rationale, limits and implementation sequence are in
 [human-centered work orchestration and active-role context](service-operations-model.md#human-centered-work-orchestration-and-active-role-context).
-The current C0 console is local, unauthenticated and read-only. The development
-evidence identity and active-role panel is explicitly simulated. Real role switching, live
+The current C0 console is local, unauthenticated and read-only. Its persistent
+identity and active-role panel is explicitly simulated. Real role switching, live
 queues, AI triage and reassignment remain pending. No production deployment,
 API expenditure or protected action is authorized by this document.
 
@@ -97,8 +97,8 @@ The owner found the initial Operator direction encouraging and the mixture of
 C0 and an unrelated synthetic proposal confusing. The primary account journey
 now follows Interview → Confirmed business knowledge → Website content and
 design → Operator review → Next action. Links keep ordinary review inside the
-console. Synthetic proposal evidence and the simulated identity panel are under
-**Development evidence** on the overview, outside the C0 journey.
+console. Synthetic proposal evidence is under **Development evidence** on the
+overview, outside the C0 journey.
 
 The approved October 6 [business brief](miopages-c0-business-brief.md) is the
 retained synthesis of the original discovery. The verbatim original interview
@@ -127,6 +127,23 @@ same-tab navigation. The Experience decision
 asks what past work MioPages can substantiate and has permission to show.
 The next practical review is to select one permission-cleared project or keep
 the page text-led. Any exact page proposal uses the existing approval path.
+
+### Persistent identity and simulated role switching
+
+On November 8, 2026 the owner requested the simulated identity back in the
+shared header. **MioPages owner** can switch between Content Reviewer and
+Technical Operator on the same console pages. The browser retains only the
+selected example role. Content Reviewer emphasizes the recorded Experience
+decision, interview evidence and content review. Technical Operator adds a
+labeled example checklist for the four page previews, navigation and design
+captures. The recorded Experience decision stays visible and the example
+does not affect the recorded attention count.
+
+The selector changes presentation and read-only shortcuts. It grants no
+access or authority, and the exact synthetic proposal artifacts stay separate
+and byte-identical. All 388 repository tests, TypeScript and targeted lint
+passed. Chrome verified switching, navigation and role persistence at 1440,
+390 and 320 px. The next owner review returns to the C0 Interview section.
 
 ### Proposal evidence and simulated active-role context
 

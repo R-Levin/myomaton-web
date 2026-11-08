@@ -355,10 +355,11 @@ do not require customers to navigate the internal team structure.
 
 **Near-term implementation sequence and open policy.** Review the first C0 Operator view with the owner, then connect tenant-scoped real content proposal revisions and exact preview evidence in account detail. Improve evidence-led attention grouping and navigation, test scale using clearly labeled fixtures, then pilot bounded AI triage, contextual guidance/handoff and role-aware experiences. Integrate real page-context media work into this same surface. Determine future role-permission matrix, reassignment authority, workload/capacity cues, escalation/notification timing and AI budget thresholds from operating evidence. Nothing above authorizes hosted writes, external AI calls, new credentials or irreversible production actions.
 
-The [local walkthrough](development-control.md#proposal-evidence-and-simulated-active-role-context)
-uses exact retained synthetic proposal evidence under its original scope and
-demonstrates identity and active role as display only. The C0 account continues
-to show unknown proposal status pending an authenticated tenant connection.
+The [local console](development-control.md#persistent-identity-and-simulated-role-switching)
+demonstrates one identity switching between two example roles in a shared
+interface. Role changes affect emphasis and shortcuts. Recorded C0 evidence
+and access remain independent of the browser preference. C0 proposal status
+continues to be unknown pending an authenticated tenant connection.
 
 ### Exception-driven attention queue
 

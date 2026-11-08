@@ -17,6 +17,7 @@ const headers = {
   "Referrer-Policy": "no-referrer",
   "Content-Security-Policy": "default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
 };
+const roleScript = "/operator-role.js";
 const designCaptures: Record<string, readonly [name: string, digest: string]> = {
   "/": ["home", "c1f2974e1d4dac7a8062c29deea843c2bbcc61b3424079d698a5f044c422c9e7"],
   "/service": ["service", "e009cdbf30afc113d73fa47ebfc091df9dbd24a6df76d867b2490c1b6327dfb7"],
@@ -30,10 +31,10 @@ export async function createOperatorOverview() {
   if (evidence && (evidence.latest.scope.webPresenceId === account.id || evidence.latest.scope.managedSiteId === reviewed.target.managedSiteId)) {
     throw Error("Synthetic proposal evidence must stay separate from the C0 account");
   }
-  const routes = new Map<string, { type: string; body: Buffer | string }>();
+  const routes = new Map<string, { type: string; body: Buffer | string; interactive?: boolean }>();
   const html = (path: string, body: string | null) => {
     if (!body) throw Error("Expected reviewed preview");
-    routes.set(path, { type: "text/html; charset=utf-8", body });
+    routes.set(path, { type: "text/html; charset=utf-8", body, interactive: true });
   };
   html("/", overview([account], Boolean(evidence)));
   html(accountPath(account.id), accountView(account, review));
@@ -42,7 +43,7 @@ export async function createOperatorOverview() {
     html("/development-evidence", development);
     html(accountPath(evidence.latest.scope.webPresenceId), development);
     for (const { revision, preview } of evidence.revisions) {
-      if (preview) html(exactPreviewPath(evidence, revision.binding.revision), preview.html);
+      if (preview) routes.set(exactPreviewPath(evidence, revision.binding.revision), { type: "text/html; charset=utf-8", body: preview.html });
     }
   }
   for (const page of account.pages) {
@@ -54,6 +55,7 @@ export async function createOperatorOverview() {
     if (verified) routes.set(imagePath, { type: "image/png", body: bytes });
     html(path, pageView(account, String(page.id), verified ? imagePath : undefined));
   }
+  routes.set(roleScript, { type: "text/javascript; charset=utf-8", body: await readFile("scripts/operator-overview/role-preview.js") });
   routes.set("/operator.css", { type: "text/css; charset=utf-8", body: await readFile("scripts/operator-overview/operator.css") });
   const styles = await Promise.all(["app/presentation.css", "app/focus-presentation.css"].map(file => readFile(file, "utf8")));
   for (const font of sourceSans.resources) {
@@ -64,7 +66,8 @@ export async function createOperatorOverview() {
 
   const server = createServer((request, response) => {
     const address = server.address();
-    const route = routes.get(request.url ?? "");
+    const path = request.url ?? "";
+    const route = routes.get(path);
     const reply = (status: number, message: string, extra = {}) => {
       response.writeHead(status, { ...headers, "Content-Type": "text/plain; charset=utf-8", ...extra }).end(message);
     };
@@ -72,7 +75,8 @@ export async function createOperatorOverview() {
     if (request.headers["sec-fetch-site"] === "cross-site" && request.headers["sec-fetch-mode"] !== "navigate") return reply(403, "Open the local console directly");
     if (request.method !== "GET") return reply(405, "Read-only review", { Allow: "GET" });
     if (!route) return reply(404, "Unknown review page");
-    response.writeHead(200, { ...headers, "Content-Type": route.type }).end(route.body);
+    const policy = route.interactive ? `${headers["Content-Security-Policy"]}; script-src 'self'` : headers["Content-Security-Policy"];
+    response.writeHead(200, { ...headers, "Content-Type": route.type, "Content-Security-Policy": policy }).end(route.body);
   });
   return server;
 }

@@ -1,20 +1,22 @@
-:root{color-scheme:light}
+:root{color-scheme:light;scroll-padding-top:7rem}
 *{box-sizing:border-box}
 body{margin:0;background:#f6f5f9;color:#262437;font:1rem/1.55 system-ui,sans-serif}
 a{color:#443989;text-underline-offset:.2em}
 a:focus-visible,summary:focus-visible{outline:3px solid #5344a5;outline-offset:4px}
 .op-wrap{width:min(66rem,100% - 2rem);margin-inline:auto}
-.op-bar{background:#fff;border-bottom:1px solid #dfdbea}
+.op-bar{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid #dfdbea}
 .op-bar .op-wrap{display:flex;align-items:center;justify-content:space-between;gap:.65rem;min-height:4rem}
 .op-bar a{display:flex;align-items:center;gap:.55rem;color:#282243;font-weight:700;text-decoration:none}
 .op-mark{display:grid;place-items:center;background:#433588;color:#fff;border-radius:.45rem;width:1.9rem;height:1.9rem}
 .op-bar-label,.op-note,.op-lead{color:#615a73}
 .op-kicker,.op-note,.op-identity{font-size:.875rem}
-.op-identity{position:relative;margin-block:.4rem;color:#51466e}
-.op-identity summary{display:grid;cursor:pointer;text-align:right}
-.op-identity[open] div{position:absolute;z-index:20;right:0;width:min(16rem,80vw);padding:.75rem 1rem;background:#fff;border:1px solid #ded9e8;border-radius:.45rem;box-shadow:0 .5rem 1rem #251f3c19}
-.op-identity p,.op-identity ul{margin:.25rem 0}
-.op-identity ul{padding-inline-start:1.2rem}
+.op-identity{margin-block:.5rem;color:#51466e;text-align:right}
+.op-role-control{display:flex;justify-content:flex-end;align-items:center;gap:.4rem;margin-block:.2rem}
+.op-role-control label{font-weight:650}
+.op-role-control select{font:inherit;color:#382d68;background:#fff;border:1px solid #a9a0be;border-radius:.35rem;min-height:2.75rem;padding:.2rem .35rem}
+.op-identity small{display:block;color:#615a73}
+[data-role-example][hidden]{display:none}
+.op-role-example{margin-block:.65rem;border-inline-start:4px solid #897ac0}
 .op-main{padding:2.4rem 0 4rem}
 .op-kicker{color:#615a73;margin:0 0 .45rem}
 .op-main h1,.op-main h2,.op-main h3{line-height:1.2;color:#251f3c;margin:0}
@@ -61,3 +63,4 @@ a:focus-visible,summary:focus-visible{outline:3px solid #5344a5;outline-offset:4
 .op-preview summary{cursor:pointer;color:#443989;margin-top:.5rem}
 .op-preview img{display:block;width:100%;height:auto;margin-top:.55rem}
 @media(max-width:36rem){.op-alert{align-items:flex-start;flex-direction:column}.op-bar-label{display:none}}
+@media(max-width:22.5rem){.op-mark{display:none}}

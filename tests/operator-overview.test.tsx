@@ -40,14 +40,42 @@ test("the loopback overview leads to scoped account evidence and the existing v3
       assert.equal(reply.status, 200);
       assert.equal(reply.headers.get("cache-control"), "no-store");
       assert.match(reply.headers.get("content-security-policy")!, /frame-ancestors 'none'/);
-      return new JSDOM(await reply.text()).window.document;
+      return new JSDOM(await reply.text(), { url: base + path, runScripts: "outside-only" }).window.document;
     };
     const start = await document("/");
     const presencePath = accountPath(reviewed.target.webPresenceId);
     assert.equal(start.querySelector(".op-alert a")?.getAttribute("href"), presencePath);
-    assert.equal(start.querySelector(".op-identity"), null);
+    const checkRoleHeader = (document: Document) => {
+      assert.match(document.querySelector(".op-identity")!.textContent!, /MioPages owner.*Simulated.*Active role/);
+      assert.match(document.querySelector("#role-boundary")!.textContent!, /Read-only demo · no permissions granted/);
+      const control = document.querySelector<HTMLSelectElement>("#operator-role")!;
+      assert.deepEqual([...control.options].map(option => option.text), ["Content Reviewer", "Technical Operator"]);
+      return control;
+    };
+    const control = checkRoleHeader(start);
+    const roleScript = await fetch(base + "/operator-role.js");
+    assert.match(roleScript.headers.get("content-type")!, /^text\/javascript/);
+    const script = await roleScript.text();
+    const browser = start.defaultView!;
+    browser.localStorage.setItem("miopages-operator-demo-role", "invalid-role");
+    browser.eval(script);
+    assert.equal(control.value, "content-reviewer");
+    assert.equal(control.disabled, false);
+    const roleExample = start.querySelector<HTMLElement>("[data-role-example]")!;
+    assert.equal(roleExample.hidden, true);
+    control.value = "technical-operator";
+    control.dispatchEvent(new browser.Event("change"));
+    assert.equal(browser.localStorage.getItem("miopages-operator-demo-role"), "technical-operator");
+    assert.equal(roleExample.hidden, false);
+    assert.match(roleExample.textContent!, /Simulated role example.*Open website previews/);
     assert.equal(start.querySelectorAll(".op-alert").length, 1);
     const account = await document(presencePath);
+    const accountRole = checkRoleHeader(account);
+    account.defaultView!.localStorage.setItem("miopages-operator-demo-role", browser.localStorage.getItem("miopages-operator-demo-role")!);
+    account.defaultView!.eval(script);
+    assert.equal(accountRole.value, "technical-operator");
+    assert.equal(account.querySelector<HTMLElement>('[data-role-example="content-reviewer"]')!.hidden, true);
+    assert.match(account.querySelector('[data-role-example="technical-operator"]:not([hidden])')!.textContent!, /Check reviewed website pages/);
     assert.deepEqual([...account.querySelectorAll('.op-steps a')].map(link => link.getAttribute('href')), ["#interview", "#knowledge", "#website", "#review", "#next-action"]);
     assert.match(account.body.textContent!, /original interview transcript and verbatim answers were unavailable/);
     assert.match(account.body.textContent!, /An exact C0 page proposal and approval trail is unavailable/);
@@ -64,13 +92,14 @@ test("the loopback overview leads to scoped account evidence and the existing v3
     const proposal = await document(developmentPath);
     assert.match(proposal.querySelector("h1")!.textContent!, /Proposal evidence/);
     assert.match(proposal.body.textContent!, /Synthetic example/);
-    assert.match(proposal.querySelector(".op-identity summary")!.textContent!, /Simulated.*MioPages owner.*Active role: Content Reviewer/);
+    checkRoleHeader(proposal);
     assert.equal(proposal.querySelectorAll(".op-revisions > li").length, evidence.revisions.length);
     for (const { revision, preview } of evidence.revisions) {
       const path = exactPreviewPath(evidence, revision.binding.revision);
       const response = await fetch(base + path);
       if (preview) {
         assert.equal(response.status, 200);
+        assert.doesNotMatch(response.headers.get("content-security-policy")!, /script-src/);
         assert.equal(fingerprint(await response.text()), preview.digest);
       } else assert.equal(response.status, 404);
       assert.equal((await fetch(base + path.replace(samplePath, presencePath))).status, 404);
@@ -81,7 +110,9 @@ test("the loopback overview leads to scoped account evidence and the existing v3
       const focus = preview.querySelector('[data-grammar="service-led"][data-grammar-version="3"]');
       assert.ok(focus);
       assert.equal(focus.querySelectorAll("main > section").length, reviewed.after.sections.filter(section => section.page_id === page.id).length);
-      assert.equal(preview.querySelectorAll("script,form,iframe").length, 0);
+      checkRoleHeader(preview);
+      assert.deepEqual([...preview.querySelectorAll("script")].map(element => element.getAttribute("src")), ["/operator-role.js"]);
+      assert.equal(preview.querySelectorAll("form,iframe").length, 0);
       assert.equal(preview.querySelector('.op-preview a')?.getAttribute('href'), `${presencePath}#website`);
       assert.equal(preview.querySelectorAll('a[target="_blank"]').length, 0);
     }

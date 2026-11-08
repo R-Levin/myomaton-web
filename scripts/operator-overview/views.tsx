@@ -6,14 +6,17 @@ import { exactPreviewPath, type ProposalEvidence } from "./proposal-evidence";
 import { approvedReviewDigest, type C0Review } from "./c0-review";
 
 /* eslint-disable @next/next/no-head-element, @next/next/no-css-tags, @next/next/no-html-link-for-pages, @next/next/no-img-element -- Standalone HTML and local assets served by Node outside Next. */
-function layout(title: string, children: ReactNode, options: { preview?: boolean; development?: boolean } = {}) {
+function layout(title: string, children: ReactNode, preview = false) {
   return "<!doctype html>" + renderToStaticMarkup(<html lang="en"><head><meta charSet="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" /><title>{`${title} · MioPages Operator`}</title>
-    <link rel="stylesheet" href="/operator.css" />{options.preview && <link rel="stylesheet" href="/presentation.css" />}
+    <link rel="stylesheet" href="/operator.css" />{preview && <link rel="stylesheet" href="/presentation.css" />}
+    <script src="/operator-role.js" defer />
   </head><body><header className="op-bar"><div className="op-wrap"><a href="/" aria-label="MioPages Operator overview"><span className="op-mark" aria-hidden="true">M</span>MioPages <span className="op-bar-label">Operator</span></a>
-    {options.development ? <details className="op-identity"><summary><span><span className="op-tag">Simulated</span> MioPages owner</span><span>Active role: Content Reviewer</span></summary>
-      <div><p>Demo identity with two example roles.</p><ul><li>Content Reviewer · active in this example</li><li>Technical Operator</li></ul><p>Local read-only review. Sign-in and permissions are unavailable.</p></div>
-    </details> : <span className="op-note">Local · read-only</span>}</div></header>
+    <div className="op-identity"><strong>MioPages owner</strong> <span className="op-tag">Simulated</span>
+      <div className="op-role-control"><label htmlFor="operator-role">Active role</label><select id="operator-role" defaultValue="content-reviewer" aria-describedby="role-boundary" disabled>
+        <option value="content-reviewer">Content Reviewer</option><option value="technical-operator">Technical Operator</option>
+      </select></div><small id="role-boundary">Read-only demo · no permissions granted</small>
+    </div></div></header>
     {children}</body></html>);
 }
 
@@ -23,8 +26,13 @@ export function overview(accounts: readonly SnapshotAccount[], development = fal
     <div className="op-kicker">Workspace / Overview</div><h1>Operator overview</h1>
     <p className="op-lead">Start with the accounts that need a decision.</p>
     <section aria-labelledby="attention"><h2 id="attention">Needs attention <span className="op-count">{attention.length}</span></h2>
+      {accounts[0] && <aside className="op-card op-role-example" data-role-example="technical-operator" hidden>
+        <span className="op-tag">Simulated role example</span><h3>Check the four website previews before a handoff</h3>
+        <p>Compare the reviewed layout with the accepted design captures. This is an example check, with no recorded technical issue.</p>
+        <p className="op-follow"><a href={`${accountPath(accounts[0].id)}#website`}>Open website previews</a></p>
+      </aside>}
       {attention.length ? <ul className="op-list">{attention.map(account => <li className="op-card op-alert" key={account.id}>
-        <div><span className="op-tag op-warn">Needs a decision</span><h3>Choose what past work MioPages can show</h3>
+        <div><span className="op-tag op-warn">Recorded C0 decision · Content review</span><h3>Choose what past work MioPages can show</h3>
           <p>The Experience page has room for a past project. Confirm what MioPages contributed and get permission to show the work.</p></div>
         <a className="op-button" href={accountPath(account.id)}>Open MioPages journey <span aria-hidden="true">→</span></a>
       </li>)}</ul> : <p className="op-card">No Operator review is flagged in the loaded snapshot.</p>}
@@ -54,6 +62,16 @@ export function accountView(account: SnapshotAccount, review: C0Review | null) {
     <h1>MioPages journey</h1><p className="op-lead">Customer #0 · {account.domain}</p>
     <p>Follow the retained record from discovery to the reviewed four-page website and the next decision.</p>
     <nav className="op-steps" aria-label="Journey steps"><ol>{stages.map(([id, label]) => <li key={id}><a href={`#${id}`}>{label}</a></li>)}</ol></nav>
+    <aside className="op-card op-role-example" data-role-example="content-reviewer">
+      <span className="op-tag">Simulated role example</span><h3>Content Reviewer focus</h3>
+      <p>Compare the interview with the confirmed business knowledge. Check what MioPages can substantiate before proposing new copy or imagery.</p>
+      <p className="op-follow"><a href="#interview">Review interview evidence</a> · <a href="#next-action">Review the Experience decision</a></p>
+    </aside>
+    <aside className="op-card op-role-example" data-role-example="technical-operator" hidden>
+      <span className="op-tag">Simulated role example</span><h3>Technical Operator focus</h3>
+      <p>Check the four reviewed pages, their navigation and accepted design captures. The local previews show development evidence. Live delivery status is outside this view.</p>
+      <p className="op-follow"><a href="#website">Check reviewed website pages</a></p>
+    </aside>
 
     <section id="interview" aria-labelledby="interview-heading"><h2 id="interview-heading">1. Interview</h2>
       <div className="op-card"><span className="op-tag">Approved discovery summary</span><h3>What the original discovery established</h3>
@@ -126,7 +144,7 @@ export function proposalEvidenceView(evidence: ProposalEvidence) {
         </li>;
       })}</ol>
     </section>
-  </main>, { development: true });
+  </main>);
 }
 
 export function pageView(account: SnapshotAccount, pageId: string, capture?: string) {
@@ -135,7 +153,9 @@ export function pageView(account: SnapshotAccount, pageId: string, capture?: str
   return layout(`${page.page.name} preview`, <>
     <div className="op-preview"><div className="op-wrap"><nav aria-label="Preview navigation"><a href={`${accountPath(account.id)}#website`}>← MioPages journey</a>{account.pages.map(item => <a key={String(item.id)} href={previewPath(account.id, String(item.id))} aria-current={item.id === pageId ? "page" : undefined}>{String(item.name)}</a>)}</nav>
       <p>Website preview · reviewed development copy and layout. Illustrations and visitor actions are limited here.</p>
+      <p data-role-example="content-reviewer"><strong>Simulated Content Reviewer focus</strong> · Read the page in context and <a href={`${accountPath(account.id)}#review`}>check the recorded review</a>.</p>
+      <p data-role-example="technical-operator" hidden><strong>Simulated Technical Operator focus</strong> · Follow the page links and compare the design capture if available.</p>
       {capture && <details><summary>See the accepted design capture</summary><p>This historical capture includes the illustrative design elements used for review.</p><img loading="lazy" src={capture} alt={`Accepted design capture of the MioPages ${page.page.name} page`} /></details>}</div></div>
     <FocusPage page={page} />
-  </>, { preview: true });
+  </>, true);
 }
