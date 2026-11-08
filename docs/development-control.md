@@ -67,6 +67,29 @@ identity and active-role panel is explicitly simulated. Real role switching, liv
 queues, AI triage and reassignment remain pending. No production deployment,
 API expenditure or protected action is authorized by this document.
 
+## Founder-led customer stewardship and contextual review
+
+**Owner-approved direction, November 8, 2026; implementation pending.** The
+founder's 30+ years of customer relationship and account-management judgment are
+a deliberate, distinctive source of MioPages' service standards. Other Operators
+should benefit from governed guidance and practical contextual workflows rather
+than needing to contribute equivalent deep philosophy or manually administer a
+CRM/task system. The owner approved recommendations alongside each item, optional
+expand-in-place questions/notes, AI preselection with human confirmation and
+natural **Approve selected** grouping where the same approval authority applies.
+An Operator can note a problem with a customer photo, have the system propose a
+replacement request beneath it, and inspect/edit/approve the customer message.
+Protect trust through grounded, natural copy and attention to obvious AI mistakes.
+During early operations, a human examines customer-facing material before it
+is sent for approval or published. AI preselection does not convey approval or
+authorization to send, publish or accept customer facts.
+
+Full operating principles and limits:
+[founder-led customer stewardship and contextual decisions](service-operations-model.md#founder-led-customer-stewardship-and-contextual-decisions).
+This does not authorize new AI API calls, live messages, UI writes or release
+authority. Exercise the flow first in a bounded owner-visible interactive
+review; preserve C0 source integrity and separate production gates.
+
 ## Local Operator overview and C0 account review
 
 The first integrated Operator view groups actionable evidence ahead of the
