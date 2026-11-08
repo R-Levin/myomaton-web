@@ -157,6 +157,8 @@ inbound routing, attachment rules, response workflow and any
 new-message case creation remain design decisions, not already
 operational functionality.
 
+**New inbound email may open a support case (owner-approved, November 8, 2026).** Customers should be able to start an entirely new support request by emailing the supported MioPages address, not only by replying to an existing thread. MioPages automatically creates an appropriate new case, links the identified customer/account when reliable, confirms receipt and routes it to the authorized work queue without manual Operator intake. Apply sender/account verification proportionate to the requested action, spam/abuse safeguards, duplicate/thread detection and safe handling of unknown senders; email alone does not authorize sensitive changes or approvals. Preserve a simple conversational customer experience, with an Operator involved only when triage or resolution requires judgment. Exact mailbox/service integration and case lifecycle remain to be implemented.
+
 ## Expanded Launch
 
 Expanded Launch is a rare exception for materially unusual supported complexity,
