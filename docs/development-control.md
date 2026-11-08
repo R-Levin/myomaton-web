@@ -152,9 +152,13 @@ These are design decisions, not implemented production behavior.
 customer. Its original early-October three-pass discovery was a real
 interview and the approved outcome survives in
 `docs/miopages-c0-business-brief.md`. **Reuse this evidence; do not
-repeat the interview.** No verbatim Q&A survived, so identify it
-truthfully as an approved discovery synthesis, not a fabricated
-transcript or the later Free Review interview.
+repeat the interview.** Historical chat context contains **some recoverable
+original interview questions and responses**, and first-/second-pass
+written syntheses preserve further explicit follow-up questions.
+The complete verbatim transcript remains **unverified**, not proven absent.
+See [C0 question recovery audit](c0-discovery-question-recovery-audit.md).
+Distinguish attributable original Q&A, synthesis follow-up lists, and
+approved discovery conclusions from the separate later Free Review interview.
 
 Run a new, isolated and realistic C0 onboarding/build sequence
 without overwriting the already accepted C0 business state, service-led
