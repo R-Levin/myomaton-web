@@ -100,6 +100,45 @@ delivery proof is not proof of inbound synchronization, protection of edited
 presentation or production publishing. No additional implementation or
 hosted operations are authorized by this documentation alone.
 
+## Appearance and CSS round-trip boundary
+
+**Owner expectation, November 8, 2026; design for a bounded contract,
+not arbitrary lossless WordPress theme synchronization.** The MioPages
+WordPress plugin must participate in visual configuration as well as
+content delivery: Core's approved design specification governs supported
+theme/style choices (type, palette, spacing, layout/breakpoints), theme
+templates and patterns, navigation/header/footer composition, media
+presentation and permissible custom CSS. Prefer native WordPress
+theme.json, Global Styles, block templates and registered settings/
+capabilities where applicable. Theme and Appearance APIs/settings differ
+among classic themes, block themes and third-party plugins, so enumerate
+the supported distribution's concrete interfaces rather than promising
+a universal bridge.
+
+Capture authorized changes in supported WordPress Appearance/Site Editor
+and Gutenberg surfaces as scoped versioned proposals with old/new
+effective values, author/source, Core base revision and affected pages/
+sections/sites. Core reviews and promotes approved revisions to the
+managed site design specification, while later Core releases must preserve
+those accepted refinements. Treat site-wide adjustments differently from
+page-level overrides; detect unmanaged custom CSS, unsupported theme
+options, third-party plugin changes, stylesheet modifications and
+incompatible theme switches as divergence requiring review, not silent
+auto-import or overwrite. Govern editability and release authority
+centrally, enforcing WP-side privileges too. Initial integration is
+limited to a known standardized controlled WordPress distribution;
+external themes/plugins may require explicit adapters or remain
+unsupported. These are desired design boundaries, not implemented
+capabilities.
+
+**New WordPress page/section approval:** An authorized Operator may
+create a page or section in Gutenberg, but plugin capture forms a
+pending structured addition to Core with source provenance. It does not
+become managed canonical site structure or automatically public simply
+because saved in WordPress; Core approval and governed release remain
+required. Exact WP draft/publication guards must be proved in the
+supported distribution.
+
 ## Content ownership and Gutenberg protection
 
 The owner clarified the presentation direction on November 7, 2026. For WordPress
