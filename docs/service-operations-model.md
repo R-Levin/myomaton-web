@@ -391,6 +391,22 @@ continues to be unknown pending an authenticated tenant connection.
 
 **Provisional owner preference, November 8, 2026.** When an authorized Operator identifies several issues on one rendered WordPress page, prefer gathering those observations, annotations and supporting evidence in a **single contextual page-level review** so the Operator can discuss them together and the system can propose coherent resolutions. Keep individual issues distinguishable for ownership, scope, audit and necessary escalations; do not force a separate task for each observation. This grouping is a pragmatic initial workflow choice, **subject to adjustment after using the interface**, not a universal requirement that unrelated or materially different approvals share one decision.
 
+### Customer approval of WordPress-rendered previews
+
+**Owner-approved direction, November 8, 2026.** Customers may inspect the
+**real WordPress-rendered** page or site, including an appropriately secured
+private/staged preview where applicable, but **WordPress is not the customer
+interaction interface**. MioPages owns the customer-facing review and approval
+experience: understandable change context, invitation/identity checks,
+approve/request-changes response, customer correspondence, and audit trail.
+Do not require customers to use WP Admin, Gutenberg, or WordPress accounts
+for ordinary managed-service participation. Bind customer approval to the
+specific immutable managed content/design/page/site revision and preview
+that was actually shown; subsequent WordPress edits must not silently
+inherit earlier approval. A preview link alone conveys no authority to
+approve, publish or bypass release gates. The exact customer feedback
+controls and staging/link-access design remain to be reviewed.
+
 ### Inline approval summary
 
 **Owner-approved interaction, November 8, 2026.** For page approval, present a **brief, contextual summary inline** in the existing visual review workflow, not a separate mandatory approval screen. Summarize which page/site and scoped version are being approved, meaningful changes and any outstanding concerns/required external confirmations. Offer only actions authorized for the authenticated person (e.g. approve, request changes, send for customer approval, or hand off). Allow evidence/decision details to expand on demand; require explicit confirmation for consequential actions and preserve an auditable decision with applicable publication gates. An authorized Superuser should be able to decide here even when viewing a different role perspective; do not imply that approving page content automatically publishes it or bypasses customer authority.
