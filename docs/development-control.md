@@ -126,6 +126,25 @@ See [Core-specified site and WordPress round-trip clarification](wordpress-deliv
 This does not close the pending native-editing ownership/mapping/conflict
 decision or authorize a production write.
 
+## Full-site customer approval and standing-authorization scope
+
+**Owner clarification, November 8, 2026.** Customer launch acceptance
+should normally review the complete actual WP-rendered proposed website
+(navigation, page structure, demonstrable forms, sample blog and key
+layouts) via the simple MioPages customer approval/request-changes
+experience; bind approval to the reviewed site version. After launch,
+do not routinely require page/site customer approvals for normal
+maintenance, technical/conversion refinements or verified minor factual
+changes. Reserve bounded customer review for major/new pages, material
+site sections and consequential changes. Allow explicitly customer-set
+and revocable standing authorizations for named low-risk change types,
+while retaining evidence, testing, privacy, factual confirmation,
+applicable approvals and release safeguards. The exact preference
+categories and existing launch checkpoint alignment remain open.
+Canonical rationale:
+[whole-site launch approval versus ongoing delegated changes](service-operations-model.md#whole-site-launch-approval-versus-ongoing-delegated-changes).
+These are design decisions, not implemented production behavior.
+
 ## Local Operator overview and C0 account review
 
 The first integrated Operator view groups actionable evidence ahead of the
