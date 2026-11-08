@@ -25,6 +25,34 @@ Use the existing MioPages business as the customer. Preserve all accepted histor
 5. **Review the complete proposed site as the customer.** Include meaningful navigation, key pages, responsive behavior, media/provenance, a representative blog post and safely demonstrable form behavior. In MioPages (not WP Admin), present simple Approve / Request Changes with comments tied to a specific actual rendered preview/version. Follow the approval/checkpoint rules; avoid isolated per-page signoffs as default.
 6. **Prove readiness and handoff without a surprise production release.** Show exception-first readiness and a readily available complete report; distinguish Ready for Customer Review, Customer Approved, Ready for Launch and verified Live. Stage launch sequencing/communications as a rehearsal; real DNS, public publication, mail delivery, domain cutover, production contact handling or activation require their separate actual approvals and verified operational gates. Test the beginning of Ongoing: communications, baseline reporting, simple change request, prioritization and authorized follow-up.
 
+## First development milestone: full becoming-a-customer questionnaire
+
+**Owner-updated priority, November 8, 2026; supersedes the narrower
+interview-summary-only first slice below.** The first experience
+to build and test is the real **Start with MioPages → fit/scope →
+verified commercial commitment → complete progressive paid-onboarding
+questionnaire** flow. This is the full “I'm becoming a client”
+journey, not a standalone form and not another static interview
+timeline. Reuse the existing foundational-intake v2 and the
+authentic first C0 discovery evidence; verify recoverable original
+questions/answers before prefill, distinguish synthesis from
+verbatim source and ask only significant missing facts. The new
+paid questionnaire must be conditional, versioned/resumable, linked
+to source and ownership and have a clear customer/Operator
+handoff into confirmation of business understanding. The currently
+unresolved commercial/payment gate can only be exercised as an
+explicit **rehearsal surrogate**, never represented as paid/verified
+production activation.
+
+Use [the detailed questionnaire and customer-journey specification](commercial-v1-full-onboarding-questionnaire.md)
+for provisional customer-facing questions, branches, records, UI
+principles, acceptance checks and the first implementation task.
+Once the full interview/resume is genuinely working, proceed with
+Checkpoint 1 knowledge confirmation and Presence Direction,
+then initial Core-to-WordPress site creation as the immediately
+following integration goal. The historical read-only console
+remains a reference, not the product workflow under test.
+
 ## Implementation approach and first bounded coding slice
 
 **Do not attempt all six stages in a single blind implementation change.** Begin by inspecting the current branch, runtime and accepted documents. The first deliverable is an interactive, isolated **C0 onboarding resume** path in the existing customer/Operator architecture, not another static C0 timeline:
