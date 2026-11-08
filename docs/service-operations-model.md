@@ -149,6 +149,23 @@ approve content, promise outcomes or perform sensitive customer/account
 actions. Exception-driven routing and verified customer authority remain in
 force. Exact categories and implementation are deferred.
 
+### Concise account next-action recommendations
+
+**Owner-approved direction, November 8, 2026.** Within the brief
+account overview, MioPages should suggest the most useful next action
+when trustworthy customer, operational or performance evidence supports
+one. Keep the everyday presentation **short and streamlined**: what
+merits attention, the recommended action, and a concise reason or
+impact. Make supporting evidence, uncertainty, rationale, dependencies
+and alternative actions available on demand rather than exposing them
+all by default. Recommendations should align with the Operator's actual
+permissions, role perspective and open work, and allow an appropriate
+in-context decision or handoff. Do not manufacture activities or
+content changes to populate a recommendation list; a healthy account
+may legitimately have no immediate action. Avoid redundant to-do items,
+unnecessary summaries and repeated confirmations. The exact ranking
+and interface behavior remain implementation decisions.
+
 ### Proactive customer account briefing
 
 **Owner-approved direction, November 8, 2026.** When an authorized
