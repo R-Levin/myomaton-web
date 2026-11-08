@@ -185,6 +185,8 @@ rollback while unexpected divergence cannot silently become approved
 Core state or be silently overwritten. At ~100 installations, event
 capture plus scheduled verification should remain efficient.
 
+**Automatic capture, no Operator bookkeeping (owner clarification, November 8, 2026).** Authorized WordPress customizations, including supported custom CSS and Appearance changes, should be observed and recorded by the plugin **without an Operator manually reporting or registering them**. Prefer scoped hooks/events with stable source identity, before/after values or hashes, actor when attributable, timestamps, affected surfaces and revision lineage; supplement with scheduled configuration reconciliation to discover missed or out-of-band changes. Recording is not the same as approving a business claim, accepting a design revision into the canonical specification, or authorizing publication. Preserve legitimate local work during pending review where safe; if a customization is unsupported or cannot be preserved confidently across release/rollback, clearly flag the exception and recommend a bounded resolution. Do not promise universal observation of arbitrary direct file/database or third-party changes. Keep routine collection invisible to Operators and surface only actionable exceptions.
+
 ## Content ownership and Gutenberg protection
 
 The owner clarified the presentation direction on November 7, 2026. For WordPress
