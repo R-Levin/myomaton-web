@@ -499,6 +499,34 @@ permissions server-side rather than trusting a UI role selector.
 
 **Owner preference, November 8, 2026; pending implementation.** Operators reviewing a WordPress-delivered site should work against the **actual WordPress-rendered page** with MioPages context/recommendations available in a collapsible side panel when technically practical, so the page can be viewed unobstructed. Do not require an embedded WordPress frame or a single-tab interface. Operators will commonly use separate Core, WordPress frontend and authorized WP Admin/Gutenberg browser tabs/windows. Provide clear, securely scoped links between the matching customer, site, page/section and relevant review item, using stable identities and resumable context; avoid fragile reliance on window state or tab coordination. Preserve unsent notes and guard against conflicting concurrent updates by checking revisions. Keep actual editing and governed approval boundaries clear: the panel is a review aid, not a second page builder. Confirm implementation feasibility and browser restrictions before choosing embedded rendering versus linked tabs.
 
+### Distinct customer-review and launch-readiness milestones
+
+**Owner-approved distinction, November 8, 2026.** Distinguish a site that
+is ready for *customer review* from one ready for *production launch*.
+Use clear, consistent labels and per-stage plain-language explanations;
+avoid ambiguous shorthand such as "ready to go live." Recommended
+working milestone labels and meanings:
+
+1. **Ready for Customer Review:** complete proposed site/version and
+   secured working WordPress-rendered preview, with the relevant
+   pre-review checks satisfied. This is not publication authorization.
+2. **Customer Approved:** the customer accepted the **specific version**
+   and review scope shown, with evidence of the decision. It does not
+   attest to final production setup or remove independent launch gates.
+3. **Ready for Launch:** required operational configuration, production
+   checks, and applicable release authorizations are satisfied; DNS,
+   TLS, live contact delivery, rollback/recovery and other requirements
+   must be verified as applicable. Never call untested checks passed.
+4. **Live:** the approved release is publicly deployed and post-deploy
+   operational checks verify its actual functioning. A publish command
+   alone does not prove this state.
+
+Show remaining blockers/next action at each milestone. Distinguish
+customer-facing words from Operator detail where helpful, but preserve
+the same underlying state semantics. The exact machine-state mapping
+and customer copy require implementation review. Do not assume that
+readiness alone constitutes permission to publish.
+
 ### Launch readiness summary with expandable full evidence
 
 **Owner-approved review preference, November 8, 2026.** Before an
