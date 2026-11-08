@@ -219,8 +219,10 @@ console. Synthetic proposal evidence is under **Development evidence** on the
 overview, outside the C0 journey.
 
 The approved October 6 [business brief](miopages-c0-business-brief.md) is the
-retained synthesis of the original discovery. The verbatim original interview
-was unavailable. The journey presents the exact C0 Business Knowledge and
+retained synthesis of the original discovery. The console did not load a complete
+verbatim original interview; some October 5–6 prompt/answer fragments are
+recoverable separately (see [question audit](c0-discovery-question-recovery-audit.md)).
+The journey presents the exact C0 Business Knowledge and
 Offering revisions used in the October 8 [four-page milestone](miopages-canonical-promotion.md),
 its proposed site structure, accepted design, scoped content previews and
 retained visual captures when their bytes match. The later C0 revamp is a
