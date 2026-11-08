@@ -149,6 +149,23 @@ approve content, promise outcomes or perform sensitive customer/account
 actions. Exception-driven routing and verified customer authority remain in
 force. Exact categories and implementation are deferred.
 
+### Operator access to customer communication history
+
+**Owner preference, November 8, 2026.** Authorized Operators
+should be able to access the relevant customer communication history
+from the account context across support, content requests, factual
+changes, approvals and other interactions, regardless of origin
+channel. Default to a useful AI-assisted summary that can be refined,
+scoped or queried as needed; provide search/filtering and access to
+the underlying original correspondence and decision provenance when
+necessary. Do not require a separate rigid "complete history"
+screen or assume every Operator needs every conversation. Enforce
+customer/tenant, role, confidentiality and purpose-based access
+controls, with a visible distinction between source messages,
+recorded decisions and AI interpretation. Exact summary defaults,
+search/retrieval interaction, taxonomy and record model remain
+subject to testing rather than fixed prematurely.
+
 ### Customer communication as parent capability
 
 **Owner-approved distinction, November 8, 2026.** Treat ongoing
