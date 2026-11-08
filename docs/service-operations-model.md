@@ -499,6 +499,26 @@ permissions server-side rather than trusting a UI role selector.
 
 **Owner preference, November 8, 2026; pending implementation.** Operators reviewing a WordPress-delivered site should work against the **actual WordPress-rendered page** with MioPages context/recommendations available in a collapsible side panel when technically practical, so the page can be viewed unobstructed. Do not require an embedded WordPress frame or a single-tab interface. Operators will commonly use separate Core, WordPress frontend and authorized WP Admin/Gutenberg browser tabs/windows. Provide clear, securely scoped links between the matching customer, site, page/section and relevant review item, using stable identities and resumable context; avoid fragile reliance on window state or tab coordination. Preserve unsent notes and guard against conflicting concurrent updates by checking revisions. Keep actual editing and governed approval boundaries clear: the panel is a review aid, not a second page builder. Confirm implementation feasibility and browser restrictions before choosing embedded rendering versus linked tabs.
 
+### Launch readiness summary with expandable full evidence
+
+**Owner-approved review preference, November 8, 2026.** Before an
+initial complete WordPress-rendered site is sent for customer approval,
+MioPages should run a consolidated launch-readiness review spanning
+navigation, forms and verified submission/routing, responsive rendering,
+content and factual support, media eligibility/rights, SEO/metadata,
+accessibility/security where applicable, and unresolved decisions.
+Use an **exception-first Operator summary** highlighting actionable
+problems, gating blockers and decisions, not a mandatory long checklist.
+The **full readiness report** must always be easily accessible (e.g.,
+one click) with every check, result, evidence/source, timestamp and
+limits. Distinguish verified pass, verified failure/needs attention,
+not tested/unknown, and not applicable; don't report untested items as
+passed. Link issues to appropriate page/section/role and preserve the
+version/release tested. Automated checks should handle what can be
+verified reliably, but meaningful visual and contextual review still
+requires the correct human judgment. The exact tests, launch gates and
+UX remain implementation tasks, not claims about current coverage.
+
 ### Exception-driven attention queue
 
 **Approved direction, November 7, 2026.** Internal customer account review extends
