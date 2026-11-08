@@ -139,6 +139,52 @@ because saved in WordPress; Core approval and governed release remain
 required. Exact WP draft/publication guards must be proved in the
 supported distribution.
 
+## Observed WordPress reality and configuration reconciliation
+
+**Owner-approved direction, November 8, 2026; detailed implementation pending.**
+For the controlled standardized WordPress distribution, Core must retain enough
+information to account for the *actual* WordPress site, even when Core cannot
+independently reproduce every visual setting or WordPress rendering behavior.
+Do not conflate "Core specification is known" with "live WP output is verified."
+Core remains authoritative over supported site design/content and approved
+releases, while WordPress is the real rendered surface reviewed by Operators.
+
+Build the plugin around a versioned **observed configuration manifest** per
+installation/site, with stable identifiers and timestamps for the active
+theme and relevant versions, managed plugins/versions, theme/global style
+configuration and supported appearance settings, page/section/template/
+navigation identities, relevant CSS and customization references, release
+identity and source/version/provenance. The manifest should distinguish
+canonical Core-managed structured settings from locally observed state.
+Capture supported changes through scoped events/versioned proposals and
+periodic reconciliation to catch unsupported or missed mutations. Record
+what changed, where, when, by whom if attributable, previous/observed
+versions and whether the change has been approved and incorporated into Core.
+When an edit cannot be understood as structured Core design, preserve a
+bounded auditable record and its preservation/conflict rule rather than
+pretending to round-trip its rendering semantics. Define safe storage,
+access, and retention for potentially sensitive configuration data.
+
+Show simple operational states (at least **verified in sync**,
+**known change awaiting review**, **unmanaged/unsupported difference**,
+and an explicit **unknown/not recently verified** state). A status reflects
+the last successful observed comparison, not perfect visual fidelity.
+Visual acceptance must use WordPress frontend pages and, when justified,
+responsive/browser captures and human review. A verified manifest or
+checksum alone does not prove the design renders correctly. Discrepancy
+classification should generate work only when meaningful and avoid
+operator-facing noise.
+
+Do not claim to detect arbitrary changes made outside the supported
+surface with perfect accuracy. Prefer a known, versioned block theme
+and controlled plugin footprint initially; identify the minimum verified
+WP APIs, hooks, setting snapshots, permission boundaries and hash/drift
+checks for Commercial V1. Define a tested merge/preservation contract
+so that legitimate accepted local refinements survive Core updates and
+rollback while unexpected divergence cannot silently become approved
+Core state or be silently overwritten. At ~100 installations, event
+capture plus scheduled verification should remain efficient.
+
 ## Content ownership and Gutenberg protection
 
 The owner clarified the presentation direction on November 7, 2026. For WordPress
