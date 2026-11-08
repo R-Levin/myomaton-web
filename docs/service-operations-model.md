@@ -391,6 +391,58 @@ continues to be unknown pending an authenticated tenant connection.
 
 **Provisional owner preference, November 8, 2026.** When an authorized Operator identifies several issues on one rendered WordPress page, prefer gathering those observations, annotations and supporting evidence in a **single contextual page-level review** so the Operator can discuss them together and the system can propose coherent resolutions. Keep individual issues distinguishable for ownership, scope, audit and necessary escalations; do not force a separate task for each observation. This grouping is a pragmatic initial workflow choice, **subject to adjustment after using the interface**, not a universal requirement that unrelated or materially different approvals share one decision.
 
+### Whole-site launch approval versus ongoing delegated changes
+
+**Owner-approved workflow direction, November 8, 2026; exact launch gates and
+customer preference UX remain to be specified.** Initial customer acceptance
+should normally be a **single comprehensible review of the proposed complete
+WordPress-rendered site**, not a stream of unrelated individual page
+approvals. Show real page/navigation structure, header/footer, representative
+article/blog presentation, forms and other meaningful features, including
+responsive behavior. Preview interactions such as forms must be honestly
+demonstrable and tested, without accidentally sending live leads or
+misrepresenting production integration. The MioPages customer interface
+offers simple **Approve** / **Request Changes** and comments while the
+customer may inspect a secured WordPress-rendered preview. Approval is
+tied to the exact reviewed site/release revision and scope; operational
+readiness, correctness, security and publication authority remain separate
+gates even where the customer makes one overall decision.
+
+After launch, **routine maintenance and evidence-driven optimization
+should not normally reopen page/site-level customer approvals**. Reserve
+targeted page-level or broader site-level review for material changes
+(e.g., a new page, a substantial multipage/section expansion, significant
+presentation or positioning changes); introducing an ordinary block
+within an existing page may be reviewed contextually when material, not
+treated as a new whole-site acceptance by default. Align approval
+scope and effort with the actual risk/impact rather than with each
+technical block edit.
+
+Allow the customer to establish and later change **scoped standing
+authorization preferences** for well-defined classes of changes, such
+as low-risk performance/form usability improvements, verified contact
+detail updates, and routine publishing/editorial workflows. Core stores
+the customer-granted scope, version, source, actor, timing, exceptions
+and revocation, applies it in recommendation/release decisions, and
+provides a plain-language customer-facing way to understand it. Do
+not infer blanket permission from a toggle. Contact numbers and other
+business facts still require appropriate source/ownership verification;
+form changes must respect consent/privacy, routing, conversion testing
+and lead integrity; material claims, external commitments, new offerings,
+major redesign and consequential publication remain governed by the
+relevant customer/Operator approvals. Customer preferences cannot
+override legal, contractual, security or release safeguards.
+
+**Operational UX:** Most post-launch changes should be tested, recorded
+and handled by authorized Operators/Core under these defined rules
+without creating customer inbox noise. When a change falls outside
+standing authority, summarize the exceptional decision with a focused
+preview and comments. The canonical audit trail differentiates standing
+authority, validated fact changes, actual release approval and customer
+sign-off. This direction must be reconciled with existing staged
+onboarding and approval checkpoints; it does not authorize bypassing
+them or claim the current portal implements these functions.
+
 ### Customer approval of WordPress-rendered previews
 
 **Owner-approved direction, November 8, 2026.** Customers may inspect the
