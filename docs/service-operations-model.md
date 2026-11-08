@@ -149,6 +149,26 @@ approve content, promise outcomes or perform sensitive customer/account
 actions. Exception-driven routing and verified customer authority remain in
 force. Exact categories and implementation are deferred.
 
+### Proactive customer account briefing
+
+**Owner-approved direction, November 8, 2026.** When an authorized
+Operator opens a customer account, show a short, contextual briefing
+of meaningful recent developments and any genuinely actionable items:
+new customer requests, unresolved concerns, approval or escalation
+needs, changing business goals/priorities, significant service or site
+events and due follow-ups. Do not require the Operator to search all
+correspondence before understanding the account. Use relevant
+communication, knowledge, work and service-event history to assemble
+a clear, source-grounded summary with links to supporting evidence
+and the appropriate current work items. Distinguish confirmed
+information from AI interpretation or uncertain signals. Prioritize
+by the authenticated Operator's responsibility, permissions and
+current task. Healthy accounts should remain quiet; do not invent
+activity, replay completed tasks or add summary/status chores.
+Provide on-demand access to fuller context and let Operators refine
+what the briefing covers. Exact triggers, time horizon, salience
+ranking and interface remain to be designed and tested.
+
 ### Operator access to customer communication history
 
 **Owner preference, November 8, 2026.** Authorized Operators
