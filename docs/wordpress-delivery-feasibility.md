@@ -54,6 +54,52 @@ This is an architectural **gap analysis**, not a complete code-level inventory. 
 
 **Security qualification:** A WordPress server owner/administrator with code or DB access can bypass UI-based locks; for such sites, the platform must enforce authorizations centrally, detect unsupported mutations or drift, and avoid claiming physical impossibility of tampering.
 
+## Core-specified site and WordPress round-trip clarification
+
+**Owner's intended architecture clarified November 8, 2026; detailed
+synchronization contract and Commercial V1 inbound editing scope remain
+pending.** Core defines and retains the authoritative managed site blueprint,
+including page/section structure, navigation, initial theme/design choices,
+typography, layout/spacing intent, content, media placements and relevant
+metadata. The WordPress plugin should materialize the approved initial release
+as native WordPress pages, blocks, templates and media/presentation structures
+for frontend rendering and authorized Gutenberg refinement. This does **not**
+mean building a second visual page builder in Core, nor leaving WordPress as
+the independent source of business truth.
+
+After an authorized Operator reviews and edits the actual WordPress site,
+the plugin should capture supported changes with stable Core/WP identity,
+source revision and scope, including intentional presentation refinements,
+and return them as structured inbound proposed changes. Core reconciles and
+governs these edits, preserving authorized refinements across later managed
+updates/rollbacks and rejecting or flagging drift/conflicts. Core records
+the approved evolving structure/content/design decisions for ongoing
+measurement, review and improvement; not every incidental internal WP
+implementation detail needs its own canonical domain field. No direct
+WP save is automatically a Core approval or publication mandate.
+
+New pages/sections may originate from a Core-generated proposal or from
+authorized WordPress editing, provided the plugin can express the result
+through a supported canonical Page/Section proposal and the relevant
+review/release authorities. A WordPress-only page must not silently become
+authoritative managed structure. Exact edit vocabulary, identity mapping,
+conflict policy, visual-configuration preservation and when/how drafts appear
+publicly are still to be specified and proved. Arbitrary Gutenberg HTML,
+plugins and theme customizations cannot be assumed to round-trip losslessly.
+
+For ordinary blog/articles, the owner still prefers a constrained, consistent
+WordPress editorial experience (a principal article body/design area,
+featured image and necessary title/SEO/editorial metadata), rather than
+rebuilding each post with arbitrary layouts. Core remains responsible for
+governed article information, provenance, optimization and release history.
+Specific blog template/editor limits remain open for practical testing.
+
+This clarification further specifies, rather than replaces, the existing
+commitment to Gutenberg for visual execution. The closed private signed
+delivery proof is not proof of inbound synchronization, protection of edited
+presentation or production publishing. No additional implementation or
+hosted operations are authorized by this documentation alone.
+
 ## Content ownership and Gutenberg protection
 
 The owner clarified the presentation direction on November 7, 2026. For WordPress
