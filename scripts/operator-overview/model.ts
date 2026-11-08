@@ -1,5 +1,6 @@
 import { normalizeAction, sectionActionId, type Action } from "../../lib/platform/actions/model";
 import { normalizeBinding, projectContent } from "../../lib/platform/canonical/projections";
+import { normalizeKnowledge, normalizeOffering } from "../../lib/platform/canonical/model";
 import type { CustomerState } from "../../lib/platform/customer-initialization";
 import { customerGraph, type CustomerTarget } from "../../lib/platform/customer-state";
 import { resolveDesignConfiguration } from "../../lib/platform/design-systems/configuration";
@@ -35,6 +36,9 @@ export function snapshotAccount(state: CustomerState, target: CustomerTarget) {
   const nextReview = visualNeeds.find(need => need.role === "evidence-project" && need.importance === "important");
   const activeAssets = graph.assets.filter(row => row.status === "active");
   const promotion = record(record(site.metadata).promotion);
+  const knowledge = graph.business_knowledge.map(row => ({ version: Number(row.version), ...normalizeKnowledge(row.payload) }));
+  const offerings = graph.offerings.filter(row => row.status === "active")
+    .map(row => ({ name: String(row.name), version: Number(row.version), ...normalizeOffering(row.payload) }));
 
   function preview(pageId: string): ManagedSitePage | null {
     const page = pages.find(row => row.id === pageId);
@@ -82,7 +86,8 @@ export function snapshotAccount(state: CustomerState, target: CustomerTarget) {
 
   return { id: target.webPresenceId, organization: String(organization.name), name: String(presence.name),
     domain: String(presence.primary_domain), site: String(site.name), presenceStatus: String(presence.status),
-    pages, visualNeeds, nextReview, activeAssets, publicationAuthorized: promotion.publicationAuthorized === true, preview };
+    pages, visualNeeds, nextReview, activeAssets, knowledge, offerings, websiteReviewedAt: String(promotion.at),
+    publicationAuthorized: promotion.publicationAuthorized === true, preview };
 }
 
 export type SnapshotAccount = ReturnType<typeof snapshotAccount>;

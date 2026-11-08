@@ -9,6 +9,7 @@ import reviewed from "../scripts/customer-updates/miopages-focus-reviewed.json";
 import { accountPath, previewPath, snapshotAccount } from "../scripts/operator-overview/model";
 import { evidencePath, exactPreviewPath, loadProposalEvidence, verifyProposalEvidence } from "../scripts/operator-overview/proposal-evidence";
 import { overview } from "../scripts/operator-overview/views";
+import { loadC0Review } from "../scripts/operator-overview/c0-review";
 import { fingerprint } from "../lib/platform/canonical/model";
 
 test("the account projection refuses unrelated ownership and keeps quiet accounts out of attention", () => {
@@ -18,6 +19,8 @@ test("the account projection refuses unrelated ownership and keeps quiet account
   assert.equal(account.pages.length, 4);
   assert.equal(account.preview("12345678-1234-1234-1234-123456789abc"), null);
   assert.equal(account.nextReview?.pageName, "Experience");
+  assert.equal(account.knowledge[0].version, 1);
+  assert.equal(account.offerings[0].components.length, 3);
   assert.throws(() => snapshotAccount(graph, { ...reviewed.target, organizationId: "foreign-org" }), /ownership/);
   const doc = new JSDOM(overview([{ ...account, nextReview: undefined }])).window.document;
   assert.equal(doc.querySelector(".op-alert"), null);
@@ -42,21 +45,26 @@ test("the loopback overview leads to scoped account evidence and the existing v3
     const start = await document("/");
     const presencePath = accountPath(reviewed.target.webPresenceId);
     assert.equal(start.querySelector(".op-alert a")?.getAttribute("href"), presencePath);
-    assert.match(start.querySelector(".op-identity summary")!.textContent!, /Simulated.*MioPages owner.*Active role: Content Reviewer/);
-    assert.match(start.querySelector(".op-identity")!.textContent!, /Sign-in and permissions are unavailable/);
+    assert.equal(start.querySelector(".op-identity"), null);
     assert.equal(start.querySelectorAll(".op-alert").length, 1);
     const account = await document(presencePath);
-    assert.match(account.body.textContent!, /Pending approval status is unknown/);
+    assert.deepEqual([...account.querySelectorAll('.op-steps a')].map(link => link.getAttribute('href')), ["#interview", "#knowledge", "#website", "#review", "#next-action"]);
+    assert.match(account.body.textContent!, /original interview transcript and verbatim answers were unavailable/);
+    assert.match(account.body.textContent!, /An exact C0 page proposal and approval trail is unavailable/);
+    assert.match(account.body.textContent!, /Business Knowledge revision 1/);
     assert.match(account.body.textContent!, /no publication authorization/);
     const next = account.querySelector(".op-alert a")!.getAttribute("href")!;
     assert.match((await document(next)).querySelector("title")!.textContent!, /Experience preview/);
     const evidence = await loadProposalEvidence();
     assert.ok(evidence);
-    const samplePath = account.querySelector('a[href^="/accounts/"][href$="' + evidence.latest.scope.webPresenceId + '"]')?.getAttribute("href");
-    assert.equal(samplePath, evidencePath(evidence));
-    const proposal = await document(samplePath!);
+    const samplePath = evidencePath(evidence);
+    assert.equal(account.querySelector(`a[href="${samplePath}"]`), null);
+    assert.equal(account.querySelector('a[href="/development-evidence"]'), null);
+    const developmentPath = start.querySelector('a[href="/development-evidence"]')!.getAttribute("href")!;
+    const proposal = await document(developmentPath);
     assert.match(proposal.querySelector("h1")!.textContent!, /Proposal evidence/);
     assert.match(proposal.body.textContent!, /Synthetic example/);
+    assert.match(proposal.querySelector(".op-identity summary")!.textContent!, /Simulated.*MioPages owner.*Active role: Content Reviewer/);
     assert.equal(proposal.querySelectorAll(".op-revisions > li").length, evidence.revisions.length);
     for (const { revision, preview } of evidence.revisions) {
       const path = exactPreviewPath(evidence, revision.binding.revision);
@@ -65,7 +73,7 @@ test("the loopback overview leads to scoped account evidence and the existing v3
         assert.equal(response.status, 200);
         assert.equal(fingerprint(await response.text()), preview.digest);
       } else assert.equal(response.status, 404);
-      assert.equal((await fetch(base + path.replace(samplePath!, presencePath))).status, 404);
+      assert.equal((await fetch(base + path.replace(samplePath, presencePath))).status, 404);
     }
     assert.equal((await fetch(base + samplePath, { method: "POST" })).status, 405);
     for (const page of reviewed.after.pages) {
@@ -74,6 +82,8 @@ test("the loopback overview leads to scoped account evidence and the existing v3
       assert.ok(focus);
       assert.equal(focus.querySelectorAll("main > section").length, reviewed.after.sections.filter(section => section.page_id === page.id).length);
       assert.equal(preview.querySelectorAll("script,form,iframe").length, 0);
+      assert.equal(preview.querySelector('.op-preview a')?.getAttribute('href'), `${presencePath}#website`);
+      assert.equal(preview.querySelectorAll('a[target="_blank"]').length, 0);
     }
     assert.equal((await fetch(base + presencePath, { method: "POST" })).status, 405);
     for (const path of ["/accounts/foreign", `${presencePath}/pages/foreign`, "/.env.local", "/?site=foreign"]) {
@@ -83,6 +93,8 @@ test("the loopback overview leads to scoped account evidence and the existing v3
       get(base, { headers: { Host: "foreign.test" } }, response => { response.resume(); resolve(response.statusCode); }).on("error", reject);
     });
     assert.equal(foreignHost, 403);
+    assert.equal((await fetch(base + presencePath, { headers: { "Sec-Fetch-Site": "cross-site", "Sec-Fetch-Mode": "cors" } })).status, 403);
+    assert.equal(await loadC0Review({ webPresenceId: "foreign", managedSiteId: reviewed.target.managedSiteId }), null);
   } finally {
     await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
   }

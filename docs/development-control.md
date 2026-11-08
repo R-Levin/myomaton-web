@@ -62,8 +62,8 @@ discovery proof and avoiding stock where unsuitable for the C0 brand.
 
 The governing detail, rationale, limits and implementation sequence are in
 [human-centered work orchestration and active-role context](service-operations-model.md#human-centered-work-orchestration-and-active-role-context).
-The current C0 console is local, unauthenticated and read-only. Its identity
-and active-role panel is explicitly simulated. Real role switching, live
+The current C0 console is local, unauthenticated and read-only. The development
+evidence identity and active-role panel is explicitly simulated. Real role switching, live
 queues, AI triage and reassignment remain pending. No production deployment,
 API expenditure or protected action is authorized by this document.
 
@@ -78,22 +78,59 @@ visual needs stay in the account detail. This is a display rule for the local
 review, not a new persisted task, escalation or approval workflow.
 
 From the repository root, run `node --import tsx scripts/operator-overview.ts`
-and open `http://127.0.0.1:4317/`. Follow **Open account review** and then
-**Preview Experience**. All four snapshot pages can be inspected. The preview
+and open `http://127.0.0.1:4317/`. Follow **Open MioPages journey → Next action →
+Preview Experience**. All four snapshot pages can be inspected. The preview
 uses reviewed copy, canonical source projections and design tokens. Asset
 delivery and visitor interactions are outside its scope. Content proposal,
 release, activity and monitoring records are outside this snapshot, so the
 view makes no claim about current health, pending approvals or live delivery.
 The script has no database connection or mutation routes.
 
-All 387 repository tests, TypeScript and targeted lint passed. Focused checks
+At the initial checkpoint, all 387 repository tests, TypeScript and targeted lint passed. Focused checks
 verified account ownership, quiet-account rendering, four scoped v3 previews,
 method refusal and host checks. Chrome followed overview → account → Experience
 → Home at desktop and mobile widths.
 
+### C0 journey and retained human Review
+
+The owner found the initial Operator direction encouraging and the mixture of
+C0 and an unrelated synthetic proposal confusing. The primary account journey
+now follows Interview → Confirmed business knowledge → Website content and
+design → Operator review → Next action. Links keep ordinary review inside the
+console. Synthetic proposal evidence and the simulated identity panel are under
+**Development evidence** on the overview, outside the C0 journey.
+
+The approved October 6 [business brief](miopages-c0-business-brief.md) is the
+retained synthesis of the original discovery. The verbatim original interview
+was unavailable. The journey presents the exact C0 Business Knowledge and
+Offering revisions used in the October 8 [four-page milestone](miopages-canonical-promotion.md),
+its proposed site structure, accepted design, scoped content previews and
+retained visual captures when their bytes match. The later C0 revamp is a
+separate milestone. An exact C0 website proposal and approval ledger is
+unavailable in this snapshot. Publication remains outside this review.
+
+The separate October 14 human Free Review intake supplies four selected
+business answers with contact fields omitted. The console reuses the existing
+development-only Review store to validate the C0 owner, retained evidence and
+revision/event chain before showing the approved October 19 revision 3 text
+and its history. Approval concerns that undelivered [Free Review](free-review-synthesis.md),
+not the website design or a release. Raw human files stay local and Git-ignored.
+If that evidence is unavailable, the view shows the documented status and
+identifies which details could not be loaded.
+
+To include the retained human evidence, launch the local console with
+`NODE_ENV=development` and `MIOPAGES_REVIEW_SYNTHESIS=local-operator`. The
+normal local entry remains `http://127.0.0.1:4317/`. All 388 repository tests,
+TypeScript and targeted lint passed. Chrome verified the full journey at 1440
+and 390 px, including all four accepted captures, the retained Review, and
+same-tab navigation. The Experience decision
+asks what past work MioPages can substantiate and has permission to show.
+The next practical review is to select one permission-cleared project or keep
+the page text-led. Any exact page proposal uses the existing approval path.
+
 ### Proposal evidence and simulated active-role context
 
-The C0 account now links to a separately scoped synthetic proposal walkthrough.
+The earlier C0 account linked to a separately scoped synthetic proposal walkthrough.
 The console replays the retained disposable PostgreSQL proposal history when
 that exact known artifact is available. Three revisions are listed. Revisions
 2 and 3 have exact recorded previews and approval events. Revision 1 has no
