@@ -128,6 +128,35 @@ reply capture, verified decision collection, notification preferences,
 templates and provider integration are implementation decisions,
 not capabilities already delivered.
 
+### Email-to-case support continuity
+
+**Owner-approved direction, November 8, 2026.** Customer support
+should work as a normal **two-way email conversation** with an
+automatically maintained case/discussion in MioPages Core.
+HostShop was cited as a serviceable reference for the expected
+email-to-ticket experience, not as a mandated integration.
+Customers can reply to a service email without being forced into
+a portal; MioPages should thread replies by durable case identity
+and verified account/context where possible, preserve relevant
+messages/attachments and delivery state, and show the case to
+authorized Operators in their existing prioritized work queues.
+Use bounded AI triage, summaries, reply drafts and routing where
+helpful, with human decision authority when needed. Keep replies
+customer-friendly rather than exposing internal case mechanics.
+
+Define unambiguous threading/identity safeguards for forwarded
+mail, changed subject lines, multiple simultaneous issues and
+unrecognized senders. Recording a reply or recognizing a known
+email address does not by itself authorize sensitive account
+actions, publication or formal customer approval. Avoid duplicate
+manual status entry; preserve privacy, spam/abuse controls, access
+scope, retention and operator escalation/handoff records.
+Implement a focused support-conversation capability, not an
+unnecessary standalone CRM/help-desk clone. Provider choice,
+inbound routing, attachment rules, response workflow and any
+new-message case creation remain design decisions, not already
+operational functionality.
+
 ## Expanded Launch
 
 Expanded Launch is a rare exception for materially unusual supported complexity,
