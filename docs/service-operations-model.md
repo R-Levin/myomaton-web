@@ -149,6 +149,55 @@ approve content, promise outcomes or perform sensitive customer/account
 actions. Exception-driven routing and verified customer authority remain in
 force. Exact categories and implementation are deferred.
 
+### Sustainable request flow, aging and service expectations
+
+**Owner-approved direction, November 8, 2026.** Design ongoing work as a
+**manageable, garden-hose flow rather than an unbounded fire hose** for a
+shared, economically sustainable managed service. A customer is buying
+managed Web Presence outcomes, **not a dedicated on-demand account manager**.
+During onboarding, the customer agreement and explanatory collateral should
+establish plain-language scope, normal communication channels, reasonable
+response/handling expectations, how priorities are chosen and what kinds
+of unusually intensive requests need separate discussion. Avoid suggesting
+24/7 personal account coverage, unlimited immediate changes or rigid
+published request-count limits. Do not accidentally turn planning
+effort estimates into contractual SLAs.
+
+**Queue behavior:** Automatically notice requests that are unreasonably
+old for their type, actual commitments and waiting state, recommending
+focused follow-up or escalation instead of relying on Operators to
+manually track age. Use evidence of urgency/customer impact, safety,
+service commitments, elapsed actionable time and effort to prioritize
+a bounded active work set. Batch related ordinary changes, respond
+with appropriate acknowledgement/status and avoid both noisy
+Operator notifications and repeated customer approval steps.
+Distinguish an unresolved customer request from work intentionally
+queued, awaiting customer input, completed or formally handed off.
+
+**Excessive request volume vs abuse:** Monitor aggregate incoming
+request volume, complexity and consumption of Operator/AI resources
+to detect unsustainable patterns. A customer asking for many
+legitimate changes is not automatically an abuser. First clarify,
+consolidate, stage and prioritize work against the agreed normal
+service scope, with a courteous explanation of timing and options.
+Where requests are genuinely outside scope, materially atypical
+or recurring at an unsustainable level, recommend an Operator-led
+discussion of reprioritization, separate scoped work or service
+fit before committing resources; don't surprise customers with
+automatic fees or arbitrary refusal of ordinary included work.
+Treat actual harassment, spam, exploitation and security incidents
+through separate authorized abuse/safety measures, with an evidence
+trail and proportionate escalation. Do not silently de-prioritize
+requests based on unsupported AI judgments about customer character.
+
+**Implementation boundary:** Default to automatic trend awareness
+and actionable exceptions, not customer policing or a noisy quota
+dashboard. Precise thresholds, capacity models, customer language,
+service terms and abuse-handling authority remain to be validated
+against real workload and agreed commercial terms. Record necessary
+timing and effort signals as ordinary work events without separate
+Operator bookkeeping.
+
 ### Concise account next-action recommendations
 
 **Age-aware work prioritization (owner-approved, November 8, 2026).** Prioritize meaningful work using expected customer benefit, urgency, effort, risk, commitments and **elapsed time since a customer request or issue was raised**. Consider age as an explicit signal so older customer needs are not perpetually displaced by newer recommendations. Age should not mechanically trump safety-critical incidents, firm deadlines, consequential approvals, service commitments or higher-impact needs; use reasonable escalation/aging thresholds and explain exceptions briefly when relevant. Distinguish waiting on customer/third party, actively progressing, handed off, and actionable but unattended work to avoid misleading overdue status. Continue to minimize noise, manufactured work and manual timekeeping. Exact thresholds and ranking weights are to be validated in operation.
