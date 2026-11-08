@@ -145,6 +145,30 @@ Canonical rationale:
 [whole-site launch approval versus ongoing delegated changes](service-operations-model.md#whole-site-launch-approval-versus-ongoing-delegated-changes).
 These are design decisions, not implemented production behavior.
 
+## Next proving focus: fresh end-to-end customer onboarding
+
+**Owner direction, November 8, 2026.** Stop relying solely on the
+read-only C0 Operator walkthrough as a stand-in for customer onboarding.
+The near-term major proving exercise should start at a **fresh actual
+interview** and test the entire real customer/Operator sequence through
+confirmed knowledge, direction, WordPress plugin generation, in-WP
+review/refinement and Core capture, complete-site customer acceptance,
+readiness, scoped launch, verified live operation and Ongoing.
+Preserve the existing C0 approved v3 site, source evidence and hosted
+records as a historical baseline; don't overwrite/reinterpret the
+earlier initial discovery (verbatim transcript not retained).
+Choose whether to use MioPages as a new intake with explicit prior
+knowledge provenance or a separately isolated representative small
+business. Do not assert the missing full interview, customer portal,
+real two-way WP appearance sync or launch path are already implemented.
+Use an isolated rehearsal with labeled blockers and explicit surrogate
+steps only; production gates remain in force.
+
+See [C0 fresh onboarding rehearsal](miopages-c0-product-model.md#fresh-end-to-end-onboarding-rehearsal-november-8-2026).
+Before another large console iteration, turn this into a bounded
+interface-driven test plan and record any observed pain points as a
+prioritized implementation backlog.
+
 ## Local Operator overview and C0 account review
 
 The first integrated Operator view groups actionable evidence ahead of the
