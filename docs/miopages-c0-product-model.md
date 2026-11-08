@@ -251,53 +251,39 @@ pages, sales explanations, pricing/package presentation, onboarding explanations
 and customer FAQs. Preserve its substance and boundaries even when marketing
 wording changes. It establishes neither final prices nor contractual entitlements.
 
-## Fresh end-to-end onboarding rehearsal (November 8, 2026)
+## Authentic interview-to-WordPress rebuild rehearsal (November 8, 2026)
 
-**Owner-requested near-term proving direction.** Before continuing to expand
-the local Operator console extensively, use a **fresh, realistic new-customer
-onboarding run** to test the *complete service experience* beginning with the
-initial interview. Preserve the existing approved C0 business brief, canonical
-knowledge, service-led v3 design, historical captures, reviewed decisions and
-hosted state as **immutable/reference historical evidence**; do not rewrite
-history or imply that the initial three-pass discovery transcript was retained.
-The earlier C0 proof and the new rehearsal must remain explicitly distinct.
+**Owner-updated direction (supersedes the earlier proposal to restart the
+interview):** Use MioPages itself as the realistic customer and begin with
+the **already completed, approved three-pass original C0 discovery** in
+`docs/miopages-c0-business-brief.md`. The interview was genuine
+customer/onboarding work, not a development fixture. Do **not** ask the
+owner to repeat it or treat the lack of verbatim Q&A as permission to
+invent questions/answers. The approved synthesis is the preserved
+customer input; subsequent corrections and confirmations are new events
+with their own provenance. The later Free Review Q&A is distinct.
 
-The new run should present only information a real new customer would have
-actually supplied or that permitted research discovered with source/provenance;
-do **not** silently preload the approved C0 answers or bypass customer
-confirmation simply because the organization is known to development. If
-the same MioPages business is used, distinguish prior knowledge available
-to the system (with source/freshness) from fresh customer-supplied interview
-answers, and apply the ordinary progressive information-reuse rules. A
-representative non-MioPages small business may instead be used if needed to
-avoid the unusual founder-as-customer context; choosing the exercise subject
-and sandbox isolation is a deliberate next design choice, not a migration
-of the existing canonical C0.
+Create a **separate C0 rehearsal/onboarding run** to follow the real
+customer and Operator interfaces from interview outcome through
+confirmed knowledge, one Presence Direction, site architecture/design,
+initial plugin-created WordPress site, Gutenberg refinements returning
+to Core, entire-site preview and customer approval, readiness and
+guarded launch, then Ongoing communications and optimization.
+The existing accepted C0 canonical data, v3 design, historical captures
+and hosted state remain reference material and must not be silently
+reused as if newly generated or overwritten. The new site should be
+built from the available authentic interview knowledge under normal
+approval rules, with real missing facts identified rather than made up.
 
-Exercise the actual customer and Operator interface path in order:
-foundational intake/optional Review or direct start, paid onboarding
-interview, confirmed knowledge and focused gaps, one Presence Direction,
-approved managed site structure/content/design, initial plugin-driven
-WordPress rendering, authorized Gutenberg refinement with automatic
-Core-bound capture, Operator verification, complete customer site preview
-and scoped approval, production readiness, explicitly authorized
-publication and post-launch verification, then communication/measurement/
-ongoing work. Use real reviewed site and form behavior; do not claim
-faked integrations or temporary demos are production verified. Record
-realistic Operator effort, customer friction, manual handoffs, exceptions,
-conflicts and what requires developer intervention.
-
-**Test discipline:** The goal is discovery of workflow gaps, not a staged
-"happy path" or a new bespoke MioPages-only builder. When a real interface
-step or plugin integration is absent, label it **not implemented/blocked**,
-record a minimal testable gap and use an explicitly named surrogate
-only for a bounded proof, never as evidence the commercial workflow works.
-Keep production, hosted databases, approved releases, customer approval
-and launch permissions protected by existing gates. The test should
-inform a short implementation backlog and next Operator console iteration
-based on observed friction; do not claim full end-to-end readiness today.
-This is a near-term planned rehearsal, not an instruction to rewrite
-approved C0 or deploy a new public site.
+Test actual interactions and integrations in bounded slices, starting
+with a truthful interactive customer/Operator knowledge confirmation
+and progressing to a private WordPress-generated Home/navigation.
+Label unimplemented steps and manual surrogates honestly. Never treat
+a screenshot or technical preview as proof of customer delivery or
+production publication. Existing security and launch approvals remain
+separate. See the executable
+[C0 onboarding and WordPress rebuild rehearsal](c0-onboarding-wordpress-rebuild-rehearsal.md)
+for the staged sequence, evidence criteria and first coding slice.
 
 ## What Customer 0 must prove
 
