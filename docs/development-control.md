@@ -90,6 +90,25 @@ This does not authorize new AI API calls, live messages, UI writes or release
 authority. Exercise the flow first in a bounded owner-visible interactive
 review; preserve C0 source integrity and separate production gates.
 
+## Conversational escalation and event retention direction
+
+**Owner-approved direction, November 8, 2026; not yet implemented.**
+Operators can raise an unclear concern in ordinary language. AI/system should
+first help resolve it conversationally, escalating an out-of-bounds or
+unresolved issue with its context to an authorized next human or resource.
+After an accepted transfer, the original Operator's portion is **handed
+off** and leaves their active queue; the underlying issue remains open
+until resolved. Notify the original Operator only if they are needed again.
+
+The eventual normal work-event trail should retain scoped issue, evidence,
+resource/role/assignment, handoff, approval and resolution/outcome provenance
+without separate timekeeping or task-admin chores. Performance/coaching review
+based on appropriately retained history is deferred, not a current feature;
+do not build worker scoring or surveillance. Data retention, access,
+correction and minimization require explicit policy before production.
+See [conversational resolution and accountable handoff](service-operations-model.md#conversational-resolution-accountable-handoff-and-retained-outcomes).
+The current read-only console does not yet collect operational events.
+
 ## Local Operator overview and C0 account review
 
 The first integrated Operator view groups actionable evidence ahead of the
