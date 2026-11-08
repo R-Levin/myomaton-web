@@ -128,6 +128,27 @@ reply capture, verified decision collection, notification preferences,
 templates and provider integration are implementation decisions,
 not capabilities already delivered.
 
+### Human-reviewed support reply drafts and bounded future automation
+
+**Owner-approved direction, November 8, 2026.** MioPages may assist with
+routine customer-support messages by drafting context-aware, grounded replies
+inside the existing case and Operator review flow. **Initially, an authorized
+human reviews and approves any AI-authored customer-facing support response
+before sending it.** The system should surface relevant known facts, uncertainty,
+prior correspondence, proposed next action and any questions requiring
+confirmation, without presenting unsupported claims or implying commitments.
+Preserve the final sent text, approving actor, case linkage and communication
+outcome without separate bookkeeping.
+
+**Future optional automation:** Once actual support patterns and evidence
+demonstrate reliability, consider explicitly allowlisted low-risk inquiry
+categories for unattended responses, with configurable authority, escalation
+criteria, auditability and customer-friendly handoff to a human. Do not treat
+this as present permission to autonomously reply, change business facts,
+approve content, promise outcomes or perform sensitive customer/account
+actions. Exception-driven routing and verified customer authority remain in
+force. Exact categories and implementation are deferred.
+
 ### Email-to-case support continuity
 
 **Owner-approved direction, November 8, 2026.** Customer support
