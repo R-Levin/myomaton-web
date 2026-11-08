@@ -149,6 +149,30 @@ approve content, promise outcomes or perform sensitive customer/account
 actions. Exception-driven routing and verified customer authority remain in
 force. Exact categories and implementation are deferred.
 
+### Customer communication as parent capability
+
+**Owner-approved distinction, November 8, 2026.** Treat ongoing
+**customer communication** as the umbrella capability; help/support
+requests are one subset, not the universal record type. The same
+customer may use email or the MioPages interface for questions,
+service issues, factual/business changes, new offerings, content
+requests, customer approvals, account matters and routine exchanges.
+Recognize the likely intent, preserve the conversation and relevant
+customer/account/site context, and route resulting decisions or work
+to the authorized service workflow. Avoid forcing every interaction
+into a support ticket or making the customer classify it first.
+An incoming message may lead to work, a question, an approval or
+several related outcomes without losing the original correspondence.
+
+**Open design boundary:** The taxonomy, classification rules,
+conversation-to-work mapping, case/record identities, event model,
+storage/retention rules and exact routing mechanics are **TBD**.
+Do not prematurely hard-code "support case" as the only message
+container or assume every email produces a ticket. Keep the initial
+implementation grounded in a modest unified communications model
+with clear provenance, authorization, privacy and traceability,
+rather than designing a heavyweight CRM or broad workflow engine.
+
 ### Email-to-case support continuity
 
 **Owner-approved direction, November 8, 2026.** Customer support
