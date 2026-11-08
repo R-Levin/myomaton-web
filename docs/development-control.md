@@ -109,6 +109,23 @@ correction and minimization require explicit policy before production.
 See [conversational resolution and accountable handoff](service-operations-model.md#conversational-resolution-accountable-handoff-and-retained-outcomes).
 The current read-only console does not yet collect operational events.
 
+## Core-defined WordPress site and inbound editing clarification
+
+**Owner clarification, November 8, 2026; implementation boundaries pending.**
+The Operator expects Core to specify and retain the site architecture,
+initial themes/design, page/section tree, navigation, media and content.
+The WordPress plugin materializes the approved initial site using native
+WordPress presentation and rendering. Operators review/refine in WordPress;
+supported edits must be captured back as versioned, scoped proposals and,
+when accepted, persist in Core without being overwritten by future releases.
+Core can originate new pages/sections; WordPress-origin additions should
+also return to Core through governed creation/review, not exist only as
+untracked managed pages. Routine blog editing should remain template-driven
+with article content and featured image instead of bespoke layout per post.
+See [Core-specified site and WordPress round-trip clarification](wordpress-delivery-feasibility.md#core-specified-site-and-wordpress-round-trip-clarification).
+This does not close the pending native-editing ownership/mapping/conflict
+decision or authorize a production write.
+
 ## Local Operator overview and C0 account review
 
 The first integrated Operator view groups actionable evidence ahead of the
