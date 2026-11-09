@@ -220,6 +220,23 @@ before coding a replacement. Full system implementation requires
 source/provenance and customer authorization checks and must
 respect existing production/hosted safeguards.
 
+### Issue #10 · C0 interview design ready for owner review
+
+The [C0 adaptive onboarding walkthrough](c0-adaptive-onboarding-walkthrough.md)
+records the source and prototype coverage gaps, a November 9 read-only public
+site inventory, concrete interview questions and branches, and a first C0
+assessment with proposed content and conversion direction. It uses the approved
+discovery and recorded exclusions, separates observations and proposals, and
+leaves unresolved answers visible. The legacy site inventory includes active
+URLs for older QR and Kickstart offers in addition to the main navigation.
+
+This checkpoint is documentation only. The owner should review the questions,
+site dispositions and sufficiency of the assessment before implementation.
+If accepted, start with one deep offering branch, evidence reuse, one durable
+exclusion and the resumable assessment. Existing release and confirmation
+gates apply. The Issue #9 application and the saved owner result were not used
+as a build basis or edited in preparing this design.
+
 ### Issue #9 · first local signup and onboarding slice
 
 Run `node --import tsx scripts/intake/c0-onboarding.ts` from the repository root

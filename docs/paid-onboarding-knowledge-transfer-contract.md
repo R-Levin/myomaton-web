@@ -98,6 +98,10 @@ The **November 8 `paid-onboarding/1` ten-step UI (commit `4672bfa`) is a develop
 
 Do not move to Core-to-WordPress generation on the strength of the ten-step prototype. There is no new production publication, account activation, billing, customer-state migration or credential authorization in this correction.
 
+The [Issue #10 C0 walkthrough](c0-adaptive-onboarding-walkthrough.md) applies
+this contract to the original discovery, current public-site observations and
+recorded C0 decisions. The proposed interview and assessment await owner review.
+
 ## Canonical relationships
 
 [Progressive onboarding](progressive-onboarding-and-launch-readiness.md) establishes the one continuous customer journey; [customer journey and approval](customer-journey-and-change-management.md) controls the business-truth/plan/site gates; [onboarding and optimization](onboarding-optimization.md) describes customer facts and content/visual reference evidence; [conversion architecture](conversion-architecture.md) governs intent/decision paths; [WordPress delivery](wordpress-delivery-feasibility.md) begins after sufficient confirmed knowledge; and [C0 rehearsal](c0-onboarding-wordpress-rebuild-rehearsal.md) preserves existing C0 accepted history. This contract sharpens **depth and breadth** without requiring a massive obligatory form for every customer.
