@@ -77,12 +77,12 @@ must not become assumptions every future customer inherits. See the
 
 ## Initial customer hypothesis
 
-The initial Ideal Customer Profile is an established small service business,
-roughly 3–25 people, with real expertise, existing customers and a legitimate
-offering. Its web presence is outdated, weak, fragmented or neglected. It has
-little desire to become a webmaster and limited internal capacity for sustained
-web/content optimization. Traditional agency cost or complexity may feel
-uncomfortable or disproportionate.
+The earlier initial Ideal Customer Profile **hypothesis** emphasized
+established small service businesses, roughly 3–25 people, with real expertise,
+customers and a legitimate offering. Their web presence may be outdated, weak,
+fragmented or neglected; they may not want to manage a site or pay for a large
+agency engagement. **This remains one promising acquisition segment, not a
+universal eligibility rule or the full intended target market.**
 
 Candidate categories include trades, professional services, niche B2B, local
 service businesses, small agencies and small nonprofits/organizations. These are
@@ -102,6 +102,34 @@ Review conversation and assessment** into deeper paid onboarding, with
 no redundant re-entry. See [the knowledge-transfer contract](paid-onboarding-knowledge-transfer-contract.md)
 and [fictional Customer 2](fictional-customer-2-tree-service-onboarding-scenario.md).
 
+
+**Owner correction during the live C0 prepared-understanding review
+(November 9, 2026):** **Startups remain an important market**, alongside
+established local service/trade companies, professional firms, technical
+businesses and other small organizations. The older October 14 Free Review
+language about startups and small businesses is **not rejected or superseded
+simply because later launch marketing also emphasizes established firms**.
+New businesses may sometimes be simpler to launch because they have fewer
+legacy URLs, integrations or migration dependencies; this is a practical
+hypothesis, not a guarantee of easier content or delivery. MioPages' managed
+Web Presence model is intended to work broadly across industries where
+supported scope, customer needs, fit and economics align. Larger organizations
+are possible later, not a priority for the initial acquisition effort. The
+initial target segments are **marketing and learning priorities**, not
+industry, age, company-size or business-maturity exclusions. Do not imply
+that every bespoke integration, ecommerce need or enterprise requirement can
+be fulfilled in Commercial V1: the bounded service and supported capability
+catalog still govern.
+
+For the active C0 `paid-onboarding/2` local rehearsal, the prepared source
+reconciliation currently describes the transition from “startups and small
+businesses” to established firms as if it were an exclusive replacement.
+The owner identified this as **an inaccurate inference** and should be able
+to record a correction; it is a product-feedback example of why current
+owner truth must override earlier AI reconciliations. Codex should amend
+the fixture/presentation in a later reviewed slice rather than silently
+altering the already-running session or reusing speculative classification
+as a confirmed fact.
 
 ### Customer pains to test
 
