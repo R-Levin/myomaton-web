@@ -36,6 +36,20 @@ Site capabilities and native publishing. The existing PostgreSQL authority and
 [initialization-only bootstrap boundary](bootstrap.md) already apply. Myomaton's
 source-controlled transitions are historical tooling, not ongoing authority.
 
+**Owner correction after C0 walkthrough (November 8–9, 2026):**
+Full paid onboarding must be a **substantive knowledge-transfer
+interview** comparable to a helpful doctor's-office intake, not
+the ten shallow fields exercised in local `paid-onboarding/1`.
+Do not cap the number of material questions; use customer-provided
+documents, existing site evidence, previous answers and adaptive
+follow-ups to make comprehensive capture easy. Explicitly ask
+what content/site elements to **retain, revise, replace, remove
+or avoid**. Distinguish this deep intake from short Free Review
+and from later focused clarification. “Not a giant second form”
+prevents repeated work and irrelevant boilerplate, not meaningful
+depth. See
+[full interview knowledge transfer](paid-onboarding-knowledge-transfer-contract.md).
+
 ## Guided onboarding and ongoing updates
 
 The [progressive onboarding and Launch Readiness model](progressive-onboarding-and-launch-readiness.md)
