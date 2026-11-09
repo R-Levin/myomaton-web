@@ -65,6 +65,11 @@ Only then generate the initial WordPress site through the controlled plugin/them
 
 ## Source contracts
 
+The first local rehearsal now exercises the ten question groups, save/resume,
+and an immutable business-understanding submission. See the [Issue #9 local
+walkthrough and verification](development-control.md#issue-9--first-local-signup-and-onboarding-slice)
+for the URL, scope, known limits and review steps.
+
 - [Progressive onboarding, commercial gate and full interview](progressive-onboarding-and-launch-readiness.md#full-structured-commercial-v1-interview)
 - [Four approval checkpoints](customer-journey-and-change-management.md#four-approval-checkpoints)
 - [Original interview recovery](c0-discovery-question-recovery-audit.md)

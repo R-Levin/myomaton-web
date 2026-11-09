@@ -1,3 +1,5 @@
+import { onboardingVersion, paidQuestions } from "./onboarding";
+
 // Shared foundational information, not confirmed canonical customer knowledge.
 export const legacyIntakeVersion = "foundational-intake/1";
 export const intakeVersion = "foundational-intake/2";
@@ -64,8 +66,10 @@ const questionsV2: Question[] = questions.map((q, i) => i !== 8 ? q : {
 export function questionsFor(version: string): Question[] {
   if (version === legacyIntakeVersion) return questions;
   if (version === intakeVersion) return questionsV2;
+  if (version === onboardingVersion) return onboardingQuestions;
   throw new IntakeError("unsupported_questionnaire");
 }
+const onboardingQuestions = paidQuestions(questionsV2);
 export function fieldApplies(field: Field, answers: Answers) { return matches(field.when, answers) && (!field.whenAny || field.whenAny.some(c => matches(c, answers))); }
 // Keep low-level v1 helper defaults for existing callers; session consumers pass their stored version.
 export class IntakeError extends Error {
@@ -79,6 +83,7 @@ export function matches(condition: Condition | undefined, answers: Answers) {
 export function fieldLabel(field: Field, answers: Answers) { return field.labels?.find(l => matches(l.when, answers))?.label ?? field.label; }
 export function questionTitle(index: number, answers: Answers, intent: EntryIntent = "FREE_REVIEW", version: string = legacyIntakeVersion) {
   const questions = questionsFor(version);
+  if (version === onboardingVersion) return questions[index].title;
   if (index === 6) return fieldLabel(questions[index].fields[0], answers);
   if (intent === "DIRECT_START" && index === 7) return "What would make getting started most useful to you?";
   if (intent === "DIRECT_START" && index === 10) return "How should we contact you about getting started?";
@@ -132,7 +137,7 @@ export function questionErrors(index: number, answers: Answers, version: string 
     const v = answers[field.key];
     if (fieldApplies(field, answers) && field.required && (!v || Array.isArray(v) && !v.length)) errors[field.key] = "Please answer this question.";
   }
-  if (index === 1 && [projects[0], projects[2]].includes(answers.project as typeof projects[0]) && !answers.website && !answers.publicProfile) errors.website = "Provide your website or a public profile for the existing presence.";
+  if (version !== onboardingVersion && index === 1 && [projects[0], projects[2]].includes(answers.project as typeof projects[0]) && !answers.website && !answers.publicProfile) errors.website = "Provide your website or a public profile for the existing presence.";
   return errors;
 }
 export function validateComplete(answers: Answers, version: string = legacyIntakeVersion) {

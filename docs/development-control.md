@@ -176,6 +176,56 @@ Implementation spec:
 Issue #9 is the initial executable task; align its acceptance
 with this updated priority before coding.
 
+### Issue #9 · first local signup and onboarding slice
+
+Run `node --import tsx scripts/intake/c0-onboarding.ts` from the repository root
+and open `http://127.0.0.1:4320/onboarding`. The listener is loopback-only. It
+creates a password-protected disposable PostgreSQL cluster on an unused local
+port, applies the existing migrations there, and seeds random rehearsal owner
+and site IDs. It never reads `DATABASE_URL` or an existing customer database.
+The default Windows client directory is `C:/Program Files/PostgreSQL/18/bin`.
+Set `PG_BIN_DIR` if the matching local PostgreSQL binaries are elsewhere.
+
+As Customer 0, choose **Review fit and scope**, then **Continue with rehearsal
+authorization**. Review the prefilled business details and advance to **What
+you provide**. Add a test priority, select **Save progress**, and reload to
+confirm the answer and current step return. Use **Not sure yet** if the main
+contact action is undecided. Choose the applicable existing-website option,
+complete the ten steps, then select **Review my answers** and **Submit for
+review**. The same browser can resume while the launcher is running. Stopping
+it removes that disposable run. Use a fresh private browser window for a new
+run if the browser still has a cookie from an earlier rehearsal.
+
+The rehearsal uses the approved October 5–6 discovery via the scoped C0
+Business Knowledge and Offering data retained in
+`scripts/customer-updates/miopages-focus-reviewed.json`. The recovery audit
+records partial prompt evidence, including the audience and ongoing-service
+questions. Git history and a targeted local filename check found the approved
+brief and audit, without an independently verified full transcript or copies
+of the named historical pasted files in the checked repository and attachment
+locations. The October 14 Free Review was excluded from this direct-start
+rehearsal. The source label distinguishes approved synthesis from quotations
+and new, unconfirmed answers.
+
+The working slice reuses the intake question and field renderer, origin and
+cookie checks, transactional drafts and immutable submission ledger. The new
+`paid-onboarding/1` groups ten topics and records source, freshness and scoped
+rehearsal author. The summary separates previously approved inputs, new
+answers and open questions. It gives the Operator a next step in the same
+scoped view. The commercial checkpoint is a rehearsal surrogate. Live
+agreement/payment, authenticated access, a separate Operator queue, governed
+business confirmation and publication remain outside this slice. Submitted
+rehearsal records are refused as activation evidence.
+
+Verified 388 repository tests, TypeScript and targeted lint. The disposable
+PostgreSQL integration test passed origin and session refusal, inapplicable
+answer removal, stale save refusal, resume with the same database after an
+HTTP listener restart, immutable submission and activation refusal. Chrome
+walked all ten steps at 1440 and 390 px, saved and reloaded an added answer,
+changed the contact branch and resumed the submitted summary. Next is the
+owner’s C0 walkthrough and feedback, followed by a separately governed
+Checkpoint 1. WordPress generation remains gated behind review and direction.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

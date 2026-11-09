@@ -21,7 +21,7 @@ export function sessionToken(request: Request, cookieName = intakeCookie) {
   return /^[a-f0-9]{64}$/.test(token) ? token : null;
 }
 export async function intakeHttp(request: Request, service: IntakeService, abuse: ContactAbuseGuard, enabled: boolean, sharedDevelopment = false) {
-  const cookieName = sharedDevelopment ? "miopages_intake_shared_development" : intakeCookie;
+  const cookieName = service.isOnboarding ? "miopages_c0_onboarding" : sharedDevelopment ? "miopages_intake_shared_development" : intakeCookie;
   const reply = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store", "Vary": "Cookie" } });
   if (!enabled || !loopbackOrigin(request.url)) return reply({ error: "unavailable" }, 503);
   if (request.headers.get("x-intake-request") !== "1") return reply({ error: "invalid_origin" }, 403);
@@ -40,7 +40,7 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
         const input = value as Record<string, unknown>;
         const keys = input.operation === "save" ? ["operation", "version", "answers", "step"] : input.operation === "submit" ? ["operation", "version"] : ["operation"];
         if (Object.keys(input).some(k => !keys.includes(k))) throw new IntakeError("invalid_request");
-        if (input.operation === "begin") { if (!token) { token = newResumeToken(); fresh = true; } return await service.create(token, "FREE_REVIEW"); }
+        if (input.operation === "begin") { if (!token) { token = newResumeToken(); fresh = true; } return await service.create(token, service.isOnboarding ? "DIRECT_START" : "FREE_REVIEW"); }
         if (!token) throw new IntakeError("session_unavailable", 404);
         if (input.operation === "save") return await service.save(token, input.version as number, input.answers, input.step as number);
         if (input.operation === "submit") return await service.submit(token, input.version as number);
@@ -49,7 +49,7 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
     });
     if (error) return reply({ error: error.code, fieldErrors: error.fields }, error.status);
     response.headers.set("Vary", "Cookie");
-    if (fresh && response.ok) response.headers.set("Set-Cookie", `${cookieName}=${token}; Path=/api/intake; HttpOnly; SameSite=Strict; Max-Age=2592000`);
+    if (fresh && response.ok) response.headers.set("Set-Cookie", `${cookieName}=${token}; Path=${service.isOnboarding ? "/api/onboarding" : "/api/intake"}; HttpOnly; SameSite=Strict; Max-Age=2592000`);
     return response;
   } catch (e) {
     return e instanceof IntakeError ? reply({ error: e.code, fieldErrors: e.fields }, e.status) : reply({ error: "unavailable" }, 503);
