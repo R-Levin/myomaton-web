@@ -36,6 +36,14 @@ answer in the approved Ongoing synthesis about continuing updates, improvement
 and measurement. Ask what that looks like in a real month. The synthesis supplies
 the answer used here. The owner's exact words and their order remain unverified.
 
+### Source completeness: existing site **and** pre-onboarding interview / Review
+
+**Owner review, November 9.** For an ordinary Review-led client, paid onboarding begins with the **existing site/public-presence analysis** *and* the **actual earlier Free Review interview and delivered assessment**, not the site alone and not a repeat of the initial intake. A Free Review's stated goals, priorities, corrections and assessment findings must retain their source and be compared against old-site claims; neither independently authorizes publication. The corresponding full requirement and fictional small-business acceptance case are in [the knowledge-transfer contract](paid-onboarding-knowledge-transfer-contract.md) and [Customer 2 tree-service test](fictional-customer-2-tree-service-onboarding-scenario.md).
+
+**C0 has a special authentic lineage:** carry forward the approved original October 5–6 three-pass business discovery and the November 9 read-only existing-site inventory. The later October 14 Free Review is **separate** evidence and must only be reused where its actual identity, scope, answers and source provenance are confirmed—not retroactively presented as part of the earlier discovery or automatically substituted for a completed prospect Free Review. If that Review is applicable to C0's starting understanding, include its grounded questions/answers/assessment with separate labels and clear gaps. C0 founder-led strategy proposals remain separately labeled. The current local `paid-onboarding/1` test does **not** implement this complete merged source view.
+
+**Owner's market decision:** established local service businesses (including trades like the fictional tree service) belong alongside professional and technical firms in MioPages' intended good-fit market; the initial acquisition mix may still be prioritized by practical economics and evidence. This is an audience expansion/clarification, not a claim of demonstrated demand or a requirement to market to all sectors at once.
+
 ### Founder-led collaboration for Customer 0
 
 The owner and ChatGPT will work through strategy, positioning, the new offer,
