@@ -204,6 +204,24 @@ Managed MioPages backend/platform access or IP does not transfer. Export remains
 gated by P5/P6, not implemented here. Rare bad debt may be preferable to collections
 drama; legal/accounting review must resolve actual treatment before use.
 
+## Full interview depth clarification — owner walkthrough November 8–9, 2026
+
+The `paid-onboarding/1` ten-screen smoke proof was **not** accepted
+as the complete onboarding interview. “No giant second questionnaire”
+means do not dump a generic one-size-fits-all form or ask customers
+to repeat known facts; it does **not** impose a cap on depth or
+question count. Full paid onboarding can ask as many material,
+contextual questions as a real business requires, especially
+about every important offering, audience, real proof, business
+limitations, visitor decision process, current-site performance
+and **what must be retained AND explicitly excluded**. Prefer
+preparation, source-backed extraction and reuse, conditional
+follow-ups, optional rich explanations/materials, and an easy
+pause/resume path. Successful completion depends on a
+source-grounded, reviewable business and website assessment and
+**sufficient build-ready knowledge**, not finishing ten screens.
+See [the corrective interview contract](paid-onboarding-knowledge-transfer-contract.md).
+
 ## Full structured Commercial V1 interview
 
 The fuller structured onboarding interview is required for Commercial V1 and is
