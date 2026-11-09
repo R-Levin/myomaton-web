@@ -9,6 +9,20 @@ The owner approved this operating practice on November 7, 2026. Record material 
 
 This practice keeps approval boundaries and work in progress visible while evidence is still current. Capture a small entry as soon as a material decision is made, including its date, source, scope and status. A pending entry records the alternatives and who must decide before dependent work starts. Assign one editor per affected canonical file and review overlapping edits before staging. Review the decision diff with the implementation diff in the same cycle. Git is the durable continuity record. Conversation evidence informs the record, and approval authority stays with the authorized decision maker. Documentation cannot grant additional implementation authority or override an existing approval gate.
 
+### GitHub review handoffs
+
+**Owner-approved operating convention, November 9, 2026.** Use GitHub as the
+shared record for approved requirements and decisions, development progress and
+review documents. Publish the reviewable work to the shared development branch
+before asking ChatGPT for feedback. Post a handoff in the relevant issue with
+the exact repository, branch, commit SHA and file paths or section links. State
+the decisions already made, the questions still open and the current approval
+boundary. This lets another session review the same version from GitHub.
+
+Keep credentials, sensitive data and temporary runtime artifacts out of Git.
+The issue handoff is an asynchronous review reference. Existing role assignments,
+owner approval and implementation and publication gates still apply.
+
 ### November 7 customer account operations clarification
 
 The owner superseded the earlier Gutenberg/customer-interaction framing. Use
@@ -220,7 +234,7 @@ before coding a replacement. Full system implementation requires
 source/provenance and customer authorization checks and must
 respect existing production/hosted safeguards.
 
-### Issue #10 · C0 interview design ready for owner review
+### Issue #10 · C0 interview design ready for owner and ChatGPT review
 
 The [C0 adaptive onboarding walkthrough](c0-adaptive-onboarding-walkthrough.md)
 records the source and prototype coverage gaps, a November 9 read-only public
@@ -229,9 +243,24 @@ assessment with proposed content and conversion direction. It uses the approved
 discovery and recorded exclusions, separates observations and proposals, and
 leaves unresolved answers visible. The legacy site inventory includes active
 URLs for older QR and Kickstart offers in addition to the main navigation.
+The original design was published at `391a7db`. The
+[owner's November 9 decisions](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6740683772)
+now govern the draft: one managed service replaces the entire legacy catalog.
+The public homepage's existing-customer button was verified to lead to
+[HostShop sign-in](https://my.miopages.com/login), the sole legacy service-related
+destination to retain. The [C0 product model](miopages-c0-product-model.md#founder-led-transition-to-the-managed-service)
+records the exceptional founder/ChatGPT strategy collaboration, Codex's
+supporting role and the owner's final approval. The
+[knowledge-transfer contract](paid-onboarding-knowledge-transfer-contract.md#normal-contact-and-existing-site-evidence-are-welcome)
+also confirms that actual business contacts and appropriate existing-site
+materials are normal onboarding inputs for C0 and ordinary customers.
 
-This checkpoint is documentation only. The owner should review the questions,
-site dispositions and sufficiency of the assessment before implementation.
+This checkpoint is documentation only. Review the
+[Standard Launch conversation](c0-adaptive-onboarding-walkthrough.md#understand-the-offering-well-enough-to-explain-it),
+[existing-site inventory](c0-adaptive-onboarding-walkthrough.md#the-existing-site-review)
+and [proposed assessment](c0-adaptive-onboarding-walkthrough.md#the-assessment-c0-would-see-today)
+with the owner and ChatGPT before implementation. Legacy URL dispositions and
+transition obligations remain separate from the approved catalog decision.
 If accepted, start with one deep offering branch, evidence reuse, one durable
 exclusion and the resumable assessment. Existing release and confirmation
 gates apply. The Issue #9 application and the saved owner result were not used

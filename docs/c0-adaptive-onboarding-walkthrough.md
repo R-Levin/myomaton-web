@@ -2,8 +2,10 @@
 
 **Owner review draft · November 9, 2026 · [Issue #10](https://github.com/R-Levin/myomaton-web/issues/10)**
 
-This walkthrough uses MioPages as the real customer. It starts after the existing
-fit and commercial handoff, with the rehearsal-only checkpoint where applicable.
+This walkthrough uses MioPages as the real customer in a founder-led launch.
+The owner is retiring the entire legacy catalog and launching one managed Web
+Presence service. It starts after the existing fit and commercial handoff, with
+the rehearsal-only checkpoint where applicable.
 Read the screen copy and choose how you would answer. Questions in quotation marks
 are **proposed for this interview** unless explicitly identified as recovered.
 Branches show what the system would do with a future answer. The assessment at the
@@ -17,6 +19,7 @@ end uses evidence already available, without assuming those future answers.
 | Approved third-pass synthesis | The [C0 business brief](miopages-c0-business-brief.md) was retained in Git at `277c094`. It establishes one managed Web Presence service, an initial established expertise-led audience, a remote US focus, Launch into Ongoing, and the Free Review's role. | This is approved discovery guidance. Timing, price and capacity figures are provisional. The November working commercial model supersedes the earlier price hypotheses for planning. [Commercial model](progressive-onboarding-and-launch-readiness.md#miopages-working-commercial-model) |
 | Confirmed C0 records | Business Knowledge and Offering revision 1 in [the reviewed graph](../scripts/customer-updates/miopages-focus-reviewed.json) retain the source approval and structured Standard Launch, Expanded Launch and Ongoing components. The audience, ownership and reduced administrative burden can be carried forward with those references. | The four-page accepted v3 design and later development revamp are historical comparison points. This interview should produce its own direction from the evidence. [Canonical promotion](miopages-canonical-promotion.md) · [Later transition](miopages-c0-transition.md) |
 | Separate later material | The October 14 Free Review is a later human intake, documented in the [recovery audit](c0-discovery-question-recovery-audit.md). The Issue #9 owner run establishes concrete feedback about the product experience. | The later answers are not substituted for October 5–6 discovery. The owner's saved rehearsal result remains separate and was left in place. |
+| November 9 owner decision | Retire all legacy offerings, including QR-code/self-managed websites. Preserve the separate HostShop account portal as the sole legacy service-related destination. | The retirement direction is approved. Legacy URL dispositions, cutover and contractual handling remain separate decisions. [Owner decision on Issue #10](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6740683772) |
 | Public site observation | A November 9 read-only inspection found the legacy site still organized around WordPress websites, hosting/email, support, a gallery and a general contact path. | Observed content is evidence of what the site shows. Current service commitments, delivery, ownership, permissions and traffic require other evidence. See the [inventory](#the-existing-site-review). |
 
 Source check for this draft used the Git-tracked brief, recovery audit, product model
@@ -32,6 +35,33 @@ expertise-led businesses. Use it to open the buying-decision branch directly.
 answer in the approved Ongoing synthesis about continuing updates, improvement
 and measurement. Ask what that looks like in a real month. The synthesis supplies
 the answer used here. The owner's exact words and their order remain unverified.
+
+### Founder-led collaboration for Customer 0
+
+The owner and ChatGPT will work through strategy, positioning, the new offer,
+messaging, proof, content, search/discovery and marketing priorities together.
+Codex can supply research, structure alternatives and support implementation
+within the approved scope. If a question exposes a strategic choice the founder
+has yet to make, take that choice into the collaboration and return a draft for
+review. Ask for a real delivery example only where one exists. A proposal for a
+new service process remains a proposal until the owner approves it.
+
+Keep three evidence labels throughout the interview and assessment.
+
+- **Owner-confirmed fact or decision** carries its source, date and scope. The
+  owner confirms business truth and gives final approval under the existing gates.
+- **Source-backed research** records what was observed, where and when, with
+  coverage limits. Legacy website copy demonstrates what it says. Service truth,
+  rights and operations require their own confirmation.
+- **AI-assisted proposal** identifies the recommendation and the evidence or
+  assumptions behind it. Jointly drafted positioning, SEO ideas and copy stay
+  proposed until the owner decides. Approval of a proposal applies to the
+  reviewed content and its purpose.
+
+This additional strategy work is specific to the MioPages launch. Ordinary
+customers continue through the general-purpose self-service or assisted intake,
+with source reuse and focused follow-ups. Existing roles and approval boundaries
+apply to both. [C0 product model](miopages-c0-product-model.md#founder-led-transition-to-the-managed-service)
 
 ### What the ten-step prototype can carry forward
 
@@ -65,7 +95,7 @@ need the customer. [Operating direction](service-operations-model.md#whole-site-
 | Geography and practical constraints | Remote US focus is established for the initial offer. | Ask only for consequential exceptions such as onsite work, time zones, industry exclusions or regulated claims. Obtain required wording and reviewer if an exception applies. | Accurate eligibility and routing, without speculative location pages or availability promises. |
 | Website and URL history | Starter inventory from the public site below. Known historical C0 design is available for comparison. | Ask which old claims, pages, assets and features to keep, rewrite, replace, retire or exclude. Obtain old URLs, campaign links, download lists and available search evidence to assess continuity. | The new site needs deliberate content decisions and a separately verified redirect map. |
 | Brand and content preferences | Prior C0 review favored purposeful explanatory imagery and declined unrelated stock. Earlier style references have an approved historical rationale. | Ask which attributes matter for this build and which must be avoided. Invite a reference link, brand kit, existing wording or example, with context and reuse rights. | Provide design direction without asking the customer to select themes, layouts or CSS. |
-| Systems, search and measurement | The brief records legacy 20i hosting, email and social presence. The site links to the account portal. GA4/Search Console access remains unverified in the reviewed inputs. | Identify each dependency, continuity owner and need for integration. Ask for page lists, export or authorized metrics as available. Verify domains, mail, forms, search properties and event collection separately. | Preserve working customer access, avoid misleading integration claims and plan an evidence-based baseline. |
+| Systems, search and measurement | The brief records legacy 20i hosting, email and social presence. The public HostShop sign-in destination is verified. GA4/Search Console access remains unverified. | Identify each dependency and continuity owner. Ask for page lists, export or authorized metrics as available. Verify authenticated portal access, domains, mail, forms, search properties and event collection separately as applicable. | Preserve the HostShop route and plan an evidence-based baseline. |
 | Content library and future topics | The offer gives useful themes such as fit, delivery, ownership and ongoing care. A production library or performance history was not established here. | Invite service sheets, anonymized FAQs, articles, policies, slide decks, launch notes and useful links. Ask what is current, historical, private or inappropriate for reuse. | Identify substantive initial content and later opportunities instead of filling a blog quota. |
 | Authority and timing | The canonical journey separates business confirmation, direction, complete site review and later authorized launch. | Identify who can confirm business facts, approve use of each asset and accept each milestone. Verify the actual commitment and readiness conditions in their own workflows. | Prevent a questionnaire answer, role selection or draft assessment from authorizing publication. |
 
@@ -120,6 +150,14 @@ review status per material statement. It can turn verified steps into a useful
 Service section and put real boundary questions alongside them. Historical prices
 and provisional current numbers stay out of public copy pending commercial review.
 
+For C0, if the owner is still deciding where Standard Launch ends, ask “Which
+decisions are settled, and where would it help to compare two ways of describing
+the scope?” ChatGPT can help the owner work through the alternatives, with Codex
+supporting research or analysis as needed. Carry an unresolved alternative into
+the assessment as an AI-assisted proposal, with its assumptions visible. Resume
+the interview with the owner's confirmed decision when it is available. Ordinary
+customers can clarify the scope of their existing offer without a strategy phase.
+
 ### Explore one buying decision in depth
 
 Start with the approved audience. If useful, let the owner pick a first example
@@ -156,10 +194,17 @@ All six returned HTTP 200 and displayed a contact form in the HTML. The footer's
 privacy and terms links also returned 200. The public robots file pointed to
 `/sitemap.xml`, which returned an XML list of 28 same-origin URLs, including
 older offers and articles. This is a starter inventory of inspected
-surfaces. Form submission, delivery, private portal access, destination behavior,
+surfaces. Form submission, delivery, private portal access,
 traffic, rankings, download rights and asset ownership remain unverified.
 
-> “Here’s what I found on the site. I’ve suggested what to do with each item. Tell me what must stay, what should change, and anything you never want to see in the new site. We’ll handle old links separately.”
+The live homepage's hosting-account button links to the separate HostShop
+sign-in at [my.miopages.com/login](https://my.miopages.com/login). Its navigation
+also links to a [combined sign-in and account-creation page](https://my.miopages.com/basket-summary-login?r=%2Fmanage).
+Both public HTTPS pages returned 200. Preserve the existing hosting-account
+button's focused sign-in destination as a utility for existing customers.
+The inspection stopped at the public sign-in screens. [Current homepage](https://miopages.com/)
+
+> “You’ve already decided to retire the old offers and keep the HostShop sign-in for existing customers. I’ve marked those decisions below. What links, records or customer obligations should we check before proposing the transition?”
 
 Each row can be **Keep as is**, **Improve**, **Replace**, **Retire**, **Exclude
 from the new site** or **Investigate**. The state below is a recommendation
@@ -169,12 +214,12 @@ excluding an inherited claim and changing a URL are separate decisions.
 | Observed surface | Proposed disposition | What the customer sees next |
 | --- | --- | --- |
 | Homepage leads with WordPress, hosting and email. [Homepage](https://miopages.com/) | **Replace** the main message with the one managed service and its intended outcomes. Preserve the brand identity subject to the approved source. | “Is there a phrase or explanation here people still recognize and rely on? What should never be reused as the new homepage promise?” |
-| Websites page speaks to creatives, lists several builders and offers broad customization. [Websites](https://miopages.com/websites/) | **Replace** the public offer explanation. Propose **excluding** the broad builder/customization promise under the bounded managed-service direction. | “Which, if any, of these old services are still offered to existing customers? Should they be absent from the new offer, or mentioned only in existing-customer help?” |
-| Hosting & Email and the account link are visible on the current site. [Hosting & Email](https://miopages.com/web-hosting-and-email/) · [Account destination](https://my.miopages.com/) | **Investigate** which access paths should remain. **Exclude** hosting/email as the new headline offer. Prefer retaining a verified utility link where existing customers rely on it. | “Which link do existing hosting customers actually use? Is anything still sold separately, or do they just need account access and support?” If they rely on it, add a utility continuity check rather than routing it into new customer signup. |
-| Web Support lists broad services and implies immediate availability. [Web Support](https://miopages.com/web-support/) | **Improve** accurate existing-customer support guidance. Propose **retiring** the open-ended new-customer support claim and **excluding** immediate-response wording unless separately substantiated and approved. | “Which support categories can we still describe? Which promises should be removed? Is there a separate urgent path for existing customers that we must preserve and verify?” |
-| A self-managed QR website offer with a low monthly price remains reachable via the sitemap. Separate proposal and Kickstart pages also returned 200. [Self-managed websites](https://miopages.com/self-managed-websites-with-qr/) · [Request a Proposal](https://miopages.com/request-proposal/) · [Kickstart Wizard](https://miopages.com/online-kickstart-mind-map-wizard/) · [Kickstart session](https://miopages.com/online-kickstart-with-a-zoom-mind-mapping-session/) | Propose **excluding** the DIY offer and its old price from the new service, and **retiring** the old acquisition flows only after checking who uses them. | “Is anyone still using the QR product or sending customers to one of these pages? Should any path survive as legacy help?” Inspect dependencies before choosing any redirect. |
+| Websites page speaks to creatives, lists several builders and offers broad customization. [Websites](https://miopages.com/websites/) | **Retire** the legacy offers as approved. **Replace** their marketing with the one managed service. | “Are there old links or customer materials we should account for before proposing what happens to these URLs?” |
+| Hosting & Email and the account link are visible on the current site. [Hosting & Email](https://miopages.com/web-hosting-and-email/) · [HostShop sign-in](https://my.miopages.com/login) | **Retire** standalone hosting and email as marketed offers. **Keep** the separate HostShop sign-in as the sole legacy service-related destination. | “Where should an existing customer see the account link? Who can verify account access and any transition communications separately?” |
+| Web Support lists broad services and implies immediate availability. [Web Support](https://miopages.com/web-support/) | **Retire** the old support offer and **exclude** its response promises from the new marketing. Existing obligations are a separate transition matter. | “Are there commitments that need a private transition plan, and who can verify them before we propose retiring the old URLs?” |
+| A self-managed QR website offer with a low monthly price remains reachable via the sitemap. Separate proposal and Kickstart pages also returned 200. [Self-managed websites](https://miopages.com/self-managed-websites-with-qr/) · [Request a Proposal](https://miopages.com/request-proposal/) · [Kickstart Wizard](https://miopages.com/online-kickstart-mind-map-wizard/) · [Kickstart session](https://miopages.com/online-kickstart-with-a-zoom-mind-mapping-session/) | **Retire** the QR/self-managed offer and **exclude** its old price and legacy signup prompts. Old URL dispositions remain open. | “Are any QR links, printed materials or customer dependencies still in use?” Record them before proposing changes to any URLs or flows. |
 | The Gallery shows legacy project names and images, including Ragan Design Group, TSG Performance and Nerds Love Art. [Project Gallery](https://miopages.com/project-gallery/) | **Replace** the gallery treatment with evidence-led Experience. The brief explicitly holds back Nerds Love Art. Leave other cards in **Investigate** until the individual contribution and rights are clear. | “Is any old item too dated, no longer yours to show, or likely to imply a current relationship?” Keep the holdback through imports and future drafts. Preserve private reference only when authorized. |
-| General contact form and published contact choices. [Contact](https://miopages.com/contact/) | **Investigate** what works and what customers use. **Improve** to route a Review, a new service question and existing-customer help appropriately if evidence supports separate paths. | “Which of these routes should a new prospect use? Which are only for existing customers? Who receives each one today?” Leave observed phone/email details unconfirmed until checked. |
+| General contact form and published contact choices. [Contact](https://miopages.com/contact/) | **Investigate** delivery and use. **Improve** the new-service inquiry path and keep HostShop account access separate. | “Which actual business phone, email or location should visitors see, if applicable? Where should the form deliver new-service inquiries? Do any existing channels need transition communications?” Confirm currentness and publication intent for each item. Verify form delivery separately. |
 | Blog index displays older articles, including an old QR offer and an account-portal announcement. [Blog](https://miopages.com/blog/) | **Investigate** by topic and URL. **Keep as is** is available for any accurate, owned evergreen article verified by the owner. Group expired offers and announcements for possible **retirement**, subject to continuity checks. | “Which articles do you still share or want prospects to find? Which links should keep working even if the article or offer is retired?” Exclude old prices and activation prompts from imported new-site content. |
 | Footer policy and terms links. [Privacy Policy](https://miopages.com/privacy-policy/) · [Terms of Use](https://miopages.com/terms-of-use/) | **Investigate** continuity and obtain the owner-approved text applicable to the new service before deciding whether to keep or replace. | “Which policy or terms must remain accessible during the transition, and who can approve updates?” Existing text does not establish suitability for the new offer. |
 
@@ -224,10 +269,9 @@ of redirects remain part of launch work.
   what fallback to show if a booking tool is unavailable. Request only a public
   link or the system name. Configuration and verification happen through the
   protected workflow.
-- If an existing customer needs hosting access or urgent help, preserve that as a
-  distinct utility intent with an approved destination. It should not be counted as
-  a new prospect conversion. For a poor fit, determine the useful next path with
-  the owner, without implying paid work or immediate support.
+- For existing-customer hosting account access, use the verified public HostShop
+  sign-in as a distinct utility action. Count only new-service actions toward
+  prospect conversion. For a poor fit, determine a useful next path with the owner.
 
 Follow the chosen action through **viewed → selected → accepted → delivered →
 qualified**, where those events are applicable. The scope review names who can
@@ -237,7 +281,7 @@ handoff are unresolved. [Conversion Architecture](conversion-architecture.md)
 
 ### Let the customer give as much useful context as they have
 
-> “You can add a link, paste an explanation or give us the material you already use. Tell us what it is and whether it’s current. We’ll bring back the parts that affect the website and ask about anything unclear.”
+> “You can share pages, screenshots, images or other business material you already use. Tell us what is current, what you have permission to use, and what you want to keep, rewrite or remove. We’ll bring back the parts that affect the website and ask about anything unclear.”
 
 The proposed interface accepts material alongside its topic, with repeatable
 entries for offerings, evidence, locations and existing-site items. A customer can
@@ -250,10 +294,14 @@ Allow relevant follow-ups and additional material after saving, without a quota 
 topics or questions. Bound individual uploads and requests for safety, with a clear
 way to add more in separate items. Future document/media intake needs scoped private
 storage, type and size validation, rights and consent labels, redaction guidance,
-retention and an authenticated access path. The customer can share nonsecret links
-or references in an assisted review until that is available. Never ask for passwords
-or client data dumps. Mark statements as supplied, observed, inferred for review,
-confirmed, excluded or unresolved at the level where the evidence applies.
+retention and an authenticated access path. In assisted review, invite actual
+publishable business contacts, public links and appropriate business materials.
+Treat internal form routing and nonpublic materials as private submissions and
+use an approved private channel when needed. Git and issue comments carry the
+review record without private source content. Passwords and payment data use
+their dedicated secure flows. Mark statements as supplied, observed, inferred
+for review, confirmed, excluded or unresolved at the level where the evidence
+applies. [Normal contact and existing-site evidence](paid-onboarding-knowledge-transfer-contract.md#normal-contact-and-existing-site-evidence-are-welcome)
 
 Context can make other questions relevant. A proposed integration prompts a question
 about the owner and required behavior, not credentials. A new location prompts which
@@ -263,13 +311,17 @@ routes to the right reviewer before that claim or material is used.
 
 ## The assessment C0 would see today
 
-> **Here is what we understand about MioPages.** You help established service and technical businesses explain their expertise and keep their Web presence useful. The service has a defined starting point in Launch and continuing support in Ongoing. The old site makes hosting, builders and broad support much more prominent than the managed relationship. It also gives existing customers a recognizable account link, which is worth preserving if verified. The new site should explain the relationship first and give existing customers a clear utility route.
+> **What you’ve confirmed.** MioPages is launching one managed Web Presence service for established service and technical businesses, with Launch and Ongoing. The old offers are being retired. Existing customers will keep their separate HostShop sign-in.
+>
+> **What we observed.** The public site emphasizes hosting, site builders and broad support. Its hosting-account button reaches the HostShop sign-in page.
+>
+> **What we propose.** Explain the managed relationship first and make the existing account link easy to find. Use this draft to decide which claims and next steps are ready for the new site.
 
 | Candidate knowledge or recommendation | Evidence and status | Effect on the proposed site |
 | --- | --- | --- |
 | Initial audience, US remote focus, ownership and lower administrative burden | Confirmed in C0 Business Knowledge. A more specific buyer trigger, objection and fit signal remain open. | A grounded Home message is possible. Buyer-specific copy and targeting need examples. |
 | One Offering with Launch, expanded scope when justified, and Ongoing | Approved brief and Offering revision 1. Normal deliverables and handoff detail require confirmation. | Service can explain the relationship and its stages. Detailed inclusions, timelines and commercial promises stay provisional. |
-| Move legacy hosting and open-ended support out of new-client positioning | Direct site observation plus approved service positioning. Specific old-content dispositions are recommendations for owner review. | Lead with managed outcomes. Keep verified existing-customer account/support access separate from the new-client path. |
+| Retire the legacy offers and preserve HostShop access | Owner-approved catalog and portal decision. The public sign-in destination was independently observed. URL dispositions and transition obligations are unresolved. | Lead with the single managed offer. Keep [HostShop sign-in](https://my.miopages.com/login) separate from the new-client path. |
 | Proof on Experience | Named historical leads and legacy Gallery observed. Specific contribution, outcome and permissions are open. The recorded holdback and stock rejections apply. | Use an accurate text-led Experience draft while evidence is gathered. Any public case, image or results claim needs its own clearance. |
 | Review-first visitor action with a secondary conversation or start path | The brief supports the Review and a continuation choice. The production primary action, destination, delivery and recipient are unresolved. | Draft the Review explanation and outline the flow. Hold any live form or timing promise until operational verification. |
 | Design and content continuity | Prior accepted v3 explains the service visually and is useful reference evidence. Legacy URLs and assets need item decisions. | Compare purposeful explanatory graphics with verified materials. Propose a single direction after knowledge confirmation. Keep URL migration independent of visual approval. |
@@ -278,7 +330,7 @@ routes to the right reviewer before that claim or material is used.
 responsibility MioPages takes. Service explains the start, handoff, continuing care
 and fit boundaries. Experience explains the relevant work with the proof actually
 available. Review sets useful expectations and supports the confirmed visitor
-action when verified. Existing customers get a distinct utility route. Policies
+action when verified. Existing customers get the separate HostShop link. Policies
 and contact paths depend on applicable approval and verified destinations. This
 outline follows the evidence and remains a recommendation. The customer can
 correct intent or priority without choosing pages, templates or styling mechanics.
@@ -296,9 +348,9 @@ action before asking people to use it.
 
 **What is ready.** There is enough evidence for an initial assessment and an
 outline. Before requesting confirmation of the build basis, ask for the normal
-Launch/Ongoing deliverables and limits, one real buying example, and the owner's
-decision on the legacy offer and customer-access paths. Decide whether Experience
-can remain text-led. Agree the primary visitor action and assign verification of
+Launch/Ongoing deliverables and limits, one real buying example, and any
+transition dependencies around old URLs or existing commitments. Decide whether
+Experience can remain text-led. Agree the primary visitor action and assign verification of
 its recipient and delivery. Make any accepted fallback explicit in the summary.
 Optional extra proof or content can continue in parallel. Business understanding,
 Presence Direction and complete-site acceptance still use the existing checkpoints.

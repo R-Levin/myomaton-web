@@ -10,11 +10,10 @@ These are proving roles, not separate architectures. The
 [canonical C0 customer graph](miopages-c0-canonical-state.md) now exists; its existence
 does not imply that the planned commercial workflows are implemented.
 
-MioPages already exists as a real but largely moribund web-presence business/site.
-Its existing content is historical input, not canonical product direction. Its
-positioning, offer, content and design are open to reconsideration through trusted
-operator decisions. This document defines a product hypothesis and proving purpose;
-it does not launch the service, migrate the existing site or write customer state.
+MioPages already exists as a real web-presence business and website. Its legacy
+content is historical input. This document defines the proving purpose and records
+the owner-approved transition below. Launch, migration and customer state changes
+remain subject to their existing approvals.
 
 The [Web Presence service model](web-presence-service-model.md) owns the reusable
 service independent of this business. The [capability catalog](platform-capabilities.md)
@@ -31,6 +30,28 @@ The [approved provisional C0 business brief](miopages-c0-business-brief.md) is t
 completed discovery output and canonical input for the next IA/content-model phase.
 It refines this document's broader hypotheses; reopen discovery only for a genuine
 contradiction or missing business fact. It authorizes no publication or state writes.
+
+## Founder-led transition to the managed service
+
+**Owner-approved direction, November 9, 2026.** MioPages is launching one managed
+Web Presence service and retiring every legacy offering, including standalone
+hosting and email, legacy website and support packages, and QR-code/self-managed
+websites. The sole legacy service-related destination to carry forward is the
+existing-customer HostShop sign-in at [my.miopages.com/login](https://my.miopages.com/login).
+The current public homepage's hosting-account button was verified to reach that
+sign-in page. Portal access after authentication, old URL dispositions, transition
+obligations and cutover remain separate. [Owner decision on Issue #10](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6740683772) ·
+[Existing-site inventory](c0-adaptive-onboarding-walkthrough.md#the-existing-site-review)
+
+This is an exceptional founder-led business launch. The owner and ChatGPT will
+work together on strategy, positioning, the service offer, messaging, proof and
+content, with Codex supporting research, analysis and authorized development.
+Keep owner-confirmed facts and decisions, source-backed research, and AI-assisted
+proposals distinct. The owner retains final approval. Ordinary future customers
+continue to use the reusable self-service or assisted intake without mandatory
+strategic collaboration. These decisions guide the review draft. They do not
+authorize application changes, live migration, portal changes or publication.
+[Adaptive interview and assessment](c0-adaptive-onboarding-walkthrough.md)
 
 ## Historical and operational context
 
