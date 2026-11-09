@@ -8,6 +8,12 @@ The existing, **outdated website** describes an **established tree-service compa
 
 **Source/provenance correction (owner, November 9):** All of the business details above were obtained from the fictional company's **existing, outdated website**, not volunteered in an onboarding interview or directly confirmed by the company. Treat them as **unverified existing-site observations/claims requiring owner confirmation**, not as trusted customer-supplied or confirmed business truth. No specific site URL, real business name, actual phone number, addresses, hours, service terms or licenses has been provided for an independent inspection. This is an explicitly fictional scenario, not evidence of a website actually inspected by ChatGPT or Codex. Existing copy and payment logos also require rights/currentness checks before reuse.
 
+### The likely completed Free Review is the second starting source
+
+**Owner clarification, November 9:** The fictional tree-service owner **probably completed a Free Web Presence Review before paid onboarding**. The scenario must therefore test **both** the outdated website and the Review's actual intake conversation and delivered assessment as prior evidence. The Review might have captured goals, frustrations, desired customer actions, business priorities, missing information, and the system's initial website recommendations. **No concrete Free Review answers or delivered assessment were supplied for this fictional customer, so do not invent them or present their content as known.**
+
+At the beginning of paid onboarding, show a concise consolidated preview: **What the old site says** (observed/unverified), **What you told us during your Free Review** (attributed answers, if a Review really occurred), and **What our Review recommended** (assessment, not confirmed truth). Ask the owner to correct contradictions and outdated claims, then focus on genuinely missing or deeper site-build questions. Skip any question already adequately answered in the Review. If there was no Review (direct start), use the available website and initial intake instead. Research, interviews and proposed strategies do not establish publication rights or verified current facts.
+
 ## 2. Immediate system understanding — do not ask these generic questions again
 
 The system should **begin with a provisional site-derived assessment**, summarize the extracted information naturally, and invite corrections, instead of asking the owner to repeat site content as though nothing is known. Group findings as structured **unconfirmed** candidates:
@@ -45,7 +51,7 @@ A grounded initial assessment might say:
 
 **Possible initial architecture (recommendation only):** Home, Tree Care, Emergency Service, Other/Seasonal Services, About/Experience, Contact/Free Estimate, plus an appropriate **new** helpful-articles/FAQ content capability; perhaps location guidance and useful seasonal education. Do not invent a universal page count or require equal pages for yard clearing, firewood and plowing. SEO/location pages should depend on real service-area evidence rather than fabricated town coverage. Confirm emergency and routine conversion paths, not merely CTA labels.
 
-**Current assessment status:** *useful provisional website-derived understanding, not confirmed and not build-ready*. Next owner questions should resolve whether the website's claimed services and priorities are still accurate, specific tree-care job types and exclusions, emergency contact/availability, public business identity and contact details, trust/evidence, seasonal services, any legacy pages/URLs worth retaining or excluding, and which genuinely helpful content topics should be introduced. When answers are supported, present a revised understanding and proposed site direction for factual confirmation, not an auto-published site.
+**Current assessment status:** *useful provisional website-derived understanding; plus any actual prior Free Review findings once supplied, not confirmed and not build-ready*. Next owner questions should resolve whether the website's claimed services and priorities are still accurate, specific tree-care job types and exclusions, emergency contact/availability, public business identity and contact details, trust/evidence, seasonal services, any legacy pages/URLs worth retaining or excluding, and which genuinely helpful content topics should be introduced. When answers are supported, present a revised understanding and proposed site direction for factual confirmation, not an auto-published site.
 
 ## 5. Acceptance benchmark for Codex and the normal onboarding design
 
@@ -55,10 +61,11 @@ A grounded initial assessment might say:
 4. It requests exact necessary job types/exclusions, operating details, public destinations and proof permissions rather than treating “tree care” as sufficient copy.
 5. It allows long natural descriptions, repeatable service/proof records and future customer-supplied existing-site materials without a fixed total question limit.
 6. It avoids forcing a CRM or e-commerce workflow because the business takes digital payments.
-7. Its first assessment clearly distinguishes **old website observations**, **customer-confirmed facts**, unresolved details, feasible recommendations and unverified claims; it says what is and is not sufficient for the site.
+7. Its first assessment clearly distinguishes **old website observations**, **previous Free Review answers and recommendations (if actually available)**, **customer-confirmed facts**, unresolved details, feasible recommendations and unverified claims; it says what is and is not sufficient for the site.
 8. C0's founder-specific strategy collaboration remains distinct from the ordinary Customer 2 experience, which should be thorough, low-friction, prepared and mostly managed by the platform.
 9. An actual website/asset inspection and upload capability must be implemented, authorized and tested before claiming it works; sample responses are *design expectations*, not working code.
 10. Recognizes the **outdated existing site** as the information source and likely **replacement** candidate, while separately auditing useful content, destination URLs and contact continuity before retirements/redirects.
 11. Recognizes the **absence of a blog/content-marketing function** as a content opportunity and proposes suitable new educational content without inventing prior articles, without promising a fixed content quota and without granting permission to publish unverified tree-care claims.
+12. For a Review-led customer, loads the **actual Free Review interview, follow-ups and delivered assessment**, reconciles them with the existing-site evidence and demonstrates that meaningful information is not re-asked. For direct start, it does not pretend a Review took place.
 
 **No production records, live local sessions, legacy services, DNS or WordPress generation are authorized by this scenario.**
