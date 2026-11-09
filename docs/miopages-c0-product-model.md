@@ -89,6 +89,20 @@ service businesses, small agencies and small nonprofits/organizations. These are
 discovery targets, not industry restrictions. The approximate organization size
 is an acquisition hypothesis, not a platform limit or eligibility rule.
 
+**Owner-confirmed market clarification (November 9, 2026):** Established
+local service and trade businesses—such as the fictional Bucks/Montgomery
+County tree-service example—are **included** in the intended customer
+market alongside professional and technical service firms. C0 marketing
+may prioritize subsegments based on demonstrated fit and service economics,
+but must not exclude capable local services by default. The hypothetical
+case is a useful onboarding design benchmark, not evidence of a real lead
+or confirmed customer demand. The normal Review-led journey carries both
+**existing website/public-presence observations** and the **actual Free
+Review conversation and assessment** into deeper paid onboarding, with
+no redundant re-entry. See [the knowledge-transfer contract](paid-onboarding-knowledge-transfer-contract.md)
+and [fictional Customer 2](fictional-customer-2-tree-service-onboarding-scenario.md).
+
+
 ### Customer pains to test
 
 - An outdated or embarrassing website with no clear internal owner.
