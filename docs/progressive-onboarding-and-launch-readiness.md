@@ -140,8 +140,17 @@ Review path: foundational information → Free Review → prospect elects to con
 → reuse known information → fit/scope confirmation and commercial gate → deeper
 paid onboarding.
 
-Direct start: **same foundational questions/information** → skip Review delivery
-→ fit/scope determination → same commercial gate → deeper paid onboarding.
+Direct start: **same foundational questions/information** (completed within the
+onboarding journey, not as a mandatory Free Review) → skip Review assessment and
+delivery → fit/scope determination → same commercial gate → deeper paid onboarding.
+**The Free Review is optional, not a prerequisite to becoming a customer.** On
+direct start, foundational discovery and deep paid discovery are both part of
+one continuous, versioned, resumable customer onboarding experience, with no
+repeated answers, artificial second form or implied free Review. Reuse website
+research and any other genuine prior facts. Only the applicable foundational
+questions are needed to establish fit/scope and a legitimate commercial
+commitment before the deeper paid interview; don't defer all business context
+until after billing or present unverified payment as authorization.
 
 Reuse known answers on either path; direct start does not force redundant re-entry
 or buy an unseen scope. Assisted start guides this same process. Neither path is a
