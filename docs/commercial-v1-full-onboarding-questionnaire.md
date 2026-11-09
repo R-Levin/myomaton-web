@@ -2,6 +2,34 @@
 
 **Status: Working implementation specification for C0 rehearsal, 2026-11-08.** The owner directed that the **complete “I'm becoming a client” process**, including the **full paid onboarding questionnaire**, be the first development step before rebuilding the C0 WordPress site. This document translates existing approved journey and intake decisions into an **initial testable question design**, not final sales terms, a deployed questionnaire, a new source of canonical customer truth or a production authorization. Exact wording, requiredness and effort must be refined by realistic testing.
 
+## Corrective owner review — November 8–9, 2026
+
+**The ten-section “provisional question bank” below was interpreted by
+Codex as the whole paid interview. That interpretation and resulting
+`paid-onboarding/1` experience are explicitly **rejected** for full
+Commercial V1 onboarding.** The owner completed the real C0 local
+walkthrough and found that it simply repeated initial interview-level
+questions, lacked detailed material for an actual assessment and
+Managed Site, and misleadingly offered individual routine update
+discussions as a customer service preference. **There is no fixed
+upper limit on questions or depth.** The intended experience is a
+prepared, doctor-office-style business knowledge transfer: comprehensive
+where necessary; much easier for customers through reuse, research,
+materials, explanations and adaptive questions; no repeated known
+facts or forced technical/site-design homework. The existing-site
+review must solicit both **what to preserve** and **what must be
+removed, replaced or deliberately excluded**.
+
+The authoritative corrective coverage model, UX and knowledge-based
+acceptance criteria are now in
+[full paid onboarding: business knowledge transfer](paid-onboarding-knowledge-transfer-contract.md).
+Read it **before** using the legacy ten rows below. Those rows
+represent only broad **topic headings**, not adequate questions,
+depth, conditional branches, completeness or acceptance criteria.
+The technical implementation can be retained as a tested local
+draft/resume/storage spike, but cannot be considered an accepted
+full onboarding deliverable or authorization to generate a site.
+
 ## Governing principles
 
 - **One progressive interview, not two conflicting forms.** Reuse and extend `lib/platform/intake/model.ts` and the versioned/resumable intake foundation. The existing `foundational-intake/2` (the twelve-screen early intake with primary vs secondary Action) and the older version-1 historical Review packet remain intact. Do not repurpose the October 14 Review submission as the original October 5–6 C0 interview.
