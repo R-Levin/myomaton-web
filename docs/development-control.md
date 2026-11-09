@@ -176,6 +176,50 @@ Implementation spec:
 Issue #9 is the initial executable task; align its acceptance
 with this updated priority before coding.
 
+### C0 owner walkthrough — full interview NOT accepted
+
+**November 8–9, 2026: customer experience failed product acceptance.**
+The owner actually completed the local ten-step Customer 0 interview.
+Step 9 misleadingly asked whether the customer preferred to
+"Discuss updates individually" when MioPages is a managed service;
+owner selected "Not sure yet" because the choices were inappropriate.
+At the final question, the owner said **“This seems like the initial
+interview, and it feels like it's not asking the kinds of questions we
+need to provide an initial assessment.”** On reflection, the owner
+called the outcome a serious departure from extensive earlier design:
+the full interview should resemble an easy, comprehensive
+doctor's-office intake, accept as much relevant business knowledge
+as the customer can give, ask as many conditional/detail questions
+as needed, reuse prior answers, and establish both **what to retain
+AND what to remove/avoid** from the existing site.
+
+**Root cause:** The working ten-heading spec did not require deep
+business-knowledge collection or readiness tests. The subsequent
+`paid-onboarding/1` implementation captured mostly one superficial
+answer per broad topic and used completing ten screens as the
+submission threshold. The 388 reported tests validate technical
+behavior (isolation, draft/resume, stale edits and immutability),
+**not a meaningful assessment or build-ready knowledge**.
+The assistant's earlier instructions were too thin. Treat commit
+`4672bfa` as a useful local technical experiment, **not an
+accepted Commercial V1 full onboarding interview**. Do not quietly
+expand the form to a fixed 20/50-question checklist, claim
+customer acceptance, restart/delete the owner test without
+permission or proceed to WordPress generation on this basis.
+
+The corrective product contract is
+[deep adaptive paid onboarding knowledge transfer](paid-onboarding-knowledge-transfer-contract.md);
+it clarifies that "no giant second form" forbids irrelevant
+repeated work, not depth. The immediate next step is a grounded
+read-only coverage gap analysis of real C0 and a **reviewable
+sample adaptive interview** that surfaces relevant deep follow-ups,
+reused known material, offering-level details, explicit
+retain/improve/replace/retire/avoid inventory, customer proof and
+first assessment. Review the **content and customer experience**
+before coding a replacement. Full system implementation requires
+source/provenance and customer authorization checks and must
+respect existing production/hosted safeguards.
+
 ### Issue #9 · first local signup and onboarding slice
 
 Run `node --import tsx scripts/intake/c0-onboarding.ts` from the repository root
