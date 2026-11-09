@@ -234,7 +234,7 @@ before coding a replacement. Full system implementation requires
 source/provenance and customer authorization checks and must
 respect existing production/hosted safeguards.
 
-### Issue #10 · C0 interview design ready for owner and ChatGPT review
+### Issue #10 · reviewed C0 interview design
 
 The [C0 adaptive onboarding walkthrough](c0-adaptive-onboarding-walkthrough.md)
 records the source and prototype coverage gaps, a November 9 read-only public
@@ -255,16 +255,72 @@ supporting role and the owner's final approval. The
 also confirms that actual business contacts and appropriate existing-site
 materials are normal onboarding inputs for C0 and ordinary customers.
 
-This checkpoint is documentation only. Review the
+The design handoff covered the
 [Standard Launch conversation](c0-adaptive-onboarding-walkthrough.md#understand-the-offering-well-enough-to-explain-it),
 [existing-site inventory](c0-adaptive-onboarding-walkthrough.md#the-existing-site-review)
 and [proposed assessment](c0-adaptive-onboarding-walkthrough.md#the-assessment-c0-would-see-today)
-with the owner and ChatGPT before implementation. Legacy URL dispositions and
-transition obligations remain separate from the approved catalog decision.
-If accepted, start with one deep offering branch, evidence reuse, one durable
-exclusion and the resumable assessment. Existing release and confirmation
-gates apply. The Issue #9 application and the saved owner result were not used
-as a build basis or edited in preparing this design.
+with the owner and ChatGPT. Legacy URL dispositions and transition obligations
+remain separate from the approved catalog decision. The agreed implementation
+and current review boundary are recorded below.
+
+### Issue #10 · adaptive intake rehearsal ready for review
+
+The [November 9 owner authorization](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6741173857)
+opens the bounded local implementation. It keeps the existing-site inventory
+and earlier Free Review distinct, reuses confirmed discovery and focuses on a
+material source difference, one offer and visitor branch, one additional
+existing-site decision, and a provisional assessment. The
+[optional Review clarification](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6741359817)
+adds a direct-start check of the missing foundational goal and a local fit and
+scope checkpoint before deeper discovery in the same draft. No Free Review
+assessment is required on direct start. C0's retained October 14
+Review is separate from its October 5–6 discovery. The local view shows four
+selected business answers and the exact approved, undelivered assessment if
+the existing protected Review record can be verified. Older Review wording
+about startups and the old site's legacy catalog are visible alongside the
+current owner-confirmed direction. Fictional C2 uses the supplied old-site
+observations and flags missing Review evidence. No transcript, delivery or
+confirmed tree-service claims are inferred.
+
+From the repository root in local PowerShell:
+
+```powershell
+$env:NODE_ENV = 'development'
+$env:MIOPAGES_REVIEW_SYNTHESIS = 'local-operator'
+node --import tsx scripts/intake/c0-onboarding.ts --adaptive
+```
+
+Open [Customer 0](http://127.0.0.1:4321/onboarding) or
+[fictional Customer 2](http://127.0.0.1:4321/onboarding/customer-2). Select
+**Open prepared interview**, expand the sources, then choose **Needs a
+correction** or confirm the prepared summary. In C2, add a fictional business
+goal. Review the proposed scope and choose **Continue in this rehearsal**.
+In C0, choose **Request a Free Review** to see the handoff follow-up.
+In C2, choose **Emergency calls and routine
+estimates**, then switch to **Request an estimate** to see the emergency
+follow-up disappear. Use **Save progress**, reload, and add an **Explicitly
+exclude from future drafts** decision before reading the assessment. Submission
+preserves the answers and prepared-source fingerprint for review in the
+disposable database. It cannot serve as activation evidence.
+
+The new mode uses port 4321, a fresh disposable cluster, separate scenario
+scopes and cookies, and the existing draft, optimistic version and immutable
+submission contracts. The earlier 4320 rehearsal and any saved owner run stay
+separate. Saving and resuming works while the same local launcher is running.
+Private Review material stays in the existing local store and the loopback
+session. Source selection and reconciliation in this slice are prepared from
+reviewed records. Automated site or document import, matching delivered Reviews
+from live accounts, AI follow-ups, durable canonical exclusion, authenticated
+onboarding and launch remain future work.
+
+Verification passed: 388 application tests, 23 PostgreSQL intake and activation
+tests, TypeScript and focused lint. A desktop Chrome C0 walkthrough loaded the
+verified Review, saved and reloaded a conditional answer, recorded an exclusion
+and submitted an immutable draft. A mobile Chrome C2 walkthrough confirmed the
+foundational priority and local scope gate before deeper questions, and verified
+that switching from emergency calls to routine estimates hides the obsolete
+follow-up. The database regression also verifies tenant and stale-source refusal.
+Pause here for owner review before further implementation or WordPress generation.
 
 ### Issue #9 · first local signup and onboarding slice
 

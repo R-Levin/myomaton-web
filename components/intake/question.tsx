@@ -1,7 +1,7 @@
 import { questionsFor, legacyIntakeVersion, intakeVersion, questionTitle, fieldLabel, fieldApplies, type Answers } from "../../lib/platform/intake/model";
 
-export function InterviewQuestion({ index, answers, errors, change, classes = {}, questionnaireVersion = legacyIntakeVersion }: { index: number; answers: Answers; errors: Record<string, string>; change: (key: string, value: string | string[]) => void; classes?: Record<string,string>; questionnaireVersion?: string }) {
-  return <>{questionsFor(questionnaireVersion)[index].fields.filter(f => fieldApplies(f, answers)).map(field => {
+export function InterviewQuestion({ index, answers, errors, change, classes = {}, questionnaireVersion = legacyIntakeVersion, hiddenFields = [] }: { index: number; answers: Answers; errors: Record<string, string>; change: (key: string, value: string | string[]) => void; classes?: Record<string,string>; questionnaireVersion?: string; hiddenFields?: readonly string[] }) {
+  return <>{questionsFor(questionnaireVersion)[index].fields.filter(f => !hiddenFields.includes(f.key) && fieldApplies(f, answers)).map(field => {
     const id = `intake-${field.key}`, error = errors[field.key], description = [field.hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined;
     const label = fieldLabel(field, answers), value = answers[field.key];
     const repeated = label.replace(/ \(optional\)$/i, "") === questionTitle(index, answers, "FREE_REVIEW", questionnaireVersion);

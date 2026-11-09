@@ -21,7 +21,7 @@ export function sessionToken(request: Request, cookieName = intakeCookie) {
   return /^[a-f0-9]{64}$/.test(token) ? token : null;
 }
 export async function intakeHttp(request: Request, service: IntakeService, abuse: ContactAbuseGuard, enabled: boolean, sharedDevelopment = false) {
-  const cookieName = service.isOnboarding ? "miopages_c0_onboarding" : sharedDevelopment ? "miopages_intake_shared_development" : intakeCookie;
+  const cookieName = service.isOnboarding ? service.onboardingCookie : sharedDevelopment ? "miopages_intake_shared_development" : intakeCookie;
   const reply = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store", "Vary": "Cookie" } });
   if (!enabled || !loopbackOrigin(request.url)) return reply({ error: "unavailable" }, 503);
   if (request.headers.get("x-intake-request") !== "1") return reply({ error: "invalid_origin" }, 403);

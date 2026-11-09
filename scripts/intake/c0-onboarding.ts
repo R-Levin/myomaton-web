@@ -11,6 +11,7 @@ import { developmentGuard } from "../../lib/platform/contact/boundaries";
 import { normalizeKnowledge, normalizeOffering } from "../../lib/platform/canonical/model";
 import { intakeHttp } from "../../lib/platform/intake/http";
 import { IntakeService, type IntakeEvidence } from "../../lib/platform/intake/service";
+import { prepareC0, prepareC2 } from "./adaptive-sources";
 
 const host = "127.0.0.1", port = 4320;
 const headers = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer",
@@ -31,8 +32,9 @@ function prefill() {
     offer: evidence("approved offer summary"), serviceArea: evidence("remote/national US; mapped to Nationwide") } };
 }
 
-export async function createC0Onboarding(bin: string) {
-  const client = await build({ entryPoints: { onboarding: "scripts/intake/c0-onboarding-client.tsx" }, bundle: true, write: false,
+export async function createC0Onboarding(bin: string, adaptive = false) {
+  const entry = adaptive ? "scripts/intake/adaptive-onboarding-client.tsx" : "scripts/intake/c0-onboarding-client.tsx";
+  const client = await build({ entryPoints: { onboarding: entry }, bundle: true, write: false,
     outdir: "onboarding", jsx: "automatic", platform: "browser", define: { "process.env.NODE_ENV": '"production"' }, minify: true });
   const assets = new Map(client.outputFiles.map(file => [file.path.endsWith(".css") ? "/onboarding.css" : "/onboarding.js", file.text]));
   if (assets.size !== 2) throw Error("Expected isolated interview assets");
@@ -42,12 +44,20 @@ export async function createC0Onboarding(bin: string) {
   const pool = new Pool({ connectionString: cluster.url });
   try {
     await migrateWithBootstrapCompatibility(pool);
-    const organization = randomUUID(), webPresenceId = randomUUID(), managedSiteId = randomUUID();
-    await pool.query("INSERT INTO organizations(id,name,status) VALUES($1,'C0 onboarding rehearsal','active')", [organization]);
-    await pool.query("INSERT INTO web_presences(id,organization_id,name,status) VALUES($1,$2,'C0 onboarding rehearsal','active')", [webPresenceId, organization]);
-    await pool.query("INSERT INTO managed_sites(id,web_presence_id,name,status) VALUES($1,$2,'C0 onboarding rehearsal','active')", [managedSiteId, webPresenceId]);
-    const selection = { webPresenceId, managedSiteId };
-    const service = new IntakeService(pool, selection, { database: new URL(cluster.url).pathname.slice(1), ...prefill() });
+    async function scope(name: string) {
+      const organization = randomUUID(), webPresenceId = randomUUID(), managedSiteId = randomUUID();
+      await pool.query("INSERT INTO organizations(id,name,status) VALUES($1,$2,'active')", [organization, name]);
+      await pool.query("INSERT INTO web_presences(id,organization_id,name,status) VALUES($1,$2,$3,'active')", [webPresenceId, organization, name]);
+      await pool.query("INSERT INTO managed_sites(id,web_presence_id,name,status) VALUES($1,$2,$3,'active')", [managedSiteId, webPresenceId, name]);
+      return { webPresenceId, managedSiteId };
+    }
+    const database = new URL(cluster.url).pathname.slice(1);
+    const selection = await scope("C0 onboarding rehearsal");
+    const c0 = adaptive ? { answers: {}, provenance: {}, prepared: await prepareC0() } : prefill();
+    const service = new IntakeService(pool, selection, { database, ...c0 });
+    const routes = new Map([["/api/onboarding", service]]);
+    if (adaptive) routes.set("/api/onboarding/customer-2", new IntakeService(pool, await scope("Fictional C2 onboarding rehearsal"),
+      { database, answers: {}, provenance: {}, prepared: prepareC2() }));
     const abuse = developmentGuard(120);
     function listener() {
       const server = createServer(async (req, res) => {
@@ -56,14 +66,15 @@ export async function createC0Onboarding(bin: string) {
         if (req.socket.remoteAddress !== host || !addr || typeof addr === "string" || req.headers.host !== `${host}:${addr.port}`) return send(403, "text/plain", "Local access required.");
         try {
           const route = req.url;
-          if (route === "/api/onboarding" && (req.method === "GET" || req.method === "POST")) {
-            const request = new Request(`http://${host}:${addr.port}/api/onboarding`, { method: req.method, headers: new Headers(req.headers as Record<string, string>),
+          const intake = route && routes.get(route);
+          if (intake && (req.method === "GET" || req.method === "POST")) {
+            const request = new Request(`http://${host}:${addr.port}${route}`, { method: req.method, headers: new Headers(req.headers as Record<string, string>),
               ...(req.method === "POST" && { body: Readable.toWeb(req), duplex: "half" }) } as RequestInit);
-            const response = await intakeHttp(request, service, abuse, true);
+            const response = await intakeHttp(request, intake, abuse, true);
             const body = await response.text();
             res.writeHead(response.status, { ...headers, ...Object.fromEntries(response.headers) }).end(body);
           } else if (req.method !== "GET") send(405, "text/plain", "Unsupported request.");
-          else if (route === "/onboarding" || route === "/") send(200, "text/html; charset=utf-8", page);
+          else if (route === "/onboarding" || route === "/" || adaptive && route === "/onboarding/customer-2") send(200, "text/html; charset=utf-8", page);
           else if (route && assets.has(route)) send(200, route.endsWith(".css") ? "text/css; charset=utf-8" : "text/javascript; charset=utf-8", assets.get(route)!);
           else send(404, "text/plain", "Unknown rehearsal page.");
         } catch { send(503, "text/plain", "Local rehearsal unavailable."); }
@@ -75,11 +86,15 @@ export async function createC0Onboarding(bin: string) {
 }
 
 async function main() {
-  const rehearsal = await createC0Onboarding(process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin");
+  const adaptive = process.argv[2] === "--adaptive";
+  if (process.argv.length > (adaptive ? 3 : 2)) throw Error("Unexpected rehearsal argument");
+  const listenPort = adaptive ? 4321 : port;
+  const rehearsal = await createC0Onboarding(process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin", adaptive);
   const server = rehearsal.listener();
   try {
-    server.listen(port, host); await once(server, "listening");
-    console.log(`Customer 0 onboarding rehearsal: http://${host}:${port}/onboarding (Ctrl+C closes the disposable session)`);
+    server.listen(listenPort, host); await once(server, "listening");
+    console.log(`Customer 0 onboarding rehearsal: http://${host}:${listenPort}/onboarding (Ctrl+C closes the disposable session)`);
+    if (adaptive) console.log(`Fictional Customer 2: http://${host}:${listenPort}/onboarding/customer-2`);
     await new Promise<void>(resolve => { process.once("SIGINT", resolve); process.once("SIGTERM", resolve); });
   } finally {
     if (server.listening) { server.closeAllConnections(); await new Promise<void>(resolve => server.close(() => resolve())); }
@@ -88,5 +103,5 @@ async function main() {
 }
 
 if (process.argv[1]?.replaceAll("\\", "/").endsWith("/scripts/intake/c0-onboarding.ts")) {
-  main().catch(() => { console.error("Unable to start isolated C0 onboarding. Check local PostgreSQL utilities and port 4320."); process.exitCode = 1; });
+  main().catch(() => { console.error("Unable to start isolated onboarding. Check local PostgreSQL utilities and the selected loopback port."); process.exitCode = 1; });
 }

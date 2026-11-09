@@ -1,7 +1,7 @@
 import { choice, fingerprint, object, text, uuid } from "../canonical/model";
 import { submissionDigest, type Owner, type Submission } from "../reviews/model";
 import type { InformationConfirmation } from "./information";
-import { onboardingVersion } from "../intake/onboarding";
+import { intakeVersion, legacyIntakeVersion } from "../intake/model";
 
 export type Operation = "inspect" | "create" | "confirm-commercial" | "assess" | "confirm-information" | "initialize-customer" | "confirm-business-information";
 export type Scope = Owner & { pendingCustomerId: string };
@@ -20,7 +20,9 @@ export type CreateCase = { requestId: string; scope: Scope; submissionId: string
 export function digest(value: unknown) { if (typeof value !== "string" || !/^[a-f0-9]{64}$/.test(value)) throw Error("Invalid digest"); return value; }
 export function scope(value: Scope): Scope { object(value, ["webPresenceId", "managedSiteId", "pendingCustomerId"]); return { webPresenceId: uuid(value.webPresenceId), managedSiteId: uuid(value.managedSiteId), pendingCustomerId: uuid(value.pendingCustomerId) }; }
 export function source(submission: Submission): Source {
-  if (submission.questionnaire_version === onboardingVersion) throw Error("Rehearsal onboarding is not activation evidence");
+  if (submission.questionnaire_version !== legacyIntakeVersion && submission.questionnaire_version !== intakeVersion) {
+    throw Error("Only foundational submissions are activation evidence; rehearsal onboarding is not activation evidence");
+  }
   if (submissionDigest(submission) !== submission.digest) throw Error("Immutable source digest mismatch");
   return { submissionId: uuid(submission.id), intakeId: uuid(submission.intake_id), digest: digest(submission.digest), questionnaireVersion: text(submission.questionnaire_version, 80), draftVersion: submission.draft_version, path: choice(submission.entry_intent, ["FREE_REVIEW", "DIRECT_START"]) };
 }
