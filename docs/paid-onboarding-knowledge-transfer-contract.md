@@ -20,6 +20,42 @@ After onboarding, the customer should feel that MioPages has **thoroughly unders
 - **Material unknowns get resolved.** The system may infer directions for review, but must not silently invent pricing, qualifications, claims, commitments, reviews, testimonials, rights, products or promises. The customer can say “not sure,” with appropriate follow-up/support and launch-readiness classification.
 - **Complete enough for a site vs complete every optional answer:** The full interview remains open to richer input even after minimum site facts are known. A knowledge-readiness assessment, not a fixed number of answered questions, determines when the operator can recommend a plan. Optional detail can continue without blocking progress; key missing facts are explicit exceptions.
 
+### Normal contact and existing-site evidence are welcome
+
+**Owner clarification, November 9, 2026.** Do **not** make ordinary
+business onboarding artificially timid about concrete customer details.
+For C0 and normal customers, invite and capture **real business contact
+information intended for the website** (published phone/email,
+contact form destination, general business address/location and
+appropriate business contact name), as well as relevant **existing
+website text, pages, screenshots, files, images, offers, current
+claims and their history**. Review their accuracy, currentness,
+ownership, publishing intent and keep/revise/retire/exclude decisions.
+Where the customer consents, this information is essential to an
+accurate assessment and launch-ready website, not an improper
+exception to normal intake.
+
+Ask for a real contact destination rather than a vague preference
+about whether visitors should call or message. Distinguish business
+information meant to be **published** from private customer/Operator
+contact details and access/administration data. Invite URLs, excerpts
+and appropriate business materials directly during assisted C0
+strategy work; use the intended scoped/private onboarding storage
+for nonpublic submissions when implemented. Public site research is
+not equivalent to permission to republish every asset or claim.
+Avoid placing personal contact records, private documents, credentials
+or confidential customer data into **Git**, issue comments or public
+documentation. Access tokens, passwords and payment information require
+their specialized secure flows, never interview free text.
+
+The current local spike and walkthrough do **not** yet prove secure
+private document ingestion or full existing-site import. Treat
+these as concrete product capabilities/gaps to implement rather than
+reasons to avoid asking customers for useful source materials. The
+founder can provide normal business materials and authorize actual
+use of them in the C0 strategy exercise; do not invent contact details
+or infer consent from an observed legacy page.
+
 ## Required business-knowledge coverage (adapted per business)
 
 For **every applicable topic** below, support as much specificity as the customer can reasonably provide. These are **coverage domains**, not an instruction to ask every business every question or to overwhelm them with one page of fields. Use structured repeatable objects (e.g., multiple products/services, locations, teams, proof examples) with sensible free-text and file/reference support.
