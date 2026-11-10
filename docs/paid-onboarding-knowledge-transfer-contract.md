@@ -24,6 +24,34 @@ For the category and intended market, examine a few appropriate organic search r
 Turn the short research result into an explainable comparative understanding: **what the owner has said; what existing evidence shows; what customers appear to seek; what other providers commonly present; where there is a meaningful discrepancy or opportunity; and what is still unverified**. Select and freshly formulate the next question by its likely **consequence for a real Web Presence decision** (Offering/scope, positioning, trust/proof, primary and secondary visitor actions, search/content structure, qualification, operating promises or readiness), not just by an empty questionnaire field. Ask only where the answer has value, then reconsider priorities after it arrives. This is an **intelligence/quality requirement**, not approval for unlimited crawling, ungrounded generalizations, third-party content reuse, indiscriminate collection, or extra operator bureaucracy. Right-size source breadth, latency and expense to likely value; expose provenance and uncertainty. The exact research/query strategy and question-ranking rubric still need design and an owner-visible C0/C2/startup comparison before implementation acceptance.
 
 - **What we understand / what we need:** Start the paid interview by presenting consolidated existing knowledge and proposed understanding for targeted confirmation or correction. Show known information without redundant “What do you offer?”/“Who are your customers?” prompts. For previously confirmed items, ask for *materially deeper detail* only where needed to produce content or understand conversion.
+
+#### Research-first demonstration and question rubric
+
+Read a small set of public pages for two or three decision intents, such as
+scope and price, proof and risk, or the path to requesting help. Sample more
+than one geography where useful. Include the prospect's own public site if
+present. Distinguish owner statements, site observations, third-party claims
+and hypotheses. Retain source and observation date. Search visibility helps
+locate examples. It cannot establish demand, customer satisfaction or sales.
+
+1. Carry forward what is known. Mark contradictions and uncertain claims,
+   including differences between the proposed business and its public site.
+2. Discover gaps from the evidence. For each possible question, identify a
+   real site decision that would change and give two plausible answers with
+   different consequences.
+3. Discard questions that cover known information or lack a useful consequence.
+   Rank the remainder by materiality, uncertainty, novelty and owner effort.
+   The demo uses twice the materiality score, plus uncertainty and novelty,
+   minus effort, on a 0–2 scale. Model ratings are provisional. Safety,
+   permissions and other consequential conflicts stay visible for human review.
+4. Ask the top question, record the answer with its source, and update the
+   recommendation and next evidence needed. Repeat only where the next answer
+   could change a decision.
+
+The [local demonstration](shared-intelligent-onboarding-live-proof-2026-11-10.md#research-first-demonstration)
+uses this rubric with public summaries and isolated synthetic replies. A
+short research packet limits this comparison and does not set a product-wide
+interview length. Broader integration awaits owner review of question quality.
 - **No fake original questions.** Some October 5–6 C0 prompts and earlier synthesis artifacts survive; a complete literal transcript is unverified. The October 14 Free Review is separate. Evidence provenance remains truthful; fresh corrections are new records.
 - **Generated follow-ups, not only preselected fields.** Use the known business facts, site/public-presence evidence, prior Free Review, actual owner replies and structured coverage gaps to **formulate new, business-specific questions** when they would materially improve understanding or build readiness. Prewritten questions, templates and rules can be starting points and constraints, but **the interview must not be limited to selecting a question from a finite preset bank**. Tailor questions and their conditional follow-ups to the customer's actual offerings, scope, operational realities, visitor decisions and answers; ask more or fewer as warranted. Record the reason/gap, source context, exact question/version, answer, provenance, and subsequent applicability in the authorized resumable session. Don't repeat known facts, fabricate service details, ask speculative questions as though assumptions are confirmed, or emit unrelated industry's choices (e.g. emergency tree-service options in C0 MioPages). On contradictory or regulated/high-consequence information, route to an Operator/customer confirmation rather than treating generated interpretation as business truth. Operator can intervene, revise or suppress inappropriate prompts. Demonstrate true new-question generation (not just fixed conditional display), durable resume, normalization and at least one second-order follow-up in a bounded test before accepting full adaptive interviewing.
 - **Comprehensive capture, progressive presentation.** Use a readable topical outline, expandable sections, optional rich elaboration, short initial prompts that branch to meaningful follow-ups, auto-save/save-and-return, visible missing-information summary, and help. Customer-provided documents, media, existing-site links and free-text explanation should be supported as evidence channels when actual safe ingestion/upload is implemented. Never claim an unimplemented upload or research feature works.

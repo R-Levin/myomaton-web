@@ -206,3 +206,29 @@ next product slice is to show the real question, answer and changed finding in
 the Core interview UI, then carry reviewed findings into a versioned Presence
 Direction and the existing multi-page Core proposal path for private WordPress
 review. Formal hardening and owner acceptance precede production or publication.
+
+## Research-first demonstration
+
+This bounded comparison adds an observed market packet before the shared
+interview. The [question rubric](paid-onboarding-knowledge-transfer-contract.md#research-first-demonstration-and-question-rubric)
+and [local runner](../scripts/intake/research-first.ts) preserve the distinction
+between observations, provisional ratings and confirmed facts. The provider
+gets attributed summaries and synthetic replies. Source URLs stay local in
+the reviewed packet. The existing runner uses `--execute --owner-diagnostic
+attempt-04 --research` for the first dedicated research run under the same
+phase budget. Reproduction requires a fresh attempt directory. Each case has
+its own disposable tenant. The demo discovers and ranks two or three
+questions, saves the highest-ranked one, then saves and reads back the
+model's response to one synthetic answer. The alternate answers shown in the
+review are decision forecasts.
+
+| Case and search intent | Prior knowledge and public observations | What is still uncertain |
+| --- | --- | --- |
+| C0 · “managed website ongoing edits scope” | The owner confirmed Launch and Ongoing for startups and established businesses. The public Home still separates old services. Pronto distinguishes editorial/site management from search work. UK provider PresGro distinguishes refresh from rebuild and exposes setup and recurring charges. [C0 Home](https://miopages.com/) · [Pronto](https://www.prontomarketing.com/website-management-services/) · [PresGro](https://www.presgro.com/managed-websites) | What the owner can promise and approve for a routine change, where a prospect needs to qualify scope, which example is cleared, and whether the message will convert. |
+| Fictional C2 · “storm damage tree service after hours” and “written tree estimate insurance” | The scenario gives weekday urgent calls in a northern area, possible voicemail and a separate estimate process. An Illinois comparator advertises urgent calling and routine estimate intake separately. A Washington utility illustrates why responsibility depends on local line and location. Consumer guidance raises legitimacy, written scope and price questions. [Acorn](https://acorn-tree.com/contact) · [Snohomish PUD](https://www.snopud.com/outages-safety/prevention/tree-trimming/) · [FTC](https://consumer.ftc.gov/articles/how-avoid-scams-after-weather-emergencies-and-natural-disasters) | The real fallback or referral, staffed hours and territory, insurance proof, and what a quote includes. No comparator's availability or utility guidance applies to C2 by default. |
+| Hypothetical mobile bicycle repair startup · “mobile bike repair visit minimum,” “can you fix my e-bike” and “repair estimate dispute” | The founder scenario has one mechanic and no track record. velofix qualifies service by postal code and separates mechanical work from electrical diagnosis. Ben's example distinguishes a labor minimum and parts and states e-bike exclusions. One disputed in-shop repair account illustrates possible confusion around approval of charges. [velofix](https://www.velofix.com/what-we-do/faq/) · [Ben's](https://bensmobilebikerepair.com/) · [BBB complaint and response](https://www.bbb.org/us/ks/wichita/profile/sporting-goods-retail/bicycle-x-change-shops-0714-65095/complaints) | Which trips are viable, eligibility, quote approval, minimum and real customer demand. The complaint is neither a verified finding of fault nor a frequency measure. |
+
+These are small search-discovered samples. Ranking, paid placement, local
+demand and commercial performance were outside the sample. Comparator prices
+or practices may prompt a question, but they cannot set the prospect's price
+or prove a customer outcome.

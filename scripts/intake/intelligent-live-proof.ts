@@ -291,10 +291,12 @@ export async function runProof(directory: string, bin: string, rates: Rates, tra
 }
 
 async function main() {
-  const [mode, flag, attempt = "attempt", ...rest] = process.argv.slice(2);
+  const [mode, flag, attempt = "attempt", scope, ...rest] = process.argv.slice(2);
   const ownerDiagnostic = flag === "--owner-diagnostic";
+  const research = scope === "--research";
   if (!["--preflight", "--execute"].includes(mode) || (flag && !ownerDiagnostic) || rest.length ||
-      (attempt !== "attempt" && (!ownerDiagnostic || !isNumberedAttempt(attempt)))) throw Error("Explicit proof mode required");
+      (attempt !== "attempt" && (!ownerDiagnostic || !isNumberedAttempt(attempt))) ||
+      (scope && (!research || !ownerDiagnostic || !isNumberedAttempt(attempt)))) throw Error("Explicit proof mode required");
   await readManifest();
   const { receipt, key, commit } = await preflight(ownerDiagnostic);
   const bin = process.env.PG_BIN_DIR;
@@ -315,18 +317,23 @@ async function main() {
     await mkdir(directory, { mode: 0o700 }); // Existing attempts are never replaced.
     await writeFile(join(directory, "authorization.json"), JSON.stringify({
       authorization: attempt !== "attempt" ? developmentAuthorization : ownerDiagnostic ? ownerDiagnosticAuthorization : authorization,
-      commit, manifestSha, rateCard, countMicros: receipt.countMicros, validUntil: receipt.validUntil, previousExposureMicros,
+      commit, manifestSha, ...(research && { scope: "public-research-and-synthetic-interview" }),
+      rateCard, countMicros: receipt.countMicros, validUntil: receipt.validUntil, previousExposureMicros,
     }) + "\n", { flag: "wx", mode: 0o600 });
     Object.assign(process.env, { NODE_ENV: "development", MIOPAGES_REVIEW_SYNTHESIS: "local-operator" });
-    await runProof(directory, bin, fixedRates(receipt.countMicros), httpsTransport(receipt, key, async failure => {
+    const transport = httpsTransport(receipt, key, async failure => {
       await writeFile(join(directory, "provider-error.json"), JSON.stringify(failure) + "\n", { flag: "wx", mode: 0o600 });
       console.error("Provider failure " + JSON.stringify(failure));
-    }));
+    });
+    if (research) {
+      const { runResearchProof } = await import("./research-first");
+      await runResearchProof(directory, bin, fixedRates(receipt.countMicros), transport);
+    } else await runProof(directory, bin, fixedRates(receipt.countMicros), transport);
   } finally {
     await lock.close();
     await unlink(lockPath);
   }
-  console.log("PASS: four traces completed. Review sanitized evidence and usage before acceptance.");
+  console.log(research ? "PASS: three research-led interviews completed." : "PASS: four traces completed. Review sanitized evidence and usage before acceptance.");
 }
 
 if (process.argv[1]?.replaceAll("\\", "/").endsWith("/scripts/intake/intelligent-live-proof.ts")) {

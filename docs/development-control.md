@@ -415,6 +415,13 @@ Onboarding remains in development. Continue the Core interview UI and
 Presence Direction handoff, then formally harden and obtain owner acceptance
 before release.
 
+The owner subsequently directed a research pass before interview questions.
+The [market research and originality contract](paid-onboarding-knowledge-transfer-contract.md#owner-direction-lightweight-market-intelligence-before-questions)
+and [three-case demonstration](shared-intelligent-onboarding-live-proof-2026-11-10.md#research-first-demonstration)
+now guide the next owner review. The fixed-gap live proof remains useful as
+the comparison baseline. Broad Core interview integration follows review of
+the research and questioning quality.
+
 ### Issue #9 · first local signup and onboarding slice
 
 Run `node --import tsx scripts/intake/c0-onboarding.ts` from the repository root

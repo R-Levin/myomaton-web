@@ -106,13 +106,15 @@ export function offlineResponsesProvider(directory: string, configuredRates: Rat
 }
 
 export function controlledProofResponsesProvider(directory: string, rates: Rates, transport: ResponsesTransport,
-  projectInput: (context: QuestionContext, attribution: QuestionAttribution) => unknown): QuestionProvider {
+  projectInput: (context: QuestionContext, attribution: QuestionAttribution) => unknown,
+  response?: { instructions: string; format: { type: "json_schema"; name: string; strict: true; schema: object } }): QuestionProvider {
   if (rates.cacheWritePerMillion !== 0 || rates.countMicros > 10_000) throw Error("Live proof rate card refused");
-  return meteredResponsesProvider(directory, rates, transport, { requests: 14, generations: 7, projectInput });
+  return meteredResponsesProvider(directory, rates, transport, { requests: 14, generations: 7, projectInput, response });
 }
 
 function meteredResponsesProvider(directory: string, configuredRates: Rates, transport: ResponsesTransport,
-  limits: { requests: number; generations: number; projectInput?: (context: QuestionContext, attribution: QuestionAttribution) => unknown }): QuestionProvider {
+  limits: { requests: number; generations: number; projectInput?: (context: QuestionContext, attribution: QuestionAttribution) => unknown;
+    response?: { instructions: string; format: { type: "json_schema"; name: string; strict: true; schema: object } } }): QuestionProvider {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
@@ -143,8 +145,8 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
         ? " Ask one concrete follow-up based on the answer. Cite the answer reference exactly and at least one supplied source. Recommend a next action based on what the answer supplies, and distinguish what remains unverified from what could be reviewed now."
         : " This is the first question. Set assessment to null. Cite at least one supplied source. Ask for one concrete detail about this business that would resolve the gap instead of restating it.")
         + " Write one complete sentence per text field and aim for 20 words or fewer. Finish each thought well before the length limit. Use plain English punctuation." : instruction;
-      const request = { model: rates.model, instructions, input: JSON.stringify(projected),
-        text: { format: limits.projectInput ? proofFormat(context, answerRef) : format } };
+      const request = { model: rates.model, instructions: limits.response?.instructions ?? instructions, input: JSON.stringify(projected),
+        text: { format: limits.response?.format ?? (limits.projectInput ? proofFormat(context, answerRef) : format) } };
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation, countDispatched: true, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);
