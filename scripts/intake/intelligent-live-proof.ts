@@ -293,7 +293,7 @@ export async function runProof(directory: string, bin: string, rates: Rates, tra
 async function main() {
   const [mode, flag, attempt = "attempt", scope, ...rest] = process.argv.slice(2);
   const ownerDiagnostic = flag === "--owner-diagnostic";
-  const research = scope === "--research";
+  const research = scope === "--research" || scope === "--research-c0";
   if (!["--preflight", "--execute"].includes(mode) || (flag && !ownerDiagnostic) || rest.length ||
       (attempt !== "attempt" && (!ownerDiagnostic || !isNumberedAttempt(attempt))) ||
       (scope && (!research || !ownerDiagnostic || !isNumberedAttempt(attempt)))) throw Error("Explicit proof mode required");
@@ -317,7 +317,7 @@ async function main() {
     await mkdir(directory, { mode: 0o700 }); // Existing attempts are never replaced.
     await writeFile(join(directory, "authorization.json"), JSON.stringify({
       authorization: attempt !== "attempt" ? developmentAuthorization : ownerDiagnostic ? ownerDiagnosticAuthorization : authorization,
-      commit, manifestSha, ...(research && { scope: "public-research-and-synthetic-interview" }),
+      commit, manifestSha, ...(research && { scope: "public-research-and-synthetic-interview", c0Only: scope === "--research-c0" }),
       rateCard, countMicros: receipt.countMicros, validUntil: receipt.validUntil, previousExposureMicros,
     }) + "\n", { flag: "wx", mode: 0o600 });
     Object.assign(process.env, { NODE_ENV: "development", MIOPAGES_REVIEW_SYNTHESIS: "local-operator" });
@@ -327,13 +327,13 @@ async function main() {
     });
     if (research) {
       const { runResearchProof } = await import("./research-first");
-      await runResearchProof(directory, bin, fixedRates(receipt.countMicros), transport);
+      await runResearchProof(directory, bin, fixedRates(receipt.countMicros), transport, scope === "--research-c0");
     } else await runProof(directory, bin, fixedRates(receipt.countMicros), transport);
   } finally {
     await lock.close();
     await unlink(lockPath);
   }
-  console.log(research ? "PASS: three research-led interviews completed." : "PASS: four traces completed. Review sanitized evidence and usage before acceptance.");
+  console.log(research ? "PASS: research-led interview evidence saved." : "PASS: four traces completed. Review sanitized evidence and usage before acceptance.");
 }
 
 if (process.argv[1]?.replaceAll("\\", "/").endsWith("/scripts/intake/intelligent-live-proof.ts")) {

@@ -241,3 +241,22 @@ route beyond known coverage. The next iteration explicitly carried forward
 the owner-approved retirement decision, told the model to keep verified
 coverage fixed in both branches, and asked it to establish how the business
 operates before proposing a page or visitor action.
+
+### Original direction for the bicycle pilot
+
+**Proposed headline:** “Check the visit before we set a time.”
+
+**Proposed supporting copy:** “Tell us your postal code, the kind of bike you
+ride, and what needs fixing. We'll check whether the job fits our route and
+explain the visit cost before you choose a time.”
+
+This concept comes from the fictional founder's one-mechanic route and quote
+approval process, informed by the observed market questions about coverage,
+eligible work and charges. The proposed action is a request to check a visit.
+The page would explain mechanical scope, then show the request and the
+confirmation step. Price, territory and service claims stay pending until
+confirmed. I compared the copy and proposed flow with the sampled providers
+for obvious similarities. The draft uses its own wording and organization,
+and contains no competitor prices, reviews, artwork, or distinctive design.
+Before any content approval, repeat that check on the actual rendered draft
+and verify rights on anything supplied for use.

@@ -21,6 +21,8 @@ async function cases() {
       ...contexts.c0.sources.filter(source => source.kind === "owner-confirmed"),
       { id: "c0-retirement", kind: "owner-confirmed", at: "2026-11-09", reference: "docs/c0-adaptive-onboarding-walkthrough.md",
         statement: "The standalone legacy offers are retired. Present Launch and Ongoing as one managed service, with no standalone Launch offer in this demonstration. HostShop access stays separate." },
+      { id: "c0-scope", kind: "owner-confirmed", at: "2026-11-10", reference: "docs/miopages-c0-business-brief.md#launch-and-ongoing-offer",
+        statement: "The provisional Launch scope includes a managed site for new businesses and supported migration for established firms. Ongoing includes business updates and customer approval. Specific included limits and commitments still need confirmation." },
       observed("c0-legacy", "https://miopages.com/", "The public home navigation presents site creation, hosting, email and support separately. It also provides access to existing hosting accounts."),
       observed("c0-pronto", "https://www.prontomarketing.com/website-management-services/", "The provider groups site upkeep and edits under management, offers editorial help and sells search marketing separately."),
       observed("c0-presgro", "https://www.presgro.com/managed-websites", "A UK provider separates limited refreshes from rebuilds and shows setup and recurring charges for a defined scope."),
@@ -93,13 +95,14 @@ export function rankMarketQuestions(value: unknown, evidence: InterviewEvidence[
 }
 
 export function respectsC0Offer(question: { unknown: string; question: string; ifYes: string; ifNo: string }) {
-  return !/launch[- ]only|standalone launch|split launch and ongoing|separate hosting,? email/i.test(
+  return !/launch[- ]only|standalone launch|split launch and ongoing|separate hosting,? email|full new website build, or only|refresh[- ]only/i.test(
     [question.unknown, question.question, question.ifYes, question.ifNo].join(" "),
   );
 }
 
-export async function runResearchProof(directory: string, bin: string, rates: Rates, transport: ResponsesTransport) {
-  const packet = await cases();
+export async function runResearchProof(directory: string, bin: string, rates: Rates, transport: ResponsesTransport, c0Only = false) {
+  const all = await cases();
+  const packet = c0Only ? all.filter(item => item.id === "c0") : all;
   await initializeOfflineUsageLedger(directory, rates);
   const fixture = await openIntelligentFixture(bin);
   try {
@@ -135,7 +138,7 @@ export async function runResearchProof(directory: string, bin: string, rates: Ra
           assert.equal(attribution.ownerDigest, ownerDigest);
           const wire = exactProjection(context, item.path, gap, selected, history[0], answer);
           return { ...wire, evidence: wire.evidence.map(({ id, kind, statement }) => ({ id, kind, statement })) };
-        }, { instructions: "Do not ask again for a fact that this answer supplies. Keep confirmed restrictions fixed. Ask for the most consequential remaining operational detail. If an urgent route is unstaffed, hold any urgent action for those hours and ask who can verify the safe fallback. Never recommend unmonitored voicemail or an unverified referral for an urgent hazard. Do not assume a request is a confirmed booking or a quote is an approved price." });
+        }, { instructions: "Do not ask again for a fact that this answer supplies. Keep confirmed restrictions fixed. If the answer clarifies a different part of the business, preserve that distinction and identify the unresolved question. If an urgent route is unstaffed, hold any urgent action for those hours and ask who can verify the safe fallback. Never recommend unmonitored voicemail or an unverified referral for an urgent hazard. Do not assume a request is a confirmed booking or a quote is an approved price." });
         const provider: QuestionProvider = { version: "research-first/1", async propose(context, attribution) {
           if (history.length) return adapter.propose(context, attribution);
           exactProjection(context, item.path, gap, selected);
