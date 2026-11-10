@@ -1,6 +1,6 @@
 # Shared intelligent onboarding · controlled OpenAI proof
 
-**November 10, 2026 · Preparation baseline and execution checkpoint · No API traffic**
+**November 10, 2026 · Preparation baseline, revised authorization and live result**
 
 The proposed run exercises the existing [offline engine at `b48b3cf`](https://github.com/R-Levin/myomaton-web/blob/b48b3cf3e0d03504c5d5d37457d17ae1def43d17/docs/shared-intelligent-onboarding-proposal-2026-11-10.md#offline-implementation-checkpoint). It tests whether model-generated follow-ups and draft assessment changes respond to business evidence. It does not finish the onboarding interview or establish owner-visible product acceptance. [Issue #10 preparation authorization](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6773902908)
 
@@ -52,11 +52,11 @@ transport and do not establish live API behavior or model quality.
 
 [Issue #10 owner authorization](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6775948557) now authorizes this exact proof conditional on preflight. The aggregate development-phase ceiling is $5. The single approved proof still has the $0.50 application cap, seven generation and seven exact count requests, with zero retries. Remaining funds require a later reviewed scope.
 
-**Live result · BLOCKED at no-call preflight.** OpenAI's Help Center resolved the count fee in [the Issue #10 review](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6777356649). The immutable approved manifest still matches its pinned SHA-256. Its original count price fields describe the earlier preparation state. Use the verified zero rate in the existing local attestation.
+**Historical result before the revised authorization · BLOCKED at no-call preflight.** OpenAI's Help Center resolved the count fee in [the Issue #10 review](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6777356649). The immutable approved manifest still matches its pinned SHA-256. Its original count price fields describe the earlier preparation state. Use the verified zero rate in the existing local attestation.
 
 The [acquisition CLI](../scripts/acquisition-pilot.ts) used the [OpenAI Images adapter](../lib/platform/acquisition/openai.ts), which reads `OPENAI_API_KEY` and defaults to `gpt-image-1.5`. Ignored iteration 2 and 3 generation receipts record OpenAI candidates and request IDs for that model. Neither receipt records an organization, project or key identifier. The current process value matches the Windows user environment and has project-key syntax. The ignored `.env.local` has no OpenAI settings and the proof worktree has no private preflight receipt. These checks establish the local loading convention and historical Images success. They do not identify the current key's OpenAI project, establish that it is the same key used historically, or verify its Responses access, billing or data controls.
 
-The browser launcher failed before authenticated dashboard inspection. No model request, count request or credential probe was sent. **Actual usage and charges remain zero.** Model quality remains unevaluated.
+The browser launcher failed before authenticated dashboard inspection. This earlier checkpoint sent no model request, count request or credential probe. See the live result below for the superseding execution evidence.
 
 ### Reuse the existing key if the project check passes
 
@@ -92,3 +92,37 @@ After a successful semantic proof, define one versioned, reviewable Presence Dir
 From the clean reviewed worktree, use the existing CLI with `--preflight --owner-diagnostic`. This is local-only. Then use `--execute --owner-diagnostic` once if preflight passes. This explicit mode uses the inherited `OPENAI_API_KEY` without changing the Windows setting or the prior receipt-based mode. Both execution modes share the exclusive ignored attempt directory. The diagnostic is the first C0 buyer question. The runner must count its exact input and validate the returned generation before it can proceed. The successful question is retained in the proof and replayed locally for the alternative answer. There is no separate diagnostic question or extra request pair.
 
 The pinned manifest, dated model, strict schema, TLS-only host, 4,000 input and 1,200 output token ceilings, generation `store:false`, seven generations, seven free counts, zero retries and $0.50 application cap all apply. Stop on the first refusal. Report only the endpoint, HTTP status and safe API error fields. Preserve the usage ledger and any reservation that could not be settled. This mode grants no authority over other model workloads or provider settings.
+
+### Live result · provider accepted, proof stopped before first question
+
+The explicit no-call preflight passed at execution commit
+`3fceffd168013770d41b20c765af58fba25df5d2`. Eleven focused checks passed
+before execution, including the synthetic first-generation refusal and
+14-request ceiling. TypeScript and targeted lint passed. The final
+five-check rerun passed after adding the first-question checkpoint.
+
+The exclusive live attempt sent one exact count and one generation.
+Both reached the transport's HTTP 200 success path. The ledger confirms
+the requested dated model and service tier, validated usage, and a decoded
+structured output. There was no HTTP API error receipt. This establishes
+effective access for the configured key to both calls for this diagnostic.
+It does not independently identify the project or confirm its settings.
+
+| Observed usage | Value |
+| --- | --- |
+| Requests | 1 free input count, 1 generation, 0 retries |
+| Generation tokens | 695 input, 275 output, 0 cached or reasoning tokens |
+| Local reservation | US$0.008400 |
+| Usage-priced estimate | **US$0.001759** at the published rates. The dashboard charge was outside this check. |
+
+The process exited with `Proof refused or interrupted` after the ledger
+settled. It did not write the first validated question or a trace receipt.
+The retained evidence locates the stop between provider acceptance and
+persisting the first validated question. It does not distinguish an engine
+validation failure, another local refusal, or a persistence failure. The
+runner kept no raw generated text. The other traces did not run, so there
+are no verified question excerpts or answer-dependent assessments to review.
+The ignored attempt and usage evidence are preserved. The one-shot attempt
+has been consumed and was not retried. Any later attempt requires separate
+authorization and a sanitized local diagnostic that can distinguish these
+failure stages.

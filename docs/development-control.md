@@ -362,7 +362,7 @@ bounded live reasoning run. See [Issue #10](https://github.com/R-Levin/myomaton-
 for the pinned handoff and next owner decision. Draft PR #11 remains a separate
 review.
 
-### Issue #10 · controlled live reasoning proof authorized and blocked at preflight
+### Issue #10 · live diagnostic accepted by OpenAI, local proof stopped
 
 The [owner authorized the exact live proof](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6775948557)
 under a $5 phase ceiling. The one run retains a $0.50 hard application cap
@@ -386,7 +386,11 @@ permits the [first-trace diagnostic](shared-intelligent-onboarding-live-proof-20
 with the existing protected key despite unresolved exact key and snapshot
 matching. A validated first question permits the rest of the same proof.
 The single attempt, pinned inputs, seven generations, 14 requests, zero
-retries and $0.50 cap remain in force.
+retries and $0.50 cap applied. The [live result](shared-intelligent-onboarding-live-proof-2026-11-10.md#live-result--provider-accepted-proof-stopped-before-first-question)
+supersedes the earlier no-call status. OpenAI accepted one count and one
+generation on the pinned snapshot. The usage-priced estimate is $0.001759.
+The runner stopped before persisting a validated question. No follow-ups,
+semantic acceptance or retry occurred. The one-shot evidence is retained.
 
 ### Issue #9 · first local signup and onboarding slice
 
