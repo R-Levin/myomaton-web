@@ -426,6 +426,13 @@ the intelligent interview and its separate live reasoning approval. The Issue #1
 handoff lives on `codex/c0-integration-spine-phase-a-2026-11-10`, isolated from the
 preserved C0 rehearsal and the other onboarding worktrees.
 
+The owner authorized the [local Phase B text-only proof and public launch assessment](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6774531879).
+[Phase B implementation and review](c0-integration-spine-phase-b-2026-11-10.md)
+records the connected local proof. The preferred [public launch plan](miopages-accelerated-public-launch-2026-11-10.md)
+uses the existing public WordPress site for a manual editorial relaunch, subject
+to verified access, recovery, inquiry delivery and separate owner release
+approval. Phase B and Issue #10 are independent of that publication decision.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

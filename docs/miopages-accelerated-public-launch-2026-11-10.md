@@ -1,0 +1,50 @@
+# Accelerated public MioPages launch decision
+
+[Issue #12 owner decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6774531879) · November 10, 2026 · **Release proposal for owner review**
+
+Use the existing public WordPress site on `miopages.com` for a manual editorial relaunch. Keep its current host, Divi child theme, HTTPS and account utility. The first release should explain one managed Web Presence service and give an interested business a verified way to reach a person. Retain canonical copy and asset references in Git for eventual Core migration. Acknowledge WordPress editorial delivery as manual in the release record.
+
+[Issue #10's latest continuity decision](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6774762930) keeps the preserved C0 answers and owner corrections available for later source reconciliation. Record each manually delivered page's URL, WordPress revision, owner-approved copy source and asset references in the release handoff. Distinguish confirmed claims from hypotheses and observed site evidence. Reconcile the published message into existing Core knowledge and proposal history through the usual approval gates.
+
+## Read-only inventory
+
+| Surface | Observed or recorded evidence | Release implication |
+| --- | --- | --- |
+| Public site and editorial capability | HTTPS Home and Contact returned 200. Home still markets standalone websites, hosting/email and support. Public `wp-json/` reports WordPress and a Divi namespace. HTML loads Divi and Divi-child resources. Unauthenticated `wp-admin/` redirected to a protected login response (401). The Git record identifies 20i and WordPress elsewhere, including a separate protected rehearsal. | Ordinary Divi/WordPress content, menu and page settings are the likely shortest change surface. Confirm the actual public package, authorized editor and recovery access in My20i/WP before drafting there. This inspection could see the public site only. Do not infer admin access or recovery from the protected rehearsal. |
+| Copy, design and claims | [C0 business brief](miopages-c0-business-brief.md), [C0 product model](miopages-c0-product-model.md) and [accepted v3 preview](miopages-c0-preview.md) provide Home, Service, Experience and Review direction. The owner retired the legacy offers and declined the proposed C0 stock images. | Use reviewed Launch→Ongoing copy and the service-led hierarchy. Use existing approved local illustrations only when their rights and the exact files are verified. Leave out unverified claims, testimonials, time promises and pricing. Keep the illustrative Review example visibly illustrative if used. |
+| Visitor actions | The public [Contact page](https://miopages.com/contact/) returned 200 with a Divi form and a published email address. Its submission, recipient, storage and notification were outside the read-only check. Public `/review/` returned 404. `/start/` resolved to an unrelated legacy article. A Core runtime Review route returned 200, while its intake URL returned 404. | Reuse `/contact/` only after end-to-end verification. Give the Review a manual intake path with honest copy. Do not link an unproven form, Core intake or guessed booking/payment destination. |
+| Existing customer utility | The Home account link points to [HostShop sign-in](https://my.miopages.com/login), which returned HTTP 200. Authenticated sign-in was outside this inspection. [Privacy](https://miopages.com/privacy-policy/), Websites, Web Support and Hosting & Email routes were reachable. | Keep HostShop visibly separate as “Existing customer login.” Inventory legacy paths for inbound links, client support and obligations before approving any retirements or redirects. Preserve contractual pages and dependencies pending review. |
+| Search and measurement | `robots.txt` returned 200 and advertised `/sitemap.xml`, which returned 200. `/sitemap_index.xml` returned 200 and `/wp-sitemap.xml` returned 404. Sitemap contents, index coverage, existing analytics access and conversion events are unverified. | Inspect the robots-advertised sitemap and reconcile canonical URLs. Use verified Search Console access if available. Start with a first-party inquiry tally and optional self-reported source. Add only approved tracking compatible with the actual privacy notice. |
+
+Public observations used HTTPS GETs only. The protected test at `miopages.org` and the retained acceptance hostname are separate from the recommended public edit target. See the [WordPress acceptance closeout](development-control.md#wordpress-private-delivery-acceptance-closed).
+
+## Two paths and the critical path
+
+| Path | What it reuses | What blocks it |
+| --- | --- | --- |
+| **A · Existing public WordPress, manual editorial refresh** | Existing domain, theme, content editor, contact route, TLS and HostShop. Core brief/v3 provide content and structure. | Confirm authorized edit and rollback access, exact page/menu/redirect changes, truthful copy and privacy, and a tested monitored inquiry path. Owner must approve the exact release. Theme/plugin installs, new infrastructure and AI work are outside the proposed first change. |
+| **B · Core-controlled signed WordPress launch** | Core proposal/approval, protected signed delivery, immutable private stage and receipts. | Native site materialization for pages/blocks/media/navigation/Actions, visual whole-site approval, a separately authorized activation and tested public rollback remain open. The accepted adapter stages text privately. Phase B adds local proof of a private view. |
+
+### Preferred release sequence
+
+1. **Prepare and confirm access.** Inventory public page IDs, current home/front-page setting, Divi theme and menus, form recipients/settings, privacy/terms URLs and indexed legacy links. Identify a single accountable publisher and inbox owner. Establish a current recoverable files/database backup plus page, menu, theme-setting and form-setting snapshots. Capture public desktop/mobile baselines and confirm who can restore those exact settings. WordPress revisions help restore individual page content. [WordPress revisions](https://wordpress.org/documentation/article/revisions/).
+2. **Use one modest release set.** Home `/` presents the managed proposition and who it helps. Service `/service/` explains Launch, Ongoing and the customer's role. Review `/review/` explains what a person reviews and what prospects can expect. Contact `/contact/` offers two plain options, “Request a Free Review” and “Discuss starting,” handled manually in one queue. Keep Experience out of primary navigation until its evidence is ready. Retain HostShop and reviewed privacy/terms in utility navigation. Verify the new slugs have no conflicts before the owner signs off. Keep the accepted C0 hero/report direction and avoid new stock or fabricated proof.
+3. **Prove one visitor action before go-live.** Prefer the existing Divi form if the staged candidate can collect name, email, site (optional) and intent/message, confirm receipt without exposing data, and deliver a synthetic request to the monitored recipient. Verify spam handling and inbox triage, including a failed-delivery response or fallback. If that test fails, use a clearly labeled manual email request only after verifying delivery to the published address from an external mailbox and confirming owner coverage. Phrase the CTA and privacy notice for the actual workflow. Keep a first-party tally of received and qualified inquiries, without putting personal data into analytics or Git.
+4. **Review an exact change set.** After separately authorized draft/staging work, provide the owner the four actual page previews and exact copy revisions, menu and path mapping, legacy dispositions, final form or email route, privacy text and backup reference. Use a protected preview on the existing site if supported. Drafting or previewing content in WordPress requires write authorization. [WordPress draft and visibility controls](https://wordpress.org/documentation/article/page-post-settings-sidebar/).
+5. **Only with go-live approval, apply and verify.** Publish the approved revision set and navigation in one maintenance window. Keep DNS, TLS, existing mail and HostShop in place. Check desktop/mobile, HTTPS, navigation, titles and canonical URLs, search visibility/sitemap, approved redirect map, successful external inquiry delivery, and a reachable HostShop login. Record the baseline inquiry count and available Search Console signals for follow-up. If output or inquiry delivery fails, restore the prior Home/pages, navigation, redirects and affected form/settings, clear only relevant cache and recheck the baseline. Use the complete backup if the targeted restoration fails.
+
+The first publication decision needs a verified publisher and recovery path, exact reviewed content/routing/privacy, and evidence that the chosen inquiry path reaches the accountable inbox. Search Console access, richer content, native WordPress generation, Issue #10's live reasoning and broader Commercial V1 automation can follow. This handoff authorizes no public-site edits or deployment.
+
+### Legacy routing to confirm with the owner
+
+Public WordPress inventory lists `/websites/`, `/web-hosting-and-email/`,
+`/self-managed-websites-with-qr/`, `/web-support/`, `/project-gallery/`,
+`/request-proposal/`, `/fast-track-options/` and old thank-you routes. Remove
+retired offers from primary navigation in the proposed release. Consider a
+permanent redirect from `/websites/` to `/service/` and `/request-proposal/` to
+`/contact/` after checking that those destinations satisfy the old visitor
+intent. Keep hosting and QR links serving an owner-reviewed transition notice
+if existing clients still rely on them. Keep current support access until the
+owner confirms a replacement. Treat any dependent thank-you or campaign URL
+as part of the form and redirect audit. Preserve the privacy and terms URLs
+while reviewing their actual content. Use no bulk redirects or deletions.

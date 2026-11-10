@@ -20,7 +20,7 @@ type Row = { id: string; entry_intent: EntryIntent; questionnaire_version: strin
 export type IntakeEvidence = { source: "c0-discovery" | "rehearsal-response"; confirmation: "prior-approved" | "unconfirmed"; suppliedAt: string; reference: string; author: string };
 export type IntakeView = { questionnaireVersion: string; intent: EntryIntent; state: Row["state"]; answers: Answers; step: number; version: number; expiresAt: string;
   provenance?: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; submission?: { digest: string; submittedAt: string } };
-type Rehearsal = { database: string; answers: Answers; provenance: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding };
+type Rehearsal = { database: string; answers: Answers; provenance: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; intelligentFixtureSchema?: string };
 function view(r: Row): IntakeView { return { questionnaireVersion: r.questionnaire_version, intent: r.entry_intent, state: r.state, answers: r.answers, step: r.step, version: r.version, expiresAt: r.expires_at.toISOString() }; }
 async function transaction<T>(pool: Pool, run: (db: PoolClient) => Promise<T>) {
   const db = await pool.connect();
@@ -54,17 +54,19 @@ export class IntakeService {
     };
     if (Object.keys(errors).length) throw new IntakeError("incomplete", 400, errors);
   }
-  private async scope(db: Pick<PoolClient, "query">, lock = false) {
+  private async scope(db: Pick<PoolClient, "query">, lock = false, intelligent = false) {
     if (this.rehearsal) {
       const { database, schema, host, port } = (await db.query("SELECT current_database() AS database, current_schema() AS schema, host(inet_server_addr()) AS host, inet_server_port() AS port")).rows[0];
-      if (!/^migration_rehearsal_[a-f0-9]{32}$/.test(database) || database !== this.rehearsal.database || schema !== "public" || host !== "127.0.0.1" || !port || port === 5432) throw new IntakeError("unavailable", 503);
+      const fixtureSchema = intelligent ? this.rehearsal.intelligentFixtureSchema : undefined;
+      if (fixtureSchema !== undefined && !/^canonical_test_[a-f0-9]{32}_intake$/.test(fixtureSchema)) throw new IntakeError("unavailable", 503);
+      if (!/^migration_rehearsal_[a-f0-9]{32}$/.test(database) || database !== this.rehearsal.database || schema !== (fixtureSchema ?? "public") || host !== "127.0.0.1" || !port || port === 5432) throw new IntakeError("unavailable", 503);
     }
     const { webPresenceId, managedSiteId } = this.selection;
     const r = await db.query(`SELECT m.id FROM managed_sites m JOIN web_presences w ON w.id=m.web_presence_id WHERE m.id=$1 AND w.id=$2 AND m.status='active' AND w.status='active' ${lock ? "FOR SHARE OF m,w" : ""}`, [managedSiteId, webPresenceId]);
     if (r.rows.length !== 1) throw new IntakeError("unavailable", 404);
   }
-  private async owned(db: Pick<PoolClient, "query">, token: string, lock = false, versions = this.rehearsal ? [this.paidVersion] : [legacyIntakeVersion, intakeVersion]): Promise<Row> {
-    await this.scope(db, lock);
+  private async owned(db: Pick<PoolClient, "query">, token: string, lock = false, versions = this.rehearsal ? [this.paidVersion] : [legacyIntakeVersion, intakeVersion], intelligent = false): Promise<Row> {
+    await this.scope(db, lock, intelligent);
     const r = await db.query(`SELECT * FROM prospect_intakes WHERE web_presence_id=$1 AND managed_site_id=$2 AND resume_hash=$3 AND expires_at>now() AND resume_expires_at>now() ${lock ? "FOR UPDATE" : ""}`, [this.selection.webPresenceId, this.selection.managedSiteId, resumeHash(token)]);
     if (r.rows.length !== 1) throw new IntakeError("session_unavailable", 404);
     if (!versions.includes(r.rows[0].questionnaire_version)) throw new IntakeError("session_unavailable", 404);
@@ -82,9 +84,9 @@ export class IntakeService {
         entry.scope.webPresenceId !== this.selection.webPresenceId || entry.scope.managedSiteId !== this.selection.managedSiteId) {
       throw new IntakeError("unavailable", 503);
     }
-    await this.scope(db, true);
+    await this.scope(db, true, true);
     const inserted = open && (await this.insertDraft(db, token, entry.source.path, intelligentVersion)).rowCount === 1;
-    const row = await this.owned(db, token, true, [intelligentVersion]);
+    const row = await this.owned(db, token, true, [intelligentVersion], true);
     if (row.state !== "draft" || row.entry_intent !== entry.source.path) throw new IntakeError("session_unavailable", 404);
     const binding = fingerprint(entry);
     const prior = row.provenance.intelligent as { binding: string; sourceDigest: string; state: InterviewState } | undefined;
