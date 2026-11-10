@@ -260,3 +260,44 @@ for obvious similarities. The draft uses its own wording and organization,
 and contains no competitor prices, reviews, artwork, or distinctive design.
 Before any content approval, repeat that check on the actual rendered draft
 and verify rights on anything supplied for use.
+
+### Live research and interview results
+
+The existing engine saved and read back all three research-led interviews in
+`attempt-07` at `f14313f2`. The focused C0 retest in `attempt-08` at
+`346a0e4` added the provisional Launch scope from the business brief. The
+table uses the best reviewable result for each case. Each live follow-up used
+one synthetic answer. Alternatives below are reviewer interpretations of
+what a different answer would change.
+
+| Case | New question and why it matters | Live follow-up and finding | What different answers change |
+| --- | --- | --- | --- |
+| C0 | “For Launch, what is the maximum included build or migration scope you want the website to promise?” The comparator's explicit scope limits made the implementation boundary a better question than generic buyer proof. Other candidates surfaced support commitments and customer approvals. | “Should Launch include one existing site update or just one new site build or migration, and what needs separate scope approval?” The model held readiness open and asked for limits, but carried a synthetic Ongoing update into Launch. Discard that part of the recommendation. The supplied answer confirms a possible Ongoing workflow within the fixture and leaves Launch scope unanswered. | If typical migrations and new sites fit the supported Launch scope, explain both under one Service page with clear boundaries. If complex migrations need separate scoping, give prospects a scope conversation before promising delivery. Show customer sign-off in a separate Ongoing workflow example. |
+| Fictional C2 | “What specific tree problems should the urgent phone route accept as serviceable versus redirect?” A second candidate asked what happens when nobody answers. The distinction matters because a visible phone button can imply a staffed, capable service. | “Which urgent tree jobs in the northern service area are eligible during weekday coverage, excluding power-line hazards?” It called for a review of the urgent script and a verified fallback owner. The fictional answer ruled out power-line work and confirmed no one monitors urgent voicemail after hours. | Verified job categories and coverage support a clearly scoped weekday call path. With no staffed fallback, hold the after-hours urgent action. Keep routine estimates separate, state what an estimate covers after confirmation, and verify any insurance or qualification proof before displaying it. Reject generated branches that treat voicemail as an urgent fallback. |
+| Hypothetical bicycle startup | “Which exact areas can you reliably cover for bookings with one mechanic?” The other candidates asked about minimum charge and bike eligibility. Together these affect capacity, quote disputes and the scope of a first visit. | “Which postal codes or neighborhoods are included in the first-month compact route, and which are excluded?” The model called for a verified pilot map. The synthetic answer supports mechanical work, manual confirmation and a quote first. It leaves the minimum and actual territory open. | If the founder confirms a compact area, show the areas and qualify each request before quoting. If the boundary is still changing, ask for location and confirm manually without implying a booking. Ask next which mechanical jobs fit a first visit and when a customer would need a different provider. |
+
+All readiness states stayed **open**. Compared with the fixed-gap proof, the
+research made the C0 question about a service promise, the C2 question about
+the actual conditions for urgent routing, and the startup question about a
+launch constraint that changes the main action. The earlier engine proof
+showed answer sensitivity once a gap was supplied. This demo shows the model
+can discover a useful gap from observations and a small set of facts. It also
+shows that more context does not guarantee correct ranking or phase attribution.
+The C0 filter screens known phrasing, and the reviewer still checks meaning.
+For a real interview, answer relevance needs an explicit review rule before
+any assessment is promoted, and consequential service or safety claims need
+the existing confirmation and approval checks.
+
+The demo used manually sampled public pages and live model reasoning. Ten
+focused regression tests passed, including the scoped interview and budget
+checks. The final two research tests, TypeScript and targeted lint also
+passed after the focused C0 change. This research work used **21 generations
+and 21 free counts**, 15,552 input and 7,341 output tokens, for a usage-priced
+ledger estimate of **$0.044704**. The full Issue #10 phase estimate is
+**$0.061639**. No unresolved reservations were recorded. The ledger estimates
+use published rates. Dashboard charges were outside this check.
+
+Owner review should focus on whether the selected questions change a real
+site decision, whether the system respects previously settled facts, and
+whether a partial answer is recognized. Broader Core integration, automatic
+research, and production approval remain outside this demonstration.
