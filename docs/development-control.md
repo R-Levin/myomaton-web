@@ -369,9 +369,10 @@ under a $5 phase ceiling. The one run retains a $0.50 hard application cap
 and exactly seven planned generations and seven token counts. The
 [execution checkpoint](shared-intelligent-onboarding-live-proof-2026-11-10.md#authorized-execution-checkpoint)
 records the guarded local runner and the successful four-trace fake run.
-Live dispatch remains blocked until the count fee bound and the dedicated
-development project's credential, permissions, billing and data controls
-are verified. No provider traffic or charge occurred. The preserved C0
+OpenAI confirmed that the count endpoint is free. Record `countMicros: 0`
+in the private attestation. Live dispatch remains blocked until the dedicated
+development project's credential, model access, permissions, billing and data
+controls are verified. No provider traffic or charge occurred. The preserved C0
 draft and hosted systems remain outside the proof. Once the semantic proof
 passes review, the next integration decision is a versioned Presence
 Direction proposal mapped to existing Core and Issue #12's private delivery
