@@ -50,6 +50,20 @@ prevents repeated work and irrelevant boilerplate, not meaningful
 depth. See
 [full interview knowledge transfer](paid-onboarding-knowledge-transfer-contract.md).
 
+**Owner clarification, November 9 (adaptive question-generation requirement):**
+The system must actually **generate consequential new follow-up questions**
+from confirmed customer answers, website/Free Review evidence and the
+knowledge gaps relevant to site construction—not just select/reroute
+a small set of prewritten questions. Static prompts and templates remain
+useful scaffolding and safe fallbacks; they cannot define the coverage
+ceiling. Generated questions require source-linked intent, safe bounds,
+appropriate customer/operator review, saved wording and answers, and
+contextual applicability. Cross-business choices from unrelated test
+scenarios must not leak into real interviews. The current
+`paid-onboarding/2` local slice proves **conditional display**,
+not this generated-interviewer capability. [Full paid onboarding
+contract](paid-onboarding-knowledge-transfer-contract.md).
+
 ## Guided onboarding and ongoing updates
 
 The [progressive onboarding and Launch Readiness model](progressive-onboarding-and-launch-readiness.md)
