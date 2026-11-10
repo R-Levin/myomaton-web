@@ -23,6 +23,24 @@ Keep credentials, sensitive data and temporary runtime artifacts out of Git.
 The issue handoff is an asynchronous review reference. Existing role assignments,
 owner approval and implementation and publication gates still apply.
 
+**Coordination update adopted November 10, 2026.** Use this file as the recovery
+index. Keep governing requirements in the canonical contracts and use the
+relevant GitHub issue for the current review, owner decision and next gate.
+Codex owns technical coordination, implementation, verification and the
+sanitized Git handoff. ChatGPT reviews strategy and product fit against the
+published artifact. The owner alone authorizes consequential changes.
+
+At session start, verify the active remote branch and commit, local checkout
+and outstanding edits. Read this index and the latest issue decision. At each
+material checkpoint, publish the exact branch, SHA and file links, the approved
+scope, what was verified, unresolved items and one next action with its actor
+and stop condition. Mark live state unknown unless independently checked.
+Keep exact private evidence in protected local storage and reference its hash
+when useful. Use separate review branches or worktrees for parallel work,
+assign a single editor to each shared document and check overlapping diffs
+before integration. A review comment records feedback. Implementation or
+provider spend requires the owner's explicit authorization.
+
 ### November 7 customer account operations clarification
 
 The owner superseded the earlier Gutenberg/customer-interaction framing. Use
@@ -263,7 +281,9 @@ with the owner and ChatGPT. Legacy URL dispositions and transition obligations
 remain separate from the approved catalog decision. The agreed implementation
 and current review boundary are recorded below.
 
-### Issue #10 · adaptive intake rehearsal ready for review
+<a name="issue-10--adaptive-intake-rehearsal-ready-for-review"></a>
+
+### Issue #10 · historical adaptive intake rehearsal
 
 The [November 9 owner authorization](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6741173857)
 opens the bounded local implementation. It keeps the existing-site inventory
@@ -281,6 +301,10 @@ about startups and the old site's legacy catalog are visible alongside the
 current owner-confirmed direction. Fictional C2 uses the supplied old-site
 observations and flags missing Review evidence. No transcript, delivery or
 confirmed tree-service claims are inferred.
+
+The following is the historical disposable-fixture procedure. The owner
+rejected this fixture as a meaningful interview. The preserved C0 draft needs
+no further walkthrough, submission or restart. See the current proposal below.
 
 From the repository root in local PowerShell:
 
@@ -321,6 +345,20 @@ foundational priority and local scope gate before deeper questions, and verified
 that switching from emergency calls to routine estimates hides the obsolete
 follow-up. The database regression also verifies tenant and stale-source refusal.
 Pause here for owner review before further implementation or WordPress generation.
+
+### Issue #10 · shared intelligent onboarding proposal pending approval
+
+The owner prioritized one shared onboarding engine for Review-led and
+direct-start customers. The earlier C0 fixture is a completed diagnostic.
+Keep the preserved draft as evidence and leave it outside further testing.
+The [strategy recovery](https://github.com/R-Levin/myomaton-web/blob/2c6a41f22a811090b3a24d3f84607c41f2b33cc4/docs/c0-strategy-recovery-and-intelligent-onboarding-2026-11-10.md)
+supplies the business context. The
+[shared-engine proposal](shared-intelligent-onboarding-proposal-2026-11-10.md)
+supersedes its Review-preview fallback as the first implementation priority.
+Review the proposed Launch-to-Ongoing knowledge gap, acceptance evidence and
+development budget before authorizing implementation or any live API request.
+See [Issue #10](https://github.com/R-Levin/myomaton-web/issues/10) for the pinned
+handoff and next owner decision. Draft PR #11 remains a separate review.
 
 ### Issue #9 · first local signup and onboarding slice
 
