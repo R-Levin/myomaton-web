@@ -381,6 +381,13 @@ passes review, the next integration decision is a versioned Presence
 Direction proposal mapped to existing Core and Issue #12's private delivery
 work.
 
+The [later owner direction](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6778994149)
+permits the [first-trace diagnostic](shared-intelligent-onboarding-live-proof-2026-11-10.md#owner-authorized-first-trace-capability-check)
+with the existing protected key despite unresolved exact key and snapshot
+matching. A validated first question permits the rest of the same proof.
+The single attempt, pinned inputs, seven generations, 14 requests, zero
+retries and $0.50 cap remain in force.
+
 ### Issue #9 · first local signup and onboarding slice
 
 Run `node --import tsx scripts/intake/c0-onboarding.ts` from the repository root

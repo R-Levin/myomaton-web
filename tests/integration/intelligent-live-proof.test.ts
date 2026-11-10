@@ -6,7 +6,16 @@ import { join } from "node:path";
 import test from "node:test";
 import type { QuestionContext } from "../../lib/platform/intake/intelligent-model";
 import { controlledProofResponsesProvider } from "../../lib/platform/intake/intelligent-responses";
-import { checkAttestation, exactProjection, manifestSha, proofModel, readManifest, runProof } from "../../scripts/intake/intelligent-live-proof";
+import { checkAttestation, exactProjection, manifestSha, proofModel, providerFailure, readManifest, runProof } from "../../scripts/intake/intelligent-live-proof";
+
+test("provider refusals retain status and safe API error fields only", () => {
+  assert.deepEqual(providerFailure("/v1/responses", 400, { error: {
+    code: "invalid_json_schema", type: "invalid_request_error", param: "text.format.schema", message: "private body",
+  } }), { path: "/v1/responses", status: 400, code: "invalid_json_schema", type: "invalid_request_error", param: "text.format.schema" });
+  assert.deepEqual(providerFailure("/v1/responses/input_tokens", 401, { error: {
+    code: "sk-proj-secret", type: "org_private", param: "private body", message: "private body",
+  } }), { path: "/v1/responses/input_tokens", status: 401, code: null, type: null, param: null });
+});
 
 test("no-call preflight requires matching key, commit, project evidence and count price", () => {
   const key = "sk-proj-fake-for-offline-tests-only", commit = "a".repeat(40), now = Date.now();
@@ -97,6 +106,32 @@ test("pinned proof driver uses seven exact count/generation pairs, offline", asy
     } }, context => context);
     await assert.rejects(exhausted.propose({ entryPath: "DIRECT_START", gap, evidence, history: [] },
       { ownerDigest: "a".repeat(64), workDigest: "b".repeat(64) }), /Development budget exhausted/);
+  } finally {
+    if (oldNodeEnv === undefined) Reflect.deleteProperty(process.env, "NODE_ENV"); else Object.assign(process.env, { NODE_ENV: oldNodeEnv });
+    if (oldSynthesis === undefined) delete process.env.MIOPAGES_REVIEW_SYNTHESIS; else process.env.MIOPAGES_REVIEW_SYNTHESIS = oldSynthesis;
+    await rm(directory, { recursive: true });
+  }
+});
+
+test("failed first diagnostic preserves its reservation and stops before another call", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "miopages-live-proof-refusal-"));
+  const oldNodeEnv = process.env.NODE_ENV, oldSynthesis = process.env.MIOPAGES_REVIEW_SYNTHESIS;
+  Object.assign(process.env, { NODE_ENV: "development", MIOPAGES_REVIEW_SYNTHESIS: "local-operator" });
+  try {
+    const paths: string[] = [];
+    await assert.rejects(runProof(directory, process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin", {
+      model: proofModel, verifiedOn: "2026-11-10", inputPerMillion: 750_000, cachedPerMillion: 75_000,
+      cacheWritePerMillion: 0, outputPerMillion: 4_500_000, countMicros: 0,
+    }, { async send(path) {
+      paths.push(path);
+      if (path === "/v1/responses/input_tokens") return { body: { input_tokens: 1_000 } };
+      throw Error("Simulated API refusal");
+    } }), /Required generated question/);
+    assert.deepEqual(paths, ["/v1/responses/input_tokens", "/v1/responses"]);
+    const ledger = JSON.parse(await readFile(join(directory, "onboarding-usage.json"), "utf8"));
+    assert.equal(ledger.attempts.length, 1);
+    assert.equal(ledger.attempts[0].reservedMicros, 8400);
+    assert.equal(ledger.attempts[0].status, "pending");
   } finally {
     if (oldNodeEnv === undefined) Reflect.deleteProperty(process.env, "NODE_ENV"); else Object.assign(process.env, { NODE_ENV: oldNodeEnv });
     if (oldSynthesis === undefined) delete process.env.MIOPAGES_REVIEW_SYNTHESIS; else process.env.MIOPAGES_REVIEW_SYNTHESIS = oldSynthesis;
