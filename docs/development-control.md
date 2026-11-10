@@ -376,7 +376,7 @@ bounded live reasoning run. See [Issue #10](https://github.com/R-Levin/myomaton-
 for the pinned handoff and next owner decision. Draft PR #11 remains a separate
 review.
 
-### Issue #10 · live diagnostic accepted by OpenAI, local proof stopped
+### Issue #10 · functional live onboarding proof
 
 The [owner authorized the exact live proof](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6775948557)
 under a $5 phase ceiling. The one run retains a $0.50 hard application cap
@@ -386,10 +386,8 @@ records the guarded local runner and the successful four-trace fake run.
 OpenAI confirmed that the count endpoint is free. Record `countMicros: 0`
 in the private attestation. Historical OpenAI Images success and the current
 Windows user environment establish the acquisition loading path. Live dispatch
-remains blocked until the owner matches that key to the development project and
-verifies model access, endpoint permissions, billing and data controls. The
-existing runner can take the verified key through its explicit proof input.
-No provider traffic or charge occurred. The preserved C0
+was initially blocked pending development project verification. The original
+preflight sent no provider traffic. The preserved C0
 draft and hosted systems remain outside the proof. Once the semantic proof
 passes review, the next integration decision is a versioned Presence
 Direction proposal mapped to existing Core and Issue #12's private delivery
@@ -405,6 +403,17 @@ supersedes the earlier no-call status. OpenAI accepted one count and one
 generation on the pinned snapshot. The usage-priced estimate is $0.001759.
 The runner stopped before persisting a validated question. No follow-ups,
 semantic acceptance or retry occurred. The one-shot evidence is retained.
+
+The owner-approved development policy at `f2ad4b2` permits fresh scoped
+iterations. Two deliberate attempts repaired the turn contract, captured safe
+failure stages and improved incomplete assessment text. The
+[functional result](shared-intelligent-onboarding-live-proof-2026-11-10.md#functional-result--four-live-traces-saved-and-reviewed)
+records four persisted live traces. The two C0 buyer answers produced distinct
+recommendations from the same question. Total phase usage through this
+checkpoint was 15 generations and 15 free counts, estimated at $0.016935.
+Onboarding remains in development. Continue the Core interview UI and
+Presence Direction handoff, then formally harden and obtain owner acceptance
+before release.
 
 ### Issue #9 · first local signup and onboarding slice
 

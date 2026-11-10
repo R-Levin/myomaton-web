@@ -158,3 +158,51 @@ limits. This run established local saving and answer dependence, with output
 quality still incomplete. Preserve it as evidence. The next iteration asks
 for shorter complete sentences, gives them more schema headroom, and refuses
 incomplete or invisible-control-laden assessment text before saving evidence.
+
+### Functional result · four live traces saved and reviewed
+
+`attempt-03` ran at `a9e303a87c588180d1a4e4e0907167337003c6df`. All four
+traces persisted and read back through the existing onboarding engine.
+The same C0 buyer question was used in both scenarios. The second copy was a
+validated local replay without a provider call. All follow-ups cited the
+synthetic answer and at least one allowed source. The fictional C2 response
+used only its own source and answer.
+
+**C0 buyer proof, shared first question:** “What one concrete proof, such as
+a before-and-after example or client quote, shows Launch and Ongoing are
+not old hosting?”
+
+| Synthetic trace | Actual generated follow-up | Actual assessment and material change |
+| --- | --- | --- |
+| C0 buyer A · Dated internal comparison available | “Which specific proof can be reviewed now to distinguish Launch and Ongoing from the old hosting offer, and what is still withheld?” | “Review the dated comparison internally first, then decide whether any portion can support buyer proof.” A shareable artifact or a clear statement that none is cleared remained necessary. |
+| C0 buyer B · No dated comparison, permission or outcomes | “What specific customer evidence could later show Launch and Ongoing changed an actual site, not just our intended process?” | “Review can proceed on process description only, while buyer-proof remains unverified until a dated customer example or permission exists.” The recommendation shifts from inspecting evidence in hand to limiting copy to process and collecting support. Publication clearance remains a separate decision. |
+| C0 Ongoing · No baseline or assigned reviewer | “What first Ongoing improvement should the team review now, and which owner decision or evidence will support it?” | “Review response tracking first if no owner decision exists yet.” The draft asks for a decision naming the first improvement and its evidence source. Its first question was “What single ongoing improvement should MioPages support first, and who approves it?” |
+| Fictional C2 · Weekday urgent calls in the northern area | “What exact contact route should route routine estimates, given urgent calls use weekdays in the northern service area?” | “Review the routine estimate contact path now, because urgent coverage boundaries are partly defined.” The draft asks for the missing routine estimate route. Its first question was “What exact phone number or contact route handles urgent tree work, separate from routine estimates, on this site?” No number or real contact was supplied. |
+
+Each readiness badge stayed **open**. The changed evidence and recommended
+work are visible even though neither answer authorizes readiness or publication.
+The two buyer scenarios are the clearest demonstration of material adaptation.
+The Ongoing question is comparatively generic. The C2 assessment leaves the
+after-hours voicemail or fallback unresolved. Before product acceptance, review
+whether both follow-ups ask the most useful next question, and tighten the
+distinction between finding proof and having permission to publish it.
+
+| Phase attempt | Free counts | Generations | Input tokens | Output tokens | Usage-priced estimate |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Original `attempt` | 1 | 1 | 695 | 275 | $0.001759 |
+| `attempt-02` | 7 | 7 | 4,576 | 972 | $0.007809 |
+| `attempt-03` | 7 | 7 | 4,821 | 833 | $0.007367 |
+| **Total** | **15** | **15** | **10,092** | **2,080** | **$0.016935** |
+
+Costs sum the settled per-request ledger estimates, rounded up to micro-USD.
+No retries, cached tokens, reasoning tokens or unresolved reservations were
+recorded. The provider dashboard charge was outside the run. Fourteen focused
+tests, TypeScript and targeted lint passed on the final implementation.
+The pinned manifest and previous attempt evidence were preserved. No private
+C0 evidence or hosted customer state was used.
+
+This is functional synthetic proof. Onboarding remains in development. The
+next product slice is to show the real question, answer and changed finding in
+the Core interview UI, then carry reviewed findings into a versioned Presence
+Direction and the existing multi-page Core proposal path for private WordPress
+review. Formal hardening and owner acceptance precede production or publication.
