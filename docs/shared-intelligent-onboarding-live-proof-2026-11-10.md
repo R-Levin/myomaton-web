@@ -232,3 +232,12 @@ These are small search-discovered samples. Ranking, paid placement, local
 demand and commercial performance were outside the sample. Comparator prices
 or practices may prompt a question, but they cannot set the prospect's price
 or prove a customer outcome.
+
+The first research attempt stopped at local gap validation after one generation.
+The second persisted all three cases after the schema required an explicit market
+citation for each candidate. Review caught a material issue in that run. It
+treated retired C0 offers as an option and suggested broadening C2's urgent
+route beyond known coverage. The next iteration explicitly carried forward
+the owner-approved retirement decision, told the model to keep verified
+coverage fixed in both branches, and asked it to establish how the business
+operates before proposing a page or visitor action.
