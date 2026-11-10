@@ -147,3 +147,14 @@ text. The first assessment must be null. Existing semantic checks stay in
 place. Safe diagnostics distinguish provider failure, proposal validation,
 draft persistence, output screening and evidence write. They retain no
 rejected model text. [Structured Outputs constraints](https://developers.openai.com/api/docs/guides/structured-outputs)
+
+The first corrected run, `attempt-02` at `96fe3e9bc98b4f366b15638bee473be3843ba073`,
+saved all four live traces using seven free counts and seven generations.
+It used 4,576 input and 972 output tokens, for a ledger estimate of
+$0.007809. The two buyer traces produced different recommendations and evidence
+needs from the same first question. Both remained open for evidence. The
+Ongoing and C2 assessments contained clipped phrases near the schema length
+limits. This run established local saving and answer dependence, with output
+quality still incomplete. Preserve it as evidence. The next iteration asks
+for shorter complete sentences, gives them more schema headroom, and refuses
+incomplete or invisible-control-laden assessment text before saving evidence.

@@ -171,13 +171,15 @@ export function exactProjection(context: QuestionContext, entryPath: Trace["entr
   }] : [] };
 }
 
-function reviewedTurn(turn: InterviewTurn | undefined, context: Trace["context"], followUp = false): InterviewTurn {
+export function reviewedTurn(turn: InterviewTurn | undefined, context: Trace["context"], followUp = false): InterviewTurn {
   if (!turn?.question || (followUp && !turn.assessment)) throw Error("Required generated question or assessment missing");
   const text = [turn.question, turn.rationale, turn.assessment?.recommendation, turn.assessment?.evidenceNeeded].join(" ");
   const foreign = context === "c2" ? /\b(?:MioPages|HostShop|Web Presence|Ongoing)\b/i : /\b(?:tree service|urgent tree work|northern service area)\b/i;
-  if (foreign.test(text) || /https?:\/\/|\b\S+@\S+\.\S+|\bsk-(?:proj-)?[\w-]{8,}|(?:\(\d{3}\)|\b\d{3})[ .-]?\d{3}[ .-]?\d{4}\b/i.test(text)) {
+  if (foreign.test(text) || /[\u200b-\u200f\u202a-\u202e\u2060-\u206f]|https?:\/\/|\b\S+@\S+\.\S+|\bsk-(?:proj-)?[\w-]{8,}|(?:\(\d{3}\)|\b\d{3})[ .-]?\d{3}[ .-]?\d{4}\b/i.test(text)) {
     throw Error("Generated output failed the protected evidence screen");
   }
+  const statements = [turn.rationale, turn.assessment?.recommendation, turn.assessment?.evidenceNeeded];
+  if (statements.some(statement => statement && !/[.!?]$/.test(statement))) throw Error("Incomplete proof sentence");
   return turn;
 }
 
@@ -249,6 +251,9 @@ export async function runProof(directory: string, bin: string, rates: Rates, tra
           latest = { stage: "output-screen", code: "refused" };
           return { draft, turn: reviewedTurn(draft.state.turns[index], trace.context, index === 1) };
         } catch (error) {
+          if (latest.stage === "output-screen" && error instanceof Error && error.message === "Incomplete proof sentence") {
+            latest = { stage: "output-screen", code: "incomplete_sentence" };
+          }
           await writeFile(join(directory, "local-error.json"),
             JSON.stringify({ trace: trace.id, turn: index + 1, ...latest }) + "\n", { flag: "wx", mode: 0o600 });
           throw error;

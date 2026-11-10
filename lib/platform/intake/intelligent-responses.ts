@@ -38,15 +38,15 @@ const format = {
 };
 
 function proofFormat(context: QuestionContext, answerRef?: string) {
-  const concise = (max: number) => ({ type: "string", pattern: `^[^<>\\r\\n]{1,${max}}$` });
+  const sentence = (max: number) => ({ type: "string", pattern: `^[^<>\\r\\n]{1,${max - 1}}[.!?]$` });
   const sourceIds = context.evidence.map(item => item.id);
   if (answerRef) sourceIds.push(answerRef);
   return { ...format, schema: { ...format.schema, properties: {
-    question: { type: "string", pattern: "^[^<>\\r\\n]{1,199}\\?$" },
-    rationale: concise(140),
+    question: { type: "string", pattern: "^[^<>\\r\\n]{1,269}\\?$" },
+    rationale: sentence(210),
     sourceIds: { type: "array", minItems: 1, maxItems: 6, items: { type: "string", enum: sourceIds } },
     assessment: answerRef ? { ...format.schema.properties.assessment, type: "object", properties: {
-      recommendation: concise(180), evidenceNeeded: { anyOf: [concise(140), { type: "null" }] },
+      recommendation: sentence(260), evidenceNeeded: { anyOf: [sentence(215), { type: "null" }] },
     } } : { type: "null" },
   } } };
 }
@@ -140,9 +140,9 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
       const previous = context.history.at(-1);
       const answerRef = previous?.answer ? previous.id + ":answer" : undefined;
       const instructions = limits.projectInput ? instruction + (answerRef
-        ? " Ask one concrete follow-up based on the answer. Cite the answer reference exactly and at least one supplied source."
-        : " This is the first question. Set assessment to null. Cite at least one supplied source.")
-        + " Keep fields concise and on one line. Use plain English punctuation." : instruction;
+        ? " Ask one concrete follow-up based on the answer. Cite the answer reference exactly and at least one supplied source. Recommend a next action based on what the answer supplies, and distinguish what remains unverified from what could be reviewed now."
+        : " This is the first question. Set assessment to null. Cite at least one supplied source. Ask for one concrete detail about this business that would resolve the gap instead of restating it.")
+        + " Write one complete sentence per text field and aim for 20 words or fewer. Finish each thought well before the length limit. Use plain English punctuation." : instruction;
       const request = { model: rates.model, instructions, input: JSON.stringify(projected),
         text: { format: limits.projectInput ? proofFormat(context, answerRef) : format } };
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");

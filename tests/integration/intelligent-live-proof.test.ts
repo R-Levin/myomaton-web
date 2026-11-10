@@ -9,7 +9,7 @@ import { IntelligentOnboarding, type InterviewStage } from "../../lib/platform/i
 import { readProposal, type InterviewState, type QuestionContext } from "../../lib/platform/intake/intelligent-model";
 import type { IntakeService } from "../../lib/platform/intake/service";
 import { controlledProofResponsesProvider } from "../../lib/platform/intake/intelligent-responses";
-import { checkAttestation, exactProjection, manifestSha, phaseExposure, proofModel, providerFailure, readManifest, runProof } from "../../scripts/intake/intelligent-live-proof";
+import { checkAttestation, exactProjection, manifestSha, phaseExposure, proofModel, providerFailure, readManifest, reviewedTurn, runProof } from "../../scripts/intake/intelligent-live-proof";
 
 test("provider refusals retain status and safe API error fields only", () => {
   assert.deepEqual(providerFailure("/v1/responses", 400, { error: {
@@ -93,6 +93,15 @@ test("phase exposure includes historical settled spend, unresolved reservations 
   } finally { await rm(root, { recursive: true }); }
 });
 
+test("proof screen refuses clipped assessments and invisible output controls", () => {
+  const turn = { id: "fixture", gapId: "ongoing", question: "Who checks the first inquiry?", rationale: "Clarify responsibility.",
+    sourceIds: ["c0-discovery"], respondsTo: "fixture:answer", generatorVersion: "test", at: "now",
+    assessment: { recommendation: "Assign someone to read the first inquiry.", evidenceNeeded: "Name the reviewer and collect the" } };
+  assert.throws(() => reviewedTurn(turn, "c0", true), /Incomplete proof sentence/);
+  assert.throws(() => reviewedTurn({ ...turn, assessment: { ...turn.assessment, evidenceNeeded: "Name the reviewer.\u200b" } }, "c0", true), /evidence screen/);
+  assert.doesNotThrow(() => reviewedTurn({ ...turn, assessment: { ...turn.assessment, evidenceNeeded: "Name the reviewer." } }, "c0", true));
+});
+
 test("pinned proof driver uses seven exact count/generation pairs, offline", async () => {
   const directory = await mkdtemp(join(tmpdir(), "miopages-live-proof-fake-"));
   const oldNodeEnv = process.env.NODE_ENV, oldSynthesis = process.env.MIOPAGES_REVIEW_SYNTHESIS;
@@ -133,7 +142,7 @@ test("pinned proof driver uses seven exact count/generation pairs, offline", asy
         : context.gap.id === "coverage" ? "When can urgent callers reach someone?" : "Which evidence would make the service promise credible?";
       const assessment = prior ? { recommendation: hasProof ? "Review the dated comparison privately." : "Keep the evidence gap open.",
         evidenceNeeded: hasProof ? null : "Confirm a baseline and owner." } : null;
-      const proposal = { question, assessment, rationale: "Fixture generated response", sourceIds: prior ? [...sources.slice(0, 1), prior.id + ":answer"] : sources.slice(0, 1) };
+      const proposal = { question, assessment, rationale: "Fixture generated response.", sourceIds: prior ? [...sources.slice(0, 1), prior.id + ":answer"] : sources.slice(0, 1) };
       return { requestId: "req_fake_response", body: { id: "resp_fake", model: proofModel, service_tier: "default", status: "completed",
         usage: { input_tokens: 1000, output_tokens: 100, total_tokens: 1100, input_tokens_details: { cached_tokens: 0 }, output_tokens_details: { reasoning_tokens: 0 } },
         output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(proposal) }] }] } };
