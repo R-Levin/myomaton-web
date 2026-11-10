@@ -91,8 +91,8 @@ Its public description illustrates how a free assessment can demonstrate experti
 explain a few prioritized improvements and connect diagnosis to implementation.
 MioPages' Review leads to a broader managed relationship through structured onboarding,
 delivery, measurement and continuing improvement. Keep the assessment bounded and
-the optional Review mockup separate from the authoritative onboarding Home and
-customer release. The comparison adds no CRO subsystem or adopted competitor workflow.
+the **default-generated illustrative Review preview (which the Operator may retain, revise or omit from delivery)** separate from the authoritative onboarding Home and
+customer release. This is approved intended behavior, **not** a claim the automatic generation pipeline is already implemented. [Default-generation and Operator decisions](progressive-onboarding-and-launch-readiness.md#default-generated-illustrative-home-preview--operator-controls-delivery). The comparison adds no CRO subsystem or adopted competitor workflow.
 [Flowout's Free CRO Audit](https://www.flowout.com/free-cro-audit).
 
 ### Full-service consultative experiment
