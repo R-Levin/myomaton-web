@@ -1,6 +1,6 @@
 # Shared intelligent onboarding · controlled OpenAI proof
 
-**November 10, 2026 · Approval package only · No credential use or API traffic**
+**November 10, 2026 · Preparation baseline and execution checkpoint · No API traffic**
 
 The proposed run exercises the existing [offline engine at `b48b3cf`](https://github.com/R-Levin/myomaton-web/blob/b48b3cf3e0d03504c5d5d37457d17ae1def43d17/docs/shared-intelligent-onboarding-proposal-2026-11-10.md#offline-implementation-checkpoint). It tests whether model-generated follow-ups and draft assessment changes respond to business evidence. It does not finish the onboarding interview or establish owner-visible product acceptance. [Issue #10 preparation authorization](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6773902908)
 
@@ -46,4 +46,33 @@ request arithmetic and absence of private input. All six focused offline
 engine and ledger checks passed again. These checks used the existing fake
 transport and do not establish live API behavior or model quality.
 
-**Decision for review:** approve this exact snapshot, manifest, data policy and one capped execution only subject to successful preflight. Published model and generation rates are verified. Project access and controls, token-count billing and the live extension remain unverified. No key or provider call is authorized by this document.
+**Original preparation decision:** the snapshot, manifest, data policy and one capped execution were proposed subject to successful preflight. The owner's later authorization and implementation are recorded below.
+
+## Authorized execution checkpoint
+
+[Issue #10 owner authorization](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6775948557) now authorizes this exact proof conditional on preflight. The aggregate development-phase ceiling is $5. The single approved proof still has the $0.50 application cap, seven generation and seven exact count requests, with zero retries. Remaining funds require a later reviewed scope.
+
+**Live result · BLOCKED at no-call preflight.** The manifest SHA-256 matched and the published snapshot and Standard generation prices still match this runbook. The official [count reference](https://developers.openai.com/api/reference/resources/responses/subresources/input_tokens/methods/count), [counting guide](https://developers.openai.com/api/docs/guides/token-counting) and [pricing](https://developers.openai.com/api/docs/pricing) did not establish the count endpoint's separate fee or a provider-backed upper bound. A generic key is present in the local environment. Its project, scope and custody were unavailable for verification. The launcher reads only the separately supplied dedicated development key and does not fall back to the inherited key. Effective project model access, billing, endpoint permissions and project-level data controls still require documented verification. No model request, count request, or credential probe was sent. **Actual usage and charges for this checkpoint were zero.** Model quality remains unevaluated.
+
+The [local runner](../scripts/intake/intelligent-live-proof.ts) shares the Activation and Intake fixture with the [original offline engine test](../tests/integration/intelligent-onboarding.test.ts). It verifies the unchanged manifest, projects each request from a scoped fixture, replays the exact first buyer question in a second draft and uses the existing metered Responses adapter with the tighter 14/7 limits. The local transport uses certificate-verified direct HTTPS, two fixed POST paths, bounded response bytes and no redirects or retries. The output screen, engine citation/answer validation and one-attempt marker fail closed. The [driver test](../tests/integration/intelligent-live-proof.test.ts) exercises all four traces through fake responses. Those responses and charges are simulated.
+
+Nine focused checks passed, including all seven simulated pairs, exact shared count/generation payload, replay without a request, C2 isolation, rejection of foreign or added evidence, and refusal of an eighth generation or fifteenth request. The existing reservation and uncertain-charge tests also passed. The 388 application regressions, Next route type generation, TypeScript and targeted lint passed.
+
+### Evidence needed before the one authorized run
+
+1. In the development project console or account records, confirm the dedicated project, the exact snapshot, effective authorization for the two approved POST paths, sufficient billing allowance, and no broader credential permission. Confirm training/data sharing is off, effective retention is compatible with the runbook, and caching uses the approved default behavior. The [OpenAI data controls](https://developers.openai.com/api/docs/guides/your-data) distinguish application state from abuse monitoring. The approved scope accepts default abuse-monitoring retention for this minimized proof where it is the verified project setting.
+2. Obtain official account billing guidance or provider confirmation that the exact `POST /v1/responses/input_tokens` fee is zero or bounded by US$0.01 per call. Preserve the reference privately. Do not use a billable probe to establish the rate.
+3. With actual evidence reviewed, prepare the local attestation under `runtime-content/openai-onboarding-proof/preflight.json` in the live-proof worktree, using a user-restricted ignored directory. Keep it out of Git. Use the reviewed commit, pinned manifest digest, project and organization IDs, SHA-256 of the dedicated key computed locally, and a UTC expiry at most two hours ahead. Include the following closed set of affirmative project checks and supporting references. A checked box or fabricated reference cannot establish any provider setting.
+
+   | Field | Required value |
+   | --- | --- |
+   | `authorization`, `commit`, `manifestSha`, `rateCard` | Issue comment ID `6775948557`, full reviewed Git SHA, pinned manifest SHA-256, `openai-gpt54mini-standard-usd/2026-11-10.1` |
+   | `project`, `organization`, `credentialSha256`, `validUntil` | Verified identifiers, dedicated key fingerprint and expiry |
+   | `countMicros`, `countPriceEvidence`, `projectAccessEvidence`, `dataControlsEvidence` | Verified count price ceiling in micro-USD from 0 to 10,000 and private evidence references |
+   | `verified` | An object with `pinnedModelEnabled`, `restrictedEndpoints`, `billingAndPhaseBudget`, `trainingOptInDisabled`, `retentionAndCachingReviewed`, `projectCredentialProtected` all set to true after actual verification |
+
+4. In the isolated worktree, set `PG_BIN_DIR` to the local PostgreSQL tools and supply the dedicated key to the child as `MIOPAGES_OPENAI_DEV_API_KEY` through the protected local prompt or secret loader. Run `node --import tsx scripts/intake/intelligent-live-proof.ts --preflight` to check the local receipt without traffic. After PASS, `--execute` is the single authorized attempt. Preserve the ignored `attempt` directory on success or failure. Inspect the validated excerpts and usage ledger before committing a sanitized handoff.
+
+### Next implementation gate
+
+After a successful semantic proof, define one versioned, reviewable Presence Direction proposal from scoped interview evidence. It should carry source and confidence labels, audience and Offering priorities, proposed site structure and action hierarchy, page briefs, SEO/design/media guidance and explicit unresolved proof. Map its accepted pieces to the existing Core knowledge/proposal contracts and the [Issue #12 integration track](https://github.com/R-Levin/myomaton-web/issues/12). Test generation of a local multi-page candidate against the preserved v3 design and exact preview/review boundaries before extending native WordPress page, navigation, media and action materialization. This proposal carries no new authorization for API spend, source promotion, WordPress materialization or publication.

@@ -362,18 +362,20 @@ bounded live reasoning run. See [Issue #10](https://github.com/R-Levin/myomaton-
 for the pinned handoff and next owner decision. Draft PR #11 remains a separate
 review.
 
-### Issue #10 · controlled live reasoning proof pending approval
+### Issue #10 · controlled live reasoning proof authorized and blocked at preflight
 
-The owner authorized preparation only. The
-[live proof package](shared-intelligent-onboarding-live-proof-2026-11-10.md)
-pins the model, public and fictional evidence projection, semantic acceptance
-criteria and US$0.50 ceiling. The proposed maximum is seven generation
-attempts and seven token-count requests. The offline engine remains unchanged.
-The exact development-project permissions, retention and token-count fee
-bound are preflight gates. An explicit owner decision and a reviewed narrow
-transport and test driver are required before credentials or traffic. The
-preserved C0 draft and hosted systems remain outside the proof.
-[Issue #10 preparation authorization](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6773902908)
+The [owner authorized the exact live proof](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6775948557)
+under a $5 phase ceiling. The one run retains a $0.50 hard application cap
+and exactly seven planned generations and seven token counts. The
+[execution checkpoint](shared-intelligent-onboarding-live-proof-2026-11-10.md#authorized-execution-checkpoint)
+records the guarded local runner and the successful four-trace fake run.
+Live dispatch remains blocked until the count fee bound and the dedicated
+development project's credential, permissions, billing and data controls
+are verified. No provider traffic or charge occurred. The preserved C0
+draft and hosted systems remain outside the proof. Once the semantic proof
+passes review, the next integration decision is a versioned Presence
+Direction proposal mapped to existing Core and Issue #12's private delivery
+work.
 
 ### Issue #9 · first local signup and onboarding slice
 

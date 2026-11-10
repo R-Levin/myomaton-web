@@ -7,16 +7,16 @@ import type { QuestionAttribution, QuestionContext, QuestionProvider } from "./i
 const maxInput = 4_000, maxOutput = 1_200;
 const maxRequests = 16, maxGenerations = 8, capMicros = 500_000;
 const version = "onboarding-responses/1";
-type Rates = {
+export type Rates = {
   model: string; verifiedOn: string;
   inputPerMillion: number; cachedPerMillion: number; cacheWritePerMillion: number; outputPerMillion: number;
   countMicros: number;
 };
 type Reply = { body: unknown; requestId?: string };
-export type OfflineResponsesTransport = {
-  readonly mode: "offline-test";
+export type ResponsesTransport = {
   send(path: "/v1/responses/input_tokens" | "/v1/responses", request: object): Promise<Reply>;
 };
+export type OfflineResponsesTransport = ResponsesTransport & { readonly mode: "offline-test" };
 type Usage = { input: number; cached: number; cacheWrite: number; output: number; reasoning: number };
 type Receipt = QuestionAttribution & { reservedMicros: number; countDispatched: boolean; generationDispatched: boolean;
   countRequestId?: string; generationRequestId?: string; responseId?: string; usage?: Usage; estimatedMicros?: number;
@@ -86,17 +86,28 @@ function responseProposal(body: Record<string, unknown>) {
   return JSON.parse(item.text) as unknown;
 }
 
-// This slice has no network client, API key loader or fallback to fetch.
 export function offlineResponsesProvider(directory: string, configuredRates: Rates, transport: OfflineResponsesTransport): QuestionProvider {
   if (transport.mode !== "offline-test" || process.env.NODE_ENV === "production") throw Error("Offline Responses transport required");
+  return meteredResponsesProvider(directory, configuredRates, transport, { requests: maxRequests, generations: maxGenerations });
+}
+
+export function controlledProofResponsesProvider(directory: string, rates: Rates, transport: ResponsesTransport,
+  projectInput: (context: QuestionContext, attribution: QuestionAttribution) => unknown): QuestionProvider {
+  if (rates.cacheWritePerMillion !== 0 || rates.countMicros > 10_000) throw Error("Live proof rate card refused");
+  return meteredResponsesProvider(directory, rates, transport, { requests: 14, generations: 7, projectInput });
+}
+
+function meteredResponsesProvider(directory: string, configuredRates: Rates, transport: ResponsesTransport,
+  limits: { requests: number; generations: number; projectInput?: (context: QuestionContext, attribution: QuestionAttribution) => unknown }): QuestionProvider {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
   const inputRate = Math.max(rates.inputPerMillion, rates.cachedPerMillion, rates.cacheWritePerMillion);
   return { version, async propose(context: QuestionContext, attribution: QuestionAttribution) {
-    if (process.env.NODE_ENV === "production") throw Error("Offline Responses transport required");
+    if (process.env.NODE_ENV === "production") throw Error("Development Responses transport required");
     const { ownerDigest, workDigest } = attribution;
     if (![ownerDigest, workDigest].every(value => /^[a-f0-9]{64}$/.test(value))) throw Error("Scoped attribution required");
+    const projected = limits.projectInput ? limits.projectInput(context, attribution) : context;
     const lock = await open(lockPath, "wx", 0o600);
     try {
       const ledger: Ledger = JSON.parse(await readFile(path, "utf8"));
@@ -111,8 +122,8 @@ export function offlineResponsesProvider(directory: string, configuredRates: Rat
       const requests = ledger.attempts.filter(item => item.countDispatched).length + generations;
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");
       const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + maxOutput * rates.outputPerMillion) / 1_000_000);
-      if (requests + 2 > maxRequests || generations >= maxGenerations || spent + reservation > capMicros) throw Error("Development budget exhausted");
-      const request = { model: rates.model, instructions: instruction, input: JSON.stringify(context), text: { format } };
+      if (requests + 2 > limits.requests || generations >= limits.generations || spent + reservation > capMicros) throw Error("Development budget exhausted");
+      const request = { model: rates.model, instructions: instruction, input: JSON.stringify(projected), text: { format } };
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation, countDispatched: true, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);
@@ -143,7 +154,10 @@ export function offlineResponsesProvider(directory: string, configuredRates: Rat
         throw Error("Provider model or tier mismatch");
       }
       let usage: Usage;
-      try { usage = responseUsage(body, input); }
+      try {
+        usage = responseUsage(body, input);
+        if (limits.projectInput && usage.cacheWrite !== 0) throw Error("Unexpected cache-write billing");
+      }
       catch (error) { await checkpoint(); throw error; }
       const estimate = rates.countMicros + Math.ceil(((usage.input - usage.cached - usage.cacheWrite) * rates.inputPerMillion +
         usage.cached * rates.cachedPerMillion + usage.cacheWrite * rates.cacheWritePerMillion + usage.output * rates.outputPerMillion) / 1_000_000);
