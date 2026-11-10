@@ -9,7 +9,7 @@ import { rankMarketQuestions, runResearchProof } from "../../scripts/intake/rese
 const candidate = (id: string, question: string, impact: number) => ({
   unknown: "Visitor route", question, why: "Visitors need a reliable next step.",
   ifYes: "Show the verified route.", ifNo: "Keep the action provisional.",
-  impact, uncertainty: 2, novelty: 2, effort: 1, sourceIds: [id],
+  impact, uncertainty: 2, novelty: 2, effort: 1, marketId: id, sourceIds: [],
 });
 const result = (...candidates: unknown[]) => ({ understanding: "There is a service to explain.", uncertainty: "The next action is unverified.", candidates });
 
