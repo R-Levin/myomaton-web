@@ -5,6 +5,8 @@ This file is the first-read **navigation and operational handoff** when merged t
 
 ## Active review handoff — C0 onboarding at chat boundary (November 9, 2026)
 
+**Broader verified context recovery:** [November 9 chat-boundary source and decision audit](c0-chat-boundary-recovery-audit-2026-11-09.md). This is a source-indexed review note, not a new canonical product contract. It distinguishes authoritative source, superseded hypotheses, implementation status, earlier-chat excerpts and inaccessible local state.
+
 **Evidence and scope.** ChatGPT retrieved the GitHub development branch at `f73918708f7498d92f701fb5d17b132bae01b08f`, inspected `lib/platform/intake/adaptive.ts` and `scripts/intake/adaptive-onboarding-client.tsx`, and read Issue #10 through its November 9 existing-site feedback. These are **remote-source observations**, not a check of the unpushed Windows checkout, running localhost rehearsal, database, or saved browser form state. GitHub `main` is older and must not be mistaken for the active development branch.
 
 **Last owner-visible C0 state.** The owner is examining the `paid-onboarding/2` **Decide what to carry forward from the old site** screen, immediately before **Read the assessment**. The screen carries forward retirement/exclusion of legacy service marketing (including QR/self-managed offers), separate preservation of existing HostShop customer sign-in, and investigation of old URLs/links/commitments. The owner has **not authorized submission for Operator review**. Preserve the local rehearsal and its saved answers; **do not reset it**.
