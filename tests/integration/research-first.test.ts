@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { proofModel } from "../../scripts/intake/intelligent-live-proof";
-import { rankMarketQuestions, runResearchProof } from "../../scripts/intake/research-first";
+import { rankMarketQuestions, respectsC0Offer, runResearchProof } from "../../scripts/intake/research-first";
 
 const candidate = (id: string, question: string, impact: number) => ({
   unknown: "Visitor route", question, why: "Visitors need a reliable next step.",
@@ -21,6 +21,8 @@ test("research ranking prioritizes consequential new gaps and refuses foreign ev
   assert.equal(rankMarketQuestions(result({ ...first, novelty: 0 }, second), evidence).ranked[0].question, second.question);
   assert.throws(() => rankMarketQuestions(result(first, { ...second, sourceIds: ["market-foreign"] }), evidence), /question refused/);
   assert.throws(() => rankMarketQuestions(result(first, { ...second, ifYes: second.ifNo }), evidence), /question refused/);
+  assert.equal(respectsC0Offer({ ...first, ifYes: "Offer a Launch-only purchase." }), false);
+  assert.equal(respectsC0Offer({ ...first, question: "Which routine changes can the customer request during Ongoing?" }), true);
 });
 
 test("public research produces a new saved gap and answer-dependent assessment per isolated case", async () => {

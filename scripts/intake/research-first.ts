@@ -20,7 +20,7 @@ async function cases() {
     { id: "c0", path: "FREE_REVIEW", sources: [
       ...contexts.c0.sources.filter(source => source.kind === "owner-confirmed"),
       { id: "c0-retirement", kind: "owner-confirmed", at: "2026-11-09", reference: "docs/c0-adaptive-onboarding-walkthrough.md",
-        statement: "The standalone legacy offers are retired. Launch and Ongoing belong to one managed service. Existing customers retain separate HostShop account access." },
+        statement: "The standalone legacy offers are retired. Present Launch and Ongoing as one managed service, with no standalone Launch offer in this demonstration. HostShop access stays separate." },
       observed("c0-legacy", "https://miopages.com/", "The public home navigation presents site creation, hosting, email and support separately. It also provides access to existing hosting accounts."),
       observed("c0-pronto", "https://www.prontomarketing.com/website-management-services/", "The provider groups site upkeep and edits under management, offers editorial help and sells search marketing separately."),
       observed("c0-presgro", "https://www.presgro.com/managed-websites", "A UK provider separates limited refreshes from rebuilds and shows setup and recurring charges for a defined scope."),
@@ -92,6 +92,12 @@ export function rankMarketQuestions(value: unknown, evidence: InterviewEvidence[
     ranked: ranked.filter(row => row.impact > 0 && row.uncertainty > 0 && row.novelty > 0).sort((a, b) => b.score - a.score) };
 }
 
+export function respectsC0Offer(question: { unknown: string; question: string; ifYes: string; ifNo: string }) {
+  return !/launch[- ]only|standalone launch|split launch and ongoing|separate hosting,? email/i.test(
+    [question.unknown, question.question, question.ifYes, question.ifNo].join(" "),
+  );
+}
+
 export async function runResearchProof(directory: string, bin: string, rates: Rates, transport: ResponsesTransport) {
   const packet = await cases();
   await initializeOfflineUsageLedger(directory, rates);
@@ -113,7 +119,8 @@ export async function runResearchProof(directory: string, bin: string, rates: Ra
           return { ...seed, evidence: seed.evidence.map(({ id, kind, statement }) => ({ id, kind, statement })) };
         }, researchContract(sources));
         const research = rankMarketQuestions(await discovery.propose(seed, { ownerDigest, workDigest: fingerprint({ case: item.id, stage: "research" }) }), sources);
-        const best = research.ranked[0];
+        const candidates = item.id === "c0" ? research.ranked.filter(respectsC0Offer) : research.ranked;
+        const best = candidates[0];
         if (!best) throw Error("No material new question found");
         const gap: InterviewGap = { id: "discovered-1", questionPurpose: best.unknown, sourceIds: best.sourceIds, known: seed.gap.known };
         const selected = sources.filter(source => source.kind === "owner-confirmed" || gap.sourceIds.includes(source.id));
@@ -128,7 +135,7 @@ export async function runResearchProof(directory: string, bin: string, rates: Ra
           assert.equal(attribution.ownerDigest, ownerDigest);
           const wire = exactProjection(context, item.path, gap, selected, history[0], answer);
           return { ...wire, evidence: wire.evidence.map(({ id, kind, statement }) => ({ id, kind, statement })) };
-        }, { instructions: "Do not ask again for a fact that this answer supplies. Keep confirmed restrictions fixed. Ask for the most consequential remaining operational detail. If an urgent route is unstaffed, ask who can verify a safe fallback without inventing one. Do not assume a request is a confirmed booking or a quote is an approved price." });
+        }, { instructions: "Do not ask again for a fact that this answer supplies. Keep confirmed restrictions fixed. Ask for the most consequential remaining operational detail. If an urgent route is unstaffed, hold any urgent action for those hours and ask who can verify the safe fallback. Never recommend unmonitored voicemail or an unverified referral for an urgent hazard. Do not assume a request is a confirmed booking or a quote is an approved price." });
         const provider: QuestionProvider = { version: "research-first/1", async propose(context, attribution) {
           if (history.length) return adapter.propose(context, attribution);
           exactProjection(context, item.path, gap, selected);
@@ -147,7 +154,8 @@ export async function runResearchProof(directory: string, bin: string, rates: Ra
         stage = { stage: "readback", code: "refused" };
         assert.deepEqual(await engine.resume(entry), followed);
         assert.equal(second.respondsTo, first.id + ":answer");
-        await writeFile(join(directory, "market-" + item.id + ".json"), JSON.stringify({ research, answer: item.answer,
+        await writeFile(join(directory, "market-" + item.id + ".json"), JSON.stringify({ research: { ...research, ranked: candidates },
+          rejectedKnownScope: research.ranked.length - candidates.length, answer: item.answer,
           selected: best.question, followUp: second.question, assessment: second.assessment,
           before: before.readiness[0].status, after: followed.readiness[0].status }, null, 2) + "\n", { flag: "wx", mode: 0o600 });
       } catch (error) {
