@@ -362,6 +362,19 @@ bounded live reasoning run. See [Issue #10](https://github.com/R-Levin/myomaton-
 for the pinned handoff and next owner decision. Draft PR #11 remains a separate
 review.
 
+### Issue #10 · controlled live reasoning proof pending approval
+
+The owner authorized preparation only. The
+[live proof package](shared-intelligent-onboarding-live-proof-2026-11-10.md)
+pins the model, public and fictional evidence projection, semantic acceptance
+criteria and US$0.50 ceiling. The proposed maximum is seven generation
+attempts and seven token-count requests. The offline engine remains unchanged.
+The exact development-project permissions, retention and token-count fee
+bound are preflight gates. An explicit owner decision and a reviewed narrow
+transport and test driver are required before credentials or traffic. The
+preserved C0 draft and hosted systems remain outside the proof.
+[Issue #10 preparation authorization](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6773902908)
+
 ### Issue #9 · first local signup and onboarding slice
 
 Run `node --import tsx scripts/intake/c0-onboarding.ts` from the repository root

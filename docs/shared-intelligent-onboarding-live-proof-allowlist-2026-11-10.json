@@ -1,0 +1,184 @@
+{
+  "version": "miopages-onboarding-live-proof/2026-11-10.1",
+  "status": "proposal-only",
+  "baseCommit": "b48b3cf3e0d03504c5d5d37457d17ae1def43d17",
+  "provider": {
+    "model": "gpt-5.4-mini-2026-03-17",
+    "host": "api.openai.com",
+    "tier": "default",
+    "mode": "foreground",
+    "store": false,
+    "maxInputTokens": 4000,
+    "maxOutputTokens": 1200,
+    "paths": [
+      "/v1/responses/input_tokens",
+      "/v1/responses"
+    ]
+  },
+  "rateCard": {
+    "version": "openai-gpt54mini-standard-usd/2026-11-10.1",
+    "verifiedOn": "2026-11-10",
+    "inputPerMillion": 750000,
+    "cachedPerMillion": 75000,
+    "outputPerMillion": 4500000,
+    "units": "micro-USD per million tokens",
+    "separatelyBilledCacheWrites": "stop-if-reported",
+    "countPriceStatus": "unverified",
+    "conditionalMaxCountMicros": 10000
+  },
+  "limits": {
+    "plannedGenerations": 7,
+    "plannedCountRequests": 7,
+    "maxOutboundRequests": 14,
+    "maxGenerationAttempts": 7,
+    "maxTotalMicros": 500000,
+    "automaticRetries": 0
+  },
+  "contexts": {
+    "c0": {
+      "sources": [
+        {
+          "id": "c0-discovery",
+          "kind": "owner-confirmed",
+          "reference": "docs/miopages-c0-business-brief.md#launch-and-ongoing-offer",
+          "at": "2026-10-05/2026-10-06",
+          "statement": "MioPages offers one managed Web Presence service, starting with Launch and continuing into Ongoing. The customer supplies business truth and confirms consequential changes."
+        },
+        {
+          "id": "c0-audience",
+          "kind": "owner-confirmed",
+          "reference": "docs/miopages-c0-product-model.md#initial-customer-hypothesis",
+          "at": "2026-11-09",
+          "statement": "Startups remain in scope alongside established local service and trade, professional, and technical firms."
+        },
+        {
+          "id": "c0-website",
+          "kind": "website-observation",
+          "reference": "docs/c0-adaptive-onboarding-walkthrough.md#the-existing-site-review",
+          "at": "2026-11-09",
+          "statement": "The legacy site presented separate website and hosting services. The observed old copy does not describe the current managed offering."
+        },
+        {
+          "id": "c0-retained-interview",
+          "kind": "historical-review-answer",
+          "reference": "docs/c0-discovery-question-recovery-audit.md",
+          "at": "2026-10-14",
+          "statement": "The earlier Free Review interview discussed startups and small businesses. It is distinct from the approved October discovery."
+        },
+        {
+          "id": "c0-retained-assessment",
+          "kind": "historical-review-assessment",
+          "reference": "docs/free-review-synthesis.md#current-bounded-implementation",
+          "at": "2026-10-19",
+          "statement": "The separately retained assessment was approved and undelivered. This record is historical analysis, not a delivery receipt."
+        },
+        {
+          "id": "c0-fixture-review",
+          "kind": "synthetic-review",
+          "reference": "disposable-review-led-fixture",
+          "at": "2026-11-10",
+          "statement": "A synthetic, separately approved Review exercises the Review-led entry gate. This fixture does not record real Review delivery."
+        }
+      ],
+      "gaps": [
+        {
+          "id": "buyer-proof",
+          "questionPurpose": "Clarify what would persuade a skeptical buyer that the managed service differs from the old hosting offer, and what proof is available.",
+          "sourceIds": [
+            "c0-discovery",
+            "c0-audience",
+            "c0-website",
+            "c0-retained-interview",
+            "c0-retained-assessment",
+            "c0-fixture-review"
+          ],
+          "known": [
+            "The managed offer starts with Launch and continues into Ongoing.",
+            "Startups and established service businesses are in scope."
+          ]
+        },
+        {
+          "id": "ongoing",
+          "questionPurpose": "Clarify what first Ongoing improvement is supportable and what evidence or owner decision it requires.",
+          "sourceIds": [
+            "c0-discovery",
+            "c0-audience",
+            "c0-website"
+          ],
+          "known": [
+            "The managed offer starts with Launch and continues into Ongoing."
+          ]
+        }
+      ]
+    },
+    "c2": {
+      "sources": [
+        {
+          "id": "c2-site",
+          "kind": "website-observation",
+          "reference": "docs/fictional-customer-2-tree-service-onboarding-scenario.md",
+          "at": "2026-11-09",
+          "statement": "This fictional benchmark describes an old tree-service site advertising urgent tree work and routine estimates. No real site, delivery record, confirmed coverage or actual contact route was supplied."
+        }
+      ],
+      "gaps": [
+        {
+          "id": "coverage",
+          "questionPurpose": "Resolve the practical boundary of urgent call coverage and distinguish the routine estimate route.",
+          "sourceIds": [
+            "c2-site"
+          ],
+          "known": [
+            "The fictional old site advertises urgent tree work and routine estimates."
+          ]
+        }
+      ]
+    }
+  },
+  "traces": [
+    {
+      "id": "c0-buyer-a",
+      "context": "c0",
+      "entryPath": "FREE_REVIEW",
+      "gap": "buyer-proof",
+      "firstQuestion": "generate",
+      "answer": {
+        "disposition": "provided",
+        "text": "In this scenario we have a dated before-and-after comparison of the old hosting setup and a managed handoff. Its owner can check what was actually done, but the comparison has not been cleared for public use."
+      }
+    },
+    {
+      "id": "c0-buyer-b",
+      "context": "c0",
+      "entryPath": "FREE_REVIEW",
+      "gap": "buyer-proof",
+      "firstQuestion": "replay-validated-c0-buyer-a",
+      "answer": {
+        "disposition": "provided",
+        "text": "In this scenario we have no dated comparison, customer permission or measured outcomes. We can describe our intended process, but do not yet have evidence that it worked for a customer."
+      }
+    },
+    {
+      "id": "c0-ongoing",
+      "context": "c0",
+      "entryPath": "DIRECT_START",
+      "gap": "ongoing",
+      "firstQuestion": "generate",
+      "answer": {
+        "disposition": "provided",
+        "text": "In this scenario the site has just launched. There are no usable inquiry notes yet and no one has agreed who will check how prospects respond."
+      }
+    },
+    {
+      "id": "c2-coverage",
+      "context": "c2",
+      "entryPath": "DIRECT_START",
+      "gap": "coverage",
+      "firstQuestion": "generate",
+      "answer": {
+        "disposition": "provided",
+        "text": "For the fictional service, we can answer urgent calls on weekdays in the northern service area. Other calls may reach voicemail. Routine estimates follow a separate process."
+      }
+    }
+  ]
+}
