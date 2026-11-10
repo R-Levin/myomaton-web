@@ -370,9 +370,12 @@ and exactly seven planned generations and seven token counts. The
 [execution checkpoint](shared-intelligent-onboarding-live-proof-2026-11-10.md#authorized-execution-checkpoint)
 records the guarded local runner and the successful four-trace fake run.
 OpenAI confirmed that the count endpoint is free. Record `countMicros: 0`
-in the private attestation. Live dispatch remains blocked until the dedicated
-development project's credential, model access, permissions, billing and data
-controls are verified. No provider traffic or charge occurred. The preserved C0
+in the private attestation. Historical OpenAI Images success and the current
+Windows user environment establish the acquisition loading path. Live dispatch
+remains blocked until the owner matches that key to the development project and
+verifies model access, endpoint permissions, billing and data controls. The
+existing runner can take the verified key through its explicit proof input.
+No provider traffic or charge occurred. The preserved C0
 draft and hosted systems remain outside the proof. Once the semantic proof
 passes review, the next integration decision is a versioned Presence
 Direction proposal mapped to existing Core and Issue #12's private delivery
