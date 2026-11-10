@@ -36,6 +36,20 @@ const format = {
     },
   },
 };
+
+function proofFormat(context: QuestionContext, answerRef?: string) {
+  const concise = (max: number) => ({ type: "string", pattern: `^[^<>\\r\\n]{1,${max}}$` });
+  const sourceIds = context.evidence.map(item => item.id);
+  if (answerRef) sourceIds.push(answerRef);
+  return { ...format, schema: { ...format.schema, properties: {
+    question: { type: "string", pattern: "^[^<>\\r\\n]{1,199}\\?$" },
+    rationale: concise(140),
+    sourceIds: { type: "array", minItems: 1, maxItems: 6, items: { type: "string", enum: sourceIds } },
+    assessment: answerRef ? { ...format.schema.properties.assessment, type: "object", properties: {
+      recommendation: concise(180), evidenceNeeded: { anyOf: [concise(140), { type: "null" }] },
+    } } : { type: "null" },
+  } } };
+}
 const record = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw Error("Unexpected provider record");
   return value as Record<string, unknown>;
@@ -123,7 +137,14 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");
       const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + maxOutput * rates.outputPerMillion) / 1_000_000);
       if (requests + 2 > limits.requests || generations >= limits.generations || spent + reservation > capMicros) throw Error("Development budget exhausted");
-      const request = { model: rates.model, instructions: instruction, input: JSON.stringify(projected), text: { format } };
+      const previous = context.history.at(-1);
+      const answerRef = previous?.answer ? previous.id + ":answer" : undefined;
+      const instructions = limits.projectInput ? instruction + (answerRef
+        ? " Ask one concrete follow-up based on the answer. Cite the answer reference exactly and at least one supplied source."
+        : " This is the first question. Set assessment to null. Cite at least one supplied source.")
+        + " Keep fields concise and on one line. Use plain English punctuation." : instruction;
+      const request = { model: rates.model, instructions, input: JSON.stringify(projected),
+        text: { format: limits.projectInput ? proofFormat(context, answerRef) : format } };
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation, countDispatched: true, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);

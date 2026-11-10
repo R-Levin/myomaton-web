@@ -122,7 +122,28 @@ persisting the first validated question. It does not distinguish an engine
 validation failure, another local refusal, or a persistence failure. The
 runner kept no raw generated text. The other traces did not run, so there
 are no verified question excerpts or answer-dependent assessments to review.
-The ignored attempt and usage evidence are preserved. The one-shot attempt
-has been consumed and was not retried. Any later attempt requires separate
-authorization and a sanitized local diagnostic that can distinguish these
-failure stages.
+The original one-shot attempt and its usage evidence are preserved. The later
+development policy permits fresh, separately recorded attempts under the phase
+budget.
+
+## Controlled development iterations
+
+[Development policy at `f2ad4b2`](development-control.md#development-velocity-proportional-safeguards-and-completion-hardening)
+and [Issue #10](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6779329635)
+authorize deliberate synthetic attempts within $5 aggregate and $0.50 per run.
+The original `attempt` remains intact. Start each later attempt explicitly
+from a clean reviewed checkout with `--execute --owner-diagnostic attempt-02`
+or the next unused numbered directory. There are zero automatic retries.
+The phase lock prevents overlapping runs. Existing settled costs and unresolved
+reservations are counted before admitting another run.
+
+The original response was discarded, so its exact local refusal cannot be
+reconstructed. Offline tests reproduced a contract mismatch. The old provider
+schema could return an assessment before an answer, foreign citations or
+unbounded text even though the local validator rejects those. The proof schema
+now distinguishes initial and follow-up turns, narrows citation choices to
+the supplied sources and answer reference, and requests concise one-line
+text. The first assessment must be null. Existing semantic checks stay in
+place. Safe diagnostics distinguish provider failure, proposal validation,
+draft persistence, output screening and evidence write. They retain no
+rejected model text. [Structured Outputs constraints](https://developers.openai.com/api/docs/guides/structured-outputs)

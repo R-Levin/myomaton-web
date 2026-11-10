@@ -40,6 +40,15 @@ export interface QuestionProvider {
   propose(context: QuestionContext, attribution: QuestionAttribution): Promise<unknown>;
 }
 
+export class ProposalValidationError extends Error {
+  constructor(readonly code: string, message: string) { super(message); }
+}
+
+function checked<T>(code: string, read: () => T): T {
+  try { return read(); }
+  catch { throw new ProposalValidationError(code, "Interview proposal field refused"); }
+}
+
 const safeText = (value: unknown, max: number) => {
   const result = text(value, max);
   if (/[<>\u0000-\u001f\u007f-\u009f]/u.test(result) || Buffer.byteLength(JSON.stringify(result)) > max + 2) throw Error("Interview text validation failed");
@@ -47,7 +56,7 @@ const safeText = (value: unknown, max: number) => {
 };
 const normalize = (value: string) => value.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 export function readProposal(value: unknown, context: QuestionContext, id: string, generatorVersion: string): InterviewTurn {
-  const output = object(value, ["question", "rationale", "sourceIds", "assessment"]);
+  const output = checked("proposal_shape", () => object(value, ["question", "rationale", "sourceIds", "assessment"]));
   const previous = context.history.at(-1);
   const answerRef = previous?.answer ? previous.id + ":answer" : null;
   const permitted = new Set(context.evidence.map(item => item.id));
@@ -56,22 +65,22 @@ export function readProposal(value: unknown, context: QuestionContext, id: strin
   if (!Array.isArray(references) || references.length < 1 || references.length > 6 ||
       new Set(references).size !== references.length || references.some(ref => typeof ref !== "string" || !permitted.has(ref)) ||
       !references.some(ref => context.gap.sourceIds.includes(ref)) || (answerRef && !references.includes(answerRef))) {
-    throw Error("Interview evidence references invalid");
+    throw new ProposalValidationError("evidence_references", "Interview evidence references invalid");
   }
-  const question = output.question === null ? null : safeText(output.question, 420);
+  const question = output.question === null ? null : checked("question_text", () => safeText(output.question, 420));
   const known = [...context.gap.known, ...context.history.flatMap(turn => turn.question ? [turn.question] : [])];
-  if (question && (!question.endsWith("?") || known.some(prior => normalize(prior) === normalize(question)))) throw Error("Repeated or invalid question");
-  if (!answerRef && !question) throw Error("Initial question required");
-  if (answerRef && output.assessment === null) throw Error("Follow-up assessment required");
+  if (question && (!question.endsWith("?") || known.some(prior => normalize(prior) === normalize(question)))) throw new ProposalValidationError("question_form", "Repeated or invalid question");
+  if (!answerRef && !question) throw new ProposalValidationError("initial_question_missing", "Initial question required");
+  if (answerRef && output.assessment === null) throw new ProposalValidationError("followup_assessment_missing", "Follow-up assessment required");
   let assessment: InterviewTurn["assessment"] = null;
   if (output.assessment !== null) {
-    if (!answerRef) throw Error("Assessment requires an answer");
-    const candidate = object(output.assessment, ["recommendation", "evidenceNeeded"]);
-    const evidenceNeeded = candidate.evidenceNeeded === null ? null : safeText(candidate.evidenceNeeded, 280);
-    if (!evidenceNeeded && previous?.answer?.disposition !== "provided") throw Error("Unanswered gap cannot be planning evidence");
-    assessment = { recommendation: safeText(candidate.recommendation, 380), evidenceNeeded };
+    if (!answerRef) throw new ProposalValidationError("assessment_before_answer", "Assessment requires an answer");
+    const candidate = checked("assessment_shape", () => object(output.assessment, ["recommendation", "evidenceNeeded"]));
+    const evidenceNeeded = candidate.evidenceNeeded === null ? null : checked("evidence_needed_text", () => safeText(candidate.evidenceNeeded, 280));
+    if (!evidenceNeeded && previous?.answer?.disposition !== "provided") throw new ProposalValidationError("unanswered_readiness", "Unanswered gap cannot be planning evidence");
+    assessment = { recommendation: checked("recommendation_text", () => safeText(candidate.recommendation, 380)), evidenceNeeded };
   }
-  return { id, gapId: context.gap.id, question, rationale: safeText(output.rationale, 280), sourceIds: [...references],
+  return { id, gapId: context.gap.id, question, rationale: checked("rationale_text", () => safeText(output.rationale, 280)), sourceIds: [...references],
     respondsTo: answerRef, generatorVersion: safeText(generatorVersion, 80), assessment, at: new Date().toISOString() };
 }
 

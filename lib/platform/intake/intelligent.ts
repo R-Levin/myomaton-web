@@ -4,12 +4,13 @@ import { fingerprint } from "../canonical/model";
 import type { Scope } from "../activation/model";
 import { IntakeError } from "./model";
 import type { IntakeService } from "./service";
-import { interviewAnswer, interviewReadiness, readProposal, type InterviewEvidence, type InterviewGap, type InterviewState, type QuestionContext, type QuestionProvider } from "./intelligent-model";
+import { interviewAnswer, interviewReadiness, ProposalValidationError, readProposal, type InterviewEvidence, type InterviewGap, type InterviewState, type QuestionContext, type QuestionProvider } from "./intelligent-model";
 
 type ScopedEvidence = InterviewEvidence & Pick<Scope, "webPresenceId" | "managedSiteId">;
 type Sources = { scope: Scope; evidence: ScopedEvidence[]; gaps: InterviewGap[] };
 type Entry = { context: unknown; caseId: string; token: string };
 const maxTurns = 4;
+export type InterviewStage = { stage: "draft-reservation" | "provider" | "proposal-validation" | "draft-persistence"; code: string };
 
 export class IntelligentOnboarding {
   private readonly sources: Sources;
@@ -62,11 +63,12 @@ export class IntelligentOnboarding {
     return { ...draft, readiness: interviewReadiness(this.sources.gaps, draft.state) };
   }
 
-  async propose(entry: Entry, expectedVersion: number, gapId: string) {
+  async propose(entry: Entry, expectedVersion: number, gapId: string, observe?: (stage: InterviewStage) => void) {
     const gap = this.sources.gaps.find(item => item.id === gapId);
     if (!gap) throw new IntakeError("invalid_request");
     const id = randomUUID();
     let input: QuestionContext | undefined;
+    observe?.({ stage: "draft-reservation", code: "started" });
     const started = await this.access(entry, false, (state, version, entryPath, evidence) => {
       this.expectVersion(version, expectedVersion);
       const last = state.turns.at(-1);
@@ -81,19 +83,30 @@ export class IntelligentOnboarding {
     let turn: InterviewState["turns"][number] | undefined;
     let failure: InterviewState["failure"] = null;
     if (!input) throw Error("Reserved interview context missing");
+    let rejection: InterviewStage | undefined;
+    observe?.({ stage: "provider", code: "started" });
     try {
       const { webPresenceId, managedSiteId } = this.sources.scope;
       const result = await this.provider.propose(structuredClone(input), {
         ownerDigest: fingerprint({ webPresenceId, managedSiteId }), workDigest: fingerprint({ caseId: entry.caseId, id }),
       });
       try { turn = readProposal(result, input, id, this.provider.version); }
-      catch { failure = { gapId, code: "invalid_output" }; }
-    } catch { failure = { gapId, code: "provider_unavailable" }; }
+      catch (error) {
+        failure = { gapId, code: "invalid_output" };
+        rejection = { stage: "proposal-validation", code: error instanceof ProposalValidationError ? error.code : "invalid_output" };
+      }
+    } catch {
+      failure = { gapId, code: "provider_unavailable" };
+      rejection = { stage: "provider", code: "unavailable" };
+    }
+    observe?.(rejection ?? { stage: "proposal-validation", code: "validated" });
+    observe?.({ stage: "draft-persistence", code: "started" });
     const draft = await this.access(entry, false, (state, version) => {
       this.expectVersion(version, started.version);
       if (state.pending?.id !== id) throw new IntakeError("draft_changed", 409);
       return { turns: turn ? [...state.turns, turn] : state.turns, pending: null, failure };
     });
+    observe?.(rejection ?? { stage: "draft-persistence", code: "saved" });
     return { ...draft, readiness: interviewReadiness(this.sources.gaps, draft.state) };
   }
 

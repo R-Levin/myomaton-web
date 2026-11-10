@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import type { QuestionContext } from "../../lib/platform/intake/intelligent-model";
+import type { ActivationService } from "../../lib/platform/activation/service";
+import { IntelligentOnboarding, type InterviewStage } from "../../lib/platform/intake/intelligent";
+import { readProposal, type InterviewState, type QuestionContext } from "../../lib/platform/intake/intelligent-model";
+import type { IntakeService } from "../../lib/platform/intake/service";
 import { controlledProofResponsesProvider } from "../../lib/platform/intake/intelligent-responses";
-import { checkAttestation, exactProjection, manifestSha, proofModel, providerFailure, readManifest, runProof } from "../../scripts/intake/intelligent-live-proof";
+import { checkAttestation, exactProjection, manifestSha, phaseExposure, proofModel, providerFailure, readManifest, runProof } from "../../scripts/intake/intelligent-live-proof";
 
 test("provider refusals retain status and safe API error fields only", () => {
   assert.deepEqual(providerFailure("/v1/responses", 400, { error: {
@@ -51,6 +54,45 @@ test("exact wire projection refuses alternate, foreign or augmented evidence", a
   assert.throws(() => exactProjection(augmented, entryPath, gap, evidence), /projection mismatch/);
 });
 
+test("first-turn semantic validation reports bounded codes and a failed draft write stays distinct", async () => {
+  const manifest = await readManifest(), { sources: evidence, gaps: [gap] } = manifest.contexts.c2;
+  const context: QuestionContext = { entryPath: "DIRECT_START", gap, evidence, history: [] };
+  const valid = { question: "Who can answer a weekday urgent call?", rationale: "Resolve coverage.", sourceIds: ["c2-site"], assessment: null };
+  for (const [proposal, code] of [
+    [{ ...valid, assessment: { recommendation: "Proceed", evidenceNeeded: null } }, "assessment_before_answer"],
+    [{ ...valid, sourceIds: ["c0-discovery"] }, "evidence_references"],
+    [{ ...valid, question: "No question mark" }, "question_form"],
+    [{ ...valid, rationale: "x".repeat(281) }, "rationale_text"],
+  ] as const) assert.throws(() => readProposal(proposal, context, "fixture-turn", "test"), { code });
+
+  const scope = { webPresenceId: "fixture-presence", managedSiteId: "fixture-site", pendingCustomerId: "fixture-customer" };
+  const authority = { source: { path: "DIRECT_START" } };
+  const activation = { withOnboardingDraft: async (_: unknown, _id: string, _scope: typeof scope,
+    run: (db: null, entry: typeof authority) => unknown) => run(null, authority) } as unknown as ActivationService;
+  let version = 1, state: InterviewState = { turns: [], pending: null, failure: null };
+  const intelligentDraft: IntakeService["intelligentDraft"] = async (_db, _entry, _token, _digest, _open, change) => {
+    if (version === 2) throw Error("Simulated storage failure");
+    if (change) state = change(state, version++);
+    return { version, state };
+  };
+  const engine = new IntelligentOnboarding(activation, { intelligentDraft } as IntakeService, {
+    scope, evidence: evidence.map(item => ({ ...item, ...scope })), gaps: [gap],
+  }, { version: "test", async propose() { return valid; } });
+  const stages: InterviewStage[] = [];
+  await assert.rejects(engine.propose({ context: {}, caseId: "fixture", token: "unused" }, 1, gap.id, stage => stages.push(stage)), /storage failure/);
+  assert.deepEqual(stages.slice(-2), [{ stage: "proposal-validation", code: "validated" }, { stage: "draft-persistence", code: "started" }]);
+});
+
+test("phase exposure includes historical settled spend, unresolved reservations and incomplete attempts", async () => {
+  const root = await realpath(await mkdtemp(join(tmpdir(), "miopages-proof-phase-")));
+  try {
+    for (const name of ["attempt", "attempt-02", "attempt-03"]) await mkdir(join(root, name));
+    await writeFile(join(root, "attempt", "onboarding-usage.json"), JSON.stringify({ attempts: [{ status: "completed", estimatedMicros: 1759 }] }));
+    await writeFile(join(root, "attempt-02", "onboarding-usage.json"), JSON.stringify({ attempts: [{ status: "uncertain", reservedMicros: 8400 }] }));
+    assert.equal(await phaseExposure(root), 510159);
+  } finally { await rm(root, { recursive: true }); }
+});
+
 test("pinned proof driver uses seven exact count/generation pairs, offline", async () => {
   const directory = await mkdtemp(join(tmpdir(), "miopages-live-proof-fake-"));
   const oldNodeEnv = process.env.NODE_ENV, oldSynthesis = process.env.MIOPAGES_REVIEW_SYNTHESIS;
@@ -64,7 +106,9 @@ test("pinned proof driver uses seven exact count/generation pairs, offline", asy
     const findings = await runProof(directory, process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin", rates, { async send(path, body) {
       calls++;
       assert.equal((body as { model: string }).model, proofModel);
-      const wire = body as { input: string };
+      const wire = body as { input: string; text: { format: { schema: { properties: {
+        assessment: { type: string }; sourceIds: { items: { enum: string[] } };
+      } } } } };
       assert.equal(JSON.stringify(body).includes("ownerDigest"), false);
       if (path === "/v1/responses/input_tokens") {
         assert.equal(calls % 2, 1);
@@ -77,6 +121,9 @@ test("pinned proof driver uses seven exact count/generation pairs, offline", asy
       const context = JSON.parse(wire.input) as QuestionContext;
       const prior = context.history[0];
       const sources = context.evidence.map(item => item.id);
+      const schema = wire.text.format.schema.properties;
+      assert.equal(schema.assessment.type, prior ? "object" : "null");
+      assert.deepEqual(schema.sourceIds.items.enum, prior ? [...sources, prior.id + ":answer"] : sources);
       assert.equal(sources.some(id => id.startsWith("c0-")), context.gap.id !== "coverage");
       assert.equal(sources.some(id => id.includes("review")), context.entryPath === "FREE_REVIEW");
       const hasProof = prior?.answer?.text?.includes("have a dated");
@@ -126,12 +173,14 @@ test("failed first diagnostic preserves its reservation and stops before another
       paths.push(path);
       if (path === "/v1/responses/input_tokens") return { body: { input_tokens: 1_000 } };
       throw Error("Simulated API refusal");
-    } }), /Required generated question/);
+    } }), /Interview turn refused/);
     assert.deepEqual(paths, ["/v1/responses/input_tokens", "/v1/responses"]);
     const ledger = JSON.parse(await readFile(join(directory, "onboarding-usage.json"), "utf8"));
     assert.equal(ledger.attempts.length, 1);
     assert.equal(ledger.attempts[0].reservedMicros, 8400);
     assert.equal(ledger.attempts[0].status, "pending");
+    assert.deepEqual(JSON.parse(await readFile(join(directory, "local-error.json"), "utf8")),
+      { trace: "c0-buyer-a", turn: 1, stage: "provider", code: "unavailable" });
   } finally {
     if (oldNodeEnv === undefined) Reflect.deleteProperty(process.env, "NODE_ENV"); else Object.assign(process.env, { NODE_ENV: oldNodeEnv });
     if (oldSynthesis === undefined) delete process.env.MIOPAGES_REVIEW_SYNTHESIS; else process.env.MIOPAGES_REVIEW_SYNTHESIS = oldSynthesis;

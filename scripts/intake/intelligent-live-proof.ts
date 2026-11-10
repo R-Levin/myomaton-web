@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { lstat, mkdir, readFile, realpath, writeFile } from "node:fs/promises";
+import { lstat, mkdir, open, readdir, readFile, realpath, unlink, writeFile } from "node:fs/promises";
 import { request } from "node:https";
 import { dirname, join, resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { fingerprint } from "../../lib/platform/canonical/model";
-import { IntelligentOnboarding } from "../../lib/platform/intake/intelligent";
+import { IntelligentOnboarding, type InterviewStage } from "../../lib/platform/intake/intelligent";
 import type { InterviewEvidence, InterviewGap, InterviewTurn, QuestionContext, QuestionProvider } from "../../lib/platform/intake/intelligent-model";
 import { controlledProofResponsesProvider, initializeOfflineUsageLedger, type Rates, type ResponsesTransport } from "../../lib/platform/intake/intelligent-responses";
 import { IntakeService } from "../../lib/platform/intake/service";
@@ -17,7 +17,10 @@ export const manifestSha = "11d47ae88f1df63d4d6e70fbf1f694197bffa782c81b35c6e8e9
 export const proofModel = "gpt-5.4-mini-2026-03-17";
 const authorization = "6775948557";
 const ownerDiagnosticAuthorization = "6778994149";
+const developmentAuthorization = "6779329635";
 const proofRoot = resolve("runtime-content/openai-onboarding-proof");
+const runCapMicros = 500_000, phaseCapMicros = 5_000_000;
+const isNumberedAttempt = (name: string) => /^attempt-(?:0[2-9]|[1-9][0-9])$/.test(name);
 const sha = (value: string | Buffer) => createHash("sha256").update(value).digest("hex");
 type Trace = {
   id: string; context: "c0" | "c2"; entryPath: QuestionContext["entryPath"]; gap: string;
@@ -178,6 +181,32 @@ function reviewedTurn(turn: InterviewTurn | undefined, context: Trace["context"]
   return turn;
 }
 
+export async function phaseExposure(root: string) {
+  let total = 0;
+  for (const name of await readdir(root)) {
+    if (name !== "attempt" && !isNumberedAttempt(name)) continue;
+    const directory = join(root, name);
+    if (!(await lstat(directory)).isDirectory() || await realpath(directory) !== directory) throw Error("Phase evidence boundary refused");
+    const path = join(directory, "onboarding-usage.json");
+    const file = await lstat(path).catch((error: NodeJS.ErrnoException) => {
+      if (error.code === "ENOENT") return null;
+      throw error;
+    });
+    if (!file) { total += runCapMicros; continue; }
+    if (!file.isFile() || file.size > 32768) throw Error("Phase ledger refused");
+    const { attempts } = JSON.parse(await readFile(path, "utf8"));
+    if (!Array.isArray(attempts) || attempts.length > 7) throw Error("Phase ledger refused");
+    for (const entry of attempts) {
+      const settled = entry.status === "completed" || entry.status === "rejected";
+      const amount = settled ? entry.estimatedMicros : entry.reservedMicros;
+      if (!["completed", "rejected", "uncertain", "pending"].includes(entry.status) ||
+          !Number.isSafeInteger(amount) || amount < 0 || amount > runCapMicros) throw Error("Phase ledger refused");
+      total += amount;
+    }
+  }
+  return total;
+}
+
 export async function runProof(directory: string, bin: string, rates: Rates, transport: ResponsesTransport) {
   const manifest = await readManifest();
   if (!isDeepStrictEqual(rates, fixedRates(rates.countMicros))) throw Error("Pinned proof rate card required");
@@ -212,24 +241,42 @@ export async function runProof(directory: string, bin: string, rates: Rates, tra
         scope: entry.scope, evidence: data.sources.map(item => ({ ...item, ...owner,
           ...(item.kind === "synthetic-review" && { reviewDigest: entry.review?.digest }) })), gaps: data.gaps,
       }, provider);
+      async function generate(version: number, index: number) {
+        let latest: InterviewStage | { stage: "output-screen"; code: string } = { stage: "draft-reservation", code: "started" };
+        try {
+          const draft = await engine.propose(entry, version, trace.gap, stage => { latest = stage; });
+          if (draft.state.failure) throw Error("Interview turn refused");
+          latest = { stage: "output-screen", code: "refused" };
+          return { draft, turn: reviewedTurn(draft.state.turns[index], trace.context, index === 1) };
+        } catch (error) {
+          await writeFile(join(directory, "local-error.json"),
+            JSON.stringify({ trace: trace.id, turn: index + 1, ...latest }) + "\n", { flag: "wx", mode: 0o600 });
+          throw error;
+        }
+      }
+      async function saveFinding(file: string, content: object, turn: number) {
+        try { await writeFile(join(directory, file), JSON.stringify(content, null, 2) + "\n", { flag: "wx", mode: 0o600 }); }
+        catch (error) {
+          await writeFile(join(directory, "local-error.json"),
+            JSON.stringify({ trace: trace.id, turn, stage: "evidence-persistence", code: "write_failed" }) + "\n", { flag: "wx", mode: 0o600 });
+          throw error;
+        }
+      }
       const before = await engine.open(entry);
-      const asked = await engine.propose(entry, before.version, trace.gap);
-      const first = reviewedTurn(asked.state.turns[0], trace.context);
+      const { draft: asked, turn: first } = await generate(before.version, 0);
       if (trace.id === "c0-buyer-a") {
         initialBuyer = first;
-        await writeFile(join(directory, "diagnostic-question.json"),
-          JSON.stringify({ question: first.question, sourceIds: first.sourceIds }) + "\n", { flag: "wx", mode: 0o600 });
+        await saveFinding("diagnostic-question.json", { question: first.question, sourceIds: first.sourceIds }, 1);
       }
       const answered = await engine.answer(entry, asked.version, first.id, trace.answer.disposition, trace.answer.text);
       history.push(answered.state.turns[0]);
-      const followed = await engine.propose(entry, answered.version, trace.gap);
-      const second = reviewedTurn(followed.state.turns[1], trace.context, true);
+      const { draft: followed, turn: second } = await generate(answered.version, 1);
       assert.deepEqual(await engine.resume(entry), followed);
       assert.equal(second.respondsTo, first.id + ":answer");
       const receipt = { trace: trace.id, initialQuestion: first.question, initialSourceIds: first.sourceIds,
         followUp: second.question, followUpSourceIds: second.sourceIds, assessment: second.assessment,
         before: before.readiness.find(item => item.gapId === trace.gap), after: followed.readiness.find(item => item.gapId === trace.gap) };
-      await writeFile(join(directory, trace.id + ".json"), JSON.stringify(receipt, null, 2) + "\n", { flag: "wx", mode: 0o600 });
+      await saveFinding(trace.id + ".json", receipt, 2);
       findings.push(receipt);
     }
     assert.equal(findings[0].initialQuestion, findings[1].initialQuestion);
@@ -239,9 +286,10 @@ export async function runProof(directory: string, bin: string, rates: Rates, tra
 }
 
 async function main() {
-  const [mode, flag, ...rest] = process.argv.slice(2);
+  const [mode, flag, attempt = "attempt", ...rest] = process.argv.slice(2);
   const ownerDiagnostic = flag === "--owner-diagnostic";
-  if (!["--preflight", "--execute"].includes(mode) || (flag && !ownerDiagnostic) || rest.length) throw Error("Explicit proof mode required");
+  if (!["--preflight", "--execute"].includes(mode) || (flag && !ownerDiagnostic) || rest.length ||
+      (attempt !== "attempt" && (!ownerDiagnostic || !isNumberedAttempt(attempt)))) throw Error("Explicit proof mode required");
   await readManifest();
   const { receipt, key, commit } = await preflight(ownerDiagnostic);
   const bin = process.env.PG_BIN_DIR;
@@ -254,15 +302,25 @@ async function main() {
   git("check-ignore", "--", proofRoot);
   await mkdir(proofRoot, { recursive: true, mode: 0o700 });
   if (await realpath(proofRoot) !== proofRoot) throw Error("Protected attempt directory required");
-  const directory = join(proofRoot, "attempt");
-  await mkdir(directory, { mode: 0o700 }); // Exclusive across process restarts. Preserve on every outcome.
-  await writeFile(join(directory, "authorization.json"), JSON.stringify({ authorization: ownerDiagnostic ? ownerDiagnosticAuthorization : authorization, commit, manifestSha,
-    rateCard, countMicros: receipt.countMicros, validUntil: receipt.validUntil }) + "\n", { flag: "wx", mode: 0o600 });
-  Object.assign(process.env, { NODE_ENV: "development", MIOPAGES_REVIEW_SYNTHESIS: "local-operator" });
-  await runProof(directory, bin, fixedRates(receipt.countMicros), httpsTransport(receipt, key, async failure => {
-    await writeFile(join(directory, "provider-error.json"), JSON.stringify(failure) + "\n", { flag: "wx", mode: 0o600 });
-    console.error("Provider failure " + JSON.stringify(failure));
-  }));
+  const lockPath = join(proofRoot, ".phase.lock"), lock = await open(lockPath, "wx", 0o600);
+  try {
+    const previousExposureMicros = await phaseExposure(proofRoot);
+    if (previousExposureMicros + runCapMicros > phaseCapMicros) throw Error("Development phase budget exhausted");
+    const directory = join(proofRoot, attempt);
+    await mkdir(directory, { mode: 0o700 }); // Existing attempts are never replaced.
+    await writeFile(join(directory, "authorization.json"), JSON.stringify({
+      authorization: attempt !== "attempt" ? developmentAuthorization : ownerDiagnostic ? ownerDiagnosticAuthorization : authorization,
+      commit, manifestSha, rateCard, countMicros: receipt.countMicros, validUntil: receipt.validUntil, previousExposureMicros,
+    }) + "\n", { flag: "wx", mode: 0o600 });
+    Object.assign(process.env, { NODE_ENV: "development", MIOPAGES_REVIEW_SYNTHESIS: "local-operator" });
+    await runProof(directory, bin, fixedRates(receipt.countMicros), httpsTransport(receipt, key, async failure => {
+      await writeFile(join(directory, "provider-error.json"), JSON.stringify(failure) + "\n", { flag: "wx", mode: 0o600 });
+      console.error("Provider failure " + JSON.stringify(failure));
+    }));
+  } finally {
+    await lock.close();
+    await unlink(lockPath);
+  }
   console.log("PASS: four traces completed. Review sanitized evidence and usage before acceptance.");
 }
 
