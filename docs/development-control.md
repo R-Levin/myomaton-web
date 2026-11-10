@@ -412,6 +412,20 @@ changed the contact branch and resumed the submitted summary. Next is the
 owner’s C0 walkthrough and feedback, followed by a separately governed
 Checkpoint 1. WordPress generation remains gated behind review and direction.
 
+## Parallel C0 integration spine · Issue #12
+
+[Phase A source map and proposal](c0-integration-spine-phase-a-2026-11-10.md) is the
+recovery entry for [Issue #12](https://github.com/R-Levin/myomaton-web/issues/12).
+The proposed first walkthrough connects one answer to a reviewed Service Intro,
+the existing signed WordPress stage and a private review view. The owner and
+ChatGPT review the text-only scope and the staged-object preview seam before
+implementation. The accepted WordPress HTTPS delivery remains closed.
+
+[Issue #10](https://github.com/R-Levin/myomaton-web/issues/10) retains ownership of
+the intelligent interview and its separate live reasoning approval. The Issue #12
+handoff lives on `codex/c0-integration-spine-phase-a-2026-11-10`, isolated from the
+preserved C0 rehearsal and the other onboarding worktrees.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier
