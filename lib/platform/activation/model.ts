@@ -3,7 +3,7 @@ import { submissionDigest, type Owner, type Submission } from "../reviews/model"
 import type { InformationConfirmation } from "./information";
 import { intakeVersion, legacyIntakeVersion } from "../intake/model";
 
-export type Operation = "inspect" | "create" | "confirm-commercial" | "assess" | "confirm-information" | "initialize-customer" | "confirm-business-information";
+export type Operation = "inspect" | "create" | "confirm-commercial" | "assess" | "confirm-information" | "initialize-customer" | "confirm-business-information" | "draft-onboarding";
 export type Scope = Owner & { pendingCustomerId: string };
 export type Authority = { operatorId: string; authorityReference: string };
 // Supplied by a trusted composition root, never deserialized from a request body.

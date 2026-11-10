@@ -1,6 +1,6 @@
 # Shared intelligent onboarding · bounded implementation proposal
 
-**November 10, 2026 · Owner and ChatGPT review · Implementation and API spend pending**
+**November 10, 2026 · Offline implementation delivered for review · Live API proof pending separate approval**
 
 Build the first vertical slice of one onboarding engine. Both entry paths should reach the same source reconciliation, interview and readiness flow. Prove that two different answers produce different follow-up questions and a different business recommendation. The slice covers one substantive C0 knowledge gap and one fictional C2 control. Full coverage, Review-preview generation, real Review delivery and site generation remain separate work. [Recovery index](development-control.md#github-review-handoffs) · [C0 strategy recovery](https://github.com/R-Levin/myomaton-web/blob/2c6a41f22a811090b3a24d3f84607c41f2b33cc4/docs/c0-strategy-recovery-and-intelligent-onboarding-2026-11-10.md)
 
@@ -51,4 +51,61 @@ Use the acquisition code's reserve-before-dispatch and uncertain-charge handling
 - **Simulated tests, zero provider traffic.** Use a fake transport and disposable data to prove the two paths converge after authorization, a Review stays optional, historical approval does not imply delivery, readiness responds to known and missing evidence, and exact prompt/answer provenance resumes. Test foreign and stale contexts, wrong-business options, malicious or invalid output, concurrent dispatch, reload/retry behavior, and exhausted or uncertain budget. These tests prove application behavior.
 - **Actual reasoning proof, separate owner authorization.** Run the four capped traces with the real model. For the two C0 counterfactuals, fork the same persisted first question and evidence into isolated C0 test drafts and vary only the answer under test. Reusing the first response requires no extra call. Preserve a sanitized receipt for each trace showing evidence class, shareable generated wording, why the answer changed the second question and assessment, and usage. ChatGPT reviews semantic relevance against the approved evidence. Different wording alone is insufficient. No known offer should be re-asked and no fabricated Review, evidence, authority or promises should appear. Report failure if the model output is generic, crosses scopes or leaves the plan effectively unchanged.
 
-**Owner decision requested:** approve the shared-engine slice, the first C0 knowledge gap and the offline acceptance criteria. Before live calls, separately approve the exact model, sanitized evidence allowlist, development-project data handling and spending envelope. Keep the preserved owner rehearsal unchanged. Stop before implementation, paid API calls, hosted writes, knowledge promotion or WordPress generation.
+## Offline implementation checkpoint
+
+The owner authorized this bounded local slice with the product correction that
+the first proof must explore a substantive buyer, offering, objection or proof
+gap alongside an Ongoing-cycle question. [Product correction](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6772007075) · [Owner authorization](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6772038269)
+
+The trusted in-process engine uses the existing activation authority and exact
+immutable intake/Review source checks. Review-led and direct-start cases
+converge on the same draft operations after commercial confirmation. A new
+local-only draft version stores the source binding, exact displayed question,
+generator version, answer or deferral, and proposed assessment in the existing
+provenance envelope. The bounded test passed without a schema migration or
+changes to earlier drafts. This version has no HTTP route or submission path.
+The disposable Review-led case uses a synthetic approved Review prerequisite.
+The curated October 14 historical interview and approved, undelivered
+assessment retain separate provenance. Direct start requires no Review. C2 has
+its own tenant, activation, draft, sources and usage attribution.
+
+| Saved example from the offline fixture | Assessment effect |
+| --- | --- |
+| C0 buyer proof: “If a founder sees the old hosting offer, what evidence would show that Launch includes an ongoing managed relationship?” A fixture answer with a dated comparison produced “Who can verify the comparison and clear it for prospective customers?” | Draft a reviewable Service example from the comparison. Readiness is **planning review**. Deferring the evidence follow-up reopens the gap. |
+| C0 same initial buyer-proof question with an unknown answer: “What baseline should be collected before making that claim?” | Keep the claim out of launch copy and collect a baseline. Readiness remains **open**. |
+| C0 Ongoing: “After Launch, which supported change could you make if early inquiries misunderstand the offer?” The fixture has no usable notes. | The second question asks what baseline to collect. Keep the improvement claim open pending evidence and a reviewer. |
+| Fictional C2: “Which parts of the advertised service area can you actually cover for an urgent tree call on a weekday?” A fixture answer limits coverage. | The saved follow-up asks about out-of-area callers and the routine estimate route. Recommend separate limited urgent and routine routes while hours, coverage and fallback remain unverified. |
+
+The fake transport is test code. It supplies the example wording to exercise
+context assembly, strict validation, exact resume, evidence links and
+answer-dependent state. These examples establish neither actual model
+reasoning nor semantic acceptance. Exact duplicate questions and foreign
+references are refused. Meaningful novelty, semantic relevance and subtle
+cross-business language still require review of real generated output.
+
+The Responses adapter has a strict request/response contract and an injected
+offline transport only. It records scoped request slots, token usage, rate-card
+binding and cost estimates in a locked development ledger. The regression
+exercised eight fake generations and sixteen fake requests, and refused a
+ninth generation. Additional checks cover oversize input, a spend limit,
+changed rates and a timeout or invalid usage that retains its reservation
+across reopen. Tests use synthetic pricing and do not verify provider rates.
+No key was loaded and no provider traffic occurred.
+
+Verification passed: 388 application tests, eight focused onboarding and
+accounting checks including the two earlier intake modes, 21 activation and
+canonical information regression checks, TypeScript and focused ESLint.
+
+Run the isolated proof from this checkout:
+
+```powershell
+node --import tsx --test tests/integration/intelligent-onboarding.test.ts
+```
+
+**Next owner decision:** review the saved examples and implementation. Any
+live reasoning proof requires separate explicit approval of the exact pinned
+model, evidence allowlist, development-project key and data controls, verified
+rate card, and no more than US$0.50. The proposed provider run is distinct
+from any later owner-visible conversation acceptance. No hosted writes,
+canonical promotion, Operator submission, WordPress generation or publication
+are authorized by this checkpoint.

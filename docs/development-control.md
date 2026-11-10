@@ -346,19 +346,21 @@ that switching from emergency calls to routine estimates hides the obsolete
 follow-up. The database regression also verifies tenant and stale-source refusal.
 Pause here for owner review before further implementation or WordPress generation.
 
-### Issue #10 · shared intelligent onboarding proposal pending approval
+### Issue #10 · shared intelligent onboarding offline proof
 
 The owner prioritized one shared onboarding engine for Review-led and
 direct-start customers. The earlier C0 fixture is a completed diagnostic.
 Keep the preserved draft as evidence and leave it outside further testing.
 The [strategy recovery](https://github.com/R-Levin/myomaton-web/blob/2c6a41f22a811090b3a24d3f84607c41f2b33cc4/docs/c0-strategy-recovery-and-intelligent-onboarding-2026-11-10.md)
 supplies the business context. The
-[shared-engine proposal](shared-intelligent-onboarding-proposal-2026-11-10.md)
-supersedes its Review-preview fallback as the first implementation priority.
-Review the proposed Launch-to-Ongoing knowledge gap, acceptance evidence and
-development budget before authorizing implementation or any live API request.
-See [Issue #10](https://github.com/R-Levin/myomaton-web/issues/10) for the pinned
-handoff and next owner decision. Draft PR #11 remains a separate review.
+[shared-engine proposal and offline checkpoint](shared-intelligent-onboarding-proposal-2026-11-10.md#offline-implementation-checkpoint)
+records the authorized local proof. It covers both post-gate entry paths, C0
+buyer proof and Ongoing, and an isolated fictional C2 control. The transport
+is simulated. The original C0 run stays outside testing. Review the saved
+examples and safeguards before deciding whether to authorize the separately
+bounded live reasoning run. See [Issue #10](https://github.com/R-Levin/myomaton-web/issues/10)
+for the pinned handoff and next owner decision. Draft PR #11 remains a separate
+review.
 
 ### Issue #9 · first local signup and onboarding slice
 

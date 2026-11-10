@@ -5,6 +5,10 @@ import { fingerprint } from "../canonical/model";
 import { IntakeError, intakeVersion, legacyIntakeVersion, normalizeAnswers, questionErrors, questionsFor, validateComplete, type Answers, type EntryIntent } from "./model";
 import { onboardingVersion } from "./onboarding";
 import { adaptiveFoundationErrors, adaptiveOfferStep, adaptiveOnboardingVersion, adaptiveQuestions, adaptiveScopeStep, type PreparedUnderstanding } from "./adaptive";
+import type { OnboardingEntry } from "../activation/service";
+import type { InterviewState } from "./intelligent-model";
+
+const intelligentVersion = "paid-onboarding/3";
 
 export const draftDays = 30, submissionDays = 90;
 export const newResumeToken = () => randomBytes(32).toString("hex");
@@ -59,12 +63,40 @@ export class IntakeService {
     const r = await db.query(`SELECT m.id FROM managed_sites m JOIN web_presences w ON w.id=m.web_presence_id WHERE m.id=$1 AND w.id=$2 AND m.status='active' AND w.status='active' ${lock ? "FOR SHARE OF m,w" : ""}`, [managedSiteId, webPresenceId]);
     if (r.rows.length !== 1) throw new IntakeError("unavailable", 404);
   }
-  private async owned(db: Pick<PoolClient, "query">, token: string, lock = false): Promise<Row> {
+  private async owned(db: Pick<PoolClient, "query">, token: string, lock = false, versions = this.rehearsal ? [this.paidVersion] : [legacyIntakeVersion, intakeVersion]): Promise<Row> {
     await this.scope(db, lock);
     const r = await db.query(`SELECT * FROM prospect_intakes WHERE web_presence_id=$1 AND managed_site_id=$2 AND resume_hash=$3 AND expires_at>now() AND resume_expires_at>now() ${lock ? "FOR UPDATE" : ""}`, [this.selection.webPresenceId, this.selection.managedSiteId, resumeHash(token)]);
     if (r.rows.length !== 1) throw new IntakeError("session_unavailable", 404);
-    if (!(this.rehearsal ? [this.paidVersion] : [legacyIntakeVersion, intakeVersion]).includes(r.rows[0].questionnaire_version)) throw new IntakeError("session_unavailable", 404);
+    if (!versions.includes(r.rows[0].questionnaire_version)) throw new IntakeError("session_unavailable", 404);
     return r.rows[0];
+  }
+  private async insertDraft(db: PoolClient, token: string, intent: EntryIntent, version: string) {
+    return db.query(`INSERT INTO prospect_intakes(web_presence_id,managed_site_id,entry_intent,questionnaire_version,resume_hash,expires_at,resume_expires_at)
+      VALUES($1,$2,$3,$4,$5,now()+interval '30 days',now()+interval '30 days') ON CONFLICT(resume_hash) DO NOTHING`, [this.selection.webPresenceId, this.selection.managedSiteId, intent, version, resumeHash(token)]);
+  }
+  // The caller supplies the transaction and verified entry from ActivationService.
+  // The browser intake routes have no access to this draft version.
+  async intelligentDraft(db: PoolClient, entry: OnboardingEntry, token: string, sourceDigest: string, open: boolean,
+    change?: (state: InterviewState, version: number) => InterviewState) {
+    if (process.env.NODE_ENV === "production" || !this.rehearsal || this.rehearsal.prepared ||
+        entry.scope.webPresenceId !== this.selection.webPresenceId || entry.scope.managedSiteId !== this.selection.managedSiteId) {
+      throw new IntakeError("unavailable", 503);
+    }
+    await this.scope(db, true);
+    const inserted = open && (await this.insertDraft(db, token, entry.source.path, intelligentVersion)).rowCount === 1;
+    const row = await this.owned(db, token, true, [intelligentVersion]);
+    if (row.state !== "draft" || row.entry_intent !== entry.source.path) throw new IntakeError("session_unavailable", 404);
+    const binding = fingerprint(entry);
+    const prior = row.provenance.intelligent as { binding: string; sourceDigest: string; state: InterviewState } | undefined;
+    if (!inserted && (prior?.binding !== binding || prior.sourceDigest !== sourceDigest)) throw new IntakeError("prepared_source_changed", 409);
+    const current: InterviewState = prior?.state ?? { turns: [], pending: null, failure: null };
+    if (!inserted && !change) return { version: row.version, state: current };
+    const state = change ? change(current, row.version) : current;
+    const record = JSON.stringify({ intelligent: { binding, sourceDigest, state } });
+    // Reserve room for JSONB serialization and stay under both existing bounds.
+    if (Buffer.byteLength(record) > 12_000) throw new IntakeError("payload_too_large", 413);
+    await db.query("UPDATE prospect_intakes SET provenance=$2,version=version+1,updated_at=now() WHERE id=$1", [row.id, record]);
+    return { version: row.version + 1, state };
   }
   private async readView(db: Pick<PoolClient, "query">, row: Row): Promise<IntakeView> {
     if (!this.rehearsal) return view(row);
@@ -84,8 +116,7 @@ export class IntakeService {
     if (!["FREE_REVIEW", "DIRECT_START"].includes(intent) || this.rehearsal && intent !== "DIRECT_START") throw new IntakeError("invalid_intent");
     return transaction(this.pool, async db => {
       await this.scope(db, true);
-      const inserted = await db.query(`INSERT INTO prospect_intakes(web_presence_id,managed_site_id,entry_intent,questionnaire_version,resume_hash,expires_at,resume_expires_at)
-        VALUES($1,$2,$3,$4,$5,now()+interval '30 days',now()+interval '30 days') ON CONFLICT(resume_hash) DO NOTHING`, [this.selection.webPresenceId, this.selection.managedSiteId, intent, this.rehearsal ? this.paidVersion : intakeVersion, resumeHash(token)]);
+      const inserted = await this.insertDraft(db, token, intent, this.rehearsal ? this.paidVersion : intakeVersion);
       let r = await this.owned(db, token, true);
       if (r.entry_intent !== intent) throw new IntakeError("intent_conflict", 409);
       if (this.rehearsal && inserted.rowCount) {

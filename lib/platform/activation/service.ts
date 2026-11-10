@@ -13,6 +13,7 @@ import { confirmedAssessment, confirmedInformationSource, informationFields, inf
 export type CaseIdentity = { id: string; scope: Scope; source: Source; review: ReviewBinding | null; createdAt: string; createdBy: string; authorityReference: string };
 export type CaseEvent = { version: number; requestId: string; requestDigest: string; operation: string; actor: string; authorityReference: string; at: string; previous: string | null; snapshot: CaseState; digest: string };
 export type CaseInspection = CaseIdentity & { version: number; state: CaseState; history: CaseEvent[]; canonicalBinding: CanonicalBinding | null };
+export type OnboardingEntry = Pick<CaseIdentity, "id" | "scope" | "source" | "review"> & { commercialEvent: string };
 type CaseRow = { id: string; web_presence_id: string; managed_site_id: string; pending_customer_id: string; submission_id: string; source: Source; review: ReviewBinding | null; request_id: string; request_digest: string; created_by: string; authority_reference: string; created_at: Date };
 
 async function inspectActivationRow(c: PoolClient, r: CaseRow): Promise<CaseInspection> {
@@ -107,6 +108,21 @@ export class ActivationService {
     if(current.state.status!=="AUTHORIZED_FOR_ONBOARDING"||!comm)throw Error("Commercial confirmation and onboarding authority required");
     const {source:kind,reference,confirmedAt,launchScope,ongoingScope,note}=comm;
     if(!same(commercial({source:kind,reference,confirmedAt,launchScope,ongoingScope,...(note===undefined?{}:{note})},{operatorId:comm.recordedBy,authorityReference:comm.authorityReference}),comm))throw Error("Invalid accepted commercial scope");
+  }
+  // Trusted local composition only. Hold the scoped activation lock through the
+  // draft operation, never through a provider call.
+  async withOnboardingDraft<T>(context: unknown, id: string, selection: Scope, run: (c: PoolClient, entry: OnboardingEntry) => Promise<T>) {
+    if (process.env.NODE_ENV === "production") throw Error("Local onboarding proof only");
+    const owner = scope(selection);
+    await this.authorize(context, "draft-onboarding", owner);
+    return this.transaction(async c => {
+      const row = await this.row(c, id, owner);
+      const current = await inspectActivationRow(c, row);
+      await this.eligibleSource(c, row, current);
+      const commercialEvent = current.history.find(event => event.operation === "confirm-commercial");
+      if (!commercialEvent) throw Error("Commercial confirmation event required");
+      return run(c, { id: current.id, scope: owner, source: current.source, review: current.review, commercialEvent: commercialEvent.digest });
+    });
   }
   async canonicalReadiness(context:unknown,id:string,selection:Scope) {
     const owner=scope(selection);await this.authorize(context,"initialize-customer",owner);
