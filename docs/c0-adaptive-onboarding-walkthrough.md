@@ -364,6 +364,36 @@ Optional extra proof or content can continue in parallel. Business understanding
 Presence Direction and complete-site acceptance still use the existing checkpoints.
 [Four approval checkpoints](customer-journey-and-change-management.md#four-approval-checkpoints)
 
+## Owner's additional live C0 interview corrections (November 9, 2026)
+
+These requirements apply to the product and are **not implemented by the
+current `paid-onboarding/2` rehearsal**.
+
+- **Free Review default illustrative preview:** After intake/site research and
+  assessment synthesis, normally **generate an initial, business-specific Home
+  concept for every Free Review** as part of the system's standard preparation.
+  The Operator inspects it and may **keep, revise/regenerate or exclude it**
+  from the delivered Review. Do not make automatic generation conditional on
+  whether a prospect was randomly selected for an experiment or the Operator
+  happens to request one. Do not guarantee that a flawed preview reaches a
+  customer. Track generation, approval, revision, rejection and delivery
+  separately; preserve the difference between this nonbinding visual teaser
+  and the post-onboarding authoritative Home/Managed Site. The exact intended
+  behavior is in [progressive onboarding](progressive-onboarding-and-launch-readiness.md#default-generated-illustrative-home-preview--operator-controls-delivery).
+- **True generated adaptive questions:** The system must be able to **compose
+  new follow-up questions from business evidence and the customer's answers**
+  as material knowledge gaps emerge. Picking or revealing pre-scripted
+  options is useful basic logic, **not sufficient**. Make each new prompt
+  relevant to the business, justified by a gap, free of invented facts,
+  nonrepetitive, durable/resumable with provenance and inspectable by an
+  Operator. Demonstrate new generated follow-up branches and avoid leaking
+  unrelated test-business choices into C0. The contract is in
+  [paid onboarding knowledge transfer](paid-onboarding-knowledge-transfer-contract.md).
+- **The current local owner run remains unchanged**; the preceding points
+  are implementation acceptance requirements for subsequent slices, not
+  authorization for background mutation, automatic site production or
+  customer-visible Review delivery.
+
 ## Owner acceptance before implementation
 
 - Walk through the opening, Standard Launch, buyer objection, legacy exclusion,
