@@ -10,6 +10,7 @@ import { accountPath, previewPath, snapshotAccount } from "../scripts/operator-o
 import { evidencePath, exactPreviewPath, loadProposalEvidence, verifyProposalEvidence } from "../scripts/operator-overview/proposal-evidence";
 import { overview } from "../scripts/operator-overview/views";
 import { loadC0Review } from "../scripts/operator-overview/c0-review";
+import { loadOnboardingEvidence, onboardingEvidencePath } from "../scripts/operator-overview/onboarding-evidence";
 import { fingerprint } from "../lib/platform/canonical/model";
 
 test("the account projection refuses unrelated ownership and keeps quiet accounts out of attention", () => {
@@ -28,7 +29,13 @@ test("the account projection refuses unrelated ownership and keeps quiet account
 });
 
 test("the loopback overview leads to scoped account evidence and the existing v3 previews", async () => {
-  const server = await createOperatorOverview();
+  await assert.rejects(() => loadOnboardingEvidence("../attempt-11"), /numbered local/);
+  const server = await createOperatorOverview([{
+    id: "c0-ongoing", label: "MioPages C0 · Ongoing reply", question: "Which Launch scope is included?",
+    answer: "An existing client may ask for one change.", relevance: "off-topic", topic: "Ongoing work",
+    excerpt: "one change", unresolved: "Launch scope remains open.", clarification: "How many pages are included?",
+    recommendation: null, status: "Still open",
+  }]);
   server.listen(0, "127.0.0.1");
   await once(server, "listening");
   try {
@@ -43,6 +50,11 @@ test("the loopback overview leads to scoped account evidence and the existing v3
       return new JSDOM(await reply.text(), { url: base + path, runScripts: "outside-only" }).window.document;
     };
     const start = await document("/");
+    assert.ok(start.querySelector(`a[href="${onboardingEvidencePath}"]`));
+    const onboarding = await document(onboardingEvidencePath);
+    assert.match(onboarding.body.textContent!, /synthetic[\s\S]*Ongoing work[\s\S]*Still open[\s\S]*How many pages/);
+    assert.equal(onboarding.querySelectorAll("form, iframe").length, 0);
+    assert.equal((await fetch(base + onboardingEvidencePath, { method: "POST" })).status, 405);
     const presencePath = accountPath(reviewed.target.webPresenceId);
     assert.equal(start.querySelector(".op-alert a")?.getAttribute("href"), presencePath);
     const checkRoleHeader = (document: Document) => {

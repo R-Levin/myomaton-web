@@ -4,6 +4,7 @@ import { FocusPage } from "../../components/managed-sites/focus-page";
 import { accountPath, previewPath, type SnapshotAccount } from "./model";
 import { exactPreviewPath, type ProposalEvidence } from "./proposal-evidence";
 import { approvedReviewDigest, type C0Review } from "./c0-review";
+import { onboardingEvidencePath, type OnboardingEvidence } from "./onboarding-evidence";
 
 /* eslint-disable @next/next/no-head-element, @next/next/no-css-tags, @next/next/no-html-link-for-pages, @next/next/no-img-element -- Standalone HTML and local assets served by Node outside Next. */
 function layout(title: string, children: ReactNode, preview = false) {
@@ -20,7 +21,7 @@ function layout(title: string, children: ReactNode, preview = false) {
     {children}</body></html>);
 }
 
-export function overview(accounts: readonly SnapshotAccount[], development = false) {
+export function overview(accounts: readonly SnapshotAccount[], development = false, onboarding = false) {
   const attention = accounts.filter(account => account.nextReview);
   return layout("Overview", <main className="op-wrap op-main">
     <div className="op-kicker">Workspace / Overview</div><h1>Operator overview</h1>
@@ -45,6 +46,25 @@ export function overview(accounts: readonly SnapshotAccount[], development = fal
       <p className="op-note">Source: reviewed development snapshot. Customer activity, monitoring, and live workflow queues are outside this view.</p>
     </section>
     {development && <p className="op-note"><a href="/development-evidence">Development evidence</a> · separate test examples</p>}
+    {onboarding && <p><a href={onboardingEvidencePath}>Review the onboarding interview proof</a></p>}
+  </main>);
+}
+
+export function onboardingEvidenceView(cases: OnboardingEvidence) {
+  return layout("Onboarding interview proof", <main className="op-wrap op-main">
+    <p><a href="/">Back to the Operator overview</a></p>
+    <h1>Onboarding interview proof</h1>
+    <p className="op-lead">Read-only examples from saved AI interview turns. All replies are synthetic and the proposed wording is for review.</p>
+    {cases.map(entry => <article className="op-card" key={entry.id}>
+      <h2>{entry.label}</h2>
+      <p><strong>Question.</strong> {entry.question}</p>
+      <p><strong>Example reply.</strong> {entry.answer}</p>
+      <p><strong>What the reply covers.</strong> {entry.topic}{entry.excerpt && <> <q>{entry.excerpt}</q></>}</p>
+      <p><strong>Assessment status.</strong> {entry.status}</p>
+      {entry.unresolved && <p><strong>Still needed.</strong> {entry.unresolved}</p>}
+      {entry.clarification && <p><strong>Next question.</strong> {entry.clarification}</p>}
+      {entry.recommendation && <p><strong>Draft recommendation.</strong> {entry.recommendation}</p>}
+    </article>)}
   </main>);
 }
 

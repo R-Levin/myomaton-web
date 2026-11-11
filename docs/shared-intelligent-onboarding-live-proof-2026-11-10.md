@@ -301,3 +301,48 @@ Owner review should focus on whether the selected questions change a real
 site decision, whether the system respects previously settled facts, and
 whether a partial answer is recognized. Broader Core integration, automatic
 research, and production approval remain outside this demonstration.
+
+## Scoped answer review
+
+The owner retained all three scenarios in Issue #10 comment `6783175966`.
+The defect was carrying an Ongoing reply into a Launch recommendation. The
+existing interview engine now saves a scoped review with the topic, an exact
+excerpt, and the unresolved part of the question. Only a direct answer can
+produce a planning recommendation for that gap. Partial, off-topic, and
+uncertain replies keep it open and require a clarification. The review is
+an AI interpretation of a saved answer and grants no approval authority.
+
+The final live run replayed the prior business-specific questions. It used
+the same public research summaries and separately seeded synthetic drafts.
+The engine read each result back from disposable PostgreSQL.
+
+| Case | What the reply covered | Saved result |
+| --- | --- | --- |
+| C0 · Ongoing | Changes to an existing client's services and owner sign-off | **Open.** The model identified Ongoing and asked “What is the maximum included Launch build or migration scope, if any, that should be promised?” No Launch recommendation was saved. |
+| C0 · Launch | Five core pages, approved copy from up to three existing pages, and separately scoped redirects, integrations and larger migrations | **Planning review.** The recommendation reflects those limits and the model asked no further question on this gap. These are synthetic terms. |
+| Fictional C2 · tree service | No after-hours urgent voicemail coverage and no suspected power-line jobs | **Open.** “Which tree jobs are eligible for the urgent route and which need a verified fallback?” The synthetic restrictions remain in place. |
+| Hypothetical startup · bicycle repair | Small mechanical pilot with manual confirmation and a quote before scheduling | **Open.** “Which exact territory is covered in the first month for one mechanic?” No locations or public minimum were inferred. |
+
+Attempts 09 and 10 kept the Ongoing case open but misclassified its topic and
+refused the direct C0 turn during validation. Exact excerpt constraints and
+a single answer-review instruction resolved the conflict. Attempt 11 saved
+all four turns. The generated explanations sometimes contain awkward or
+unfinished phrasing and the C0 clarification stays close to the original
+question. This quality gap is visible in the local review.
+
+The final run used four generations and four free token counts, with 3,532
+input and 824 output tokens. Its estimate is $0.006358. Including the two
+prior attempts, this correction used eight generations, eight counts, 7,996
+input tokens and 1,483 output tokens, estimated at $0.012673. Phase usage
+through this checkpoint is 44 generations and 44 counts, estimated at
+**$0.074312**. The $0.50 per-run cap and $5 aggregate cap remained in force.
+There were zero automatic retries. Private evidence and credentials stay
+outside Git.
+
+From the local proof worktree with its existing `attempt-11` receipts, run
+`node --import tsx scripts/operator-overview.ts --onboarding-review attempt-11`.
+Open [Onboarding interview proof](http://127.0.0.1:4322/development-evidence/onboarding).
+This GET-only view uses the existing local Operator shell and reads saved
+proof evidence. It makes no provider calls and has no answer editor. The
+next step is to expose the same scoped review in a disposable Core customer
+interview after saving an answer through either existing entry path.

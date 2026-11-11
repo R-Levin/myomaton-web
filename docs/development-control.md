@@ -422,14 +422,18 @@ now guide the next owner review. The fixed-gap live proof remains useful as
 the comparison baseline. Broad Core interview integration follows review of
 the research and questioning quality.
 
-The research runner generated and saved three separate live traces from
-public summaries and synthetic answers. It surfaced Launch scope, urgent
-tree routing, and pilot service coverage. The C0 assessment mixed an Ongoing
-answer into Launch, so that recommendation was rejected in review. The
-[results, source inventory and original startup concept](shared-intelligent-onboarding-live-proof-2026-11-10.md#research-first-demonstration)
-show the next product decision. The research runs cost an estimated $0.044704.
-The cumulative Issue #10 phase estimate is $0.061639. Review intelligence
-quality before integrating the research step into the Core interview.
+The owner clarified in [Issue #10](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6783175966)
+that all three research scenarios remain in scope. The correction concerns
+the earlier C0 recommendation that carried an Ongoing reply into Launch.
+The [saved live contrast and local review](shared-intelligent-onboarding-live-proof-2026-11-10.md#scoped-answer-review)
+show that an Ongoing-only reply now leaves Launch open and a direct Launch
+reply advances only that decision to planning review. The fictional tree
+service and bicycle startup still ask for missing operational facts.
+The cumulative phase estimate is $0.074312. The saved proof is visible in the
+local Operator console. The next Core slice is a disposable, authenticated
+interview that can save an answer and show the scoped review in place through
+both entry paths. Readiness still requires owner acceptance and formal
+hardening before production.
 
 ### Issue #9 · first local signup and onboarding slice
 
