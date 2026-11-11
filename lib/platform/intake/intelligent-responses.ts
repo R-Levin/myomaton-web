@@ -50,8 +50,12 @@ function proofFormat(context: QuestionContext, answerRef?: string, reviewAnswers
     } } : { type: "null" },
   } } };
   if (!reviewAnswers || !answerRef) return base;
+  const answerText = context.history.at(-1)?.answer?.text;
+  const excerpts = answerText?.match(/[^.!?]+[.!?]*/gu)?.map(part => part.trim())
+    .filter(part => part.length > 0 && Buffer.byteLength(JSON.stringify(part)) <= 452);
   const fields = { relevance: { type: "string", enum: answerRelevances }, topic: { type: "string" },
-    excerpt: maybeString, unresolved: { anyOf: [sentence(215), { type: "null" }] } };
+    excerpt: excerpts?.length ? { type: "string", enum: [...new Set(excerpts)] } : maybeString,
+    unresolved: { anyOf: [sentence(215), { type: "null" }] } };
   return { ...base, schema: { ...base.schema, required: [...base.schema.required, "answerReview"],
     properties: { ...base.schema.properties,
       question: { anyOf: [base.schema.properties.question, { type: "null" }] },
@@ -60,7 +64,7 @@ function proofFormat(context: QuestionContext, answerRef?: string, reviewAnswers
     },
   } };
 }
-const answerReviewInstructions = "Compare the exact question and named gap with the supplied answer before assessing. Mark direct only if the reply supplies all material details for this gap. Mark partial if it resolves only part of the gap, off-topic if it answers another topic or business phase, or needs-confirmation for contradictions, unsupported claims, or no usable reply. Name the actual topic answered and quote a short exact excerpt from the reply, or null if there is no answer text. For anything other than direct, set assessment to null, describe the unresolved part of the asked gap and ask one targeted clarification. Keep facts from a different phase separate. For direct, set unresolved and assessment.evidenceNeeded to null, draft a recommendation limited to the stated scope, and use null for question if the gap is answered.";
+const answerReviewInstructions = "First identify the actual subject of the reply independently of the question. Existing-client edits and approvals are Ongoing work and provide no evidence of initial Launch build or migration limits. Apply the same distinction to other business topics. Mark off-topic if no part of the asked gap is answered, partial if some is answered, or needs-confirmation if it is contradictory or unusable. Name the actual subject and select an exact allowed excerpt from the reply, or null if there is no answer text. For an unresolved gap, set assessment to null, say what is still unresolved, and ask a targeted clarification. Mark direct if the reply answers the asked decision, even when it names other work to scope separately. For direct, set unresolved and assessment.evidenceNeeded to null, draft a recommendation limited to the answer, and set question to null.";
 const record = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw Error("Unexpected provider record");
   return value as Record<string, unknown>;

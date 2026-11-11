@@ -82,17 +82,21 @@ export function readProposal(value: unknown, context: QuestionContext, id: strin
   const known = [...context.gap.known, ...context.history.flatMap(turn => turn.question ? [turn.question] : [])];
   if (question && (!question.endsWith("?") || known.some(prior => normalize(prior) === normalize(question)))) throw new ProposalValidationError("question_form", "Repeated or invalid question");
   if (!answerRef && !question) throw new ProposalValidationError("initial_question_missing", "Initial question required");
-  const answerReview = reviewRequired ? checked("answer_relevance", (): AnswerReview => {
-    const review = object(output.answerReview, ["relevance", "topic", "excerpt", "unresolved"]);
+  const answerReview = reviewRequired ? ((): AnswerReview => {
+    const review = checked("answer_relevance", () => object(output.answerReview, ["relevance", "topic", "excerpt", "unresolved"]));
     const relevance = answerRelevances.find(status => status === review.relevance);
-    const excerpt = review.excerpt === null ? null : safeText(review.excerpt, 450);
-    const unresolved = review.unresolved === null ? null : safeText(review.unresolved, 280);
+    const excerpt = review.excerpt === null ? null : checked("answer_excerpt", () => safeText(review.excerpt, 450));
+    const unresolved = review.unresolved === null ? null : checked("answer_unresolved", () => safeText(review.unresolved, 280));
     const supplied = previous?.answer?.text;
-    if (!relevance || (excerpt !== null && !supplied?.includes(excerpt)) ||
-        (supplied && !excerpt) || (relevance === "direct" && (!excerpt || unresolved)) ||
-        (relevance !== "direct" && (!unresolved || !question))) throw Error("Answer review refused");
-    return { relevance, topic: safeText(review.topic, 120), excerpt, unresolved };
-  }) : undefined;
+    if ((excerpt !== null && !supplied?.includes(excerpt)) || (supplied && !excerpt)) {
+      throw new ProposalValidationError("answer_excerpt", "Answer excerpt did not match the saved reply");
+    }
+    if (!relevance || (relevance === "direct" && (!excerpt || unresolved)) ||
+        (relevance !== "direct" && (!unresolved || !question))) {
+      throw new ProposalValidationError("answer_review_consistency", "Answer relevance and clarification were inconsistent");
+    }
+    return { relevance, topic: checked("answer_topic", () => safeText(review.topic, 120)), excerpt, unresolved };
+  })() : undefined;
   const mayAssess = !answerReview || answerReview.relevance === "direct";
   if (mayAssess && answerRef && output.assessment === null) throw new ProposalValidationError("followup_assessment_missing", "Follow-up assessment required");
   let assessment: InterviewTurn["assessment"] = null;
@@ -101,7 +105,7 @@ export function readProposal(value: unknown, context: QuestionContext, id: strin
     const candidate = checked("assessment_shape", () => object(output.assessment, ["recommendation", "evidenceNeeded"]));
     const evidenceNeeded = candidate.evidenceNeeded === null ? null : checked("evidence_needed_text", () => safeText(candidate.evidenceNeeded, 280));
     if (!evidenceNeeded && previous?.answer?.disposition !== "provided") throw new ProposalValidationError("unanswered_readiness", "Unanswered gap cannot be planning evidence");
-    if (answerReview && evidenceNeeded !== null) throw new ProposalValidationError("answer_relevance", "Unresolved scope requires clarification");
+    if (answerReview && evidenceNeeded !== null) throw new ProposalValidationError("answer_review_consistency", "Unresolved scope requires clarification");
     assessment = { recommendation: checked("recommendation_text", () => safeText(candidate.recommendation, 380)), evidenceNeeded };
   }
   return { id, gapId: context.gap.id, question, rationale: checked("rationale_text", () => safeText(output.rationale, 280)), sourceIds: [...references],

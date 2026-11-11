@@ -39,7 +39,7 @@ test("only a directly supported reply can advance the asked gap", () => {
   const follow = readProposal(proposal, input(answer), "follow", "test", true);
   assert.equal(interviewReadiness([gap], { turns: [follow], pending: null, failure: null })[0].status, "planning-review");
   assert.throws(() => readProposal({ ...proposal, answerReview: { ...proposal.answerReview, excerpt: "Launch includes ten pages." } },
-    input(answer), "follow", "test", true), { code: "answer_relevance" });
+    input(answer), "follow", "test", true), { code: "answer_excerpt" });
 });
 
 test("research ranking prioritizes consequential new gaps and refuses foreign evidence or equivalent branches", () => {
