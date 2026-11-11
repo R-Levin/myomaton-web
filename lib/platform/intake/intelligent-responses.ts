@@ -2,7 +2,7 @@ import { open, readFile, rename, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { fingerprint } from "../canonical/model";
-import type { QuestionAttribution, QuestionContext, QuestionProvider } from "./intelligent-model";
+import { answerRelevances, type QuestionAttribution, type QuestionContext, type QuestionProvider } from "./intelligent-model";
 
 const maxInput = 4_000, maxOutput = 1_200;
 const maxRequests = 16, maxGenerations = 8, capMicros = 500_000;
@@ -37,11 +37,11 @@ const format = {
   },
 };
 
-function proofFormat(context: QuestionContext, answerRef?: string) {
+function proofFormat(context: QuestionContext, answerRef?: string, reviewAnswers = false) {
   const sentence = (max: number) => ({ type: "string", pattern: `^[^<>\\r\\n]{1,${max - 1}}[.!?]$` });
   const sourceIds = context.evidence.map(item => item.id);
   if (answerRef) sourceIds.push(answerRef);
-  return { ...format, schema: { ...format.schema, properties: {
+  const base = { ...format, schema: { ...format.schema, properties: {
     question: { type: "string", pattern: "^[^<>\\r\\n]{1,269}\\?$" },
     rationale: sentence(210),
     sourceIds: { type: "array", minItems: 1, maxItems: 6, items: { type: "string", enum: sourceIds } },
@@ -49,7 +49,18 @@ function proofFormat(context: QuestionContext, answerRef?: string) {
       recommendation: sentence(260), evidenceNeeded: { anyOf: [sentence(215), { type: "null" }] },
     } } : { type: "null" },
   } } };
+  if (!reviewAnswers || !answerRef) return base;
+  const fields = { relevance: { type: "string", enum: answerRelevances }, topic: { type: "string" },
+    excerpt: maybeString, unresolved: { anyOf: [sentence(215), { type: "null" }] } };
+  return { ...base, schema: { ...base.schema, required: [...base.schema.required, "answerReview"],
+    properties: { ...base.schema.properties,
+      question: { anyOf: [base.schema.properties.question, { type: "null" }] },
+      assessment: { anyOf: [base.schema.properties.assessment, { type: "null" }] },
+      answerReview: { type: "object", additionalProperties: false, properties: fields, required: Object.keys(fields) },
+    },
+  } };
 }
+const answerReviewInstructions = "Compare the exact question and named gap with the supplied answer before assessing. Mark direct only if the reply supplies all material details for this gap. Mark partial if it resolves only part of the gap, off-topic if it answers another topic or business phase, or needs-confirmation for contradictions, unsupported claims, or no usable reply. Name the actual topic answered and quote a short exact excerpt from the reply, or null if there is no answer text. For anything other than direct, set assessment to null, describe the unresolved part of the asked gap and ask one targeted clarification. Keep facts from a different phase separate. For direct, set unresolved and assessment.evidenceNeeded to null, draft a recommendation limited to the stated scope, and use null for question if the gap is answered.";
 const record = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw Error("Unexpected provider record");
   return value as Record<string, unknown>;
@@ -107,14 +118,15 @@ export function offlineResponsesProvider(directory: string, configuredRates: Rat
 
 export function controlledProofResponsesProvider(directory: string, rates: Rates, transport: ResponsesTransport,
   projectInput: (context: QuestionContext, attribution: QuestionAttribution) => unknown,
-  response?: { instructions: string; format?: { type: "json_schema"; name: string; strict: true; schema: object } }): QuestionProvider {
+  response?: ProofResponse): QuestionProvider {
   if (rates.cacheWritePerMillion !== 0 || rates.countMicros > 10_000) throw Error("Live proof rate card refused");
   return meteredResponsesProvider(directory, rates, transport, { requests: 14, generations: 7, projectInput, response });
 }
+type ProofResponse = { instructions: string; reviewAnswers?: boolean; format?: { type: "json_schema"; name: string; strict: true; schema: object } };
 
 function meteredResponsesProvider(directory: string, configuredRates: Rates, transport: ResponsesTransport,
   limits: { requests: number; generations: number; projectInput?: (context: QuestionContext, attribution: QuestionAttribution) => unknown;
-    response?: { instructions: string; format?: { type: "json_schema"; name: string; strict: true; schema: object } } }): QuestionProvider {
+    response?: ProofResponse }): QuestionProvider {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
@@ -141,13 +153,16 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
       if (requests + 2 > limits.requests || generations >= limits.generations || spent + reservation > capMicros) throw Error("Development budget exhausted");
       const previous = context.history.at(-1);
       const answerRef = previous?.answer ? previous.id + ":answer" : undefined;
+      const reviewAnswers = limits.response?.reviewAnswers === true;
       const instructions = limits.projectInput ? instruction + (answerRef
-        ? " Ask one concrete follow-up based on the answer. Cite the answer reference exactly and at least one supplied source. Recommend a next action based on what the answer supplies, and distinguish what remains unverified from what could be reviewed now."
+        ? " Cite the answer reference exactly and at least one supplied source." + (reviewAnswers ? "" :
+          " Ask one concrete follow-up based on the answer. Recommend a next action based on what the answer supplies, and distinguish what remains unverified from what could be reviewed now.")
         : " This is the first question. Set assessment to null. Cite at least one supplied source. Ask for one concrete detail about this business that would resolve the gap instead of restating it.")
         + " Write one complete sentence per text field and aim for 20 words or fewer. Finish each thought well before the length limit. Use plain English punctuation." : instruction;
-      const scopedInstructions = limits.response?.format ? limits.response.instructions : [instructions, limits.response?.instructions].filter(Boolean).join(" ");
+      const scopedInstructions = limits.response?.format ? limits.response.instructions :
+        [instructions, limits.response?.instructions, reviewAnswers && answerRef ? answerReviewInstructions : ""].filter(Boolean).join(" ");
       const request = { model: rates.model, instructions: scopedInstructions, input: JSON.stringify(projected),
-        text: { format: limits.response?.format ?? (limits.projectInput ? proofFormat(context, answerRef) : format) } };
+        text: { format: limits.response?.format ?? (limits.projectInput ? proofFormat(context, answerRef, reviewAnswers) : format) } };
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation, countDispatched: true, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);

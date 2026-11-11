@@ -90,7 +90,7 @@ export class IntelligentOnboarding {
       const result = await this.provider.propose(structuredClone(input), {
         ownerDigest: fingerprint({ webPresenceId, managedSiteId }), workDigest: fingerprint({ caseId: entry.caseId, id }),
       });
-      try { turn = readProposal(result, input, id, this.provider.version); }
+      try { turn = readProposal(result, input, id, this.provider.version, this.provider.reviewAnswers); }
       catch (error) {
         failure = { gapId, code: "invalid_output" };
         rejection = { stage: "proposal-validation", code: error instanceof ProposalValidationError ? error.code : "invalid_output" };

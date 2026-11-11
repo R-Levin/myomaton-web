@@ -100,13 +100,30 @@ export function respectsC0Offer(question: { unknown: string; question: string; i
   );
 }
 
-export async function runResearchProof(directory: string, bin: string, rates: Rates, transport: ResponsesTransport, c0Only = false) {
+const previousQuestions = {
+  c0: { unknown: "Maximum included Launch build or migration scope",
+    question: "For Launch, what is the maximum included build or migration scope you want the website to promise?",
+    sourceIds: ["market-c0-presgro", "c0-scope", "c0-retirement"] },
+  c2: { unknown: "Which tree jobs are eligible for the urgent route and which need a verified fallback",
+    question: "What specific tree problems should the urgent phone route accept as serviceable versus redirect?",
+    sourceIds: ["market-c2-illinois", "c2-coverage", "market-c2-consumer"] },
+  startup: { unknown: "The exact first-month territory for one mechanic",
+    question: "Which exact areas can you reliably cover for bookings with one mechanic?",
+    sourceIds: ["market-startup-velofix", "startup-plan"] },
+};
+const directLaunchAnswer = "For this synthetic answer, Standard Launch includes up to five core pages and migration of approved copy from up to three existing pages. URL redirects, custom integrations, and larger migrations need separate scoping.";
+
+export async function runResearchProof(directory: string, bin: string, rates: Rates, transport: ResponsesTransport, mode: "all" | "c0" | "contrast" = "all") {
   const all = await cases();
-  const packet = c0Only ? all.filter(item => item.id === "c0") : all;
+  const packet = all.filter(item => mode !== "c0" || item.id === "c0").flatMap(item => {
+    const base = { item, name: item.id as string, answerText: item.answer as string };
+    if (mode !== "contrast" || item.id !== "c0") return [base];
+    return [{ ...base, name: "c0-ongoing" }, { ...base, name: "c0-launch", answerText: directLaunchAnswer }];
+  });
   await initializeOfflineUsageLedger(directory, rates);
   const fixture = await openIntelligentFixture(bin);
   try {
-    for (const item of packet) {
+    for (const { item, name, answerText } of packet) {
       const sources = [...item.sources];
       let stage: InterviewStage | { stage: "gap-discovery" | "readback"; code: string } = { stage: "gap-discovery", code: "refused" };
       try {
@@ -121,9 +138,10 @@ export async function runResearchProof(directory: string, bin: string, rates: Ra
           assert.deepEqual(context, seed);
           return { ...seed, evidence: seed.evidence.map(({ id, kind, statement }) => ({ id, kind, statement })) };
         }, researchContract(sources));
-        const research = rankMarketQuestions(await discovery.propose(seed, { ownerDigest, workDigest: fingerprint({ case: item.id, stage: "research" }) }), sources);
-        const candidates = item.id === "c0" ? research.ranked.filter(respectsC0Offer) : research.ranked;
-        const best = candidates[0];
+        const research = mode === "contrast" ? null : rankMarketQuestions(
+          await discovery.propose(seed, { ownerDigest, workDigest: fingerprint({ case: item.id, stage: "research" }) }), sources);
+        const candidates = research ? (item.id === "c0" ? research.ranked.filter(respectsC0Offer) : research.ranked) : [];
+        const best = mode === "contrast" ? previousQuestions[item.id] : candidates[0];
         if (!best) throw Error("No material new question found");
         const gap: InterviewGap = { id: "discovered-1", questionPurpose: best.unknown, sourceIds: best.sourceIds, known: seed.gap.known };
         const selected = sources.filter(source => source.kind === "owner-confirmed" || gap.sourceIds.includes(source.id));
@@ -133,13 +151,13 @@ export async function runResearchProof(directory: string, bin: string, rates: Ra
           sourceIds: best.sourceIds, assessment: null };
         readProposal(proposal, firstContext, "research-first", "research-first/1");
         const history: InterviewTurn[] = [];
-        const answer = { disposition: "provided" as const, text: item.answer };
+        const answer = { disposition: "provided" as const, text: answerText };
         const adapter = controlledProofResponsesProvider(directory, rates, transport, (context, attribution) => {
           assert.equal(attribution.ownerDigest, ownerDigest);
           const wire = exactProjection(context, item.path, gap, selected, history[0], answer);
           return { ...wire, evidence: wire.evidence.map(({ id, kind, statement }) => ({ id, kind, statement })) };
-        }, { instructions: "Do not ask again for a fact that this answer supplies. Keep confirmed restrictions fixed. If the answer clarifies a different part of the business, preserve that distinction and identify the unresolved question. If an urgent route is unstaffed, hold any urgent action for those hours and ask who can verify the safe fallback. Never recommend unmonitored voicemail or an unverified referral for an urgent hazard. Do not assume a request is a confirmed booking or a quote is an approved price." });
-        const provider: QuestionProvider = { version: "research-first/1", async propose(context, attribution) {
+        }, { reviewAnswers: true, instructions: "Keep confirmed restrictions fixed. If an urgent route is unstaffed, hold any urgent action for those hours and ask who can verify the safe fallback. Do not assume a request is a confirmed booking or a quote is an approved price." });
+        const provider: QuestionProvider = { version: "research-first/2", reviewAnswers: true, async propose(context, attribution) {
           if (history.length) return adapter.propose(context, attribution);
           exactProjection(context, item.path, gap, selected);
           return proposal;
@@ -157,13 +175,15 @@ export async function runResearchProof(directory: string, bin: string, rates: Ra
         stage = { stage: "readback", code: "refused" };
         assert.deepEqual(await engine.resume(entry), followed);
         assert.equal(second.respondsTo, first.id + ":answer");
-        await writeFile(join(directory, "market-" + item.id + ".json"), JSON.stringify({ research: { ...research, ranked: candidates },
-          rejectedKnownScope: research.ranked.length - candidates.length, answer: item.answer,
-          selected: best.question, followUp: second.question, assessment: second.assessment,
+        await writeFile(join(directory, "market-" + name + ".json"), JSON.stringify({
+          research: research && { ...research, ranked: candidates },
+          rejectedKnownScope: research ? research.ranked.length - candidates.length : 0, answer: answerText,
+          selected: best.question, gap: best.unknown, evidence: selected, sourceIds: second.sourceIds,
+          answerReview: second.answerReview, followUp: second.question, assessment: second.assessment,
           before: before.readiness[0].status, after: followed.readiness[0].status }, null, 2) + "\n", { flag: "wx", mode: 0o600 });
       } catch (error) {
         if (error instanceof ResearchRefusal || error instanceof ProposalValidationError) stage = { ...stage, code: error.code };
-        await writeFile(join(directory, "local-error.json"), JSON.stringify({ case: item.id, ...stage }) + "\n", { flag: "wx", mode: 0o600 });
+        await writeFile(join(directory, "local-error.json"), JSON.stringify({ case: name, ...stage }) + "\n", { flag: "wx", mode: 0o600 });
         throw error;
       }
     }

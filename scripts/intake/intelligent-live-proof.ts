@@ -172,13 +172,15 @@ export function exactProjection(context: QuestionContext, entryPath: Trace["entr
 }
 
 export function reviewedTurn(turn: InterviewTurn | undefined, context: Trace["context"], followUp = false): InterviewTurn {
-  if (!turn?.question || (followUp && !turn.assessment)) throw Error("Required generated question or assessment missing");
-  const text = [turn.question, turn.rationale, turn.assessment?.recommendation, turn.assessment?.evidenceNeeded].join(" ");
+  if (!turn || (!turn.question && turn.answerReview?.relevance !== "direct") ||
+      (followUp && !turn.assessment && !turn.answerReview)) throw Error("Required generated question or assessment missing");
+  const text = [turn.question, turn.rationale, turn.assessment?.recommendation, turn.assessment?.evidenceNeeded,
+    turn.answerReview?.topic, turn.answerReview?.excerpt, turn.answerReview?.unresolved].join(" ");
   const foreign = context === "c2" ? /\b(?:MioPages|HostShop|Web Presence|Ongoing)\b/i : /\b(?:tree service|urgent tree work|northern service area)\b/i;
   if (foreign.test(text) || /[\u200b-\u200f\u202a-\u202e\u2060-\u206f]|https?:\/\/|\b\S+@\S+\.\S+|\bsk-(?:proj-)?[\w-]{8,}|(?:\(\d{3}\)|\b\d{3})[ .-]?\d{3}[ .-]?\d{4}\b/i.test(text)) {
     throw Error("Generated output failed the protected evidence screen");
   }
-  const statements = [turn.rationale, turn.assessment?.recommendation, turn.assessment?.evidenceNeeded];
+  const statements = [turn.rationale, turn.assessment?.recommendation, turn.assessment?.evidenceNeeded, turn.answerReview?.unresolved];
   if (statements.some(statement => statement && !/[.!?]$/.test(statement))) throw Error("Incomplete proof sentence");
   return turn;
 }
@@ -293,7 +295,7 @@ export async function runProof(directory: string, bin: string, rates: Rates, tra
 async function main() {
   const [mode, flag, attempt = "attempt", scope, ...rest] = process.argv.slice(2);
   const ownerDiagnostic = flag === "--owner-diagnostic";
-  const research = scope === "--research" || scope === "--research-c0";
+  const research = scope === "--research" || scope === "--research-c0" || scope === "--research-contrast";
   if (!["--preflight", "--execute"].includes(mode) || (flag && !ownerDiagnostic) || rest.length ||
       (attempt !== "attempt" && (!ownerDiagnostic || !isNumberedAttempt(attempt))) ||
       (scope && (!research || !ownerDiagnostic || !isNumberedAttempt(attempt)))) throw Error("Explicit proof mode required");
@@ -327,7 +329,8 @@ async function main() {
     });
     if (research) {
       const { runResearchProof } = await import("./research-first");
-      await runResearchProof(directory, bin, fixedRates(receipt.countMicros), transport, scope === "--research-c0");
+      await runResearchProof(directory, bin, fixedRates(receipt.countMicros), transport,
+        scope === "--research-contrast" ? "contrast" : scope === "--research-c0" ? "c0" : "all");
     } else await runProof(directory, bin, fixedRates(receipt.countMicros), transport);
   } finally {
     await lock.close();
