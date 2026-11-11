@@ -156,7 +156,11 @@ export async function runResearchProof(directory: string, bin: string, rates: Ra
           assert.equal(attribution.ownerDigest, ownerDigest);
           const wire = exactProjection(context, item.path, gap, selected, history[0], answer);
           return { ...wire, evidence: wire.evidence.map(({ id, kind, statement }) => ({ id, kind, statement })) };
-        }, { reviewAnswers: true, instructions: "Keep confirmed restrictions fixed. If an urgent route is unstaffed, hold any urgent action for those hours and ask who can verify the safe fallback. Do not assume a request is a confirmed booking or a quote is an approved price." });
+        }, { reviewAnswers: true, instructions: "Keep confirmed restrictions fixed. " + (item.id === "c0"
+          ? "The initial build and migration are Launch. Service changes and approvals for existing clients are Ongoing. Classify the reply by the phase it actually describes."
+          : item.id === "c2"
+            ? "If an urgent route is unstaffed, hold any urgent action for those hours. Clarify eligible jobs or the safe fallback."
+            : "Do not assume a request is a confirmed booking or a quote is an approved price. Clarify the exact territory if the reply gives no locations.") });
         const provider: QuestionProvider = { version: "research-first/2", reviewAnswers: true, async propose(context, attribution) {
           if (history.length) return adapter.propose(context, attribution);
           exactProjection(context, item.path, gap, selected);
