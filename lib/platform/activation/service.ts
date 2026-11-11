@@ -111,10 +111,10 @@ export class ActivationService {
   }
   // Trusted local composition only. Hold the scoped activation lock through the
   // draft operation, never through a provider call.
-  async withOnboardingDraft<T>(context: unknown, id: string, selection: Scope, run: (c: PoolClient, entry: OnboardingEntry) => Promise<T>) {
+  async withOnboardingDraft<T>(context: unknown, id: string, selection: Scope, run: (c: PoolClient, entry: OnboardingEntry) => Promise<T>, access: "draft-onboarding" | "inspect" = "draft-onboarding") {
     if (process.env.NODE_ENV === "production") throw Error("Local onboarding proof only");
     const owner = scope(selection);
-    await this.authorize(context, "draft-onboarding", owner);
+    await this.authorize(context, access, owner);
     return this.transaction(async c => {
       const row = await this.row(c, id, owner);
       const current = await inspectActivationRow(c, row);

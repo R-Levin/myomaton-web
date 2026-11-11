@@ -14,7 +14,7 @@ const observed = (id: string, reference: string, statement: string): InterviewEv
 const fictional = (id: string, statement: string): InterviewEvidence =>
   ({ id, kind: "owner-confirmed", at: "2026-11-10", reference: "Synthetic owner statement for the local demonstration", statement });
 
-async function cases() {
+export async function researchCases() {
   const { contexts } = await readManifest();
   return [
     { id: "c0", path: "FREE_REVIEW", sources: [
@@ -100,7 +100,7 @@ export function respectsC0Offer(question: { unknown: string; question: string; i
   );
 }
 
-const previousQuestions = {
+export const previousQuestions = {
   c0: { unknown: "Maximum included Launch build or migration scope",
     question: "For Launch, what is the maximum included build or migration scope you want the website to promise?",
     sourceIds: ["market-c0-presgro", "c0-scope", "c0-retirement"] },
@@ -114,7 +114,7 @@ const previousQuestions = {
 const directLaunchAnswer = "For this synthetic answer, Standard Launch includes up to five core pages and migration of approved copy from up to three existing pages. URL redirects, custom integrations, and larger migrations need separate scoping.";
 
 export async function runResearchProof(directory: string, bin: string, rates: Rates, transport: ResponsesTransport, mode: "all" | "c0" | "contrast" = "all") {
-  const all = await cases();
+  const all = await researchCases();
   const packet = all.filter(item => mode !== "c0" || item.id === "c0").flatMap(item => {
     const base = { item, name: item.id as string, answerText: item.answer as string };
     if (mode !== "contrast" || item.id !== "c0") return [base];

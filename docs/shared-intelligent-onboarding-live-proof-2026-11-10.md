@@ -346,3 +346,46 @@ This GET-only view uses the existing local Operator shell and reads saved
 proof evidence. It makes no provider calls and has no answer editor. The
 next step is to expose the same scoped review in a disposable Core customer
 interview after saving an answer through either existing entry path.
+
+## Interactive Core interview
+
+Run `node --import tsx scripts/intake/c0-onboarding.ts --core-interview` from
+this branch's worktree and open [the local interview](http://127.0.0.1:4323/onboarding).
+The launcher prints separate local sign-in codes for C0, fictional C2,
+the hypothetical bicycle startup and the Operator. Keep the terminal open.
+These codes grant access only to the disposable rehearsal. The browser
+holds an HttpOnly, same-site session cookie and saves progress to the
+existing scoped interview draft in local PostgreSQL. Reload or sign back
+in to resume during the same run. Stopping the launcher clears the session
+and disposes of that database.
+
+1. Sign in using the `c0` code. Choose **Free Review-led** and **Open
+   interview**. Expand **Market research and sources** to see which
+   observations helped shape the Launch question.
+2. Enter “During Ongoing, existing clients can request a service change.”
+   Choose **Save and review answer**. Launch stays open and the follow-up
+   asks specifically about the scope for a new site or migration.
+3. Answer “Launch includes up to five core pages.” The saved answer moves
+   the scoped draft to **Ready for planning review**. Reload and confirm
+   both replies and the assessment remain. **Direct start** opens an
+   independent rehearsal of the same interview without the historical
+   Free Review evidence.
+4. Sign out and use the `operator` code. Open the saved C0 Review-led
+   interview to inspect the same evidence and decision. The Operator
+   role cannot edit answers or promote knowledge. Use the other customer
+   codes to try the tree service and bicycle startup independently.
+
+The existing activation checks still require a scoped source and commercial
+authorization event. Both prerequisites are synthetic. The Review-led path
+exercises the existing approved Review gate and carries retained historical
+summaries with provenance. It does not represent real payment or Free Review
+delivery. The initial questions are genuine prior AI outputs. Follow-ups and
+scoped answer checks here use deliberately narrow local rules, including an
+open state for ambiguous replies. New browser replies stay local. This
+slice spent $0 on providers. Free-form AI follow-ups, durable account login,
+and Operator confirmation of business knowledge remain later steps.
+
+The local HTTP and browser-bundle test exercised sign-in, both entry paths,
+saved answers, reload, stale-write refusal, cross-customer refusal and
+read-only Operator access. The prior research, provider-budget and onboarding
+regressions also passed, along with TypeScript and targeted lint.

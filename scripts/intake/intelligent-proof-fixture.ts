@@ -25,13 +25,13 @@ export async function openIntelligentFixture(bin: string) {
   try {
     await migrateWithBootstrapCompatibility(pool);
     const database = new URL(cluster.url).pathname.slice(1);
-    const grants = new WeakMap<object, { scope: Scope; operations: Operation[] }>();
+    const grants = new WeakMap<object, { scope: Scope; operations: Operation[]; actor: string }>();
     const activation = new ActivationService(pool, { async authorize(context, operation, scope) {
       const grant = typeof context === "object" && context ? grants.get(context) : undefined;
       if (!grant || !grant.operations.includes(operation) || Object.keys(scope).some(key => scope[key as keyof Scope] !== grant.scope[key as keyof Scope])) {
         throw Error("Missing scoped test authority");
       }
-      return { operatorId: "disposable-operator", authorityReference: "offline-test-only" };
+      return { operatorId: grant.actor, authorityReference: "offline-test-only" };
     } }, localApprovedReviews, async db => {
       const { rows: [bound] } = await db.query("SELECT current_database() AS db, current_schema() AS schema, host(inet_server_addr()) AS host");
       if (bound.db !== database || !/^migration_rehearsal_[a-f0-9]{32}$/.test(database) || bound.schema !== "public" || bound.host !== "127.0.0.1") {
@@ -66,15 +66,21 @@ export async function openIntelligentFixture(bin: string) {
         await store.append("approve", binding, null, "disposable-operator", "Synthetic approval only", Object.fromEntries(qualityChecks.map(key => [key, true])));
         review = { id: store.id, revision: binding.revision, digest: binding.revisionDigest };
       }
-      const scope = { ...selection, pendingCustomerId: randomUUID() }, context = {};
-      grants.set(context, { scope, operations: ["create", "confirm-commercial", "draft-onboarding"] });
-      const created = await activation.create(context, { requestId: randomUUID(), scope, submissionId: submission.id, submissionDigest: submission.digest, review });
-      const authorize = () => activation.update(context, created.id, scope, created.version, randomUUID(), "confirm-commercial", {
+      const scope = { ...selection, pendingCustomerId: randomUUID() }, context = {}, provisioning = {};
+      grants.set(provisioning, { scope, operations: ["create", "confirm-commercial"], actor: "disposable-operator" });
+      grants.set(context, { scope, operations: ["draft-onboarding"], actor: "disposable-customer:" + scope.pendingCustomerId });
+      const created = await activation.create(provisioning, { requestId: randomUUID(), scope, submissionId: submission.id, submissionDigest: submission.digest, review });
+      const authorize = () => activation.update(provisioning, created.id, scope, created.version, randomUUID(), "confirm-commercial", {
         source: "agreement-order", reference: "Synthetic commercial prerequisite", confirmedAt: new Date().toISOString(), launchScope: "Test only", ongoingScope: "Test only",
       });
       return { scope, context, caseId: created.id, token: newResumeToken(), authorize, review };
     }
-    return { pool, activation, database, owner, createEntry, close };
+    function inspector(scope: Scope) {
+      const context = {};
+      grants.set(context, { scope, operations: ["inspect"], actor: "disposable-review-operator" });
+      return context;
+    }
+    return { pool, activation, database, owner, createEntry, inspector, close };
   } catch (error) {
     await close();
     throw error;

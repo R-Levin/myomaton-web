@@ -27,13 +27,14 @@ export class IntelligentOnboarding {
         Buffer.byteLength(JSON.stringify(sources)) > 9_000) throw Error("Invalid onboarding source projection");
   }
 
-  private access(entry: Entry, open = false, change?: (state: InterviewState, version: number, path: QuestionContext["entryPath"], evidence: InterviewEvidence[]) => InterviewState) {
-    return this.activation.withOnboardingDraft(entry.context, entry.caseId, this.sources.scope, (db, authority) => {
+  private access(entry: Entry, open = false, change?: (state: InterviewState, version: number, path: QuestionContext["entryPath"], evidence: InterviewEvidence[]) => InterviewState, inspect = false) {
+    return this.activation.withOnboardingDraft(entry.context, entry.caseId, this.sources.scope, async (db, authority) => {
       const evidence = this.evidenceFor(authority.source.path, authority.review?.digest);
       const digest = fingerprint({ scope: this.sources.scope, gaps: this.sources.gaps, evidence });
-      return this.intake.intelligentDraft(db, authority, entry.token, digest, open,
+      const draft = await this.intake.intelligentDraft(db, authority, entry.token, digest, open,
         change && ((state, version) => change(state, version, authority.source.path, evidence)));
-    });
+      return { ...draft, evidence, entryPath: authority.source.path };
+    }, inspect ? "inspect" : "draft-onboarding");
   }
 
   private evidenceFor(path: QuestionContext["entryPath"], reviewDigest?: string) {
@@ -49,6 +50,11 @@ export class IntelligentOnboarding {
 
   async resume(entry: Entry) {
     const draft = await this.access(entry);
+    return { ...draft, readiness: interviewReadiness(this.sources.gaps, draft.state) };
+  }
+
+  async inspect(entry: Entry) {
+    const draft = await this.access(entry, false, undefined, true);
     return { ...draft, readiness: interviewReadiness(this.sources.gaps, draft.state) };
   }
 
@@ -73,7 +79,8 @@ export class IntelligentOnboarding {
       this.expectVersion(version, expectedVersion);
       const last = state.turns.at(-1);
       const history = state.turns.filter(turn => turn.gapId === gapId);
-      if (state.pending || state.turns.length >= maxTurns || history.length >= 2 ||
+      if (state.pending || state.turns.length >= maxTurns || history.length >= (this.provider.reviewAnswers ? 3 : 2) ||
+          (history.at(-1)?.answerReview?.relevance === "direct") ||
           (last?.question && !last.answer)) throw new IntakeError("question_unavailable", 409);
       const selected = evidence.filter(item => gap.sourceIds.includes(item.id));
       if (!selected.length) throw new IntakeError("prepared_source_changed", 409);

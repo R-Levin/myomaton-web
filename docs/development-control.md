@@ -430,10 +430,13 @@ show that an Ongoing-only reply now leaves Launch open and a direct Launch
 reply advances only that decision to planning review. The fictional tree
 service and bicycle startup still ask for missing operational facts.
 The cumulative phase estimate is $0.074312. The saved proof is visible in the
-local Operator console. The next Core slice is a disposable, authenticated
-interview that can save an answer and show the scoped review in place through
-both entry paths. Readiness still requires owner acceptance and formal
-hardening before production.
+local Operator console. The [interactive Core rehearsal](shared-intelligent-onboarding-live-proof-2026-11-10.md#interactive-core-interview)
+adds local customer sign-in, both entry paths, resumable draft answers and a
+read-only Operator view of the same saved evidence. It uses the prior AI
+questions and a local follow-up provider. The next decision is approval
+of the free-form provider input and privacy contract after the owner has
+reviewed the interaction. Production still requires formal hardening and
+owner acceptance.
 
 ### Issue #9 · first local signup and onboarding slice
 
