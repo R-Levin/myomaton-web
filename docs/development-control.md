@@ -477,6 +477,11 @@ The [signed native draft continuation](c0-integration-spine-phase-b-2026-11-10.m
 records the separate Core envelope, internal draft writer, hosted storage
 check and migration prerequisite. Existing staging remains compatible.
 
+The [hosted native draft verification](c0-integration-spine-phase-b-2026-11-10.md#hosted-native-draft-apply-and-restore)
+records two non-public WordPress revisions, reconciled application
+receipts, and restoration of the prior draft set. Customer preview access
+through Core and the full growth-service acceptance remain open.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

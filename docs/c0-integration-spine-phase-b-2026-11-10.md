@@ -527,3 +527,56 @@ bash ~/miopages-wp-rehearsal/scripts/wordpress-native-draft-migration.sh ENROLL-
 
 The retry verifies the existing 0019 ledger and grants before enrollment.
 It has no apply step. Expect PASS for verification and enrollment.
+
+### Hosted native draft apply and restore
+
+On November 12, 2026, the enrollment-only launcher verified migration 0019
+and enrolled installation `d84ebc69-46d5-4c64-adc6-ac7b87468f89` for the
+existing inactive fixture. Independent protected authentication verified
+the author, Page approver, reviewer and site authorizer grants. The old
+installation `9a511424-79af-4d02-801e-8d191d4b0d2f` remains revoked.
+The four test credentials expire at 2026-11-13 18:37:37.609 UTC. The
+off-webroot WordPress CLI configuration remains restricted to this
+installation. No secret or signer was copied into Git.
+
+The first Core prepare operation refused an editorial-only Page before
+saving it. After verifying that no new proposal existed, preparation used
+the existing fixture's revision-linked canonical fact on both Pages.
+The rendered Core previews were fetched and independently matched their
+approval digests. A distinct scoped principal recorded each synthetic
+Page approval, and a separate authorizer and reviewer authorized the
+complete site. Neither operation records Customer acceptance or launch
+approval. The scoped installation credential relay initially reported a
+trailing line-ending error. The decoded file was independently verified
+for ownership, permissions, syntax and scope before the first write.
+
+| Hosted operation | Exact candidate digest | Native WordPress Pages |
+| --- | --- | --- |
+| Apply revision 1 | `d6b9d28e20de0f9605fb60a70c5df3b5e3278d19a13bb858f186fd3a90ca9c4d` | Home 13, Service 14 |
+| Apply revision 2 | `3d9e6e560c69cea1ccb001fd8239ab5f8baff1e8dc566354350a0587f1bd8a98` | Home 15, Service 16 |
+| Restore revision 1 | `d6b9d28e20de0f9605fb60a70c5df3b5e3278d19a13bb858f186fd3a90ca9c4d` | Original Home 13 and Service 14 |
+
+The Core site proposal is `1e28f792-624d-4141-96db-45c4ba05e17d`.
+The same Service Page proposal was revised to tell visitors to bring
+their existing website address. That change responds to the established
+synthetic inquiry. No new hosted Contact or outcome measurement was
+performed. WordPress created actual draft Pages via the signed CLI
+delivery on the existing development installation. Core authenticated
+and durably recorded all three application receipts, then accepted
+each exact retry. The restore receipt matched the original native
+IDs and hashes, and the independent WordPress pointer readback returned
+revision 1. These are application receipts, separate from the original
+signed staging receipt contract.
+
+WordPress 7.1.4 ran Delivery 0.0.8 with Managed Site 0.1.0 active. A
+read-only WP-CLI render of the active theme's Page template with all
+four actual posts verified the draft text, native block output,
+navigation and the Home Action. All posts remain drafts. The stored
+links are HTTPS, and logged-out requests to all four returned 401.
+Authenticated browser rendering is available for the owner's review
+using the existing site protection and WordPress editor login:
+[restored Home](https://miopages.org/?page_id=13&preview=true),
+[restored Service](https://miopages.org/?page_id=14&preview=true),
+and [revision 2 Service](https://miopages.org/?page_id=16&preview=true).
+The revision 2 draft set is retained for comparison. No public
+publication, theme switch or Core public deployment occurred.
