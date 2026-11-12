@@ -44,8 +44,10 @@ async function main() {
         result = await service.review.review(context, command.input as Parameters<typeof service.review.review>[1]);
         break;
       case "preview-site-draft":
-      case "authorize-site-draft": {
-        const authorizing = command.operation === "authorize-site-draft";
+      case "authorize-site-draft":
+      case "issue-site-draft": {
+        const issuing = command.operation === "issue-site-draft";
+        const authorizing = command.operation !== "preview-site-draft";
         const input = object(command.input, ["site", "references", "draft", ...(authorizing ? ["reviewerToken", "expectedDigest"] : [])]);
         const site = object(input.site, ["organizationId", "webPresenceId", "managedSiteId"]);
         if (!Array.isArray(input.references) || input.references.length < 1 || input.references.length > 16) {
@@ -57,10 +59,13 @@ async function main() {
         });
         const scope = { organizationId: uuid(site.organizationId),
           webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
-        result = authorizing
-          ? await service.review.authorizeSiteDraft(context, await service.operator.authenticate(input.reviewerToken),
-            scope, references, input.draft, input.expectedDigest)
-          : await service.review.previewSiteDraft(context, scope, references, input.draft);
+        if (authorizing) {
+          const reviewer = await service.operator.authenticate(input.reviewerToken);
+          result = issuing
+            ? await service.review.issueSiteDraft(context, reviewer, scope, references, input.draft, input.expectedDigest,
+              createPrivateKey(process.env.MIOPAGES_WP_SIGNING_KEY ?? ""))
+            : await service.review.authorizeSiteDraft(context, reviewer, scope, references, input.draft, input.expectedDigest);
+        } else result = await service.review.previewSiteDraft(context, scope, references, input.draft);
         break;
       }
       case "enroll":

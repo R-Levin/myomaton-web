@@ -473,6 +473,10 @@ extension. Core retains knowledge, approval and delivery authority. The
 theme owns rendering. The native writer, receipt and rollback still gate
 hosted draft acceptance.
 
+The [signed native draft continuation](c0-integration-spine-phase-b-2026-11-10.md#signed-native-draft-continuation)
+records the separate Core envelope, internal draft writer, hosted storage
+check and migration prerequisite. Existing staging remains compatible.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

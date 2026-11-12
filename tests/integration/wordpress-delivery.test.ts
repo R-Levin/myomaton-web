@@ -470,8 +470,22 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
             context, reviewerContext, site, [homeDecision, review], draftIntent, digest);
           await assert.rejects(authorizeDraft(reviewerContext), /authorization refused/);
           await assert.rejects(authorizeDraft(authorizerContext, "0".repeat(64)), /preview digest mismatch/);
+          const issueDraft = (digest = initialDraft.digest, signingKey = key.privateKey) =>
+            protectedServices.review.issueSiteDraft(authorizerContext, reviewerContext, site, [homeDecision, review],
+              draftIntent, digest, signingKey);
+          await assert.rejects(issueDraft(), /authorization conflict/);
           assert.deepEqual(await authorizeDraft(authorizerContext), initialDraft);
           assert.deepEqual(await authorizeDraft(authorizerContext), initialDraft);
+          await assert.rejects(issueDraft(initialDraft.digest, generateKeyPairSync("ed25519").privateKey), /signer does not match/);
+          const draftEnvelope = await issueDraft();
+          const verifyDraft = (envelope = draftEnvelope, target = identity) =>
+            spawnSync("php", ["wordpress/miopages-delivery/tests/native-draft-envelope.php"], { encoding: "utf8",
+              input: JSON.stringify({ envelope, identity: target }) });
+          const verifiedDraft = verifyDraft();
+          assert.equal(verifiedDraft.status, 0, verifiedDraft.stderr);
+          assert.deepEqual(JSON.parse(verifiedDraft.stdout), { digest: initialDraft.digest, revision: 1 });
+          assert.equal(verifyDraft({ ...draftEnvelope, payloadSha256: "0".repeat(64) }).status, 1);
+          assert.equal(verifyDraft(draftEnvelope, { ...identity, installationId: randomUUID() }).status, 1);
           await assert.rejects(pullDb.query("SELECT * FROM wordpress_native_draft_authorizations"), /permission denied/);
           await assert.rejects(protectedServices.review.previewSiteDraft(reviewerContext, site, [homeDecision, review],
             { ...draftIntent, installationId: randomUUID() }), /installation scope/);

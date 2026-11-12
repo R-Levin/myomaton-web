@@ -348,3 +348,37 @@ regressions passed. The tests exercised the 0017-to-0018 upgrade and retry,
 exact authorization retries, reviewer-only refusal, mismatched digest
 refusal, restricted pull-role access and two linked authorized revisions.
 TypeScript and targeted lint passed.
+
+### Signed native draft continuation
+
+The hosted integration milestone remains actual non-public native drafts
+and a reversible inquiry-driven change under the managed service and
+content-growth contracts. Issue #12 clarifies that scoped Operators may
+use WordPress for site work while Core remains the operating workspace.
+Customer review through Core remains a separate protected sharing flow.
+
+Core now rederives the authorized site revision and checks the current
+enrollment key, exact reviewer and authorizer grants, and latest durable
+decision before issuing a domain-separated draft-only envelope. PHP checks
+the signature, time window, intended use and installed site identity.
+The v1 staging envelope and receipt stay separate. The internal writer
+contains draft-only copy-on-write, a predecessor check, native readback,
+and a transaction-protected pointer. It is not registered as a command
+or deployed. Core application receipt reconciliation and intentional
+restoration of a prior draft remain required.
+
+Both local delivery integration tests passed, including PHP verification
+of a Core-issued envelope and refusal before authorization, on wrong
+signer, on changed bytes, and on a foreign installation. The hosted
+WordPress database verified that posts, postmeta and options use InnoDB.
+WordPress remains on Delivery 0.0.6 and Twenty Twenty-Five 1.5 active,
+with Managed Site 0.1.0 installed and inactive. No draft posts or hosted
+database changes were made during these checks.
+
+The migration launcher `scripts/wordpress-native-draft-migration.sh`
+requires the existing migration-role password through a hidden prompt
+in the established Cloud rehearsal checkout. It reuses the known
+Session Pooler parameters and verified CA, then runs the explicit 0018
+apply and independent verify operations. Retained credentials are for
+the Operator and pull roles. They do not supply the migration password.
+No new credential or database environment is needed.
