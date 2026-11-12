@@ -4,7 +4,7 @@ import { lstat, mkdtemp, open, readFile, realpath } from "node:fs/promises";
 import path from "node:path";
 import { migrationRole, operatorRole, protectedConnection, protectedPool, verifyProtectedSession } from "../lib/platform/wordpress-delivery/protected-connection";
 import { protectedOperatorServices } from "../lib/platform/wordpress-delivery/protected-services";
-import { wordpressRehearsalFixture } from "./customer-initializers/wordpress-rehearsal";
+import { sharedInventorySnapshot } from "./db/wordpress-shared-inventory";
 import { rehearsalSite } from "./db/wordpress-rehearsal-principals";
 import { privateStageDiagnostic, verifyPrivateStageAdapter } from "./db/wordpress-private-stage";
 
@@ -46,12 +46,26 @@ async function main() {
       const db = await migration.connect();
       try {
         await verifyProtectedSession(db, migrationRole, "postgres");
+        stage = "fixture-read-only-verification";
+        await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+        try {
+          const inventory = await sharedInventorySnapshot(db, [], rehearsalSite);
+          assert.equal(inventory.status, "PASS");
+          assert.ok(inventory.fixture.selected && inventory.fixture.approvedProjectionSource);
+        }
+        finally { await db.query("ROLLBACK"); }
         await db.query("BEGIN ISOLATION LEVEL SERIALIZABLE");
         try {
           await db.query("SET LOCAL search_path=miopages_wp,public");
           await db.query("SELECT pg_advisory_xact_lock(hashtextextended('miopages-native-draft-enrollment',0))");
+          stage = "adapter-ledger-and-grants";
           await verifyPrivateStageAdapter(db, true, true);
-          assert.deepEqual((await wordpressRehearsalFixture(db, "verify")).site, rehearsalSite);
+          stage = "fixture-scope-and-origin";
+          const scopeRow = (await db.query(`SELECT w.status AS presence_status,m.status AS site_status
+            FROM public.web_presences w JOIN public.managed_sites m ON m.web_presence_id=w.id
+            WHERE w.organization_id=$1 AND w.id=$2 AND m.id=$3 FOR SHARE OF w,m`,
+          [rehearsalSite.organizationId, ...scope])).rows[0];
+          assert.deepEqual(scopeRow, { presence_status: "inactive", site_status: "inactive" });
           const old = (await db.query("SELECT id,status,web_presence_id,managed_site_id FROM wordpress_installations WHERE origin=$1", [origin])).rows;
           assert.deepEqual(old, [{ id: oldInstallation, status: "revoked",
             web_presence_id: rehearsalSite.webPresenceId, managed_site_id: rehearsalSite.managedSiteId }]);

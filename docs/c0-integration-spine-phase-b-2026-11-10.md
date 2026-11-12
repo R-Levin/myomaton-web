@@ -505,3 +505,25 @@ the original constraint refuses reuse, the forward upgrade and retry keep
 revoked rows, keys, deliveries and audit records identical, a scoped actor
 can enroll a replacement, a second active enrollment fails and the old
 installation still refuses pull and rotation.
+
+#### Hosted 0019 verified and enrollment-only retry
+
+The hosted launcher passed apply and independent verify with four adapter
+migrations. A separate read-only hosted check confirmed the valid active-only
+origin index, the original generation 1 revoked installation, zero active
+fixture grants and no new custody directory. Enrollment stopped at
+`enrollment-preflight` before any enrollment writes. The old fixture
+initializer's verifier required a read-only transaction and an unchanged
+initialization snapshot. The correction runs the established shared
+inventory in a read-only transaction against the current fixture and
+retained proposal history, then checks and locks the exact inactive
+site scope in the separate enrollment write transaction.
+
+Use only the enrollment retry after the corrected source is installed:
+
+```bash
+bash ~/miopages-wp-rehearsal/scripts/wordpress-native-draft-migration.sh ENROLL-NATIVE-DRAFT-ONLY
+```
+
+The retry verifies the existing 0019 ledger and grants before enrollment.
+It has no apply step. Expect PASS for verification and enrollment.
