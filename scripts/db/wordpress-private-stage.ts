@@ -11,13 +11,17 @@ import { wordpressRehearsalFixture } from "../customer-initializers/wordpress-re
 import { quote } from "../backup/managed-permissions";
 
 const migrations = ["0016_wordpress_delivery", "0017_private_stage_authority"];
+const draftMigration = "0018_native_draft_authority";
+const draftTable = "wordpress_native_draft_authorizations";
+const draftInsertColumns = ["installation_id", "site_proposal_id", "revision", "candidate_digest", "previous_digest",
+  "reviewer_grant_id", "authorizer_grant_id"];
 const backup = "miopages_backup";
 const runtime = "miopages_runtime";
 const tables = ["wordpress_installations", "wordpress_installation_keys", "wordpress_delivery_events",
   "wordpress_deliveries", "wordpress_request_nonces", "wordpress_operator_credentials", "wordpress_operator_grants",
   "wordpress_proposal_approvals", "wordpress_private_releases", "wordpress_schema_migrations"];
 // Called in an existing transaction after checking the protected migration connection.
-export async function integratePrivateStage(db: PoolClient, canonicalSchema = "public") {
+export async function integratePrivateStage(db: PoolClient, canonicalSchema = "public", nativeDraft = false) {
   const selected = [operatorRole, pullRole, backup, runtime];
   const roles = (await db.query(`SELECT rolname FROM pg_roles
     WHERE rolname=ANY($1) AND rolcanlogin AND NOT (rolsuper OR rolbypassrls OR rolcreaterole OR rolcreatedb OR rolreplication)
@@ -33,8 +37,9 @@ export async function integratePrivateStage(db: PoolClient, canonicalSchema = "p
   await db.query(`CREATE TABLE IF NOT EXISTS ${adapter}.wordpress_schema_migrations
     (name text PRIMARY KEY, sha256 text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now())`);
   const prior = (await db.query("SELECT name,sha256 FROM wordpress_schema_migrations ORDER BY name")).rows;
-  if (prior.length > migrations.length) throw Error("Unknown private-stage migration");
-  for (const [index, name] of migrations.entries()) {
+  const expectedMigrations = nativeDraft ? [...migrations, draftMigration] : migrations;
+  if (prior.length > expectedMigrations.length) throw Error("Unknown private-stage migration");
+  for (const [index, name] of expectedMigrations.entries()) {
     const sql = await readFile("lib/platform/wordpress-delivery/" + name + ".sql", "utf8");
     const digest = createHash("sha256").update(sql.replaceAll("\r\n", "\n")).digest("hex");
     if (index < prior.length) {
@@ -44,7 +49,8 @@ export async function integratePrivateStage(db: PoolClient, canonicalSchema = "p
     await db.query(sql);
     await db.query("INSERT INTO wordpress_schema_migrations(name,sha256) VALUES($1,$2)", [name, digest]);
   }
-  const managedTables = list(adapterSchema, tables);
+  const adapterTables = nativeDraft ? [...tables, draftTable] : tables;
+  const managedTables = list(adapterSchema, adapterTables);
   const subjects = ["PUBLIC", ...selected.map(quote)].join(",");
   await db.query(`REVOKE ALL ON SCHEMA ${adapter} FROM ${subjects};
     REVOKE ALL ON TABLE ${managedTables} FROM ${subjects};
@@ -54,7 +60,7 @@ export async function integratePrivateStage(db: PoolClient, canonicalSchema = "p
     GRANT SELECT ON TABLE ${list(canonicalSchema, privateStageSource)} TO ${operatorRole},${pullRole};
     GRANT INSERT ON TABLE ${list(canonicalSchema, privateStageProposalTables)} TO ${operatorRole};
     GRANT UPDATE(id) ON ${canonical}.site_change_proposals TO ${operatorRole};
-    GRANT SELECT ON TABLE ${list(adapterSchema, tables.filter(t => t !== "wordpress_schema_migrations"))} TO ${operatorRole};
+    GRANT SELECT ON TABLE ${list(adapterSchema, adapterTables.filter(t => t !== "wordpress_schema_migrations"))} TO ${operatorRole};
     GRANT INSERT ON TABLE ${list(adapterSchema, ["wordpress_installations", "wordpress_installation_keys", "wordpress_delivery_events",
       "wordpress_deliveries", "wordpress_proposal_approvals", "wordpress_private_releases"])} TO ${operatorRole};
     GRANT UPDATE(status,generation) ON wordpress_installations TO ${operatorRole};
@@ -65,7 +71,8 @@ export async function integratePrivateStage(db: PoolClient, canonicalSchema = "p
     GRANT UPDATE(request_epoch) ON wordpress_installations TO ${pullRole};
     GRANT UPDATE(staged_at) ON wordpress_deliveries TO ${pullRole};
     GRANT DELETE ON wordpress_request_nonces TO ${pullRole};
-    GRANT EXECUTE ON FUNCTION ${adapter}.wordpress_delivery_release_reference() TO ${operatorRole}`);
+    GRANT EXECUTE ON FUNCTION ${adapter}.wordpress_delivery_release_reference() TO ${operatorRole};
+    ${nativeDraft ? `GRANT INSERT(${draftInsertColumns.join(",")}) ON ${adapter}.${draftTable} TO ${operatorRole};` : ""}`);
   const forbidden = await db.query(`SELECT 1 FROM unnest($1::text[]) r WHERE
     has_schema_privilege(r,$2,'CREATE') OR has_schema_privilege(r,$3,'CREATE')
     OR has_table_privilege(r,$2||'.pages','INSERT,UPDATE,DELETE')
@@ -73,22 +80,24 @@ export async function integratePrivateStage(db: PoolClient, canonicalSchema = "p
   if (forbidden.rowCount) throw Error("Excess private-stage privileges");
 }
 
-export async function verifyPrivateStageAdapter(db: PoolClient) {
+export async function verifyPrivateStageAdapter(db: PoolClient, nativeDraft = false) {
   await verifyWordPressRoles(db);
   const recorded = (await db.query("SELECT name,sha256 FROM miopages_wp.wordpress_schema_migrations ORDER BY name")).rows;
-  const expectedMigrations = await Promise.all(migrations.map(async name => ({ name, sha256: createHash("sha256")
+  const adapterTables = nativeDraft ? [...tables, draftTable] : tables;
+  const expectedMigrations = await Promise.all((nativeDraft ? [...migrations, draftMigration] : migrations).map(async name => ({ name, sha256: createHash("sha256")
     .update((await readFile("lib/platform/wordpress-delivery/" + name + ".sql", "utf8")).replaceAll("\r\n", "\n")).digest("hex") })));
   assert.deepEqual(recorded, expectedMigrations, "Private-stage migration checksum mismatch");
   const owned = (await db.query(`SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE n.nspname='miopages_wp' AND c.relkind IN ('r','p') AND pg_get_userbyid(c.relowner)=$1 ORDER BY c.relname`, [migrationRole])).rows;
-  assert.deepEqual(owned.map(row => row.relname), [...tables].sort(), "Private-stage table ownership mismatch");
+  assert.deepEqual(owned.map(row => row.relname), [...adapterTables].sort(), "Private-stage table ownership mismatch");
   assert.equal((await db.query("SELECT pg_get_userbyid(nspowner) AS owner FROM pg_namespace WHERE nspname='miopages_wp'")).rows[0]?.owner, migrationRole);
   const expected = new Set<string>();
   const add = (role: string, table: string, privilege: string, column = "") => expected.add([role, table, privilege, column].join("|"));
   for (const role of [operatorRole, pullRole]) for (const table of privateStageSource) add(role, "public." + table, "SELECT");
   for (const table of privateStageProposalTables) add(operatorRole, "public." + table, "INSERT");
   add(operatorRole, "public.site_change_proposals", "UPDATE", "id");
-  for (const table of tables.filter(table => table !== "wordpress_schema_migrations")) add(operatorRole, "miopages_wp." + table, "SELECT");
+  for (const table of adapterTables.filter(table => table !== "wordpress_schema_migrations")) add(operatorRole, "miopages_wp." + table, "SELECT");
+  if (nativeDraft) for (const field of draftInsertColumns) add(operatorRole, "miopages_wp." + draftTable, "INSERT", field);
   for (const table of ["wordpress_installations", "wordpress_installation_keys", "wordpress_delivery_events",
     "wordpress_deliveries", "wordpress_proposal_approvals", "wordpress_private_releases"]) add(operatorRole, "miopages_wp." + table, "INSERT");
   for (const column of ["status", "generation"]) add(operatorRole, "miopages_wp.wordpress_installations", "UPDATE", column);
@@ -125,7 +134,7 @@ export async function verifyPrivateStageAdapter(db: PoolClient) {
   assert.equal(fn[0].owner, migrationRole);
   assert.equal(fn[0].prosecdef, false);
   assert.deepEqual(fn[0].callers, [operatorRole]);
-  for (const table of tables) {
+  for (const table of adapterTables) {
     const rights = (await db.query(`SELECT has_table_privilege($1,$3,'SELECT') AS backup_read,
       has_any_column_privilege($1,$3,'INSERT,UPDATE') OR has_table_privilege($1,$3,'DELETE,TRUNCATE,REFERENCES,TRIGGER') AS backup_write,
       has_any_column_privilege($2,$3,'SELECT,INSERT,UPDATE,REFERENCES') OR has_table_privilege($2,$3,'DELETE,TRUNCATE,TRIGGER') AS runtime_access`,
@@ -198,9 +207,10 @@ async function main(stage: (value: DiagnosticStage) => void) {
   const action = process.env.MIOPAGES_WP_SCHEMA_ACTION;
   const probeRole = action === "probe-pull-session" ? pullRole : action === "probe-operator-session" ? operatorRole : null;
   const fixtureOperation = action === "create-rehearsal-fixture" ? "create" : action === "verify-rehearsal-fixture" ? "verify" : null;
-  const verifyAdapter = action === "verify-private-stage";
+  const nativeDraft = action === "apply-native-draft-stage" || action === "verify-native-draft-stage";
+  const verifyAdapter = action === "verify-private-stage" || action === "verify-native-draft-stage";
   const inventory = action === "inventory-private-stage";
-  if (!verifyAdapter && !fixtureOperation && !inventory && !probeRole && action !== "apply-private-stage" && action !== "preflight-private-stage") {
+  if (!verifyAdapter && !fixtureOperation && !inventory && !probeRole && !nativeDraft && action !== "apply-private-stage" && action !== "preflight-private-stage") {
     throw Error("Explicit schema operation required");
   }
   const expected = process.env.MIOPAGES_WP_EXPECTED_DATABASE;
@@ -219,7 +229,7 @@ async function main(stage: (value: DiagnosticStage) => void) {
         await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
         await protectedConnection(db, migrationRole, expected);
         stage("adapter_validation");
-        const result = await verifyPrivateStageAdapter(db);
+        const result = await verifyPrivateStageAdapter(db, nativeDraft);
         await db.query("ROLLBACK");
         console.log(JSON.stringify({ ...result, readOnly: true }));
         return;
@@ -288,9 +298,9 @@ async function main(stage: (value: DiagnosticStage) => void) {
         return;
       }
       stage("migration");
-      await integratePrivateStage(db);
+      await integratePrivateStage(db, "public", nativeDraft);
       await db.query("COMMIT");
-      console.log(JSON.stringify({ privateStageMigrations: migrations.length, verified: true }));
+      console.log(JSON.stringify({ privateStageMigrations: migrations.length + Number(nativeDraft), verified: true }));
     } catch (error) { await db.query("ROLLBACK").catch(() => {}); throw error; }
     finally { db.release(); }
   } finally { await pool.end(); }

@@ -4,7 +4,7 @@ import type { Scope } from "../content-editing/authority";
 import { object, text } from "../canonical/model";
 import type { Actor, CustomerAuthority, Permission, ProposalAuthority } from "../content-editing/proposal";
 
-type Operation = Permission | "review-private-stage" | "enroll" | "rotate" | "revoke" | "issue";
+type Operation = Permission | "review-private-stage" | "authorize-native-draft" | "enroll" | "rotate" | "revoke" | "issue";
 type Grant = Actor & { customer?: CustomerAuthority };
 
 export function customerMandate(value: unknown): CustomerAuthority {

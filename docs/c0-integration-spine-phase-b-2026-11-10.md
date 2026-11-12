@@ -307,3 +307,44 @@ inputs with WordPress's native block parser. No posts were written and
 the installed plugin was unchanged. This projection has no CLI entry
 point. Durable authorization, a guarded writer, rollback and a
 Core-reconciled application receipt remain open.
+
+### Theme and draft authorization
+
+The [service model](web-presence-service-model.md) and [content-growth loop](content-growth-loop.md)
+remain the controlling plan. Native drafts provide the review surface for
+the inquiry-to-improvement cycle. The theme only renders that surface.
+
+- **Hosted:** MioPages Managed Site 0.1.0 was checksum-verified and installed
+  on the protected WordPress development installation. WordPress recognized
+  it as a block theme. A process-local WP-CLI preview exercised its page
+  template, global stylesheet, palette and Gutenberg content with a synthetic
+  sample. Twenty Twenty-Five 1.5 remains active and MioPages Delivery 0.0.6
+  remains installed. The sample HTML is ignored locally at
+  `runtime-content/miopages-managed-site-hosted-theme-0.1.0.html`.
+  It illustrates the reusable theme and contains no native draft posts.
+- **Theme boundary:** Semantic surface, ink, brand and supporting presets
+  give Core stable presentation targets. The same block theme can serve
+  multiple Managed Sites. Mapping Core visual direction to selected presets
+  and reviewable page design remains open. The theme has no synchronization,
+  canonical content, approvals or business logic.
+- **Locally implemented:** Protected `authorize-site-draft` requires a
+  distinct scoped authorizer and an independently authenticated reviewer.
+  It rederives the exact site digest and binds immutable revision and
+  predecessor records under migration 0018. It does not confer customer
+  acceptance or public publication. The existing staging receipt still
+  acknowledges only signed staged bytes.
+- **Pending:** Migration 0018 has not been applied to hosted Supabase.
+  The existing migration runner exposes separate `apply-native-draft-stage`
+  and `verify-native-draft-stage` operations. Signed draft authorization
+  transport, guarded native materialization, application receipt and
+  rollback must be connected before updating the hosted plugin or creating
+  WordPress drafts. No short-lived principals were enrolled in this slice.
+  Issue #10 remains separate. Inquiry acceptance remains connected in the
+  local cycle, and customer outcome feedback and first-party measurement
+  remain separate product work.
+
+Both WordPress delivery integration tests and all ten database rollout
+regressions passed. The tests exercised the 0017-to-0018 upgrade and retry,
+exact authorization retries, reviewer-only refusal, mismatched digest
+refusal, restricted pull-role access and two linked authorized revisions.
+TypeScript and targeted lint passed.

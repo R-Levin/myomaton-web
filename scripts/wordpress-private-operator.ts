@@ -43,8 +43,10 @@ async function main() {
       case "review":
         result = await service.review.review(context, command.input as Parameters<typeof service.review.review>[1]);
         break;
-      case "preview-site-draft": {
-        const input = object(command.input, ["site", "references", "draft"]);
+      case "preview-site-draft":
+      case "authorize-site-draft": {
+        const authorizing = command.operation === "authorize-site-draft";
+        const input = object(command.input, ["site", "references", "draft", ...(authorizing ? ["reviewerToken", "expectedDigest"] : [])]);
         const site = object(input.site, ["organizationId", "webPresenceId", "managedSiteId"]);
         if (!Array.isArray(input.references) || input.references.length < 1 || input.references.length > 16) {
           throw Error("Invalid draft page references");
@@ -53,8 +55,12 @@ async function main() {
           const ref = object(value, ["proposalId", "approvalId"]);
           return { proposalId: uuid(ref.proposalId), approvalId: hash(ref.approvalId) };
         });
-        result = await service.review.previewSiteDraft(context, { organizationId: uuid(site.organizationId),
-          webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) }, references, input.draft);
+        const scope = { organizationId: uuid(site.organizationId),
+          webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
+        result = authorizing
+          ? await service.review.authorizeSiteDraft(context, await service.operator.authenticate(input.reviewerToken),
+            scope, references, input.draft, input.expectedDigest)
+          : await service.review.previewSiteDraft(context, scope, references, input.draft);
         break;
       }
       case "enroll":

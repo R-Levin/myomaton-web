@@ -84,11 +84,21 @@ export class PrivateReleaseReview {
 
   // Review-only. A digest returned here does not grant draft materialization.
   async previewSiteDraft(context: unknown, site: Site, references: readonly { proposalId: string; approvalId: string }[], draft: unknown) {
+    return this.siteDraft(context, site, references, draft);
+  }
+
+  async authorizeSiteDraft(context: unknown, reviewer: unknown, site: Site,
+    references: readonly { proposalId: string; approvalId: string }[], draft: unknown, expectedDigest: unknown) {
+    return this.siteDraft(reviewer, site, references, draft, { context, digest: hash(expectedDigest) });
+  }
+
+  private async siteDraft(context: unknown, site: Site, references: readonly { proposalId: string; approvalId: string }[], draft: unknown,
+    decision?: { context: unknown; digest: string }) {
     if (!Array.isArray(references) || references.length < 1 || references.length > 16) throw Error("Invalid draft page references");
     site = { organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
     const db = await this.pool.connect();
     try {
-      await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+      await db.query(decision ? "BEGIN ISOLATION LEVEL SERIALIZABLE" : "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
       await this.boundary(db);
       await db.query("SET LOCAL TIME ZONE 'UTC'");
       const reviewer = await this.operator.authorizeIn(db, context, "review-private-stage", site);
@@ -104,6 +114,25 @@ export class PrivateReleaseReview {
         AND organization_id=$2 AND web_presence_id=$3 AND managed_site_id=$4 AND status='active'`,
       [result.candidate.installationId, site.organizationId, site.webPresenceId, site.managedSiteId]);
       if (!rowCount) throw Error("Draft installation scope mismatch");
+      if (decision) {
+        const authorizer = await this.operator.authorizeIn(db, decision.context, "authorize-native-draft", site);
+        if (authorizer.operatorId === reviewer.operatorId || members.some(member => member.approver === authorizer.operatorId)) {
+          throw Error("Independent draft authorizer required");
+        }
+        if (decision.digest !== result.digest) throw Error("Draft preview digest mismatch");
+        const { installationId, siteProposalId, revision, previousDigest } = result.candidate;
+        const key = [installationId, siteProposalId, revision];
+        const values = [...key, result.digest, previousDigest, reviewer.authorityReference, authorizer.authorityReference];
+        if (revision > 1 && !(await db.query(`SELECT 1 FROM wordpress_native_draft_authorizations WHERE installation_id=$1
+          AND site_proposal_id=$2 AND revision=$3 AND candidate_digest=$4`,
+        [installationId, siteProposalId, revision - 1, previousDigest])).rowCount) throw Error("Prior draft authorization mismatch");
+        await db.query(`INSERT INTO wordpress_native_draft_authorizations
+          (installation_id,site_proposal_id,revision,candidate_digest,previous_digest,reviewer_grant_id,authorizer_grant_id)
+          VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (installation_id,site_proposal_id,revision) DO NOTHING`, values);
+        if (!(await db.query(`SELECT 1 FROM wordpress_native_draft_authorizations WHERE installation_id=$1
+          AND site_proposal_id=$2 AND revision=$3 AND candidate_digest=$4 AND previous_digest IS NOT DISTINCT FROM $5::text
+          AND reviewer_grant_id=$6 AND authorizer_grant_id=$7`, values)).rowCount) throw Error("Draft authorization conflict");
+      }
       await db.query("COMMIT");
       return result;
     } catch (error) {

@@ -206,17 +206,18 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
         await admin.query(`CREATE ROLE "${role}" LOGIN PASSWORD '${password}'`);
       }
       await admin.query(`GRANT USAGE ON SCHEMA "${fixture.schema}" TO ${operatorRole},${pullRole}`);
-      const migrate = async () => {
+      const migrate = async (nativeDraft = false) => {
         const db = await admin.connect();
         try {
           await db.query("BEGIN");
-          await integratePrivateStage(db, fixture.schema);
+          await integratePrivateStage(db, fixture.schema, nativeDraft);
           await db.query("COMMIT");
         } catch (error) { await db.query("ROLLBACK"); throw error; }
         finally { db.release(); }
       };
       await migrate();
-      await migrate();
+      await migrate(true);
+      await migrate(true);
 
       const login = (role: string) => {
         const url = new URL(cluster.url);
@@ -253,6 +254,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
         const approver = await provision(["approve-site-proposal", "review-private-stage"]);
         const author = await provision(["prepare-site-proposal", "revise-site-proposal", "preview-site-proposal"]);
         const reviewer = await provision(["review-private-stage", "enroll", "issue", "revoke"]);
+        const authorizer = await provision(["authorize-native-draft"]);
         const expired = await provision(["enroll"], new Date(0));
         const origin = "https://core.example.test";
         const protectedServices = protectedOperatorServices(operatorDb, boundary(operatorRole), origin);
@@ -261,6 +263,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
         const reviewerContext = await protectedServices.operator.authenticate(reviewer.token);
         const authorContext = await protectedServices.operator.authenticate(author.token);
         const approverContext = await protectedServices.operator.authenticate(approver.token);
+        const authorizerContext = await protectedServices.operator.authenticate(authorizer.token);
         await assert.rejects(protectedServices.operator.authorize(reviewerContext, "issue", { ...site, managedSiteId: randomUUID() }), /authorization refused/);
 
         const approvePage = async (page = fixture.page, expected?: Parameters<ReturnType<typeof protectedServices.proposals>["prepare"]>[5]) => {
@@ -463,6 +466,13 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           const initialDraft = await protectedServices.review.previewSiteDraft(reviewerContext, site, [homeDecision, review], draftIntent);
           assert.deepEqual(initialDraft.candidate.pages.map(item => item.path), ["/", "/service"]);
           assert.deepEqual(await protectedServices.review.previewSiteDraft(reviewerContext, site, [homeDecision, review], draftIntent), initialDraft);
+          const authorizeDraft = (context: unknown, digest = initialDraft.digest) => protectedServices.review.authorizeSiteDraft(
+            context, reviewerContext, site, [homeDecision, review], draftIntent, digest);
+          await assert.rejects(authorizeDraft(reviewerContext), /authorization refused/);
+          await assert.rejects(authorizeDraft(authorizerContext, "0".repeat(64)), /preview digest mismatch/);
+          assert.deepEqual(await authorizeDraft(authorizerContext), initialDraft);
+          assert.deepEqual(await authorizeDraft(authorizerContext), initialDraft);
+          await assert.rejects(pullDb.query("SELECT * FROM wordpress_native_draft_authorizations"), /permission denied/);
           await assert.rejects(protectedServices.review.previewSiteDraft(reviewerContext, site, [homeDecision, review],
             { ...draftIntent, installationId: randomUUID() }), /installation scope/);
           await assert.rejects(protectedServices.review.previewSiteDraft(approverContext, site, [homeDecision, review], draftIntent), /Independent/);
@@ -498,6 +508,11 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
             { ...draftIntent, revision: 2, previousDigest: initialDraft.digest });
           assert.equal(updatedDraft.candidate.previousDigest, initialDraft.digest);
           assert.notEqual(updatedDraft.digest, initialDraft.digest);
+          const nextIntent = { ...draftIntent, revision: 2, previousDigest: initialDraft.digest };
+          assert.deepEqual(await protectedServices.review.authorizeSiteDraft(authorizerContext, reviewerContext, site,
+            [homeDecision, decision], nextIntent, updatedDraft.digest), updatedDraft);
+          const authorizations = await admin.query("SELECT revision,candidate_digest FROM miopages_wp.wordpress_native_draft_authorizations ORDER BY revision");
+          assert.deepEqual(authorizations.rows, [{ revision: 1, candidate_digest: initialDraft.digest }, { revision: 2, candidate_digest: updatedDraft.digest }]);
           assert.equal(revised.manifest.previous, initial.digest);
           assert.notEqual(revised.digest, initial.digest);
           assert.deepEqual(revised.manifest.pages[0], initial.manifest.pages[0]);

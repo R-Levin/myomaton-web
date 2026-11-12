@@ -467,6 +467,12 @@ records the owner direction, actual access checks and the exact site
 preview implementation. The existing site review bridge remains the
 local baseline until a native WordPress application and rollback pass.
 
+The [theme and draft authorization checkpoint](c0-integration-spine-phase-b-2026-11-10.md#theme-and-draft-authorization)
+records the installed development theme and the local exact draft-approval
+extension. Core retains knowledge, approval and delivery authority. The
+theme owns rendering. The native writer, receipt and rollback still gate
+hosted draft acceptance.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier
