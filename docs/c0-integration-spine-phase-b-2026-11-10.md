@@ -139,3 +139,39 @@ both site versions and verified the navigation, inquiry link, C0 transition
 copy, manifest digests and before/after Service text. The integration test
 also refused foreign-scope members, mismatched bases and receipts, and a
 revised member from a different proposal. TypeScript and targeted lint passed.
+
+## Role-played Operator review and draft plan
+
+[Owner decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6826131281)
+
+Regenerate the walkthrough using the PowerShell command above on the
+current `codex/first-operational-cycle-2026-11-12` checkout. Open **Operator
+review** and choose **Content Reviewer**. Compare the Service wording and
+add an observation or change request. Switch to **Technical Operator** in
+the same page. Read the handoff, inspect the version 2 manifest and draft
+plan, and add a QA observation or technical change request back to Content
+Reviewer. Both perspectives use version 2 of the same candidate. Notes
+stay in the page and clear on reload. The roles are provisional examples
+to evaluate which responsibilities and handoffs make sense.
+
+The separate Customer preview is still a non-public local capture.
+Customer sharing and response remain subject to staged access and P7.
+Role-play can neither record a real decision nor satisfy principal separation,
+customer consent, exact approval, or release authorization.
+
+The PHP test preview extracts draft-only Page inputs from each exact
+validated signed object. The candidate manifest now binds each source
+approval and draft input digest. The local draft plan collects both inputs,
+paths, navigation and Contact intent under that manifest digest. Its state
+is blocked pending site-level approval and native materialization. No
+WordPress record is created by the plan. The next integration step is an
+exact site-level preview and approval, followed by a rollback-capable
+private draft writer and receipt reconciliation. The synthetic inquiry and
+measurement still exercise the existing local cycle. Real AI interviewing,
+lead qualification and durable first-party measurement remain separate
+development tracks.
+
+Both local WordPress integration tests passed. The final focused rerun
+verified role switching and notes in both directions in the generated
+browser document, literal rendering of note text, the script policy hash,
+and both draft input digests. TypeScript, targeted lint and PHP syntax passed.

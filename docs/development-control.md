@@ -454,6 +454,13 @@ stage-appropriate Customer and Operator access and distinct permissions.
 See the [architecture](platform-service-architecture.md) and [handoff](c0-integration-spine-phase-b-2026-11-10.md#unified-private-site-candidate).
 This is a documentation clarification within the existing implementation scope.
 
+The [role-play acceptance decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6826131281)
+is implemented in the [same local site walkthrough](c0-integration-spine-phase-b-2026-11-10.md#role-played-operator-review-and-draft-plan).
+The Content Reviewer and Technical Operator are provisional test perspectives.
+The draft plan is derived from verified stage bytes and binds to the candidate
+digest. It cannot be applied until exact site-level approval and native private
+materialization are implemented.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

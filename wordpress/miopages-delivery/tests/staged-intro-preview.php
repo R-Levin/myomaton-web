@@ -53,6 +53,13 @@ try {
         'objectSha256' => $digest,
         'pageId' => $page['id'],
         'sectionId' => $section['id'],
+        'draftInput' => [
+            'post_type' => 'page',
+            'post_status' => 'draft',
+            'post_title' => $page['title'],
+            'heading' => $section['content']['heading'],
+            'paragraph' => $section['content']['text'],
+        ],
         'html' => '<article aria-label="Private staged Intro"><p>' . $escape($page['title']) . ' · ' . $escape($expectedPath) . '</p>'
             . '<h3>' . $escape($section['content']['heading']) . '</h3>'
             . '<p>' . nl2br($escape($section['content']['text']), false) . '</p></article>',

@@ -5,10 +5,14 @@ import { normalizeDestination } from "../../lib/platform/actions/model";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import type { Site } from "../../lib/platform/wordpress-delivery/authority";
 
+export type DraftInput = {
+  post_type: "page"; post_status: "draft"; post_title: string; heading: string; paragraph: string;
+};
+
 type StagedPage = {
   site: Site; path: "/" | "/service"; pageId: string; proposalId: string; revision: number;
-  sourceDigest: string; projectionDigest: string; previewDigest: string;
-  release: string; receipt: string; objectSha256: string; html: string;
+  sourceDigest: string; projectionDigest: string; previewDigest: string; approvalId: string;
+  release: string; receipt: string; objectSha256: string; html: string; draftInput: DraftInput;
 };
 
 // Local composition of exact, separately governed stages. The digest is an
@@ -22,7 +26,10 @@ export function privateSiteCandidate(site: Site, home: StagedPage, service: Stag
   for (const member of [home, service]) {
     assert.deepEqual(member.site, site);
     assert.match(member.objectSha256, /^[a-f0-9]{64}$/);
+    assert.match(member.approvalId, /^[a-f0-9]{64}$/);
     assert.equal(member.receipt, "staged:1:" + member.objectSha256);
+    assert.equal(member.draftInput.post_type, "page");
+    assert.equal(member.draftInput.post_status, "draft");
   }
   if (previous) {
     assert.deepEqual(previous.manifest.site, site);
@@ -32,7 +39,8 @@ export function privateSiteCandidate(site: Site, home: StagedPage, service: Stag
     assert.equal(previous.pages.service.revision + 1, service.revision);
     assert.notEqual(previous.pages.service.objectSha256, service.objectSha256);
   }
-  const metadata = ({ html, ...binding }: StagedPage) => ({ ...binding, renderedDigest: fingerprint(html) });
+  const metadata = ({ html, draftInput, ...binding }: StagedPage) =>
+    ({ ...binding, renderedDigest: fingerprint(html), draftInputDigest: fingerprint(draftInput) });
   const manifest = { site, version: previous ? previous.manifest.version + 1 : 1, previous: previous?.digest ?? null,
     navigation: ["/", "/service"], action: { type: "contact", destination: normalizeDestination("contact", "#inquiry") },
     pages: [metadata(home), metadata(service)] };
@@ -41,7 +49,8 @@ export function privateSiteCandidate(site: Site, home: StagedPage, service: Stag
 
 type PrivateSiteCandidate = {
   manifest: { site: Site; version: number; previous: string | null; navigation: string[];
-    action: { type: string; destination: string | null }; pages: (Omit<StagedPage, "html"> & { renderedDigest: string })[] };
+    action: { type: string; destination: string | null };
+    pages: (Omit<StagedPage, "html" | "draftInput"> & { renderedDigest: string; draftInputDigest: string })[] };
   digest: string;
   pages: { home: StagedPage; service: StagedPage };
 };
@@ -69,4 +78,8 @@ export async function writePrivateSiteCandidate(directory: string, candidate: Pr
   }
   await writeFile(path.join(target, "candidate.json"), JSON.stringify({ digest: candidate.digest, ...candidate.manifest }, null, 2) + "\n",
     { flag: "wx", mode: 0o600 });
+  const plan = { candidateDigest: candidate.digest, state: "blocked-pending-site-approval-and-native-materializer",
+    navigation: candidate.manifest.navigation, action: candidate.manifest.action,
+    pages: [candidate.pages.home, candidate.pages.service].map(({ pageId, path, draftInput }) => ({ pageId, path, draftInput })) };
+  await writeFile(path.join(target, "wordpress-draft-plan.json"), JSON.stringify(plan, null, 2) + "\n", { flag: "wx", mode: 0o600 });
 }

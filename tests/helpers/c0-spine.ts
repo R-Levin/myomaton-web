@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { createHash, randomUUID } from "node:crypto";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { IntelligentOnboarding } from "../../lib/platform/intake/intelligent";
@@ -206,8 +206,13 @@ nav{display:flex;flex-wrap:wrap;gap:1rem}a{color:#075581}dt{font-weight:700}dd{m
 summary{cursor:pointer;font-weight:700}.status{color:#174e48;font-weight:700}</style></head>`;
   await writePrivateSiteCandidate(directory, cycle.initial, shell);
   await writePrivateSiteCandidate(directory, cycle.revised, shell);
-  await writeFile(file, `${shell}<body><main><p>MioPages · Disposable C0-derived rehearsal</p><h1>From onboarding to a better website</h1>
-<p>Follow a saved business answer through private staging, a synthetic inquiry and a reviewed improvement. This is a read-only capture of the local run.</p>
+  const script = (await Promise.all(["scripts/operator-overview/role-preview.js", "tests/helpers/c0-role-play.js"]
+    .map(source => readFile(source, "utf8")))).join("\n").replace(/\r\n?/g, "\n");
+  assert.doesNotMatch(script, /<\/script/i);
+  const scriptHash = createHash("sha256").update(script).digest("base64");
+  const reviewShell = shell.replace("form-action 'none'", `script-src 'sha256-${scriptHash}'; form-action 'none'`);
+  await writeFile(file, `${reviewShell}<body><main><p>MioPages · Disposable C0-derived rehearsal</p><h1>From onboarding to a better website</h1>
+<p>Follow a saved business answer through private staging, a synthetic inquiry and a reviewed improvement. The recorded evidence is read-only.</p>
 <nav aria-label="Walkthrough"><a href="#interview">1. Business knowledge</a><a href="#customer">2. Customer preview</a><a href="#measurement">3. Inquiry and measurement</a><a href="#operator">4. Operator review</a><a href="#after">5. Improved preview</a></nav>
 <section id="interview"><h2>1. Interview</h2><p>Managed Launch and Ongoing came from the C0 brief. Both answers below are rehearsal inputs and remain staged.</p>
 <details open><summary>Direct start · delivered path</summary>${interviewDetails(interview.direct)}</details>
@@ -227,6 +232,34 @@ ${fields({ "Accepted inquiries": cycle.inquiry.accepted, "Notifications delivere
 <p>A single question identifies a point of confusion. It cannot establish how common that confusion is.</p></section>
 <section id="operator"><h2>4. Operator review · Fixture decision</h2>
 <p>Add an explicit instruction about bringing the existing website address. Preserve the managed-service description. The author, exact preview approver and independent projection reviewer used separate scoped test authority.</p>
+<h3>Try the handoff on site candidate version ${cycle.revised.manifest.version}</h3>
+<p>Simulated persona: owner acting as an Operator. Switching perspectives changes the work shown and the kind of note you can leave. This rehearsal has no sign-in or authority to approve, share, stage or publish.</p>
+<label for="operator-role">Active simulated role</label>
+<select id="operator-role" disabled><option value="content-reviewer">Content Reviewer</option><option value="technical-operator">Technical Operator</option></select>
+<noscript><p>Enable JavaScript to switch simulated roles and try the handoff.</p></noscript>
+<div data-role-example="content-reviewer">
+  <h4>Review what the candidate says</h4>
+  <p>Check that the transition is clear and that Service answers the sample inquiry. Leave a content observation or change request for the Technical Operator.</p>
+  <details><summary>Compare Service wording</summary>${cycle.initial.pages.service.html}${cycle.revised.pages.service.html}</details>
+  <p><a href="#customer">Inspect the customer preview</a></p>
+</div>
+<div data-role-example="technical-operator" hidden>
+  <h4>Check staging and review readiness</h4>
+  <p>Compare the candidate versions and exact receipts. Check the Home and Service navigation and inquiry target. Send QA findings back to the Content Reviewer.</p>
+  <p><a href="site-v2/candidate.json">Inspect the revised site manifest</a> · <a href="site-v2/wordpress-draft-plan.json">Inspect the blocked WordPress draft plan</a></p>
+  <p>Native WordPress drafts need exact site-level approval and a private materializer. This candidate has separately approved page evidence.</p>
+</div>
+<form id="rehearsal-note">
+  <fieldset disabled><legend>Simulated handoff note</legend>
+    <label for="note-category">Type</label> <select id="note-category" name="category"></select>
+    <p><label for="note-text">Note</label><br><textarea id="note-text" name="note" rows="3" cols="36" maxlength="500" required></textarea></p>
+    <button type="submit">Add rehearsal note</button>
+  </fieldset>
+</form>
+<p id="rehearsal-note-status" role="status"></p>
+<h4>Handoff for version ${cycle.revised.manifest.version} · Local notes</h4>
+<p>Notes stay in this page and are discarded on reload. Customer sharing, customer feedback and exact site approval remain separate future workflow stages.</p>
+<ol id="rehearsal-handoff"></ol>
 <details><summary>Version, authority and receipt evidence</summary>${fields({ ...evidence,
   "Direct draft digest": interview.direct.draftDigest, "Review-led draft digest": interview.reviewLed.draftDigest,
   "Direct assessment sources": interview.direct.finding.sourceIds.join(", "), "Review-led assessment sources": interview.reviewLed.finding.sourceIds.join(", "),
@@ -239,6 +272,6 @@ ${fields({ "Accepted inquiries": cycle.inquiry.accepted, "Notifications delivere
 <p><a href="site-v1/service.html">Service before</a> · <a href="site-v2/service.html">Service after</a> · <a href="site-v2/index.html">Open the revised candidate</a></p>
 <p><strong>Next measurement.</strong> Check whether future visitors provide a site address without asking what to bring. No follow-up data or effect is recorded.</p>
 <p>Customer signoff and publication remain separate decisions. The fixture was disposed after capture.</p>
-</section></main></body></html>`, { flag: "wx", mode: 0o600 });
+</section></main><script>${script}</script></body></html>`, { flag: "wx", mode: 0o600 });
   return file;
 }

@@ -19,7 +19,7 @@ import { protectedOperatorServices } from "../../lib/platform/wordpress-delivery
 import { inspectCanonical, writeCanonical } from "../../lib/platform/canonical/writes";
 import { requestMac, WordPressDelivery } from "../../lib/platform/wordpress-delivery/service";
 import { c0SpineInterview, prepareCycleInquiry, presenceDirection, writeC0SpineReview } from "../helpers/c0-spine";
-import { privateSiteCandidate } from "../helpers/private-site-candidate";
+import { privateSiteCandidate, type DraftInput } from "../helpers/private-site-candidate";
 
 async function initializeWordPressTestBaseline(url: string) {
   const baseline = new Pool({ connectionString: url });
@@ -375,7 +375,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
             const child = spawnSync("php", ["wordpress/miopages-delivery/tests/staged-intro-preview.php"],
               { encoding: "utf8", input: JSON.stringify(input) });
             assert.equal(child.status, 0, "Private staged Intro refused");
-            return JSON.parse(child.stdout) as { objectSha256: string; pageId: string; sectionId: string; html: string };
+            return JSON.parse(child.stdout) as { objectSha256: string; pageId: string; sectionId: string; html: string; draftInput: DraftInput };
           };
           const rendered = await render();
           assert.deepEqual([rendered.objectSha256, rendered.pageId, rendered.sectionId],
@@ -439,12 +439,12 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
                 releaseId: stageRelease, approvalId: decision.approvalId, digest, path: pathName }),
             });
             assert.equal(child.status, 0, child.stderr);
-            const stagedPage = JSON.parse(child.stdout) as { objectSha256: string; html: string; pageId: string };
+            const stagedPage = JSON.parse(child.stdout) as { objectSha256: string; html: string; pageId: string; draftInput: DraftInput };
             assert.equal(stagedPage.objectSha256, digest);
             assert.deepEqual(await readdir(stageDirectory), [".release.lock", "objects"]);
             return { ...stagedPage, site, path: pathName, proposalId: decision.proposalId, revision: decision.binding.revision,
               sourceDigest: projection.sourceDigest, projectionDigest: projection.projectionDigest,
-              receipt: marker, release: stageRelease, previewDigest: decision.previewDigest };
+              receipt: marker, release: stageRelease, previewDigest: decision.previewDigest, approvalId: decision.approvalId };
           };
           const homePage = { ...page, pageId: randomUUID(), slug: "/", title: fixture.editorial("MioPages Home"),
             sections: [{ ...page.sections[0], id: randomUUID(), heading: fixture.editorial("What’s next for MioPages"),
@@ -455,7 +455,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           assert.match(home.html, /moving from legacy offerings/);
           const service = { ...rendered, site, path: "/service" as const, proposalId: review.proposalId,
             revision: review.binding.revision, sourceDigest: preview.sourceDigest, projectionDigest: preview.projectionDigest,
-            receipt: exactReceipt, release: releaseId, previewDigest: review.previewDigest };
+            receipt: exactReceipt, release: releaseId, previewDigest: review.previewDigest, approvalId: review.approvalId };
           const initial = privateSiteCandidate(site, home, service);
           assert.throws(() => privateSiteCandidate(site, home, { ...service, site: { ...site, managedSiteId: randomUUID() } }));
           assert.throws(() => privateSiteCandidate(site, home, { ...service, sourceDigest: "0".repeat(64) }));
@@ -472,6 +472,10 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           assert.equal(improved.pageId, rendered.pageId);
           assert.notEqual(improved.objectSha256, rendered.objectSha256);
           assert.match(improved.html, /Bring its address to the first conversation/);
+          assert.equal(improved.draftInput.heading, inquiry.recommendation);
+          assert.equal(improved.draftInput.paragraph, serviceDirection);
+          assert.throws(() => privateSiteCandidate(site, home, { ...improved,
+            draftInput: { ...improved.draftInput, post_status: "publish" as "draft" } }, initial));
           const currentHome = await protectedServices.review.review(reviewerContext, homeDecision);
           assert.equal(currentHome.projectionDigest, home.projectionDigest);
           assert.equal(currentHome.sourceDigest, home.sourceDigest);
@@ -512,6 +516,50 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
     } finally { await fixture.stop(); }
   } finally { await cluster.stop(); }
   if (process.env.MIOPAGES_C0_SPINE_REVIEW === "1" && walkthrough) {
-    console.log("C0 spine review: " + await writeC0SpineReview(...walkthrough));
+    const file = await writeC0SpineReview(...walkthrough);
+    const { JSDOM } = await import("jsdom");
+    const browser = new JSDOM(await readFile(file, "utf8"), { url: "file:///rehearsal/index.html", runScripts: "outside-only" });
+    try {
+      const { document, Event } = browser.window;
+      const script = document.querySelector("script")!.textContent!;
+      const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]')!.getAttribute("content")!;
+      assert.ok(csp.includes("'sha256-" + createHash("sha256").update(script).digest("base64") + "'"));
+      browser.window.eval(script);
+      const role = document.querySelector<HTMLSelectElement>("#operator-role")!;
+      const form = document.querySelector<HTMLFormElement>("#rehearsal-note")!;
+      const note = document.querySelector<HTMLTextAreaElement>("#note-text")!;
+      const category = document.querySelector<HTMLSelectElement>("#note-category")!;
+      const submit = (value: string) => {
+        note.value = value;
+        assert.equal(form.dispatchEvent(new Event("submit", { cancelable: true })), false);
+      };
+      assert.equal(role.disabled, false);
+      assert.equal(role.value, "content-reviewer");
+      category.value = "Request a content change";
+      submit("Check the transition wording <example>.");
+      role.value = "technical-operator";
+      role.dispatchEvent(new Event("change"));
+      assert.equal(document.querySelector<HTMLElement>('[data-role-example="content-reviewer"]')!.hidden, true);
+      assert.equal(document.querySelector<HTMLElement>('[data-role-example="technical-operator"]')!.hidden, false);
+      assert.equal(category.value, "QA observation");
+      assert.match(document.querySelector("#rehearsal-handoff")!.textContent!, /Content Reviewer → Technical Operator.*<example>/);
+      assert.equal(document.querySelector("#rehearsal-handoff example"), null);
+      submit("The Home and Service routes match the candidate.");
+      assert.match(document.querySelector("#rehearsal-handoff")!.textContent!, /Technical Operator → Content Reviewer/);
+      role.value = "content-reviewer";
+      role.dispatchEvent(new Event("change"));
+      assert.equal(document.querySelectorAll("#rehearsal-handoff li").length, 2);
+    } finally { browser.window.close(); }
+    const dir = path.join(path.dirname(file), "site-v2");
+    const manifest = JSON.parse(await readFile(path.join(dir, "candidate.json"), "utf8"));
+    const plan = JSON.parse(await readFile(path.join(dir, "wordpress-draft-plan.json"), "utf8"));
+    assert.equal(plan.candidateDigest, manifest.digest);
+    assert.equal(plan.state, "blocked-pending-site-approval-and-native-materializer");
+    for (const [i, page] of plan.pages.entries()) {
+      assert.equal(page.draftInput.post_status, "draft");
+      assert.equal(fingerprint(page.draftInput), manifest.pages[i].draftInputDigest);
+      assert.equal(page.pageId, manifest.pages[i].pageId);
+    }
+    console.log("C0 spine review: " + file);
   }
 });
