@@ -175,3 +175,63 @@ Both local WordPress integration tests passed. The final focused rerun
 verified role switching and notes in both directions in the generated
 browser document, literal rendering of note text, the script policy hash,
 and both draft input digests. TypeScript, targeted lint and PHP syntax passed.
+
+## Pending native draft authorization
+
+The current [Issue #12 milestone](https://github.com/R-Levin/myomaton-web/issues/12)
+is to create actual native, non-public Home and Service drafts and carry the
+synthetic inquiry through a governed revision, rollback and remeasurement
+handoff. This advances the approved [managed service](web-presence-service-model.md#ongoing-service-and-value),
+[content-growth loop](content-growth-loop.md#human-review-and-publication-approval)
+and [measurement contract](measurement-and-analytics.md#business-change-context).
+It adds a real surface for reviewing and testing improvements while leaving
+business outcomes, approved public release and remeasurement as distinct stages.
+
+**Implemented boundary.** The protected [release source](../lib/platform/wordpress-delivery/private-source.ts)
+resolves one latest `PageProposal` and one exact approval. It explicitly
+refuses Action-bound content. [Migration 0017](../lib/platform/wordpress-delivery/0017_private_stage_authority.sql)
+requires the matching proposal and approval pair. The signed envelope
+accepts multiple pages, but it does not establish approval of their
+combined navigation and visitor actions. The existing PHP staging store
+writes immutable files and the receipt acknowledges those bytes. Neither
+is a native WordPress draft write or an application receipt.
+
+**Proposed decision for owner discussion.** Preserve the existing per-page
+approvals and add one exact, site-scoped non-public draft authorization
+over the ordered page revisions, navigation, resolved Actions, canonical
+base, installation and prior draft version. Reuse Core's protected
+principal and independent review pattern. Use separate fixture principals
+in the disposable test. A scoped Operator would authorize materialization
+for QA and customer review. The customer would review the resulting
+non-public revision, request changes, or provide exact launch acceptance
+when eligible. Customer launch acceptance and public release authority
+remain separate from the draft authorization. Simulated roles have no
+authority in this path.
+
+**Acceptance after the decision.** Reject stale or foreign members, changed
+navigation or Action targets, and approval/reviewer conflicts. Write or
+revise only the identified native drafts, link Home and Service, and
+reconcile a new draft-application receipt to the exact site version.
+Keep the staged-object receipt distinct. Roll back to the matching prior
+draft revision and verify the restored pages, links and Action. The local
+test needs an isolated real WordPress runtime and database. The current
+CLI test runs PHP with WordPress shims and has no native writer.
+
+The tempting shortcut is to write drafts from the existing local manifest
+using two Page approvals. That would leave the site's composition and
+Action outside the authority evidence. This is a material approval-contract
+change, so implementation is paused. No new grant, migration, native write
+or owner approval has been recorded.
+
+Baseline verification from `37cac856` passed both local PostgreSQL/PHP
+delivery integration tests, including the inquiry-driven revision, signed
+receipts and simulated role handoff. This verifies the existing bridge.
+Native draft creation and rollback are still unverified.
+
+Keep Issue #10's genuine AI interview on its separate branch. The next
+measurement slice should attach a customer-confirmed qualification or
+outcome to an accepted inquiry and preserve an explicit unknown when no
+answer exists. First-party signals should tie to an exact candidate and
+baseline before any post-change comparison. Those are parallel product
+capabilities under the existing contracts. The current inquiry, snapshot,
+recommendation and role notes remain local fixtures.

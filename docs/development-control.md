@@ -461,6 +461,13 @@ The draft plan is derived from verified stage bytes and binds to the candidate
 digest. It cannot be applied until exact site-level approval and native private
 materialization are implemented.
 
+The next Issue #12 milestone is native non-public WordPress drafts, with
+the same intake-to-improvement cycle. The [pending draft authorization decision](c0-integration-spine-phase-b-2026-11-10.md#pending-native-draft-authorization)
+records the one-Page release constraint and the proposed site-level review
+boundary. Native writes and changes to the protected approval contract
+are paused for owner discussion. The existing site review bridge remains
+the local baseline.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier
