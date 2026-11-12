@@ -20,9 +20,10 @@ final class MioPages_Native_Draft_Writer
         $candidate = $payload['candidate'];
         $digest = $payload['digest'];
         if ($payload['operation'] === 'restore') {
-            return self::restore($candidate, $digest);
+            return ['operation' => 'restore', 'installationId' => $candidate['installationId'],
+                'requestedDigest' => $digest, 'applied' => self::restore($candidate, $digest)];
         }
-        return self::transaction($candidate['installationId'], function (?array $state) use ($candidate, $digest): array {
+        $applied = self::transaction($candidate['installationId'], function (?array $state) use ($candidate, $digest): array {
             $current = $state['current'] ?? null;
             if ($current !== null && $current['siteProposalId'] !== $candidate['siteProposalId']) {
                 throw new RuntimeException('Native draft proposal scope changed.');
@@ -57,6 +58,8 @@ final class MioPages_Native_Draft_Writer
             self::verifyDrafts($next);
             return ['current' => $next, 'previous' => $current, 'highWaterRevision' => $candidate['revision']];
         });
+        return ['operation' => 'apply', 'installationId' => $candidate['installationId'],
+            'requestedDigest' => $digest, 'applied' => $applied];
     }
 
     private static function restore(array $candidate, string $digest): array

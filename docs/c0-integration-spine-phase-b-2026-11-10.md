@@ -400,3 +400,14 @@ reconciled to Core. The implementation does not expose public routes,
 and intentional restore ends this bounded two-version rehearsal. Further
 revisions after restore need an explicit resumption contract. Plugin 0.0.8
 has not been installed or used to write hosted drafts.
+
+The next receipt increment authenticates WordPress's native readback with
+the scoped installation secret. The receipt uses a separate HMAC context
+from staging. Core validates the requested and applied digests, operation,
+installation, site proposal, revision, page paths, draft status and unique
+WordPress post IDs, and retains the exact content hashes for reconciliation.
+The verifier takes its expected values from the caller's Core decision.
+Durable receipt recording, lookup of the authoritative expected decision
+and the hosted apply/restore test remain open. The test used synthetic
+readback data and the real PHP receipt format. No hosted plugin or
+credentials changed in this increment.

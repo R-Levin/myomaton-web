@@ -20,20 +20,22 @@ require_once __DIR__ . '/includes/class-miopages-private-staging.php';
 
 if (defined('WP_CLI') && WP_CLI && defined('MIOPAGES_NATIVE_DRAFT_IDENTITY') && is_array(MIOPAGES_NATIVE_DRAFT_IDENTITY)) {
     require_once __DIR__ . '/includes/class-miopages-native-draft-writer.php';
+    require_once __DIR__ . '/includes/class-miopages-native-draft-receipt.php';
     WP_CLI::add_command('miopages native-draft', static function (): void {
         try {
+            $pull = defined('MIOPAGES_PRIVATE_PULL') ? MIOPAGES_PRIVATE_PULL : null;
+            $key = $pull['secretHex'] ?? null;
+            if (!is_string($key) || !preg_match('/^[a-f0-9]{64}$/D', $key)
+                || !is_string(MIOPAGES_NATIVE_DRAFT_IDENTITY['installationId'] ?? null)
+                || ($pull['identity']['installationId'] ?? null) !== MIOPAGES_NATIVE_DRAFT_IDENTITY['installationId']) {
+                throw new RuntimeException('Native draft receipt installation unavailable.');
+            }
             $wire = stream_get_contents(STDIN, 1048577);
             if (!is_string($wire)) {
                 throw new RuntimeException('Native draft input unavailable.');
             }
             $applied = MioPages_Native_Draft_Writer::apply($wire, MIOPAGES_NATIVE_DRAFT_IDENTITY);
-            $posts = [];
-            foreach ($applied['posts'] as $route => $post) {
-                $posts[] = ['path' => $route, 'id' => $post['ID'], 'status' => $post['post_status'],
-                    'contentSha256' => hash('sha256', $post['post_content'])];
-            }
-            WP_CLI::line(wp_json_encode(['candidateDigest' => $applied['digest'], 'revision' => $applied['revision'],
-                'posts' => $posts]));
+            WP_CLI::line(wp_json_encode(MioPages_Native_Draft_Receipt::create($applied, hex2bin($key))));
         } catch (Throwable $error) {
             WP_CLI::error('Native draft operation refused or failed. Verify WordPress state before retry.');
         }
