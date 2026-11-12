@@ -32,31 +32,57 @@ final class MioPages_Native_Draft_Writer
                 self::verifyDrafts($current);
                 return $state;
             }
-            if (($current['digest'] ?? null) !== $candidate['previousDigest']
-                || ($current['revision'] ?? 0) + 1 !== $candidate['revision']
-                || ($state['highWaterRevision'] ?? 0) >= $candidate['revision']) {
+            $restoredFrom = $state['restoredFrom'] ?? null;
+            $predecessor = $restoredFrom ?? ($current['digest'] ?? null);
+            if ($predecessor !== $candidate['previousDigest']
+                || ($state['highWaterRevision'] ?? 0) + 1 !== $candidate['revision']) {
                 throw new RuntimeException('Native draft predecessor mismatch.');
+            }
+            $logicalIds = array_column($candidate['pages'], 'id', 'path');
+            ksort($logicalIds);
+            if (count($logicalIds) !== count($candidate['pages'])
+                || count(array_unique($logicalIds)) !== count($logicalIds)) {
+                throw new RuntimeException('Native draft logical Page identity invalid.');
             }
             if ($current !== null) {
                 self::verifyDrafts($current);
+                $currentIds = $current['logicalPageIds'] ?? null;
+                $currentPaths = array_keys($current['posts']);
+                sort($currentPaths);
+                if ($currentPaths !== array_keys($logicalIds) || ($currentIds !== null && $currentIds !== $logicalIds)) {
+                    throw new RuntimeException('Native draft logical Page identity changed.');
+                }
             }
             $ids = [];
             foreach ($candidate['pages'] as $page) {
-                $ids[$page['path']] = self::savePost([
+                $path = $page['path'];
+                $ids[$path] = $current['posts'][$path]['ID'] ?? self::savePost([
                     'post_type' => 'page', 'post_status' => 'draft',
                     'post_title' => $page['title'], 'post_content' => '',
                 ]);
             }
             $posts = MioPages_Native_Draft_Content::posts($candidate, $ids);
-            foreach ($posts as $post) {
-                if (self::savePost($post) !== $post['ID']) {
-                    throw new RuntimeException('Native draft target changed.');
-                }
+            foreach ($posts as $path => &$post) {
+                $post['post_name'] = $current['posts'][$path]['post_name']
+                    ?? self::newSlug($path, $post['ID']);
+                self::updateDraft($post, $current['posts'][$path] ?? null);
             }
+            unset($post);
             $next = ['siteProposalId' => $candidate['siteProposalId'], 'revision' => $candidate['revision'],
-                'digest' => $digest, 'posts' => $posts];
+                'digest' => $digest, 'posts' => $posts, 'logicalPageIds' => $logicalIds];
             self::verifyDrafts($next);
-            return ['current' => $next, 'previous' => $current, 'highWaterRevision' => $candidate['revision']];
+            // The signed predecessor of a forward revision after a restore is
+            // the high-water authorization, not the currently materialized content.
+            // A later restore may only target the exact signed predecessor.
+            $previous = $restoredFrom === null ? $current : null;
+            if ($previous !== null && !isset($previous['logicalPageIds'])) {
+                $previous['logicalPageIds'] = $logicalIds;
+                foreach ($previous['posts'] as $path => &$post) {
+                    $post['post_name'] = $posts[$path]['post_name'];
+                }
+                unset($post);
+            }
+            return ['current' => $next, 'previous' => $previous, 'highWaterRevision' => $candidate['revision']];
         });
         return ['operation' => 'apply', 'installationId' => $candidate['installationId'],
             'requestedDigest' => $digest, 'applied' => $applied];
@@ -80,10 +106,75 @@ final class MioPages_Native_Draft_Writer
                 throw new RuntimeException('Native draft restoration predecessor mismatch.');
             }
             self::verifyDrafts($current);
+            if (isset($current['logicalPageIds'])) {
+                if (($previous['logicalPageIds'] ?? null) !== $current['logicalPageIds']) {
+                    throw new RuntimeException('Native draft restoration identity mismatch.');
+                }
+                foreach ($current['posts'] as $path => $post) {
+                    $prior = $previous['posts'][$path] ?? null;
+                    if ($prior === null || $prior['ID'] !== $post['ID'] || $prior['post_name'] !== $post['post_name']) {
+                        throw new RuntimeException('Native draft restoration target mismatch.');
+                    }
+                    self::updateDraft($prior, $post);
+                }
+            }
             self::verifyDrafts($previous);
             return ['current' => $previous, 'previous' => null, 'restoredFrom' => $digest,
                 'highWaterRevision' => $state['highWaterRevision']];
         });
+    }
+
+    private static function newSlug(string $path, int $id): string
+    {
+        $name = $path === '/' ? 'home' : sanitize_title(trim($path, '/'));
+        return wp_unique_post_slug(substr($name, 0, 160) . '-miopages-' . $id, $id, 'publish', 'page', 0);
+    }
+
+    private static function updateDraft(array $post, ?array $previous): void
+    {
+        $id = $post['ID'];
+        if ($post === $previous) {
+            return;
+        }
+        clean_post_cache($id);
+        if ($previous !== null && ($previous['post_title'] !== $post['post_title']
+            || $previous['post_content'] !== $post['post_content'])) {
+            self::saveRevision($id);
+        }
+        if (self::savePost($post) !== $id) {
+            throw new RuntimeException('Native draft target changed.');
+        }
+        self::saveRevision($id);
+    }
+
+    private static function saveRevision(int $id): void
+    {
+        $post = get_post($id);
+        if (!$post || !wp_revisions_enabled($post)) {
+            throw new RuntimeException('Native WordPress revisions are unavailable.');
+        }
+        foreach (wp_get_post_revisions($id) as $revision) {
+            if (wp_is_post_autosave($revision)) {
+                continue;
+            }
+            if ($revision->post_title === $post->post_title && $revision->post_content === $post->post_content) {
+                return;
+            }
+            break;
+        }
+        // WordPress normally folds whitespace when deciding whether to save.
+        // Preserve exact reviewed bytes when a managed revision changes them.
+        add_filter('wp_save_post_revision_check_for_changes', '__return_false');
+        try {
+            $saved = wp_save_post_revision($id);
+        } finally {
+            remove_filter('wp_save_post_revision_check_for_changes', '__return_false');
+        }
+        $revision = is_int($saved) && $saved > 0 ? get_post($saved) : null;
+        if (!$revision || wp_is_post_revision($revision) !== $id
+            || $revision->post_title !== $post->post_title || $revision->post_content !== $post->post_content) {
+            throw new RuntimeException('Native WordPress revision write failed.');
+        }
     }
 
     private static function savePost(array $post): int
@@ -100,10 +191,12 @@ final class MioPages_Native_Draft_Writer
         global $wpdb;
         foreach ($revision['posts'] as $expected) {
             $row = $wpdb->get_row($wpdb->prepare(
-                "SELECT post_type,post_status,post_title,post_content FROM {$wpdb->posts} WHERE ID=%d",
+                "SELECT post_type,post_status,post_title,post_content,post_name FROM {$wpdb->posts} WHERE ID=%d FOR UPDATE",
                 $expected['ID']
             ), ARRAY_A);
             unset($expected['ID']);
+            // The original draft writer always left the slug empty.
+            $expected['post_name'] ??= '';
             if ($row !== $expected) {
                 throw new RuntimeException('Native WordPress draft readback mismatch.');
             }

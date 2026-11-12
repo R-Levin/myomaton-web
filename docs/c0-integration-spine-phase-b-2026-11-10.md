@@ -580,3 +580,70 @@ using the existing site protection and WordPress editor login:
 and [revision 2 Service](https://miopages.org/?page_id=16&preview=true).
 The revision 2 draft set is retained for comparison. No public
 publication, theme switch or Core public deployment occurred.
+
+### Stable native WordPress Page identities
+
+The owner approved stable native Page identities in [Issue #12](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6833439688).
+The restored installation pointer selected Home 13 and Service 14.
+Read-only inspection confirmed that all four earlier proof Pages were
+drafts with empty slugs. Delivery 0.0.9 adopted the restored pair and
+assigned `home-miopages-13` and `service-miopages-14` once. It now pins
+the signed Core Page IDs and routes to this pair, locks and verifies
+the current draft rows before writing, and preserves the IDs and slugs
+on updates and restores. Native WordPress revisions preserve the before
+and after content for authorized Operators. Core continues to govern
+exact proposal previews, Page approvals and site-level authorization.
+Customer acceptance and public release remain separate.
+
+| Hosted operation | Exact authorized or restored site digest | WordPress readback |
+| --- | --- | --- |
+| Apply revision 3, adopting the restored baseline | `85786f251ed5b93e42d9ae2b8c7247d85d99280aa9b1bc5932a1321330a043db` | Home 13, Service 14, original content |
+| Apply revision 4, asking visitors to bring their existing website address | `1a6343c049c0430e51ef7fa3780123c9475352af0328301d661a38a9b500eb2a` | Home 13 unchanged, Service 14 updated |
+| Restore revision 3 | `85786f251ed5b93e42d9ae2b8c7247d85d99280aa9b1bc5932a1321330a043db` | Home 13 and Service 14, exact revision 3 hashes |
+
+The Core receipt journal verified all three application receipts and
+their exact retries. Home's SHA-256 remained
+`960fea54ac23eb52c15eb9aedec4e84023903c845160942ebc96256b58999940`.
+Service changed from
+`90c4917bfe9fa5fd7d478df98a972c6cfd26050e47d54a0c735ef369d9cbc39e`
+to `fa9596ba187dd3c2ee4293b3a751b58a86835200595bbd209e3cbd8bd9d44e95`
+and returned to the original hash. The WordPress Pages count stayed
+at six. Historical Pages 15 and 16 kept their status, slugs and
+content hashes. Their disposition requires a separately reviewed plan.
+
+The active Managed Site theme 0.1.0 rendered navigation between the
+two actual drafts and the Home Action in each tested state. With
+the existing HTTP protection and WordPress editor login, open
+[Home](https://miopages.org/?page_id=13&preview=true),
+[Service](https://miopages.org/?page_id=14&preview=true),
+or the [Service change in WordPress Revisions](https://miopages.org/wp-admin/revision.php?revision=20).
+The authenticated preview links always point to the currently applied
+drafts. The historical comparison is available in WordPress Revisions.
+Independent readback matched the exact Service hashes on native
+revisions 19 (baseline), 20 (change) and 21 (restored). The two
+preview URLs each returned HTTP 401 without credentials. Hosted
+public Core remained at `62439fc`.
+
+Forward delivery after a restore must extend the highest Core
+authorization. Revision 3 therefore carried forward the already
+restored content while authorizing the new stable baseline. The
+first forward application after a restore cannot itself roll back
+to a different physical snapshot than its signed predecessor.
+Exact restore of a normal revision targets its immediate signed
+predecessor. Page set or route changes require explicit reconciliation.
+If a WordPress title, body, draft status or managed slug drifts,
+the writer refuses the update or restore pending review.
+
+Local verification passed the PHP stable writer regression and
+four delivery and receipt tests, including two PostgreSQL integration
+tests. Coverage includes legacy
+adoption, duplicate prevention, logical identity change refusal,
+native history, drift refusal and exact restore. The first plugin
+install command stopped at the default CLI PHP 8.0 compatibility
+check and left 0.0.8 active. The same archive installed successfully
+with PHP 8.4.27 after verifying the retained 0.0.8 archive. Plugin
+archive SHA-256 `6c3f812f0eb03016f97d433a8ea365c732d12e31c19662c8c1159ace9742fa7e`.
+Rollback archive SHA-256 `000e5a5dcbb818b9721559b16008dfccbc72aeb468ea91b12dc1600530c5ac53`.
+The archived plugin predates the stable pointer format and must
+only be restored with a compatible reviewed state. The hosted test
+used a signed content restore through 0.0.9.

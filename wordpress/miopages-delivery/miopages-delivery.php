@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MioPages Delivery (Development Proof)
  * Description: Restricted, read-only C0 fixture preview for the MioPages WordPress delivery feasibility proof.
- * Version: 0.0.8
+ * Version: 0.0.9
  * Requires PHP: 8.3
  * Text Domain: miopages-delivery
  */

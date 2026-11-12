@@ -482,6 +482,12 @@ records two non-public WordPress revisions, reconciled application
 receipts, and restoration of the prior draft set. Customer preview access
 through Core and the full growth-service acceptance remain open.
 
+The [stable native WordPress Page checkpoint](c0-integration-spine-phase-b-2026-11-10.md#stable-native-wordpress-page-identities)
+replaces duplicate Page creation on ordinary revisions. The hosted
+synthetic change and exact restore used the same Home and Service
+IDs, slugs and preview links. Earlier proof Pages are retained
+pending a reviewed cleanup plan. Core-mediated Customer review remains open.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier
