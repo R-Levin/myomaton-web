@@ -454,3 +454,20 @@ reported Managed Site 0.1.0 active. No theme switch was performed in this
 increment. Native identity and pull configuration were both absent and
 the database contained zero native draft pointers. There are no owner
 draft URLs, hosted application receipts or verified native rollbacks yet.
+
+### Hosted re-enrollment blocked by the revoked origin binding
+
+A read-only probe through the verified hosted Operator role found one
+`https://miopages.org` installation row, revoked at generation 1. The
+hosted database confirmed `UNIQUE (origin)` on the installations table.
+The existing enrollment command inserts a new row and therefore cannot
+reuse this origin. The rotation command refuses revoked installations.
+The approved enrollment did not start, so no migration password,
+principals, grants, credentials or WordPress changes were needed.
+
+The narrow proposed correction is a forward adapter migration that
+enforces one **active** installation per origin while retaining revoked
+rows, keys and receipts. An enrollment test must confirm the old
+installation remains refused and a second active enrollment conflicts.
+This is pending owner approval. No migration rerun, credential rotation,
+origin workaround, or modification to the revoked audit record was made.
