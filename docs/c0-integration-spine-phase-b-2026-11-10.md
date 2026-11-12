@@ -270,3 +270,23 @@ session could not connect to an OpenSSH agent. Current host files, roles,
 database reachability and WordPress state could not be independently
 verified in this pass. Prior accepted delivery and database evidence is
 historical. No hosted writes were performed.
+
+### Hosted access reverified
+
+The existing Windows agent became available. Read-only SSH verified the
+public Core checkout at `62439fc` on Node 22.23.2, the separate rehearsal
+checkout at `7e44f3a`, and an empty acceptance webroot with no port 8081
+listener. On the protected WordPress host, WP-CLI reported WordPress 7.1.4,
+MioPages Delivery 0.0.6 active, and a successful local database query.
+The retained protected role file was owned by the Cloud account with
+mode 0600. Both restricted Supabase role probes independently passed
+verified TLS and Session Pooler session integrity using that file.
+
+A read-only scoped inventory found zero active fixture installations and
+zero fixture grants backed by unexpired, unrevoked operator credentials.
+Database login and SSH access therefore exist. The old rehearsal authority
+cannot issue a new release. The remaining hosted authorization decision is
+whether to enroll fresh short-lived, fixture-scoped test principals and one
+installation through the existing protected process. That would be a new
+scoped enrollment, without replacing existing credentials. No hosted data,
+credentials, plugins, listeners, approvals or grants were changed.
