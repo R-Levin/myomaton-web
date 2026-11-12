@@ -42,7 +42,9 @@ try {
         throw new RuntimeException('Stage identity or approval mismatch');
     }
     $page = $payload['pages'][0];
-    if ($page['path'] !== '/service' || count($page['sections']) !== 1 || $page['sections'][0]['type'] !== 'intro') {
+    $expectedPath = $pins['path'] ?? '/service';
+    if (!in_array($expectedPath, ['/', '/service'], true) || $page['path'] !== $expectedPath
+        || count($page['sections']) !== 1 || $page['sections'][0]['type'] !== 'intro') {
         throw new RuntimeException('Unexpected Intro shape');
     }
     $section = $page['sections'][0];
@@ -51,7 +53,7 @@ try {
         'objectSha256' => $digest,
         'pageId' => $page['id'],
         'sectionId' => $section['id'],
-        'html' => '<article aria-label="Staged Service Intro"><p>' . $escape($page['title']) . ' · /service</p>'
+        'html' => '<article aria-label="Private staged Intro"><p>' . $escape($page['title']) . ' · ' . $escape($expectedPath) . '</p>'
             . '<h3>' . $escape($section['content']['heading']) . '</h3>'
             . '<p>' . nl2br($escape($section['content']['text']), false) . '</p></article>',
     ], JSON_THROW_ON_ERROR);

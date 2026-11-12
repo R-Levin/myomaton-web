@@ -433,6 +433,15 @@ uses the existing public WordPress site for a manual editorial relaunch, subject
 to verified access, recovery, inquiry delivery and separate owner release
 approval. Phase B and Issue #10 are independent of that publication decision.
 
+The owner reaffirmed the [first connected local service cycle](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6813306713).
+The [walkthrough and replacement inventory](c0-integration-spine-phase-b-2026-11-10.md#first-connected-operational-cycle)
+extend Phase B on `codex/first-operational-cycle-2026-11-12` from `4a93ed8`.
+The Issue #10 interview and live AI proof remain on their separate branch
+at `d9ef9ae`. This slice uses their existing engine and the explicitly
+deterministic Phase B adapter. It does not resolve the owner's AI interview
+acceptance concerns. The closed hosted WordPress transport acceptance remains
+independent of this local cycle.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

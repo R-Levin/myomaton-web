@@ -45,3 +45,34 @@ Review still needed on true customer/Operator authentication, native WordPress P
 [Issue #10's continuity decision](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6774762930) keeps the preserved C0 interview and owner corrections available for its separate reconciliation. The Phase B fixture did not use that private evidence.
 
 The next public decision is to review the [WordPress editorial release plan](miopages-accelerated-public-launch-2026-11-10.md), confirm authorized editing and rollback access, and authorize exact draft preparation and inquiry delivery verification separately. Publishing requires a further exact go-live approval.
+
+## First connected operational cycle
+
+[Owner direction](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6813306713) · November 12, 2026
+
+Run the same PowerShell walkthrough above from the checkout of
+`codex/first-operational-cycle-2026-11-12`. The generated HTML opens to
+**Business knowledge → Customer preview → Inquiry and measurement → Operator
+review → Improved preview**. The report is a read-only capture. The test
+executes the connected operations before writing it and disposes the fixture.
+
+| Step | Working component | Temporary beacon and replacement |
+| --- | --- | --- |
+| Entry and evidence | The same commercial-gated Core interview reads both saved entry paths. It scopes the synthetic approved Review to the Review-led case and keeps the existing-site observation and C0 brief separate. | The Phase B answer adapter is deterministic. Replace it with Issue #10’s real AI interview once its allowed input contract and product interaction pass review. The preserved owner interview and fictional C2 records are outside this tenant. |
+| Assessment and Presence Direction | The two saved findings produce different audience and Service emphasis. The direct-start finding supplies the first candidate. | A small mapping attaches draft digest, uncertainty, page purpose and action intent. Replace it with versioned, evidence-bound Presence Direction proposals. |
+| Private site | Protected Core authorship, exact proposal preview, separate fixture approval and independent projection review feed signed Home and Service Intros. PHP validates and stores each envelope. Core reconciles the exact receipt. | The adapter accepts one Intro per release and keeps the latest reviewed source per site. Separate fixture installations and the read-only captured page links assemble the walkthrough. Replace with an exact multi-page proposal and native private WordPress page, navigation, media and Action integration. The captures do not represent simultaneous current release eligibility. |
+| Inquiry | The same disposable site scope accepts one request through Core Contact. Exact retry returns duplicate, foreign-site submission is refused, and a stored submission and accepted event reconcile. | A temporary local Contact definition and page stand in for the WordPress visitor action. No notification route was configured. Replace with the staged site's scoped native action, authorized notification and separate lead qualification. |
+| Measurement and improvement | One accepted event and the saved synthetic visitor question identify uncertainty about what to bring. Service revision 2 keeps the same Page and proposal IDs and explicitly asks visitors to bring their current site's address. Core and PHP stage the changed bytes and reconcile a new receipt. | The snapshot and interpretation are fixture rules. Visits, rate, lead quality and conversion are unknown. Replace with durable first-party measurement and an Operator workflow that records decisions and remeasurement against an actual baseline. |
+| Customer and Operator | The capture has customer progress and before/after previews, plus a separate Operator evidence section with approval, scope, revision and receipt references. | Local test authority and a static review capture. Replace with authenticated Customer and Operator views over live scoped workflow records, with separately authorized real approvals. |
+
+The walkthrough performs no provider calls, sends no notification and applies
+no publication. The previous live AI evidence remains on Issue #10. This
+branch keeps its worktree and Git history separate and does not repeat the
+hosted WordPress acceptance. A subsequent measurement is proposed in the
+capture. No post-change outcome is asserted.
+
+Verification passed both local WordPress integration tests, all six offline
+onboarding checks, PHP syntax, TypeScript and targeted lint. The rendered
+capture was checked for working section links, three staged page captures
+and the before/after wording. The original Phase B revocation, receipt retry,
+tampered-byte and inactive-pointer checks still ran.

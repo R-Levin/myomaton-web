@@ -18,7 +18,7 @@ import { operatorRole, pullRole } from "../../lib/platform/wordpress-delivery/pr
 import { protectedOperatorServices } from "../../lib/platform/wordpress-delivery/protected-services";
 import { inspectCanonical, writeCanonical } from "../../lib/platform/canonical/writes";
 import { requestMac, WordPressDelivery } from "../../lib/platform/wordpress-delivery/service";
-import { c0SpineInterview, writeC0SpineReview } from "../helpers/c0-spine";
+import { c0SpineInterview, cycleInquiry, presenceDirection, writeC0SpineReview } from "../helpers/c0-spine";
 
 async function initializeWordPressTestBaseline(url: string) {
   const baseline = new Pool({ connectionString: url });
@@ -250,7 +250,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           return { id, token };
         };
         const approver = await provision(["approve-site-proposal", "review-private-stage"]);
-        const author = await provision(["prepare-site-proposal", "preview-site-proposal"]);
+        const author = await provision(["prepare-site-proposal", "revise-site-proposal", "preview-site-proposal"]);
         const reviewer = await provision(["review-private-stage", "enroll", "issue", "revoke"]);
         const expired = await provision(["enroll"], new Date(0));
         const origin = "https://core.example.test";
@@ -262,14 +262,15 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
         const approverContext = await protectedServices.operator.authenticate(approver.token);
         await assert.rejects(protectedServices.operator.authorize(reviewerContext, "issue", { ...site, managedSiteId: randomUUID() }), /authorization refused/);
 
-        const approvePage = async (page = fixture.page) => {
-          const proposed = await protectedServices.proposals(authorContext).prepare(authorContext, randomUUID(), fixture.scope, randomUUID(), page);
+        const approvePage = async (page = fixture.page, expected?: Parameters<ReturnType<typeof protectedServices.proposals>["prepare"]>[5]) => {
+          const proposed = await protectedServices.proposals(authorContext).prepare(authorContext,
+            expected?.proposalId ?? randomUUID(), fixture.scope, randomUUID(), page, expected ?? null);
           const binding = proposed.revision!.binding;
           const preview = await protectedServices.proposals(authorContext).preview(authorContext, binding, randomUUID());
           const approval = await protectedServices.proposals(approverContext).approve(approverContext, {
             binding, requestId: randomUUID(), previewDigest: preview.digest, previewEvent: preview.event, reference: "Test customer review",
           });
-          return { site, proposalId: binding.proposalId, approvalId: approval.hash, binding, previewDigest: preview.digest,
+          return { site, proposalId: binding.proposalId, approvalId: approval.hash, binding, revision: proposed.revision!, previewDigest: preview.digest,
             authorGrant: proposed.actor.authorityReference, approvalGrant: approval.actor.authorityReference };
         };
         const internal = await approvePage();
@@ -294,7 +295,9 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
         const canonical = await inspectCanonical(admin, "knowledge", site.webPresenceId, knowledgeId);
         assert.ok(canonical);
         const interview = await c0SpineInterview(fixture);
-        const selected = interview.direct;
+        const directions = presenceDirection(interview), selected = interview.direct;
+        assert.equal(directions[0].draftDigest, selected.draftDigest);
+        assert.notEqual(directions[0].audience, directions[1].audience);
         assert.equal(selected.finding.recommendation, "Lead with the existing-website handoff.");
         const heading = "Already have a website? Start there.";
         const page = { ...fixture.page, slug: "/service", title: fixture.editorial("Managed Web Presence"),
@@ -320,11 +323,13 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           keyId: "private", publicKeyBase64: Buffer.from(key.publicKey.export({ format: "jwk" }).x!, "base64url").toString("base64") });
         const issued = await protectedServices.delivery.issue(reviewerContext, installationId, releaseId, key.privateKey);
         assert.ok(issued);
-        const handler = new WordPressDelivery(pullDb, async () => null, async id => id === credentialId ? secret : null,
+        const credentials = new Map<string, Buffer>([[credentialId, secret]]);
+        const handler = new WordPressDelivery(pullDb, async () => null, async id => credentials.get(id) ?? null,
           origin, undefined, boundary(pullRole));
-        const request = (operation: string, receipt = "") => {
+        const request = (operation: string, receipt = "", delivery = { installationId, releaseId, credentialId, wpOrigin }) => {
+          const { installationId, releaseId, credentialId, wpOrigin } = delivery;
           const nonce = randomBytes(16).toString("hex"), time = String(Date.now());
-          const mac = requestMac(secret, [origin, operation, installationId, wpOrigin, credentialId, releaseId, nonce, time, receipt]);
+          const mac = requestMac(credentials.get(credentialId)!, [origin, operation, installationId, wpOrigin, credentialId, releaseId, nonce, time, receipt]);
           const headers = { origin: wpOrigin, installation: installationId, credential: credentialId, release: releaseId, nonce, time, receipt, mac };
           return new Request(origin + "/api/wordpress-delivery/" + operation, { method: "POST",
             headers: Object.fromEntries(Object.entries(headers).map(([k, v]) => ["X-MioPages-" + k, v])) });
@@ -389,6 +394,67 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           await assert.rejects(render(), /Current Core delivery eligibility required/);
           await admin.query("UPDATE managed_sites SET name=$2 WHERE id=$1", [site.managedSiteId, originalName]);
           assert.deepEqual(await render(), rendered);
+          const stagePage = async (decision: Awaited<ReturnType<typeof approvePage>>, pathName: string) => {
+            const stageRelease = randomUUID(), stageInstallation = randomUUID(), stageCredential = randomUUID();
+            const stageSecret = randomBytes(32);
+            const stageOrigin = `https://${stageInstallation}.example.test`;
+            credentials.set(stageCredential, stageSecret);
+            const projection = await protectedServices.review.review(reviewerContext, decision);
+            await protectedServices.review.review(reviewerContext, { ...decision,
+              commit: { releaseId: stageRelease, projectionDigest: projection.projectionDigest } });
+            const stageIdentity = { ...identity, installationId: stageInstallation };
+            await protectedServices.delivery.enroll(reviewerContext, { ...stageIdentity, origin: stageOrigin, credentialId: stageCredential });
+            const delivery = await protectedServices.delivery.issue(reviewerContext, stageInstallation, stageRelease, key.privateKey);
+            assert.ok(delivery);
+            const pulled = await handler.handle(request("pull", "", { installationId: stageInstallation, releaseId: stageRelease, credentialId: stageCredential, wpOrigin: stageOrigin }));
+            assert.equal(pulled.status, 200);
+            const body = await pulled.text(), digest = delivery.envelopeSha256;
+            assert.equal(createHash("sha256").update(body).digest("hex"), digest);
+            const stageDirectory = path.join(root, stageInstallation);
+            await mkdir(stageDirectory, { mode: 0o700 });
+            const stage = spawnSync("php", ["wordpress/miopages-delivery/tests/core-pull-compat.php"], {
+              encoding: "utf8", input: JSON.stringify({ core: origin, origin: stageOrigin, credentialId: stageCredential, secret: stageSecret.toString("hex"),
+                releaseId: stageRelease, identity: stageIdentity, directory: stageDirectory, webroot, envelope: body, digest }),
+            });
+            assert.equal(stage.status, 0, stage.stderr);
+            const result = JSON.parse(stage.stdout);
+            assert.equal(result.result.state, "staged");
+            const [pull, receipt] = result.requests;
+            const checkedPull = await handler.handle(new Request(pull.url, { method: "POST", headers: pull.headers }));
+            assert.equal(checkedPull.status, 200);
+            assert.equal(await checkedPull.text(), body);
+            const ack = await handler.handle(new Request(receipt.url, { method: "POST", headers: receipt.headers }));
+            assert.equal(ack.status, 204);
+            assert.ok((await admin.query("SELECT staged_at FROM miopages_wp.wordpress_deliveries WHERE installation_id=$1 AND release_id=$2",
+              [stageInstallation, stageRelease])).rows[0].staged_at instanceof Date);
+            const marker = new Headers(receipt.headers).get("X-MioPages-Receipt");
+            assert.equal(marker, "staged:1:" + digest);
+            const child = spawnSync("php", ["wordpress/miopages-delivery/tests/staged-intro-preview.php"], {
+              encoding: "utf8", input: JSON.stringify({ identity: stageIdentity, directory: stageDirectory, webroot,
+                releaseId: stageRelease, approvalId: decision.approvalId, digest, path: pathName }),
+            });
+            assert.equal(child.status, 0, child.stderr);
+            const stagedPage = JSON.parse(child.stdout) as { objectSha256: string; html: string; pageId: string };
+            assert.equal(stagedPage.objectSha256, digest);
+            assert.deepEqual(await readdir(stageDirectory), [".release.lock", "objects"]);
+            return { ...stagedPage, receipt: marker, release: stageRelease, previewDigest: decision.previewDigest };
+          };
+          const homePage = { ...page, pageId: randomUUID(), slug: "/", title: fixture.editorial("MioPages Home"),
+            sections: [{ ...page.sections[0], id: randomUUID(), heading: fixture.editorial("A managed Web Presence for your business") }] };
+          const home = await stagePage(await approvePage(homePage), "/");
+          assert.equal(home.pageId, homePage.pageId);
+          const inquiry = await cycleInquiry(admin, site);
+          const improvedPage = { ...page, sections: [{ ...page.sections[0], heading: {
+            kind: "editorial" as const, text: inquiry.recommendation,
+            rationale: `Disposable Operator reviewed one accepted inquiry asking what to bring. Evidence ${inquiry.submissionId}.`,
+          } }] };
+          const decision = await approvePage(improvedPage, review.binding);
+          assert.equal(decision.proposalId, review.proposalId);
+          assert.equal(decision.binding.revision, 2);
+          const improved = await stagePage(decision, "/service");
+          assert.equal(improved.pageId, rendered.pageId);
+          assert.notEqual(improved.objectSha256, rendered.objectSha256);
+          assert.match(improved.html, /Bring its address to the first conversation/);
           await admin.query("UPDATE miopages_wp.wordpress_operator_grants SET revoked_at=now() WHERE operator_id=$1 AND permission='approve-site-proposal'", [approver.id]);
           assert.equal((await handler.handle(request("pull"))).status, 409);
           await assert.rejects(render(), /Current Core delivery eligibility required/);
@@ -408,7 +474,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
             "Staged Page": rendered.pageId, "Staged Intro Section": rendered.sectionId,
             "Envelope digest": rendered.objectSha256, "Returned receipt": exactReceipt,
             "Core accepted receipt at": receipt.staged_at.toISOString(),
-          }, rendered.html];
+          }, rendered.html, { directions, home, inquiry, improved }];
         } finally {
           assert.match(path.basename(root), /^miopages-wordpress-pull-/);
           assert.equal(path.dirname(root), await realpath(tmpdir()));
