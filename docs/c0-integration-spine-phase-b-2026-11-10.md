@@ -471,3 +471,37 @@ rows, keys and receipts. An enrollment test must confirm the old
 installation remains refused and a second active enrollment conflicts.
 This is pending owner approval. No migration rerun, credential rotation,
 origin workaround, or modification to the revoked audit record was made.
+
+### Active-origin migration and scoped enrollment
+
+The owner approved forward migration 0019. It adds a unique index for
+active origins and removes the broader constraint in one transaction.
+The existing rows and grants are unchanged. The protected launcher checks
+the 0018 ledger, applies 0019, verifies all four migration checksums,
+permissions and the exact index, then enrolls the fixture. It uses one
+hidden prompt for the existing migration password and never writes it to
+disk.
+
+In the existing authenticated 20i Cloud Bash shell, run:
+
+```bash
+bash ~/miopages-wp-rehearsal/scripts/wordpress-native-draft-migration.sh APPLY-0019-AND-ENROLL-NATIVE-DRAFT
+```
+
+Expect two migration PASS lines and an `enroll-native-draft` PASS line.
+The launcher checks the exact fixture and revoked installation before
+enrolling four distinct, 24-hour test principals for authoring, Page
+approval, independent review and native draft authorization. It verifies
+each token's allowed and refused operations, then enrolls one new
+installation through the existing Core operator service. The revoked
+installation, key and delivery history remain retained. Only the new
+test material is stored in an off-webroot 0700 directory and 0600 file
+for the hosted test. Keep its contents out of chat and Git. On BLOCKED,
+preserve the report and stop. A partial enrollment must be inspected
+before any retry. No native draft or publication is part of this launcher.
+
+Both local WordPress integration tests passed. The protected test verified
+the original constraint refuses reuse, the forward upgrade and retry keep
+revoked rows, keys, deliveries and audit records identical, a scoped actor
+can enroll a replacement, a second active enrollment fails and the old
+installation still refuses pull and rotation.

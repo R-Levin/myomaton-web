@@ -13,7 +13,7 @@ import { siteReleaseFixture } from "../../scripts/site-releases/disposable";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import type { ReviewedProjection } from "../../lib/platform/wordpress-delivery/authority";
 import { sharedInventory } from "../../scripts/db/wordpress-shared-inventory";
-import { integratePrivateStage } from "../../scripts/db/wordpress-private-stage";
+import { advanceActiveInstallationOrigin, integratePrivateStage } from "../../scripts/db/wordpress-private-stage";
 import { operatorRole, pullRole } from "../../lib/platform/wordpress-delivery/protected-connection";
 import { protectedOperatorServices } from "../../lib/platform/wordpress-delivery/protected-services";
 import { inspectCanonical, writeCanonical } from "../../lib/platform/canonical/writes";
@@ -552,6 +552,30 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           await protectedServices.delivery.revoke(reviewerContext, installationId);
           assert.equal((await handler.handle(request("pull"))).status, 403);
           await assert.rejects(render(), /Current Core delivery eligibility required/);
+          const replacement = { ...site, installationId: randomUUID(), origin: wpOrigin, credentialId: randomUUID(),
+            keyId: identity.keyId, publicKeyBase64: identity.publicKeyBase64 };
+          await assert.rejects(protectedServices.delivery.enroll(reviewerContext, replacement), /wordpress_installation_origin/);
+          const history = async () => Promise.all(["wordpress_installations", "wordpress_installation_keys", "wordpress_deliveries",
+            "wordpress_delivery_events"].map(async table => (await admin.query(
+            `SELECT to_jsonb(t) AS record FROM miopages_wp.${table} t WHERE ${table === "wordpress_installations" ? "id" : "installation_id"}=$1 ORDER BY to_jsonb(t)::text`,
+            [installationId])).rows));
+          const original = await history();
+          const upgrade = await admin.connect();
+          try {
+            await upgrade.query("BEGIN");
+            await advanceActiveInstallationOrigin(upgrade, fixture.schema);
+            await advanceActiveInstallationOrigin(upgrade, fixture.schema);
+            await upgrade.query("COMMIT");
+          } catch (error) { await upgrade.query("ROLLBACK"); throw error; }
+          finally { upgrade.release(); }
+          assert.deepEqual(await history(), original);
+          await assert.rejects(protectedServices.delivery.enroll(approverContext, replacement), /authorization refused/);
+          await protectedServices.delivery.enroll(reviewerContext, replacement);
+          await assert.rejects(protectedServices.delivery.enroll(reviewerContext,
+            { ...replacement, installationId: randomUUID(), credentialId: randomUUID() }), /wordpress_installation_active_origin/);
+          assert.equal((await handler.handle(request("pull"))).status, 403);
+          await assert.rejects(protectedServices.delivery.rotate(reviewerContext, installationId, 1, replacement), /Rotation refused/);
+          assert.deepEqual(await history(), original);
           walkthrough = [interview, {
             "Fixture Organization": site.organizationId, "Fixture Web Presence": site.webPresenceId,
             "Fixture Managed Site": site.managedSiteId, "Author principal": author.id,

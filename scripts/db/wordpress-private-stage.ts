@@ -12,6 +12,7 @@ import { quote } from "../backup/managed-permissions";
 
 const migrations = ["0016_wordpress_delivery", "0017_private_stage_authority"];
 const draftMigration = "0018_native_draft_authority";
+const originMigration = "0019_active_installation_origin";
 const draftTable = "wordpress_native_draft_authorizations";
 const draftInsertColumns = ["installation_id", "site_proposal_id", "revision", "candidate_digest", "previous_digest",
   "reviewer_grant_id", "authorizer_grant_id"];
@@ -80,13 +81,22 @@ export async function integratePrivateStage(db: PoolClient, canonicalSchema = "p
   if (forbidden.rowCount) throw Error("Excess private-stage privileges");
 }
 
-export async function verifyPrivateStageAdapter(db: PoolClient, nativeDraft = false) {
+export async function verifyPrivateStageAdapter(db: PoolClient, nativeDraft = false, activeOrigin = false) {
   await verifyWordPressRoles(db);
   const recorded = (await db.query("SELECT name,sha256 FROM miopages_wp.wordpress_schema_migrations ORDER BY name")).rows;
   const adapterTables = nativeDraft ? [...tables, draftTable] : tables;
-  const expectedMigrations = await Promise.all((nativeDraft ? [...migrations, draftMigration] : migrations).map(async name => ({ name, sha256: createHash("sha256")
+  const expectedMigrations = await Promise.all((nativeDraft ? [...migrations, draftMigration, ...(activeOrigin ? [originMigration] : [])] : migrations).map(async name => ({ name, sha256: createHash("sha256")
     .update((await readFile("lib/platform/wordpress-delivery/" + name + ".sql", "utf8")).replaceAll("\r\n", "\n")).digest("hex") })));
   assert.deepEqual(recorded, expectedMigrations, "Private-stage migration checksum mismatch");
+  if (activeOrigin) {
+    const { rows } = await db.query(`SELECT i.indisunique, i.indisvalid, pg_get_indexdef(i.indexrelid,1,true) AS column,
+        pg_get_expr(i.indpred,i.indrelid) AS predicate
+      FROM pg_index i WHERE i.indexrelid='miopages_wp.wordpress_installation_active_origin'::regclass
+        AND i.indrelid='miopages_wp.wordpress_installations'::regclass AND i.indnkeyatts=1 AND i.indnatts=1`);
+    assert.deepEqual(rows, [{ indisunique: true, indisvalid: true, column: "origin", predicate: "(status = 'active'::text)" }]);
+    assert.equal((await db.query(`SELECT 1 FROM pg_constraint
+      WHERE conrelid='miopages_wp.wordpress_installations'::regclass AND conname='wordpress_installation_origin'`)).rowCount, 0);
+  }
   const owned = (await db.query(`SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE n.nspname='miopages_wp' AND c.relkind IN ('r','p') AND pg_get_userbyid(c.relowner)=$1 ORDER BY c.relname`, [migrationRole])).rows;
   assert.deepEqual(owned.map(row => row.relname), [...adapterTables].sort(), "Private-stage table ownership mismatch");
@@ -142,6 +152,20 @@ export async function verifyPrivateStageAdapter(db: PoolClient, nativeDraft = fa
     assert.deepEqual(rights, { backup_read: true, backup_write: false, runtime_access: false });
   }
   return { verified: true, privateStageMigrations: recorded.length, checksumsVerified: true, grantsVerified: true };
+}
+
+export async function advanceActiveInstallationOrigin(db: PoolClient, canonicalSchema = "public") {
+  await db.query("SELECT pg_advisory_xact_lock(hashtextextended('miopages-private-stage-schema',0))");
+  await db.query(`SET LOCAL search_path=${quote(adapterSchema)},${quote(canonicalSchema)}`);
+  const present = (await db.query("SELECT 1 FROM wordpress_schema_migrations WHERE name=$1", [originMigration])).rowCount;
+  if (present) return;
+  const prior = (await db.query("SELECT name FROM wordpress_schema_migrations ORDER BY name")).rows.map(row => row.name);
+  assert.deepEqual(prior, [...migrations, draftMigration], "Verified adapter migration 0018 required");
+  const sql = await readFile("lib/platform/wordpress-delivery/" + originMigration + ".sql", "utf8");
+  await db.query(sql);
+  await db.query("INSERT INTO wordpress_schema_migrations(name,sha256) VALUES($1,$2)", [
+    originMigration, createHash("sha256").update(sql.replaceAll("\r\n", "\n")).digest("hex"),
+  ]);
 }
 
 const diagnosticStages = {
@@ -207,8 +231,9 @@ async function main(stage: (value: DiagnosticStage) => void) {
   const action = process.env.MIOPAGES_WP_SCHEMA_ACTION;
   const probeRole = action === "probe-pull-session" ? pullRole : action === "probe-operator-session" ? operatorRole : null;
   const fixtureOperation = action === "create-rehearsal-fixture" ? "create" : action === "verify-rehearsal-fixture" ? "verify" : null;
-  const nativeDraft = action === "apply-native-draft-stage" || action === "verify-native-draft-stage";
-  const verifyAdapter = action === "verify-private-stage" || action === "verify-native-draft-stage";
+  const activeOrigin = action === "apply-active-installation-origin" || action === "verify-active-installation-origin";
+  const nativeDraft = activeOrigin || action === "apply-native-draft-stage" || action === "verify-native-draft-stage";
+  const verifyAdapter = action === "verify-private-stage" || action === "verify-native-draft-stage" || action === "verify-active-installation-origin";
   const inventory = action === "inventory-private-stage";
   if (!verifyAdapter && !fixtureOperation && !inventory && !probeRole && !nativeDraft && action !== "apply-private-stage" && action !== "preflight-private-stage") {
     throw Error("Explicit schema operation required");
@@ -229,7 +254,7 @@ async function main(stage: (value: DiagnosticStage) => void) {
         await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
         await protectedConnection(db, migrationRole, expected);
         stage("adapter_validation");
-        const result = await verifyPrivateStageAdapter(db, nativeDraft);
+        const result = await verifyPrivateStageAdapter(db, nativeDraft, activeOrigin);
         await db.query("ROLLBACK");
         console.log(JSON.stringify({ ...result, readOnly: true }));
         return;
@@ -298,9 +323,14 @@ async function main(stage: (value: DiagnosticStage) => void) {
         return;
       }
       stage("migration");
-      await integratePrivateStage(db, "public", nativeDraft);
+      if (activeOrigin) {
+        const present = (await db.query("SELECT 1 FROM miopages_wp.wordpress_schema_migrations WHERE name=$1", [originMigration])).rowCount;
+        await verifyPrivateStageAdapter(db, true, Boolean(present));
+        await advanceActiveInstallationOrigin(db);
+        await verifyPrivateStageAdapter(db, true, true);
+      } else await integratePrivateStage(db, "public", nativeDraft);
       await db.query("COMMIT");
-      console.log(JSON.stringify({ privateStageMigrations: migrations.length + Number(nativeDraft), verified: true }));
+      console.log(JSON.stringify({ privateStageMigrations: migrations.length + Number(nativeDraft) + Number(activeOrigin), verified: true }));
     } catch (error) { await db.query("ROLLBACK").catch(() => {}); throw error; }
     finally { db.release(); }
   } finally { await pool.end(); }
