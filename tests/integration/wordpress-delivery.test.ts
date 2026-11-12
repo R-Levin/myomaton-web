@@ -457,6 +457,20 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
             revision: review.binding.revision, sourceDigest: preview.sourceDigest, projectionDigest: preview.projectionDigest,
             receipt: exactReceipt, release: releaseId, previewDigest: review.previewDigest, approvalId: review.approvalId };
           const initial = privateSiteCandidate(site, home, service);
+          const draftIntent = { siteProposalId: randomUUID(), installationId, revision: 1, previousDigest: null,
+            navigation: ["/", "/service"], actions: [{ id: randomUUID(), label: "Explore the planned service",
+              from: "/", type: "page", destination: "/service" }] };
+          const initialDraft = await protectedServices.review.previewSiteDraft(reviewerContext, site, [homeDecision, review], draftIntent);
+          assert.deepEqual(initialDraft.candidate.pages.map(item => item.path), ["/", "/service"]);
+          assert.deepEqual(await protectedServices.review.previewSiteDraft(reviewerContext, site, [homeDecision, review], draftIntent), initialDraft);
+          await assert.rejects(protectedServices.review.previewSiteDraft(reviewerContext, site, [homeDecision, review],
+            { ...draftIntent, installationId: randomUUID() }), /installation scope/);
+          await assert.rejects(protectedServices.review.previewSiteDraft(approverContext, site, [homeDecision, review], draftIntent), /Independent/);
+          const reordered = await protectedServices.review.previewSiteDraft(reviewerContext, site, [homeDecision, review],
+            { ...draftIntent, navigation: ["/service", "/"] });
+          assert.notEqual(reordered.digest, initialDraft.digest);
+          await assert.rejects(protectedServices.review.previewSiteDraft(reviewerContext, site, [homeDecision, review],
+            { ...draftIntent, actions: [{ ...draftIntent.actions[0], destination: "https://foreign.example.test/" }] }), /action destination/);
           assert.throws(() => privateSiteCandidate(site, home, { ...service, site: { ...site, managedSiteId: randomUUID() } }));
           assert.throws(() => privateSiteCandidate(site, home, { ...service, sourceDigest: "0".repeat(64) }));
           assert.throws(() => privateSiteCandidate(site, home, { ...service, receipt: home.receipt }));
@@ -480,6 +494,10 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           assert.equal(currentHome.projectionDigest, home.projectionDigest);
           assert.equal(currentHome.sourceDigest, home.sourceDigest);
           const revised = privateSiteCandidate(site, home, improved, initial);
+          const updatedDraft = await protectedServices.review.previewSiteDraft(reviewerContext, site, [homeDecision, decision],
+            { ...draftIntent, revision: 2, previousDigest: initialDraft.digest });
+          assert.equal(updatedDraft.candidate.previousDigest, initialDraft.digest);
+          assert.notEqual(updatedDraft.digest, initialDraft.digest);
           assert.equal(revised.manifest.previous, initial.digest);
           assert.notEqual(revised.digest, initial.digest);
           assert.deepEqual(revised.manifest.pages[0], initial.manifest.pages[0]);
@@ -500,6 +518,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
             "Proposal": review.proposalId, "Revision": review.binding.revision, "Canonical base digest": preview.sourceDigest,
             "Core preview digest": review.previewDigest, "Exact fixture approval event": review.approvalId,
             "Projection digest": preview.projectionDigest, "Installation": installationId, "Release": releaseId,
+            "Core exact site preview v1": initialDraft.digest, "Core exact site preview v2": updatedDraft.digest,
             "Staged Page": rendered.pageId, "Staged Intro Section": rendered.sectionId,
             "Envelope digest": rendered.objectSha256, "Returned receipt": exactReceipt,
             "Core accepted receipt at": receipt.staged_at.toISOString(),

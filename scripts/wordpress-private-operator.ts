@@ -1,6 +1,6 @@
 import { createPrivateKey } from "node:crypto";
 import { object, uuid } from "../lib/platform/canonical/model";
-import { binding, pageProposal, proposalScope } from "../lib/platform/content-editing/proposal";
+import { binding, hash, pageProposal, proposalScope } from "../lib/platform/content-editing/proposal";
 import { operatorRole, protectedConnection, protectedPool } from "../lib/platform/wordpress-delivery/protected-connection";
 import { protectedOperatorServices } from "../lib/platform/wordpress-delivery/protected-services";
 import type { Enrollment } from "../lib/platform/wordpress-delivery/service";
@@ -43,6 +43,20 @@ async function main() {
       case "review":
         result = await service.review.review(context, command.input as Parameters<typeof service.review.review>[1]);
         break;
+      case "preview-site-draft": {
+        const input = object(command.input, ["site", "references", "draft"]);
+        const site = object(input.site, ["organizationId", "webPresenceId", "managedSiteId"]);
+        if (!Array.isArray(input.references) || input.references.length < 1 || input.references.length > 16) {
+          throw Error("Invalid draft page references");
+        }
+        const references = input.references.map(value => {
+          const ref = object(value, ["proposalId", "approvalId"]);
+          return { proposalId: uuid(ref.proposalId), approvalId: hash(ref.approvalId) };
+        });
+        result = await service.review.previewSiteDraft(context, { organizationId: uuid(site.organizationId),
+          webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) }, references, input.draft);
+        break;
+      }
       case "enroll":
         await service.delivery.enroll(context, command.input as Enrollment);
         result = { enrolled: true };

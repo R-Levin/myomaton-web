@@ -7,6 +7,7 @@ import { hash, pageProposal } from "../content-editing/proposal";
 import { proposalPreview } from "../content-editing/proposal-preview";
 import { validatePages, type ReviewedProjection, type Site } from "./authority";
 import { customerMandate, type ProtectedOperator } from "./operator";
+import { bindSiteDraft } from "./site-draft";
 
 async function approvedProjection(db: PoolClient, site: Site, proposalId: string, approvalId: string) {
   const identity = (await db.query(`SELECT p.created_at,g.operator_id,g.id AS grant_id,g.customer
@@ -80,6 +81,36 @@ export async function reviewedPrivateSource(db: PoolClient, site: Site): Promise
 
 export class PrivateReleaseReview {
   constructor(private pool: Pool, private operator: ProtectedOperator, private boundary: (db: PoolClient) => Promise<void>) {}
+
+  // Review-only. A digest returned here does not grant draft materialization.
+  async previewSiteDraft(context: unknown, site: Site, references: readonly { proposalId: string; approvalId: string }[], draft: unknown) {
+    if (!Array.isArray(references) || references.length < 1 || references.length > 16) throw Error("Invalid draft page references");
+    site = { organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
+    const db = await this.pool.connect();
+    try {
+      await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+      await this.boundary(db);
+      await db.query("SET LOCAL TIME ZONE 'UTC'");
+      const reviewer = await this.operator.authorizeIn(db, context, "review-private-stage", site);
+      const members = [];
+      for (const ref of references) {
+        const proposalId = uuid(ref.proposalId);
+        const projection = await approvedProjection(db, site, proposalId, hash(ref.approvalId));
+        if (projection.approver === reviewer.operatorId) throw Error("Independent projection reviewer required");
+        members.push({ ...site, ...projection, proposalId });
+      }
+      const result = bindSiteDraft(site, members, draft);
+      const { rowCount } = await db.query(`SELECT 1 FROM wordpress_installations WHERE id=$1
+        AND organization_id=$2 AND web_presence_id=$3 AND managed_site_id=$4 AND status='active'`,
+      [result.candidate.installationId, site.organizationId, site.webPresenceId, site.managedSiteId]);
+      if (!rowCount) throw Error("Draft installation scope mismatch");
+      await db.query("COMMIT");
+      return result;
+    } catch (error) {
+      await db.query("ROLLBACK");
+      throw error;
+    } finally { db.release(); }
+  }
 
   async review(context: unknown, input: { site: Site; proposalId: string; approvalId: string;
     commit?: { releaseId: string; projectionDigest: string } }) {

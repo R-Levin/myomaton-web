@@ -235,3 +235,38 @@ answer exists. First-party signals should tie to an exact candidate and
 baseline before any post-change comparison. Those are parallel product
 capabilities under the existing contracts. The current inquiry, snapshot,
 recommendation and role notes remain local fixtures.
+
+## Hosted native draft continuation
+
+[Owner execution directive](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6829990525)
+supersedes the earlier pause for a design decision. The target remains the
+existing 20i Cloud, Supabase and protected WordPress installation. No
+parallel environment was created.
+
+The existing protected review service can now derive an exact read-only
+site preview. It revalidates current per-page approvals, canonical source
+and independent reviewer authority, checks that the installation is active
+and scoped to the same site, and binds the ordered pages, navigation,
+internal Actions and revision link into one digest. This is a review
+operation. Durable draft authorization, a native writer, a distinct
+application receipt and rollback remain required. Launch acceptance and
+publication continue under separate authority. Fixture review notes carry
+no authority.
+
+The existing protected operator CLI exposes this review as
+`preview-site-draft`. It takes the site, exact Page proposal and approval
+references, and the draft selection over the existing protected stdin
+channel. It uses the scoped private-stage reviewer grant and does not
+need a signer. Both local delivery integration tests passed on rerun.
+They verify the original connected cycle, deterministic before and after
+site previews, an independent reviewer, installation scope, navigation
+digest changes and refusal of an out-of-site Action. An earlier run hit
+a transient Windows file lock during disposable PostgreSQL cleanup.
+
+Read-only HTTPS requests returned 200 for Core, 401 for the protected
+WordPress host and 502 for the retained idle acceptance hostname. The
+three account SSH probes returned permission denied. The Windows command
+session could not connect to an OpenSSH agent. Current host files, roles,
+database reachability and WordPress state could not be independently
+verified in this pass. Prior accepted delivery and database evidence is
+historical. No hosted writes were performed.
