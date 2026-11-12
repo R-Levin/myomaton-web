@@ -290,3 +290,20 @@ whether to enroll fresh short-lived, fixture-scoped test principals and one
 installation through the existing protected process. That would be a new
 scoped enrollment, without replacing existing credentials. No hosted data,
 credentials, plugins, listeners, approvals or grants were changed.
+
+### Native plugin development
+
+The owner authorized fresh scoped rehearsal enrollment and the necessary
+development plugin update. Enrollment is timed for the hosted run because
+the test principals are short-lived.
+
+The plugin source now has a draft content projection for reviewed Intro
+sections, ordered navigation and internal Page Actions. It maps to native
+Gutenberg heading and paragraph blocks and WordPress preview links. The
+Contact beacon remains outside this projection. Local PHP verified fixed
+draft status, escaping and refusal of duplicate or foreign targets. WP-CLI
+on the existing development installation parsed both synthetic page
+inputs with WordPress's native block parser. No posts were written and
+the installed plugin was unchanged. This projection has no CLI entry
+point. Durable authorization, a guarded writer, rollback and a
+Core-reconciled application receipt remain open.
