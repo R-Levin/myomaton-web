@@ -9,7 +9,8 @@ import { proposalPreview } from "../content-editing/proposal-preview";
 import { validatePages, type ReviewedProjection, type Site } from "./authority";
 import { customerMandate, type ProtectedOperator } from "./operator";
 import { bindSiteDraft } from "./site-draft";
-import { nativeDraftEnvelope } from "./native-draft-envelope";
+import { nativeDraftEnvelope, readNativeDraftEnvelope } from "./native-draft-envelope";
+import type { NativeDraftReceiptExpectation } from "./native-draft-receipt";
 
 async function approvedProjection(db: PoolClient, site: Site, proposalId: string, approvalId: string) {
   const identity = (await db.query(`SELECT p.created_at,g.operator_id,g.id AS grant_id,g.customer
@@ -100,6 +101,43 @@ export class PrivateReleaseReview {
     const preview = await this.siteDraft(reviewer, site, references, draft, { context, digest: hash(expectedDigest), key, operation });
     if (!("envelope" in preview)) throw Error("Native draft issuance refused");
     return preview.envelope;
+  }
+
+  async nativeDraftReceiptDecision(context: unknown, site: Site, installationId: string, envelope: unknown) {
+    site = { organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
+    installationId = uuid(installationId);
+    const db = await this.pool.connect();
+    try {
+      await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+      await this.boundary(db);
+      const reviewer = await this.operator.authorizeIn(db, context, "review-private-stage", site);
+      const { rows: [installation] } = await db.query(`SELECT k.key_id,k.public_key,k.credential_id FROM wordpress_installations i
+        JOIN wordpress_installation_keys k ON k.installation_id=i.id AND k.generation=i.generation
+        WHERE i.id=$1 AND i.organization_id=$2 AND i.web_presence_id=$3 AND i.managed_site_id=$4 AND i.status='active'`,
+      [installationId, site.organizationId, site.webPresenceId, site.managedSiteId]);
+      if (!installation) throw Error("Draft receipt installation scope mismatch");
+      const signed = readNativeDraftEnvelope(envelope, installation.key_id, installation.public_key);
+      const draft = signed.candidate;
+      if (draft.installationId !== installationId || fingerprint(draft.scope) !== fingerprint(site)) throw Error("Draft receipt scope mismatch");
+      const { rows: [latest] } = await db.query(`SELECT a.*, g.revoked_at FROM wordpress_native_draft_authorizations a
+        JOIN wordpress_operator_grants g ON g.id=a.authorizer_grant_id AND g.permission='authorize-native-draft'
+        WHERE a.installation_id=$1 AND a.site_proposal_id=$2 ORDER BY a.revision DESC LIMIT 1`,
+      [installationId, uuid(draft.siteProposalId)]);
+      if (!latest || latest.revoked_at !== null || latest.reviewer_grant_id !== reviewer.authorityReference ||
+          latest.revision !== draft.revision || latest.candidate_digest !== signed.digest || latest.previous_digest !== draft.previousDigest) {
+        throw Error("Draft receipt has no current exact authorization");
+      }
+      const restore = signed.operation === "restore";
+      if (restore && (!draft.previousDigest || draft.revision < 2)) throw Error("Draft receipt predecessor missing");
+      const expected: NativeDraftReceiptExpectation = { installationId, siteProposalId: draft.siteProposalId, operation: signed.operation,
+        requestedDigest: signed.digest, appliedDigest: restore ? hash(draft.previousDigest) : signed.digest,
+        revision: draft.revision - Number(restore), paths: draft.pages.map(page => page.path) };
+      await db.query("COMMIT");
+      return { expected, credentialId: uuid(installation.credential_id) };
+    } catch (error) {
+      await db.query("ROLLBACK");
+      throw error;
+    } finally { db.release(); }
   }
 
   private async siteDraft(context: unknown, site: Site, references: readonly { proposalId: string; approvalId: string }[], draft: unknown,

@@ -421,3 +421,36 @@ confirmed the new authorization table is empty. The restricted Operator
 role has SELECT and column INSERT access, with no UPDATE or DELETE. The
 pull role has none of these permissions. No migration retry is needed.
 This checkpoint did not enroll principals or create WordPress drafts.
+
+### Native application receipt reconciliation
+
+The protected Core operator CLI now accepts `reconcile-site-draft`.
+It verifies the enrolled installation's signature on the exact operation,
+looks up the current durable site authorization under the scoped reviewer,
+then checks WordPress's application MAC using the enrolled installation
+secret. Core writes immutable receipt evidence in a configured owner-only
+directory on the existing Cloud rehearsal account. This file journal is
+the development receipt store and does not require a second migration.
+It accepts exact retries, rejects conflicts, and compares a restore with
+the prior application receipt's exact WordPress post IDs and content hashes.
+It also requires a reconciled application of the revision being restored.
+The existing staged-object receipt remains independent.
+
+Both local delivery tests and both receipt tests passed, as did TypeScript,
+targeted lint, PHP syntax and the native content check. Hosted read-only
+checks still found zero active installations and zero usable scoped
+Operator grants for the designated fixture. The restricted Operator login
+cannot insert principal or grant rows. Migration 0018 is complete. The
+concrete authorization dependency is the previously approved scoped
+enrollment through the existing protected migration-role procedure.
+
+Delivery 0.0.8 is active on the protected WordPress development installation.
+Package SHA-256 is `4d28e5e90fe2e67ab5235cb6522d17421c5138d90762b04518e133ef04406b2e`.
+The verified previous 0.0.6 rollback ZIP is retained off-webroot in
+`~/miopages-native-draft-plugin.rSmjFa49` with SHA-256
+`42de1d2190c7ad8d9db88a50c02db01618303fe4f791ceb2bd3e0d3a31e3e85a`.
+The protected hostname returned HTTP 401 without authentication. WP-CLI
+reported Managed Site 0.1.0 active. No theme switch was performed in this
+increment. Native identity and pull configuration were both absent and
+the database contained zero native draft pointers. There are no owner
+draft URLs, hosted application receipts or verified native rollbacks yet.

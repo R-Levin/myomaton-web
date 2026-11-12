@@ -478,6 +478,12 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           assert.deepEqual(await authorizeDraft(authorizerContext), initialDraft);
           await assert.rejects(issueDraft(initialDraft.digest, generateKeyPairSync("ed25519").privateKey), /signer does not match/);
           const draftEnvelope = await issueDraft();
+          const receiptDecision = await protectedServices.review.nativeDraftReceiptDecision(reviewerContext, site, installationId, draftEnvelope);
+          assert.equal(receiptDecision.credentialId, credentialId);
+          assert.deepEqual(receiptDecision.expected, { installationId, siteProposalId: draftIntent.siteProposalId,
+            operation: "apply", requestedDigest: initialDraft.digest, appliedDigest: initialDraft.digest, revision: 1, paths: ["/", "/service"] });
+          await assert.rejects(protectedServices.review.nativeDraftReceiptDecision(reviewerContext, site, installationId,
+            { ...draftEnvelope, payloadSha256: "0".repeat(64) }), /signature refused/);
           const verifyDraft = (envelope = draftEnvelope, target = identity) =>
             spawnSync("php", ["wordpress/miopages-delivery/tests/native-draft-envelope.php"], { encoding: "utf8",
               input: JSON.stringify({ envelope, identity: target }) });
@@ -530,6 +536,10 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           const verifiedRestore = verifyDraft(restoreEnvelope);
           assert.equal(verifiedRestore.status, 0, verifiedRestore.stderr);
           assert.deepEqual(JSON.parse(verifiedRestore.stdout), { digest: updatedDraft.digest, revision: 2, operation: "restore" });
+          const restoreDecision = await protectedServices.review.nativeDraftReceiptDecision(reviewerContext, site, installationId, restoreEnvelope);
+          assert.equal(restoreDecision.expected.appliedDigest, initialDraft.digest);
+          assert.equal(restoreDecision.expected.operation, "restore");
+          await assert.rejects(protectedServices.review.nativeDraftReceiptDecision(reviewerContext, site, installationId, draftEnvelope), /no current exact authorization/);
           const authorizations = await admin.query("SELECT revision,candidate_digest FROM miopages_wp.wordpress_native_draft_authorizations ORDER BY revision");
           assert.deepEqual(authorizations.rows, [{ revision: 1, candidate_digest: initialDraft.digest }, { revision: 2, candidate_digest: updatedDraft.digest }]);
           assert.equal(revised.manifest.previous, initial.digest);

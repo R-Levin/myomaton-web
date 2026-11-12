@@ -4,6 +4,7 @@ import { binding, hash, pageProposal, proposalScope } from "../lib/platform/cont
 import { operatorRole, protectedConnection, protectedPool } from "../lib/platform/wordpress-delivery/protected-connection";
 import { protectedOperatorServices } from "../lib/platform/wordpress-delivery/protected-services";
 import type { Enrollment } from "../lib/platform/wordpress-delivery/service";
+import { NativeDraftReceiptJournal } from "../lib/platform/wordpress-delivery/native-draft-receipt";
 
 async function main() {
   if (process.env.MIOPAGES_WP_PRIVATE_STAGE !== "enabled") throw Error("Protected stage disabled");
@@ -12,10 +13,11 @@ async function main() {
   for await (const chunk of process.stdin) {
     const bytes = Buffer.from(chunk);
     length += bytes.length;
-    if (length > 65536) throw Error("Protected command too large");
+    if (length > 1_048_576) throw Error("Protected command too large");
     chunks.push(bytes);
   }
   const command = object(JSON.parse(Buffer.concat(chunks).toString("utf8")), ["token", "operation", "input"]);
+  if (length > 65536 && command.operation !== "reconcile-site-draft") throw Error("Protected command too large");
   const pool = protectedPool(process.env.MIOPAGES_WP_OPERATOR_URL ?? "", operatorRole, process.env.MIOPAGES_WP_DATABASE_CA);
   try {
     const service = protectedOperatorServices(pool, db => protectedConnection(db, operatorRole), process.env.MIOPAGES_WP_CORE_ORIGIN ?? "");
@@ -74,6 +76,18 @@ async function main() {
         await service.delivery.enroll(context, command.input as Enrollment);
         result = { enrolled: true };
         break;
+      case "reconcile-site-draft": {
+        const p = object(command.input, ["site", "installationId", "envelope", "receipt"]);
+        const site = object(p.site, ["organizationId", "webPresenceId", "managedSiteId"]);
+        const decision = await service.review.nativeDraftReceiptDecision(context, {
+          organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId),
+        }, uuid(p.installationId), p.envelope);
+        const key = process.env["MIOPAGES_WP_CREDENTIAL_" + decision.credentialId.toUpperCase().replaceAll("-", "_")] ?? "";
+        if (!/^[a-f0-9]{64}$/.test(key)) throw Error("Native draft receipt credential unavailable");
+        const journal = new NativeDraftReceiptJournal(process.env.MIOPAGES_WP_NATIVE_DRAFT_RECEIPTS ?? "");
+        result = await journal.record(decision.expected, Buffer.from(key, "hex"), p.receipt);
+        break;
+      }
       case "rotate": {
         const p = object(command.input, ["installationId", "expectedGeneration", "key"]);
         await service.delivery.rotate(context, uuid(p.installationId), p.expectedGeneration as number,

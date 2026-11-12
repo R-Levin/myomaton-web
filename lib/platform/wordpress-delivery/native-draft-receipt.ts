@@ -1,4 +1,6 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
+import { link, lstat, open, readFile, realpath, unlink } from "node:fs/promises";
+import path from "node:path";
 import { object, uuid } from "../canonical/model";
 import { hash } from "../content-editing/proposal";
 
@@ -43,4 +45,55 @@ export function verifyNativeDraftReceipt(value: unknown, secret: Buffer, expecte
   });
   if (new Set(posts.map(post => post.id)).size !== posts.length) throw Error("Duplicate native draft receipt post");
   return { installationId, siteProposalId, operation: expected.operation, requestedDigest, appliedDigest, revision: body.revision, posts };
+}
+
+/** Development receipts live in the existing protected Core account. */
+export class NativeDraftReceiptJournal {
+  constructor(private root: string) {}
+
+  private async file(installationId: string, digest: string, operation: "apply" | "restore") {
+    const stat = await lstat(this.root);
+    if (!path.isAbsolute(this.root) || await realpath(this.root) !== this.root || !stat.isDirectory() ||
+        (process.getuid && (stat.uid !== process.getuid() || (stat.mode & 0o777) !== 0o700))) {
+      throw Error("Native draft receipt root refused");
+    }
+    return path.join(this.root, [uuid(installationId), hash(digest), operation].join("-") + ".json");
+  }
+
+  async read(installationId: string, digest: string, operation: "apply" | "restore") {
+    const file = await this.file(installationId, digest, operation), stat = await lstat(file);
+    if (!stat.isFile() || stat.size > 20_000 || (process.getuid && (stat.uid !== process.getuid() || (stat.mode & 0o777) !== 0o600))) {
+      throw Error("Stored native draft receipt refused");
+    }
+    return JSON.parse(await readFile(file, "utf8")) as unknown;
+  }
+
+  async record(expected: NativeDraftReceiptExpectation, secret: Buffer, wire: unknown) {
+    const verified = verifyNativeDraftReceipt(wire, secret, expected);
+    if (expected.operation === "restore") {
+      const previous = verifyNativeDraftReceipt(await this.read(expected.installationId, expected.appliedDigest, "apply"), secret, {
+        ...expected, operation: "apply", requestedDigest: expected.appliedDigest,
+      });
+      verifyNativeDraftReceipt(await this.read(expected.installationId, expected.requestedDigest, "apply"), secret, {
+        ...expected, operation: "apply", appliedDigest: expected.requestedDigest, revision: expected.revision + 1,
+      });
+      if (JSON.stringify(previous.posts) !== JSON.stringify(verified.posts)) throw Error("Restored draft differs from previous readback");
+    }
+    const file = await this.file(expected.installationId, expected.requestedDigest, expected.operation);
+    const temp = file + "." + randomUUID() + ".tmp";
+    const writer = await open(temp, "wx", 0o600);
+    try {
+      try { await writer.writeFile(JSON.stringify(wire) + "\n"); await writer.sync(); } finally { await writer.close(); }
+      try { await link(temp, file); } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+      }
+      if (process.platform !== "win32") {
+        const directory = await open(this.root, "r");
+        try { await directory.sync(); } finally { await directory.close(); }
+      }
+      const recorded = verifyNativeDraftReceipt(await this.read(expected.installationId, expected.requestedDigest, expected.operation), secret, expected);
+      if (JSON.stringify(recorded) !== JSON.stringify(verified)) throw Error("Conflicting native draft receipt");
+      return recorded;
+    } finally { await unlink(temp); }
+  }
 }
