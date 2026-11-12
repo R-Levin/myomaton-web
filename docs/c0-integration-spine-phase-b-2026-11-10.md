@@ -411,3 +411,13 @@ Durable receipt recording, lookup of the authoritative expected decision
 and the hosted apply/restore test remain open. The test used synthetic
 readback data and the real PHP receipt format. No hosted plugin or
 credentials changed in this increment.
+
+### Hosted migration 0018 verified
+
+The operator's protected Cloud launcher returned PASS for both
+`apply-native-draft-stage` and `verify-native-draft-stage`, each with
+three recorded adapter migrations. Independent read-only hosted probes
+confirmed the new authorization table is empty. The restricted Operator
+role has SELECT and column INSERT access, with no UPDATE or DELETE. The
+pull role has none of these permissions. No migration retry is needed.
+This checkpoint did not enroll principals or create WordPress drafts.
