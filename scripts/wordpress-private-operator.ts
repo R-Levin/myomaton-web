@@ -45,8 +45,9 @@ async function main() {
         break;
       case "preview-site-draft":
       case "authorize-site-draft":
-      case "issue-site-draft": {
-        const issuing = command.operation === "issue-site-draft";
+      case "issue-site-draft":
+      case "issue-site-draft-restore": {
+        const issuing = command.operation === "issue-site-draft" || command.operation === "issue-site-draft-restore";
         const authorizing = command.operation !== "preview-site-draft";
         const input = object(command.input, ["site", "references", "draft", ...(authorizing ? ["reviewerToken", "expectedDigest"] : [])]);
         const site = object(input.site, ["organizationId", "webPresenceId", "managedSiteId"]);
@@ -63,7 +64,8 @@ async function main() {
           const reviewer = await service.operator.authenticate(input.reviewerToken);
           result = issuing
             ? await service.review.issueSiteDraft(context, reviewer, scope, references, input.draft, input.expectedDigest,
-              createPrivateKey(process.env.MIOPAGES_WP_SIGNING_KEY ?? ""))
+              createPrivateKey(process.env.MIOPAGES_WP_SIGNING_KEY ?? ""),
+              command.operation === "issue-site-draft-restore" ? "restore" : "apply")
             : await service.review.authorizeSiteDraft(context, reviewer, scope, references, input.draft, input.expectedDigest);
         } else result = await service.review.previewSiteDraft(context, scope, references, input.draft);
         break;

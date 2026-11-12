@@ -5,12 +5,14 @@ type Preview = ReturnType<typeof bindSiteDraft>;
 
 // Only the protected operator service issues this envelope after revalidating
 // the durable exact draft authorization. It is distinct from release v1.
-export function nativeDraftEnvelope(preview: Preview, keyId: string, publicKeyBase64: string, key: KeyObject, now = Date.now()) {
+export function nativeDraftEnvelope(preview: Preview, keyId: string, publicKeyBase64: string, key: KeyObject, operation: "apply" | "restore") {
   if (key.type !== "private" || key.asymmetricKeyType !== "ed25519" ||
       createPublicKey(key).export({ format: "jwk" }).x !== Buffer.from(publicKeyBase64, "base64").toString("base64url")) {
     throw Error("Native draft signer does not match installation");
   }
-  const payload = Buffer.from(JSON.stringify({ schema: "miopages.wordpress.native-draft", version: 1,
+  if (operation === "restore" && !preview.candidate.previousDigest) throw Error("Native draft has no predecessor to restore");
+  const now = Date.now();
+  const payload = Buffer.from(JSON.stringify({ schema: "miopages.wordpress.native-draft", version: 1, operation,
     purpose: "non-public-draft-only", issuedAt: Math.floor(now / 1000), expiresAt: Math.floor(now / 1000) + 900,
     digest: preview.digest, candidate: preview.candidate }), "utf8");
   if (payload.length > 700_000) throw Error("Native draft payload too large");

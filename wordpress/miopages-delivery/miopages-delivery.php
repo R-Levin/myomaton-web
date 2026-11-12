@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MioPages Delivery (Development Proof)
  * Description: Restricted, read-only C0 fixture preview for the MioPages WordPress delivery feasibility proof.
- * Version: 0.0.7
+ * Version: 0.0.8
  * Requires PHP: 8.3
  * Text Domain: miopages-delivery
  */
@@ -17,6 +17,28 @@ require_once __DIR__ . '/includes/class-miopages-filesystem-probe.php';
 require_once __DIR__ . '/includes/class-miopages-release-validator.php';
 require_once __DIR__ . '/includes/class-miopages-release-store.php';
 require_once __DIR__ . '/includes/class-miopages-private-staging.php';
+
+if (defined('WP_CLI') && WP_CLI && defined('MIOPAGES_NATIVE_DRAFT_IDENTITY') && is_array(MIOPAGES_NATIVE_DRAFT_IDENTITY)) {
+    require_once __DIR__ . '/includes/class-miopages-native-draft-writer.php';
+    WP_CLI::add_command('miopages native-draft', static function (): void {
+        try {
+            $wire = stream_get_contents(STDIN, 1048577);
+            if (!is_string($wire)) {
+                throw new RuntimeException('Native draft input unavailable.');
+            }
+            $applied = MioPages_Native_Draft_Writer::apply($wire, MIOPAGES_NATIVE_DRAFT_IDENTITY);
+            $posts = [];
+            foreach ($applied['posts'] as $route => $post) {
+                $posts[] = ['path' => $route, 'id' => $post['ID'], 'status' => $post['post_status'],
+                    'contentSha256' => hash('sha256', $post['post_content'])];
+            }
+            WP_CLI::line(wp_json_encode(['candidateDigest' => $applied['digest'], 'revision' => $applied['revision'],
+                'posts' => $posts]));
+        } catch (Throwable $error) {
+            WP_CLI::error('Native draft operation refused or failed. Verify WordPress state before retry.');
+        }
+    });
+}
 
 if (defined('WP_CLI') && WP_CLI && defined('MIOPAGES_PRIVATE_PULL') && is_array(MIOPAGES_PRIVATE_PULL)) {
     require_once __DIR__ . '/includes/class-miopages-release-pull.php';

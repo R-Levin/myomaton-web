@@ -95,14 +95,15 @@ export class PrivateReleaseReview {
   }
 
   async issueSiteDraft(context: unknown, reviewer: unknown, site: Site,
-    references: readonly { proposalId: string; approvalId: string }[], draft: unknown, expectedDigest: unknown, key: KeyObject) {
-    const preview = await this.siteDraft(reviewer, site, references, draft, { context, digest: hash(expectedDigest), key });
+    references: readonly { proposalId: string; approvalId: string }[], draft: unknown, expectedDigest: unknown, key: KeyObject,
+    operation: "apply" | "restore" = "apply") {
+    const preview = await this.siteDraft(reviewer, site, references, draft, { context, digest: hash(expectedDigest), key, operation });
     if (!("envelope" in preview)) throw Error("Native draft issuance refused");
     return preview.envelope;
   }
 
   private async siteDraft(context: unknown, site: Site, references: readonly { proposalId: string; approvalId: string }[], draft: unknown,
-    decision?: { context: unknown; digest: string; key?: KeyObject }) {
+    decision?: { context: unknown; digest: string; key?: KeyObject; operation?: "apply" | "restore" }) {
     if (!Array.isArray(references) || references.length < 1 || references.length > 16) throw Error("Invalid draft page references");
     site = { organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
     const db = await this.pool.connect();
@@ -146,7 +147,7 @@ export class PrivateReleaseReview {
           const newest = (await db.query(`SELECT revision FROM wordpress_native_draft_authorizations
             WHERE installation_id=$1 AND site_proposal_id=$2 ORDER BY revision DESC LIMIT 1`, [installationId, siteProposalId])).rows[0];
           if (newest?.revision !== revision) throw Error("Native draft authorization superseded");
-          const envelope = nativeDraftEnvelope(result, installation.key_id, installation.public_key, decision.key);
+          const envelope = nativeDraftEnvelope(result, installation.key_id, installation.public_key, decision.key, decision.operation ?? "apply");
           await db.query("COMMIT");
           return { ...result, envelope };
         }

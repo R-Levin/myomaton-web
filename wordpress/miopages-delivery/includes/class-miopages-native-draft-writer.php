@@ -19,6 +19,9 @@ final class MioPages_Native_Draft_Writer
         $payload = MioPages_Native_Draft_Envelope::verify($wire, $identity);
         $candidate = $payload['candidate'];
         $digest = $payload['digest'];
+        if ($payload['operation'] === 'restore') {
+            return self::restore($candidate, $digest);
+        }
         return self::transaction($candidate['installationId'], function (?array $state) use ($candidate, $digest): array {
             $current = $state['current'] ?? null;
             if ($current !== null && $current['siteProposalId'] !== $candidate['siteProposalId']) {
@@ -53,6 +56,30 @@ final class MioPages_Native_Draft_Writer
                 'digest' => $digest, 'posts' => $posts];
             self::verifyDrafts($next);
             return ['current' => $next, 'previous' => $current, 'highWaterRevision' => $candidate['revision']];
+        });
+    }
+
+    private static function restore(array $candidate, string $digest): array
+    {
+        return self::transaction($candidate['installationId'], function (?array $state) use ($candidate, $digest): array {
+            $current = $state['current'] ?? null;
+            $previous = $state['previous'] ?? null;
+            if ($current === null || $current['siteProposalId'] !== $candidate['siteProposalId']) {
+                throw new RuntimeException('Native draft restoration scope mismatch.');
+            }
+            if (($state['restoredFrom'] ?? null) === $digest && $current['digest'] === $candidate['previousDigest']) {
+                self::verifyDrafts($current);
+                return $state;
+            }
+            if ($current['digest'] !== $digest || $current['revision'] !== $candidate['revision']
+                || $previous === null || $previous['digest'] !== $candidate['previousDigest']
+                || $previous['revision'] + 1 !== $current['revision']) {
+                throw new RuntimeException('Native draft restoration predecessor mismatch.');
+            }
+            self::verifyDrafts($current);
+            self::verifyDrafts($previous);
+            return ['current' => $previous, 'previous' => null, 'restoredFrom' => $digest,
+                'highWaterRevision' => $state['highWaterRevision']];
         });
     }
 

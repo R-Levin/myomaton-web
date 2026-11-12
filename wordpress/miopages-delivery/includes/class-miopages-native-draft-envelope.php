@@ -32,9 +32,10 @@ final class MioPages_Native_Draft_Envelope
         }
         $payload = json_decode($raw, true, 48, JSON_THROW_ON_ERROR);
         $clock = $now ?? time();
-        if (!is_array($payload) || count($payload) !== 7
+        if (!is_array($payload) || count($payload) !== 8
             || ($payload['schema'] ?? null) !== 'miopages.wordpress.native-draft' || ($payload['version'] ?? null) !== 1
             || ($payload['purpose'] ?? null) !== 'non-public-draft-only'
+            || !in_array($payload['operation'] ?? null, ['apply', 'restore'], true)
             || !is_int($payload['issuedAt'] ?? null) || !is_int($payload['expiresAt'] ?? null)
             || $payload['issuedAt'] > $clock + 60 || $payload['expiresAt'] <= $clock
             || $payload['expiresAt'] - $payload['issuedAt'] !== 900

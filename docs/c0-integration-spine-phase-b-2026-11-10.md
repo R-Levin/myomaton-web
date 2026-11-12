@@ -382,3 +382,21 @@ Session Pooler parameters and verified CA, then runs the explicit 0018
 apply and independent verify operations. Retained credentials are for
 the Operator and pull roles. They do not supply the migration password.
 No new credential or database environment is needed.
+
+The reviewed source for the migration was transferred as a checksum-verified
+Git bundle into the existing detached Cloud rehearsal checkout at
+`0758217`. The first transfer command failed at shell quoting before
+checkout. The corrected command verified the bundle and the final HEAD.
+The migration awaits the operator's hidden input and PASS receipts.
+
+The subsequent development plugin source is version 0.0.8. Its
+CLI-only native draft command requires a protected installation identity,
+an authorized WordPress editor and an exact Core-signed apply or restore
+operation. Apply allocates versioned native draft posts and switches only
+the private review pointer. Restore verifies the current and previous
+versions before returning the pointer to the prior draft set. The CLI
+reports exact readback hashes and post IDs. These reports are not yet
+reconciled to Core. The implementation does not expose public routes,
+and intentional restore ends this bounded two-version rehearsal. Further
+revisions after restore need an explicit resumption contract. Plugin 0.0.8
+has not been installed or used to write hosted drafts.

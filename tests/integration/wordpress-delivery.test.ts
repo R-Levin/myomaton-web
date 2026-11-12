@@ -483,7 +483,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
               input: JSON.stringify({ envelope, identity: target }) });
           const verifiedDraft = verifyDraft();
           assert.equal(verifiedDraft.status, 0, verifiedDraft.stderr);
-          assert.deepEqual(JSON.parse(verifiedDraft.stdout), { digest: initialDraft.digest, revision: 1 });
+          assert.deepEqual(JSON.parse(verifiedDraft.stdout), { digest: initialDraft.digest, revision: 1, operation: "apply" });
           assert.equal(verifyDraft({ ...draftEnvelope, payloadSha256: "0".repeat(64) }).status, 1);
           assert.equal(verifyDraft(draftEnvelope, { ...identity, installationId: randomUUID() }).status, 1);
           await assert.rejects(pullDb.query("SELECT * FROM wordpress_native_draft_authorizations"), /permission denied/);
@@ -525,6 +525,11 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           const nextIntent = { ...draftIntent, revision: 2, previousDigest: initialDraft.digest };
           assert.deepEqual(await protectedServices.review.authorizeSiteDraft(authorizerContext, reviewerContext, site,
             [homeDecision, decision], nextIntent, updatedDraft.digest), updatedDraft);
+          const restoreEnvelope = await protectedServices.review.issueSiteDraft(authorizerContext, reviewerContext, site,
+            [homeDecision, decision], nextIntent, updatedDraft.digest, key.privateKey, "restore");
+          const verifiedRestore = verifyDraft(restoreEnvelope);
+          assert.equal(verifiedRestore.status, 0, verifiedRestore.stderr);
+          assert.deepEqual(JSON.parse(verifiedRestore.stdout), { digest: updatedDraft.digest, revision: 2, operation: "restore" });
           const authorizations = await admin.query("SELECT revision,candidate_digest FROM miopages_wp.wordpress_native_draft_authorizations ORDER BY revision");
           assert.deepEqual(authorizations.rows, [{ revision: 1, candidate_digest: initialDraft.digest }, { revision: 2, candidate_digest: updatedDraft.digest }]);
           assert.equal(revised.manifest.previous, initial.digest);
