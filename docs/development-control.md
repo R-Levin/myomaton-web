@@ -442,6 +442,13 @@ deterministic Phase B adapter. It does not resolve the owner's AI interview
 acceptance concerns. The closed hosted WordPress transport acceptance remains
 independent of this local cycle.
 
+The [next Issue #12 increment](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6825736318)
+groups Home and Service into a [versioned private review candidate](c0-integration-spine-phase-b-2026-11-10.md#unified-private-site-candidate).
+The review bridge retains exact per-page authority and signed receipts.
+It records C0 as transitioning to the managed service. The native
+multi-page approval and WordPress draft materialization boundaries remain
+open. Issue #10 owns the real AI work on its separate branch.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

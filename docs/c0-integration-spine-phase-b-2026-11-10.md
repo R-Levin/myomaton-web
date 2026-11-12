@@ -76,3 +76,60 @@ onboarding checks, PHP syntax, TypeScript and targeted lint. The rendered
 capture was checked for working section links, three staged page captures
 and the before/after wording. The original Phase B revocation, receipt retry,
 tampered-byte and inactive-pointer checks still ran.
+
+## Unified private site candidate
+
+[Source review](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6825669795)
+and [owner go-ahead](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6825736318).
+
+Regenerate using the PowerShell command above on
+`codex/first-operational-cycle-2026-11-12`. Choose **Customer preview → Open
+the private candidate**. Use **Home**, **Service** and **Ask about your website**
+in the site header. The inquiry link opens the local sample and its accepted
+Contact outcome. Return to **Operator review** for the trace, then choose
+**Service before** and **Service after** under **Improved private candidate**.
+Both versions keep the same Home and Service page identities and navigation.
+
+The review bridge groups two PHP-verified staged pages only when their site,
+canonical base and exact staged receipts agree. The version manifest binds
+each page ID, proposal, revision, exact preview digest, projection, stage
+digest and receipt. Version 2 references the version 1 digest, retains the
+exact Home capture, and accepts only the next revision of the same Service
+proposal and Page. Core revalidates Home's approval and projection after
+staging the revised Service. The Contact definition is seeded before the
+first page approvals so the temporary inquiry route leaves the same base
+available after the sample. Its accepted event, explicit recommendation,
+protected Service revision and new acknowledged staging receipt remain
+in the walkthrough.
+
+Home describes MioPages as moving from legacy offerings toward a managed
+Web Presence service. Service explains the planned Launch and Ongoing
+relationship. These fixture projections carry no claim of commercial
+availability, commitment, pricing, launch date or measured outcome.
+
+**Native boundary.** The signed envelope validator already accepts multiple
+pages. The protected source still resolves one latest `PageProposal` and
+one approval event per release. It excludes Action-bound content, and the
+WordPress staging store writes an immutable object rather than private
+WordPress Pages or navigation. Combining the pages into a single signed
+delivery here would require changing what the approval attests to. This
+increment preserves that boundary. The candidate manifest is a local
+review identifier, with no signing or approval authority. The two stages
+are individually authenticated and captured while eligible, without
+claiming simultaneous pull eligibility.
+
+Replace the bridge with an exact site-level proposal and preview covering
+the full page set, navigation and Action targets, plus a WordPress private
+draft materializer with rollback and Core receipt reconciliation. The
+local navigation and Contact action are presentation bridges. The
+inquiry, measurement interpretation and Operator decision are fixtures.
+Native notification delivery and post-change measurement remain open.
+Issue #10's AI path stays separate and the interview provider here remains
+deterministic. No new model calls, real approvals, deployment or publication
+are part of this run. Local verification does not establish owner acceptance.
+
+Both WordPress integration tests passed. The final focused rerun regenerated
+both site versions and verified the navigation, inquiry link, C0 transition
+copy, manifest digests and before/after Service text. The integration test
+also refused foreign-scope members, mismatched bases and receipts, and a
+revised member from a different proposal. TypeScript and targeted lint passed.

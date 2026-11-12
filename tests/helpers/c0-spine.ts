@@ -12,13 +12,14 @@ import type { Pool } from "pg";
 import { contactHttp } from "../../lib/platform/contact/http";
 import { acceptContactSubmission } from "../../lib/platform/contact/submissions";
 import type { ContactEvents } from "../../lib/platform/contact/boundaries";
+import { writePrivateSiteCandidate, type privateSiteCandidate } from "./private-site-candidate";
 
 export function presenceDirection(interview: Awaited<ReturnType<typeof c0SpineInterview>>) {
   return [interview.direct, interview.reviewLed].map(entry => ({
     path: entry.path, draftDigest: entry.draftDigest, assessment: entry.finding.status,
     audience: entry.finding.recommendation === "Lead with the existing-website handoff."
       ? "Established businesses with an existing website" : "Founders preparing their first website",
-    offering: "Managed Web Presence from Launch to Ongoing",
+    offering: "Planned managed Web Presence from Launch to Ongoing",
     pages: { home: "Explain the managed service and direct visitors to its details",
       service: entry.finding.recommendation! },
     action: "Ask about your website",
@@ -26,12 +27,17 @@ export function presenceDirection(interview: Awaited<ReturnType<typeof c0SpineIn
   }));
 }
 
-export async function cycleInquiry(pool: Pool, scope: { webPresenceId: string; managedSiteId: string }) {
+export async function prepareCycleInquiry(pool: Pool, scope: { webPresenceId: string; managedSiteId: string }) {
   // Private Contact configuration bridge on the same disposable tenant. The
   // signed Intro contract cannot carry a native WordPress form yet.
-  const definitionId = randomUUID(), sectionId = randomUUID(), pageId = randomUUID();
+  const definitionId = randomUUID();
   await pool.query("INSERT INTO contact_definitions(id,web_presence_id,name,configuration) VALUES($1,$2,'Local inquiry',$3)",
     [definitionId, scope.webPresenceId, { fields: [{ key: "message", label: "Message", required: true }] }]);
+  return () => cycleInquiry(pool, scope, definitionId);
+}
+
+async function cycleInquiry(pool: Pool, scope: { webPresenceId: string; managedSiteId: string }, definitionId: string) {
+  const sectionId = randomUUID(), pageId = randomUUID();
   await pool.query("INSERT INTO pages(id,managed_site_id,slug,name,title) VALUES($1,$2,'/local-inquiry','Local inquiry','Local inquiry')", [pageId, scope.managedSiteId]);
   await pool.query("INSERT INTO sections(id,page_id,type,content) VALUES($1,$2,'contact',$3)", [sectionId, pageId, { contact_definition_id: definitionId }]);
   const fixtureMessage = "I already have a website. Should I send its URL before we talk?";
@@ -98,7 +104,7 @@ export async function c0SpineInterview(fixture: Awaited<ReturnType<typeof siteRe
       evidence: [
         { ...intakeOwner, id: brief, kind: "owner-confirmed", at: "2026-11-09",
           reference: "docs/miopages-c0-business-brief.md#launch-and-ongoing-offer",
-          statement: "MioPages offers a managed Web Presence service from Launch to Ongoing." },
+          statement: "MioPages is transitioning from legacy offerings to a managed Web Presence service designed around Launch and Ongoing." },
         { ...intakeOwner, id: siteEvidence, kind: "website-observation", at: "2026-11-10",
           reference: "docs/c0-adaptive-onboarding-walkthrough.md",
           statement: "The legacy site markets standalone hosting and website services." },
@@ -116,7 +122,7 @@ export async function c0SpineInterview(fixture: Awaited<ReturnType<typeof siteRe
         const sources = context.evidence.map(item => item.id);
         const previous = context.history.at(-1);
         if (!previous) return { question: "Which prospective customer needs clearer Launch guidance first?",
-          rationale: "Explain the handoff within the confirmed managed-service offer.", sourceIds: sources, assessment: null };
+          rationale: "Explain the handoff within the planned managed service.", sourceIds: sources, assessment: null };
         const existing = previous.answer?.text === "Prospects who already have a website.";
         return {
           question: existing ? "Which existing pages or tools should they flag during the first conversation?"
@@ -174,11 +180,11 @@ const escape = (value: unknown) => String(value ?? "").replace(/[&<>"']/g, chara
 
 export async function writeC0SpineReview(
   interview: Awaited<ReturnType<typeof c0SpineInterview>>,
-  evidence: Record<string, string | number>, stagedIntro: string, cycle: {
+  evidence: Record<string, string | number>, cycle: {
     directions: ReturnType<typeof presenceDirection>;
-    home: { html: string; receipt: string; release: string; previewDigest: string };
+    initial: ReturnType<typeof privateSiteCandidate>;
     inquiry: Awaited<ReturnType<typeof cycleInquiry>>;
-    improved: { html: string; receipt: string; release: string; previewDigest: string };
+    revised: ReturnType<typeof privateSiteCandidate>;
   },
 ) {
   const directory = await mkdtemp(path.resolve("runtime-content/c0-spine-review-"));
@@ -190,15 +196,17 @@ export async function writeC0SpineReview(
     "Operator finding": entry.finding.recommendation, "Readiness": entry.finding.status,
     "Evidence still needed": entry.finding.evidenceNeeded ?? "Ready for planning review",
   });
-  await writeFile(file, `<!doctype html><html lang="en"><head><meta charset="utf-8">
+  const shell = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action 'none'; base-uri 'none'">
 <title>MioPages · Private C0 rehearsal</title><style>
 body{margin:0;background:#f3f6fa;color:#182637;font:1rem/1.55 system-ui}main{max-width:52rem;margin:auto;padding:1.5rem}
 h1,h2,h3{line-height:1.2}section,article{background:white;border:1px solid #d6dfe9;border-radius:.8rem;padding:1.2rem;margin:1rem 0}
 nav{display:flex;flex-wrap:wrap;gap:1rem}a{color:#075581}dt{font-weight:700}dd{margin:0 0 .5rem;overflow-wrap:anywhere}
-summary{cursor:pointer;font-weight:700}.status{color:#174e48;font-weight:700}</style></head>
-<body><main><p>MioPages · Disposable C0-derived rehearsal</p><h1>From onboarding to a better website</h1>
+summary{cursor:pointer;font-weight:700}.status{color:#174e48;font-weight:700}</style></head>`;
+  await writePrivateSiteCandidate(directory, cycle.initial, shell);
+  await writePrivateSiteCandidate(directory, cycle.revised, shell);
+  await writeFile(file, `${shell}<body><main><p>MioPages · Disposable C0-derived rehearsal</p><h1>From onboarding to a better website</h1>
 <p>Follow a saved business answer through private staging, a synthetic inquiry and a reviewed improvement. This is a read-only capture of the local run.</p>
 <nav aria-label="Walkthrough"><a href="#interview">1. Business knowledge</a><a href="#customer">2. Customer preview</a><a href="#measurement">3. Inquiry and measurement</a><a href="#operator">4. Operator review</a><a href="#after">5. Improved preview</a></nav>
 <section id="interview"><h2>1. Interview</h2><p>Managed Launch and Ongoing came from the C0 brief. Both answers below are rehearsal inputs and remain staged.</p>
@@ -209,10 +217,9 @@ ${cycle.directions.map(direction => `<details><summary>${escape(direction.path =
   "Audience": direction.audience, "Offering": direction.offering, "Home": direction.pages.home, "Service": direction.pages.service,
   "Visitor action": direction.action, "Still to confirm": direction.open,
 })}</details>`).join("")}</section>
-<section id="customer"><h2>2. Customer preview</h2><p class="status">Two private page captures ready for review</p>
-<p>Home introduces the service. Service explains where an existing website fits. These are separate signed Intro stages. The links below are the local navigation and contact bridge.</p>
-<nav aria-label="Candidate navigation"><a href="#home">Home</a><a href="#service">Service</a><a href="#measurement">Ask about your website</a></nav>
-<div id="home">${cycle.home.html}</div><div id="service">${stagedIntro}</div></section>
+<section id="customer"><h2>2. Customer preview</h2><p class="status">Private site candidate · Version 1</p>
+<p>Home introduces the transition. Service explains where an existing website fits. The local preview connects verified page stages through shared navigation and a sample inquiry.</p>
+<p><a href="site-v1/index.html">Open the private candidate</a></p></section>
 <section id="measurement"><h2>3. Inquiry and measurement · Synthetic</h2>
 <p><q>${escape(cycle.inquiry.message)}</q></p>
 ${fields({ "Accepted inquiries": cycle.inquiry.accepted, "Notifications delivered": "None · delivery disabled",
@@ -224,11 +231,12 @@ ${fields({ "Accepted inquiries": cycle.inquiry.accepted, "Notifications delivere
   "Direct draft digest": interview.direct.draftDigest, "Review-led draft digest": interview.reviewLed.draftDigest,
   "Direct assessment sources": interview.direct.finding.sourceIds.join(", "), "Review-led assessment sources": interview.reviewLed.finding.sourceIds.join(", "),
   "Review-led approved fixture Review digest": interview.reviewLed.reviewDigest,
-  "Inquiry": cycle.inquiry.submissionId, "Home release": cycle.home.release, "Home receipt": cycle.home.receipt,
-  "Service revision 2 preview digest": cycle.improved.previewDigest, "Updated release": cycle.improved.release,
-  "Updated receipt": cycle.improved.receipt })}</details></section>
-<section id="after"><h2>5. Improved private Service preview</h2>
-${cycle.improved.html}
+  "Inquiry": cycle.inquiry.submissionId, "Home release": cycle.initial.pages.home.release, "Home receipt": cycle.initial.pages.home.receipt,
+  "Candidate v1 digest": cycle.initial.digest, "Candidate v2 digest": cycle.revised.digest,
+  "Service revision 2 preview digest": cycle.revised.pages.service.previewDigest, "Updated release": cycle.revised.pages.service.release,
+  "Updated receipt": cycle.revised.pages.service.receipt })}<p><a href="site-v1/candidate.json">Version 1 manifest</a> · <a href="site-v2/candidate.json">Version 2 manifest</a></p></details></section>
+<section id="after"><h2>5. Improved private candidate · Version 2</h2>
+<p><a href="site-v1/service.html">Service before</a> · <a href="site-v2/service.html">Service after</a> · <a href="site-v2/index.html">Open the revised candidate</a></p>
 <p><strong>Next measurement.</strong> Check whether future visitors provide a site address without asking what to bring. No follow-up data or effect is recorded.</p>
 <p>Customer signoff and publication remain separate decisions. The fixture was disposed after capture.</p>
 </section></main></body></html>`, { flag: "wx", mode: 0o600 });

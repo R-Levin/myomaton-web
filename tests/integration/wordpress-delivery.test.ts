@@ -18,7 +18,8 @@ import { operatorRole, pullRole } from "../../lib/platform/wordpress-delivery/pr
 import { protectedOperatorServices } from "../../lib/platform/wordpress-delivery/protected-services";
 import { inspectCanonical, writeCanonical } from "../../lib/platform/canonical/writes";
 import { requestMac, WordPressDelivery } from "../../lib/platform/wordpress-delivery/service";
-import { c0SpineInterview, cycleInquiry, presenceDirection, writeC0SpineReview } from "../helpers/c0-spine";
+import { c0SpineInterview, prepareCycleInquiry, presenceDirection, writeC0SpineReview } from "../helpers/c0-spine";
+import { privateSiteCandidate } from "../helpers/private-site-candidate";
 
 async function initializeWordPressTestBaseline(url: string) {
   const baseline = new Pool({ connectionString: url });
@@ -279,6 +280,9 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
         // Seed the authorized public source through the existing writer, with the
         // disposable presence temporarily active. The adapter itself cannot write it.
         const now = new Date().toISOString(), knowledgeId = fixture.confirmed[0].confirmation.recordId;
+        const transition = "MioPages is moving from legacy offerings toward one managed Web Presence service.";
+        const serviceDirection = "The planned service starts with Launch for a new site or migration and continues with Ongoing care.";
+        const runInquiry = await prepareCycleInquiry(admin, site);
         const priorKnowledge = await inspectCanonical(admin, "knowledge", site.webPresenceId, knowledgeId);
         assert.ok(priorKnowledge);
         await admin.query("UPDATE web_presences SET status='active' WHERE id=$1", [site.webPresenceId]);
@@ -287,9 +291,10 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
             expectedVersion: priorKnowledge.row.version, expectedFingerprint: priorKnowledge.fingerprint, responsibleIdentity: "test-public-fact-reviewer",
             changeReason: "Disposable fixture", payload: { ...priorKnowledge.row.payload, entries: [
               ...priorKnowledge.row.payload.entries,
-              { key: "public-fact", kind: "audience", value: "MioPages provides one managed Web Presence service, from Launch to Ongoing.",
+              ...[["public-fact", serviceDirection], ["transition-home", transition]].map(([key, value]) =>
+                ({ key, kind: "audience", value,
                 evidence: { sourceKind: "operator", sourceReference: "Disposable approved source", confirmation: "confirmed",
-                  visibility: "public", confirmedBy: "test-public-fact-reviewer", confirmedAt: now } },
+                  visibility: "public", confirmedBy: "test-public-fact-reviewer", confirmedAt: now } })),
             ], approval: { by: "test-public-fact-reviewer", at: now, scope: "public" } } });
         } finally { await admin.query("UPDATE web_presences SET status='inactive' WHERE id=$1", [site.webPresenceId]); }
         const canonical = await inspectCanonical(admin, "knowledge", site.webPresenceId, knowledgeId);
@@ -311,7 +316,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
         await assert.rejects(protectedServices.review.review(approverContext, review), /Independent/);
         const preview = await protectedServices.review.review(reviewerContext, review);
         const reviewerGrant = await protectedServices.operator.authorize(reviewerContext, "review-private-stage", site);
-        assert.equal(preview.pages[0].sections[0].content.text, "MioPages provides one managed Web Presence service, from Launch to Ongoing.");
+        assert.equal(preview.pages[0].sections[0].content.text, serviceDirection);
         const releaseId = randomUUID(), commit = { releaseId, projectionDigest: preview.projectionDigest };
         await assert.rejects(protectedServices.review.review(reviewerContext, { ...review, commit: { ...commit, projectionDigest: "0".repeat(64) } }), /digest mismatch/);
         await protectedServices.review.review(reviewerContext, { ...review, commit });
@@ -376,7 +381,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           assert.deepEqual([rendered.objectSha256, rendered.pageId, rendered.sectionId],
             [issued.envelopeSha256, page.pageId, page.sections[0].id]);
           assert.match(rendered.html, /Already have a website\? Start there\./);
-          assert.match(rendered.html, /one managed Web Presence service, from Launch to Ongoing/);
+          assert.match(rendered.html, /planned service starts with Launch/);
           await assert.rejects(render({ ...pins, identity: { ...identity, webPresenceId: randomUUID() } }), /Private staged Intro refused/);
           await assert.rejects(render({ ...pins, identity: { ...identity, managedSiteId: randomUUID() } }), /Private staged Intro refused/);
           await assert.rejects(render({ ...pins, releaseId: randomUUID() }), /Private staged Intro refused/);
@@ -394,7 +399,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           await assert.rejects(render(), /Current Core delivery eligibility required/);
           await admin.query("UPDATE managed_sites SET name=$2 WHERE id=$1", [site.managedSiteId, originalName]);
           assert.deepEqual(await render(), rendered);
-          const stagePage = async (decision: Awaited<ReturnType<typeof approvePage>>, pathName: string) => {
+          const stagePage = async (decision: Awaited<ReturnType<typeof approvePage>>, pathName: "/" | "/service") => {
             const stageRelease = randomUUID(), stageInstallation = randomUUID(), stageCredential = randomUUID();
             const stageSecret = randomBytes(32);
             const stageOrigin = `https://${stageInstallation}.example.test`;
@@ -437,13 +442,25 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
             const stagedPage = JSON.parse(child.stdout) as { objectSha256: string; html: string; pageId: string };
             assert.equal(stagedPage.objectSha256, digest);
             assert.deepEqual(await readdir(stageDirectory), [".release.lock", "objects"]);
-            return { ...stagedPage, receipt: marker, release: stageRelease, previewDigest: decision.previewDigest };
+            return { ...stagedPage, site, path: pathName, proposalId: decision.proposalId, revision: decision.binding.revision,
+              sourceDigest: projection.sourceDigest, projectionDigest: projection.projectionDigest,
+              receipt: marker, release: stageRelease, previewDigest: decision.previewDigest };
           };
           const homePage = { ...page, pageId: randomUUID(), slug: "/", title: fixture.editorial("MioPages Home"),
-            sections: [{ ...page.sections[0], id: randomUUID(), heading: fixture.editorial("A managed Web Presence for your business") }] };
-          const home = await stagePage(await approvePage(homePage), "/");
+            sections: [{ ...page.sections[0], id: randomUUID(), heading: fixture.editorial("What’s next for MioPages"),
+              text: { ...page.sections[0].text, source: { ...page.sections[0].text.source, field: "transition-home" } } }] };
+          const homeDecision = await approvePage(homePage);
+          const home = await stagePage(homeDecision, "/");
           assert.equal(home.pageId, homePage.pageId);
-          const inquiry = await cycleInquiry(admin, site);
+          assert.match(home.html, /moving from legacy offerings/);
+          const service = { ...rendered, site, path: "/service" as const, proposalId: review.proposalId,
+            revision: review.binding.revision, sourceDigest: preview.sourceDigest, projectionDigest: preview.projectionDigest,
+            receipt: exactReceipt, release: releaseId, previewDigest: review.previewDigest };
+          const initial = privateSiteCandidate(site, home, service);
+          assert.throws(() => privateSiteCandidate(site, home, { ...service, site: { ...site, managedSiteId: randomUUID() } }));
+          assert.throws(() => privateSiteCandidate(site, home, { ...service, sourceDigest: "0".repeat(64) }));
+          assert.throws(() => privateSiteCandidate(site, home, { ...service, receipt: home.receipt }));
+          const inquiry = await runInquiry();
           const improvedPage = { ...page, sections: [{ ...page.sections[0], heading: {
             kind: "editorial" as const, text: inquiry.recommendation,
             rationale: `Disposable Operator reviewed one accepted inquiry asking what to bring. Evidence ${inquiry.submissionId}.`,
@@ -455,6 +472,14 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           assert.equal(improved.pageId, rendered.pageId);
           assert.notEqual(improved.objectSha256, rendered.objectSha256);
           assert.match(improved.html, /Bring its address to the first conversation/);
+          const currentHome = await protectedServices.review.review(reviewerContext, homeDecision);
+          assert.equal(currentHome.projectionDigest, home.projectionDigest);
+          assert.equal(currentHome.sourceDigest, home.sourceDigest);
+          const revised = privateSiteCandidate(site, home, improved, initial);
+          assert.equal(revised.manifest.previous, initial.digest);
+          assert.notEqual(revised.digest, initial.digest);
+          assert.deepEqual(revised.manifest.pages[0], initial.manifest.pages[0]);
+          assert.throws(() => privateSiteCandidate(site, home, { ...improved, proposalId: randomUUID() }, initial));
           await admin.query("UPDATE miopages_wp.wordpress_operator_grants SET revoked_at=now() WHERE operator_id=$1 AND permission='approve-site-proposal'", [approver.id]);
           assert.equal((await handler.handle(request("pull"))).status, 409);
           await assert.rejects(render(), /Current Core delivery eligibility required/);
@@ -474,7 +499,7 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
             "Staged Page": rendered.pageId, "Staged Intro Section": rendered.sectionId,
             "Envelope digest": rendered.objectSha256, "Returned receipt": exactReceipt,
             "Core accepted receipt at": receipt.staged_at.toISOString(),
-          }, rendered.html, { directions, home, inquiry, improved }];
+          }, { directions, initial, inquiry, revised }];
         } finally {
           assert.match(path.basename(root), /^miopages-wordpress-pull-/);
           assert.equal(path.dirname(root), await realpath(tmpdir()));
