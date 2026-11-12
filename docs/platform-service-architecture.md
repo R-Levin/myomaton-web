@@ -422,6 +422,15 @@ facts retain their authority; claims, preferences, AI recommendations and gaps
 remain distinct. Operator QA and existing approval/release authority are mandatory.
 Autonomous publication and sophisticated autonomous optimization remain deferred.
 
+The evolving Managed Site is non-public during development. Scoped Operators
+can inspect drafts, run QA, and respond to customer feedback. At the designated
+customer review stage, authorized customer participants can view the shared
+revision and submit feedback or request changes. Exact-revision approval
+requires the designated customer authority. Operator evidence and controls
+remain separately permissioned. Sharing a revision, recording feedback,
+approving content, and authorizing public release are distinct gates.
+Customer access remains subject to the existing P7 readiness gate.
+
 Use this development sequence under the existing readiness and deferred gates:
 
 1. **Hosted foundation — immediate:** separately authorized 20i Managed Cloud,

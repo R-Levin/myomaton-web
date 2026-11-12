@@ -82,6 +82,12 @@ tampered-byte and inactive-pointer checks still ran.
 [Source review](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6825669795)
 and [owner go-ahead](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6825736318).
 
+The Managed Site candidate is non-public. The [architecture](platform-service-architecture.md)
+defines stage-appropriate review and response by both customers and Operators,
+with separately scoped Operator evidence and exact-revision approval authority.
+The local capture illustrates those views. Authenticated sharing, feedback,
+and approval interactions remain outside this increment.
+
 Regenerate using the PowerShell command above on
 `codex/first-operational-cycle-2026-11-12`. Choose **Customer preview → Open
 the private candidate**. Use **Home**, **Service** and **Ask about your website**

@@ -449,6 +449,11 @@ It records C0 as transitioning to the managed service. The native
 multi-page approval and WordPress draft materialization boundaries remain
 open. Issue #10 owns the real AI work on its separate branch.
 
+Owner clarification: Managed Site development is non-public, with
+stage-appropriate Customer and Operator access and distinct permissions.
+See the [architecture](platform-service-architecture.md) and [handoff](c0-integration-spine-phase-b-2026-11-10.md#unified-private-site-candidate).
+This is a documentation clarification within the existing implementation scope.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier
