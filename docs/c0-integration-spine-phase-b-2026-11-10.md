@@ -1203,3 +1203,24 @@ Public DNS still returned 185.146.167.193 for the requested name, whose
 `/core` returned 404. The existing development URL returned 200 and the
 future portal's root returned 301 to `https://miopages.com/`. This hostname
 decision does not authorize dispatch of the pending AI answer.
+
+
+Focused local verification passed 13 tests, TypeScript and changed-file lint.
+[Linux run 43504040742](https://github.com/R-Levin/myomaton-web/actions/runs/43504040742)
+passed with nine default-origin checks and twelve neutral-origin checks.
+The latter retain the legacy shell, refuse cross-origin POST and exclude the
+unrelated app hostname. Source `9c02afc9266793e0a42d89619a7c6d8539fbe623`,
+artifact 14074763360, tar SHA-256
+`9da65b0c1fa74e00666e921d4dcabe985c70a3010330b91091e048c24ac970ca`.
+The archive and all 164 files were independently verified and staged
+off-webroot in `update-9c02afc` inside the development package's private
+directory. The live app and origin selector were untouched.
+
+Direct HTTPS to the existing package IP with the proposed name validated
+TLS but produced 404 for `/core`, 503 for `/core/` and 503 for the protected
+API. The current hostname on that same IP returned 200, 307 and 401
+respectively. The proposed name has yet to prove Node forwarding. The
+next operation is the authorized secondary mapping in My20i, followed by
+a forced-address HTTPS check and the exact DNS and TLS verification before
+installing the staged candidate. My20i control-plane interaction must come
+from an authenticated operator session while browser startup is unavailable.
