@@ -30,11 +30,17 @@ function grantBinding(grant: ProviderGrant) {
     maxRequests: grant.maxRequests, capMicros: grant.capMicros, rates: grant.rates, ledgerDirectory: grant.ledgerDirectory });
 }
 
-export function coreOrigin() {
+const legacyCoreOrigin = "https://wp-acceptance.miopages.com";
+const developmentCoreOrigin = "https://core-dev.miopages.com";
+
+export function coreOrigin(host: string | null) {
   if (process.env.MIOPAGES_PROTECTED_CORE !== "enabled") return null;
-  const url = new URL(process.env.MIOPAGES_PROTECTED_CORE_ORIGIN ?? "");
-  if (url.origin !== "https://wp-acceptance.miopages.com" || url.href !== url.origin + "/") throw Error("Protected Core origin refused");
-  return url;
+  const configured = process.env.MIOPAGES_PROTECTED_CORE_ORIGIN;
+  if (configured !== legacyCoreOrigin && configured !== developmentCoreOrigin) throw Error("Protected Core origin refused");
+  const primary = new URL(configured);
+  if (host === primary.host) return primary;
+  const legacy = new URL(legacyCoreOrigin);
+  return host === legacy.host ? legacy : null;
 }
 
 async function privateConfig<T>(file: string): Promise<T> {
@@ -105,7 +111,7 @@ async function openCore() {
   return { operators, selection, intake, interview, draftToken: cfg.draftToken };
 }
 let core: ReturnType<typeof openCore> | undefined;
-const sessions = new Map<string, { credential: string; expires: number }>();
+const sessions = new Map<string, { credential: string; expires: number; origin: string }>();
 const loginGuard = developmentGuard(20);
 
 const headers = { "Cache-Control": "no-store", "Vary": "Cookie", "X-Content-Type-Options": "nosniff", "X-Robots-Tag": "noindex, nofollow" };
@@ -114,16 +120,16 @@ const session = (token: string, age: number) => `${coreCookie}=${token}; Path=/;
 export async function hostedCoreRequest(request: Request) {
   const reply = (value: unknown, status = 200) => Response.json(value, { status, headers });
   try {
-    const origin = coreOrigin();
+    const origin = coreOrigin(request.headers.get("host"));
     if (!origin) return reply({ error: "unavailable" }, 404);
     const url = new URL(request.url);
-    if (request.headers.get("host") !== origin.host || request.headers.get("x-forwarded-proto") !== "https" ||
+    if (request.headers.get("x-forwarded-proto") !== "https" ||
         url.pathname !== "/api/protected-core" || url.search) return reply({ error: "unavailable" }, 404);
     if (request.headers.get("x-intake-request") !== "1" ||
         (request.method === "POST" && request.headers.get("origin") !== origin.origin)) return reply({ error: "invalid_origin" }, 403);
     if (request.method === "POST" && request.headers.get("x-core-operation") === "logout") {
       const token = sessionToken(request, coreCookie);
-      if (token) sessions.delete(token);
+      if (token && sessions.get(token)?.origin === origin.origin) sessions.delete(token);
       const response = reply({ status: "signed_out" });
       response.headers.set("Set-Cookie", session("", 0));
       return response;
@@ -131,8 +137,8 @@ export async function hostedCoreRequest(request: Request) {
     if (request.method !== "GET" && request.method !== "POST") return reply({ error: "invalid_method" }, 405);
     const token = sessionToken(request, coreCookie);
     const active = token ? sessions.get(token) : undefined;
-    const credential = active && active.expires > Date.now() ? active.credential : null;
-    if (token && !credential) sessions.delete(token);
+    const credential = active && active.origin === origin.origin && active.expires > Date.now() ? active.credential : null;
+    if (token && active && active.expires <= Date.now()) sessions.delete(token);
     if (!credential && request.method === "GET") return reply({ error: "sign_in_required" }, 401);
     const app = await (core ??= openCore());
     const authenticate = async (credential: unknown) => {
@@ -159,13 +165,13 @@ export async function hostedCoreRequest(request: Request) {
         return null;
       }
       if (value.operation === "sign-in") {
-        if (!await loginGuard.allow(origin.host)) { refusal = reply({ error: "rate_limited" }, 429); return null; }
+        if (!await loginGuard.allow("protected-core")) { refusal = reply({ error: "rate_limited" }, 429); return null; }
         if (!await authenticate(value.credential)) { refusal = reply({ error: "sign_in_required" }, 401); return null; }
         const now = Date.now();
-        for (const [id, active] of sessions) if (active.expires <= now || active.credential === value.credential) sessions.delete(id);
+        for (const [id, active] of sessions) if (active.expires <= now || (active.credential === value.credential && active.origin === origin.origin)) sessions.delete(id);
         if (sessions.size >= 32) { refusal = reply({ error: "unavailable" }, 503); return null; }
         signedIn = randomBytes(32).toString("hex");
-        sessions.set(signedIn, { credential: value.credential as string, expires: now + 900_000 });
+        sessions.set(signedIn, { credential: value.credential as string, expires: now + 900_000, origin: origin.origin });
         return { status: "signed_in" };
       }
       const context = await authenticate(credential);

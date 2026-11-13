@@ -512,7 +512,10 @@ deployment. Owner product acceptance requires a working online journey.
 
 The [external Core access correction](c0-integration-spine-phase-b-2026-11-10.md#external-core-access)
 records the exact slash-path fix, authenticated Edge verification and
-the separate provider-neutral hostname decision.
+the separate provider-neutral hostname decision. The owner approved the
+[exact core-dev development hostname](c0-integration-spine-phase-b-2026-11-10.md#approved-neutral-development-hostname)
+on the existing account. Verify its package mapping, exact DNS, TLS and
+Node route before switching the protected Core origin.
 
 The [business answer to editable site direction checkpoint](c0-integration-spine-phase-b-2026-11-10.md#business-answer-to-editable-site-direction)
 records the protected AI projection, editable page draft, existing proposal

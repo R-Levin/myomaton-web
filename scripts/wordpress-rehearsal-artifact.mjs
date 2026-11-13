@@ -15,7 +15,7 @@ assert.equal((await readdir(".")).some(name => name.startsWith(".env")), false, 
 const core = process.env.MIOPAGES_PROTECTED_CORE === "enabled";
 const origin = core ? "https://wp-acceptance.miopages.com" : "https://rehearsal.example.test";
 
-async function smoke(directory) {
+async function smoke(directory, coreOrigin = origin) {
 // Explicit environment: importantly no DATABASE_URL, operator credentials or signer.
 const compiled = JSON.parse(await readFile(path.join(directory, '.next/required-server-files.json'), 'utf8')).config;
 assert.equal(compiled.skipTrailingSlashRedirect, true);
@@ -24,7 +24,7 @@ const child = spawn(process.execPath, ["--max-old-space-size=256", path.join(dir
   cwd: directory,
   env: { PATH: process.env.PATH, HOME: process.env.HOME, NODE_ENV: "production", NEXT_TELEMETRY_DISABLED: "1",
     MIOPAGES_ROUTING_MODE: "shared-hostnames",
-    ...(core ? { MIOPAGES_PROTECTED_CORE: "enabled", MIOPAGES_PROTECTED_CORE_ORIGIN: origin } : {
+    ...(core ? { MIOPAGES_PROTECTED_CORE: "enabled", MIOPAGES_PROTECTED_CORE_ORIGIN: coreOrigin } : {
       MIOPAGES_WP_PRIVATE_STAGE: "enabled", MIOPAGES_WP_CORE_ORIGIN: origin,
       MIOPAGES_WP_PULL_URL: "postgresql://miopages_wp_pull:build-only@127.0.0.1:1/build_only?sslmode=verify-full",
     }) },
@@ -35,26 +35,39 @@ try {
   let ready = false;
   for (let attempt = 0; attempt < 100; attempt++) {
     if (child.exitCode !== null) throw new Error("Isolated Next runtime exited before readiness");
-    try { ready = (await request(8081, origin, "/", "GET")).status === 404; } catch { /* booting */ }
+    try { ready = (await request(8081, coreOrigin, "/", "GET")).status === 404; } catch { /* booting */ }
     if (ready) break;
     await new Promise(resolve => setTimeout(resolve, 200));
   }
   assert.ok(ready, "Isolated runtime readiness without DATABASE_URL");
   if (!core) return await routingSmoke(8081, origin);
-  assert.equal((await request(8081, origin, "/core", "GET")).status, 200);
-  const api = await request(8081, origin, "/api/protected-core", "GET", { "x-intake-request": "1" });
+  assert.equal((await request(8081, coreOrigin, "/core", "GET")).status, 200);
+  const api = await request(8081, coreOrigin, "/api/protected-core", "GET", { "x-intake-request": "1" });
   assert.equal(api.status, 401);
   assert.equal(api.headers["cache-control"], "no-store");
-  const canonical = await request(8081, origin, "/core/", "GET");
+  const canonical = await request(8081, coreOrigin, "/core/", "GET");
   assert.equal(canonical.status, 307);
   assert.equal(canonical.headers.location, "/core");
   assert.equal(canonical.headers["cache-control"], "no-store");
   for (const target of ["/core/?x=1", "/core?x=1", "/api/protected-core/", "/api/contact", "/_next/static/../core"]) {
-    const response = await request(8081, origin, target, "GET");
+    const response = await request(8081, coreOrigin, target, "GET");
     assert.equal(response.status, 404);
     assert.equal(response.headers["cache-control"], "no-store");
   }
-  return { checks: 8, anonymousApi: 401, shell: 200, slashRedirect: 307 };
+  const alias = 'https://core-dev.miopages.com';
+  if (coreOrigin === alias) {
+    for (const target of ['/core', '/api/protected-core']) {
+      const legacy = await request(8081, origin, target, 'GET', { 'x-intake-request': '1' });
+      assert.equal(legacy.status, target === '/core' ? 200 : 401);
+    }
+    const cross = await request(8081, alias, '/api/protected-core', 'POST', { 'x-intake-request': '1', origin });
+    assert.equal(cross.status, 403);
+    assert.equal((await request(8081, 'https://app.miopages.com', '/api/protected-core', 'GET', { 'x-intake-request': '1' })).status, 404);
+    return { checks: 12, legacyCore: 200, crossOrigin: 403, unrelatedHost: 404 };
+  }
+  const inactive = await request(8081, alias, '/api/protected-core', 'GET', { 'x-intake-request': '1' });
+  assert.equal(inactive.status, 404);
+  return { checks: 9, anonymousApi: 401, shell: 200, slashRedirect: 307 };
 } finally {
   child.kill("SIGTERM");
   const stopped = await Promise.race([exited.then(() => true), new Promise(resolve => setTimeout(() => resolve(false), 5000))]);
@@ -101,7 +114,10 @@ if (core) {
 // links. This temporary dependency link is removed before creating the archive.
 await symlink(path.resolve("node_modules"), path.join(staging, "node_modules"), "dir");
 let routingSmokeResult;
-try { routingSmokeResult = await smoke(path.resolve(staging)); }
+try {
+  routingSmokeResult = await smoke(path.resolve(staging));
+  if (core) routingSmokeResult.neutralOrigin = await smoke(path.resolve(staging), 'https://core-dev.miopages.com');
+}
 finally { await unlink(path.join(staging, "node_modules")); }
 for (const [file, digest] of Object.entries(hashes)) {
   assert.equal(createHash("sha256").update(await readFile(path.join(staging, file))).digest("hex"), digest, "Smoke changed packaged file: " + file);

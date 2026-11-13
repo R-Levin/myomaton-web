@@ -23,6 +23,17 @@ test("protected Core refuses anonymous and cross-origin requests before accessin
     assert.equal(response.headers.get("cache-control"), "no-store");
     assert.equal((await get("/api/protected-core?draft=foreign")).status, 404);
     assert.equal((await get(undefined, { host: "runtime.miopages.com" })).status, 404);
+    const neutral = "https://core-dev.miopages.com";
+    const aliasHost = new URL(neutral).host;
+    assert.equal((await get(undefined, { host: aliasHost })).status, 404);
+    process.env.MIOPAGES_PROTECTED_CORE_ORIGIN = neutral;
+    assert.equal((await get(undefined, { host: aliasHost })).status, 401);
+    assert.equal((await get()).status, 401);
+    assert.equal((await get(undefined, { host: aliasHost + ":443" })).status, 404);
+    assert.equal((await hostedCoreRequest(new Request(neutral + "/api/protected-core", {
+      method: "POST", headers: { ...headers, host: aliasHost, origin },
+    }))).status, 403);
+    process.env.MIOPAGES_PROTECTED_CORE_ORIGIN = origin;
     assert.equal((await get(undefined, { "x-forwarded-proto": "http" })).status, 404);
     assert.equal((await hostedCoreRequest(new Request(origin + "/api/protected-core", {
       method: "POST", headers: { ...headers, origin: "https://foreign.example" },

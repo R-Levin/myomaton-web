@@ -1166,3 +1166,40 @@ No new real follow-up or generated site plan exists yet. The next action
 is to allowlist and save the exact approved development answer and run one
 follow-up within that grant. Verify the actual result and review the edited
 proposal before requesting exact private WordPress application authority.
+
+
+#### Approved neutral development hostname
+
+The owner approved the exact `core-dev.miopages.com` secondary hostname,
+DNS, TLS and protected Core origin on the existing 20i development package.
+Keep the primary package hostname and preserve the existing `app.miopages.com`
+redirect. The legacy Core origin remains available during cutover. No
+provider spend, new package or broader origin wildcard is authorized.
+
+My20i's documented path is Manage Hosting, the existing
+`wp-acceptance.miopages.com` package, then Domains for a secondary mapping to
+the existing `public_html`. Inspect the exact DNS record in the
+`miopages.com` zone before any update. Use the package target
+`185.146.167.100` only after verifying the alias, free TLS and Node forwarding.
+If certificate issuance requires the record first, coordinate the one exact
+DNS change without changing the working Core origin. Preserve the exact
+pre-change DNS and mapping so a failed verification can be reversed. My20i
+browser automation could not start in this workspace. The existing verified
+SSH account cannot edit provider package DNS or TLS.
+
+The reviewed Core build supports the two exact origins only when the new
+origin is enabled by its account-owned mode-0600 off-webroot selector.
+Origin is checked on each API request and the host-only sessions are bound
+server-side to their issuing origin. The same aggregate sign-in limit applies
+to both names. Existing WordPress delivery origin is separate. Verify the
+alias against the actual Node vhost before selecting it. After cutover,
+confirm valid HTTPS, canonical redirects, authenticated readback and sign-out
+on both Core hostnames. Confirm the public runtime, WordPress and app redirect.
+Roll back the selector, or restore the previous package artifact if needed,
+before reverting only the new mapping and exact record.
+
+At the checkpoint, the provider mapping, DNS and TLS remain unverified.
+Public DNS still returned 185.146.167.193 for the requested name, whose
+`/core` returned 404. The existing development URL returned 200 and the
+future portal's root returned 301 to `https://miopages.com/`. This hostname
+decision does not authorize dispatch of the pending AI answer.

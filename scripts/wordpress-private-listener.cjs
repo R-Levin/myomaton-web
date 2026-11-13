@@ -9,6 +9,7 @@ const HOME = '/home/virtual/vps-bef564/e/e494602172';
 const WEB = HOME + '/public_html';
 const PRIVATE = HOME + '/miopages-private-acceptance';
 const ORIGIN = 'https://wp-acceptance.miopages.com';
+const CORE_ORIGIN = 'https://core-dev.miopages.com';
 const CREDENTIAL = '421ef5e7-06da-4485-830c-91b1611c7225';
 const RSS_LIMIT = 384 * 1024 * 1024;
 const MIN_AVAILABLE = 512 * 1024 * 1024;
@@ -38,6 +39,12 @@ function childEnvironment(value) {
     ['MIOPAGES_WP_CREDENTIAL_' + CREDENTIAL.replaceAll('-', '_')]: c.secretHex };
 }
 
+function preferredCoreOrigin(value) {
+  if (value === undefined) return ORIGIN;
+  assert.equal(value, CORE_ORIGIN + '\n');
+  return CORE_ORIGIN;
+}
+
 function coreEnvironment(value) {
   assert.ok(value && typeof value === 'object' && !Array.isArray(value));
   assert.deepEqual(Object.keys(value).sort(), ['databaseUrl', 'ca', 'aiEnabled', 'apiKey'].sort());
@@ -53,8 +60,11 @@ function coreEnvironment(value) {
   else assert.equal(value.apiKey, '');
   privateFile(PRIVATE + '/core-input.json');
   if (value.aiEnabled) privateFile(PRIVATE + '/ai-scope.json');
+  let configuredOrigin;
+  try { configuredOrigin = privateFile(PRIVATE + '/core-origin'); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
   return { PATH: '/usr/bin:/bin', HOME, LANG: 'C.UTF-8', NODE_ENV: 'production', NEXT_TELEMETRY_DISABLED: '1',
-    MIOPAGES_ROUTING_MODE: 'shared-hostnames', MIOPAGES_PROTECTED_CORE: 'enabled', MIOPAGES_PROTECTED_CORE_ORIGIN: ORIGIN,
+    MIOPAGES_ROUTING_MODE: 'shared-hostnames', MIOPAGES_PROTECTED_CORE: 'enabled', MIOPAGES_PROTECTED_CORE_ORIGIN: preferredCoreOrigin(configuredOrigin),
     MIOPAGES_PROTECTED_CORE_DB_URL: value.databaseUrl, MIOPAGES_WP_DATABASE_CA: value.ca,
     MIOPAGES_PROTECTED_CORE_INPUT: PRIVATE + '/core-input.json',
     ...(value.aiEnabled && { MIOPAGES_PROTECTED_CORE_AI_SCOPE: PRIVATE + '/ai-scope.json', MIOPAGES_OPENAI_DEV_API_KEY: value.apiKey }) };
@@ -162,5 +172,5 @@ async function main() {
   event('private-listener-spawned', { pid: child.pid, bind: '127.0.0.1', port: 8081 });
 }
 
-module.exports = { configuration, childEnvironment, procStat, resourceGate, ownedMembers, HOME, WEB, PRIVATE };
+module.exports = { configuration, childEnvironment, procStat, resourceGate, ownedMembers, preferredCoreOrigin, HOME, WEB, PRIVATE };
 if (require.main === module) main().catch(() => { console.error('Private listener configuration refused; inspect before retry.'); process.exitCode = 1; });
