@@ -527,7 +527,10 @@ records one durable revision-scoped acceptance and the Operator readback.
 The [live cited follow-up and editable site checkpoint](c0-integration-spine-phase-b-2026-11-10.md#live-cited-follow-up-and-site-preparation)
 records the successful exact AI turn, hosted Operator-authored v15 plan,
 linked synthetic inquiry and private WordPress review input. The native
-apply remains gated by exact rollback after a restore and separate approval.
+apply remains gated by separate approval. The [private revision 5 review and
+recovery checkpoint](c0-integration-spine-phase-b-2026-11-10.md#private-revision-5-review-and-recovery)
+records the v2 rollback correction, local v15 previews and the exact
+preparation scope. Governed Page previews require fresh scoped credentials.
 
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 

@@ -1462,3 +1462,99 @@ back to the current content with stable Page IDs. Only then prepare the
 durable Page revisions under fresh scoped credentials and request exact
 application approval. No WordPress change, publication or new provider
 call took place during site preparation.
+
+
+#### Private revision 5 review and recovery
+
+Read-only WP-CLI independently confirmed installed Delivery 0.0.9, signed
+high-water revision 4 and displayed revision 3. It verified the exact
+native pointer and the draft status, titles, slugs and content bytes of
+Home 13 and Service 14. Core verified the signed revision 3 envelope,
+revision 3 apply receipt, and the matching authenticated restore receipt
+for revision 4. The working app and WordPress installation were left
+untouched.
+
+The new draft-only v2 envelope binds a separate materialized rollback
+revision and digest. Core checks the sequential authorization chain and
+authenticates both the baseline apply receipt and predecessor restore
+receipt before authorizing or issuing v2. WordPress checks the restored
+pointer, stable Page identities and locked current content before apply.
+It keeps the baseline snapshot and high-water counter separately. Receipt
+reconciliation checks the actual rollback revision and the forward
+revision independently. Previously issued v1 envelopes and receipt
+formats remain readable. A v1 forward apply after a stable restore is
+refused. The earlier one-time legacy Page adoption behavior is retained.
+No database migration is needed. Delivery 0.0.10 is the uninstalled
+candidate for v2.
+
+The PHP regression exercised the equivalent revision 4 high-water and
+revision 3 materialization on simulated WordPress state, applied revision
+5, restored exact revision 3 content and stable IDs and slugs, retained
+high-water 5, and successfully moved forward to revision 6. It also
+verified exact retries, stale applies, false baselines and drift refusal.
+Disposable PostgreSQL verified independent grants, both required baseline
+receipts, v2 authorization and issuance, PHP signature compatibility,
+receipt reconciliation and stale authorization refusal. These are local
+tests. Hosted revision 5 has not been applied.
+
+**Review scope fingerprint**
+`1333ddc4e88cb0cdaef0ab379c16f3ac71e0c36dcb18160b2192350d5b70a4da`.
+It binds existing Core review input v15, the v2 rollback target, both
+logical Page IDs, exact draft content hashes and internal Actions. The
+latest canonical snapshot differs from the old proposal bases only in
+`contact_definitions`, where the scoped inquiry definition was added.
+New governed Page revisions must be prepared against current base
+`8c342e25aa3c962b98a9292bfd871873aca87364b0a6d44b3be6847c09a11ebd`.
+The owned canonical source revision still resolves to the exact previously
+signed text. Existing preview approval checks are unchanged.
+
+| WordPress draft | Proposed Core Page revision | Proposed native content SHA-256 |
+| --- | --- | --- |
+| Home 13, slug `home-miopages-13` | Home 2 | `9a2a218c24ab25bd5f31c6122617f28786ea705a6db9d91d81f8d1bde2d2816b` |
+| Service 14, slug `service-miopages-14` | Service 5 | `eb3c0a43811f6c6f882317ede97c8e8e0cdbfc8b6d4c513fef12a6b91ab75b5f` |
+
+The site revision is 5 for installation
+`d84ebc69-46d5-4c64-adc6-ac7b87468f89` and site proposal
+`1e28f792-624d-4141-96db-45c4ba05e17d`. Signed predecessor revision 4 is
+`1a6343c049c0430e51ef7fa3780123c9475352af0328301d661a38a9b500eb2a`.
+Materialized rollback revision 3 is
+`85786f251ed5b93e42d9ae2b8c7247d85d99280aa9b1bc5932a1321330a043db`.
+The Home Action opens Service and the Service Action opens Home. The
+Service improvement retains synthetic inquiry
+`fe475728-c2ce-4dbe-bcc5-ec3bfba39f8c` and its revision 3 link. The
+Launch eligibility question stays unresolved. SEO descriptions stay
+in the Core review; the v2 native envelope still delivers only supported
+draft content and internal Actions.
+
+Local previews and before/after diffs are Git-ignored in
+`runtime-content/c0-wordpress-private-preview-v15-verified/index.html`.
+They use the existing Core proposal renderer and the WordPress native
+content projector. The local WordPress compatibility functions reproduced
+both actual baseline content hashes byte for byte. Edge verified both
+local pages, the Service diff and both internal Actions without external
+requests. The Core HTML is a read-only preparation artifact, without
+durable preview events. Exact governed preview digests and the signed
+site digest follow current scoped author/reviewer access and the real
+current-base proposal revisions. No protected review input was moved to
+another hosted account. Only previously retained native evidence and
+canonical source readback came into the existing local review workspace.
+
+The remaining delivery gate is one owner decision covering transfer of
+the exact protected v15 review input and prepared Page/Action mapping to
+the existing Cloud WordPress operator checkout under private custody,
+and fresh independently scoped principals for preparation, preview and
+review. Keep actual Page approval and authorization of the final native
+apply and restore tied to the resulting digests. No plugin installation,
+new WordPress apply, or publication is included in this checkpoint.
+
+For AI site generation, retain the unresolved Launch qualification
+question as interview work. With a new bounded AI session, generate site
+structure and supported sections from independently sourced facts,
+reviewable provisional answers and explicit unknowns. Ask for a
+variable page set and business-specific action strategy, then validate
+page and section candidates independently through the existing editable
+Presence Direction and proposal mechanisms. A single interview turn
+may legitimately return no plan. Decouple the generation operation
+from answering the last question and bind its full evidence input and
+output for review. Keep the current two-page native target as an
+installation identity constraint rather than a product-level site design.

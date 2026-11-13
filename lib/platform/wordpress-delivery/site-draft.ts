@@ -9,9 +9,16 @@ export type ReviewedDraftPage = Site & Pick<ReviewedProjection, "approvalId" | "
   proposalId: string;
 };
 
+export function nativeDraftRollback(value: unknown, revision: number) {
+  const rollback = object(value, ["revision", "digest"]);
+  if (!Number.isSafeInteger(revision) || typeof rollback.revision !== "number" || !Number.isSafeInteger(rollback.revision) ||
+      rollback.revision < 1 || rollback.revision >= revision - 1) throw Error("Invalid materialized rollback revision");
+  return { revision: rollback.revision, digest: hash(rollback.digest) };
+}
+
 export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[], input: unknown) {
   const scope = { organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
-  const selection = object(input, ["siteProposalId", "installationId", "revision", "previousDigest", "navigation", "actions"]);
+  const selection = object(input, ["siteProposalId", "installationId", "revision", "previousDigest", "rollback", "navigation", "actions"]);
   if (typeof selection.revision !== "number" || !Number.isSafeInteger(selection.revision) || selection.revision < 1) throw Error("Invalid draft revision");
   const revision = selection.revision;
   const previousDigest = revision === 1 && selection.previousDigest === null ? null : hash(selection.previousDigest);
@@ -48,7 +55,9 @@ export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[]
     return { id: uuid(action.id), label: text(action.label, 100), from: action.from, type: action.type, destination };
   });
   if (new Set(actions.map(action => action.id)).size !== actions.length) throw Error("Duplicate draft action");
+  const rollback = selection.rollback === undefined ? undefined : nativeDraftRollback(selection.rollback, revision);
+  if (rollback?.digest === previousDigest) throw Error("Materialized rollback digest must differ from signed predecessor");
   const candidate = { scope, siteProposalId: uuid(selection.siteProposalId), installationId: uuid(selection.installationId), revision,
-    previousDigest, sourceDigest, approvals, pages, navigation: [...selection.navigation] as string[], actions };
+    previousDigest, ...(rollback && { rollback }), sourceDigest, approvals, pages, navigation: [...selection.navigation] as string[], actions };
   return { candidate, digest: fingerprint(candidate) };
 }

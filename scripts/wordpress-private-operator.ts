@@ -59,7 +59,7 @@ async function main() {
       case "issue-site-draft-restore": {
         const issuing = command.operation === "issue-site-draft" || command.operation === "issue-site-draft-restore";
         const authorizing = command.operation !== "preview-site-draft";
-        const input = object(command.input, ["site", "references", "draft", ...(authorizing ? ["reviewerToken", "expectedDigest"] : [])]);
+        const input = object(command.input, ["site", "references", "draft", ...(authorizing ? ["reviewerToken", "expectedDigest", "recoveryCredentialId"] : [])]);
         const site = object(input.site, ["organizationId", "webPresenceId", "managedSiteId"]);
         if (!Array.isArray(input.references) || input.references.length < 1 || input.references.length > 16) {
           throw Error("Invalid draft page references");
@@ -72,11 +72,19 @@ async function main() {
           webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
         if (authorizing) {
           const reviewer = await service.operator.authenticate(input.reviewerToken);
-          result = issuing
-            ? await service.review.issueSiteDraft(context, reviewer, scope, references, input.draft, input.expectedDigest,
-              createPrivateKey(process.env.MIOPAGES_WP_SIGNING_KEY ?? ""),
-              command.operation === "issue-site-draft-restore" ? "restore" : "apply")
-            : await service.review.authorizeSiteDraft(context, reviewer, scope, references, input.draft, input.expectedDigest);
+          const credentialId = input.recoveryCredentialId === undefined ? undefined : uuid(input.recoveryCredentialId);
+          const hex = credentialId && process.env["MIOPAGES_WP_CREDENTIAL_" + credentialId.toUpperCase().replaceAll("-", "_")];
+          if (credentialId && !/^[a-f0-9]{64}$/.test(hex ?? "")) throw Error("Native draft recovery credential unavailable");
+          const secret = hex ? Buffer.from(hex, "hex") : undefined;
+          const recovery = credentialId && secret ? { credentialId, secret,
+            journal: new NativeDraftReceiptJournal(process.env.MIOPAGES_WP_NATIVE_DRAFT_RECEIPTS ?? "") } : undefined;
+          try {
+            result = issuing
+              ? await service.review.issueSiteDraft(context, reviewer, scope, references, input.draft, input.expectedDigest,
+                createPrivateKey(process.env.MIOPAGES_WP_SIGNING_KEY ?? ""),
+                command.operation === "issue-site-draft-restore" ? "restore" : "apply", recovery)
+              : await service.review.authorizeSiteDraft(context, reviewer, scope, references, input.draft, input.expectedDigest, recovery);
+          } finally { secret?.fill(0); }
         } else result = await service.review.previewSiteDraft(context, scope, references, input.draft);
         break;
       }

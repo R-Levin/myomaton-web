@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 
 final class MioPages_Native_Draft_Envelope
 {
-    private const PREFIX = "MioPages-WP-Native-Draft-v1\n";
+    private const PREFIX = "MioPages-WP-Native-Draft-v";
 
     public static function verify(string $wire, array $identity, ?int $now = null): array
     {
@@ -18,7 +18,7 @@ final class MioPages_Native_Draft_Envelope
         $envelope = json_decode($wire, true, 48, JSON_THROW_ON_ERROR);
         if (!is_array($envelope) || count($envelope) !== 6
             || ($envelope['schema'] ?? null) !== 'miopages.wordpress.native-draft-envelope'
-            || ($envelope['version'] ?? null) !== 1 || !is_string($identity['keyId'] ?? null)
+            || !in_array($envelope['version'] ?? null, [1, 2], true) || !is_string($identity['keyId'] ?? null)
             || ($envelope['keyId'] ?? null) !== $identity['keyId']) {
             throw new InvalidArgumentException('Native draft envelope refused.');
         }
@@ -27,13 +27,13 @@ final class MioPages_Native_Draft_Envelope
         $public = self::decode($identity['publicKeyBase64'] ?? null, SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES);
         if (strlen($signature) !== SODIUM_CRYPTO_SIGN_BYTES || strlen($public) !== SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES
             || !is_string($envelope['payloadSha256'] ?? null) || !hash_equals(hash('sha256', $raw), $envelope['payloadSha256'])
-            || !sodium_crypto_sign_verify_detached($signature, self::PREFIX . $raw, $public)) {
+            || !sodium_crypto_sign_verify_detached($signature, self::PREFIX . $envelope['version'] . "\n" . $raw, $public)) {
             throw new InvalidArgumentException('Native draft signature refused.');
         }
         $payload = json_decode($raw, true, 48, JSON_THROW_ON_ERROR);
         $clock = $now ?? time();
         if (!is_array($payload) || count($payload) !== 8
-            || ($payload['schema'] ?? null) !== 'miopages.wordpress.native-draft' || ($payload['version'] ?? null) !== 1
+            || ($payload['schema'] ?? null) !== 'miopages.wordpress.native-draft' || ($payload['version'] ?? null) !== $envelope['version']
             || ($payload['purpose'] ?? null) !== 'non-public-draft-only'
             || !in_array($payload['operation'] ?? null, ['apply', 'restore'], true)
             || !is_int($payload['issuedAt'] ?? null) || !is_int($payload['expiresAt'] ?? null)
@@ -44,6 +44,15 @@ final class MioPages_Native_Draft_Envelope
             throw new InvalidArgumentException('Native draft payload refused.');
         }
         $candidate = $payload['candidate'];
+        $rollback = $candidate['rollback'] ?? null;
+        if ($payload['version'] === 1 ? array_key_exists('rollback', $candidate) : (
+            !is_array($rollback) || count($rollback) !== 2 || !is_int($rollback['revision'] ?? null)
+            || !is_int($candidate['revision'] ?? null) || $rollback['revision'] < 1
+            || $rollback['revision'] >= $candidate['revision'] - 1
+            || !is_string($rollback['digest'] ?? null) || !preg_match('/^[a-f0-9]{64}$/D', $rollback['digest'])
+            || $rollback['digest'] === ($candidate['previousDigest'] ?? null))) {
+            throw new InvalidArgumentException('Native draft rollback claim refused.');
+        }
         foreach (['organizationId', 'webPresenceId', 'managedSiteId', 'installationId'] as $field) {
             $actual = $field === 'installationId' ? ($candidate[$field] ?? null) : ($candidate['scope'][$field] ?? null);
             if (!is_string($identity[$field] ?? null) || $actual !== $identity[$field]) {

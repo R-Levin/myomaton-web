@@ -12,6 +12,8 @@ export type NativeDraftReceiptExpectation = {
   appliedDigest: string;
   revision: number;
   paths: readonly string[];
+  requestedRevision?: number;
+  materializedBaseline?: { requestedDigest: string; appliedDigest: string; revision: number };
 };
 
 // The caller supplies the expected operation and applied revision from Core's
@@ -68,14 +70,32 @@ export class NativeDraftReceiptJournal {
     return JSON.parse(await readFile(file, "utf8")) as unknown;
   }
 
+  async verifyMaterializedBaseline(expected: Omit<NativeDraftReceiptExpectation, "operation">, secret: Buffer) {
+    const prior = verifyNativeDraftReceipt(await this.read(expected.installationId, expected.appliedDigest, "apply"), secret, {
+      ...expected, operation: "apply", requestedDigest: expected.appliedDigest,
+    });
+    const restored = verifyNativeDraftReceipt(await this.read(expected.installationId, expected.requestedDigest, "restore"), secret, {
+      ...expected, operation: "restore",
+    });
+    if (JSON.stringify(prior.posts) !== JSON.stringify(restored.posts)) throw Error("Materialized baseline differs from prior readback");
+    return restored;
+  }
+
   async record(expected: NativeDraftReceiptExpectation, secret: Buffer, wire: unknown) {
     const verified = verifyNativeDraftReceipt(wire, secret, expected);
+    if (expected.operation === "apply" && expected.materializedBaseline) {
+      const baseline = await this.verifyMaterializedBaseline({ installationId: expected.installationId,
+        siteProposalId: expected.siteProposalId, paths: expected.paths, ...expected.materializedBaseline }, secret);
+      if (baseline.posts.some((post, index) => post.id !== verified.posts[index].id)) {
+        throw Error("Applied draft differs from materialized Page identities");
+      }
+    }
     if (expected.operation === "restore") {
       const previous = verifyNativeDraftReceipt(await this.read(expected.installationId, expected.appliedDigest, "apply"), secret, {
         ...expected, operation: "apply", requestedDigest: expected.appliedDigest,
       });
       verifyNativeDraftReceipt(await this.read(expected.installationId, expected.requestedDigest, "apply"), secret, {
-        ...expected, operation: "apply", appliedDigest: expected.requestedDigest, revision: expected.revision + 1,
+        ...expected, operation: "apply", appliedDigest: expected.requestedDigest, revision: expected.requestedRevision ?? expected.revision + 1,
       });
       if (JSON.stringify(previous.posts) !== JSON.stringify(verified.posts)) throw Error("Restored draft differs from previous readback");
     }

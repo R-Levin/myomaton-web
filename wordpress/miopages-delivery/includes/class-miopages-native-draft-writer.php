@@ -28,7 +28,7 @@ final class MioPages_Native_Draft_Writer
             if ($current !== null && $current['siteProposalId'] !== $candidate['siteProposalId']) {
                 throw new RuntimeException('Native draft proposal scope changed.');
             }
-            if ($current !== null && $current['digest'] === $digest) {
+            if ($current !== null && $current['digest'] === $digest && $state['highWaterRevision'] === $candidate['revision']) {
                 self::verifyDrafts($current);
                 return $state;
             }
@@ -37,6 +37,14 @@ final class MioPages_Native_Draft_Writer
             if ($predecessor !== $candidate['previousDigest']
                 || ($state['highWaterRevision'] ?? 0) + 1 !== $candidate['revision']) {
                 throw new RuntimeException('Native draft predecessor mismatch.');
+            }
+            $rollback = $candidate['rollback'] ?? null;
+            if ($restoredFrom !== null && isset($current['logicalPageIds']) && $rollback === null) {
+                throw new RuntimeException('Native draft materialized rollback claim required.');
+            }
+            if ($rollback !== null && ($restoredFrom === null || $current === null ||
+                $current['revision'] !== $rollback['revision'] || $current['digest'] !== $rollback['digest'])) {
+                throw new RuntimeException('Native draft materialized baseline mismatch.');
             }
             $logicalIds = array_column($candidate['pages'], 'id', 'path');
             ksort($logicalIds);
@@ -73,8 +81,8 @@ final class MioPages_Native_Draft_Writer
             self::verifyDrafts($next);
             // The signed predecessor of a forward revision after a restore is
             // the high-water authorization, not the currently materialized content.
-            // A later restore may only target the exact signed predecessor.
-            $previous = $restoredFrom === null ? $current : null;
+            // A v2 authorization explicitly binds the actual materialized baseline.
+            $previous = $restoredFrom === null || $rollback !== null ? $current : null;
             if ($previous !== null && !isset($previous['logicalPageIds'])) {
                 $previous['logicalPageIds'] = $logicalIds;
                 foreach ($previous['posts'] as $path => &$post) {
@@ -96,13 +104,15 @@ final class MioPages_Native_Draft_Writer
             if ($current === null || $current['siteProposalId'] !== $candidate['siteProposalId']) {
                 throw new RuntimeException('Native draft restoration scope mismatch.');
             }
-            if (($state['restoredFrom'] ?? null) === $digest && $current['digest'] === $candidate['previousDigest']) {
+            $rollback = $candidate['rollback'] ?? ['digest' => $candidate['previousDigest'], 'revision' => $candidate['revision'] - 1];
+            if (($state['restoredFrom'] ?? null) === $digest && $current['digest'] === $rollback['digest']
+                && $current['revision'] === $rollback['revision'] && $state['highWaterRevision'] === $candidate['revision']) {
                 self::verifyDrafts($current);
                 return $state;
             }
             if ($current['digest'] !== $digest || $current['revision'] !== $candidate['revision']
-                || $previous === null || $previous['digest'] !== $candidate['previousDigest']
-                || $previous['revision'] + 1 !== $current['revision']) {
+                || $previous === null || $previous['digest'] !== $rollback['digest']
+                || $previous['revision'] !== $rollback['revision'] || $state['highWaterRevision'] !== $candidate['revision']) {
                 throw new RuntimeException('Native draft restoration predecessor mismatch.');
             }
             self::verifyDrafts($current);

@@ -40,7 +40,7 @@ test("the protected Core journal accepts exact retries and checks restore agains
   try {
     const journal = new NativeDraftReceiptJournal(root);
     const key = randomBytes(32), installationId = randomUUID(), siteProposalId = randomUUID();
-    const one = "1".repeat(64), two = "2".repeat(64);
+    const one = "1".repeat(64), two = "2".repeat(64), three = "3".repeat(64);
     const expected: NativeDraftReceiptExpectation = { installationId, siteProposalId, operation: "apply",
       requestedDigest: one, appliedDigest: one, revision: 1, paths: ["/"] };
     const restore: NativeDraftReceiptExpectation = { ...expected, operation: "restore", requestedDigest: two };
@@ -60,5 +60,14 @@ test("the protected Core journal accepts exact retries and checks restore agains
     await journal.record(newer, key, receipt(newer, 23));
     await assert.rejects(journal.record(restore, key, receipt(restore, 15)), /differs from previous/);
     assert.deepEqual((await journal.record(restore, key, receipt(restore, 14))).posts, result.posts);
+    const materializedBaseline = { requestedDigest: two, appliedDigest: one, revision: 1 };
+    assert.deepEqual((await journal.verifyMaterializedBaseline({ ...expected, ...materializedBaseline }, key)).posts, result.posts);
+    await assert.rejects(journal.verifyMaterializedBaseline({ ...expected, ...materializedBaseline, requestedDigest: three }, key), { code: "ENOENT" });
+    const forward = { ...expected, revision: 3, requestedDigest: three, appliedDigest: three, materializedBaseline };
+    await assert.rejects(journal.record(forward, key, receipt(forward, 23)), /materialized Page identities/);
+    await journal.record(forward, key, receipt(forward, 14));
+    const recover = { ...restore, requestedDigest: three, requestedRevision: 3 };
+    assert.deepEqual((await journal.record(recover, key, receipt(recover, 14))).posts, result.posts);
+    await assert.rejects(journal.record({ ...recover, requestedRevision: 2 }, key, receipt(recover, 14)), /decision mismatch/);
   } finally { await rm(root, { recursive: true, force: true }); }
 });

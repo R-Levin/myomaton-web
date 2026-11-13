@@ -26,6 +26,7 @@ $suites = [
     'tests/release-staging-concurrency.php',
     'tests/private-staging-smoke.php',
     'tests/lock-permissions-smoke.php',
+    'tests/native-draft-writer.php',
 ];
 $failures = 0;
 
@@ -51,4 +52,4 @@ if ($failures > 0) {
     echo "FAIL: consolidated WordPress offline gate ({$failures} failed checks).\n";
     exit(1);
 }
-echo "PASS: consolidated WordPress offline gate (7 lints, 8 smoke suites, 1 Node-to-PHP compatibility test).\n";
+echo "PASS: consolidated WordPress offline gate (" . count($lint) . " lints, " . count($suites) . " smoke suites, 1 Node-to-PHP compatibility test).\n";

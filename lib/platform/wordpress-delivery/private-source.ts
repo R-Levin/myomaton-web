@@ -10,7 +10,9 @@ import { validatePages, type ReviewedProjection, type Site } from "./authority";
 import { customerMandate, type ProtectedOperator } from "./operator";
 import { bindSiteDraft } from "./site-draft";
 import { nativeDraftEnvelope, readNativeDraftEnvelope } from "./native-draft-envelope";
-import type { NativeDraftReceiptExpectation } from "./native-draft-receipt";
+import type { NativeDraftReceiptExpectation, NativeDraftReceiptJournal } from "./native-draft-receipt";
+
+type RecoveryEvidence = { journal: NativeDraftReceiptJournal; secret: Buffer; credentialId: string };
 
 async function approvedProjection(db: PoolClient, site: Site, proposalId: string, approvalId: string) {
   const identity = (await db.query(`SELECT p.created_at,g.operator_id,g.id AS grant_id,g.customer
@@ -91,14 +93,14 @@ export class PrivateReleaseReview {
   }
 
   async authorizeSiteDraft(context: unknown, reviewer: unknown, site: Site,
-    references: readonly { proposalId: string; approvalId: string }[], draft: unknown, expectedDigest: unknown) {
-    return this.siteDraft(reviewer, site, references, draft, { context, digest: hash(expectedDigest) });
+    references: readonly { proposalId: string; approvalId: string }[], draft: unknown, expectedDigest: unknown, recovery?: RecoveryEvidence) {
+    return this.siteDraft(reviewer, site, references, draft, { context, digest: hash(expectedDigest), recovery });
   }
 
   async issueSiteDraft(context: unknown, reviewer: unknown, site: Site,
     references: readonly { proposalId: string; approvalId: string }[], draft: unknown, expectedDigest: unknown, key: KeyObject,
-    operation: "apply" | "restore" = "apply") {
-    const preview = await this.siteDraft(reviewer, site, references, draft, { context, digest: hash(expectedDigest), key, operation });
+    operation: "apply" | "restore" = "apply", recovery?: RecoveryEvidence) {
+    const preview = await this.siteDraft(reviewer, site, references, draft, { context, digest: hash(expectedDigest), key, operation, recovery });
     if (!("envelope" in preview)) throw Error("Native draft issuance refused");
     return preview.envelope;
   }
@@ -130,8 +132,11 @@ export class PrivateReleaseReview {
       const restore = signed.operation === "restore";
       if (restore && (!draft.previousDigest || draft.revision < 2)) throw Error("Draft receipt predecessor missing");
       const expected: NativeDraftReceiptExpectation = { installationId, siteProposalId: draft.siteProposalId, operation: signed.operation,
-        requestedDigest: signed.digest, appliedDigest: restore ? hash(draft.previousDigest) : signed.digest,
-        revision: draft.revision - Number(restore), paths: draft.pages.map(page => page.path) };
+        requestedDigest: signed.digest, appliedDigest: restore ? draft.rollback?.digest ?? hash(draft.previousDigest) : signed.digest,
+        revision: restore ? draft.rollback?.revision ?? draft.revision - 1 : draft.revision,
+        ...(draft.rollback && (restore ? { requestedRevision: draft.revision } : { materializedBaseline: {
+          requestedDigest: hash(draft.previousDigest), appliedDigest: draft.rollback.digest, revision: draft.rollback.revision,
+        } })), paths: draft.pages.map(page => page.path) };
       await db.query("COMMIT");
       return { expected, credentialId: uuid(installation.credential_id) };
     } catch (error) {
@@ -141,7 +146,7 @@ export class PrivateReleaseReview {
   }
 
   private async siteDraft(context: unknown, site: Site, references: readonly { proposalId: string; approvalId: string }[], draft: unknown,
-    decision?: { context: unknown; digest: string; key?: KeyObject; operation?: "apply" | "restore" }) {
+    decision?: { context: unknown; digest: string; key?: KeyObject; operation?: "apply" | "restore"; recovery?: RecoveryEvidence }) {
     if (!Array.isArray(references) || references.length < 1 || references.length > 16) throw Error("Invalid draft page references");
     site = { organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
     const db = await this.pool.connect();
@@ -158,7 +163,7 @@ export class PrivateReleaseReview {
         members.push({ ...site, ...projection, proposalId });
       }
       const result = bindSiteDraft(site, members, draft);
-      const { rows: [installation] } = await db.query(`SELECT k.key_id,k.public_key FROM wordpress_installations i
+      const { rows: [installation] } = await db.query(`SELECT k.key_id,k.public_key,k.credential_id FROM wordpress_installations i
         JOIN wordpress_installation_keys k ON k.installation_id=i.id AND k.generation=i.generation
         WHERE i.id=$1 AND i.organization_id=$2 AND i.web_presence_id=$3 AND i.managed_site_id=$4 AND i.status='active'`,
       [result.candidate.installationId, site.organizationId, site.webPresenceId, site.managedSiteId]);
@@ -169,12 +174,26 @@ export class PrivateReleaseReview {
           throw Error("Independent draft authorizer required");
         }
         if (decision.digest !== result.digest) throw Error("Draft preview digest mismatch");
-        const { installationId, siteProposalId, revision, previousDigest } = result.candidate;
+        const { installationId, siteProposalId, revision, previousDigest, rollback } = result.candidate;
         const key = [installationId, siteProposalId, revision];
         const values = [...key, result.digest, previousDigest, reviewer.authorityReference, authorizer.authorityReference];
         if (revision > 1 && !(await db.query(`SELECT 1 FROM wordpress_native_draft_authorizations WHERE installation_id=$1
           AND site_proposal_id=$2 AND revision=$3 AND candidate_digest=$4`,
         [installationId, siteProposalId, revision - 1, previousDigest])).rowCount) throw Error("Prior draft authorization mismatch");
+        if (rollback) {
+          const evidence = decision.recovery;
+          if (!evidence || evidence.credentialId !== installation.credential_id) throw Error("Installation recovery evidence required");
+          const prior = await db.query(`SELECT 1 FROM wordpress_native_draft_authorizations
+            WHERE installation_id=$1 AND site_proposal_id=$2 AND revision=$3 AND candidate_digest=$4`,
+          [installationId, siteProposalId, rollback.revision, rollback.digest]);
+          if (prior.rowCount !== 1) throw Error("Rollback authorization missing");
+          await evidence.journal.verifyMaterializedBaseline({ installationId, siteProposalId, requestedDigest: hash(previousDigest),
+            appliedDigest: rollback.digest, revision: rollback.revision, paths: result.candidate.pages.map(page => page.path) }, evidence.secret);
+        }
+        const head = (await db.query(`SELECT revision FROM wordpress_native_draft_authorizations
+          WHERE installation_id=$1 AND site_proposal_id=$2 ORDER BY revision DESC LIMIT 1`, [installationId, siteProposalId])).rows[0]?.revision ?? 0;
+        if (head > revision) throw Error("Native draft authorization superseded");
+        if (!decision.key && head !== revision && head !== revision - 1) throw Error("Native draft authorization is out of sequence");
         if (!decision.key) await db.query(`INSERT INTO wordpress_native_draft_authorizations
           (installation_id,site_proposal_id,revision,candidate_digest,previous_digest,reviewer_grant_id,authorizer_grant_id)
           VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (installation_id,site_proposal_id,revision) DO NOTHING`, values);
@@ -182,9 +201,7 @@ export class PrivateReleaseReview {
           AND site_proposal_id=$2 AND revision=$3 AND candidate_digest=$4 AND previous_digest IS NOT DISTINCT FROM $5::text
           AND reviewer_grant_id=$6 AND authorizer_grant_id=$7`, values)).rowCount) throw Error("Draft authorization conflict");
         if (decision.key) {
-          const newest = (await db.query(`SELECT revision FROM wordpress_native_draft_authorizations
-            WHERE installation_id=$1 AND site_proposal_id=$2 ORDER BY revision DESC LIMIT 1`, [installationId, siteProposalId])).rows[0];
-          if (newest?.revision !== revision) throw Error("Native draft authorization superseded");
+          if (head !== revision) throw Error("Native draft authorization superseded");
           const envelope = nativeDraftEnvelope(result, installation.key_id, installation.public_key, decision.key, decision.operation ?? "apply");
           await db.query("COMMIT");
           return { ...result, envelope };

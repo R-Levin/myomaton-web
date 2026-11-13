@@ -15,6 +15,7 @@ import type { ReviewedProjection } from "../../lib/platform/wordpress-delivery/a
 import { sharedInventory } from "../../scripts/db/wordpress-shared-inventory";
 import { advanceActiveInstallationOrigin, integratePrivateStage } from "../../scripts/db/wordpress-private-stage";
 import { operatorRole, pullRole } from "../../lib/platform/wordpress-delivery/protected-connection";
+import { NativeDraftReceiptJournal, type NativeDraftReceiptExpectation } from "../../lib/platform/wordpress-delivery/native-draft-receipt";
 import { protectedOperatorServices } from "../../lib/platform/wordpress-delivery/protected-services";
 import { inspectCanonical, writeCanonical } from "../../lib/platform/canonical/writes";
 import { requestMac, WordPressDelivery } from "../../lib/platform/wordpress-delivery/service";
@@ -565,6 +566,54 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           const proposedReadback = verifyDraft(proposedEnvelope);
           assert.equal(proposedReadback.status, 0, proposedReadback.stderr);
           assert.deepEqual(JSON.parse(proposedReadback.stdout), { digest: proposal.digest, revision: 3, operation: "apply" });
+          const recoveryRoot = await mkdtemp(path.join(await realpath(tmpdir()), "miopages-native-forward-"));
+          try {
+            const journal = new NativeDraftReceiptJournal(recoveryRoot);
+            const secret = randomBytes(32);
+            const expected = (operation: "apply" | "restore", requestedDigest: string, appliedDigest: string, revision: number): NativeDraftReceiptExpectation =>
+              ({ installationId, siteProposalId: draftIntent.siteProposalId, operation, requestedDigest, appliedDigest, revision, paths: ["/", "/service"] });
+            const wire = (e: NativeDraftReceiptExpectation) => {
+              const posts = { "/": { ID: 13, post_status: "draft", post_content: "Home" },
+                "/service": { ID: 14, post_status: "draft", post_content: "Service " + e.revision } };
+              const result = { ...e, applied: { siteProposalId: e.siteProposalId, digest: e.appliedDigest, revision: e.revision, posts } };
+              const php = spawnSync("php", ["wordpress/miopages-delivery/tests/native-draft-receipt.php"],
+                { encoding: "utf8", input: JSON.stringify({ result, key: secret.toString("hex") }) });
+              assert.equal(php.status, 0, php.stderr);
+              return JSON.parse(php.stdout);
+            };
+            const forward = { ...draftIntent, revision: 4, previousDigest: proposal.digest,
+              rollback: { revision: 2, digest: updatedDraft.digest } };
+            const refs = [nextHome, nextService];
+            const prepared = await protectedServices.review.previewSiteDraft(reviewerContext, site, refs, forward);
+            const recovery = { journal, secret, credentialId };
+            await assert.rejects(protectedServices.review.authorizeSiteDraft(authorizerContext, reviewerContext, site,
+              refs, forward, prepared.digest), /Installation recovery evidence required/);
+            await assert.rejects(protectedServices.review.authorizeSiteDraft(authorizerContext, reviewerContext, site,
+              refs, forward, prepared.digest, recovery), { code: "ENOENT" });
+            for (const e of [expected("apply", updatedDraft.digest, updatedDraft.digest, 2),
+              expected("apply", proposal.digest, proposal.digest, 3),
+              expected("restore", proposal.digest, updatedDraft.digest, 2)]) await journal.record(e, secret, wire(e));
+            assert.deepEqual(await protectedServices.review.authorizeSiteDraft(authorizerContext, reviewerContext, site,
+              refs, forward, prepared.digest, recovery), prepared);
+            const applyWire = await protectedServices.review.issueSiteDraft(authorizerContext, reviewerContext, site,
+              refs, forward, prepared.digest, key.privateKey, "apply", recovery);
+            assert.equal(applyWire.version, 2);
+            assert.equal(verifyDraft(applyWire).status, 0);
+            const accepted = await protectedServices.review.nativeDraftReceiptDecision(reviewerContext, site, installationId, applyWire);
+            assert.deepEqual(accepted.expected.materializedBaseline, { requestedDigest: proposal.digest, appliedDigest: updatedDraft.digest, revision: 2 });
+            await journal.record(accepted.expected, secret, wire(accepted.expected));
+            const recoverWire = await protectedServices.review.issueSiteDraft(authorizerContext, reviewerContext, site,
+              refs, forward, prepared.digest, key.privateKey, "restore", recovery);
+            const recovered = await protectedServices.review.nativeDraftReceiptDecision(reviewerContext, site, installationId, recoverWire);
+            assert.equal(recovered.expected.requestedRevision, 4);
+            assert.equal(recovered.expected.revision, 2);
+            assert.equal(recovered.expected.appliedDigest, updatedDraft.digest);
+            await journal.record(recovered.expected, secret, wire(recovered.expected));
+            await assert.rejects(protectedServices.review.authorizeSiteDraft(authorizerContext, reviewerContext, site,
+              refs, nextSite, proposal.digest), /authorization superseded/);
+            await assert.rejects(protectedServices.review.nativeDraftReceiptDecision(reviewerContext, site, installationId,
+              proposedEnvelope), /no current exact authorization/);
+          } finally { await rm(recoveryRoot, { recursive: true, force: true }); }
           await admin.query("UPDATE miopages_wp.wordpress_operator_grants SET revoked_at=now() WHERE operator_id=$1 AND permission='approve-site-proposal'", [approver.id]);
           assert.equal((await handler.handle(request("pull"))).status, 409);
           await assert.rejects(render(), /Current Core delivery eligibility required/);

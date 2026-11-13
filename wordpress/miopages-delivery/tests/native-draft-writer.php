@@ -96,13 +96,14 @@ $identity = $scope + ['installationId' => 'installation', 'keyId' => 'key',
     'publicKeyBase64' => base64_encode(sodium_crypto_sign_publickey($keys))];
 $apply = static function (array $body, int $number, ?string $prior, string $operation = 'apply') use ($keys, $identity): array {
     $now = time();
-    $payload = json_encode(['schema' => 'miopages.wordpress.native-draft', 'version' => 1,
+    $version = isset($body['rollback']) ? 2 : 1;
+    $payload = json_encode(['schema' => 'miopages.wordpress.native-draft', 'version' => $version,
         'purpose' => 'non-public-draft-only', 'operation' => $operation, 'issuedAt' => $now,
         'expiresAt' => $now + 900, 'digest' => hash('sha256', (string) $number),
         'candidate' => $body + ['revision' => $number, 'previousDigest' => $prior]], JSON_THROW_ON_ERROR);
-    $wire = json_encode(['schema' => 'miopages.wordpress.native-draft-envelope', 'version' => 1,
+    $wire = json_encode(['schema' => 'miopages.wordpress.native-draft-envelope', 'version' => $version,
         'keyId' => 'key', 'payloadBase64' => base64_encode($payload), 'payloadSha256' => hash('sha256', $payload),
-        'signatureBase64' => base64_encode(sodium_crypto_sign_detached("MioPages-WP-Native-Draft-v1\n" . $payload,
+        'signatureBase64' => base64_encode(sodium_crypto_sign_detached("MioPages-WP-Native-Draft-v{$version}\n" . $payload,
             sodium_crypto_sign_secretkey($keys)))], JSON_THROW_ON_ERROR);
     return MioPages_Native_Draft_Writer::apply($wire, $identity)['applied'];
 };
@@ -149,5 +150,41 @@ $wpdb->pages[14] = $revision['posts']['/service'];
 check($apply($changed, 4, $digest3, 'restore') === $baseline, 'Rollback restores the prior exact content and identities.');
 check($apply($changed, 4, $digest3, 'restore') === $baseline, 'Restore retry is idempotent.');
 check(count(wp_get_post_revisions(14)) === 3, 'Restore preserves both versions.');
+check(array_slice($wpdb->pages, 2, null, true) === $historical, 'Historical Pages are untouched.');
+$digest4 = hash('sha256', '4');
+$digest5 = hash('sha256', '5');
+$forward = $candidate;
+$forward['pages'][1]['sections'][0]['content']['text'] = 'Review the goal for your existing website.';
+$before = [$wpdb->state, $wpdb->pages, $wpdb->history];
+foreach ([
+    [$forward, 5, $digest4, 'Native draft materialized rollback claim required.'],
+    [$forward + ['rollback' => ['revision' => 3, 'digest' => $digest1]], 5, $digest4, 'Native draft materialized baseline mismatch.'],
+    [$forward + ['rollback' => ['revision' => 3, 'digest' => $digest3]], 5, $digest2, 'Native draft predecessor mismatch.'],
+    [$candidate, 3, $digest2, 'Native draft predecessor mismatch.'],
+] as [$request, $number, $previous, $message]) {
+    try {
+        $apply($request, $number, $previous);
+        throw new LogicException('Invalid forward operation accepted.');
+    } catch (RuntimeException $error) {
+        check($error->getMessage() === $message, 'Incorrect forward failure.');
+    }
+    check([$wpdb->state, $wpdb->pages, $wpdb->history] === $before, 'A refusal changed draft state.');
+}
+$forward['rollback'] = ['revision' => 3, 'digest' => $digest3];
+$five = $apply($forward, 5, $digest4);
+check(array_column($five['posts'], 'ID') === [13, 14] && $five['digest'] === $digest5, 'Revision 5 updates stable Pages.');
+check($wpdb->state['previous'] === $baseline && $wpdb->state['highWaterRevision'] === 5, 'Materialized baseline retained separately.');
+check($apply($forward, 5, $digest4) === $five, 'Forward apply retry returns the same drafts.');
+check($apply($forward, 5, $digest4, 'restore') === $baseline, 'Revision 5 restores revision 3 byte for byte.');
+check($apply($forward, 5, $digest4, 'restore') === $baseline, 'Forward restore retry is idempotent.');
+check($wpdb->state['highWaterRevision'] === 5 && $wpdb->state['restoredFrom'] === $digest5, 'Restore preserves monotonic history.');
+try {
+    $apply($forward, 5, $digest4);
+    throw new LogicException('Restored revision was reapplied.');
+} catch (RuntimeException $error) {
+    check($error->getMessage() === 'Native draft predecessor mismatch.', 'Reapplication after restore is stale.');
+}
+$forward['rollback'] = ['revision' => 3, 'digest' => $digest3];
+check($apply($forward, 6, $digest5)['revision'] === 6, 'A later forward revision remains possible.');
 check(array_slice($wpdb->pages, 2, null, true) === $historical, 'Historical Pages are untouched.');
 echo "Native draft stable identity and rollback passed.\n";
