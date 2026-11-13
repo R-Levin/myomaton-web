@@ -12,7 +12,8 @@ assert.equal(process.arch, "x64");
 assert.equal(process.versions.node.split(".")[0], "22");
 // Refuse ambient dotenv files, even if ignored by Git.
 assert.equal((await readdir(".")).some(name => name.startsWith(".env")), false, "Clean CI checkout required");
-const origin = "https://rehearsal.example.test";
+const core = process.env.MIOPAGES_PROTECTED_CORE === "enabled";
+const origin = core ? "https://wp-acceptance.miopages.com" : "https://rehearsal.example.test";
 
 async function smoke(directory) {
 // Explicit environment: importantly no DATABASE_URL, operator credentials or signer.
@@ -23,8 +24,10 @@ const child = spawn(process.execPath, ["--max-old-space-size=256", path.join(dir
   cwd: directory,
   env: { PATH: process.env.PATH, HOME: process.env.HOME, NODE_ENV: "production", NEXT_TELEMETRY_DISABLED: "1",
     MIOPAGES_ROUTING_MODE: "shared-hostnames",
-    MIOPAGES_WP_PRIVATE_STAGE: "enabled", MIOPAGES_WP_CORE_ORIGIN: origin,
-    MIOPAGES_WP_PULL_URL: "postgresql://miopages_wp_pull:build-only@127.0.0.1:1/build_only?sslmode=verify-full" },
+    ...(core ? { MIOPAGES_PROTECTED_CORE: "enabled", MIOPAGES_PROTECTED_CORE_ORIGIN: origin } : {
+      MIOPAGES_WP_PRIVATE_STAGE: "enabled", MIOPAGES_WP_CORE_ORIGIN: origin,
+      MIOPAGES_WP_PULL_URL: "postgresql://miopages_wp_pull:build-only@127.0.0.1:1/build_only?sslmode=verify-full",
+    }) },
   stdio: "ignore",
 });
 const exited = new Promise(resolve => child.once("exit", resolve));
@@ -37,7 +40,17 @@ try {
     await new Promise(resolve => setTimeout(resolve, 200));
   }
   assert.ok(ready, "Isolated runtime readiness without DATABASE_URL");
-  return await routingSmoke(8081, origin);
+  if (!core) return await routingSmoke(8081, origin);
+  assert.equal((await request(8081, origin, "/core", "GET")).status, 200);
+  const api = await request(8081, origin, "/api/protected-core", "GET", { "x-intake-request": "1" });
+  assert.equal(api.status, 401);
+  assert.equal(api.headers["cache-control"], "no-store");
+  for (const target of ["/core/", "/core?x=1", "/api/protected-core/", "/api/contact", "/_next/static/../core"]) {
+    const response = await request(8081, origin, target, "GET");
+    assert.equal(response.status, 404);
+    assert.equal(response.headers["cache-control"], "no-store");
+  }
+  return { checks: 7, anonymousApi: 401, shell: 200 };
 } finally {
   child.kill("SIGTERM");
   const stopped = await Promise.race([exited.then(() => true), new Promise(resolve => setTimeout(() => resolve(false), 5000))]);
@@ -75,6 +88,11 @@ for (const item of [".next", "public", "package.json", "package-lock.json", "nex
 await mkdir(path.join(staging, '.rehearsal'));
 await cp('scripts/wordpress-private-server.cjs', path.join(staging, '.rehearsal/private-server.cjs'));
 hashes['.rehearsal/private-server.cjs'] = createHash('sha256').update(await readFile('scripts/wordpress-private-server.cjs')).digest('hex');
+if (core) {
+  const launcher = '.rehearsal/private-listener.cjs';
+  await cp('scripts/wordpress-private-listener.cjs', path.join(staging, launcher));
+  hashes[launcher] = createHash('sha256').update(await readFile(path.join(staging, launcher))).digest('hex');
+}
 // Emulate npm ci at the destination, then test the relocated bytes and rewritten
 // links. This temporary dependency link is removed before creating the archive.
 await symlink(path.resolve("node_modules"), path.join(staging, "node_modules"), "dir");
@@ -91,7 +109,7 @@ const manifest = { sourceCommit, node: process.version, platform: process.platfo
   isolatedRuntimeSmoke: "PASS", normalCoreDatabaseCredential: false, privateRoutingBuild: true,
   entrypoint: '.rehearsal/private-server.cjs', routingSmoke: routingSmokeResult, files: hashes, symlinks: links };
 await writeFile(path.join(staging, "rehearsal-build.json"), JSON.stringify(manifest, null, 2) + "\n");
-const archive = path.join(output, "wordpress-rehearsal-linux-x64.tar.gz");
+const archive = path.join(output, core ? "protected-core-linux-x64.tar.gz" : "wordpress-rehearsal-linux-x64.tar.gz");
 execFileSync("tar", ["--exclude=./.next/cache", "-czf", archive, "-C", staging, "."]);
 const sha256 = createHash("sha256").update(await readFile(archive)).digest("hex");
 await writeFile(archive + ".sha256", sha256 + "  " + path.basename(archive) + "\n");

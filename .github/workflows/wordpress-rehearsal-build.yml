@@ -1,8 +1,9 @@
 name: WordPress isolated Linux rehearsal build
 
 on:
+  workflow_dispatch:
   push:
-    branches: ['docs/wordpress-delivery-feasibility-2026-11-02']
+    branches: ['docs/wordpress-delivery-feasibility-2026-11-02', 'codex/first-operational-cycle-2026-11-12']
     paths:
       - 'proxy.ts'
       - 'app/**'
@@ -44,6 +45,13 @@ jobs:
           node-version: '22.23.2'
           cache: npm
       - run: npm ci
+      - name: Select protected Core build for manual dispatch
+        run: |
+          if [ "$GITHUB_REF_NAME" = codex/first-operational-cycle-2026-11-12 ]; then
+            echo "MIOPAGES_PROTECTED_CORE=enabled" >> "$GITHUB_ENV"
+          else
+            echo "MIOPAGES_WP_PRIVATE_STAGE=enabled" >> "$GITHUB_ENV"
+          fi
       - name: Reject production dependency advisories
         run: npm audit --omit=dev --audit-level=low
       - name: Verify retained approved rendering on Linux
@@ -53,16 +61,15 @@ jobs:
       - name: Verify raw routing boundary and sanitized diagnostics
         run: node --test tests/wordpress-private-server.test.mjs
       - name: Build without hosted credentials
-        run: npm run build
+        run: npm run build -- --webpack
         env:
           DATABASE_URL: postgresql://build:unused@127.0.0.1:1/build_only
           MIOPAGES_ROUTING_MODE: shared-hostnames
-          MIOPAGES_WP_PRIVATE_STAGE: enabled
       - name: Prove isolated runtime and package checksummed artifact
         run: node scripts/wordpress-rehearsal-artifact.mjs
       - uses: actions/upload-artifact@v4
         with:
-          name: wordpress-rehearsal-linux-x64
+          name: ${{ github.ref_name == 'codex/first-operational-cycle-2026-11-12' && 'protected-core-linux-x64' || 'wordpress-rehearsal-linux-x64' }}
           path: |
             runtime-content/wordpress-rehearsal-artifact/*.tar.gz
             runtime-content/wordpress-rehearsal-artifact/*.sha256
