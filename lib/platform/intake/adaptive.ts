@@ -2,6 +2,7 @@ import type { Answers, Condition, Field, Question } from "./model";
 import { unknownAnswer } from "./onboarding";
 
 export const adaptiveOnboardingVersion = "paid-onboarding/2";
+export const prospectPriorities = ["Review first", "Conversation first"] as const;
 
 export type PreparedSource = {
   id: string;
@@ -58,6 +59,7 @@ export const adaptiveQuestions: Question[] = [
     pick("siteDisposition", "How should we handle one additional page, claim, image or link?", ["Keep", "Improve or replace", "Remove from the new site", "Explicitly exclude from future drafts", "Investigate", "No additional decision yet"]),
     note("siteItem", "Identify the item and explain the decision", { required: true, when: when("siteDisposition", "Keep", "Improve or replace", "Remove from the new site", "Explicitly exclude from future drafts", "Investigate") }),
     note("additionalEvidence", "What other material or context should the Operator consider? (optional)", { hint: "Use a nonsecret reference or summary in this rehearsal. Leave passwords, payment details and private files out." }),
+    { key: "sitePriority", label: "Which prospect path should this candidate emphasize?", kind: "single", choices: [...prospectPriorities] },
   ] },
 ];
 

@@ -7,6 +7,7 @@ import { adaptiveAssessmentStep, adaptiveGaps, adaptiveOfferStep, adaptiveOnboar
 import { fieldApplies } from "../../lib/platform/intake/model";
 import { IntakeService, type IntakeView } from "../../lib/platform/intake/service";
 import { createC0Onboarding } from "../../scripts/intake/c0-onboarding";
+import { prospectDirection } from "../../lib/platform/intake/prospect-direction";
 
 test("adaptive local drafts preserve source conflicts and dispositions without repeating intake", async () => {
   const rehearsal = await createC0Onboarding(process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin", true);
@@ -32,6 +33,7 @@ test("adaptive local drafts preserve source conflicts and dispositions without r
     const c0Cookie = c0.headers.get("set-cookie")!.split(";", 1)[0];
     const first = await read(c0);
     assert.equal(first.questionnaireVersion, adaptiveOnboardingVersion);
+    assert.equal((await request("c0", { operation: "site-priority", version: first.version, priority: "Review first" }, c0Cookie)).status, 404);
     assert.deepEqual(first.answers, {});
     assert.equal(first.prepared?.reconciliation.status, "conflict");
     assert.equal(first.prepared?.sources.find(s => s.id === "discovery")?.kind, "Owner-confirmed");
@@ -98,6 +100,51 @@ test("adaptive local drafts preserve source conflicts and dispositions without r
       database, answers: {}, provenance: {}, prepared: { ...first.prepared!, context: "Changed source context" },
     });
     await assert.rejects(stale.resume(c0Cookie.split("=")[1]), /prepared_source_changed/);
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>(resolve => server.close(() => resolve()));
+    await rehearsal.stop();
+  }
+});
+
+const retainedFile = process.env.MIOPAGES_LOCAL_RETAINED_C0;
+test("protected C0 resume and priority correction preserve the retained answers", { skip: !retainedFile }, async () => {
+  const rehearsal = await createC0Onboarding(process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin", true, retainedFile);
+  const server = rehearsal.listener().listen(0, "127.0.0.1");
+  try {
+    await once(server, "listening");
+    const address = server.address();
+    assert.ok(address && typeof address !== "string");
+    const origin = "http://127.0.0.1:" + address.port;
+    const endpoint = origin + "/api/onboarding";
+    const request = (body?: object, cookie?: string) => fetch(endpoint, { method: body ? "POST" : "GET",
+      headers: { "X-Intake-Request": "1", ...(cookie && { Cookie: cookie }),
+        ...(body && { Origin: origin, "Content-Type": "application/json" }) }, body: body && JSON.stringify(body) });
+    assert.equal((await request()).status, 401);
+    assert.equal((await fetch(origin + "/onboarding/customer-2")).status, 404);
+    const unlock = await fetch(endpoint + "/access", { method: "POST", headers: {
+      Origin: origin, "X-Intake-Request": "1", "X-Local-Access": rehearsal.accessCode!,
+    } });
+    assert.equal(unlock.status, 204);
+    const gate = unlock.headers.get("Set-Cookie")!.split(";", 1)[0];
+    const begin = await request({ operation: "begin" }, gate);
+    assert.equal(begin.status, 200);
+    const cookie = gate + "; " + begin.headers.get("Set-Cookie")!.split(";", 1)[0];
+    const before: IntakeView = await begin.json();
+    assert.equal(Object.keys(before.answers).length, 10);
+    assert.equal(prospectDirection(before.answers)?.primary.action, "Request a Free Review");
+    const correction = { operation: "site-priority", version: before.version, priority: "Conversation first" };
+    const saved = await request(correction, cookie);
+    assert.equal(saved.status, 200);
+    const after: IntakeView = await saved.json();
+    assert.deepEqual(after.answers, { ...before.answers, sitePriority: "Conversation first" });
+    assert.deepEqual(after.provenance, { ...before.provenance, sitePriority: after.provenance!.sitePriority });
+    assert.equal(after.provenance!.sitePriority.confirmation, "unconfirmed");
+    assert.equal(prospectDirection(after.answers)?.primary.action, "Talk about getting started");
+    assert.equal(prospectDirection(after.answers)?.secondary.action, "Request a Free Review");
+    assert.deepEqual(await (await request(correction, cookie)).json(), after);
+    assert.equal((await request({ ...correction, priority: "Review first" }, cookie)).status, 409);
+    assert.deepEqual(await (await request(undefined, cookie)).json(), after);
   } finally {
     server.closeAllConnections();
     await new Promise<void>(resolve => server.close(() => resolve()));

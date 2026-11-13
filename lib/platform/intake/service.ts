@@ -4,7 +4,7 @@ import type { DeploymentSelection } from "../managed-sites/deployment";
 import { fingerprint } from "../canonical/model";
 import { IntakeError, intakeVersion, legacyIntakeVersion, normalizeAnswers, questionErrors, questionsFor, validateComplete, type Answers, type EntryIntent } from "./model";
 import { onboardingVersion } from "./onboarding";
-import { adaptiveFoundationErrors, adaptiveOfferStep, adaptiveOnboardingVersion, adaptiveQuestions, adaptiveScopeStep, type PreparedUnderstanding } from "./adaptive";
+import { adaptiveFoundationErrors, adaptiveOfferStep, adaptiveOnboardingVersion, adaptiveQuestions, adaptiveScopeStep, prospectPriorities, type PreparedUnderstanding } from "./adaptive";
 import type { OnboardingEntry } from "../activation/service";
 import type { InterviewState } from "./intelligent-model";
 
@@ -20,7 +20,7 @@ type Row = { id: string; entry_intent: EntryIntent; questionnaire_version: strin
 export type IntakeEvidence = { source: "c0-discovery" | "rehearsal-response"; confirmation: "prior-approved" | "unconfirmed"; suppliedAt: string; reference: string; author: string };
 export type IntakeView = { questionnaireVersion: string; intent: EntryIntent; state: Row["state"]; answers: Answers; step: number; version: number; expiresAt: string;
   provenance?: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; submission?: { digest: string; submittedAt: string } };
-type Rehearsal = { database: string; answers: Answers; provenance: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; intelligentFixtureSchema?: string };
+type Rehearsal = { database: string; answers: Answers; provenance: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; intelligentFixtureSchema?: string; step?: number };
 function view(r: Row): IntakeView { return { questionnaireVersion: r.questionnaire_version, intent: r.entry_intent, state: r.state, answers: r.answers, step: r.step, version: r.version, expiresAt: r.expires_at.toISOString() }; }
 async function transaction<T>(pool: Pool, run: (db: PoolClient) => Promise<T>) {
   const db = await pool.connect();
@@ -124,7 +124,8 @@ export class IntakeService {
       if (this.rehearsal && inserted.rowCount) {
         const answers = normalizeAnswers(this.rehearsal.answers, this.paidVersion);
         const provenance = { ...this.rehearsal.provenance, preparedDigest: this.preparedDigest };
-        r = (await db.query("UPDATE prospect_intakes SET answers=$2,provenance=$3,version=version+1 WHERE id=$1 RETURNING *", [r.id, JSON.stringify(answers), JSON.stringify(provenance)])).rows[0];
+        r = (await db.query("UPDATE prospect_intakes SET answers=$2,provenance=$3,step=$4,version=version+1 WHERE id=$1 RETURNING *",
+          [r.id, JSON.stringify(answers), JSON.stringify(provenance), this.rehearsal.step ?? 0])).rows[0];
       }
       return this.readView(db, r);
     });
@@ -149,6 +150,13 @@ export class IntakeService {
       const saved = await db.query("UPDATE prospect_intakes SET answers=$2,provenance=$3,step=$4,version=version+1,updated_at=now() WHERE id=$1 RETURNING *", [r.id, JSON.stringify(answers), JSON.stringify(provenance), step]);
       return this.readView(db, saved.rows[0]);
     });
+  }
+  async saveSitePriority(token: string, version: number, priority: unknown) {
+    if (this.rehearsal?.step === undefined || this.rehearsal.prepared?.scenario !== "c0") throw new IntakeError("unavailable", 404);
+    if (!Number.isSafeInteger(version) || !prospectPriorities.some(option => option === priority)) throw new IntakeError("invalid_request");
+    const current = await this.resume(token);
+    if (current.version !== version && current.answers.sitePriority !== priority) throw new IntakeError("draft_changed", 409);
+    return this.save(token, version, { ...current.answers, sitePriority: priority }, current.step);
   }
   async submit(token: string, version: number) {
     if (!Number.isInteger(version) || version < 1) throw new IntakeError("invalid_request");

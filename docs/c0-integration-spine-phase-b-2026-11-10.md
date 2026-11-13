@@ -724,3 +724,32 @@ is development-only and the hosted native fixture is inactive. Connecting
 Contact there requires a scoped non-public eligibility path that retains
 public eligibility checks. Customer acceptance and release authority stay
 separate.
+
+### Protected C0 browser journey
+
+The owner-facing acceptance is to open a protected local Core view,
+resume the retained C0 answers, change the priority of an existing
+visitor path and see the assessment, Home, Service and primary Action
+change together. A reload must retain the correction and all earlier
+answers. Site and approval readiness must remain visibly separate.
+
+Run the existing onboarding launcher with `--retained-c0` and the
+owner's verified local evidence file. It verifies the original evidence
+checksum and source fingerprint, reuses the progressive intake store in
+a disposable PostgreSQL cluster, and protects the evidence with a
+loopback-only listener, a fresh console access code and the existing
+draft cookie. At [local onboarding](http://127.0.0.1:4322/onboarding),
+enter the access code shown in the same terminal, choose **Resume retained
+onboarding**, then save a different prospect priority and compare both
+pages. Edits survive browser reload while the launcher runs. The
+protected original capture remains unchanged. The disposable copy is
+removed when the launcher stops.
+
+The retained case uses Direct Start. Earlier Free Review material remains
+historical evidence, with its original approval and delivery status.
+The question is an editorial decision grounded in a real saved visitor
+preference. The resulting assessment and page copy are an editorial
+projection, with no fresh model output or automated knowledge promotion.
+The prospect paths keep the Review optional. No visitor destination is
+activated and no notification, lead quality or visitor outcomes are
+claimed. The local view is not a customer login or a real approval.

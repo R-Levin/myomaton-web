@@ -138,7 +138,7 @@ function AdaptiveOnboarding() {
           {step === adaptiveOfferStep && <><p>{prepared.offeringPrompt}</p><p>Leave details open if they still need verification.</p></>}
           {step === adaptiveAssessmentStep - 1 && <Inventory prepared={prepared} />}
           <InterviewQuestion index={step} questionnaireVersion={adaptiveOnboardingVersion} classes={styles} answers={answers} errors={fields}
-            hiddenFields={prepared.foundationGap ? [] : ["foundationGoal"]}
+            hiddenFields={prepared.foundationGap ? ["sitePriority"] : ["foundationGoal", "sitePriority"]}
             change={(key, value) => { setAnswers(previous => ({ ...previous, [key]: value })); setFields({}); setMessage(""); }} />
           <div className={styles.actions}>
             {step > 0 && <button className={styles.secondary} type="button" disabled={busy} onClick={event => save(step - 1, event.currentTarget.form!)}>Back</button>}

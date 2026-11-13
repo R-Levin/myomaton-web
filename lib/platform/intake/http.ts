@@ -38,11 +38,14 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
       try {
         if (!value || typeof value !== "object" || Array.isArray(value)) throw new IntakeError("invalid_request");
         const input = value as Record<string, unknown>;
-        const keys = input.operation === "save" ? ["operation", "version", "answers", "step"] : input.operation === "submit" ? ["operation", "version"] : ["operation"];
+        const keys = input.operation === "save" ? ["operation", "version", "answers", "step"]
+          : input.operation === "site-priority" ? ["operation", "version", "priority"]
+          : input.operation === "submit" ? ["operation", "version"] : ["operation"];
         if (Object.keys(input).some(k => !keys.includes(k))) throw new IntakeError("invalid_request");
         if (input.operation === "begin") { if (!token) { token = newResumeToken(); fresh = true; } return await service.create(token, service.isOnboarding ? "DIRECT_START" : "FREE_REVIEW"); }
         if (!token) throw new IntakeError("session_unavailable", 404);
         if (input.operation === "save") return await service.save(token, input.version as number, input.answers, input.step as number);
+        if (input.operation === "site-priority") return await service.saveSitePriority(token, input.version as number, input.priority);
         if (input.operation === "submit") return await service.submit(token, input.version as number);
         throw new IntakeError("invalid_request");
       } catch (e) { if (e instanceof IntakeError) error = e; throw e; }
