@@ -488,6 +488,11 @@ synthetic change and exact restore used the same Home and Service
 IDs, slugs and preview links. Earlier proof Pages are retained
 pending a reviewed cleanup plan. Core-mediated Customer review remains open.
 
+The [connected operating-cycle checkpoint](c0-integration-spine-phase-b-2026-11-10.md#connected-operating-cycle-hosted-readback)
+links the real AI proof, the existing intake integration and verified hosted
+WordPress revisions with a scoped development measurement readback. Hosted
+adaptive intake, Contact acceptance and browser workflow remain open.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

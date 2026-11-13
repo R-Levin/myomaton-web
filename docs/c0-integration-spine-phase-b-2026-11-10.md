@@ -647,3 +647,48 @@ Rollback archive SHA-256 `000e5a5dcbb818b9721559b16008dfccbc72aeb468ea91b12dc160
 The archived plugin predates the stable pointer format and must
 only be restored with a compatible reviewed state. The hosted test
 used a signed content restore through 0.0.9.
+
+### Connected operating cycle hosted readback
+
+[Owner direction](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6842102841).
+The local and remote cycle branch started at `c114ba77`, the isolated
+Issue #10 worktree and remote branch remained at `d9ef9aec`, and remote
+`main` was `68d77e59`. These histories have not been merged.
+
+**Owner walkthrough.** Start with the evidence and decision in the table
+below. Sign in through the existing WordPress protection and editor login,
+then open [Home](https://miopages.org/?page_id=13&preview=true) and follow
+the Service link. Compare the restored Service draft with
+[revision 20](https://miopages.org/wp-admin/revision.php?revision=20),
+which asked the visitor to bring their current website address. The
+restored draft is the current revision. These links use existing
+Operator access. Customer browser access through Core remains open.
+
+| Stage | Verified behavior or beacon | Replacement boundary |
+| --- | --- | --- |
+| Entry | Both entry paths converge in the existing disposable Core integration. Review-led entry adds Review evidence. Direct start reuses known facts and skips the Review. The C0-derived test scope excludes protected C0 interview records and C2. | Hosted resumable customer intake and authorized role-scoped views must consume the same Core records. |
+| Understanding | The earlier OpenAI proof generated the synthetic buyer follow-up, “What specific customer evidence could later show Launch and Ongoing changed an actual site, not just our intended process?” Without dated evidence, the assessment recommended proceeding with process descriptions while holding buyer-proof claims. With a dated internal comparison, it recommended internal review before considering shareable proof. This is retained real generated evidence, replayed here. | A hosted provider operation must take the allowed evidence projection, use the existing strict Responses validation and metered budget, and emit a draft finding. No new API request or protected data transfer occurred. |
+| Direction | For this synthetic site, describe the planned Launch and Ongoing process and clarify the existing-site handoff. No customer results are asserted. This mapping uses the earlier proof as supporting reasoning and the hosted draft history as implementation evidence. | Persist an evidence-linked Presence Direction proposal with Operator review. This readback does not claim the AI response caused the historical hosted revision. |
+| Site and Operator review | The existing hosted Core journal authenticated the exact prior apply, authorized change and restore receipts. WordPress keeps Home 13 and Service 14 under the installed Managed Site theme. The historical change used distinct scoped test principals. | Serve the same governed evidence through a scoped Core Operator view and protected Customer preview. Neither the readback nor a simulated role grants authority. |
+| Inquiry and performance | The CLI composes one explicitly synthetic existing-website question as a fixture and attaches it to the verified baseline draft. It is not sent through Contact. The snapshot separates this sample, a verified navigation check, visitor coverage, accepted inquiry, notification, qualified leads and outcome. | Send an explicit development event through a scoped Action and the existing Contact writer when the inactive native fixture has an approved eligible form/definition. Replace the sample with a durable accepted-submission reference. Notification and customer-confirmed outcomes have separate state. |
+| Recommendation and remeasurement | The sample yields the recommendation to tell existing-site visitors what to bring. The hosted readback reconciles both revisions, verifies stable Service navigation and confirms that retained revision 20 contains the clarification absent from the baseline. This is a content/Action verification. No change in visitor behavior, lead quality or business outcome is established. | Bind the observation window to the actual deployment and compare real first-party observations. Keep missing data unknown. |
+
+The protected host-side readback uses the existing Core receipt journal
+and scoped installation receipt key. A fresh WordPress CLI readback
+supplies only Page IDs, content digests and bounded booleans. The
+temporary scripts are removed after execution. No runtime, active site,
+database, credentials, customer approval or publication changes were
+made by this readback. The existing local connected fixture retains
+Contact acceptance and duplicate handling evidence.
+
+**Next integration.** The inactive hosted draft fixture cannot accept
+the existing canonical Contact request because the handler requires
+an active Web Presence, Managed Site, Page, Section and definition.
+The native draft writer currently supports Intro blocks and internal
+page Actions. The next functional slice should connect a protected
+development Action to the existing Contact submission path without
+making the fixture publicly routable. A decision is needed on how that
+path establishes test eligibility while retaining the active public
+Contact checks. It can proceed alongside the separately scoped hosted
+Responses operation and Customer/Operator view. This checkpoint is
+partial and does not establish acceptance of a complete hosted cycle.
