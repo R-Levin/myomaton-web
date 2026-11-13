@@ -259,6 +259,18 @@ test("shared post-gate interview persists scoped contextual turns and answer-dri
     assert.equal(directFollowup.readiness[0].status, "open");
     assert.notEqual(reviewedFollowup.readiness[0].recommendation, directFollowup.readiness[0].recommendation);
     assert.ok(reviewedFollowup.readiness[0].sourceIds.includes(initial.state.turns[0].id + ":answer"));
+    const reviewUnderstanding = await reviewer.reviewUnderstanding(review);
+    const directUnderstanding = await starter.reviewUnderstanding(direct);
+    assert.equal(reviewUnderstanding.entryPath, "FREE_REVIEW");
+    assert.equal(directUnderstanding.entryPath, "DIRECT_START");
+    assert.ok(reviewUnderstanding.evidence.some(item => item.kind.includes("review")));
+    assert.ok(directUnderstanding.evidence.every(item => !item.kind.includes("review")));
+    assert.equal(reviewUnderstanding.findings[0].answer?.text, reviewedAnswer.state.turns[0].answer?.text);
+    assert.equal(directUnderstanding.findings[0].answer?.disposition, "unknown");
+    assert.equal(reviewUnderstanding.findings[0].assessmentTurnId, reviewedFollowup.state.turns[1].id);
+    assert.equal(reviewUnderstanding.authority, "draft-understanding-only");
+    assert.deepEqual(await c0Engine(review).reviewUnderstanding(review), reviewUnderstanding);
+    await assert.rejects(reviewer.reviewUnderstanding(tree));
     const afterProof = await reviewer.answer(review, reviewedFollowup.version, reviewedFollowup.state.turns[1].id, "deferred", null);
     assert.equal(afterProof.readiness[0].status, "open");
     const ongoing = await reviewer.propose(review, afterProof.version, "ongoing");

@@ -493,6 +493,11 @@ links the real AI proof, the existing intake integration and verified hosted
 WordPress revisions with a scoped development measurement readback. Hosted
 adaptive intake, Contact acceptance and browser workflow remain open.
 
+The [source-aware understanding readback](c0-integration-spine-phase-b-2026-11-10.md#source-aware-understanding-readback)
+is the first integration step following the [functional assessment](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6854443846).
+The same scoped interview now returns the sources and saved answer behind
+each draft finding. Hosted customer review and fresh AI dispatch remain open.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

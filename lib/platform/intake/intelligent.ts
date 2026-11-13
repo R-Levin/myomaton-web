@@ -26,13 +26,19 @@ export class IntelligentOnboarding {
         Buffer.byteLength(JSON.stringify(sources)) > 9_000) throw Error("Invalid onboarding source projection");
   }
 
-  private access(entry: Entry, open = false, change?: (state: InterviewState, version: number, path: QuestionContext["entryPath"], evidence: InterviewEvidence[]) => InterviewState) {
-    return this.activation.withOnboardingDraft(entry.context, entry.caseId, this.sources.scope, (db, authority) => {
-      const evidence = this.evidenceFor(authority.source.path, authority.review?.digest);
-      const digest = fingerprint({ scope: this.sources.scope, gaps: this.sources.gaps, evidence });
-      return this.intake.intelligentDraft(db, authority, entry.token, digest, open,
-        change && ((state, version) => change(state, version, authority.source.path, evidence)));
+  private load(entry: Entry, open = false, change?: (state: InterviewState, version: number, path: QuestionContext["entryPath"], evidence: InterviewEvidence[]) => InterviewState) {
+    return this.activation.withOnboardingDraft(entry.context, entry.caseId, this.sources.scope, async (db, authority) => {
+      const entryPath = authority.source.path;
+      const evidence = this.evidenceFor(entryPath, authority.review?.digest);
+      const sourceDigest = fingerprint({ scope: this.sources.scope, gaps: this.sources.gaps, evidence });
+      const draft = await this.intake.intelligentDraft(db, authority, entry.token, sourceDigest, open,
+        change && ((state, version) => change(state, version, entryPath, evidence)));
+      return { draft, evidence, sourceDigest, entryPath };
     });
+  }
+
+  private async access(...args: Parameters<IntelligentOnboarding["load"]>) {
+    return (await this.load(...args)).draft;
   }
 
   private evidenceFor(path: QuestionContext["entryPath"], reviewDigest?: string) {
@@ -49,6 +55,19 @@ export class IntelligentOnboarding {
   async resume(entry: Entry) {
     const draft = await this.access(entry);
     return { ...draft, readiness: interviewReadiness(this.sources.gaps, draft.state) };
+  }
+
+  /** Review the same source projection and draft that the interview actually uses. */
+  async reviewUnderstanding(entry: Entry) {
+    const { draft, evidence, sourceDigest, entryPath } = await this.load(entry);
+    const findings = interviewReadiness(this.sources.gaps, draft.state).map(finding => {
+      const assessment = draft.state.turns.findLast(turn => turn.gapId === finding.gapId && turn.assessment);
+      const answer = draft.state.turns.find(turn => turn.id + ":answer" === assessment?.respondsTo)?.answer;
+      return { ...finding, assessmentTurnId: assessment?.id ?? null, answer: answer ?? null };
+    });
+    return { entryPath, sourceDigest, version: draft.version, evidence, findings,
+      turns: draft.state.turns, pending: draft.state.pending, failure: draft.state.failure,
+      authority: "draft-understanding-only" as const };
   }
 
   async answer(entry: Entry, expectedVersion: number, questionId: string, disposition: "provided" | "unknown" | "deferred", value: unknown) {

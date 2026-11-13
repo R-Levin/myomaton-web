@@ -692,3 +692,35 @@ path establishes test eligibility while retaining the active public
 Contact checks. It can proceed alongside the separately scoped hosted
 Responses operation and Customer/Operator view. This checkpoint is
 partial and does not establish acceptance of a complete hosted cycle.
+
+### Source-aware understanding readback
+
+The next business acceptance is a protected browser journey where the owner
+can resume without re-entering known facts, see why a question matters, save
+a meaningful correction, and compare the resulting assessment, Presence
+Direction and real non-public WordPress Pages. In the same account context,
+an Operator should be able to follow a development inquiry to durable
+acceptance and revision-linked measurement, with notification, qualification
+and business outcomes represented independently.
+
+The first implementation step reads the same scoped draft and source
+projection used to generate questions. Review-led entry retains its
+Review evidence, while direct start excludes it. The readback links each
+finding to its exact generating turn and cited answer, without promoting
+answers to canonical facts or granting approval. The existing connected
+local delivery test consumes this readback and fingerprints its sources
+and turns when preparing its proposal. Its provider and inquiry remain
+fixtures. Both entry paths, resume and cross-customer refusal are covered
+by the disposable PostgreSQL test.
+
+This is a Core service integration, with no hosted browser surface,
+durable Presence Direction proposal or fresh WordPress revision yet.
+The confirmed C0 brief and retained source evidence remain available for
+the next composition step. No new C0 data was transmitted and no provider
+spend occurred. The previous synthetic API proof does not authorize
+sending protected C0 answers. A fresh real-C0 reasoning call needs its
+exact allowed input and spend scope confirmed. The existing intake writer
+is development-only and the hosted native fixture is inactive. Connecting
+Contact there requires a scoped non-public eligibility path that retains
+public eligibility checks. Customer acceptance and release authority stay
+separate.

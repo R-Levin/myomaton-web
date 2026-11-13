@@ -156,15 +156,16 @@ export async function c0SpineInterview(fixture: Awaited<ReturnType<typeof siteRe
     const answered = await engine.resume(access);
     await assert.rejects(engine.propose(access, asked.version, "launch-handoff"), /draft_changed/);
     await engine.propose(access, answered.version, "launch-handoff");
-    const readback = await engine.resume(access);
-    const [saved, followUp] = readback.state.turns;
+    const readback = await engine.reviewUnderstanding(access);
+    const [saved, followUp] = readback.turns;
     assert.equal(saved.answer?.text, answer);
     assert.equal(followUp.respondsTo, saved.id + ":answer");
-    assert.equal(readback.readiness[0].publication, "separate-approval-required");
+    assert.equal(readback.findings[0].publication, "separate-approval-required");
     return { caseId: entry.id, path: entry.source.path, submissionDigest: entry.source.digest,
-      reviewDigest: entry.review?.digest ?? null, draftVersion: readback.version, draftDigest: fingerprint(readback.state),
+      reviewDigest: entry.review?.digest ?? null, draftVersion: readback.version,
+      draftDigest: fingerprint({ sourceDigest: readback.sourceDigest, turns: readback.turns }),
       answerRef: followUp.respondsTo, question: saved.question, answer: saved.answer?.text,
-      followUp: followUp.question, finding: readback.readiness[0] };
+      followUp: followUp.question, finding: readback.findings[0] };
   };
   const direct = await walk(directCase, "Prospects who already have a website.");
   const reviewLed = await walk(created, "Founders who are starting without a website.");
