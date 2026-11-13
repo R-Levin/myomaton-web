@@ -1318,3 +1318,16 @@ restricted view and definition transaction without creating the inquiry.
 Only after a verified policy result should Core enable and record the one
 authorized synthetic inquiry. No hosted Contact policy success is recorded
 at this checkpoint.
+
+
+The citation-constrained build `9d7430b` passed
+[Linux run 43511827820](https://github.com/R-Levin/myomaton-web/actions/runs/43511827820).
+Artifact 14078149111 and all 163 packaged files were independently rehashed.
+Tar SHA-256 `04515fb72de1c9abea2ce3b9aa9a1b7fd974c194428d6c343c6f21c54ad40d85`.
+Only the existing protected Core app was restarted. Its prior build remains
+off-webroot under `update-9d7430b/rollback`. External Microsoft Edge verified
+the canonical route, scoped sign-in, retained answer and citation diagnosis,
+correction control, Ongoing section, reload and sign-out. The HTTPS API
+refused a WordPress review package without a current, reviewed plan.
+Both public Core roots continued serving and the WordPress preview remained
+protected. No additional model call was made after the citation correction.
