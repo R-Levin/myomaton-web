@@ -38,7 +38,7 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
   if (retained && !adaptive) throw Error("Retained C0 requires adaptive intake");
   const accessCode = retained && randomBytes(16).toString("hex");
   const accessCookie = retained && randomBytes(32).toString("hex");
-  const entry = retained ? "scripts/intake/c0-site-journey-client.tsx"
+  const entry = retained ? "scripts/intake/c0-site-journey-entry.tsx"
     : adaptive ? "scripts/intake/adaptive-onboarding-client.tsx" : "scripts/intake/c0-onboarding-client.tsx";
   const client = await build({ entryPoints: { onboarding: entry }, bundle: true, write: false,
     outdir: "onboarding", jsx: "automatic", platform: "browser", define: { "process.env.NODE_ENV": '"production"' }, minify: true });

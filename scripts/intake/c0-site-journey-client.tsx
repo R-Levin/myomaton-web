@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { createRoot } from "react-dom/client";
 import styles from "../../components/intake/interview.module.css";
 import { prospectPriorities } from "../../lib/platform/intake/adaptive";
 import { prospectDirection } from "../../lib/platform/intake/prospect-direction";
 import type { IntakeView } from "../../lib/platform/intake/service";
 
-async function request(operation?: object): Promise<IntakeView | null> {
-  const response = await fetch("/api/onboarding", {
+type JourneyView = IntakeView & { interviewEnabled?: boolean };
+async function request(endpoint: string, operation?: object): Promise<JourneyView | null> {
+  const response = await fetch(endpoint, {
     method: operation ? "POST" : "GET", cache: "no-store",
     headers: { "X-Intake-Request": "1", ...(operation && { "Content-Type": "application/json" }) },
     ...(operation && { body: JSON.stringify(operation) }),
@@ -20,8 +20,9 @@ async function request(operation?: object): Promise<IntakeView | null> {
   return data;
 }
 
-function Journey() {
-  const [view, setView] = useState<IntakeView | null>(null);
+export function Journey({ hosted = false }: { hosted?: boolean }) {
+  const endpoint = hosted ? "/api/protected-core" : "/api/onboarding";
+  const [view, setView] = useState<JourneyView | null>(null);
   const [priority, setPriority] = useState("");
   const [busy, setBusy] = useState(true);
   const [message, setMessage] = useState("");
@@ -29,11 +30,12 @@ function Journey() {
   const [locked, setLocked] = useState(false);
   const [code, setCode] = useState("");
   const [page, setPage] = useState<"home" | "service">("home");
+  const [answer, setAnswer] = useState("");
   const [prior, setPrior] = useState<ReturnType<typeof prospectDirection>>(null);
   const direction = view && prospectDirection(view.answers);
   const sourceDirection = view && prospectDirection({ visitorRoute: view.answers.visitorRoute });
 
-  function adopt(next: IntakeView | null) {
+  function adopt(next: JourneyView | null) {
     setView(next);
     setPriority(String(next?.answers.sitePriority ?? ""));
   }
@@ -45,15 +47,18 @@ function Journey() {
     setError(true);
     setMessage(reason instanceof Error ? reason.message : "Core could not confirm the request.");
   }
-  useEffect(() => { request().then(adopt).catch(failed).finally(() => setBusy(false)); }, []);
+  useEffect(() => { request(endpoint).then(adopt).catch(failed).finally(() => setBusy(false)); }, [endpoint]);
   async function unlock() {
     setBusy(true);
     setMessage("");
     try {
-      const response = await fetch("/api/onboarding/access", { method: "POST",
-        headers: { "X-Intake-Request": "1", "X-Local-Access": code.trim() } });
-      if (!response.ok) throw Error("Use the access code from your current PowerShell window.");
-      adopt(await request());
+      const response = hosted ? await fetch(endpoint, { method: "POST",
+        headers: { "X-Intake-Request": "1", "Content-Type": "application/json" },
+        body: JSON.stringify({ operation: "sign-in", credential: code.trim() }) })
+        : await fetch("/api/onboarding/access", { method: "POST",
+          headers: { "X-Intake-Request": "1", "X-Local-Access": code.trim() } });
+      if (!response.ok) throw Error(hosted ? "The Operator credential was refused." : "Use the access code from your current PowerShell window.");
+      adopt(await request(endpoint));
       setLocked(false);
       setError(false);
       setCode("");
@@ -65,23 +70,39 @@ function Journey() {
     setError(false);
     setMessage("");
     try {
-      const next = await request(operation);
+      const next = await request(endpoint, operation);
       if (!next) throw Error("No saved draft was returned.");
       if (view) setPrior(direction);
       adopt(next);
-      setMessage(view ? "Saved. Your earlier answers are still available below." : "Your retained answers are ready.");
+      if ("operation" in operation && operation.operation === "interview-answer") setAnswer("");
+      setMessage(next.interview?.failure && "operation" in operation && operation.operation === "interview-next"
+        ? "A new question could not be confirmed. Your saved answers are still available."
+        : view ? "Saved. Your earlier answers are still available below." : "Your retained answers are ready.");
     } catch (reason) { failed(reason); }
     finally { setBusy(false); }
   }
 
+  const turn = view?.interview?.turns.at(-1);
+  const finding = view?.interview?.turns.findLast(item => item.assessment);
+  const assessment = finding?.assessment;
   return <div className={styles.shell}>
-    <header><strong>MioPages</strong><span>Private local development</span></header>
+    <header><strong>MioPages</strong><span>{hosted ? "Protected Operator development" : "Private local development"}</span>
+      {hosted && view && <button type="button" disabled={busy} onClick={async () => {
+        setBusy(true);
+        try {
+          const response = await fetch(endpoint, { method: "POST", headers: { "X-Intake-Request": "1", "X-Core-Operation": "logout" } });
+          if (!response.ok) throw Error("Sign-out could not be confirmed.");
+          adopt(null); setPrior(null); setLocked(true); setMessage(""); setError(false);
+        } catch (reason) { failed(reason); }
+        finally { setBusy(false); }
+      }}>Sign out</button>}
+    </header>
     <main className={styles.card} aria-busy={busy}>
       <h1>Review your Web Presence</h1>
       {locked ? <form onSubmit={event => { event.preventDefault(); void unlock(); }}>
-        <div className={styles.field}><label htmlFor="access-code">Local access code</label>
+        <div className={styles.field}><label htmlFor="access-code">{hosted ? "Operator credential" : "Local access code"}</label>
           <input id="access-code" type="password" autoComplete="off" value={code} onChange={event => setCode(event.target.value)} /></div>
-        <button disabled={busy || !code}>Open private review</button>
+        <button disabled={busy || !code}>{hosted ? "Sign in" : "Open private review"}</button>
       </form> : !view ? <>
         <p>Continue with the business information you already provided.</p>
         <button disabled={busy || error} onClick={() => void run({ operation: "begin" })}>Resume retained onboarding</button>
@@ -94,6 +115,39 @@ function Journey() {
           <p>{source.reference}</p>
           {source.entries.map(item => <p key={item.label}><strong>{item.label}</strong> {item.value}</p>)}
         </details>)}
+        {hosted && <section aria-label="Business interview">
+          <h2>Business interview</h2>
+          {!view.interviewEnabled ? <p>AI interview access is awaiting its evidence and budget configuration.</p> : <>
+            {assessment && <div>
+              <h3>What Core learned</h3>
+              <p>{assessment.recommendation}</p>
+              {assessment.evidenceNeeded && <p><strong>Still open</strong> {assessment.evidenceNeeded}</p>}
+              <p className={styles.hint}>Evidence {finding?.sourceIds.map(id => id.endsWith(":answer") ? "Saved interview answer" :
+                view.prepared?.sources.find(source => source.id === id)?.title ?? id).join(" · ")}</p>
+            </div>}
+            {turn?.question && <>
+              <h3>{turn.question}</h3><p>{turn.rationale}</p>
+              {turn.answer ? <p><strong>Saved answer</strong> {turn.answer.text}</p>
+                : <form onSubmit={event => {
+                  event.preventDefault();
+                  void run({ operation: "interview-answer", version: view.version, questionId: turn.id, answer });
+                }}>
+                  <div className={styles.field}><label htmlFor="business-answer">Your answer</label>
+                    <textarea id="business-answer" rows={4} maxLength={900} value={answer}
+                      onChange={event => setAnswer(event.target.value)} disabled={busy} /></div>
+                  <button disabled={busy || !answer.trim()}>Save answer</button>
+                </form>}
+            </>}
+            {view.interview?.pending ? <p role="status">Core is waiting for the reserved generation to settle.</p>
+              : (!turn || turn.answer) && <button disabled={busy} onClick={() => void run({
+                operation: "interview-next", version: view.version,
+              })}>{turn ? "Review answer and look for a follow-up" : "Find the next business question"}</button>}
+            {view.interview?.turns.some(item => item.answer) && <details><summary>Interview history</summary>
+              {view.interview.turns.filter(item => item.answer).map(item => <div key={item.id}>
+                <p><strong>{item.question}</strong></p><p>{item.answer?.text}</p>
+              </div>)}</details>}
+          </>}
+        </section>}
         <h2>Choose what the site should emphasize</h2>
         <p>Both paths can remain available. This decision changes what a prospect sees first on Home and Service.</p>
         <form onSubmit={event => {
@@ -117,6 +171,10 @@ function Journey() {
             <p>Primary action changed from <strong>{(prior ?? sourceDirection)?.primary.action}</strong> to <strong>{direction.primary.action}</strong>.</p>}
           <h2>Review the site proposal</h2>
           <p>Editorial proposal for review. Links and inquiry delivery still need verification.</p>
+          {assessment && <details><summary>AI recommendation for this review</summary>
+            <p>{assessment.recommendation}</p>
+            <p>Review this recommendation against the proposed pages before changing the copy or visitor actions.</p>
+          </details>}
           {view.planningEvidence && <details><summary>Proposal evidence</summary>
             <p>Draft version {view.planningEvidence.version} · {view.planningEvidence.evidenceDigest}</p>
           </details>}
@@ -153,5 +211,3 @@ function Journey() {
     </main>
   </div>;
 }
-
-createRoot(document.getElementById("onboarding")!).render(<Journey />);

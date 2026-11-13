@@ -808,3 +808,91 @@ installation, reconcile its application receipt, and verify exact
 rollback. Review the exact site digest and allow only those scoped
 development writes. No AI or hosted operation is authorized by this
 checkpoint itself.
+
+### Protected HTTPS Core
+
+[Owner P0 direction](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6858083745)
+supersedes the localhost and one-call milestone. A browser session must
+resume retained understanding, support meaningful generated questions and
+answers, show an evidence-linked direction and editable site candidate,
+and carry an independently approved revision to the protected WordPress
+installation. The browser must distinguish real delivery and inquiry
+evidence from missing outcomes.
+
+Read-only verification on November 13 found the production Core at
+`62439fc` with HTTP 200, rehearsal checkout `4c93def`, and Node 22.23.2
+on both 20i accounts. The retained acceptance account's webroot was
+empty and HTTPS returned the known idle 502. The protected WordPress
+Service preview returned 401 to an anonymous request. No hosted changes
+were made. The parallel live AI branch remains at `d9ef9aec`.
+
+The protected Next route uses the retained local journey component and
+the same progressive intake store. It rechecks scoped Operator grants
+on each request, uses short-lived opaque Secure/HttpOnly/SameSite
+sessions, and has same-origin mutation checks and a host-bound route.
+The package must run a single loopback worker behind the existing 20i
+proxy, which must set trusted Host and X-Forwarded-Proto. The production
+runtime does not enable these routes. Scoped reads and updates require
+the inactive development graph and a separately restricted database role.
+The local proof path retains its existing guards.
+
+The interview stores versioned answers and reserves a generation before
+dispatch. The real Responses transport pins the hostname and endpoints,
+uses verified TLS and no retries, and retains the existing usage ledger's
+charge reservations and exact response checks. The runtime projects only
+approved source records and the answer whose text matches an approved
+digest. The hosted route has no fixed four-turn rule. The ledger,
+payload, expiry and storage bounds still apply. No new provider requests
+were sent. An unresolved reservation needs reconciliation before retry.
+
+This checkpoint is implementation progress. The hosted interview uses
+the retained Direct Start capture. General hosted Review continuation,
+AI-derived Presence Direction driving an editable substantial proposal,
+private application of a new site revision and durable hosted
+Contact/measurement are pending. The current site view remains the
+earlier editorial planning projection. A provider recommendation does
+not approve a claim or publication.
+
+**Consolidated authorization packet for owner review.**
+
+1. **Hosting.** Deploy the checksummed production build to the retained
+   `wp-acceptance.miopages.com` 20i account only. Register one package-local
+   Core development app at loopback port 8081, with no new hosting charge.
+   Verify trusted HTTPS forwarding, protected sessions and resource
+   headroom. Retain the account, DNS and SSL on rollback. Preserve the
+   public Core process, production configuration and WordPress Pages.
+2. **Database and custody.** Use verified-TLS Supabase Session Pooler
+   and the existing inactive rehearsal tenant. Provision only a dedicated
+   protected development role with scoped draft read/insert/update and
+   read-only verification of the graph and existing credentials/grants.
+   Restrict writes to the single development scope through database
+   policy and verify foreign access refusal. Enroll the Operator credential
+   with only scoped inspect and prepare permissions. Confirm recovery
+   coverage first. Import the checksum-verified C0 prepared evidence,
+   ten saved answers and their original provenance to the acceptance
+   account, in an off-webroot mode-0600 input. Persist the owned intake
+   draft in Supabase. The original evidence and public C0 graph remain
+   intact. Configure the approved key through the owner's protected method.
+3. **AI.** Approve the three exact statements under the earlier
+   protected browser journey as internal approved development inputs.
+   They do not require a claim that they are publicly published.
+   Authorize their transmission to OpenAI `api.openai.com` through
+   Responses input counting and generation. Pin
+   `gpt-5.4-mini-2026-03-17`, use `store:false` for generation and
+   no automatic retries. Proposed session scope is up to 20 requests
+   and $0.50 estimated usage exposure with a 24-hour expiry. Later
+   turns may include only the latest generated question, the question
+   history used for duplicate checks, and a separately allowlisted
+   answer. The raw retained capture, private Review, customer IDs
+   and contact/routing details stay outside the model payload. Confirm
+   current project access, pricing, budget and data controls before
+   enabling dispatch. Expected result is a source-labeled question,
+   then a changed assessment and relevant follow-up based on an approved
+   answer. [OpenAI model documentation](https://developers.openai.com/api/docs/models/gpt-5.4-mini).
+4. **WordPress and operating evidence.** After exact candidate review,
+   authorize preparation and application of the selected non-public
+   draft revision using the existing installation, with receipt
+   reconciliation and signed rollback. Keep reviewer and authorizer
+   separate. Allow one labeled development inquiry and revision-linked
+   event only once protected Contact eligibility is defined and tested.
+   Customer confirmation and public release remain separate.

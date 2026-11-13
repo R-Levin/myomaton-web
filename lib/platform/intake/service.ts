@@ -20,8 +20,9 @@ type Row = { id: string; entry_intent: EntryIntent; questionnaire_version: strin
 export type IntakeEvidence = { source: "c0-discovery" | "rehearsal-response"; confirmation: "prior-approved" | "unconfirmed"; suppliedAt: string; reference: string; author: string };
 export type IntakeView = { questionnaireVersion: string; intent: EntryIntent; state: Row["state"]; answers: Answers; step: number; version: number; expiresAt: string;
   provenance?: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; submission?: { digest: string; submittedAt: string };
-  planningEvidence?: { version: number; evidenceDigest: string } };
-type Rehearsal = { database: string; answers: Answers; provenance: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; intelligentFixtureSchema?: string; step?: number };
+  planningEvidence?: { version: number; evidenceDigest: string }; interview?: InterviewState };
+type Rehearsal = { database: string; answers: Answers; provenance: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; intelligentFixtureSchema?: string; step?: number;
+  protectedScope?: (db: Pick<PoolClient, "query">) => Promise<void> };
 function view(r: Row): IntakeView { return { questionnaireVersion: r.questionnaire_version, intent: r.entry_intent, state: r.state, answers: r.answers, step: r.step, version: r.version, expiresAt: r.expires_at.toISOString() }; }
 async function transaction<T>(pool: Pool, run: (db: PoolClient) => Promise<T>) {
   const db = await pool.connect();
@@ -56,6 +57,10 @@ export class IntakeService {
     if (Object.keys(errors).length) throw new IntakeError("incomplete", 400, errors);
   }
   private async scope(db: Pick<PoolClient, "query">, lock = false, intelligent = false) {
+    if (this.rehearsal?.protectedScope) {
+      await this.rehearsal.protectedScope(db);
+      return;
+    }
     if (this.rehearsal) {
       const { database, schema, host, port } = (await db.query("SELECT current_database() AS database, current_schema() AS schema, host(inet_server_addr()) AS host, inet_server_port() AS port")).rows[0];
       const fixtureSchema = intelligent ? this.rehearsal.intelligentFixtureSchema : undefined;
@@ -106,9 +111,11 @@ export class IntakeService {
     this.assertPrepared(row);
     const provenance = { ...row.provenance };
     delete provenance.preparedDigest;
+    const interview = provenance.protectedInterview as InterviewState | undefined;
+    delete provenance.protectedInterview;
     const result = { ...view(row), provenance: provenance as Record<string, IntakeEvidence>, prepared: this.rehearsal.prepared };
     if (this.rehearsal.step !== undefined) {
-      return { ...result, planningEvidence: { version: row.version, evidenceDigest: fingerprint({
+      return { ...result, ...(interview && { interview }), planningEvidence: { version: row.version, evidenceDigest: fingerprint({
         scope: { webPresenceId: this.selection.webPresenceId, managedSiteId: this.selection.managedSiteId },
         version: row.version, intent: row.entry_intent, answers: row.answers, provenance: row.provenance,
       }) } };
@@ -143,6 +150,7 @@ export class IntakeService {
       const r = await this.owned(db, token, true);
       this.assertPrepared(r);
       if (r.state !== "draft") throw new IntakeError("already_submitted", 409);
+      if ((r.provenance.protectedInterview as InterviewState | undefined)?.pending) throw new IntakeError("draft_changed", 409);
       const answers = normalizeAnswers(value, r.questionnaire_version);
       if (answers.sitePriority !== undefined && this.rehearsal?.step === undefined) throw new IntakeError("invalid_request");
       if (this.rehearsal) for (const key of Object.keys(answers)) if (answers[key] === "") delete answers[key];
@@ -152,6 +160,7 @@ export class IntakeService {
       if (this.rehearsal?.prepared) this.checkAdaptiveProgress(r, answers, step, this.rehearsal.prepared);
       const provenance: Record<string, unknown> = {};
       if (this.rehearsal?.prepared) provenance.preparedDigest = r.provenance.preparedDigest;
+      if (r.provenance.protectedInterview) provenance.protectedInterview = r.provenance.protectedInterview;
       const at = new Date().toISOString();
       for (const [key, value] of Object.entries(answers)) provenance[key] = fingerprint(r.answers[key] ?? null) === fingerprint(value) && r.provenance[key]
         ? r.provenance[key] : this.rehearsal ? { source: "rehearsal-response", confirmation: "unconfirmed", suppliedAt: at, reference: r.questionnaire_version, author: `rehearsal-customer:${r.id}` } : { source: "prospect-supplied", confirmation: "unconfirmed", suppliedAt: at };
@@ -165,6 +174,20 @@ export class IntakeService {
     const current = await this.resume(token);
     if (current.version !== version && current.answers.sitePriority !== priority) throw new IntakeError("draft_changed", 409);
     return this.save(token, version, { ...current.answers, sitePriority: priority }, current.step);
+  }
+  async editProtectedInterview(token: string, version: number, change: (state: InterviewState, view: IntakeView) => InterviewState) {
+    if (!this.rehearsal?.protectedScope) throw new IntakeError("unavailable", 404);
+    return transaction(this.pool, async db => {
+      const row = await this.owned(db, token, true);
+      if (row.state !== "draft" || row.version !== version) throw new IntakeError("draft_changed", 409);
+      const view = await this.readView(db, row);
+      const state = change(view.interview ?? { turns: [], pending: null, failure: null }, view);
+      const provenance = { ...row.provenance, protectedInterview: state };
+      if (Buffer.byteLength(JSON.stringify(provenance)) > 14_000) throw new IntakeError("payload_too_large", 413);
+      const saved = await db.query("UPDATE prospect_intakes SET provenance=$2,version=version+1,updated_at=now() WHERE id=$1 RETURNING *",
+        [row.id, JSON.stringify(provenance)]);
+      return this.readView(db, saved.rows[0]);
+    });
   }
   async submit(token: string, version: number) {
     if (this.rehearsal?.step !== undefined) throw new IntakeError("unavailable", 404);

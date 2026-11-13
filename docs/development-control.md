@@ -505,6 +505,11 @@ Service. The existing exact proposal and signed-draft test now exercises
 that planning projection on both Pages. The handoff distinguishes the
 local browser view, disposable signed proof and pending hosted revision.
 
+The [protected HTTPS Core checkpoint](c0-integration-spine-phase-b-2026-11-10.md#protected-https-core)
+records the hosted route, scoped interview and Responses wiring, current
+20i observations, and the consolidated authorization for the protected
+deployment. Owner product acceptance requires a working online journey.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

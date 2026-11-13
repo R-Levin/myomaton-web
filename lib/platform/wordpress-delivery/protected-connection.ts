@@ -25,7 +25,7 @@ export function protectedPool(connectionString: string, role: string, ca?: strin
     max: 4, connectionTimeoutMillis: 5000 });
 }
 
-export async function protectedConnection(db: PoolClient, role: string, expectedDatabase?: string, onIdentityVerified?: () => void) {
+export async function protectedConnection(db: Pick<PoolClient, "query">, role: string, expectedDatabase?: string, onIdentityVerified?: () => void) {
   const row = (await db.query(`SELECT session_user::text AS login, current_user::text AS actor, current_database() AS database,
     (SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()) AS tls,
     r.rolsuper OR r.rolbypassrls OR r.rolcreaterole OR r.rolcreatedb OR r.rolreplication AS privileged,

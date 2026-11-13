@@ -7,16 +7,17 @@ import type { QuestionAttribution, QuestionContext, QuestionProvider } from "./i
 const maxInput = 4_000, maxOutput = 1_200;
 const maxRequests = 16, maxGenerations = 8, capMicros = 500_000;
 const version = "onboarding-responses/1";
-type Rates = {
+export type ResponsesRates = {
   model: string; verifiedOn: string;
   inputPerMillion: number; cachedPerMillion: number; cacheWritePerMillion: number; outputPerMillion: number;
   countMicros: number;
 };
-type Reply = { body: unknown; requestId?: string };
-export type OfflineResponsesTransport = {
-  readonly mode: "offline-test";
+type Rates = ResponsesRates;
+export type ResponsesTransport = {
   send(path: "/v1/responses/input_tokens" | "/v1/responses", request: object): Promise<Reply>;
 };
+type Reply = { body: unknown; requestId?: string };
+export type OfflineResponsesTransport = ResponsesTransport & { readonly mode: "offline-test" };
 type Usage = { input: number; cached: number; cacheWrite: number; output: number; reasoning: number };
 type Receipt = QuestionAttribution & { reservedMicros: number; countDispatched: boolean; generationDispatched: boolean;
   countRequestId?: string; generationRequestId?: string; responseId?: string; usage?: Usage; estimatedMicros?: number;
@@ -86,17 +87,41 @@ function responseProposal(body: Record<string, unknown>) {
   return JSON.parse(item.text) as unknown;
 }
 
-// This slice has no network client, API key loader or fallback to fetch.
 export function offlineResponsesProvider(directory: string, configuredRates: Rates, transport: OfflineResponsesTransport): QuestionProvider {
   if (transport.mode !== "offline-test" || process.env.NODE_ENV === "production") throw Error("Offline Responses transport required");
+  return meteredResponsesProvider(directory, configuredRates, transport, maxRequests, maxGenerations, capMicros,
+    context => {
+      if (process.env.NODE_ENV === "production") throw Error("Offline Responses transport required");
+      return context;
+    });
+}
+
+// The production build can run in the protected development package only
+// when its composition root supplies a scope-bound projection and budget.
+export function protectedResponsesProvider(directory: string, rates: Rates, transport: ResponsesTransport,
+  grant: { capMicros: number; maxRequests: number; expiresAt: number; project: (context: QuestionContext, attribution: QuestionAttribution) => unknown },
+): QuestionProvider {
+  const { capMicros: limit, maxRequests: requests, expiresAt, project } = grant;
+  if (!Number.isSafeInteger(limit) || limit < 1 || !Number.isSafeInteger(requests) || requests < 2 ||
+      !Number.isSafeInteger(expiresAt) || rates.cacheWritePerMillion !== 0) throw Error("Invalid Responses authorization");
+  return meteredResponsesProvider(directory, rates, transport, requests, requests, limit, (context, attribution) => {
+    if (Date.now() >= expiresAt) throw Error("Responses authorization expired");
+    return project(context, attribution);
+  });
+}
+
+function meteredResponsesProvider(directory: string, configuredRates: Rates, transport: ResponsesTransport,
+  requestLimit: number, generationLimit: number, spendLimit: number,
+  project: (context: QuestionContext, attribution: QuestionAttribution) => unknown,
+): QuestionProvider {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
   const inputRate = Math.max(rates.inputPerMillion, rates.cachedPerMillion, rates.cacheWritePerMillion);
   return { version, async propose(context: QuestionContext, attribution: QuestionAttribution) {
-    if (process.env.NODE_ENV === "production") throw Error("Offline Responses transport required");
     const { ownerDigest, workDigest } = attribution;
     if (![ownerDigest, workDigest].every(value => /^[a-f0-9]{64}$/.test(value))) throw Error("Scoped attribution required");
+    const projected = project(context, { ownerDigest, workDigest });
     const lock = await open(lockPath, "wx", 0o600);
     try {
       const ledger: Ledger = JSON.parse(await readFile(path, "utf8"));
@@ -111,8 +136,8 @@ export function offlineResponsesProvider(directory: string, configuredRates: Rat
       const requests = ledger.attempts.filter(item => item.countDispatched).length + generations;
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");
       const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + maxOutput * rates.outputPerMillion) / 1_000_000);
-      if (requests + 2 > maxRequests || generations >= maxGenerations || spent + reservation > capMicros) throw Error("Development budget exhausted");
-      const request = { model: rates.model, instructions: instruction, input: JSON.stringify(context), text: { format } };
+      if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) throw Error("Development budget exhausted");
+      const request = { model: rates.model, instructions: instruction, input: JSON.stringify(projected), text: { format } };
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation, countDispatched: true, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);
