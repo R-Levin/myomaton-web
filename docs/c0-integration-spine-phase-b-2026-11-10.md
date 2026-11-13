@@ -1010,3 +1010,23 @@ exact failing field is unknown. The next build makes the initial
 question and null assessment explicit in the response schema and
 records only a bounded rejection category. Any next request is a
 deliberate development operation within the remaining budget.
+
+The verified Linux build at `8f9b047` replaced the earlier build
+inside the same acceptance package. The previous build is retained
+off-webroot. A deliberate second count and generation saved the
+first real question at draft version 6 with all three approved source
+references and no pending operation. It asks which existing-site
+information MioPages needs in the first conversation and what can
+wait. The two completed generations and two counts totaled 820 input
+and 297 output tokens, with $0.001952 estimated usage. The first
+validation refusal remains part of that total.
+
+Open [Protected Core](https://wp-acceptance.miopages.com/core) and
+use the temporary scoped Operator credential held in the approved
+Cloud custody file. Secure HTTPS API sign-in, retained draft readback
+and generation persistence were independently verified. The hosted
+account's listener remains on loopback 8081 and both public Core
+hostnames remained 200. WordPress draft access remained protected.
+The next live turn requires the owner's exact answer transmission
+allowlist. The hosted proposal remains editorial pending that
+evidence-driven connection. No new WordPress revision was applied.
