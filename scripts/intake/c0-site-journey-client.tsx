@@ -125,7 +125,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         <p>MioPages is transitioning to one managed Web Presence service, with Launch followed by Ongoing care. Earlier site observations and Review material are kept with their original sources.</p>
         {view.prepared && <p className={styles.hint}>{view.prepared.reviewGap}</p>}
         {view.prepared?.sources.map(source => <details key={source.id}>
-          <summary>{source.title} · {source.kind}</summary>
+          <summary>{source.title} Â· {source.kind}</summary>
           <p>{source.reference}</p>
           {source.entries.map(item => <p key={item.label}><strong>{item.label}</strong> {item.value}</p>)}
         </details>)}
@@ -137,7 +137,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
               <p>{assessment.recommendation}</p>
               {assessment.evidenceNeeded && <p><strong>Still open</strong> {assessment.evidenceNeeded}</p>}
               <p className={styles.hint}>Evidence {finding?.sourceIds.map(id => id.endsWith(":answer") ? "Saved interview answer" :
-                view.prepared?.sources.find(source => source.id === id)?.title ?? id).join(" · ")}</p>
+                view.prepared?.sources.find(source => source.id === id)?.title ?? id).join(" Â· ")}</p>
             </div>}
             {turn?.question && <>
               <h3>{turn.question}</h3><p>{turn.rationale}</p>
@@ -220,7 +220,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
                 <label>Audience<textarea name="audience" defaultValue={plan.audience} required maxLength={350} /></label>
               </div>
               {plan.pages.map((item, index) => <details key={item.path}>
-                <summary>{item.title} · {item.path}</summary>
+                <summary>{item.title} Â· {item.path}</summary>
                 <div className={styles.field}>
                   <label>Page purpose<textarea name={`purpose-${index}`} defaultValue={item.purpose} required maxLength={300} /></label>
                   <label>Page title<input name={`title-${index}`} defaultValue={item.title} required maxLength={100} /></label>
@@ -236,7 +236,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
             </form>}
           </section>}
           {view.planningEvidence && <details><summary>Proposal evidence</summary>
-            <p>Draft version {view.planningEvidence.version} · {view.planningEvidence.evidenceDigest}</p>
+            <p>Draft version {view.planningEvidence.version} Â· {view.planningEvidence.evidenceDigest}</p>
           </details>}
           {plan && <p>Independent review is required before preparing delivery. Proposed action destinations and new Page identities need to be resolved in Core.</p>}
           {hosted && plan && reviewedPlan?.findingId === evidenceDirection?.findingId && <section>
@@ -280,7 +280,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         {hosted && <section aria-label="Ongoing service">
           <h2>Ongoing service</h2>
           {view.operations ? <>
-            <p>Private draft revision {view.operations.draft.revision} � Synthetic development check</p>
+            <p>Private draft revision {view.operations.draft.revision} · Synthetic development check</p>
             <dl>
               <dt>Accepted test inquiries</dt><dd>{view.operations.accepted}</dd>
               <dt>Notifications</dt><dd>Disabled</dd>
@@ -314,7 +314,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
             </> : <button type="button" disabled={busy} onClick={() => void run({ operation: "accept-development-inquiry" })}>Record one test inquiry</button>}
           </> : <p>Protected inquiry and measurement access is unavailable for this development draft.</p>}
         </section>}
-        <details><summary>Earlier saved responses · awaiting review</summary>
+        <details><summary>Earlier saved responses Â· awaiting review</summary>
           {Object.entries(view.answers).filter(([key]) => key !== "sitePriority" && key !== "rehearsalCommitment").map(([key, value]) => {
             const labels: Record<string, string> = { sourceDecision: "Understanding", sourceCorrection: "Correction", foundationGoal: "Goal",
               workIncluded: "Included work", workExcluded: "Excluded work", visitorRoute: "Visitor action", reviewHandoff: "Review handoff",
@@ -322,7 +322,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
               siteItem: "Item", additionalEvidence: "Additional evidence" };
             const evidence = view.provenance?.[key];
             return <p key={key}><strong>{labels[key] ?? key}</strong> {value}
-              {evidence && <><br /><small>Saved {evidence.suppliedAt.slice(0, 10)} · {evidence.confirmation === "prior-approved"
+              {evidence && <><br /><small>Saved {evidence.suppliedAt.slice(0, 10)} Â· {evidence.confirmation === "prior-approved"
                 ? "Earlier approved source" : "Owner response awaiting review"}</small></>}</p>;
           })}
         </details>
