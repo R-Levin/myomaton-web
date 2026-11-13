@@ -1406,3 +1406,59 @@ currently materialized baseline and reconcile restoration to the latter.
 Never issue or apply a new revision on the assumption that revision 3
 can be restored by the existing envelope. Page approvals, independent
 staging authority, and fresh scoped WordPress principals remain required.
+
+
+The existing Core deployment now runs `e649108`.
+[Linux build 43516047618](https://github.com/R-Levin/myomaton-web/actions/runs/43516047618)
+passed the isolated smoke. Artifact 14080682450, all 163 packaged files
+and tar SHA-256 `060dd398df27781f40185e506df39045e1b2aad2b4b772f4179001e6a4ea743f`
+were verified before swapping only the existing protected app. Its prior
+build remains in protected rollback custody. TypeScript, lint and nine
+focused tests, including disposable PostgreSQL, passed.
+
+External Edge used the hosted editor to save Operator-authored copy at
+version 14 and apply the existing synthetic inquiry recommendation to the
+Service draft at version 15. Home now asks for the website address and
+the visitor's most important action. Service explains what the team
+discusses after looking at the site and separates the first conversation
+from Ongoing eligibility. The findings on what specifically triggers Launch
+remain open. The saved model turn and original answers were unchanged.
+On reload, Core returned the same editable plan with its finding and
+answer reference, the synthetic inquiry ID
+`fe475728-c2ce-4dbe-bcc5-ec3bfba39f8c`, and the restored revision 3 digest.
+The report showed one synthetic inquiry and no measured visitor outcomes.
+Remeasurement is a later comparison against a reviewed, applied revision.
+The hosted grant was left empty after the live request. Existing public
+Core output digests matched and the WordPress preview still required
+authentication.
+
+The protected WordPress review input emitted by Core has digest
+`99f4dbb6e943ae577a15d30f69532c0a9a21511e94e2589205d354111a9b4e7c`.
+Local compilation preserved the Home and Service logical Page IDs and
+the canonical-backed Sections, added the reviewed editorial Sections,
+and resolved the Home Action to Service and Service Action to Home.
+The resulting private preparation scope digest is
+`270e57f123d268551888d838b00564c7f9e0336a8fa25bd1964d97946bb38148`.
+The intended WordPress targets remain Home 13 and Service 14. Hosted
+read-only Core evidence shows Home proposal revision 1 and Service proposal
+revision 4, so their proposed next revisions are 2 and 5 respectively.
+The site-level candidate would be revision 5 with signed predecessor
+revision 4 and an independently verified materialized revision 3 baseline.
+The prep digest is neither a persisted Page approval nor a signed site
+digest. The two exact governed Page previews and signed apply/restore
+receipts have not been produced.
+
+A read-only renderer attempt on the existing Cloud WordPress operator
+checkout was rejected by automatic approval review because it included a
+transfer of the C0-derived v15 scope to that separate account. Nothing was
+transferred. The exact review input and locally compiled scope remain in
+Git-ignored local runtime evidence. Obtain permission for the exact scoped
+review input transfer before a renderer on that account consumes it, or
+use the existing protected Core editor while the rollback contract is
+corrected. Keep the signed high-water predecessor and rollback target
+independent, verify both against the authorization chain and restored
+receipt, and test that a forward revision after a restore can be rolled
+back to the current content with stable Page IDs. Only then prepare the
+durable Page revisions under fresh scoped credentials and request exact
+application approval. No WordPress change, publication or new provider
+call took place during site preparation.
