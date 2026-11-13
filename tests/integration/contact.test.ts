@@ -6,7 +6,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { readMigrationFiles } from "drizzle-orm/migrator";
 import { schemaSignature } from "./schema-fidelity";
 import { tables } from "../../scripts/customer-updates/myomaton-secondary-pages-v1";
-import { acceptContactSubmission } from "../../lib/platform/contact/submissions";
+import { acceptContactSubmission, contactOperationalReadback } from "../../lib/platform/contact/submissions";
 import { contactPresentations } from "../../lib/platform/contact/presentation";
 import { startProductionFixture } from "./production-server";
 import { assetRoot } from "../../lib/platform/assets/local-storage";
@@ -109,6 +109,13 @@ test("Contact upgrade/fresh replay preserves public state; isolated submission o
       const input = request();
       const results = await Promise.all([submit(input), submit(input)]);
       assert.equal(results.filter(r => r.duplicate).length, 1); assert.equal(await count(), 1); assert.equal(deliveries, 1); assert.equal(events, 1);
+      const since = new Date(Date.now() - 60_000), through = new Date(Date.now() + 60_000);
+      const read = (wp: string, site: string) => contactOperationalReadback(p, { webPresenceId: wp, managedSiteId: site }, since, through);
+      const report = await read(first.wp, first.site);
+      assert.deepEqual(report, { accepted: 1, notifications: { disabled: 0, pending: 0, delivered: 1, failed: 0 },
+        qualifiedLeads: "unknown", customerOutcomes: "unknown" });
+      assert.equal((await read(first.wp, foreign.site)).accepted, 0);
+      assert.equal((await read(foreign.wp, first.site)).accepted, 0);
       const before = (await p.query("SELECT to_jsonb(s) AS row FROM contact_submissions s")).rows;
       assert.equal(before[0].row.delivery_status, "delivered"); assert.equal(before[0].row.delivery_attempts, 1);
       assert.equal(Date.parse(before[0].row.expires_at) - Date.parse(before[0].row.created_at), 30 * 86400000);

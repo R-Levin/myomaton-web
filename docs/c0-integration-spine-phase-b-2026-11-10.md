@@ -1071,3 +1071,60 @@ proposal provenance. This change is not yet deployed and does not
 generate editable site copy. The exact outbound test answer is
 still awaiting owner authorization. Hosted Contact, measurement,
 new private WordPress application and Ongoing remain open.
+
+
+#### Business answer to editable site direction
+
+The immediate acceptance gate is one actual scoped business answer, a
+cited change in understanding with remaining uncertainty, and a consequential
+change in positioning, page structure, copy or a visitor action that an
+Operator can review and edit after reload. Any WordPress application has its
+own exact scope and approval.
+
+Core now requests business-specific gaps about the offer, customer decision,
+trust and service boundaries. A follow-up can return a variable page set with
+positioning, audience, offering, page purpose, proposed sections, search
+descriptions and visitor action labels. Core requires the matching saved
+answer and citation before showing the resulting direction. A version- and
+finding-bound edit preserves the original generated plan and saved answer.
+The existing editorial proposal composer can carry the proposed title,
+purpose and all matching sections into a canonical-backed Page proposal using
+explicit Section identities. New routes, Action destinations, SEO application
+and media require resolution through their existing Core contracts. Customer
+acceptance, exact native draft authorization and public approval remain separate.
+
+The protected AI grant can carry a session batch of exact answer digests or
+separately curated projections, scoped to the same owner, sources, model,
+expiry and usage ledger. Core rereads the protected grant for each projection
+and rechecks it before generation. Revoked, changed or expired authorization
+blocks the outbound projection. A change between token count and generation
+settles the count and refuses generation. The original approved grant remains
+compatible. This is an operator-managed mechanism; customer self-service
+consent and confirmation remain open.
+
+One development answer remains pending explicit authorization. The answer
+would be saved as unconfirmed and sent only in its exact approved form for
+one count and one generation under the current grant. The retained capture
+stays outside the provider input. The owner can review the exact proposed text
+in the active handoff. No additional provider usage has occurred.
+
+Contact can now report durable inquiry acceptance and separate notification
+counts for a previously authorized Web Presence and Managed Site in a bounded
+time interval, without projecting messages or routing. Disposable PostgreSQL
+verified exact retry, one counted acceptance and scope exclusion. Qualified
+leads and customer outcomes remain unknown. The current protected Core
+database role cannot read or write Contact records. The active-site Contact
+gate remains intact; a fixture-scoped protected acceptance and measurement
+path still needs to be connected. Prior hosted WordPress receipt and rollback
+evidence remains valid for the earlier revision. A new candidate has not
+been issued or applied.
+
+Recommend `core-dev.miopages.com` for development and reserve
+`app.miopages.com` for the eventual unified portal. Public DNS returned
+185.146.167.193 for both candidates and a wildcard control; `/core` was 404
+on the candidates while the existing acceptance host returned 200 at its
+separate 185.146.167.100 target. This is consistent with wildcard resolution;
+the exact zone entries and Node alias behavior require provider-console
+verification. The pending narrow operation is an exact package alias, DNS
+record, TLS and protected origin for `core-dev` only, with a preserved
+rollback. The existing app redirect remains in place.

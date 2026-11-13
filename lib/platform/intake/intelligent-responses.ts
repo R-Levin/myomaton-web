@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { fingerprint } from "../canonical/model";
 import type { QuestionAttribution, QuestionContext, QuestionProvider } from "./intelligent-model";
+import { presencePlanSchema } from "./presence-plan";
 
 const maxInput = 4_000, maxOutput = 1_200;
 const maxRequests = 16, maxGenerations = 8, capMicros = 500_000;
@@ -100,7 +101,7 @@ export function offlineResponsesProvider(directory: string, configuredRates: Rat
 // The production build can run in the protected development package only
 // when its composition root supplies a scope-bound projection and budget.
 export function protectedResponsesProvider(directory: string, rates: Rates, transport: ResponsesTransport,
-  grant: { capMicros: number; maxRequests: number; expiresAt: number; project: (context: QuestionContext, attribution: QuestionAttribution) => unknown },
+  grant: { capMicros: number; maxRequests: number; expiresAt: number; project: (context: QuestionContext, attribution: QuestionAttribution) => unknown | Promise<unknown> },
 ): QuestionProvider {
   const { capMicros: limit, maxRequests: requests, expiresAt, project } = grant;
   if (!Number.isSafeInteger(limit) || limit < 1 || !Number.isSafeInteger(requests) || requests < 2 ||
@@ -108,12 +109,13 @@ export function protectedResponsesProvider(directory: string, rates: Rates, tran
   return meteredResponsesProvider(directory, rates, transport, requests, requests, limit, (context, attribution) => {
     if (Date.now() >= expiresAt) throw Error("Responses authorization expired");
     return project(context, attribution);
-  });
+  }, true);
 }
 
 function meteredResponsesProvider(directory: string, configuredRates: Rates, transport: ResponsesTransport,
   requestLimit: number, generationLimit: number, spendLimit: number,
-  project: (context: QuestionContext, attribution: QuestionAttribution) => unknown,
+  project: (context: QuestionContext, attribution: QuestionAttribution) => unknown | Promise<unknown>,
+  presencePlanning = false,
 ): QuestionProvider {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
@@ -122,7 +124,7 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
   return { version, async propose(context: QuestionContext, attribution: QuestionAttribution) {
     const { ownerDigest, workDigest } = attribution;
     if (![ownerDigest, workDigest].every(value => /^[a-f0-9]{64}$/.test(value))) throw Error("Scoped attribution required");
-    const projected = project(context, { ownerDigest, workDigest });
+    const projected = await project(context, { ownerDigest, workDigest });
     const lock = await open(lockPath, "wx", 0o600);
     try {
       const ledger: Ledger = JSON.parse(await readFile(path, "utf8"));
@@ -142,10 +144,18 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
       const initialFormat = { ...format, schema: { ...format.schema, properties: {
         ...format.schema.properties, question: { type: "string" }, assessment: { type: "null" },
       } } };
+      const followupFormat = presencePlanning && !initial ? { ...format, schema: { ...format.schema,
+        required: [...format.schema.required, "presencePlan"],
+        properties: { ...format.schema.properties, presencePlan: { anyOf: [presencePlanSchema, { type: "null" }] } },
+      } } : format;
+      const planningInstruction = presencePlanning
+        ? " Focus on the business itself: customer needs, offer boundaries, verifiable differentiation and buying decisions. Do not ask the owner to design the intake process. After an answer, propose a concise Presence Direction only when the supplied evidence supports it. Derive the page set, positioning, offering, audience, SEO descriptions, visitor action labels and editable sections from evidence. Do not invent claims, destinations, media permissions, or outcomes. Keep sections concise. Use null when a substantive clarification is still needed."
+        : "";
       const request = { model: rates.model, instructions: instruction + (initial
         ? " This is the first question. End it with a question mark. Keep the rationale to one short sentence under 180 ASCII characters. Return null for assessment."
         : " Cite the exact previous turn ID suffixed with :answer. Keep the rationale and evidence needed under 180 characters each."),
-        input: JSON.stringify(projected), text: { format: initial ? initialFormat : format } };
+        input: JSON.stringify(projected), text: { format: initial ? initialFormat : followupFormat } };
+      request.instructions += planningInstruction;
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation, countDispatched: true, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);
@@ -163,6 +173,17 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
         receipt.estimatedMicros = rates.countMicros;
         await checkpoint();
         throw Error("Input token ceiling exceeded");
+      }
+      if (presencePlanning) {
+        try {
+          const current = await project(context, { ownerDigest, workDigest });
+          if (fingerprint(current) !== fingerprint(projected)) throw Error("Responses projection changed");
+        } catch (error) {
+          receipt.status = "rejected";
+          receipt.estimatedMicros = rates.countMicros;
+          await checkpoint();
+          throw error;
+        }
       }
       receipt.generationDispatched = true;
       await checkpoint();

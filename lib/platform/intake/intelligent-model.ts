@@ -1,5 +1,6 @@
 import { object, text } from "../canonical/model";
 import type { EntryIntent } from "./model";
+import { readPresencePlan, type PresencePlan } from "./presence-plan";
 
 export type InterviewEvidence = {
   id: string;
@@ -20,6 +21,7 @@ export type InterviewTurn = {
   respondsTo: string | null;
   generatorVersion: string;
   assessment: { recommendation: string; evidenceNeeded: string | null } | null;
+  presencePlan?: PresencePlan;
   answer?: Answer;
   at: string;
 };
@@ -27,6 +29,7 @@ export type InterviewState = {
   turns: InterviewTurn[];
   pending: { id: string; gapId: string } | null;
   failure: { gapId: string; code: "provider_unavailable" | "invalid_output" } | null;
+  reviewedPlan?: { findingId: string; plan: PresencePlan };
 };
 export type QuestionContext = {
   entryPath: EntryIntent;
@@ -46,8 +49,8 @@ const safeText = (value: unknown, max: number) => {
   return result;
 };
 const normalize = (value: string) => value.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
-export function readProposal(value: unknown, context: QuestionContext, id: string, generatorVersion: string): InterviewTurn {
-  const output = object(value, ["question", "rationale", "sourceIds", "assessment"]);
+export function readProposal(value: unknown, context: QuestionContext, id: string, generatorVersion: string, allowPlan = false): InterviewTurn {
+  const output = object(value, ["question", "rationale", "sourceIds", "assessment", ...(allowPlan ? ["presencePlan"] : [])]);
   const previous = context.history.at(-1);
   const answerRef = previous?.answer ? previous.id + ":answer" : null;
   const permitted = new Set(context.evidence.map(item => item.id));
@@ -71,7 +74,10 @@ export function readProposal(value: unknown, context: QuestionContext, id: strin
     if (!evidenceNeeded && previous?.answer?.disposition !== "provided") throw Error("Unanswered gap cannot be planning evidence");
     assessment = { recommendation: safeText(candidate.recommendation, 380), evidenceNeeded };
   }
+  const plan = allowPlan && output.presencePlan != null ? readPresencePlan(output.presencePlan) : undefined;
+  if (plan && (!assessment || previous?.answer?.disposition !== "provided")) throw Error("Presence Direction requires a saved answer and assessment");
   return { id, gapId: context.gap.id, question, rationale: safeText(output.rationale, 280), sourceIds: [...references],
+    ...(plan && { presencePlan: plan }),
     respondsTo: answerRef, generatorVersion: safeText(generatorVersion, 80), assessment, at: new Date().toISOString() };
 }
 

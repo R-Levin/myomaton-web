@@ -514,6 +514,12 @@ The [external Core access correction](c0-integration-spine-phase-b-2026-11-10.md
 records the exact slash-path fix, authenticated Edge verification and
 the separate provider-neutral hostname decision.
 
+The [business answer to editable site direction checkpoint](c0-integration-spine-phase-b-2026-11-10.md#business-answer-to-editable-site-direction)
+records the protected AI projection, editable page draft, existing proposal
+compiler seam, inquiry readback and current approval boundaries. The next live
+step is one scoped follow-up from the exact approved outbound answer, then a
+review of the generated copy and exact private draft application scope.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier

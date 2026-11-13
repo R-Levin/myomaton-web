@@ -12,5 +12,6 @@ export function interviewDirection(turns: readonly InterviewTurn[]) {
     recommendation: finding.assessment.recommendation,
     unresolved: finding.assessment.evidenceNeeded,
     answerReference: finding.respondsTo,
+    ...(finding.presencePlan && { plan: finding.presencePlan }),
   };
 }

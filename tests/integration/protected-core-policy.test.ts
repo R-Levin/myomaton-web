@@ -53,7 +53,11 @@ test("Core development policy confines the existing draft writer to the inactive
       const previous = context.history.at(-1);
       return previous ? { question: "Who checks whether a migration is suitable?", rationale: "Determine who handles the next step.",
         sourceIds: ["offer", previous.id + ":answer"],
-        assessment: { recommendation: "Ask for the current website address before discussing migration.", evidenceNeeded: "Identify the reviewer." } }
+        assessment: { recommendation: "Ask for the current website address before discussing migration.", evidenceNeeded: "Identify the reviewer." },
+        presencePlan: { positioning: "Keep a useful existing site during a migration review", offering: "Migration review",
+          audience: "Businesses with an existing website", pages: [{ path: "/", title: "Plan your move", purpose: "Explain the handoff",
+            seoDescription: "Plan a website migration review.", action: "Bring your current site address",
+            sections: [{ heading: "Start with the site you have", body: "Share the existing website address for review." }] }] } }
         : { question: "What should someone bring to discuss their current website?", rationale: "Identify what is needed for the handoff.",
           sourceIds: ["offer"], assessment: null };
     } }, evidence);
@@ -66,6 +70,16 @@ test("Core development policy confines the existing draft writer to the inactive
     assert.equal(followed.interview?.turns[1].respondsTo, first.id + ":answer");
     assert.match(followed.interview?.turns[1].assessment?.recommendation ?? "", /migration/);
     assert.deepEqual(await service.resume(token), followed);
+    const finding = followed.interview!.turns[1];
+    const plan = finding.presencePlan!;
+    assert.equal(plan.pages[0].action, "Bring your current site address");
+    await assert.rejects(interview.editPlan(token, followed.version, first.id, plan), /draft_changed/);
+    const edited = await interview.editPlan(token, followed.version, finding.id, {
+      ...plan, pages: plan.pages.map(page => ({ ...page, title: "Review your website move" })),
+    });
+    assert.equal(edited.interview?.reviewedPlan?.plan.pages[0].title, "Review your website move");
+    assert.equal(edited.interview?.turns[1].presencePlan?.pages[0].title, "Plan your move");
+    assert.deepEqual(await service.resume(token), edited);
     await assert.rejects(role.query("SELECT * FROM public.prospect_intakes"), /permission denied/);
     await assert.rejects(role.query("DELETE FROM miopages_wp.core_development_drafts"), /permission denied/);
     await assert.rejects(role.query("UPDATE miopages_wp.core_development_drafts SET web_presence_id=$1", [randomUUID()]), /permission denied/);

@@ -87,6 +87,9 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
   const finding = view?.interview?.turns.findLast(item => item.assessment);
   const assessment = finding?.assessment;
   const evidenceDirection = interviewDirection(view?.interview?.turns ?? []);
+  const reviewedPlan = view?.interview?.reviewedPlan;
+  const plan = reviewedPlan && reviewedPlan.findingId === evidenceDirection?.findingId
+    ? reviewedPlan.plan : evidenceDirection?.plan;
   return <div className={styles.shell}>
     <header><strong>MioPages</strong><span>{hosted ? "Protected Operator development" : "Private local development"}</span>
       {hosted && view && <button type="button" disabled={busy} onClick={async () => {
@@ -166,10 +169,10 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           <button disabled={busy || !priority}>Save site priority</button>
         </form>
         {message && <p role={error ? "alert" : "status"}>{message}</p>}
-        {direction && <>
+        {(direction || evidenceDirection) && <>
           <h2>Draft assessment and direction</h2>
-          <p>{direction.finding}</p>
-          {(prior ?? sourceDirection) && (prior ?? sourceDirection)?.primary.action !== direction.primary.action &&
+          {direction && !plan && <p>{direction.finding}</p>}
+          {direction && !plan && (prior ?? sourceDirection) && (prior ?? sourceDirection)?.primary.action !== direction.primary.action &&
             <p>Primary action changed from <strong>{(prior ?? sourceDirection)?.primary.action}</strong> to <strong>{direction.primary.action}</strong>.</p>}
           <h2>Review the site proposal</h2>
           <p>Editorial proposal for review. Links and inquiry delivery still need verification.</p>
@@ -177,11 +180,42 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
             <h3>Direction from the interview</h3>
             <p>{evidenceDirection.recommendation}</p>
             {evidenceDirection.unresolved && <p><strong>Still to verify</strong> {evidenceDirection.unresolved}</p>}
-            <p>Use this finding when reviewing Home, Service and the visitor actions. Page copy still needs a separate review.</p>
+            {plan && <form key={view.version} onSubmit={event => {
+              event.preventDefault();
+              const fields = new FormData(event.currentTarget);
+              void run({ operation: "edit-presence-plan", version: view.version, findingId: evidenceDirection.findingId, plan: {
+                ...plan, pages: plan.pages.map((item, index) => ({ ...item,
+                  title: fields.get(`title-${index}`), seoDescription: fields.get(`seo-${index}`), action: fields.get(`action-${index}`),
+                  sections: item.sections.map((_section, sectionIndex) => ({
+                    heading: fields.get(`heading-${index}-${sectionIndex}`), body: fields.get(`body-${index}-${sectionIndex}`),
+                  })),
+                })),
+              } });
+            }}>
+              <p><strong>Positioning</strong> {plan.positioning}</p>
+              <p><strong>Offering</strong> {plan.offering}</p>
+              <p><strong>Audience</strong> {plan.audience}</p>
+              {plan.pages.map((item, index) => <details key={item.path}>
+                <summary>{item.title} · {item.path}</summary>
+                <p>{item.purpose}</p>
+                <div className={styles.field}>
+                  <label>Page title<input name={`title-${index}`} defaultValue={item.title} required maxLength={100} /></label>
+                  <label>Search description<input name={`seo-${index}`} defaultValue={item.seoDescription} required maxLength={160} /></label>
+                  <label>Visitor action label<input name={`action-${index}`} defaultValue={item.action} required maxLength={100} /></label>
+                  {item.sections.map((section, sectionIndex) => <div key={sectionIndex}>
+                    <label>Section heading<input name={`heading-${index}-${sectionIndex}`} defaultValue={section.heading} required maxLength={160} /></label>
+                    <label>Section content<textarea name={`body-${index}-${sectionIndex}`} defaultValue={section.body} required maxLength={1000} /></label>
+                  </div>)}
+                </div>
+              </details>)}
+              <button disabled={busy}>Save proposed page edits</button>
+            </form>}
           </section>}
           {view.planningEvidence && <details><summary>Proposal evidence</summary>
             <p>Draft version {view.planningEvidence.version} · {view.planningEvidence.evidenceDigest}</p>
           </details>}
+          {plan && <p>Independent review is required before preparing delivery. Proposed action destinations and new Page identities need to be resolved in Core.</p>}
+          {!plan && direction && <>
           <nav aria-label="Proposed pages">
             <button type="button" className={styles.secondary} aria-pressed={page === "home"} onClick={() => setPage("home")}>Home</button>{" "}
             <button type="button" className={styles.secondary} aria-pressed={page === "service"} onClick={() => setPage("service")}>Service</button>
@@ -196,6 +230,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           </article>
           <h2>Open before staging</h2>
           <p>{direction.open}</p>
+          </>}
           <p>Lead notifications, visitor measurement and business outcomes have no verified results in this review.</p>
         </>}
         <details><summary>Earlier saved responses · awaiting review</summary>

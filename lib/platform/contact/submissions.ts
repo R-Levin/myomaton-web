@@ -1,4 +1,5 @@
 import type { Pool } from "pg";
+import { uuid } from "../canonical/model";
 import { ContactError, normalizeDefinition, normalizeFields, submissionInput } from "./model";
 import { contactRetentionDays } from "../policy/site-policy";
 import { object } from "../site-globals/model";
@@ -78,4 +79,31 @@ export async function acceptContactSubmission(pool: Pool, selection: { domain: s
     catch { /* Measurement must not invalidate an accepted lead. No message content is emitted. */ }
   }
   return { accepted: true, duplicate: !accepted.created, successText: accepted.successText };
+}
+
+
+// The caller must already have authorized this tenant and Managed Site.
+// Keep message contents and recipient routing out of reporting.
+export async function contactOperationalReadback(db: Pick<Pool, "query">,
+  scope: { webPresenceId: string; managedSiteId: string }, since: Date, through: Date) {
+  if (!Number.isFinite(since.getTime()) || !Number.isFinite(through.getTime()) || since >= through) {
+    throw Error("Invalid inquiry reporting interval");
+  }
+  const rows = (await db.query<{ delivery_status: string; count: number }>(
+    `SELECT delivery_status, count(*)::int AS count
+     FROM contact_submissions
+     WHERE web_presence_id=$1 AND managed_site_id=$2 AND created_at >= $3 AND created_at < $4
+     GROUP BY delivery_status`,
+    [uuid(scope.webPresenceId), uuid(scope.managedSiteId), since, through],
+  )).rows;
+  const notifications = { disabled: 0, pending: 0, delivered: 0, failed: 0 };
+  for (const row of rows) {
+    const status = row.delivery_status;
+    if (status !== "disabled" && status !== "pending" && status !== "delivered" && status !== "failed") {
+      throw Error("Unknown inquiry notification status");
+    }
+    notifications[status] = row.count;
+  }
+  return { accepted: rows.reduce((total, row) => total + row.count, 0), notifications,
+    qualifiedLeads: "unknown", customerOutcomes: "unknown" } as const;
 }

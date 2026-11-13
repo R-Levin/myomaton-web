@@ -3,6 +3,8 @@ import { fingerprint } from "../canonical/model";
 import { interviewAnswer, readProposal, type QuestionContext, type QuestionProvider } from "./intelligent-model";
 import { IntakeError } from "./model";
 import type { IntakeService } from "./service";
+import { readPresencePlan } from "./presence-plan";
+import { interviewDirection } from "./interview-direction";
 
 /** Both the review and dispatch use the current scoped, versioned intake. */
 export class ProtectedInterview {
@@ -15,6 +17,16 @@ export class ProtectedInterview {
       const last = state.turns.at(-1);
       if (!last?.question || last.id !== questionId || last.answer || state.pending) throw new IntakeError("question_unavailable", 409);
       return { ...state, turns: [...state.turns.slice(0, -1), { ...last, answer }] };
+    });
+  }
+
+  async editPlan(token: string, version: number, findingId: unknown, value: unknown) {
+    let plan;
+    try { plan = readPresencePlan(value); } catch { throw new IntakeError("invalid_request"); }
+    return this.intake.editProtectedInterview(token, version, state => {
+      const finding = interviewDirection(state.turns);
+      if (!finding?.plan || findingId !== finding.findingId || state.pending) throw new IntakeError("draft_changed", 409);
+      return { ...state, reviewedPlan: { findingId: finding.findingId, plan } };
     });
   }
 
@@ -35,7 +47,7 @@ export class ProtectedInterview {
       const history = last ? [last] : [];
       input = {
         entryPath: view.intent, evidence: this.approvedEvidence,
-        gap: { id: gapId, questionPurpose: "Find the missing business detail most likely to change the site direction or visitor journey.",
+        gap: { id: gapId, questionPurpose: "Identify a missing fact about customers, offerings, service boundaries or trust that would materially change positioning, site content or a visitor decision.",
           sourceIds: this.approvedEvidence.map(source => source.id), known: state.turns.flatMap(turn => turn.question ? [turn.question] : []) },
         history,
       };
@@ -49,7 +61,7 @@ export class ProtectedInterview {
       const output = await this.provider.propose(input, {
         ownerDigest: fingerprint({ webPresenceId, managedSiteId }), workDigest: fingerprint({ id, webPresenceId, managedSiteId }),
       });
-      try { turn = readProposal(output, input, id, this.provider.version); }
+      try { turn = readProposal(output, input, id, this.provider.version, true); }
       catch (error) {
         failure = "invalid_output";
         const message = error instanceof Error ? error.message : "";
@@ -66,7 +78,7 @@ export class ProtectedInterview {
     } catch { failure = "provider_unavailable"; }
     return this.intake.editProtectedInterview(token, reserved.version, state => {
       if (state.pending?.id !== id) throw new IntakeError("draft_changed", 409);
-      return { turns: turn ? [...state.turns, turn] : state.turns, pending: null,
+      return { ...state, turns: turn ? [...state.turns, turn] : state.turns, pending: null,
         failure: failure ? { gapId, code: failure } : null };
     });
   }

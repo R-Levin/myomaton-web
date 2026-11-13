@@ -13,6 +13,7 @@ import { ProtectedInterview } from "./protected-interview";
 import { initializeResponsesUsageLedger, protectedResponsesProvider, type ResponsesRates } from "./intelligent-responses";
 import { responsesHttps } from "./responses-https";
 import type { QuestionContext } from "./intelligent-model";
+import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
 
 export const coreCookie = "__Host-miopages_core";
 type Config = {
@@ -20,6 +21,14 @@ type Config = {
   answers: unknown; provenance: Record<string, IntakeEvidence>;
   prepared: PreparedUnderstanding; step: number;
 };
+
+type ProviderGrant = AnswerScope & { ownerDigest: string; sources: QuestionContext["evidence"];
+  expiresAt: number; maxRequests: number; capMicros: number; rates: ResponsesRates; ledgerDirectory: string; revoked?: boolean };
+
+function grantBinding(grant: ProviderGrant) {
+  return fingerprint({ ownerDigest: grant.ownerDigest, sources: grant.sources, expiresAt: grant.expiresAt,
+    maxRequests: grant.maxRequests, capMicros: grant.capMicros, rates: grant.rates, ledgerDirectory: grant.ledgerDirectory });
+}
 
 export function coreOrigin() {
   if (process.env.MIOPAGES_PROTECTED_CORE !== "enabled") return null;
@@ -63,8 +72,7 @@ async function openCore() {
   let interview: ProtectedInterview | undefined;
   const providerFile = process.env.MIOPAGES_PROTECTED_CORE_AI_SCOPE;
   if (providerFile) {
-    const grant = await privateConfig<{ ownerDigest: string; sources: QuestionContext["evidence"]; approvedAnswerDigests: string[];
-      expiresAt: number; maxRequests: number; capMicros: number; rates: ResponsesRates; ledgerDirectory: string }>(providerFile);
+    const grant = await privateConfig<ProviderGrant>(providerFile);
     if (grant.ownerDigest !== fingerprint(selection) || !Array.isArray(grant.sources) || !grant.sources.length ||
         new Set(grant.sources.map(source => source.id)).size !== grant.sources.length ||
         !Array.isArray(grant.approvedAnswerDigests) || grant.approvedAnswerDigests.some(value => !/^[a-f0-9]{64}$/.test(value)) ||
@@ -82,12 +90,13 @@ async function openCore() {
     catch (error) { if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error; }
     const provider = protectedResponsesProvider(grant.ledgerDirectory, grant.rates,
       responsesHttps(process.env.MIOPAGES_OPENAI_DEV_API_KEY ?? "", grant.expiresAt), {
-        ...grant, project(context, attribution) {
+        ...grant, async project(context, attribution) {
+          const current = await privateConfig<ProviderGrant>(providerFile);
+          if ((current.revoked !== undefined && current.revoked !== false) || grantBinding(current) !== grantBinding(grant)) {
+            throw Error("Protected AI authorization refused");
+          }
           if (attribution.ownerDigest !== grant.ownerDigest || fingerprint(context.evidence) !== fingerprint(grant.sources)) throw Error("Model evidence scope refused");
-          const history = context.history.map(turn => {
-            if (!turn.answer || !grant.approvedAnswerDigests.includes(fingerprint(turn.answer.text))) throw Error("Answer transmission not approved");
-            return { id: turn.id, question: turn.question, answer: { text: turn.answer.text, disposition: turn.answer.disposition } };
-          });
+          const history = projectInterviewHistory(context.history, current);
           return { entryPath: context.entryPath, evidence: grant.sources, gap: context.gap, history };
         },
       });
@@ -171,6 +180,9 @@ export async function hostedCoreRequest(request: Request) {
           return view(app.interview.answer(app.draftToken, Number(value.version), value.questionId, value.answer));
         }
         if (value.operation === "interview-next" && app.interview) return view(app.interview.next(app.draftToken, Number(value.version)));
+        if (value.operation === "edit-presence-plan" && app.interview) {
+          return view(app.interview.editPlan(app.draftToken, Number(value.version), value.findingId, value.plan));
+        }
         refusal = reply({ error: "invalid_request" }, 400);
       } catch (error) {
         if (!(error instanceof IntakeError)) throw error;
