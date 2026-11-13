@@ -1128,3 +1128,41 @@ the exact zone entries and Node alias behavior require provider-console
 verification. The pending narrow operation is an exact package alias, DNS
 record, TLS and protected origin for `core-dev` only, with a preserved
 rollback. The existing app redirect remains in place.
+
+
+Linux Webpack [run 43486073425](https://github.com/R-Levin/myomaton-web/actions/runs/43486073425)
+passed the production dependency audit, retained rendering, eight private
+routing checks and isolated runtime smoke. Artifact 14066253966 binds source
+`ae51dbca6178dd0b2cba71461037f0b075181c55`. Independently verified ZIP and
+tar checksums and 163 files. Tar SHA-256
+`f2018f723eacc627afd40dc4d3ed9de293750bf54d64f6608998c7ef2d7c7463`.
+The existing lockfile, dependencies, launcher, static public files and
+protected configuration were preserved. TypeScript, changed-file lint,
+394 unit tests plus the new consent-change regression, disposable
+PostgreSQL Contact and interview tests, both WordPress integration tests
+and the Windows PHP offline gate passed. One prior C0 fixture test skipped
+without its optional private capture. POSIX file-mode verification belongs
+to the existing Linux checks.
+
+The first hosted swap passed HTTPS but the deployment guard expected PM2's
+restart counter to increase after a commanded stop/start. It stayed at 1
+and rollback restored the previous build. PM2's log confirmed only the
+commanded transitions. One corrected retry verified the same app, cwd and
+launcher, a new process, unchanged restart counter, zero unstable
+restarts and exactly one commanded stop/start. The prior build is retained
+off-webroot under `update-ae51dbc/retry-rollback`.
+
+The updated [protected HTTPS Core](https://wp-acceptance.miopages.com/core)
+is live. External Microsoft Edge verified canonical routing, assets,
+Operator sign-in, retained interview readback, reload and sign-out.
+A separate HTTPS readback verified eight assets, the Secure/HttpOnly/
+SameSite session, unchanged draft version 6 with ten retained answers and
+one saved AI question, and 401 after sign-out. Both public HTML digests
+matched their pre-update values. Anonymous WordPress draft access remained
+401. The AI ledger still has two counts, two generations and $0.001952
+estimated total, with no pending attempt or answer allowlist entry. At
+verification the existing AI grant expires November 14 at 17:30 UTC.
+No new real follow-up or generated site plan exists yet. The next action
+is to allowlist and save the exact approved development answer and run one
+follow-up within that grant. Verify the actual result and review the edited
+proposal before requesting exact private WordPress application authority.
