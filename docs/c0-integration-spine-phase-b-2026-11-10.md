@@ -929,9 +929,36 @@ run inherited a build flag in the ordinary-mode test. The corrected
 passed production build, the relocated protected shell and anonymous
 route smoke, and artifact packaging at `63cf410`.
 
+The artifact's outer ZIP, inner tar, manifest and 161 files verified
+independently. Its staged copy passed the same hash check off-webroot in
+the acceptance account. Installed Node 22.23.2, Next 16.4.5 and sharp
+0.35.5 loaded with libvips 8.18.7. A bounded, secret-free hosted loopback
+smoke returned 200 for the shell, 401 for the anonymous API, and 404 for
+the slash variant and unrelated Contact route. Port 8081 was free after
+the test. The ten verified answers and their provenance are staged with
+mode 0600 off-webroot. The original capture remains intact. PostgreSQL
+has not received the draft.
+
 The first hosted database action requires the original Supabase project
-`postgres` administrator password. The guarded launcher prompts only in
-the established authenticated Cloud shell. A missing or failed login
-stops before role creation. The hosted process and OpenAI key stay in
-the separate acceptance account. The existing public Core and
-WordPress drafts are outside this rollout.
+`postgres` administrator password and the existing `miopages_migration`
+password. Read-only checks found that the provider administrator lacks
+CREATE in the adapter schema, while the migration role has that
+authority and owns the credential/grant writes. The corrected launcher
+authenticates both before creating the new role with NOLOGIN, then
+installs the scoped views and grants before enabling LOGIN. If it
+reports a partial commit, independently inspect the role and custody
+before continuing. The approved connection uses the same Session Pooler
+and verified TLS. Run in the established runtime account Cloud Bash
+shell, from any directory:
+
+```bash
+bash ~/miopages-wp-rehearsal/scripts/db/provision-protected-core.sh PROVISION-PROTECTED-CORE
+```
+
+Return only the sanitized PASS or BLOCKED JSON. Both prompts are hidden.
+The hosted process and OpenAI key belong to the separate acceptance
+account. The existing public Core and WordPress drafts are outside this
+rollout. The disposable interview test persists a question, answer and
+answer-dependent follow-up through the restricted writer, with a
+substitute provider. No authenticated hosted run or live model response
+has been verified.
