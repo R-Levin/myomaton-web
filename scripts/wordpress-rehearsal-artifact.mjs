@@ -45,12 +45,16 @@ try {
   const api = await request(8081, origin, "/api/protected-core", "GET", { "x-intake-request": "1" });
   assert.equal(api.status, 401);
   assert.equal(api.headers["cache-control"], "no-store");
-  for (const target of ["/core/", "/core?x=1", "/api/protected-core/", "/api/contact", "/_next/static/../core"]) {
+  const canonical = await request(8081, origin, "/core/", "GET");
+  assert.equal(canonical.status, 307);
+  assert.equal(canonical.headers.location, "/core");
+  assert.equal(canonical.headers["cache-control"], "no-store");
+  for (const target of ["/core/?x=1", "/core?x=1", "/api/protected-core/", "/api/contact", "/_next/static/../core"]) {
     const response = await request(8081, origin, target, "GET");
     assert.equal(response.status, 404);
     assert.equal(response.headers["cache-control"], "no-store");
   }
-  return { checks: 7, anonymousApi: 401, shell: 200 };
+  return { checks: 8, anonymousApi: 401, shell: 200, slashRedirect: 307 };
 } finally {
   child.kill("SIGTERM");
   const stopped = await Promise.race([exited.then(() => true), new Promise(resolve => setTimeout(() => resolve(false), 5000))]);

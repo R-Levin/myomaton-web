@@ -10,9 +10,13 @@ function allowed(method, rawTarget) {
   return method === 'POST' && (rawTarget === '/api/wordpress-delivery/pull' || rawTarget === '/api/wordpress-delivery/receipt');
 }
 
-function createGuardedServer(handle, permit = allowed) {
+function createGuardedServer(handle, permit = allowed, core = false) {
   const serve = (req, res) => {
     // Inspect IncomingMessage.url verbatim, before URL parsing/normalization.
+    if (core && req.method === 'GET' && req.url === '/core/') {
+      res.writeHead(307, { Location: '/core', 'Cache-Control': 'no-store', 'Content-Length': '0' });
+      res.end(); return;
+    }
     if (!permit(req.method, req.url)) {
       res.writeHead(404, { 'Cache-Control': 'no-store', 'Content-Length': '0', Connection: 'close' });
       res.end(); return;
@@ -52,7 +56,7 @@ async function main() {
   const next = require('next');
   const app = next({ dev: false, dir, hostname: '127.0.0.1', port: 8081, quiet: true });
   await app.prepare();
-  const server = createGuardedServer(app.getRequestHandler(), core ? allowedCore : allowed);
+  const server = createGuardedServer(app.getRequestHandler(), core ? allowedCore : allowed, core);
   await new Promise((resolve, reject) => {
     server.once('error', reject); server.listen(8081, '127.0.0.1', resolve);
   });

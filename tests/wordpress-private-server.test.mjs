@@ -16,6 +16,23 @@ test('protected Core listener passes only the exact browser/API routes and stati
   assert.equal(allowedCore('POST', '/api/protected-core'), true);
 });
 
+test('only the exact Core browser slash variant redirects to the canonical path', async () => {
+  let handedOff = 0;
+  const server = createGuardedServer((_req, res) => { handedOff++; res.end(); }, allowedCore, true);
+  server.listen(0, '127.0.0.1'); await once(server, 'listening');
+  const port = server.address().port, origin = 'https://rehearsal.example.test';
+  try {
+    const redirect = await request(port, origin, '/core/', 'GET');
+    assert.equal(redirect.status, 307);
+    assert.equal(redirect.headers.location, '/core');
+    assert.equal(redirect.headers['cache-control'], 'no-store');
+    for (const [target, method] of [['/core/?x=1', 'GET'], ['/core/', 'POST'], ['/api/protected-core/', 'GET']]) {
+      expectResponse(method, target, await request(port, origin, target, method), 404);
+    }
+    assert.equal(handedOff, 0);
+  } finally { server.close(); server.closeAllConnections(); await once(server, 'close'); }
+});
+
 test('raw boundary rejects normalization, redirects, CONNECT and upgrades before Next handles a request', async () => {
   let handedOff = 0;
   const server = createGuardedServer((_req, res) => {
