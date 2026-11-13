@@ -5,7 +5,8 @@ export function interviewDirection(turns: readonly InterviewTurn[]) {
   const finding = turns.findLast(turn => turn.assessment);
   if (!finding?.assessment || !finding.respondsTo || !finding.sourceIds.includes(finding.respondsTo)) return null;
   const answered = turns.find(turn => turn.id + ":answer" === finding.respondsTo);
-  if (!answered || answered.gapId !== finding.gapId || answered.answer?.disposition !== "provided") return null;
+  if (!answered || answered.gapId !== finding.gapId || answered.answer?.disposition !== "provided" ||
+      turns.some(turn => turn.replacesAnswerTo === answered.id)) return null;
   return {
     findingId: finding.id,
     sourceIds: finding.sourceIds,

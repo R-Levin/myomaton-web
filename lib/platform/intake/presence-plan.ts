@@ -1,3 +1,4 @@
+import { canonicalPagePath } from "../managed-sites/paths";
 import { object, text } from "../canonical/model";
 
 const string = { type: "string" };
@@ -20,13 +21,12 @@ const copy = (value: unknown, max: number) => {
 
 export function readPresencePlan(value: unknown) {
   const plan = object(value, ["positioning", "offering", "audience", "pages"]);
-  if (!Array.isArray(plan.pages) || !plan.pages.length || plan.pages.length > 16) throw Error("Invalid proposed page set");
+  if (!Array.isArray(plan.pages) || !plan.pages.length) throw Error("Invalid proposed page set");
   const paths = new Set<string>();
   const pages = plan.pages.map(value => {
     const page = object(value, ["path", "title", "purpose", "seoDescription", "action", "sections"]);
     const path = copy(page.path, 120);
-    if (!/^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*)?$/.test(path) || paths.has(path) ||
-        !Array.isArray(page.sections) || !page.sections.length || page.sections.length > 6) throw Error("Invalid proposed Page");
+    if (!canonicalPagePath(path) || paths.has(path) || !Array.isArray(page.sections) || !page.sections.length) throw Error("Invalid proposed Page");
     paths.add(path);
     return { path, title: copy(page.title, 100), purpose: copy(page.purpose, 300), seoDescription: copy(page.seoDescription, 160),
       action: copy(page.action, 100), sections: page.sections.map(value => {

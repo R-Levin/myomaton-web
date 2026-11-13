@@ -4,7 +4,7 @@ import { interviewDirection } from "../lib/platform/intake/interview-direction";
 import type { InterviewTurn } from "../lib/platform/intake/intelligent-model";
 import { projectInterviewHistory } from "../lib/platform/intake/answer-projection";
 import { fingerprint } from "../lib/platform/canonical/model";
-import { composeProspectPage } from "../lib/platform/content-editing/prospect-proposal";
+import { composeProspectPage, prepareInterviewPages } from "../lib/platform/content-editing/prospect-proposal";
 import { readPresencePlan } from "../lib/platform/intake/presence-plan";
 
 test("site direction requires the exact saved answer and its citation", () => {
@@ -46,4 +46,31 @@ test("proposed site plans refuse duplicate paths and markup", () => {
     ["Start with the website address.", "Access comes later."]);
   assert.throws(() => readPresencePlan({ ...plan, pages: [page, page] }), /Invalid proposed Page/);
   assert.throws(() => readPresencePlan({ ...plan, pages: [{ ...page, title: "<script>" }] }), /Invalid canonical text/);
+});
+
+test("an exact edited Presence Direction composes a variable Page set with canonical sources", () => {
+  const ids = ["ccb1f0f2-0285-4ced-8166-5dd011082c76", "d69ecf07-53e3-43eb-b46a-b7665bbdcfa8", "1b81958a-a387-4e05-b874-ad403514fce5",
+    "75f2952c-3a53-4ba1-85de-1dfbcde23459", "9a511424-79af-4d02-801e-8d191d4b0d2f", "977b5f9f-907a-4815-989e-987f698ab9fa"];
+  const fact = { kind: "canonical", source: { domain: "knowledge", recordId: ids[0], revision: 1,
+    fingerprint: "a".repeat(64), field: "service" } };
+  const planned = { path: "/", title: "Plan the next step", purpose: "Explain the offer", seoDescription: "Review your current site.",
+    action: "Discuss your existing website", sections: [{ heading: "Start with the visitor goal", body: "Bring the action you want visitors to take." }] };
+  const packet = { scope: { webPresenceId: ids[0], managedSiteId: ids[1] }, version: 2, evidenceDigest: "b".repeat(64),
+    finding: { findingId: "finding", recommendation: "Explain the handoff.", unresolved: null, answerReference: "question:answer",
+      sourceIds: ["source", "question:answer"],
+      plan: { positioning: "Start with what visitors need", offering: "Managed Web Presence", audience: "Established businesses", pages: [planned] } } };
+  const destinations = [{ page: { operation: "replace-page", pageId: ids[2], slug: "/", title: fact,
+    purpose: "Explain the service", sections: [{ id: ids[3], type: "intro", heading: fact }] }, sectionIds: [ids[4]], action: { id: ids[5], type: "page", destination: "/" } }];
+  const prepared = prepareInterviewPages(packet, fingerprint(packet), destinations);
+  assert.deepEqual(prepared.navigation, ["/"]);
+  assert.equal(prepared.pages[0].action.label, planned.action);
+  assert.throws(() => prepareInterviewPages(packet, fingerprint(packet),
+    [{ ...destinations[0], action: { ...destinations[0].action, destination: "https://external.example" } }]), /exact proposed Page/);
+  assert.deepEqual(prepared.pages[0].proposal.sections[0].heading, fact);
+  assert.equal(prepared.pages[0].proposal.sections[1].text?.kind, "editorial");
+  assert.throws(() => prepareInterviewPages({ ...packet, version: 3 }, fingerprint(packet), destinations), /Exact interview/);
+  assert.throws(() => prepareInterviewPages(packet, fingerprint(packet), []), /Resolve each Page/);
+  const service = { ...planned, path: "/service", title: "Managed Web Presence" };
+  const multi = { ...packet, finding: { ...packet.finding, plan: { ...packet.finding.plan, pages: [planned, service] } } };
+  assert.throws(() => prepareInterviewPages(multi, fingerprint(multi), destinations), /Resolve each Page/);
 });

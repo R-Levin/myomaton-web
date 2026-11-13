@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { fingerprint } from "../canonical/model";
-import { interviewAnswer, readProposal, type QuestionContext, type QuestionProvider } from "./intelligent-model";
+import { interviewAnswer, readProposal, type InterviewState, type QuestionContext, type QuestionProvider } from "./intelligent-model";
 import { IntakeError } from "./model";
 import type { IntakeService } from "./service";
 import { readPresencePlan } from "./presence-plan";
@@ -20,13 +20,28 @@ export class ProtectedInterview {
     });
   }
 
-  async editPlan(token: string, version: number, findingId: unknown, value: unknown) {
+  async correctAnswer(token: string, version: number, questionId: unknown, value: unknown) {
+    let answer;
+    try { answer = interviewAnswer("provided", value); } catch { throw new IntakeError("invalid_request"); }
+    return this.intake.editProtectedInterview(token, version, state => {
+      const previous = state.turns.findLast(turn => turn.question && turn.answer);
+      if (!previous || previous.id !== questionId || !previous.question || state.pending) throw new IntakeError("draft_changed", 409);
+      if (previous.answer?.text === answer.text) return state;
+      const turn = { id: randomUUID(), gapId: previous.gapId, question: previous.question, rationale: previous.rationale,
+        sourceIds: previous.sourceIds.filter(id => !id.endsWith(":answer")), respondsTo: null,
+        replacesAnswerTo: previous.id, generatorVersion: previous.generatorVersion, assessment: null, answer, at: answer.at };
+      return { ...state, turns: [...state.turns, turn], failure: null };
+    });
+  }
+
+  async editPlan(token: string, version: number, findingId: unknown, value: unknown, improvement?: NonNullable<InterviewState["reviewedPlan"]>["improvement"]) {
     let plan;
     try { plan = readPresencePlan(value); } catch { throw new IntakeError("invalid_request"); }
     return this.intake.editProtectedInterview(token, version, state => {
       const finding = interviewDirection(state.turns);
       if (!finding?.plan || findingId !== finding.findingId || state.pending) throw new IntakeError("draft_changed", 409);
-      return { ...state, reviewedPlan: { findingId: finding.findingId, plan } };
+      const prior = state.reviewedPlan?.findingId === finding.findingId ? state.reviewedPlan.improvement : undefined;
+      return { ...state, reviewedPlan: { findingId: finding.findingId, plan, ...((improvement ?? prior) && { improvement: improvement ?? prior }) } };
     });
   }
 
@@ -42,8 +57,8 @@ export class ProtectedInterview {
       if (Buffer.byteLength(JSON.stringify(view.provenance)) + Buffer.byteLength(JSON.stringify(state)) > 10_000) {
         throw new IntakeError("payload_too_large", 413);
       }
-      // Keep prior turns for readback. Send only the active question and answer
-      // plus a duplicate-question index, never the raw retained capture.
+      // The approved hosted grant permits only the current answer outbound.
+      // Earlier answers, corrections and their assessments remain in Core.
       const history = last ? [last] : [];
       input = {
         entryPath: view.intent, evidence: this.approvedEvidence,
@@ -56,6 +71,7 @@ export class ProtectedInterview {
     if (!input) throw Error("Interview reservation missing");
     const { webPresenceId, managedSiteId } = this.intake.selection;
     let turn: ReturnType<typeof readProposal> | undefined;
+    let reason: string | undefined;
     let failure: "provider_unavailable" | "invalid_output" | undefined;
     try {
       const output = await this.provider.propose(input, {
@@ -72,14 +88,27 @@ export class ProtectedInterview {
           "Follow-up assessment required": "assessment-missing",
           "Assessment requires an answer": "premature-assessment",
           "Interview text validation failed": "text-validation",
+          "Invalid canonical text": "text-validation",
+          "Expected object": "output-shape",
+          "Unknown canonical field": "unexpected-field",
+          "Invalid proposed page set": "page-set",
+          "Invalid proposed Page": "page-path-or-sections",
+          "Proposed Home page required": "home-missing",
+          "Unsafe Presence Direction copy": "unsafe-copy",
         };
-        console.warn(JSON.stringify({ event: "protected-interview-output-refused", reason: reasons[message] ?? "shape-or-length" }));
+        reason = Object.hasOwn(reasons, message) ? reasons[message] : "shape-or-length";
       }
     } catch { failure = "provider_unavailable"; }
-    return this.intake.editProtectedInterview(token, reserved.version, state => {
+    const settle = (result: typeof turn, failed: typeof failure) => this.intake.editProtectedInterview(token, reserved.version, state => {
       if (state.pending?.id !== id) throw new IntakeError("draft_changed", 409);
-      return { ...state, turns: turn ? [...state.turns, turn] : state.turns, pending: null,
-        failure: failure ? { gapId, code: failure } : null };
+      return { ...state, turns: result ? [...state.turns, result] : state.turns, pending: null,
+        failure: failed ? { gapId, code: failed, ...(reason && { reason }) } : null };
     });
+    try { return await settle(turn, failure); }
+    catch (error) {
+      if (!turn || !(error instanceof IntakeError) || error.code !== "payload_too_large") throw error;
+      reason = "draft-capacity";
+      return settle(undefined, "invalid_output");
+    }
   }
 }

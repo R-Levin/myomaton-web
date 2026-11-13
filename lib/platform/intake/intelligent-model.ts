@@ -19,6 +19,7 @@ export type InterviewTurn = {
   rationale: string;
   sourceIds: string[];
   respondsTo: string | null;
+  replacesAnswerTo?: string;
   generatorVersion: string;
   assessment: { recommendation: string; evidenceNeeded: string | null } | null;
   presencePlan?: PresencePlan;
@@ -28,8 +29,8 @@ export type InterviewTurn = {
 export type InterviewState = {
   turns: InterviewTurn[];
   pending: { id: string; gapId: string } | null;
-  failure: { gapId: string; code: "provider_unavailable" | "invalid_output" } | null;
-  reviewedPlan?: { findingId: string; plan: PresencePlan };
+  failure: { gapId: string; code: "provider_unavailable" | "invalid_output"; reason?: string } | null;
+  reviewedPlan?: { findingId: string; plan: PresencePlan; improvement?: { inquiryId: string; draftDigest: string; pagePath: string } };
 };
 export type QuestionContext = {
   entryPath: EntryIntent;

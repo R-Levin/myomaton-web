@@ -1224,3 +1224,63 @@ next operation is the authorized secondary mapping in My20i, followed by
 a forced-address HTTPS check and the exact DNS and TLS verification before
 installing the staged candidate. My20i control-plane interaction must come
 from an authenticated operator session while browser startup is unavailable.
+
+
+#### Integrated Core operating cycle
+
+The owner superseded the `core-dev` execution approval. The existing
+development URL, package and port remain the only runtime target. The
+earlier alias artifact is historical. This increment removes its runtime
+selector. No provider-control-plane changes were made.
+
+The owner approved one exact C0 development answer, one token count and one
+follow-up. Hosted Core saved the answer as unconfirmed and retained all ten
+prior answers. The Responses call completed on the pinned model. Core
+refused the proposed turn under semantic validation, cleared the pending
+operation and retained draft version 9 without an assessment or site plan.
+The raw response was not retained. The existing logger did not yield a
+validation subtype, so the specific field is unknown. The latest request used
+835 input and 109 output tokens for an estimated $0.001117. The ledger now has
+six requests and $0.003069 total estimated usage. The exact answer allowlist
+entry was removed after settlement. No automatic retry occurred. A second
+live follow-up needs explicit, scoped authorization.
+
+Core now persists a safe validation category, makes the required answer
+reference explicit, and preserves a corrected answer alongside its historical
+version. A finding based on a superseded answer is excluded from site review
+until reassessed. Reported validation failures never include model text.
+Positioning, offering, audience, page purpose, copy, search descriptions and
+action labels are editable. The exact saved review input can be captured from
+Core for the existing protected WordPress Operator tool. It validates every
+Page and Action destination and composes Page inputs while preserving a
+canonical factual source. The resulting Page proposals still pass existing
+preview, approval and independent staging authorization. SEO and media
+remain outside the current native draft envelope. The stable Home 13 and
+Service 14 restore receipt was reverified with its existing HMAC. The
+previous rehearsal principals have expired. New exact approval and usable
+independent credentials are required before authorizing or applying a new
+WordPress revision. No new WordPress Page was applied.
+
+The scoped inquiry policy reuses canonical Contact storage and accepts only
+one labeled, fixed synthetic inquiry for the inactive development scope
+and restored revision 3. It grants a checked view to the existing development
+role, accepts no visitor details, and disables notifications. Contact durable
+acceptance supplies the first-party test count directly. Its recommendation is
+tied to the exact receipt scope and accepted submission. An Operator may add
+the suggested improvement to an editable draft and carry the inquiry reference
+into the review input. It does not measure
+traffic, conversion or business outcomes. Disposable PostgreSQL verified
+retry, scope refusal and denied direct canonical reads. Installing the SQL
+requires the existing migration authority to add one fixture Contact
+definition, one restricted view and column grants to the existing role.
+The protected app also requires a mode-0600 scoped enablement file. Reverify
+the restored WordPress revision and current recovery coverage before enabling
+the one test write. The public Contact route remains gated.
+
+
+The owner subsequently authorized one corrected follow-up with the same
+exact outbound text and existing grant, plus installation of the scoped
+Contact policy and one synthetic inquiry. The policy can be installed only
+from the rehearsal checkout using the established hidden migration-password
+procedure and retained recovery evidence. A retired hostname approval is
+not part of these operations.

@@ -7,12 +7,16 @@ import { IntakeService, type IntakeEvidence } from "./service";
 import { adaptiveOnboardingVersion, type PreparedUnderstanding } from "./adaptive";
 import { IntakeError, normalizeAnswers } from "./model";
 import { sessionToken } from "./http";
+import { protectedInquiry } from "../contact/protected-inquiry";
+import { protectedDevelopmentDraft } from "../wordpress-delivery/cycle-measurement";
 import { contactHttp } from "../contact/http";
 import { developmentGuard } from "../contact/boundaries";
 import { ProtectedInterview } from "./protected-interview";
 import { initializeResponsesUsageLedger, protectedResponsesProvider, type ResponsesRates } from "./intelligent-responses";
 import { responsesHttps } from "./responses-https";
 import type { QuestionContext } from "./intelligent-model";
+import { readPresencePlan } from "./presence-plan";
+import { interviewDirection } from "./interview-direction";
 import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
 
 export const coreCookie = "__Host-miopages_core";
@@ -30,17 +34,13 @@ function grantBinding(grant: ProviderGrant) {
     maxRequests: grant.maxRequests, capMicros: grant.capMicros, rates: grant.rates, ledgerDirectory: grant.ledgerDirectory });
 }
 
-const legacyCoreOrigin = "https://wp-acceptance.miopages.com";
-const developmentCoreOrigin = "https://core-dev.miopages.com";
+const protectedCoreOrigin = "https://wp-acceptance.miopages.com";
 
 export function coreOrigin(host: string | null) {
   if (process.env.MIOPAGES_PROTECTED_CORE !== "enabled") return null;
-  const configured = process.env.MIOPAGES_PROTECTED_CORE_ORIGIN;
-  if (configured !== legacyCoreOrigin && configured !== developmentCoreOrigin) throw Error("Protected Core origin refused");
-  const primary = new URL(configured);
-  if (host === primary.host) return primary;
-  const legacy = new URL(legacyCoreOrigin);
-  return host === legacy.host ? legacy : null;
+  if (process.env.MIOPAGES_PROTECTED_CORE_ORIGIN !== protectedCoreOrigin) throw Error("Protected Core origin refused");
+  const origin = new URL(protectedCoreOrigin);
+  return host === origin.host ? origin : null;
 }
 
 async function privateConfig<T>(file: string): Promise<T> {
@@ -65,16 +65,30 @@ async function openCore() {
   const answers = normalizeAnswers(cfg.answers, adaptiveOnboardingVersion);
   if (fingerprint(answers) !== fingerprint(cfg.answers) ||
       Object.keys(answers).some(key => cfg.provenance[key]?.confirmation !== "unconfirmed")) throw Error("Protected Core answer binding refused");
+  async function fixtureScope(db: Parameters<typeof protectedConnection>[0]) {
+    await protectedConnection(db, role, "postgres");
+    await db.query("SET search_path TO miopages_core_guard, miopages_wp, public");
+    const rows = (await db.query(`SELECT 1 FROM miopages_wp.core_development_scope WHERE managed_site_id=$1 AND web_presence_id=$2`,
+      [selection.managedSiteId, selection.webPresenceId])).rows;
+    if (rows.length !== 1) throw new IntakeError("unavailable", 404);
+  }
   const intake = new IntakeService(pool, selection, {
     database: "postgres", answers, provenance: cfg.provenance, prepared: cfg.prepared, step: cfg.step,
-    async protectedScope(db) {
-      await protectedConnection(db, role, "postgres");
-      await db.query("SET search_path TO miopages_core_guard, miopages_wp, public");
-      const rows = (await db.query(`SELECT 1 FROM miopages_wp.core_development_scope WHERE managed_site_id=$1 AND web_presence_id=$2`,
-      [selection.managedSiteId, selection.webPresenceId])).rows;
-      if (rows.length !== 1) throw new IntakeError("unavailable", 404);
-    },
+    protectedScope: fixtureScope,
   });
+  const inquiryFile = process.env.MIOPAGES_PROTECTED_CORE_INQUIRY_SCOPE;
+  const inquiry = async (accept = false) => {
+    if (!inquiryFile) return null;
+    const grant = await privateConfig<{ binding: string; enabled: boolean; expiresAt: number }>(inquiryFile);
+    if (grant.enabled !== true || grant.binding !== fingerprint({ selection, draft: protectedDevelopmentDraft }) ||
+        !Number.isSafeInteger(grant.expiresAt) || grant.expiresAt <= Date.now() ||
+        grant.expiresAt > Date.now() + 86_400_000) return null;
+    const db = await pool.connect();
+    try {
+      await fixtureScope(db);
+      return await protectedInquiry(db, selection, protectedDevelopmentDraft, accept);
+    } finally { db.release(); }
+  };
   let interview: ProtectedInterview | undefined;
   const providerFile = process.env.MIOPAGES_PROTECTED_CORE_AI_SCOPE;
   if (providerFile) {
@@ -103,12 +117,14 @@ async function openCore() {
           }
           if (attribution.ownerDigest !== grant.ownerDigest || fingerprint(context.evidence) !== fingerprint(grant.sources)) throw Error("Model evidence scope refused");
           const history = projectInterviewHistory(context.history, current);
-          return { entryPath: context.entryPath, evidence: grant.sources, gap: context.gap, history };
+          const answer = history.at(-1);
+          return { entryPath: context.entryPath, evidence: grant.sources, gap: context.gap, history,
+            ...(answer && { requiredAnswerReference: answer.id + ":answer" }) };
         },
       });
     interview = new ProtectedInterview(intake, provider, grant.sources);
   }
-  return { operators, selection, intake, interview, draftToken: cfg.draftToken };
+  return { operators, selection, intake, interview, inquiry, draftToken: cfg.draftToken };
 }
 let core: ReturnType<typeof openCore> | undefined;
 const sessions = new Map<string, { credential: string; expires: number; origin: string }>();
@@ -148,9 +164,12 @@ export async function hostedCoreRequest(request: Request) {
         return context;
       } catch { return null; }
     };
+    const includeOperations = async (view: Awaited<ReturnType<IntakeService["resume"]>>) => ({
+      ...view, interviewEnabled: Boolean(app.interview), operations: await app.inquiry().catch(() => null),
+    });
     if (request.method === "GET") {
       if (!await authenticate(credential)) return reply({ error: "sign_in_required" }, 401);
-      try { return reply({ ...await app.intake.resume(app.draftToken), interviewEnabled: Boolean(app.interview) }); }
+      try { return reply(await includeOperations(await app.intake.resume(app.draftToken))); }
       catch (error) {
         if (error instanceof IntakeError && error.code === "session_unavailable") return reply({ state: "not_started" });
         throw error;
@@ -179,14 +198,46 @@ export async function hostedCoreRequest(request: Request) {
       try { await app.operators.authorize(context, "prepare-site-proposal", app.selection); }
       catch { refusal = reply({ error: "authorization_required" }, 403); return null; }
       try {
-        const view = async (result: ReturnType<IntakeService["resume"]>) => ({ ...await result, interviewEnabled: Boolean(app.interview) });
+        const view = async (result: ReturnType<IntakeService["resume"]>) => includeOperations(await result);
+        if (value.operation === "accept-development-inquiry") {
+          if (Object.keys(value).length !== 1) throw new IntakeError("invalid_request");
+          const operations = await app.inquiry(true);
+          if (!operations) throw new IntakeError("unavailable", 404);
+          return { ...await app.intake.resume(app.draftToken), interviewEnabled: Boolean(app.interview), operations };
+        }
+        if (value.operation === "review-delivery-input") {
+          const current = await app.intake.resume(app.draftToken);
+          const finding = interviewDirection(current.interview?.turns ?? []);
+          const reviewed = current.interview?.reviewedPlan;
+          if (current.version !== value.version || !current.planningEvidence || !finding?.plan ||
+              reviewed?.findingId !== finding.findingId || current.interview?.pending) throw new IntakeError("draft_changed", 409);
+          const packet = { scope: app.selection, version: current.version, evidenceDigest: current.planningEvidence.evidenceDigest,
+            finding: { ...finding, plan: reviewed.plan }, ...(reviewed.improvement && { improvement: reviewed.improvement }) };
+          return { packet, digest: fingerprint(packet) };
+        }
         if (value.operation === "begin") return view(app.intake.create(app.draftToken, "DIRECT_START"));
         if (value.operation === "site-priority") return view(app.intake.saveSitePriority(app.draftToken, Number(value.version), value.priority));
         if (value.operation === "interview-answer" && app.interview) {
           return view(app.interview.answer(app.draftToken, Number(value.version), value.questionId, value.answer));
         }
+        if (value.operation === "correct-interview-answer" && app.interview) {
+          return view(app.interview.correctAnswer(app.draftToken, Number(value.version), value.questionId, value.answer));
+        }
         if (value.operation === "interview-next" && app.interview) return view(app.interview.next(app.draftToken, Number(value.version)));
         if (value.operation === "edit-presence-plan" && app.interview) {
+          if (value.improvementEvidence !== undefined) {
+            const operations = await app.inquiry();
+            const evidence = operations?.recommendation;
+            if (!operations || !evidence || evidence.evidenceId !== value.improvementEvidence) throw new IntakeError("draft_changed", 409);
+            let plan;
+            try { plan = readPresencePlan(value.plan); } catch { throw new IntakeError("invalid_request"); }
+            const page = plan.pages.find(item => item.path === value.improvementPage);
+            if (!page || !page.sections.some(section => fingerprint(section) === fingerprint(evidence.suggestedSection))) {
+              throw new IntakeError("invalid_request");
+            }
+            return view(app.interview.editPlan(app.draftToken, Number(value.version), value.findingId, plan,
+              { inquiryId: evidence.evidenceId, draftDigest: operations.draft.appliedDigest, pagePath: page.path }));
+          }
           return view(app.interview.editPlan(app.draftToken, Number(value.version), value.findingId, value.plan));
         }
         refusal = reply({ error: "invalid_request" }, 400);

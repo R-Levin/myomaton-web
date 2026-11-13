@@ -512,16 +512,17 @@ deployment. Owner product acceptance requires a working online journey.
 
 The [external Core access correction](c0-integration-spine-phase-b-2026-11-10.md#external-core-access)
 records the exact slash-path fix, authenticated Edge verification and
-the separate provider-neutral hostname decision. The owner approved the
-[exact core-dev development hostname](c0-integration-spine-phase-b-2026-11-10.md#approved-neutral-development-hostname)
-on the existing account. Verify its package mapping, exact DNS, TLS and
-Node route before switching the protected Core origin.
+the hosting handoff. The owner superseded the earlier `core-dev` approval:
+keep the existing Core URL and 20i deployment footprint. No hostname cutover
+is pending.
 
 The [business answer to editable site direction checkpoint](c0-integration-spine-phase-b-2026-11-10.md#business-answer-to-editable-site-direction)
 records the protected AI projection, editable page draft, existing proposal
-compiler seam, inquiry readback and current approval boundaries. The next live
-step is one scoped follow-up from the exact approved outbound answer, then a
-review of the generated copy and exact private draft application scope.
+compiler seam, inquiry readback and current approval boundaries.
+The [integrated Core operating-cycle checkpoint](c0-integration-spine-phase-b-2026-11-10.md#integrated-core-operating-cycle)
+records the consumed exact-answer approval, hosted model response refusal,
+scoped inquiry policy and proposal preparation path. Read this before any
+further provider dispatch or private WordPress application.
 
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 

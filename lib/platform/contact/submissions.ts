@@ -1,4 +1,4 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { uuid } from "../canonical/model";
 import { ContactError, normalizeDefinition, normalizeFields, submissionInput } from "./model";
 import { contactRetentionDays } from "../policy/site-policy";
@@ -37,23 +37,11 @@ export async function acceptContactSubmission(pool: Pool, selection: { domain: s
     const fields = normalizeFields(input.fields, definition);
     const days = contactRetentionDays(options.servicePolicy, object(row.presence_configuration).policy, object(row.site_configuration).policy);
     const now = options.now ?? new Date(), expires = new Date(now.getTime() + days * 86400000);
-    const inserted = await client.query(`INSERT INTO contact_submissions
-      (web_presence_id,managed_site_id,page_id,section_id,contact_definition_id,contact_definition_version,fields,
-       delivery_route_key,delivery_status,idempotency_key,created_at,updated_at,expires_at)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11,$12)
-      ON CONFLICT (web_presence_id,contact_definition_id,idempotency_key) DO NOTHING RETURNING id`,
-      [row.web_presence_id,row.managed_site_id,row.page_id,row.section_id,definition.id,definition.version,JSON.stringify(fields),
-        row.delivery_route_key,row.delivery_route_key === null ? "disabled" : "pending",input.idempotencyKey,now,expires]);
-    let id = inserted.rows[0]?.id;
-    if (!id) {
-      const previous = (await client.query(`SELECT *, fields=$4::jsonb AS same_fields FROM contact_submissions
-        WHERE web_presence_id=$1 AND contact_definition_id=$2 AND idempotency_key=$3 FOR UPDATE`,
-        [row.web_presence_id,definition.id,input.idempotencyKey,JSON.stringify(fields)])).rows[0];
-      if (!previous || !previous.same_fields || previous.contact_definition_version !== definition.version || previous.managed_site_id !== row.managed_site_id || previous.page_id !== row.page_id || previous.section_id !== row.section_id)
-        throw new ContactError("idempotency_conflict", 409);
-      id = previous.id;
-    }
-    accepted = { id, webPresenceId: row.web_presence_id, route: row.delivery_route_key, fields, created: !!inserted.rowCount, successText: definition.successText };
+    const stored = await storeContactSubmission(client, {
+      webPresenceId: row.web_presence_id, managedSiteId: row.managed_site_id, pageId: row.page_id, sectionId: row.section_id,
+      definition, fields, route: row.delivery_route_key, idempotencyKey: input.idempotencyKey, now, expires,
+    });
+    accepted = { id: stored.id, webPresenceId: row.web_presence_id, route: row.delivery_route_key, fields, created: stored.created, successText: definition.successText };
     await client.query("COMMIT");
   } catch (error) { await client.query("ROLLBACK"); throw error; }
   finally { client.release(); }
@@ -81,6 +69,33 @@ export async function acceptContactSubmission(pool: Pool, selection: { domain: s
   return { accepted: true, duplicate: !accepted.created, successText: accepted.successText };
 }
 
+
+// Shared durable acceptance. The caller supplies a validated definition and
+// both scope and presentation have already been authorized in this transaction.
+export async function storeContactSubmission(db: Pick<PoolClient, "query">, record: {
+  webPresenceId: string; managedSiteId: string; pageId: string | null; sectionId: string | null;
+  definition: { id: string; version: number }; fields: ReturnType<typeof normalizeFields>; route: string | null;
+  idempotencyKey: string; now: Date; expires: Date;
+}, storage: "canonical" | "protected-development" = "canonical") {
+  const table = storage === "canonical" ? "contact_submissions" : "miopages_wp.core_development_inquiries";
+  const fields = JSON.stringify(record.fields);
+  const inserted = await db.query(`INSERT INTO ${table}
+    (web_presence_id,managed_site_id,page_id,section_id,contact_definition_id,contact_definition_version,fields,
+     delivery_route_key,delivery_status,idempotency_key,created_at,updated_at,expires_at)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11,$12)
+    ON CONFLICT ${storage === "canonical" ? "(web_presence_id,contact_definition_id,idempotency_key)" : ""} DO NOTHING RETURNING id`,
+    [record.webPresenceId,record.managedSiteId,record.pageId,record.sectionId,record.definition.id,record.definition.version,
+      fields,record.route,record.route === null ? "disabled" : "pending",record.idempotencyKey,record.now,record.expires]);
+  if (inserted.rows[0]) return { id: inserted.rows[0].id as string, created: true };
+  const previous = (await db.query(`SELECT id, contact_definition_version, managed_site_id, page_id, section_id, fields=$4::jsonb AS same_fields
+    FROM ${table} WHERE web_presence_id=$1 AND contact_definition_id=$2 AND idempotency_key=$3${storage === "canonical" ? " FOR UPDATE" : ""}`,
+    [record.webPresenceId,record.definition.id,record.idempotencyKey,fields])).rows[0];
+  if (!previous?.same_fields || previous.contact_definition_version !== record.definition.version ||
+      previous.managed_site_id !== record.managedSiteId || previous.page_id !== record.pageId || previous.section_id !== record.sectionId) {
+    throw new ContactError("idempotency_conflict", 409);
+  }
+  return { id: previous.id as string, created: false };
+}
 
 // The caller must already have authorized this tenant and Managed Site.
 // Keep message contents and recipient routing out of reporting.

@@ -6,7 +6,7 @@ umask 077
 ulimit -c 0
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 [[ -t 0 && -t 1 && "$(pwd -P)" == /home/virtual/vps-bef564/5/53b4381d42/miopages-wp-rehearsal ]] || exit 1
-[[ $# == 1 && ( "$1" == APPLY-0018-NATIVE-DRAFT || "$1" == APPLY-0019-AND-ENROLL-NATIVE-DRAFT || "$1" == ENROLL-NATIVE-DRAFT-ONLY ) ]] || exit 1
+[[ $# == 1 && ( "$1" == APPLY-0018-NATIVE-DRAFT || "$1" == APPLY-0019-AND-ENROLL-NATIVE-DRAFT || "$1" == ENROLL-NATIVE-DRAFT-ONLY || "$1" == APPLY-PROTECTED-CORE-INQUIRY ) ]] || exit 1
 git diff --quiet HEAD -- scripts lib/platform
 trap 'unset WP_REHEARSAL_MIGRATION_PASSWORD' EXIT
 read -r -s -p 'Existing miopages_migration password (blank stops): ' WP_REHEARSAL_MIGRATION_PASSWORD </dev/tty
@@ -33,6 +33,19 @@ try {
   url.password = encodeURIComponent(process.env.WP_REHEARSAL_MIGRATION_PASSWORD);
   delete process.env.WP_REHEARSAL_MIGRATION_PASSWORD;
   const ca = fs.readFileSync(path.join(home, "supabase-ca.crt"), "utf8");
+  if (process.argv[2] === "APPLY-PROTECTED-CORE-INQUIRY") {
+    const result = spawnSync(process.execPath, ["--import", "tsx", "scripts/db/protected-core-inquiry.ts"], {
+      env: { HOME: home, PATH: process.env.PATH, MIOPAGES_WP_MIGRATION_URL: url.toString(), MIOPAGES_WP_DATABASE_CA: ca },
+      encoding: "utf8", timeout: 60000,
+    });
+    const report = JSON.parse((result.status === 0 ? result.stdout : result.stderr).trim());
+    if (result.status !== 0 || report.status !== "PASS") {
+      console.error(JSON.stringify({ status: "BLOCKED", operation: "protected-core-inquiry", stage: report.stage, code: report.code }));
+      process.exit(1);
+    }
+    console.log(JSON.stringify(report));
+    process.exit(0);
+  }
   const enrollOnly = process.argv[2] === "ENROLL-NATIVE-DRAFT-ONLY";
   const enroll = enrollOnly || process.argv[2] === "APPLY-0019-AND-ENROLL-NATIVE-DRAFT";
   const steps = enrollOnly ? ["verify-active-installation-origin", "enroll"]

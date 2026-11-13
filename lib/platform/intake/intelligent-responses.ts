@@ -149,11 +149,11 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
         properties: { ...format.schema.properties, presencePlan: { anyOf: [presencePlanSchema, { type: "null" }] } },
       } } : format;
       const planningInstruction = presencePlanning
-        ? " Focus on the business itself: customer needs, offer boundaries, verifiable differentiation and buying decisions. Do not ask the owner to design the intake process. After an answer, propose a concise Presence Direction only when the supplied evidence supports it. Derive the page set, positioning, offering, audience, SEO descriptions, visitor action labels and editable sections from evidence. Do not invent claims, destinations, media permissions, or outcomes. Keep sections concise. Use null when a substantive clarification is still needed."
+        ? " Focus on the business itself: customer needs, offer boundaries, verifiable differentiation and buying decisions. Do not ask the owner to design the intake process. After an answer, propose a concise Presence Direction only when the supplied evidence supports it. Derive the page set, positioning, offering, audience, SEO descriptions, visitor action labels and editable sections from evidence. Do not invent claims, destinations, media permissions, or outcomes. Separate the decision addressed by the answer from unresolved business questions. Do not transfer evidence about intake or one service stage to a different stage. Keep sections concise. Use null when a substantive clarification is still needed."
         : "";
       const request = { model: rates.model, instructions: instruction + (initial
         ? " This is the first question. End it with a question mark. Keep the rationale to one short sentence under 180 ASCII characters. Return null for assessment."
-        : " Cite the exact previous turn ID suffixed with :answer. Keep the rationale and evidence needed under 180 characters each."),
+        : " Cite the required answer reference verbatim and at least one of the supplied business source IDs. Keep the rationale and evidence needed under 180 characters each."),
         input: JSON.stringify(projected), text: { format: initial ? initialFormat : followupFormat } };
       request.instructions += planningInstruction;
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");

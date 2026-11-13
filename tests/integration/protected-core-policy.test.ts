@@ -7,6 +7,9 @@ import { disposableCluster } from "../../scripts/backup/disposable-cluster";
 import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
 import { IntakeService, newResumeToken } from "../../lib/platform/intake/service";
 import { prepareC2 } from "../../scripts/intake/adaptive-sources";
+import { protectedInquiry } from "../../lib/platform/contact/protected-inquiry";
+import { protectedDevelopmentDraft } from "../../lib/platform/wordpress-delivery/cycle-measurement";
+import { interviewDirection } from "../../lib/platform/intake/interview-direction";
 import { ProtectedInterview } from "../../lib/platform/intake/protected-interview";
 
 test("Core development policy confines the existing draft writer to the inactive fixture", async () => {
@@ -51,11 +54,11 @@ test("Core development policy confines the existing draft writer to the inactive
     const interview = new ProtectedInterview(service, { version: "offline-policy-test", async propose(context) {
       dispatches++;
       const previous = context.history.at(-1);
-      return previous ? { question: "Who checks whether a migration is suitable?", rationale: "Determine who handles the next step.",
+      return previous ? { question: previous.replacesAnswerTo ? "When does the team need the site address?" : "Who checks whether a migration is suitable?", rationale: "Determine who handles the next step.",
         sourceIds: ["offer", previous.id + ":answer"],
-        assessment: { recommendation: "Ask for the current website address before discussing migration.", evidenceNeeded: "Identify the reviewer." },
+        assessment: { recommendation: previous.answer?.text?.includes("visitor goal") ? "Lead with the visitor goal and defer the address." : "Ask for the current website address before discussing migration.", evidenceNeeded: "Identify the reviewer." },
         presencePlan: { positioning: "Keep a useful existing site during a migration review", offering: "Migration review",
-          audience: "Businesses with an existing website", pages: [{ path: "/", title: "Plan your move", purpose: "Explain the handoff",
+          audience: "Businesses with an existing website", pages: [{ path: "/", title: previous.answer?.text?.includes("visitor goal") ? "Start with your visitor goal" : "Plan your move", purpose: "Explain the handoff",
             seoDescription: "Plan a website migration review.", action: "Bring your current site address",
             sections: [{ heading: "Start with the site you have", body: "Share the existing website address for review." }] }] } }
         : { question: "What should someone bring to discuss their current website?", rationale: "Identify what is needed for the handoff.",
@@ -80,6 +83,32 @@ test("Core development policy confines the existing draft writer to the inactive
     assert.equal(edited.interview?.reviewedPlan?.plan.pages[0].title, "Review your website move");
     assert.equal(edited.interview?.turns[1].presencePlan?.pages[0].title, "Plan your move");
     assert.deepEqual(await service.resume(token), edited);
+    const corrected = await interview.correctAnswer(token, edited.version, first.id, "Bring only the visitor goal.");
+    assert.equal(corrected.interview?.turns[0].answer?.text, "Bring the current website address.");
+    assert.equal(corrected.interview?.turns.at(-1)?.replacesAnswerTo, first.id);
+    assert.equal(interviewDirection(corrected.interview!.turns), null);
+    assert.deepEqual(await interview.correctAnswer(token, corrected.version, corrected.interview!.turns.at(-1)!.id,
+      "Bring only the visitor goal."), corrected);
+    await assert.rejects(interview.editPlan(token, corrected.version, finding.id, plan), /draft_changed/);
+    const rechecked = await interview.next(token, corrected.version);
+    assert.equal(rechecked.interview?.turns.at(-1)?.respondsTo, corrected.interview!.turns.at(-1)!.id + ":answer");
+    assert.match(interviewDirection(rechecked.interview!.turns)?.recommendation ?? "", /defer the address/);
+    assert.equal(interviewDirection(rechecked.interview!.turns)?.plan?.pages[0].title, "Start with your visitor goal");
+
+    await admin.query(await readFile("lib/platform/intake/protected-core-inquiry.sql", "utf8"));
+    assert.equal((await protectedInquiry(role, selection, protectedDevelopmentDraft)).accepted, 0);
+    const submitted = await Promise.all([protectedInquiry(role, selection, protectedDevelopmentDraft, true),
+      protectedInquiry(role, selection, protectedDevelopmentDraft, true)]);
+    assert.deepEqual(submitted[0], submitted[1]);
+    assert.equal(submitted[0].accepted, 1);
+    assert.equal(submitted[0].source, "synthetic-development");
+    assert.ok(submitted[0].recommendation?.evidenceId);
+    const row = (await admin.query("SELECT id, delivery_status FROM public.contact_submissions")).rows[0];
+    assert.deepEqual(row, { id: submitted[0].recommendation?.evidenceId, delivery_status: "disabled" });
+    await assert.rejects(protectedInquiry(role, { ...selection, managedSiteId: randomUUID() }, protectedDevelopmentDraft, true), /check option/);
+    await assert.rejects(protectedInquiry(role, selection, { ...protectedDevelopmentDraft, revision: 4 }, true), /check option/);
+    await assert.rejects(role.query("SELECT * FROM public.contact_submissions"), /permission denied/);
+    await assert.rejects(role.query("UPDATE miopages_wp.core_development_inquiries SET delivery_status='pending'"), /permission denied/);
     await assert.rejects(role.query("SELECT * FROM public.prospect_intakes"), /permission denied/);
     await assert.rejects(role.query("DELETE FROM miopages_wp.core_development_drafts"), /permission denied/);
     await assert.rejects(role.query("UPDATE miopages_wp.core_development_drafts SET web_presence_id=$1", [randomUUID()]), /permission denied/);

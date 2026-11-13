@@ -1,5 +1,6 @@
 import { createPrivateKey } from "node:crypto";
 import { object, uuid } from "../lib/platform/canonical/model";
+import { prepareInterviewPages } from "../lib/platform/content-editing/prospect-proposal";
 import { binding, hash, pageProposal, proposalScope } from "../lib/platform/content-editing/proposal";
 import { operatorRole, protectedConnection, protectedPool } from "../lib/platform/wordpress-delivery/protected-connection";
 import { protectedOperatorServices } from "../lib/platform/wordpress-delivery/protected-services";
@@ -25,6 +26,13 @@ async function main() {
     const proposals = service.proposals(context);
     let result: unknown;
     switch (command.operation) {
+      case "review-interview-pages": {
+        const p = object(command.input, ["packet", "digest", "destinations"]);
+        const prepared = prepareInterviewPages(p.packet, p.digest, p.destinations);
+        await service.operator.authorize(context, "prepare-site-proposal", proposalScope(prepared.scope));
+        result = prepared;
+        break;
+      }
       case "prepare": {
         const p = object(command.input, ["scope", "proposalId", "requestId", "page", "expected"]);
         const event = await proposals.prepare(context, uuid(p.proposalId), proposalScope(p.scope), uuid(p.requestId),

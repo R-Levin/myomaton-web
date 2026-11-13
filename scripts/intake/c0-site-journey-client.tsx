@@ -5,7 +5,8 @@ import { prospectDirection } from "../../lib/platform/intake/prospect-direction"
 import { interviewDirection } from "../../lib/platform/intake/interview-direction";
 import type { IntakeView } from "../../lib/platform/intake/service";
 
-type JourneyView = IntakeView & { interviewEnabled?: boolean };
+type Operations = Awaited<ReturnType<typeof import("../../lib/platform/contact/protected-inquiry").protectedInquiry>>;
+type JourneyView = IntakeView & { interviewEnabled?: boolean; operations?: Operations | null };
 async function request(endpoint: string, operation?: object): Promise<JourneyView | null> {
   const response = await fetch(endpoint, {
     method: operation ? "POST" : "GET", cache: "no-store",
@@ -32,12 +33,16 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
   const [code, setCode] = useState("");
   const [page, setPage] = useState<"home" | "service">("home");
   const [answer, setAnswer] = useState("");
+  const [correcting, setCorrecting] = useState(false);
+  const [improvementPage, setImprovementPage] = useState("");
+  const [deliveryInput, setDeliveryInput] = useState<{ packet: unknown; digest: string } | null>(null);
   const [prior, setPrior] = useState<ReturnType<typeof prospectDirection>>(null);
   const direction = view && prospectDirection(view.answers);
   const sourceDirection = view && prospectDirection({ visitorRoute: view.answers.visitorRoute });
 
   function adopt(next: JourneyView | null) {
     setView(next);
+    setDeliveryInput(null);
     setPriority(String(next?.answers.sitePriority ?? ""));
   }
   function failed(reason: unknown) {
@@ -75,9 +80,12 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
       if (!next) throw Error("No saved draft was returned.");
       if (view) setPrior(direction);
       adopt(next);
-      if ("operation" in operation && operation.operation === "interview-answer") setAnswer("");
+      if ("operation" in operation && ["interview-answer", "correct-interview-answer"].includes(String(operation.operation))) {
+        setAnswer("");
+        setCorrecting(false);
+      }
       setMessage(next.interview?.failure && "operation" in operation && operation.operation === "interview-next"
-        ? "A new question could not be confirmed. Your saved answers are still available."
+        ? "Core could not save the model response. Your saved answer is still available."
         : view ? "Saved. Your earlier answers are still available below." : "Your retained answers are ready.");
     } catch (reason) { failed(reason); }
     finally { setBusy(false); }
@@ -85,6 +93,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
 
   const turn = view?.interview?.turns.at(-1);
   const finding = view?.interview?.turns.findLast(item => item.assessment);
+  const lastAnswered = view?.interview?.turns.findLast(item => item.answer);
   const assessment = finding?.assessment;
   const evidenceDirection = interviewDirection(view?.interview?.turns ?? []);
   const reviewedPlan = view?.interview?.reviewedPlan;
@@ -123,7 +132,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         {hosted && <section aria-label="Business interview">
           <h2>Business interview</h2>
           {!view.interviewEnabled ? <p>AI interview access is awaiting its evidence and budget configuration.</p> : <>
-            {assessment && <div>
+            {assessment && evidenceDirection && <div>
               <h3>What Core learned</h3>
               <p>{assessment.recommendation}</p>
               {assessment.evidenceNeeded && <p><strong>Still open</strong> {assessment.evidenceNeeded}</p>}
@@ -138,15 +147,27 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
                   void run({ operation: "interview-answer", version: view.version, questionId: turn.id, answer });
                 }}>
                   <div className={styles.field}><label htmlFor="business-answer">Your answer</label>
-                    <textarea id="business-answer" rows={4} maxLength={900} value={answer}
-                      onChange={event => setAnswer(event.target.value)} disabled={busy} /></div>
-                  <button disabled={busy || !answer.trim()}>Save answer</button>
+                    <textarea id="business-answer" rows={4} maxLength={900} value={correcting ? "" : answer}
+                      onChange={event => setAnswer(event.target.value)} disabled={busy || correcting} /></div>
+                  <button disabled={busy || correcting || !answer.trim()}>Save answer</button>
                 </form>}
             </>}
             {view.interview?.pending ? <p role="status">Core is waiting for the reserved generation to settle.</p>
               : (!turn || turn.answer) && <button disabled={busy} onClick={() => void run({
                 operation: "interview-next", version: view.version,
               })}>{turn ? "Review answer and look for a follow-up" : "Find the next business question"}</button>}
+            {view.interview?.failure?.reason && <p>Model response check {view.interview.failure.reason}</p>}
+            {lastAnswered && !view.interview?.pending && (correcting ? <form onSubmit={event => {
+              event.preventDefault();
+              void run({ operation: "correct-interview-answer", version: view.version, questionId: lastAnswered.id, answer });
+            }}>
+              <label>Correct the last saved answer<textarea rows={4} maxLength={900} value={answer} onChange={event => setAnswer(event.target.value)} /></label>
+              <button disabled={busy || !answer.trim()}>Save correction</button>{" "}
+              <button type="button" className={styles.secondary} onClick={() => { setCorrecting(false); setAnswer(""); }}>Cancel</button>
+            </form> : <button type="button" className={styles.secondary} disabled={busy} onClick={() => {
+              setAnswer(lastAnswered.answer?.text ?? "");
+              setCorrecting(true);
+            }}>Correct last saved answer</button>)}
             {view.interview?.turns.some(item => item.answer) && <details><summary>Interview history</summary>
               {view.interview.turns.filter(item => item.answer).map(item => <div key={item.id}>
                 <p><strong>{item.question}</strong></p><p>{item.answer?.text}</p>
@@ -184,21 +205,24 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
               event.preventDefault();
               const fields = new FormData(event.currentTarget);
               void run({ operation: "edit-presence-plan", version: view.version, findingId: evidenceDirection.findingId, plan: {
-                ...plan, pages: plan.pages.map((item, index) => ({ ...item,
-                  title: fields.get(`title-${index}`), seoDescription: fields.get(`seo-${index}`), action: fields.get(`action-${index}`),
+                ...plan, positioning: fields.get("positioning"), offering: fields.get("offering"), audience: fields.get("audience"),
+                pages: plan.pages.map((item, index) => ({ ...item,
+                  title: fields.get(`title-${index}`), purpose: fields.get(`purpose-${index}`), seoDescription: fields.get(`seo-${index}`), action: fields.get(`action-${index}`),
                   sections: item.sections.map((_section, sectionIndex) => ({
                     heading: fields.get(`heading-${index}-${sectionIndex}`), body: fields.get(`body-${index}-${sectionIndex}`),
                   })),
                 })),
               } });
             }}>
-              <p><strong>Positioning</strong> {plan.positioning}</p>
-              <p><strong>Offering</strong> {plan.offering}</p>
-              <p><strong>Audience</strong> {plan.audience}</p>
+              <div className={styles.field}>
+                <label>Positioning<textarea name="positioning" defaultValue={plan.positioning} required maxLength={500} /></label>
+                <label>Offering<textarea name="offering" defaultValue={plan.offering} required maxLength={500} /></label>
+                <label>Audience<textarea name="audience" defaultValue={plan.audience} required maxLength={350} /></label>
+              </div>
               {plan.pages.map((item, index) => <details key={item.path}>
                 <summary>{item.title} · {item.path}</summary>
-                <p>{item.purpose}</p>
                 <div className={styles.field}>
+                  <label>Page purpose<textarea name={`purpose-${index}`} defaultValue={item.purpose} required maxLength={300} /></label>
                   <label>Page title<input name={`title-${index}`} defaultValue={item.title} required maxLength={100} /></label>
                   <label>Search description<input name={`seo-${index}`} defaultValue={item.seoDescription} required maxLength={160} /></label>
                   <label>Visitor action label<input name={`action-${index}`} defaultValue={item.action} required maxLength={100} /></label>
@@ -215,6 +239,26 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
             <p>Draft version {view.planningEvidence.version} · {view.planningEvidence.evidenceDigest}</p>
           </details>}
           {plan && <p>Independent review is required before preparing delivery. Proposed action destinations and new Page identities need to be resolved in Core.</p>}
+          {hosted && plan && reviewedPlan?.findingId === evidenceDirection?.findingId && <section>
+            <h3>Prepare for WordPress review</h3>
+            <p>Review exact edited content and its evidence before creating Core Page proposals.</p>
+            <button type="button" disabled={busy} onClick={async () => {
+              setBusy(true); setError(false); setMessage("");
+              try {
+                const response = await fetch(endpoint, { method: "POST", cache: "no-store",
+                  headers: { "X-Intake-Request": "1", "Content-Type": "application/json" },
+                  body: JSON.stringify({ operation: "review-delivery-input", version: view.version }),
+                });
+                if (!response.ok) throw Error("Core could not verify the current review version. Reload before continuing.");
+                setDeliveryInput(await response.json());
+              } catch (error) { failed(error); }
+              finally { setBusy(false); }
+            }}>Prepare review package</button>
+            {deliveryInput && <details open><summary>Exact review input</summary>
+              <p>Digest {deliveryInput.digest}</p>
+              <textarea readOnly aria-label="Private WordPress review input" rows={8} value={JSON.stringify(deliveryInput, null, 2)} />
+            </details>}
+          </section>}
           {!plan && direction && <>
           <nav aria-label="Proposed pages">
             <button type="button" className={styles.secondary} aria-pressed={page === "home"} onClick={() => setPage("home")}>Home</button>{" "}
@@ -231,8 +275,45 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           <h2>Open before staging</h2>
           <p>{direction.open}</p>
           </>}
-          <p>Lead notifications, visitor measurement and business outcomes have no verified results in this review.</p>
+
         </>}
+        {hosted && <section aria-label="Ongoing service">
+          <h2>Ongoing service</h2>
+          {view.operations ? <>
+            <p>Private draft revision {view.operations.draft.revision} � Synthetic development check</p>
+            <dl>
+              <dt>Accepted test inquiries</dt><dd>{view.operations.accepted}</dd>
+              <dt>Notifications</dt><dd>Disabled</dd>
+              <dt>Visitor activity</dt><dd>Unmeasured</dd>
+              <dt>Customer outcomes</dt><dd>Unknown</dd>
+            </dl>
+            {view.operations.recommendation ? <>
+              <h3>Recommended improvement</h3>
+              <p>{view.operations.recommendation.proposal}</p>
+              <p>{view.operations.recommendation.successCheck}</p>
+              <p>{view.operations.recommendation.uncertainty}</p>
+              {plan && evidenceDirection && <form onSubmit={event => {
+                event.preventDefault();
+                const section = view.operations?.recommendation?.suggestedSection;
+                if (!section || !improvementPage) return;
+                void run({ operation: "edit-presence-plan", version: view.version, findingId: evidenceDirection.findingId,
+                  plan: { ...plan, pages: plan.pages.map(item => item.path === improvementPage
+                    ? { ...item, sections: [...item.sections, section] } : item) },
+                  improvementEvidence: view.operations?.recommendation?.evidenceId, improvementPage,
+                });
+              }}>
+                <label>Proposed Page to improve<select value={improvementPage} onChange={event => setImprovementPage(event.target.value)}>
+                  <option value="">Choose a Page</option>
+                  {plan.pages.map(item => <option key={item.path} value={item.path}>{item.title}</option>)}
+                </select></label>{" "}
+                <button disabled={busy || !improvementPage}>Add to the draft for review</button>
+              </form>}
+              <details><summary>Inquiry evidence</summary><p>{view.operations.recommendation.evidenceId}</p>
+                <p>Accepted {view.operations.recommendation.acceptedAt}</p><p>Draft {view.operations.draft.appliedDigest}</p>
+              </details>
+            </> : <button type="button" disabled={busy} onClick={() => void run({ operation: "accept-development-inquiry" })}>Record one test inquiry</button>}
+          </> : <p>Protected inquiry and measurement access is unavailable for this development draft.</p>}
+        </section>}
         <details><summary>Earlier saved responses · awaiting review</summary>
           {Object.entries(view.answers).filter(([key]) => key !== "sitePriority" && key !== "rehearsalCommitment").map(([key, value]) => {
             const labels: Record<string, string> = { sourceDecision: "Understanding", sourceCorrection: "Correction", foundationGoal: "Goal",

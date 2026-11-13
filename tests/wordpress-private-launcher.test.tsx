@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
 const require = createRequire(import.meta.url);
-const { configuration, childEnvironment, procStat, resourceGate, ownedMembers, preferredCoreOrigin } = require("../scripts/wordpress-private-listener.cjs");
+const { configuration, childEnvironment, procStat, resourceGate, ownedMembers } = require("../scripts/wordpress-private-listener.cjs");
 const { safeProbeFailure } = require("../scripts/wordpress-private-pull-probe.cjs");
 
 test("read-only probe diagnostics identify connection refusal without exporting nested error secrets", () => {
@@ -57,12 +57,4 @@ test("proc identity tolerates parentheses in names and process signals require k
   assert.equal(ownedMembers([{ ...member, group: 8080 }], 123, 3326411, known), false);
   assert.equal(ownedMembers([{ ...member, session: 8080 }], 123, 3326411, known), false);
   assert.equal(ownedMembers([], 123, 3326411, known), false);
-});
-
-test("protected Core origin changes only with the exact private selector", () => {
-  assert.equal(preferredCoreOrigin(undefined), "https://wp-acceptance.miopages.com");
-  assert.equal(preferredCoreOrigin("https://core-dev.miopages.com\n"), "https://core-dev.miopages.com");
-  for (const invalid of ["http://core-dev.miopages.com\n", "https://app.miopages.com\n", "https://core-dev.miopages.com/\n"]) {
-    assert.throws(() => preferredCoreOrigin(invalid));
-  }
 });

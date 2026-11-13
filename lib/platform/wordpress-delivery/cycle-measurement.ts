@@ -51,3 +51,13 @@ export function cycleSnapshot(draft: DraftReadback, observations: readonly Cycle
     } : null,
   };
 }
+
+
+// Exact restored baseline verified by the existing native draft receipt
+// journal. The protected inquiry grant covers this revision only.
+export const protectedDevelopmentDraft = {
+  installationId: "d84ebc69-46d5-4c64-adc6-ac7b87468f89",
+  siteProposalId: "1e28f792-624d-4141-96db-45c4ba05e17d",
+  appliedDigest: "85786f251ed5b93e42d9ae2b8c7247d85d99280aa9b1bc5932a1321330a043db",
+  revision: 3,
+} as const;
