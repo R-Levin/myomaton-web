@@ -990,3 +990,23 @@ source, destination and custody. After that decision, verify both
 scoped grants, configure the worker, validate authenticated HTTPS
 and persist the approved source-bound AI workflow. The second
 provider turn still requires an explicitly allowlisted answer.
+
+#### Hosted HTTPS activation
+
+The owner explicitly authorized the two-secret encrypted relay. The
+off-webroot config passed ownership and mode checks. The existing
+acceptance package registered only `miopages-protected-core` on its
+package-local PM2. Its listener binds loopback 8081. HTTPS Core and
+both public Core hostnames returned 200. Anonymous WordPress preview
+remained 401. A scoped HTTPS sign-in issued the Secure, HttpOnly,
+SameSite session and read back ten retained answers from PostgreSQL.
+
+The first live count and generation completed on the pinned model.
+Usage was 408 input and 196 output tokens, estimated $0.001188.
+Core rejected the output at semantic validation and retained a
+recoverable draft with no pending operation. The provider ledger
+settled the request. The response text was not retained, so the
+exact failing field is unknown. The next build makes the initial
+question and null assessment explicit in the response schema and
+records only a bounded rejection category. Any next request is a
+deliberate development operation within the remaining budget.

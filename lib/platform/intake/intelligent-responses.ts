@@ -138,7 +138,14 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");
       const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + maxOutput * rates.outputPerMillion) / 1_000_000);
       if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) throw Error("Development budget exhausted");
-      const request = { model: rates.model, instructions: instruction, input: JSON.stringify(projected), text: { format } };
+      const initial = !context.history.at(-1)?.answer;
+      const initialFormat = { ...format, schema: { ...format.schema, properties: {
+        ...format.schema.properties, question: { type: "string" }, assessment: { type: "null" },
+      } } };
+      const request = { model: rates.model, instructions: instruction + (initial
+        ? " This is the first question. End it with a question mark. Keep the rationale to one short sentence under 180 ASCII characters. Return null for assessment."
+        : " Cite the exact previous turn ID suffixed with :answer. Keep the rationale and evidence needed under 180 characters each."),
+        input: JSON.stringify(projected), text: { format: initial ? initialFormat : format } };
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation, countDispatched: true, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);

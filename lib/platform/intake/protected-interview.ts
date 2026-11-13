@@ -50,7 +50,19 @@ export class ProtectedInterview {
         ownerDigest: fingerprint({ webPresenceId, managedSiteId }), workDigest: fingerprint({ id, webPresenceId, managedSiteId }),
       });
       try { turn = readProposal(output, input, id, this.provider.version); }
-      catch { failure = "invalid_output"; }
+      catch (error) {
+        failure = "invalid_output";
+        const message = error instanceof Error ? error.message : "";
+        const reasons: Record<string, string> = {
+          "Interview evidence references invalid": "citations",
+          "Repeated or invalid question": "question-form",
+          "Initial question required": "question-missing",
+          "Follow-up assessment required": "assessment-missing",
+          "Assessment requires an answer": "premature-assessment",
+          "Interview text validation failed": "text-validation",
+        };
+        console.warn(JSON.stringify({ event: "protected-interview-output-refused", reason: reasons[message] ?? "shape-or-length" }));
+      }
     } catch { failure = "provider_unavailable"; }
     return this.intake.editProtectedInterview(token, reserved.version, state => {
       if (state.pending?.id !== id) throw new IntakeError("draft_changed", 409);
