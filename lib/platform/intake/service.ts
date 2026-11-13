@@ -32,6 +32,7 @@ async function transaction<T>(pool: Pool, run: (db: PoolClient) => Promise<T>) {
 }
 export class IntakeService {
   constructor(readonly pool: Pool, readonly selection: DeploymentSelection, private readonly rehearsal?: Rehearsal) {}
+  private get draftTable() { return this.rehearsal?.protectedScope ? "miopages_wp.core_development_drafts" : "prospect_intakes"; }
   get isOnboarding() { return Boolean(this.rehearsal); }
   get onboardingCookie() {
     const scenario = this.rehearsal?.prepared?.scenario;
@@ -73,14 +74,14 @@ export class IntakeService {
   }
   private async owned(db: Pick<PoolClient, "query">, token: string, lock = false, versions = this.rehearsal ? [this.paidVersion] : [legacyIntakeVersion, intakeVersion], intelligent = false): Promise<Row> {
     await this.scope(db, lock, intelligent);
-    const r = await db.query(`SELECT * FROM prospect_intakes WHERE web_presence_id=$1 AND managed_site_id=$2 AND resume_hash=$3 AND expires_at>now() AND resume_expires_at>now() ${lock ? "FOR UPDATE" : ""}`, [this.selection.webPresenceId, this.selection.managedSiteId, resumeHash(token)]);
+    const r = await db.query(`SELECT * FROM ${this.draftTable} WHERE web_presence_id=$1 AND managed_site_id=$2 AND resume_hash=$3 AND expires_at>now() AND resume_expires_at>now() ${lock ? "FOR UPDATE" : ""}`, [this.selection.webPresenceId, this.selection.managedSiteId, resumeHash(token)]);
     if (r.rows.length !== 1) throw new IntakeError("session_unavailable", 404);
     if (!versions.includes(r.rows[0].questionnaire_version)) throw new IntakeError("session_unavailable", 404);
     return r.rows[0];
   }
   private async insertDraft(db: PoolClient, token: string, intent: EntryIntent, version: string) {
-    return db.query(`INSERT INTO prospect_intakes(web_presence_id,managed_site_id,entry_intent,questionnaire_version,resume_hash,expires_at,resume_expires_at)
-      VALUES($1,$2,$3,$4,$5,now()+interval '30 days',now()+interval '30 days') ON CONFLICT(resume_hash) DO NOTHING`, [this.selection.webPresenceId, this.selection.managedSiteId, intent, version, resumeHash(token)]);
+    return db.query(`INSERT INTO ${this.draftTable}(web_presence_id,managed_site_id,entry_intent,questionnaire_version,resume_hash,expires_at,resume_expires_at)
+      VALUES($1,$2,$3,$4,$5,now()+interval '30 days',now()+interval '30 days') ON CONFLICT DO NOTHING`, [this.selection.webPresenceId, this.selection.managedSiteId, intent, version, resumeHash(token)]);
   }
   // The caller supplies the transaction and verified entry from ActivationService.
   // The browser intake routes have no access to this draft version.
@@ -138,7 +139,7 @@ export class IntakeService {
       if (this.rehearsal && inserted.rowCount) {
         const answers = normalizeAnswers(this.rehearsal.answers, this.paidVersion);
         const provenance = { ...this.rehearsal.provenance, preparedDigest: this.preparedDigest };
-        r = (await db.query("UPDATE prospect_intakes SET answers=$2,provenance=$3,step=$4,version=version+1 WHERE id=$1 RETURNING *",
+        r = (await db.query(`UPDATE ${this.draftTable} SET answers=$2,provenance=$3,step=$4,version=version+1 WHERE id=$1 RETURNING *`,
           [r.id, JSON.stringify(answers), JSON.stringify(provenance), this.rehearsal.step ?? 0])).rows[0];
       }
       return this.readView(db, r);
@@ -164,7 +165,7 @@ export class IntakeService {
       const at = new Date().toISOString();
       for (const [key, value] of Object.entries(answers)) provenance[key] = fingerprint(r.answers[key] ?? null) === fingerprint(value) && r.provenance[key]
         ? r.provenance[key] : this.rehearsal ? { source: "rehearsal-response", confirmation: "unconfirmed", suppliedAt: at, reference: r.questionnaire_version, author: `rehearsal-customer:${r.id}` } : { source: "prospect-supplied", confirmation: "unconfirmed", suppliedAt: at };
-      const saved = await db.query("UPDATE prospect_intakes SET answers=$2,provenance=$3,step=$4,version=version+1,updated_at=now() WHERE id=$1 RETURNING *", [r.id, JSON.stringify(answers), JSON.stringify(provenance), step]);
+      const saved = await db.query(`UPDATE ${this.draftTable} SET answers=$2,provenance=$3,step=$4,version=version+1,updated_at=now() WHERE id=$1 RETURNING *`, [r.id, JSON.stringify(answers), JSON.stringify(provenance), step]);
       return this.readView(db, saved.rows[0]);
     });
   }
@@ -184,7 +185,7 @@ export class IntakeService {
       const state = change(view.interview ?? { turns: [], pending: null, failure: null }, view);
       const provenance = { ...row.provenance, protectedInterview: state };
       if (Buffer.byteLength(JSON.stringify(provenance)) > 14_000) throw new IntakeError("payload_too_large", 413);
-      const saved = await db.query("UPDATE prospect_intakes SET provenance=$2,version=version+1,updated_at=now() WHERE id=$1 RETURNING *",
+      const saved = await db.query(`UPDATE ${this.draftTable} SET provenance=$2,version=version+1,updated_at=now() WHERE id=$1 RETURNING *`,
         [row.id, JSON.stringify(provenance)]);
       return this.readView(db, saved.rows[0]);
     });

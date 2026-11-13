@@ -18,7 +18,10 @@ export function customerMandate(value: unknown): CustomerAuthority {
 export class ProtectedOperator implements ProposalAuthority {
   #sessions = new WeakMap<object, string>();
 
-  constructor(private pool: Pool, private boundary: (db: PoolClient) => Promise<void>) {}
+  constructor(private pool: Pool, private boundary: (db: PoolClient) => Promise<void>, private developmentViews = false) {}
+
+  private get credentials() { return this.developmentViews ? "miopages_wp.core_development_credentials" : "wordpress_operator_credentials"; }
+  private get grants() { return this.developmentViews ? "miopages_wp.core_development_grants" : "wordpress_operator_grants"; }
 
   async authenticate(token: unknown) {
     if (typeof token !== "string" || token.length !== 64 || !/^[a-f0-9]+$/.test(token)) throw Error("Operator authentication refused");
@@ -26,7 +29,7 @@ export class ProtectedOperator implements ProposalAuthority {
     const db = await this.pool.connect();
     try {
       await this.boundary(db);
-      const result = await db.query("SELECT id FROM wordpress_operator_credentials WHERE token_sha256=$1 AND revoked_at IS NULL AND expires_at>clock_timestamp()", [digest]);
+      const result = await db.query(`SELECT id FROM ${this.credentials} WHERE token_sha256=$1 AND revoked_at IS NULL AND expires_at>clock_timestamp()`, [digest]);
       if (!result.rowCount) throw Error("Operator authentication refused");
       const context = Object.freeze({});
       this.#sessions.set(context, digest);
@@ -45,8 +48,8 @@ export class ProtectedOperator implements ProposalAuthority {
   async authorizeIn(db: PoolClient, context: unknown, permission: Operation, scope: Scope): Promise<Grant> {
     const digest = context && typeof context === "object" ? this.#sessions.get(context) : undefined;
     if (!digest) throw Error("Operator authorization refused");
-    const row = (await db.query(`SELECT g.id, g.operator_id, g.customer FROM wordpress_operator_grants g
-      JOIN wordpress_operator_credentials c ON c.id=g.operator_id
+    const row = (await db.query(`SELECT g.id, g.operator_id, g.customer FROM ${this.grants} g
+      JOIN ${this.credentials} c ON c.id=g.operator_id
       WHERE c.token_sha256=$1 AND c.revoked_at IS NULL AND c.expires_at>clock_timestamp()
       AND g.revoked_at IS NULL AND g.web_presence_id=$2 AND g.managed_site_id=$3 AND g.permission=$4`,
     [digest, scope.webPresenceId, scope.managedSiteId, permission])).rows[0];

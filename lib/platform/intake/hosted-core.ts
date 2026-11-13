@@ -46,7 +46,7 @@ async function openCore() {
   if (!ca) throw Error("Protected Core CA required");
   const role = "miopages_core_development";
   const pool = protectedPool(process.env.MIOPAGES_PROTECTED_CORE_DB_URL ?? "", role, ca);
-  const operators = new ProtectedOperator(pool, db => protectedConnection(db, role, "postgres"));
+  const operators = new ProtectedOperator(pool, db => protectedConnection(db, role, "postgres"), true);
   const answers = normalizeAnswers(cfg.answers, adaptiveOnboardingVersion);
   if (fingerprint(answers) !== fingerprint(cfg.answers) ||
       Object.keys(answers).some(key => cfg.provenance[key]?.confirmation !== "unconfirmed")) throw Error("Protected Core answer binding refused");
@@ -54,10 +54,8 @@ async function openCore() {
     database: "postgres", answers, provenance: cfg.provenance, prepared: cfg.prepared, step: cfg.step,
     async protectedScope(db) {
       await protectedConnection(db, role, "postgres");
-      const rows = (await db.query(`SELECT 1 FROM public.managed_sites m
-        JOIN public.web_presences w ON w.id=m.web_presence_id JOIN public.organizations o ON o.id=w.organization_id
-        JOIN public.activation_customer_bindings b ON b.managed_site_id=m.id AND b.web_presence_id=w.id AND b.organization_id=o.id
-        WHERE m.id=$1 AND w.id=$2 AND m.status='inactive' AND w.status='inactive' AND o.status='inactive'`,
+      await db.query("SET search_path TO miopages_core_guard, miopages_wp, public");
+      const rows = (await db.query(`SELECT 1 FROM miopages_wp.core_development_scope WHERE managed_site_id=$1 AND web_presence_id=$2`,
       [selection.managedSiteId, selection.webPresenceId])).rows;
       if (rows.length !== 1) throw new IntakeError("unavailable", 404);
     },
