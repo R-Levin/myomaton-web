@@ -522,7 +522,9 @@ compiler seam, inquiry readback and current approval boundaries.
 The [integrated Core operating-cycle checkpoint](c0-integration-spine-phase-b-2026-11-10.md#integrated-core-operating-cycle)
 records the consumed exact-answer approval, hosted model response refusal,
 scoped inquiry policy and proposal preparation path. Read this before any
-further provider dispatch or private WordPress application.
+further provider dispatch or private WordPress application. The [hosted synthetic inquiry checkpoint](c0-integration-spine-phase-b-2026-11-10.md#hosted-synthetic-inquiry-and-ongoing-readback)
+records one durable revision-scoped acceptance and the Operator readback.
+The corrected AI dispatch remains a separate approval boundary.
 
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 

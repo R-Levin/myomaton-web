@@ -1331,3 +1331,42 @@ correction control, Ongoing section, reload and sign-out. The HTTPS API
 refused a WordPress review package without a current, reviewed plan.
 Both public Core roots continued serving and the WordPress preview remained
 protected. No additional model call was made after the citation correction.
+
+
+#### Hosted synthetic inquiry and Ongoing readback
+
+The owner ran the approved Contact installer and returned PASS. A new
+session authenticated as the restricted development role over verified
+TLS and proved session integrity, one eligible inactive fixture, view-only
+read and insert, no update/delete, no direct canonical Contact privileges,
+and zero prior inquiries. The existing native draft journal authenticated
+the restored revision 3 receipt, and independent WordPress readback
+matched its Home 13 and Service 14 content hashes, statuses and slugs.
+
+An account-owned mode-0600 inquiry scope was enabled off-webroot for the
+exact restored revision and expires November 14, 2026 at 4:49 p.m. ET.
+Only the existing protected development app restarted. The build remained
+`9d7430b`. External Edge signed in as the existing scoped Operator, used
+**Record one test inquiry**, and observed the count change from zero to
+one. Reload and exact HTTPS retry returned the same evidence and count.
+The recommendation asks for a clearer description of what an existing
+website owner should bring to the first conversation. A separate read-only
+database session confirmed exactly one durable accepted submission,
+`fe475728-c2ce-4dbe-bcc5-ec3bfba39f8c`, bound by its idempotency key to
+the restored revision. Its acceptance timestamp was November 13,
+2026 at 4:50 p.m. ET. The Contact row has a 24-hour expiry and delivery
+status disabled. Operator sign-out refused further anonymous readback.
+
+This proves the protected Core action, durable synthetic Contact
+acceptance, revision-linked first-party count and evidence-based
+recommendation. Visitor traffic, live lead conversion and business
+outcomes remain unmeasured. Attaching the recommendation to a current
+editable site plan is available in code and still awaits such a plan.
+No new WordPress revision was applied. Public Core response digests
+matched baseline, and anonymous WordPress preview remained 401.
+The saved interview stayed at version 11 with ten retained answers
+and the approved unconfirmed answer. The AI ledger remained at eight
+requests and $0.004413 estimated with an empty answer allowlist.
+The next action is one separately authorized count and generation
+through the deployed citation correction, followed by review of any
+resulting plan and exact WordPress scope.
