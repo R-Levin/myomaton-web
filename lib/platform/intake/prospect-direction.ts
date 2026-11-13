@@ -41,3 +41,23 @@ export function prospectDirection(answers: Answers) {
     open: "Confirm where each action leads and who follows up before enabling it. Review what evidence can support claims about results.",
   };
 }
+
+/** Existing C0 editorial baseline for an Operator drafting around a cited finding. */
+export function prospectPlanSeed(answers: Answers) {
+  const direction = prospectDirection(answers);
+  if (!direction) return null;
+  return {
+    positioning: direction.home.heading,
+    offering: direction.service.title,
+    audience: "Businesses looking for help with their web presence",
+    pages: (["home", "service"] as const).map(name => ({
+      path: name === "home" ? "/" : "/service",
+      title: direction[name].title,
+      purpose: name === "home" ? "Explain the managed service and the next step" : "Explain how Launch and Ongoing work",
+      seoDescription: direction[name].body.slice(0, 160),
+      action: direction.primary.action,
+      sections: [{ heading: direction[name].heading, body: direction[name].body },
+        { heading: direction.primary.heading, body: direction.primary.body }],
+    })),
+  };
+}

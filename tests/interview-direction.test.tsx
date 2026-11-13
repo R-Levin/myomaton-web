@@ -74,3 +74,17 @@ test("an exact edited Presence Direction composes a variable Page set with canon
   const multi = { ...packet, finding: { ...packet.finding, plan: { ...packet.finding.plan, pages: [planned, service] } } };
   assert.throws(() => prepareInterviewPages(multi, fingerprint(multi), destinations), /Resolve each Page/);
 });
+
+test("a curated session sends only the permitted excerpt for an unchanged turn before expiry", () => {
+  const id = "d84ebc69-46d5-4c64-adc6-ac7b87468f89";
+  const answer = { text: "Private source with an approved summary.", disposition: "provided" as const, at: "2026-11-13" };
+  const turn: InterviewTurn = { id, gapId: "handoff", question: "What is reviewed?", rationale: "Find the starting point.",
+    sourceIds: ["source"], respondsTo: null, generatorVersion: "test", assessment: null, at: "2026-11-13", answer };
+  const scope = { approvedAnswerDigests: [], interviewSession: { endsAt: 100,
+    answers: [{ turnId: id, savedAnswerDigest: fingerprint(answer.text), outboundText: "Review the current site." }] } };
+  assert.equal(projectInterviewHistory([turn], scope, 200, 99)[0].answer.text, "Review the current site.");
+  assert.throws(() => projectInterviewHistory([turn], scope, 200, 100), /not approved/);
+  assert.throws(() => projectInterviewHistory([turn], scope, 99, 50), /Invalid interview session/);
+  assert.throws(() => projectInterviewHistory([{ ...turn, id: "1d92a248-416f-4e22-baaf-d2f1fca70352" }], scope, 200, 99), /not approved/);
+  assert.throws(() => projectInterviewHistory([{ ...turn, answer: { ...answer, text: "A correction." } }], scope, 200, 99), /not approved/);
+});

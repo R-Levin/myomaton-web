@@ -57,7 +57,7 @@ test("Core development policy confines the existing draft writer to the inactive
       return previous ? { question: previous.replacesAnswerTo ? "When does the team need the site address?" : "Who checks whether a migration is suitable?", rationale: "Determine who handles the next step.",
         sourceIds: ["offer", previous.id + ":answer"],
         assessment: { recommendation: previous.answer?.text?.includes("visitor goal") ? "Lead with the visitor goal and defer the address." : "Ask for the current website address before discussing migration.", evidenceNeeded: "Identify the reviewer." },
-        presencePlan: { positioning: "Keep a useful existing site during a migration review", offering: "Migration review",
+        presencePlan: previous.replacesAnswerTo ? null : { positioning: "Keep a useful existing site during a migration review", offering: "Migration review",
           audience: "Businesses with an existing website", pages: [{ path: "/", title: previous.answer?.text?.includes("visitor goal") ? "Start with your visitor goal" : "Plan your move", purpose: "Explain the handoff",
             seoDescription: "Plan a website migration review.", action: "Bring your current site address",
             sections: [{ heading: "Start with the site you have", body: "Share the existing website address for review." }] }] } }
@@ -93,7 +93,14 @@ test("Core development policy confines the existing draft writer to the inactive
     const rechecked = await interview.next(token, corrected.version);
     assert.equal(rechecked.interview?.turns.at(-1)?.respondsTo, corrected.interview!.turns.at(-1)!.id + ":answer");
     assert.match(interviewDirection(rechecked.interview!.turns)?.recommendation ?? "", /defer the address/);
-    assert.equal(interviewDirection(rechecked.interview!.turns)?.plan?.pages[0].title, "Start with your visitor goal");
+    assert.equal(interviewDirection(rechecked.interview!.turns)?.plan, undefined);
+    const currentFinding = rechecked.interview!.turns.at(-1)!;
+    const operatorPlan = { ...plan, pages: plan.pages.map(page => ({ ...page, title: "Start with your visitor goal" })) };
+    const authored = await interview.editPlan(token, rechecked.version, currentFinding.id, operatorPlan);
+    assert.equal(authored.interview?.reviewedPlan?.origin, "operator");
+    assert.equal(authored.interview?.reviewedPlan?.plan.pages[0].title, "Start with your visitor goal");
+    assert.equal(authored.interview?.turns.at(-1)?.presencePlan, undefined);
+    assert.deepEqual(await service.resume(token), authored);
 
     await admin.query(await readFile("lib/platform/intake/protected-core-inquiry.sql", "utf8"));
     assert.equal((await protectedInquiry(role, selection, protectedDevelopmentDraft)).accepted, 0);

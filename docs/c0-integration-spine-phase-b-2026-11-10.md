@@ -1370,3 +1370,39 @@ requests and $0.004413 estimated with an empty answer allowlist.
 The next action is one separately authorized count and generation
 through the deployed citation correction, followed by review of any
 resulting plan and exact WordPress scope.
+
+
+#### Live cited follow-up and site preparation
+
+The owner authorized one more exact count and generation. Core verified the
+deployed citation correction, existing grant, source boundary and empty
+allowlist, then sent the one approved answer. The genuine follow-up asks what
+website problems make Launch necessary before Ongoing care. The assessment
+recommends learning those triggers and explicitly leaves them unresolved.
+Core retained draft version 13, the cited answer and all prior answers, with
+no pending operation. The model returned no Presence Direction copy. The
+turn used 883 input and 123 output tokens, $0.001216 estimated. Total usage
+became ten requests and $0.005629 estimated. The one-use permission was
+removed immediately after reconciliation.
+
+A cited, current finding can now support Operator-authored Presence Direction
+when the model provides no plan. The editor starts with existing editorial
+copy. The saved provenance and exact review packet distinguish Operator
+authorship from model-proposed copy. No provider permission is required
+for editorial drafting. The protected AI grant also supports one curated
+session of turn-bound approved excerpts with an independent end time
+inside the existing tenant, model, expiry and metered request limits.
+Corrections invalidate a matching turn binding. The ordinary file-based
+grant is reread before generation. The hosted grant was left empty;
+the new session format creates no implicit authority for more transmissions.
+
+Native WordPress revision 5 on this installation must follow the signed
+high-water revision 4; the restored content actually on WordPress is
+revision 3. The installed writer deliberately stores no rollback target
+for a forward apply after restore. The normal signed restore would target
+revision 4, not the current baseline. Before approving an apply, a tested
+exact rollback contract must distinguish the signed predecessor from the
+currently materialized baseline and reconcile restoration to the latter.
+Never issue or apply a new revision on the assumption that revision 3
+can be restored by the existing envelope. Page approvals, independent
+staging authority, and fresh scoped WordPress principals remain required.

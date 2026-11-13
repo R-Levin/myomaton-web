@@ -39,9 +39,9 @@ export class ProtectedInterview {
     try { plan = readPresencePlan(value); } catch { throw new IntakeError("invalid_request"); }
     return this.intake.editProtectedInterview(token, version, state => {
       const finding = interviewDirection(state.turns);
-      if (!finding?.plan || findingId !== finding.findingId || state.pending) throw new IntakeError("draft_changed", 409);
+      if (!finding || findingId !== finding.findingId || state.pending) throw new IntakeError("draft_changed", 409);
       const prior = state.reviewedPlan?.findingId === finding.findingId ? state.reviewedPlan.improvement : undefined;
-      return { ...state, reviewedPlan: { findingId: finding.findingId, plan, ...((improvement ?? prior) && { improvement: improvement ?? prior }) } };
+      return { ...state, reviewedPlan: { findingId: finding.findingId, plan, origin: finding.plan ? "model" : "operator", ...((improvement ?? prior) && { improvement: improvement ?? prior }) } };
     });
   }
 

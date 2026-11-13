@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "../../components/intake/interview.module.css";
 import { prospectPriorities } from "../../lib/platform/intake/adaptive";
-import { prospectDirection } from "../../lib/platform/intake/prospect-direction";
+import { prospectDirection, prospectPlanSeed } from "../../lib/platform/intake/prospect-direction";
 import { interviewDirection } from "../../lib/platform/intake/interview-direction";
 import type { IntakeView } from "../../lib/platform/intake/service";
 
@@ -97,8 +97,10 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
   const assessment = finding?.assessment;
   const evidenceDirection = interviewDirection(view?.interview?.turns ?? []);
   const reviewedPlan = view?.interview?.reviewedPlan;
-  const plan = reviewedPlan && reviewedPlan.findingId === evidenceDirection?.findingId
-    ? reviewedPlan.plan : evidenceDirection?.plan;
+  const activeReviewedPlan = reviewedPlan && reviewedPlan.findingId === evidenceDirection?.findingId ? reviewedPlan : undefined;
+  const authored = evidenceDirection && !evidenceDirection.plan;
+  const plan = activeReviewedPlan?.plan ?? evidenceDirection?.plan;
+  const editorDraft = plan ?? (hosted && authored && view ? prospectPlanSeed(view.answers) : null);
   return <div className={styles.shell}>
     <header><strong>MioPages</strong><span>{hosted ? "Protected Operator development" : "Private local development"}</span>
       {hosted && view && <button type="button" disabled={busy} onClick={async () => {
@@ -125,7 +127,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         <p>MioPages is transitioning to one managed Web Presence service, with Launch followed by Ongoing care. Earlier site observations and Review material are kept with their original sources.</p>
         {view.prepared && <p className={styles.hint}>{view.prepared.reviewGap}</p>}
         {view.prepared?.sources.map(source => <details key={source.id}>
-          <summary>{source.title} Â· {source.kind}</summary>
+          <summary>{source.title} · {source.kind}</summary>
           <p>{source.reference}</p>
           {source.entries.map(item => <p key={item.label}><strong>{item.label}</strong> {item.value}</p>)}
         </details>)}
@@ -137,7 +139,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
               <p>{assessment.recommendation}</p>
               {assessment.evidenceNeeded && <p><strong>Still open</strong> {assessment.evidenceNeeded}</p>}
               <p className={styles.hint}>Evidence {finding?.sourceIds.map(id => id.endsWith(":answer") ? "Saved interview answer" :
-                view.prepared?.sources.find(source => source.id === id)?.title ?? id).join(" Â· ")}</p>
+                view.prepared?.sources.find(source => source.id === id)?.title ?? id).join(" · ")}</p>
             </div>}
             {turn?.question && <>
               <h3>{turn.question}</h3><p>{turn.rationale}</p>
@@ -199,14 +201,16 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           <p>Editorial proposal for review. Links and inquiry delivery still need verification.</p>
           {evidenceDirection && <section aria-label="Evidence for this site decision">
             <h3>Direction from the interview</h3>
+            {plan && <p>{activeReviewedPlan?.origin === "operator" ? "Operator-authored copy informed by the interview." : "Model-proposed copy for Operator review."}</p>}
+            {!plan && <p>The business assessment is saved. No website copy was generated for this turn.</p>}
             <p>{evidenceDirection.recommendation}</p>
             {evidenceDirection.unresolved && <p><strong>Still to verify</strong> {evidenceDirection.unresolved}</p>}
-            {plan && <form key={view.version} onSubmit={event => {
+            {editorDraft && <form key={view.version} onSubmit={event => {
               event.preventDefault();
               const fields = new FormData(event.currentTarget);
               void run({ operation: "edit-presence-plan", version: view.version, findingId: evidenceDirection.findingId, plan: {
-                ...plan, positioning: fields.get("positioning"), offering: fields.get("offering"), audience: fields.get("audience"),
-                pages: plan.pages.map((item, index) => ({ ...item,
+                ...editorDraft, positioning: fields.get("positioning"), offering: fields.get("offering"), audience: fields.get("audience"),
+                pages: editorDraft.pages.map((item, index) => ({ ...item,
                   title: fields.get(`title-${index}`), purpose: fields.get(`purpose-${index}`), seoDescription: fields.get(`seo-${index}`), action: fields.get(`action-${index}`),
                   sections: item.sections.map((_section, sectionIndex) => ({
                     heading: fields.get(`heading-${index}-${sectionIndex}`), body: fields.get(`body-${index}-${sectionIndex}`),
@@ -214,13 +218,14 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
                 })),
               } });
             }}>
+              {!plan && <p>The fields start from the earlier editorial proposal. Use the cited answer to revise them.</p>}
               <div className={styles.field}>
-                <label>Positioning<textarea name="positioning" defaultValue={plan.positioning} required maxLength={500} /></label>
-                <label>Offering<textarea name="offering" defaultValue={plan.offering} required maxLength={500} /></label>
-                <label>Audience<textarea name="audience" defaultValue={plan.audience} required maxLength={350} /></label>
+                <label>Positioning<textarea name="positioning" defaultValue={editorDraft.positioning} required maxLength={500} /></label>
+                <label>Offering<textarea name="offering" defaultValue={editorDraft.offering} required maxLength={500} /></label>
+                <label>Audience<textarea name="audience" defaultValue={editorDraft.audience} required maxLength={350} /></label>
               </div>
-              {plan.pages.map((item, index) => <details key={item.path}>
-                <summary>{item.title} Â· {item.path}</summary>
+              {editorDraft.pages.map((item, index) => <details key={item.path}>
+                <summary>{item.title} · {item.path}</summary>
                 <div className={styles.field}>
                   <label>Page purpose<textarea name={`purpose-${index}`} defaultValue={item.purpose} required maxLength={300} /></label>
                   <label>Page title<input name={`title-${index}`} defaultValue={item.title} required maxLength={100} /></label>
@@ -236,7 +241,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
             </form>}
           </section>}
           {view.planningEvidence && <details><summary>Proposal evidence</summary>
-            <p>Draft version {view.planningEvidence.version} Â· {view.planningEvidence.evidenceDigest}</p>
+            <p>Draft version {view.planningEvidence.version} · {view.planningEvidence.evidenceDigest}</p>
           </details>}
           {plan && <p>Independent review is required before preparing delivery. Proposed action destinations and new Page identities need to be resolved in Core.</p>}
           {hosted && plan && reviewedPlan?.findingId === evidenceDirection?.findingId && <section>
@@ -314,7 +319,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
             </> : <button type="button" disabled={busy} onClick={() => void run({ operation: "accept-development-inquiry" })}>Record one test inquiry</button>}
           </> : <p>Protected inquiry and measurement access is unavailable for this development draft.</p>}
         </section>}
-        <details><summary>Earlier saved responses Â· awaiting review</summary>
+        <details><summary>Earlier saved responses · awaiting review</summary>
           {Object.entries(view.answers).filter(([key]) => key !== "sitePriority" && key !== "rehearsalCommitment").map(([key, value]) => {
             const labels: Record<string, string> = { sourceDecision: "Understanding", sourceCorrection: "Correction", foundationGoal: "Goal",
               workIncluded: "Included work", workExcluded: "Excluded work", visitorRoute: "Visitor action", reviewHandoff: "Review handoff",
@@ -322,7 +327,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
               siteItem: "Item", additionalEvidence: "Additional evidence" };
             const evidence = view.provenance?.[key];
             return <p key={key}><strong>{labels[key] ?? key}</strong> {value}
-              {evidence && <><br /><small>Saved {evidence.suppliedAt.slice(0, 10)} Â· {evidence.confirmation === "prior-approved"
+              {evidence && <><br /><small>Saved {evidence.suppliedAt.slice(0, 10)} · {evidence.confirmation === "prior-approved"
                 ? "Earlier approved source" : "Owner response awaiting review"}</small></>}</p>;
           })}
         </details>

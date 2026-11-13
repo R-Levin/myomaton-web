@@ -48,7 +48,7 @@ export function composeProspectPage(
 // Read-only preparation. Existing authorization and proposal writers must
 // receive the resulting Page inputs under the selected scope.
 export function prepareInterviewPages(value: unknown, expectedDigest: unknown, destinations: unknown) {
-  const selection = object(value, ["scope", "version", "evidenceDigest", "finding", "improvement"]);
+  const selection = object(value, ["scope", "version", "evidenceDigest", "finding", "improvement", "planOrigin"]);
   const scope = object(selection.scope, ["webPresenceId", "managedSiteId"]);
   const finding = object(selection.finding, ["findingId", "sourceIds", "recommendation", "unresolved", "answerReference", "plan"]);
   if (fingerprint(selection) !== hash(expectedDigest) || !Number.isSafeInteger(selection.version) ||
@@ -90,6 +90,6 @@ export function prepareInterviewPages(value: unknown, expectedDigest: unknown, d
   const evidence = selection.improvement === undefined ? undefined : object(selection.improvement, ["inquiryId", "draftDigest", "pagePath"]);
   const improvement = evidence && { inquiryId: uuid(evidence.inquiryId), draftDigest: hash(evidence.draftDigest), pagePath: evidence.pagePath };
   if (improvement && !seen.has(improvement.pagePath as string)) throw Error("Improvement Page must be reviewed");
-  return { scope, inputDigest: expectedDigest as string, navigation: plan.pages.map(page => page.path), pages,
+  return { scope, planOrigin: selection.planOrigin === undefined ? undefined : choice(selection.planOrigin, ["model", "operator"]), inputDigest: expectedDigest as string, navigation: plan.pages.map(page => page.path), pages,
     ...(improvement && { improvement }) };
 }

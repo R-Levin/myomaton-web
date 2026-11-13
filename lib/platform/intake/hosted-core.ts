@@ -116,7 +116,7 @@ async function openCore() {
             throw Error("Protected AI authorization refused");
           }
           if (attribution.ownerDigest !== grant.ownerDigest || fingerprint(context.evidence) !== fingerprint(grant.sources)) throw Error("Model evidence scope refused");
-          const history = projectInterviewHistory(context.history, current);
+          const history = projectInterviewHistory(context.history, current, grant.expiresAt);
           return { entryPath: context.entryPath, evidence: grant.sources, gap: context.gap, history };
         },
       });
@@ -207,10 +207,10 @@ export async function hostedCoreRequest(request: Request) {
           const current = await app.intake.resume(app.draftToken);
           const finding = interviewDirection(current.interview?.turns ?? []);
           const reviewed = current.interview?.reviewedPlan;
-          if (current.version !== value.version || !current.planningEvidence || !finding?.plan ||
+          if (current.version !== value.version || !current.planningEvidence || !finding ||
               reviewed?.findingId !== finding.findingId || current.interview?.pending) throw new IntakeError("draft_changed", 409);
           const packet = { scope: app.selection, version: current.version, evidenceDigest: current.planningEvidence.evidenceDigest,
-            finding: { ...finding, plan: reviewed.plan }, ...(reviewed.improvement && { improvement: reviewed.improvement }) };
+            finding: { ...finding, plan: reviewed.plan }, planOrigin: reviewed.origin ?? (finding.plan ? "model" : "operator"), ...(reviewed.improvement && { improvement: reviewed.improvement }) };
           return { packet, digest: fingerprint(packet) };
         }
         if (value.operation === "begin") return view(app.intake.create(app.draftToken, "DIRECT_START"));

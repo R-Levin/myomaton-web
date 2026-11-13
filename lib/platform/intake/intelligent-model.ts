@@ -30,7 +30,7 @@ export type InterviewState = {
   turns: InterviewTurn[];
   pending: { id: string; gapId: string } | null;
   failure: { gapId: string; code: "provider_unavailable" | "invalid_output"; reason?: string } | null;
-  reviewedPlan?: { findingId: string; plan: PresencePlan; improvement?: { inquiryId: string; draftDigest: string; pagePath: string } };
+  reviewedPlan?: { findingId: string; plan: PresencePlan; origin?: "model" | "operator"; improvement?: { inquiryId: string; draftDigest: string; pagePath: string } };
 };
 export type QuestionContext = {
   entryPath: EntryIntent;
