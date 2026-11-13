@@ -10,7 +10,7 @@ import { sessionToken } from "./http";
 import { contactHttp } from "../contact/http";
 import { developmentGuard } from "../contact/boundaries";
 import { ProtectedInterview } from "./protected-interview";
-import { protectedResponsesProvider, type ResponsesRates } from "./intelligent-responses";
+import { initializeResponsesUsageLedger, protectedResponsesProvider, type ResponsesRates } from "./intelligent-responses";
 import { responsesHttps } from "./responses-https";
 import type { QuestionContext } from "./intelligent-model";
 
@@ -69,12 +69,19 @@ async function openCore() {
       expiresAt: number; maxRequests: number; capMicros: number; rates: ResponsesRates; ledgerDirectory: string }>(providerFile);
     if (grant.ownerDigest !== fingerprint(selection) || !Array.isArray(grant.sources) || !grant.sources.length ||
         new Set(grant.sources.map(source => source.id)).size !== grant.sources.length ||
-        !Array.isArray(grant.approvedAnswerDigests) || grant.rates.model !== "gpt-5.4-mini-2026-03-17") throw Error("Protected AI scope refused");
+        !Array.isArray(grant.approvedAnswerDigests) || grant.approvedAnswerDigests.some(value => !/^[a-f0-9]{64}$/.test(value)) ||
+        !Number.isSafeInteger(grant.maxRequests) || grant.maxRequests > 20 || !Number.isSafeInteger(grant.capMicros) ||
+        grant.capMicros > 500_000 || grant.expiresAt > Date.now() + 86_400_000 ||
+        grant.rates.model !== "gpt-5.4-mini-2026-03-17" || grant.rates.inputPerMillion !== 750_000 ||
+        grant.rates.cachedPerMillion !== 75_000 || grant.rates.outputPerMillion !== 4_500_000 ||
+        grant.rates.countMicros !== 0) throw Error("Protected AI scope refused");
     const ledger = await lstat(grant.ledgerDirectory);
     const home = await realpath(process.env.HOME ?? "");
     if (!ledger.isDirectory() || ledger.uid !== process.getuid?.() || (ledger.mode & 0o777) !== 0o700 ||
         await realpath(grant.ledgerDirectory) !== grant.ledgerDirectory || !grant.ledgerDirectory.startsWith(home + "/") ||
         grant.ledgerDirectory.includes("/public_html")) throw Error("Protected AI ledger refused");
+    try { await initializeResponsesUsageLedger(grant.ledgerDirectory, grant.rates); }
+    catch (error) { if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error; }
     const provider = protectedResponsesProvider(grant.ledgerDirectory, grant.rates,
       responsesHttps(process.env.MIOPAGES_OPENAI_DEV_API_KEY ?? "", grant.expiresAt), {
         ...grant, project(context, attribution) {

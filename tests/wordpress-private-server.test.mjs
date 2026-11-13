@@ -3,7 +3,18 @@ import test from 'node:test';
 import { createRequire } from 'node:module';
 import { once } from 'node:events';
 import { routingSmoke, failureSnapshot, expectResponse, request } from '../scripts/wordpress-routing-smoke.mjs';
-const { allowed, createGuardedServer } = createRequire(import.meta.url)('../scripts/wordpress-private-server.cjs');
+const { allowed, allowedCore, createGuardedServer } = createRequire(import.meta.url)('../scripts/wordpress-private-server.cjs');
+
+test('protected Core listener passes only the exact browser/API routes and static build assets', () => {
+  for (const path of ['/core/', '/core?x=1', '/api/protected-core/', '/api/wordpress-delivery/pull',
+    '/review/intake', '/_next/static/%2e%2e/core', '/_next/static/../core', '/_next/static/chunk.js.map']) {
+    assert.equal(allowedCore('GET', path), false);
+    assert.equal(allowedCore('POST', path), false);
+  }
+  assert.equal(allowedCore('GET', '/core'), true);
+  assert.equal(allowedCore('GET', '/_next/static/chunks/chunk.js'), true);
+  assert.equal(allowedCore('POST', '/api/protected-core'), true);
+});
 
 test('raw boundary rejects normalization, redirects, CONNECT and upgrades before Next handles a request', async () => {
   let handedOff = 0;

@@ -59,12 +59,13 @@ function validateRates(rates: Rates) {
       integer(rates.outputPerMillion) > 25_000_000 || integer(rates.countMicros) > capMicros) throw Error("Rate card outside development limits");
 }
 
-export async function initializeOfflineUsageLedger(directory: string, rates: Rates) {
+export async function initializeResponsesUsageLedger(directory: string, rates: Rates) {
   validateRates(rates);
   await durableWrite(join(directory, "onboarding-usage.json"), {
     ratesDigest: fingerprint(rates), rateCard: rates, adapterVersion: version, model: rates.model, tier: "default", attempts: [],
   });
 }
+export const initializeOfflineUsageLedger = initializeResponsesUsageLedger;
 
 function responseUsage(body: Record<string, unknown>, counted: number): Usage {
   const usage = record(body.usage), inputDetail = record(usage.input_tokens_details), outputDetail = record(usage.output_tokens_details);

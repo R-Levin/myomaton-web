@@ -836,6 +836,19 @@ runtime does not enable these routes. Scoped reads and updates require
 the inactive development graph and a separately restricted database role.
 The local proof path retains its existing guards.
 
+The retained package launcher supports `--core --smoke` for bounded
+loopback verification and `--core` for the supervised development
+process. It loads `core-config.json`, `core-input.json` and, when
+enabled, `ai-scope.json` off-webroot with existing custody and
+resource checks. The existing private server rejects raw requests
+outside the exact Core page, API and static build assets before Next
+normalizes them. The earlier WordPress-only mode remains separate.
+Windows Webpack production build and compiled loopback smoke passed.
+The smoke checked the actual protected shell, anonymous 401/no-store
+and raw 404 for disallowed or normalized targets. Linux artifact
+packaging and actual provider routing remain open. The anonymous
+compiled smoke uses no private configuration.
+
 The interview stores versioned answers and reserves a generation before
 dispatch. The real Responses transport pins the hostname and endpoints,
 uses verified TLS and no retries, and retains the existing usage ledger's
@@ -873,6 +886,10 @@ not approve a claim or publication.
    account, in an off-webroot mode-0600 input. Persist the owned intake
    draft in Supabase. The original evidence and public C0 graph remain
    intact. Configure the approved key through the owner's protected method.
+   No hosted role SQL has run. Review the table policies and existing
+   role behavior before applying any scoped permissions. This approval
+   does not authorize enabling a default-deny policy that changes
+   existing runtime role behavior.
 3. **AI.** Approve the three exact statements under the earlier
    protected browser journey as internal approved development inputs.
    They do not require a claim that they are publicly published.

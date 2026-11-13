@@ -38,6 +38,28 @@ function childEnvironment(value) {
     ['MIOPAGES_WP_CREDENTIAL_' + CREDENTIAL.replaceAll('-', '_')]: c.secretHex };
 }
 
+function coreEnvironment(value) {
+  assert.ok(value && typeof value === 'object' && !Array.isArray(value));
+  assert.deepEqual(Object.keys(value).sort(), ['databaseUrl', 'ca', 'aiEnabled', 'apiKey'].sort());
+  assert.equal(typeof value.aiEnabled, 'boolean');
+  assert.ok(typeof value.ca === 'string' && value.ca.includes('BEGIN CERTIFICATE'));
+  const url = new URL(value.databaseUrl);
+  assert.equal(url.protocol, 'postgresql:'); assert.equal(url.port, '5432');
+  assert.match(url.hostname, /^[a-z0-9-]+\.pooler\.supabase\.com$/);
+  assert.match(decodeURIComponent(url.username), /^miopages_core_development\.[a-z0-9]{1,63}$/);
+  assert.ok(url.password); assert.equal(url.pathname, '/postgres');
+  assert.equal(url.search, '?sslmode=verify-full'); assert.equal(url.hash, '');
+  if (value.aiEnabled) assert.match(value.apiKey, /^sk-[a-zA-Z0-9_-]{20,512}$/);
+  else assert.equal(value.apiKey, '');
+  privateFile(PRIVATE + '/core-input.json');
+  if (value.aiEnabled) privateFile(PRIVATE + '/ai-scope.json');
+  return { PATH: '/usr/bin:/bin', HOME, LANG: 'C.UTF-8', NODE_ENV: 'production', NEXT_TELEMETRY_DISABLED: '1',
+    MIOPAGES_ROUTING_MODE: 'shared-hostnames', MIOPAGES_PROTECTED_CORE: 'enabled', MIOPAGES_PROTECTED_CORE_ORIGIN: ORIGIN,
+    MIOPAGES_PROTECTED_CORE_DB_URL: value.databaseUrl, MIOPAGES_WP_DATABASE_CA: value.ca,
+    MIOPAGES_PROTECTED_CORE_INPUT: PRIVATE + '/core-input.json',
+    ...(value.aiEnabled && { MIOPAGES_PROTECTED_CORE_AI_SCOPE: PRIVATE + '/ai-scope.json', MIOPAGES_OPENAI_DEV_API_KEY: value.apiKey }) };
+}
+
 function procStat(text) {
   const end = text.lastIndexOf(')'); assert.ok(end > 0);
   const fields = text.slice(end + 1).trim().split(/\s+/);
@@ -87,13 +109,16 @@ function groupMembers(group) {
 async function main() {
   assert.equal(process.platform, 'linux'); assert.equal(process.getuid(), 3326411);
   assert.equal(fs.realpathSync(process.env.HOME), HOME);
-  assert.ok(process.argv.length === 2 || (process.argv.length === 3 && process.argv[2] === '--smoke'));
+  const flags = process.argv.slice(2);
+  assert.ok(flags.length <= 2 && new Set(flags).size === flags.length && flags.every(flag => ['--smoke', '--core'].includes(flag)));
+  const core = flags.includes('--core');
   const root = fs.lstatSync(PRIVATE);
   assert.ok(root.isDirectory() && !root.isSymbolicLink() && root.uid === process.getuid() && (root.mode & 511) === 448);
   assert.equal(fs.realpathSync(WEB), WEB);
   assert.equal(fs.readFileSync(WEB + '/.env', 'utf8'), 'PORT=8081\nNODE_ENV=production\n');
   assert.deepEqual(fs.readdirSync(WEB).filter(name => name.startsWith('.env')), ['.env']);
-  const env = childEnvironment(JSON.parse(privateFile(PRIVATE + '/pull-config.json')));
+  const env = core ? coreEnvironment(JSON.parse(privateFile(PRIVATE + '/core-config.json')))
+    : childEnvironment(JSON.parse(privateFile(PRIVATE + '/pull-config.json')));
   assert.ok(resourceGate(process.memoryUsage().rss, availableMemory()));
   const child = spawn('/usr/bin/node', ['--max-old-space-size=256', WEB + '/.rehearsal/private-server.cjs'],
     { cwd: WEB, env, detached: true, stdio: 'ignore' });
@@ -130,7 +155,7 @@ async function main() {
       if (!resourceGate(rss, available)) void stop('resource-gate', true);
     } catch { void stop('identity-or-monitor-gate', true); }
   }, 500);
-  const deadline = process.argv[2] === '--smoke' ? setTimeout(() => { void stop('90-second-smoke-deadline'); }, 90000) : undefined;
+  const deadline = flags.includes('--smoke') ? setTimeout(() => { void stop('90-second-smoke-deadline'); }, 90000) : undefined;
   process.once('SIGTERM', () => { void stop('requested-stop'); }); process.once('SIGINT', () => { void stop('requested-stop'); });
   child.once('error', () => { void stop('spawn-failed', true); });
   child.once('exit', () => { if (!stopped) void stop('unexpected-child-exit', true); });
