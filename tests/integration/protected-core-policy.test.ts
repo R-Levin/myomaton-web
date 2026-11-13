@@ -7,6 +7,7 @@ import { disposableCluster } from "../../scripts/backup/disposable-cluster";
 import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
 import { IntakeService, newResumeToken } from "../../lib/platform/intake/service";
 import { prepareC2 } from "../../scripts/intake/adaptive-sources";
+import { ProtectedInterview } from "../../lib/platform/intake/protected-interview";
 
 test("Core development policy confines the existing draft writer to the inactive fixture", async () => {
   const cluster = await disposableCluster(process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin");
@@ -44,7 +45,27 @@ test("Core development policy confines the existing draft writer to the inactive
     const result = await service.create(token, "DIRECT_START");
     assert.equal(result.version, 2);
     assert.deepEqual(await service.create(token, "DIRECT_START"), result);
-    assert.equal((await service.editProtectedInterview(token, result.version, state => state)).version, 3);
+    const evidence = [{ id: "offer", kind: "owner-confirmed" as const, at: "2026-11-13", reference: "Fictional policy test",
+      statement: "Customers can ask about an existing website." }];
+    let dispatches = 0;
+    const interview = new ProtectedInterview(service, { version: "offline-policy-test", async propose(context) {
+      dispatches++;
+      const previous = context.history.at(-1);
+      return previous ? { question: "Who checks whether a migration is suitable?", rationale: "Determine who handles the next step.",
+        sourceIds: ["offer", previous.id + ":answer"],
+        assessment: { recommendation: "Ask for the current website address before discussing migration.", evidenceNeeded: "Identify the reviewer." } }
+        : { question: "What should someone bring to discuss their current website?", rationale: "Identify what is needed for the handoff.",
+          sourceIds: ["offer"], assessment: null };
+    } }, evidence);
+    const asked = await interview.next(token, result.version);
+    const first = asked.interview!.turns[0];
+    await assert.rejects(interview.next(token, asked.version), /question_unavailable/);
+    const answered = await interview.answer(token, asked.version, first.id, "Bring the current website address.");
+    assert.equal(dispatches, 1);
+    const followed = await interview.next(token, answered.version);
+    assert.equal(followed.interview?.turns[1].respondsTo, first.id + ":answer");
+    assert.match(followed.interview?.turns[1].assessment?.recommendation ?? "", /migration/);
+    assert.deepEqual(await service.resume(token), followed);
     await assert.rejects(role.query("SELECT * FROM public.prospect_intakes"), /permission denied/);
     await assert.rejects(role.query("DELETE FROM miopages_wp.core_development_drafts"), /permission denied/);
     await assert.rejects(role.query("UPDATE miopages_wp.core_development_drafts SET web_presence_id=$1", [randomUUID()]), /permission denied/);
