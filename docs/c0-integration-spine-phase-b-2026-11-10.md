@@ -962,3 +962,31 @@ rollout. The disposable interview test persists a question, answer and
 answer-dependent follow-up through the restricted writer, with a
 substitute provider. No authenticated hosted run or live model response
 has been verified.
+
+#### Restricted role enrolled and deployment files staged
+
+The owner ran the two-prompt launcher and reported PASS for
+`miopages_core_development`, principal
+`f2cd3fe8-58b3-4dfa-9125-fd8f1bd35f8e`. A fresh SSH process
+independently verified the role's TLS and PostgreSQL session
+integrity and exactly one eligible inactive scope. The protected
+runtime credential remains in Cloud custody.
+
+The acceptance account's package-local PM2 list was empty. The
+exact Linux `63cf410` build and locked dependencies were copied
+to that account's webroot and the artifact manifest rehashed.
+Discovery metadata is absent and port 8081 was free. The ten
+retained answers remain staged off-webroot with mode 0600 under
+a mode 0700 directory. The database draft has not been imported.
+The two public Core HTTPS routes still returned 200, the protected
+WordPress preview returned 401, and the acceptance Core URL
+returned the idle 502.
+
+Automatic approval review declined the SSH relay of the generated
+scoped database connection and existing OpenAI development key
+into the protected acceptance configuration. The operation did
+not run. The owner was asked to explicitly authorize that exact
+source, destination and custody. After that decision, verify both
+scoped grants, configure the worker, validate authenticated HTTPS
+and persist the approved source-bound AI workflow. The second
+provider turn still requires an explicitly allowlisted answer.
