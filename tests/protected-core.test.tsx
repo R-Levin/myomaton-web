@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { hostedCoreRequest } from "../lib/platform/intake/hosted-core";
 import { initializeResponsesUsageLedger, protectedResponsesProvider } from "../lib/platform/intake/intelligent-responses";
+import { readProposal, type QuestionContext } from "../lib/platform/intake/intelligent-model";
 import { responsesHttps } from "../lib/platform/intake/responses-https";
 
 test("protected Core refuses anonymous and cross-origin requests before accessing protected services", async () => {
@@ -58,8 +59,8 @@ test("a changed protected projection between count and generation settles only t
       return { body: { input_tokens: 42 } };
     } }, { capMicros: 500_000, maxRequests: 20, expiresAt: Date.now() + 60_000,
       async project() { return { projection: dispatched.length }; } });
-    await assert.rejects(provider.propose({ entryPath: "DIRECT_START", history: [], evidence: [],
-      gap: { id: "buyers", questionPurpose: "Find the buyer", sourceIds: [], known: [] },
+    await assert.rejects(provider.propose({ entryPath: "DIRECT_START", history: [], evidence: [{ id: "market", kind: "owner-confirmed", at: "2026-11-13", reference: "Test", statement: "Businesses buy the service." }],
+      gap: { id: "buyers", questionPurpose: "Find the buyer", sourceIds: ["market"], known: [] },
     }, { ownerDigest: "a".repeat(64), workDigest: "b".repeat(64) }), /projection changed/);
     assert.deepEqual(dispatched, ["/v1/responses/input_tokens"]);
     const { attempts } = JSON.parse(await readFile(join(directory, "onboarding-usage.json"), "utf8"));
@@ -69,4 +70,35 @@ test("a changed protected projection between count and generation settles only t
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+test("protected transport constrains citations and Core attaches the exact answer reference", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "miopages-source-binding-"));
+  try {
+    const rates = { model: "gpt-5.4-mini-2026-03-17", verifiedOn: "2026-11-13", inputPerMillion: 750_000,
+      cachedPerMillion: 75_000, cacheWritePerMillion: 0, outputPerMillion: 4_500_000, countMicros: 0 };
+    await initializeResponsesUsageLedger(directory, rates);
+    const context: QuestionContext = { entryPath: "DIRECT_START", evidence: [
+      { id: "service", kind: "owner-confirmed", at: "2026-11-13", reference: "Test", statement: "Customers review existing websites." },
+    ], gap: { id: "handoff", questionPurpose: "Learn the buying decision.", sourceIds: ["service"], known: [] },
+    history: [{ id: "saved", gapId: "handoff", question: "What should the visitor bring?", rationale: "Determine the handoff.",
+      sourceIds: ["service"], respondsTo: null, generatorVersion: "test", assessment: null, at: "2026-11-13",
+      answer: { text: "Bring a website address.", disposition: "provided", at: "2026-11-13" } }] };
+    const provider = protectedResponsesProvider(directory, rates, { async send(path, body) {
+      const request = body as { text: { format: { schema: { properties: { sourceIds: { items: { enum: string[] } } } } } } };
+      assert.deepEqual(request.text.format.schema.properties.sourceIds.items.enum, ["service"]);
+      if (path.endsWith("input_tokens")) return { body: { input_tokens: 42 } };
+      return { body: { model: rates.model, service_tier: "default", status: "completed",
+        usage: { input_tokens: 42, input_tokens_details: { cached_tokens: 0 }, output_tokens: 10,
+          output_tokens_details: { reasoning_tokens: 0 }, total_tokens: 52 },
+        output: [{ type: "message", role: "assistant", status: "completed", content: [{ type: "output_text", text: JSON.stringify({
+          question: "Who reviews the current site?", rationale: "Assign the handoff.", sourceIds: ["service"],
+          assessment: { recommendation: "Ask for the address.", evidenceNeeded: "Who reviews it?" }, presencePlan: null,
+        }) }] }] } };
+    } }, { capMicros: 500_000, maxRequests: 20, expiresAt: Date.now() + 60_000, project: value => value });
+    const output = await provider.propose(context, { ownerDigest: "a".repeat(64), workDigest: "b".repeat(64) });
+    assert.deepEqual(readProposal(output, context, "next", provider.version, true).sourceIds, ["service", "saved:answer"]);
+    assert.throws(() => readProposal({ ...(output as object), sourceIds: ["invented", "saved:answer"] },
+      context, "next", provider.version, true), /references invalid/);
+  } finally { await rm(directory, { recursive: true, force: true }); }
 });

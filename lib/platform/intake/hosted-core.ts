@@ -117,9 +117,7 @@ async function openCore() {
           }
           if (attribution.ownerDigest !== grant.ownerDigest || fingerprint(context.evidence) !== fingerprint(grant.sources)) throw Error("Model evidence scope refused");
           const history = projectInterviewHistory(context.history, current);
-          const answer = history.at(-1);
-          return { entryPath: context.entryPath, evidence: grant.sources, gap: context.gap, history,
-            ...(answer && { requiredAnswerReference: answer.id + ":answer" }) };
+          return { entryPath: context.entryPath, evidence: grant.sources, gap: context.gap, history };
         },
       });
     interview = new ProtectedInterview(intake, provider, grant.sources);

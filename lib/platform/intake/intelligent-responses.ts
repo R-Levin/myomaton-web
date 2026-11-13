@@ -144,17 +144,29 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
       const initialFormat = { ...format, schema: { ...format.schema, properties: {
         ...format.schema.properties, question: { type: "string" }, assessment: { type: "null" },
       } } };
-      const followupFormat = presencePlanning && !initial ? { ...format, schema: { ...format.schema,
-        required: [...format.schema.required, "presencePlan"],
-        properties: { ...format.schema.properties, presencePlan: { anyOf: [presencePlanSchema, { type: "null" }] } },
-      } } : format;
+      const sourceIds = context.evidence.map(source => source.id).filter(id => context.gap.sourceIds.includes(id));
+      function providerFormat(base: typeof format | typeof initialFormat) {
+        if (!presencePlanning) return base;
+        if (!sourceIds.length) throw Error("Protected Responses sources required");
+        return { ...base, schema: { ...base.schema,
+          required: [...base.schema.required, ...(!initial ? ["presencePlan"] : [])],
+          properties: { ...base.schema.properties,
+            sourceIds: { type: "array", minItems: 1, items: { type: "string", enum: sourceIds } },
+            ...(!initial && { presencePlan: { anyOf: [presencePlanSchema, { type: "null" }] } }),
+          },
+        } };
+      }
       const planningInstruction = presencePlanning
         ? " Focus on the business itself: customer needs, offer boundaries, verifiable differentiation and buying decisions. Do not ask the owner to design the intake process. After an answer, propose a concise Presence Direction only when the supplied evidence supports it. Derive the page set, positioning, offering, audience, SEO descriptions, visitor action labels and editable sections from evidence. Do not invent claims, destinations, media permissions, or outcomes. Separate the decision addressed by the answer from unresolved business questions. Do not transfer evidence about intake or one service stage to a different stage. Keep sections concise. Use null when a substantive clarification is still needed."
         : "";
       const request = { model: rates.model, instructions: instruction + (initial
         ? " This is the first question. End it with a question mark. Keep the rationale to one short sentence under 180 ASCII characters. Return null for assessment."
         : " Cite the required answer reference verbatim and at least one of the supplied business source IDs. Keep the rationale and evidence needed under 180 characters each."),
-        input: JSON.stringify(projected), text: { format: initial ? initialFormat : followupFormat } };
+        input: JSON.stringify(projected), text: { format: providerFormat(initial ? initialFormat : format) } };
+      if (presencePlanning && !initial) request.instructions = instruction.replace(
+        "After an answer, cite its turn ID with :answer and propose",
+        "After an answer, cite the approved business sources and propose",
+      ) + " Core links the current answer automatically. Do not put an answer ID in sourceIds. Keep the rationale and evidence needed under 180 characters each.";
       request.instructions += planningInstruction;
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation, countDispatched: true, generationDispatched: false, status: "pending" };
@@ -213,6 +225,14 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
       catch { receipt.status = "rejected"; }
       await checkpoint();
       if (receipt.status === "rejected") throw Error("Provider proposal unavailable");
+      if (presencePlanning && !initial) {
+        const output = record(proposal);
+        const ids = output.sourceIds;
+        if (Array.isArray(ids) && ids.length && ids.every(id => typeof id === "string" && sourceIds.includes(id)) &&
+            new Set(ids).size === ids.length) {
+          return { ...output, sourceIds: [...ids, context.history.at(-1)!.id + ":answer"] };
+        }
+      }
       return proposal;
     } finally {
       await lock.close();

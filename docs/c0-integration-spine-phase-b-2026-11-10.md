@@ -1284,3 +1284,37 @@ Contact policy and one synthetic inquiry. The policy can be installed only
 from the rehearsal checkout using the established hidden migration-password
 procedure and retained recovery evidence. A retired hostname approval is
 not part of these operations.
+
+
+Linux run 43510372579 failed on Windows-encoded client source before
+packaging. Commit `509b34e` restored UTF-8, and
+[Linux run 43510753823](https://github.com/R-Levin/myomaton-web/actions/runs/43510753823)
+passed. The archive and all 163 files matched, and only the existing
+development app was swapped. The previous build and launcher are retained
+under `update-509b34e/rollback`. The protected HTTPS shell and slash redirect
+passed and both production HTML hashes matched their baseline. WordPress
+Delivery 0.0.9 and theme 0.1.0 remained installed, and WP-CLI confirmed
+draft Pages 13 and 14 with their existing slugs. TypeScript, lint, 396
+unit tests, disposable database and WordPress/PHP tests passed.
+
+The one corrected follow-up completed on the provider and Core reported
+`invalid_output/citations`. No follow-up, assessment or plan was saved.
+Draft version 11 retains the approved answer and all ten prior answers,
+without a pending request. The second generation consumed 897 input and
+149 output tokens at $0.001344 estimated. Total hosted development usage
+is now eight requests and $0.004413 estimated. The exact answer permission
+was removed immediately after reconciliation. Core has since been changed
+to constrain provider-selected business source IDs in the response schema
+and attach the exact dispatched answer reference itself. This preserves
+destination, evidence, privacy and usage checks. A focused offline test
+covers valid attribution and refusal of invented IDs. Further provider
+dispatch requires a new exact authorization.
+
+The approved Contact policy is staged in the existing Cloud rehearsal
+checkout as `scripts/core-inquiry-migration.sh`. Its parameter is
+`APPLY-PROTECTED-CORE-INQUIRY`. It uses the hidden existing migration
+password prompt, checks the retained recovery evidence and executes the
+restricted view and definition transaction without creating the inquiry.
+Only after a verified policy result should Core enable and record the one
+authorized synthetic inquiry. No hosted Contact policy success is recorded
+at this checkpoint.
