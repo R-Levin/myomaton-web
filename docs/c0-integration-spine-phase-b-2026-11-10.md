@@ -913,3 +913,25 @@ not approve a claim or publication.
    separate. Allow one labeled development inquiry and revision-linked
    event only once protected Contact eligibility is defined and tested.
    Customer confirmation and public release remain separate.
+
+#### Approved hosted rollout checkpoint
+
+The owner approved the consolidated development scope at `eb14d80`,
+with Linux and database-policy verification before deployment. No
+separate WordPress revision application or publication was authorized.
+The PostgreSQL role uses check-option views for the inactive fixture,
+with column-scoped writes and no change to existing table RLS. The
+existing intake trigger reads a role-specific view of the same fixture.
+The local policy regression exercised create, exact retry, draft
+updates and refusal of foreign or canonical changes. The earlier Linux
+run inherited a build flag in the ordinary-mode test. The corrected
+[Linux build](https://github.com/R-Levin/myomaton-web/actions/runs/43464170667)
+passed production build, the relocated protected shell and anonymous
+route smoke, and artifact packaging at `63cf410`.
+
+The first hosted database action requires the original Supabase project
+`postgres` administrator password. The guarded launcher prompts only in
+the established authenticated Cloud shell. A missing or failed login
+stops before role creation. The hosted process and OpenAI key stay in
+the separate acceptance account. The existing public Core and
+WordPress drafts are outside this rollout.
