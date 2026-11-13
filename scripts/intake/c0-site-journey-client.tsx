@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "../../components/intake/interview.module.css";
 import { prospectPriorities } from "../../lib/platform/intake/adaptive";
 import { prospectDirection } from "../../lib/platform/intake/prospect-direction";
+import { interviewDirection } from "../../lib/platform/intake/interview-direction";
 import type { IntakeView } from "../../lib/platform/intake/service";
 
 type JourneyView = IntakeView & { interviewEnabled?: boolean };
@@ -85,6 +86,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
   const turn = view?.interview?.turns.at(-1);
   const finding = view?.interview?.turns.findLast(item => item.assessment);
   const assessment = finding?.assessment;
+  const evidenceDirection = interviewDirection(view?.interview?.turns ?? []);
   return <div className={styles.shell}>
     <header><strong>MioPages</strong><span>{hosted ? "Protected Operator development" : "Private local development"}</span>
       {hosted && view && <button type="button" disabled={busy} onClick={async () => {
@@ -171,10 +173,12 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
             <p>Primary action changed from <strong>{(prior ?? sourceDirection)?.primary.action}</strong> to <strong>{direction.primary.action}</strong>.</p>}
           <h2>Review the site proposal</h2>
           <p>Editorial proposal for review. Links and inquiry delivery still need verification.</p>
-          {assessment && <details><summary>AI recommendation for this review</summary>
-            <p>{assessment.recommendation}</p>
-            <p>Review this recommendation against the proposed pages before changing the copy or visitor actions.</p>
-          </details>}
+          {evidenceDirection && <section aria-label="Evidence for this site decision">
+            <h3>Direction from the interview</h3>
+            <p>{evidenceDirection.recommendation}</p>
+            {evidenceDirection.unresolved && <p><strong>Still to verify</strong> {evidenceDirection.unresolved}</p>}
+            <p>Use this finding when reviewing Home, Service and the visitor actions. Page copy still needs a separate review.</p>
+          </section>}
           {view.planningEvidence && <details><summary>Proposal evidence</summary>
             <p>Draft version {view.planningEvidence.version} · {view.planningEvidence.evidenceDigest}</p>
           </details>}

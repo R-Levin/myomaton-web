@@ -1030,3 +1030,44 @@ hostnames remained 200. WordPress draft access remained protected.
 The next live turn requires the owner's exact answer transmission
 allowlist. The hosted proposal remains editorial pending that
 evidence-driven connection. No new WordPress revision was applied.
+
+#### External Core access
+
+Issue #12 records the owner's external 404. Direct HTTPS and the
+loopback listener both returned 200 for literal `/core` and 404 for
+`/core/` before the fix, with no redirect from the literal URL.
+The slash variant was refused by the raw-path gate before Next.js.
+The exact request that failed in the owner's browser is unavailable.
+The scoped correction `57f0a20` redirects only GET `/core/` to
+`/core` with 307/no-store. Query variants, API aliases and unrelated
+routes remain refused. Only the acceptance app restarted. The
+installed launcher SHA-256 is
+`dc9a08edaad4dde0210b8c440eef7cb58a659b5df35ee3608378d0eeb8fe6b89`.
+The Next build remains `8f9b047`. The prior launcher is retained
+off-webroot. External Edge verified canonical navigation, loaded
+assets, scoped sign-in, retained understanding, saved AI question,
+reload and sign-out through the actual HTTPS origin.
+
+Use [the current development Core](https://wp-acceptance.miopages.com/core)
+with the existing scoped Operator credential in Cloud custody. The
+development credential has a bounded expiry and remains separate
+from the API key and database role.
+
+Recommend `app.miopages.com` for the unified portal. It currently
+resolves to 185.146.167.193 and its root redirects to miopages.com.
+The acceptance host resolves to 185.146.167.100. Both `app` and
+`core` currently return 404 for `/core` with valid TLS. The origin
+change needs explicit authorization to replace the current app
+redirect with an exact hostname binding to the existing development
+package, adjust only its DNS/SSL if required, and move the configured
+Core origin and its host-only session. Capture the existing DNS and
+redirect for rollback before change. Verify the actual provider
+binding and preserve the apex, existing Core hosts and WordPress.
+
+The local branch also links a cited, same-gap saved answer to the
+AI recommendation and its unresolved evidence in the site review.
+The existing editorial proposal compiler can bind that finding to
+proposal provenance. This change is not yet deployed and does not
+generate editable site copy. The exact outbound test answer is
+still awaiting owner authorization. Hosted Contact, measurement,
+new private WordPress application and Ongoing remain open.

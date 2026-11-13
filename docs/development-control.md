@@ -510,6 +510,10 @@ records the hosted route, scoped interview and Responses wiring, current
 20i observations, and the consolidated authorization for the protected
 deployment. Owner product acceptance requires a working online journey.
 
+The [external Core access correction](c0-integration-spine-phase-b-2026-11-10.md#external-core-access)
+records the exact slash-path fix, authenticated Edge verification and
+the separate provider-neutral hostname decision.
+
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
 **Owner clarification, November 8, 2026; supersedes the earlier
