@@ -88,6 +88,7 @@ function Journey() {
       </> : <>
         <h2>What we understand</h2>
         <p>MioPages is transitioning to one managed Web Presence service, with Launch followed by Ongoing care. Earlier site observations and Review material are kept with their original sources.</p>
+        {view.prepared && <p className={styles.hint}>{view.prepared.reviewGap}</p>}
         {view.prepared?.sources.map(source => <details key={source.id}>
           <summary>{source.title} · {source.kind}</summary>
           <p>{source.reference}</p>
@@ -116,6 +117,9 @@ function Journey() {
             <p>Primary action changed from <strong>{(prior ?? sourceDirection)?.primary.action}</strong> to <strong>{direction.primary.action}</strong>.</p>}
           <h2>Review the site proposal</h2>
           <p>Editorial proposal for review. Links and inquiry delivery still need verification.</p>
+          {view.planningEvidence && <details><summary>Proposal evidence</summary>
+            <p>Draft version {view.planningEvidence.version} · {view.planningEvidence.evidenceDigest}</p>
+          </details>}
           <nav aria-label="Proposed pages">
             <button type="button" className={styles.secondary} aria-pressed={page === "home"} onClick={() => setPage("home")}>Home</button>{" "}
             <button type="button" className={styles.secondary} aria-pressed={page === "service"} onClick={() => setPage("service")}>Service</button>
@@ -125,8 +129,8 @@ function Journey() {
             <p>{direction[page].body}</p>
             <h4>{direction[page].nextStep.heading}</h4>
             <p>{direction[page].nextStep.body}</p>
-            <p><strong>Primary action</strong> {direction.primary.action}<br />
-              <strong>Also available</strong> {direction.secondary.action}</p>
+            <p><strong>Proposed primary action</strong> {direction.primary.action}<br />
+              <strong>Proposed secondary action</strong> {direction.secondary.action}</p>
           </article>
           <h2>Open before staging</h2>
           <p>{direction.open}</p>
@@ -138,7 +142,10 @@ function Journey() {
               workIncluded: "Included work", workExcluded: "Excluded work", visitorRoute: "Visitor action", reviewHandoff: "Review handoff",
               conversationHandoff: "Conversation handoff", publicRoute: "Proposed destination", proof: "Proof", siteDisposition: "Existing site",
               siteItem: "Item", additionalEvidence: "Additional evidence" };
-            return <p key={key}><strong>{labels[key] ?? key}</strong> {value}</p>;
+            const evidence = view.provenance?.[key];
+            return <p key={key}><strong>{labels[key] ?? key}</strong> {value}
+              {evidence && <><br /><small>Saved {evidence.suppliedAt.slice(0, 10)} · {evidence.confirmation === "prior-approved"
+                ? "Earlier approved source" : "Owner response awaiting review"}</small></>}</p>;
           })}
         </details>
       </>}

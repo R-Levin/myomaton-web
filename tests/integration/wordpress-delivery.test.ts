@@ -19,6 +19,7 @@ import { protectedOperatorServices } from "../../lib/platform/wordpress-delivery
 import { inspectCanonical, writeCanonical } from "../../lib/platform/canonical/writes";
 import { requestMac, WordPressDelivery } from "../../lib/platform/wordpress-delivery/service";
 import { c0SpineInterview, prepareCycleInquiry, presenceDirection, writeC0SpineReview } from "../helpers/c0-spine";
+import { composeProspectPage } from "../../lib/platform/content-editing/prospect-proposal";
 import { privateSiteCandidate, type DraftInput } from "../helpers/private-site-candidate";
 
 async function initializeWordPressTestBaseline(url: string) {
@@ -546,6 +547,24 @@ test("Protected operator and reviewed private release with restricted PostgreSQL
           assert.notEqual(revised.digest, initial.digest);
           assert.deepEqual(revised.manifest.pages[0], initial.manifest.pages[0]);
           assert.throws(() => privateSiteCandidate(site, home, { ...improved, proposalId: randomUUID() }, initial));
+          const planning = { version: selected.draftVersion, evidenceDigest: selected.draftDigest };
+          const priority = { sitePriority: "Conversation first" };
+          const proposedHome = composeProspectPage(homePage, randomUUID(), priority, planning);
+          const proposedService = composeProspectPage(improvedPage, randomUUID(), priority, planning);
+          const nextHome = await approvePage(proposedHome, homeDecision.binding);
+          const nextService = await approvePage(proposedService, decision.binding);
+          const nextSite = { ...nextIntent, revision: 3, previousDigest: updatedDraft.digest };
+          const proposal = await protectedServices.review.previewSiteDraft(reviewerContext, site, [nextHome, nextService], nextSite);
+          assert.deepEqual(proposal.candidate.pages.map(item => item.id), [homePage.pageId, page.pageId]);
+          assert.ok(proposal.candidate.pages.every(item => item.sections.at(-1)?.content.heading === "Talk through a new site or an existing one"));
+          assert.notEqual(proposal.digest, updatedDraft.digest);
+          await protectedServices.review.authorizeSiteDraft(authorizerContext, reviewerContext, site,
+            [nextHome, nextService], nextSite, proposal.digest);
+          const proposedEnvelope = await protectedServices.review.issueSiteDraft(authorizerContext, reviewerContext, site,
+            [nextHome, nextService], nextSite, proposal.digest, key.privateKey);
+          const proposedReadback = verifyDraft(proposedEnvelope);
+          assert.equal(proposedReadback.status, 0, proposedReadback.stderr);
+          assert.deepEqual(JSON.parse(proposedReadback.stdout), { digest: proposal.digest, revision: 3, operation: "apply" });
           await admin.query("UPDATE miopages_wp.wordpress_operator_grants SET revoked_at=now() WHERE operator_id=$1 AND permission='approve-site-proposal'", [approver.id]);
           assert.equal((await handler.handle(request("pull"))).status, 409);
           await assert.rejects(render(), /Current Core delivery eligibility required/);

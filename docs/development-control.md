@@ -501,8 +501,9 @@ each draft finding. Hosted customer review and fresh AI dispatch remain open.
 The [protected C0 browser journey](c0-integration-spine-phase-b-2026-11-10.md#protected-c0-browser-journey)
 resumes verified local answers and shows how a saved prospect-path
 decision changes the draft assessment, direction and proposed Home and
-Service. This checkpoint is local. Exact Core proposal preparation and
-hosted materialization have separate status in the handoff.
+Service. The existing exact proposal and signed-draft test now exercises
+that planning projection on both Pages. The handoff distinguishes the
+local browser view, disposable signed proof and pending hosted revision.
 
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 

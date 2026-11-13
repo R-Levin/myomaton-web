@@ -19,7 +19,8 @@ export function resumeHash(token: string) {
 type Row = { id: string; entry_intent: EntryIntent; questionnaire_version: string; state: "draft" | "needs_operator_review"; answers: Answers; provenance: Record<string, unknown>; step: number; version: number; expires_at: Date; submitted_at: Date | null };
 export type IntakeEvidence = { source: "c0-discovery" | "rehearsal-response"; confirmation: "prior-approved" | "unconfirmed"; suppliedAt: string; reference: string; author: string };
 export type IntakeView = { questionnaireVersion: string; intent: EntryIntent; state: Row["state"]; answers: Answers; step: number; version: number; expiresAt: string;
-  provenance?: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; submission?: { digest: string; submittedAt: string } };
+  provenance?: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; submission?: { digest: string; submittedAt: string };
+  planningEvidence?: { version: number; evidenceDigest: string } };
 type Rehearsal = { database: string; answers: Answers; provenance: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; intelligentFixtureSchema?: string; step?: number };
 function view(r: Row): IntakeView { return { questionnaireVersion: r.questionnaire_version, intent: r.entry_intent, state: r.state, answers: r.answers, step: r.step, version: r.version, expiresAt: r.expires_at.toISOString() }; }
 async function transaction<T>(pool: Pool, run: (db: PoolClient) => Promise<T>) {
@@ -106,6 +107,12 @@ export class IntakeService {
     const provenance = { ...row.provenance };
     delete provenance.preparedDigest;
     const result = { ...view(row), provenance: provenance as Record<string, IntakeEvidence>, prepared: this.rehearsal.prepared };
+    if (this.rehearsal.step !== undefined) {
+      return { ...result, planningEvidence: { version: row.version, evidenceDigest: fingerprint({
+        scope: { webPresenceId: this.selection.webPresenceId, managedSiteId: this.selection.managedSiteId },
+        version: row.version, intent: row.entry_intent, answers: row.answers, provenance: row.provenance,
+      }) } };
+    }
     if (row.state !== "needs_operator_review") return result;
     const { rows } = await db.query("SELECT answers,provenance,digest,draft_version,submitted_at FROM prospect_intake_submissions WHERE intake_id=$1 AND web_presence_id=$2 AND questionnaire_version=$3", [row.id, this.selection.webPresenceId, row.questionnaire_version]);
     const snapshot = rows[0];
@@ -137,6 +144,7 @@ export class IntakeService {
       this.assertPrepared(r);
       if (r.state !== "draft") throw new IntakeError("already_submitted", 409);
       const answers = normalizeAnswers(value, r.questionnaire_version);
+      if (answers.sitePriority !== undefined && this.rehearsal?.step === undefined) throw new IntakeError("invalid_request");
       if (this.rehearsal) for (const key of Object.keys(answers)) if (answers[key] === "") delete answers[key];
       // Lost-response retries are idempotent; stale tabs cannot overwrite newer answers.
       if (fingerprint(r.answers) === fingerprint(answers) && r.step === step) return this.readView(db, r);
@@ -159,6 +167,7 @@ export class IntakeService {
     return this.save(token, version, { ...current.answers, sitePriority: priority }, current.step);
   }
   async submit(token: string, version: number) {
+    if (this.rehearsal?.step !== undefined) throw new IntakeError("unavailable", 404);
     if (!Number.isInteger(version) || version < 1) throw new IntakeError("invalid_request");
     return transaction(this.pool, async db => {
       const r = await this.owned(db, token, true);

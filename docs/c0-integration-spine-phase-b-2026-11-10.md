@@ -753,3 +753,58 @@ projection, with no fresh model output or automated knowledge promotion.
 The prospect paths keep the Review optional. No visitor destination is
 activated and no notification, lead quality or visitor outcomes are
 claimed. The local view is not a customer login or a real approval.
+
+The browser readback exposes a fingerprint of the exact scoped draft
+version and evidence. The same planning projection can add a proposed
+Intro section to existing canonical-backed Page inputs. The disposable
+Core test prepares, previews and separately approves both Pages,
+authorizes the exact site as the next revision, and verifies the
+envelope in PHP with the existing WordPress verifier. It preserves
+logical Page IDs and the existing internal Action. The browser does
+not invoke the approval or signing path. The exact proposal test
+uses isolated fixture approvals and does not stage the retained C0
+answers or private source text.
+
+The local browser review was exercised in Edge through access,
+resume, correction, Home/Service navigation, a narrow viewport and
+reload. The HTTP regression also checks preserved answers and source
+provenance, stale edits, an exact retry, scoped access and refusal to
+submit the retained copy. Existing Contact and cycle measurement
+checks still use isolated development data. The protected production
+drafts remain outside this run.
+
+**Next scoped decisions.** For fresh reasoning, approve one exact
+public-source-only projection covering the published C0 service
+transition, the optional Review and Direct Start, and the question of
+what an existing-site prospect should bring. Permit the approved
+snapshot `gpt-5.4-mini-2026-03-17` to receive that projection through
+the OpenAI Responses input count and generation endpoints with
+`store:false` on generation, a proposed maximum of $0.05, one
+generation, one count and zero retries. Review the projection before
+dispatch. Raw saved answers, account identifiers and routing details
+are outside that proposal. The expected result is one original
+question with a reason and source references.
+
+Proposed outbound context, with source labels only:
+
+- `c0-service-direction`: MioPages is moving from legacy offerings
+  to one managed Web Presence service, beginning with Launch and
+  continuing with Ongoing care.
+- `c0-entry-paths`: Prospects can request an optional Free Review
+  or start a conversation directly.
+- `first-conversation`: For an established business with an existing
+  website, what should the first conversation require up front, and
+  what can the business supply later?
+
+Ask for one original question, a concise reason, and citations to
+those labels. Keep the question distinct from any customer confirmation,
+site approval or routing decision.
+
+After the owner reviews the local choice and proposed copy, the
+separate hosted operation is to prepare and independently review the
+exact Home and Service revision in the existing inactive hosted
+fixture, sign and apply it on the existing protected WordPress
+installation, reconcile its application receipt, and verify exact
+rollback. Review the exact site digest and allow only those scoped
+development writes. No AI or hosted operation is authorized by this
+checkpoint itself.

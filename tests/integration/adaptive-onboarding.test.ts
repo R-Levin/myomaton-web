@@ -8,6 +8,7 @@ import { fieldApplies } from "../../lib/platform/intake/model";
 import { IntakeService, type IntakeView } from "../../lib/platform/intake/service";
 import { createC0Onboarding } from "../../scripts/intake/c0-onboarding";
 import { prospectDirection } from "../../lib/platform/intake/prospect-direction";
+import { composeProspectPage } from "../../lib/platform/content-editing/prospect-proposal";
 
 test("adaptive local drafts preserve source conflicts and dispositions without repeating intake", async () => {
   const rehearsal = await createC0Onboarding(process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin", true);
@@ -140,8 +141,15 @@ test("protected C0 resume and priority correction preserve the retained answers"
     assert.deepEqual(after.answers, { ...before.answers, sitePriority: "Conversation first" });
     assert.deepEqual(after.provenance, { ...before.provenance, sitePriority: after.provenance!.sitePriority });
     assert.equal(after.provenance!.sitePriority.confirmation, "unconfirmed");
+    assert.equal((await request({ operation: "submit", version: after.version }, cookie)).status, 404);
     assert.equal(prospectDirection(after.answers)?.primary.action, "Talk about getting started");
     assert.equal(prospectDirection(after.answers)?.secondary.action, "Request a Free Review");
+    assert.notEqual(before.planningEvidence?.evidenceDigest, after.planningEvidence?.evidenceDigest);
+    assert.equal(after.planningEvidence?.version, after.version);
+    const editorial = { kind: "editorial" as const, text: "MioPages", rationale: "Test title" };
+    const page = composeProspectPage({ operation: "create-page", pageId: "test-page", slug: "/", title: editorial,
+      purpose: "Explain the service", sections: [] }, "test-section", after.answers, after.planningEvidence!);
+    assert.equal(page.sections[0].heading.kind === "editorial" && page.sections[0].heading.text, prospectDirection(after.answers)?.primary.heading);
     assert.deepEqual(await (await request(correction, cookie)).json(), after);
     assert.equal((await request({ ...correction, priority: "Review first" }, cookie)).status, 409);
     assert.deepEqual(await (await request(undefined, cookie)).json(), after);
