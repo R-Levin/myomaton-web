@@ -2452,3 +2452,83 @@ to the owner in readable form. Private WordPress application and
 publication remain separate approval gates. Approval recorded,
 **not execution verified**.
 
+
+#### Consolidated hosted C0/C2 result
+
+**Both proposals are retained for review.** The protected rollout first
+installed the authorized recovery build `a842527` and confirmed
+authenticated C0 baseline readback with both grants disabled. The
+follow-up `5f0e4e3` bound the approved cycle and diagnosed retries to
+the intact 16-request ledger. Its [Linux build](https://github.com/R-Levin/myomaton-web/actions/runs/43616880886),
+artifact 14121649255, matched inner SHA-256
+`72a8588ea6e809c2353d0b3db5852edc8e8591ed0a9c86cf2f138217fc576ba4`.
+The [final recovery build](https://github.com/R-Levin/myomaton-web/actions/runs/43617879598)
+at `5219ebf`, artifact 14122649391, matched inner SHA-256
+`9300777495dd7433cc40915b9372b14f92d2f5bcf02d27e7e0e0be6b4104df6b`.
+Each ZIP checksum and all 163 hosted artifact files were verified.
+Prior protected builds remain in off-webroot rollback custody.
+
+All three C0 provider responses completed and were captured. The first
+exceeded the audience and Home description constraints. The second
+exceeded three search-description constraints. The third exceeded only
+the Home search description limit, at 162 characters against 160.
+The count limit was exhausted. Recovery used the third exact capture,
+passed the same validation with one source-grounded editorial correction
+to the Home search description, and saved the result at Core draft 28.
+The receipt and capture remain exact. The correction is visible in
+Operator review, with the retained capture digest and scoped actor.
+Automated review blocked printing raw protected copy through SSH. No
+protected text was emitted. The correction was validated on the host
+and only sanitized scope, length and digest evidence was returned.
+
+Open [Protected Core](https://wp-acceptance.miopages.com/core), sign in
+with the existing Operator credential and open **AI site proposal**.
+C0 proposes Home, Free Web Presence Review and Short Conversation,
+with nine sections. Home points to the Review, and both primary entry
+pages propose contact actions whose destinations need confirmation.
+The reviewed result cites the approved service direction and entry-path
+evidence. The exact outbound answer remains marked unconfirmed and
+was not promoted. Proposal digest
+`6904fc782422af25c9e7dab2f15a82edb527f3b03527e26047bd1564583f46cc`.
+Authenticated readback matched the original interview and synthetic
+inquiry and showed the draft awaiting Operator review.
+
+After verified C0 readback, fictional C2 passed on its first generation.
+It proposes Home, Services, Storm Damage and Estimate Help, with 12
+sections. It distinguishes routine estimates from urgent assessment
+and gives visitors an estimate checklist. Hours, response times,
+coverage, licensing and insurance remain open. Contact destinations
+are unresolved. Assertions about the fictional business are not live
+business facts. The normalized C2 proposal is in separate off-webroot
+custody and a Git-ignored local review file. Proposal digest
+`f5d242b33b126f19f2187bb87c1daa35060cf80a920ceb3af7e6f154a25700d3`.
+C2 has no Core customer record or C0 evidence.
+
+**Usage and continuity.** This cycle used four counts and four
+generations. Returned input/output tokens were C0 658/1,267, 658/1,176
+and 658/1,063, then C2 610/1,089. The usage-priced deltas were
+$0.006195, $0.005786, $0.005277 and $0.005358, or **$0.022616** total.
+All four settled as estimates. Site-planning cumulative is 14 requests
+and seven generations with $0.038418 in estimates including the older
+uncertain estimate, or $0.040893 accounted at the full uncertainty
+reserve. Inclusive Core totals are 24 requests, 12 generations,
+$0.038122 settled and $0.008400 reserved, or **$0.046522 accounted**.
+No provider invoice was independently checked. No other incremental
+cash cost was recorded. Owner minutes are unknown. Ledger SHA-256
+`664b5c1f8cfd82d10ee13de24a4d218288b476089e7e3a4d125a2c25b1e55d53`.
+The eight starting receipts matched byte for byte. Both grants are
+inactive. No further dispatch is planned under this cycle.
+
+A protected scheduler canary executed successfully. The one-time
+capture removal job is queued for 2026-11-15 16:20 UTC, less than 24
+hours after the first capture. Actual execution is pending a later
+read-only check of the expiry receipt. It only sweeps the C0 and C2
+exact-response directories. The normalized proposals and financial
+ledger are retained separately. Both public HTTPS body baselines and
+WordPress drafts 13 and 14, restored revision 3/high-water 5, matched.
+No customer approval, WordPress application or publication occurred.
+
+Next, review the C0 copy and resolve the two contact destinations,
+then use the existing Operator editor and exact delivery-preparation
+workflow. The private WordPress preview remains a separately governed
+step. Independent, versioned proposal storage remains pending.
