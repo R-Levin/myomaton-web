@@ -180,6 +180,9 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
   const comparison = freshCompactComparison;
   const { comparisonId } = grant;
   if (comparisonId !== undefined && (comparisonId !== comparison.id || !compact ||
+      expiresAt > 1794677438521 || expiresAt > Date.now() + 86_400_000 ||
+      rates.model !== "gpt-5.4-mini-2026-03-17" || rates.countMicros !== 0 ||
+      rates.inputPerMillion !== 750_000 || rates.cachedPerMillion !== 75_000 || rates.outputPerMillion !== 4_500_000 ||
       ![comparison.c0, comparison.c2].some(digest => digest === inputDigest) ||
       limit !== comparison.capMicros || requests !== comparison.maxRequests ||
       retainedReservation !== comparison.retainedReservation)) throw Error("Invalid fresh comparison authorization");
