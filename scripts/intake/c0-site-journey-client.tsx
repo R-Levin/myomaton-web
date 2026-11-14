@@ -71,10 +71,11 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
     try {
       const response = hosted ? await fetch(endpoint, { method: "POST",
         headers: { "X-Intake-Request": "1", "Content-Type": "application/json" },
-        body: JSON.stringify({ operation: "sign-in", credential: code.trim() }) })
+        body: JSON.stringify({ operation: "sign-in", username: "owner", password: code }) })
         : await fetch("/api/onboarding/access", { method: "POST",
           headers: { "X-Intake-Request": "1", "X-Local-Access": code.trim() } });
-      if (!response.ok) throw Error(hosted ? "The Operator credential was refused." : "Use the access code from your current PowerShell window.");
+      if (hosted && response.status === 429) throw Error("Sign-in is temporarily limited. Wait a minute and try again.");
+      if (!response.ok) throw Error(hosted ? "The owner password was refused. Check your saved MioPages login." : "Use the access code from your current PowerShell window.");
       adopt(await request(endpoint));
       setLocked(false);
       setError(false);
@@ -143,8 +144,12 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
     <main className={styles.card} aria-busy={busy}>
       <h1>Review your Web Presence</h1>
       {locked ? <form onSubmit={event => { event.preventDefault(); void unlock(); }}>
-        <div className={styles.field}><label htmlFor="access-code">{hosted ? "Operator credential" : "Local access code"}</label>
-          <input id="access-code" type="password" autoComplete="off" value={code} onChange={event => setCode(event.target.value)} /></div>
+        {hosted && <div className={styles.field}><label htmlFor="owner-username">Username</label>
+          <input id="owner-username" name="username" value="owner" autoComplete="username" readOnly /></div>}
+        <div className={styles.field}><label htmlFor="access-code">{hosted ? "Password" : "Local access code"}</label>
+          <input id="access-code" name={hosted ? "password" : "code"} type="password" autoComplete={hosted ? "current-password" : "off"}
+            value={code} onChange={event => setCode(event.target.value)} /></div>
+        {hosted && <p className={styles.hint}>Save your MioPages login in your password manager. If you lose access, reset it through your protected Cloud account.</p>}
         <button disabled={busy || !code}>{hosted ? "Sign in" : "Open private review"}</button>
       </form> : !view ? <>
         <p>Continue with the business information you already provided.</p>

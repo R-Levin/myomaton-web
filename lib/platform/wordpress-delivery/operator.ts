@@ -16,7 +16,7 @@ export function customerMandate(value: unknown): CustomerAuthority {
 // Credentials are presented only to the protected operator process. Capability
 // objects never cross its boundary and the token hash is never written to audit.
 export class ProtectedOperator implements ProposalAuthority {
-  #sessions = new WeakMap<object, string>();
+  #sessions = new WeakMap<object, { digest: string; operatorId?: string }>();
 
   constructor(private pool: Pool, private boundary: (db: PoolClient) => Promise<void>, private developmentViews = false) {}
 
@@ -26,13 +26,22 @@ export class ProtectedOperator implements ProposalAuthority {
   async authenticate(token: unknown) {
     if (typeof token !== "string" || token.length !== 64 || !/^[a-f0-9]+$/.test(token)) throw Error("Operator authentication refused");
     const digest = createHash("sha256").update(Buffer.from(token, "hex")).digest("hex");
+    return this.authenticateDigest(digest);
+  }
+
+  async authenticateDevelopmentOwner(digest: string, operatorId: string) {
+    if (!this.developmentViews) throw Error("Operator authentication refused");
+    return this.authenticateDigest(digest, operatorId);
+  }
+
+  private async authenticateDigest(digest: string, operatorId?: string) {
     const db = await this.pool.connect();
     try {
       await this.boundary(db);
-      const result = await db.query(`SELECT id FROM ${this.credentials} WHERE token_sha256=$1 AND revoked_at IS NULL AND expires_at>clock_timestamp()`, [digest]);
+      const result = await db.query(`SELECT id FROM ${this.credentials} WHERE token_sha256=$1 AND ($2::uuid IS NULL OR id=$2) AND revoked_at IS NULL AND expires_at>clock_timestamp()`, [digest, operatorId ?? null]);
       if (!result.rowCount) throw Error("Operator authentication refused");
       const context = Object.freeze({});
-      this.#sessions.set(context, digest);
+      this.#sessions.set(context, { digest, operatorId });
       return context;
     } finally { db.release(); }
   }
@@ -46,13 +55,14 @@ export class ProtectedOperator implements ProposalAuthority {
   }
 
   async authorizeIn(db: PoolClient, context: unknown, permission: Operation, scope: Scope): Promise<Grant> {
-    const digest = context && typeof context === "object" ? this.#sessions.get(context) : undefined;
-    if (!digest) throw Error("Operator authorization refused");
+    const identity = context && typeof context === "object" ? this.#sessions.get(context) : undefined;
+    if (!identity) throw Error("Operator authorization refused");
     const row = (await db.query(`SELECT g.id, g.operator_id, g.customer FROM ${this.grants} g
       JOIN ${this.credentials} c ON c.id=g.operator_id
       WHERE c.token_sha256=$1 AND c.revoked_at IS NULL AND c.expires_at>clock_timestamp()
-      AND g.revoked_at IS NULL AND g.web_presence_id=$2 AND g.managed_site_id=$3 AND g.permission=$4`,
-    [digest, scope.webPresenceId, scope.managedSiteId, permission])).rows[0];
+      AND g.revoked_at IS NULL AND g.web_presence_id=$2 AND g.managed_site_id=$3 AND g.permission=$4
+      AND ($5::uuid IS NULL OR g.operator_id=$5)`,
+    [identity.digest, scope.webPresenceId, scope.managedSiteId, permission, identity.operatorId ?? null])).rows[0];
     if (!row) throw Error("Operator authorization refused");
     return { operatorId: row.operator_id, authorityReference: row.id,
       ...(permission === "approve-site-proposal" ? { customer: customerMandate(row.customer) } : {}) };

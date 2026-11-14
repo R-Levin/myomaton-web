@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { lstat, realpath, readFile } from "node:fs/promises";
 import { fingerprint, uuid } from "../canonical/model";
 import { protectedConnection, protectedPool } from "../wordpress-delivery/protected-connection";
+import { protectedOwnerId, protectedOwnerScope, protectedOwnerSessionSeconds, protectedOwnerToken, protectedOwnerUsername, protectedOwnerVerifier } from "./protected-owner";
 import { ProtectedOperator } from "../wordpress-delivery/operator";
 import { IntakeService, type IntakeEvidence } from "./service";
 import { adaptiveOnboardingVersion, type PreparedUnderstanding } from "./adaptive";
@@ -192,8 +193,9 @@ async function openCore() {
   return { operators, selection, intake, interview, inquiry, sitePlanning, sitePlanningEnabled, draftToken: cfg.draftToken };
 }
 let core: ReturnType<typeof openCore> | undefined;
-const sessions = new Map<string, { credential: string; expires: number; origin: string }>();
+const sessions = new Map<string, { credential: string; expires: number; origin: string; owner: boolean }>();
 const loginGuard = developmentGuard(20);
+let ownerSignInPending = false;
 
 const headers = { "Cache-Control": "no-store", "Vary": "Cookie", "X-Content-Type-Options": "nosniff", "X-Robots-Tag": "noindex, nofollow" };
 const session = (token: string, age: number) => `${coreCookie}=${token}; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=${age}`;
@@ -222,10 +224,15 @@ export async function hostedCoreRequest(request: Request) {
     if (token && active && active.expires <= Date.now()) sessions.delete(token);
     if (!credential && request.method === "GET") return reply({ error: "sign_in_required" }, 401);
     const app = await (core ??= openCore());
-    const authenticate = async (credential: unknown) => {
+    const authenticate = async (credential: unknown, owner = false) => {
       try {
-        const context = await app.operators.authenticate(credential);
-        await app.operators.authorize(context, "inspect-site-proposal", app.selection);
+        if (typeof credential !== "string") return null;
+        const context = owner
+          ? await app.operators.authenticateDevelopmentOwner(protectedOwnerVerifier(credential), protectedOwnerId)
+          : await app.operators.authenticate(credential);
+        const grant = await app.operators.authorize(context, "inspect-site-proposal", app.selection);
+        if (owner && (grant.operatorId !== protectedOwnerId || app.selection.webPresenceId !== protectedOwnerScope.webPresenceId ||
+            app.selection.managedSiteId !== protectedOwnerScope.managedSiteId)) return null;
         return context;
       } catch { return null; }
     };
@@ -238,7 +245,7 @@ export async function hostedCoreRequest(request: Request) {
       };
     };
     if (request.method === "GET") {
-      if (!await authenticate(credential)) return reply({ error: "sign_in_required" }, 401);
+      if (!await authenticate(credential, active?.owner)) return reply({ error: "sign_in_required" }, 401);
       try { return reply(await includeOperations(await app.intake.resume(app.draftToken))); }
       catch (error) {
         if (error instanceof IntakeError && error.code === "session_unavailable") return reply({ state: "not_started" });
@@ -247,6 +254,7 @@ export async function hostedCoreRequest(request: Request) {
     }
     let refusal: Response | undefined;
     let signedIn: string | undefined;
+    let sessionSeconds = 900;
     const response = await contactHttp(request, async input => {
       const value = input as Record<string, unknown> | null;
       if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -255,15 +263,30 @@ export async function hostedCoreRequest(request: Request) {
       }
       if (value.operation === "sign-in") {
         if (!await loginGuard.allow("protected-core")) { refusal = reply({ error: "rate_limited" }, 429); return null; }
-        if (!await authenticate(value.credential)) { refusal = reply({ error: "sign_in_required" }, 401); return null; }
+        const owner = value.username === protectedOwnerUsername && !Object.hasOwn(value, "credential");
+        let secret = value.credential;
+        if (owner) {
+          // Bound expensive verification to one operation at a time on the shared development host.
+          if (ownerSignInPending) { refusal = reply({ error: "rate_limited" }, 429); return null; }
+          ownerSignInPending = true;
+          try { secret = await protectedOwnerToken(value.password); }
+          catch { refusal = reply({ error: "sign_in_required" }, 401); return null; }
+          finally { ownerSignInPending = false; }
+          sessionSeconds = protectedOwnerSessionSeconds;
+        } else if (Object.hasOwn(value, "username") || Object.hasOwn(value, "password")) {
+          refusal = reply({ error: "sign_in_required" }, 401); return null;
+        }
+        if (typeof secret !== "string" || !await authenticate(secret, owner)) {
+          refusal = reply({ error: "sign_in_required" }, 401); return null;
+        }
         const now = Date.now();
-        for (const [id, active] of sessions) if (active.expires <= now || (active.credential === value.credential && active.origin === origin.origin)) sessions.delete(id);
+        for (const [id, active] of sessions) if (active.expires <= now || (active.credential === secret && active.origin === origin.origin)) sessions.delete(id);
         if (sessions.size >= 32) { refusal = reply({ error: "unavailable" }, 503); return null; }
         signedIn = randomBytes(32).toString("hex");
-        sessions.set(signedIn, { credential: value.credential as string, expires: now + 900_000, origin: origin.origin });
+        sessions.set(signedIn, { credential: secret, expires: now + sessionSeconds * 1000, origin: origin.origin, owner });
         return { status: "signed_in" };
       }
-      const context = await authenticate(credential);
+      const context = await authenticate(credential, active?.owner);
       if (!context) { refusal = reply({ error: "sign_in_required" }, 401); return null; }
       let actor;
       try { actor = await app.operators.authorize(context, "prepare-site-proposal", app.selection); }
@@ -342,7 +365,7 @@ export async function hostedCoreRequest(request: Request) {
     }, origin.origin);
     if (refusal) return refusal;
     for (const [name, value] of Object.entries(headers)) response.headers.set(name, value);
-    if (signedIn) response.headers.set("Set-Cookie", session(signedIn, 900));
+    if (signedIn) response.headers.set("Set-Cookie", session(signedIn, sessionSeconds));
     return response;
   } catch { return reply({ error: "unavailable" }, 503); }
 }

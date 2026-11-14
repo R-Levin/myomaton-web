@@ -2532,3 +2532,59 @@ Next, review the C0 copy and resolve the two contact destinations,
 then use the existing Operator editor and exact delivery-preparation
 workflow. The private WordPress preview remains a separately governed
 step. Independent, versioned proposal storage remains pending.
+
+#### Persistent owner access for protected C0 review
+
+The existing protected Core Operator principal is `f2cd3fe8-58b3-4dfa-9125-fd8f1bd35f8e`.
+The production-shaped development role's read-only view confirmed
+that all visible scoped credentials are expired. This principal's
+temporary token expired November 14, 2026 at 12:15 p.m. Eastern and
+its protected copy still exists with mode 0600. HTTPS sign-in with
+that token is refused. A separate read-only query under the scoped
+role verified C0 draft 28 and the exact saved proposal digest
+`6904fc782422af25c9e7dab2f15a82edb527f3b03527e26047bd1564583f46cc`.
+This is draft persistence evidence. Owner login is still blocked.
+
+The local candidate adds a normal username and password form for
+`owner` at the existing protected Core URL. The owner chooses and
+saves a unique password in their password manager. Core derives a
+salted scrypt verifier, and stores only its domain-separated digest
+in the existing credential record. The verifier cannot authenticate
+via the legacy WordPress/Operator token path. The persistent login
+retains the principal and its two exact C0 grants,
+`inspect-site-proposal` and `prepare-site-proposal`. No new identity,
+auth service, database schema, grant, DNS record or approval authority
+is needed. MFA and wider Operator identity management remain separate
+product work. The existing rate limit and Secure, HttpOnly,
+SameSite=Strict session cookie stay in place. The owner session
+lasts eight hours, signs out immediately and rechecks the current
+credential and grants on request.
+
+**One approval gate.** Deploy only the verified protected build with
+the previous build kept for rollback, then replace this single expired
+credential verifier and set its expiry to indefinite until reset or
+revoked. Preserve the original protected custody and existing grants.
+The same migration-owner transaction supports future password resets
+and refuses a revoked identity or changed grants. The owner chooses
+the password privately and enters it twice, plus the existing
+`miopages_migration` password, at the hidden prompts in the existing
+Cloud SSH shell. Confirm the identity and the grant list before commit.
+Verify HTTPS sign-in, draft readback and logout without returning
+passwords or content. After a reset the previous verifier is refused.
+Give the owner the final setup command only after the deployment and
+staging have been authorized. No provider calls, customer content,
+WordPress changes or publication are in scope.
+
+**Acceptance.** The owner opens [Protected Core](https://wp-acceptance.miopages.com/core),
+signs in as `owner` with the saved password and opens **AI site proposal**
+to view the existing draft 28. The technical verification and personal
+owner readback remain pending. Local tests cover the persistent
+credential on the restricted SQL policy, exact principal binding,
+normal-token refusal, cross-site refusal, the unchanged review/edit
+grants and invalidation after reset.
+
+**Running cost.** Access recovery added zero provider requests or
+generations and $0 estimated provider spend. The inclusive Core
+checkpoint remains 24 requests, 12 generations and $0.046522 accounted
+including $0.008400 reserved. Other incremental project cash cost and
+owner minutes have not been measured.

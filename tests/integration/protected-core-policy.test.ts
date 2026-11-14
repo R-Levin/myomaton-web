@@ -8,6 +8,8 @@ import { disposableCluster } from "../../scripts/backup/disposable-cluster";
 import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
 import { IntakeService, newResumeToken } from "../../lib/platform/intake/service";
 import { prepareC2 } from "../../scripts/intake/adaptive-sources";
+import { protectedOwnerId, protectedOwnerToken, protectedOwnerVerifier } from "../../lib/platform/intake/protected-owner";
+import { ProtectedOperator } from "../../lib/platform/wordpress-delivery/operator";
 import { protectedInquiry } from "../../lib/platform/contact/protected-inquiry";
 import { protectedDevelopmentDraft } from "../../lib/platform/wordpress-delivery/cycle-measurement";
 import { interviewDirection } from "../../lib/platform/intake/interview-direction";
@@ -49,6 +51,35 @@ test("Core development policy confines the existing draft writer to the inactive
     await admin.query("INSERT INTO public.activation_customer_bindings VALUES ($1,$2,$3)", [selection.managedSiteId, selection.webPresenceId, org]);
     await admin.query(await readFile("lib/platform/intake/protected-core-policy.sql", "utf8"));
     assert.equal((await role.query("SELECT count(*)::int AS n FROM miopages_wp.core_development_scope")).rows[0].n, 1);
+    // A persistent owner password reuses the existing C0 grants and remains
+    // ineligible for legacy token authentication and foreign link scopes.
+    const ownerToken = await protectedOwnerToken("fixture-only unique password");
+    const ownerVerifier = protectedOwnerVerifier(ownerToken);
+    await admin.query("INSERT INTO miopages_wp.wordpress_operator_credentials VALUES($1,$2,'infinity',NULL)", [protectedOwnerId, ownerVerifier]);
+    for (const permission of ["inspect-site-proposal", "prepare-site-proposal"]) {
+      await admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,$5,NULL,NULL)",
+        [randomUUID(), protectedOwnerId, selection.webPresenceId, selection.managedSiteId, permission]);
+    }
+    const operator = new ProtectedOperator(role, async () => {}, true);
+    await assert.rejects(operator.authenticate(ownerToken), /Operator authentication refused/);
+    await assert.rejects(operator.authenticate(ownerVerifier), /Operator authentication refused/);
+    await assert.rejects(operator.authenticateDevelopmentOwner(ownerVerifier, randomUUID()), /Operator authentication refused/);
+    await assert.rejects(new ProtectedOperator(role, async () => {}).authenticateDevelopmentOwner(ownerVerifier, protectedOwnerId),
+      /Operator authentication refused/);
+    const ownerSession = await operator.authenticateDevelopmentOwner(ownerVerifier, protectedOwnerId);
+    for (const permission of ["inspect-site-proposal", "prepare-site-proposal"] as const) {
+      assert.equal((await operator.authorize(ownerSession, permission, selection)).operatorId, protectedOwnerId);
+    }
+    for (const permission of ["approve-site-proposal", "issue"] as const) {
+      await assert.rejects(operator.authorize(ownerSession, permission, selection), /Operator authorization refused/);
+    }
+    await assert.rejects(operator.authorize(ownerSession, "inspect-site-proposal", { ...selection, managedSiteId: randomUUID() }),
+      /Operator authorization refused/);
+    const reset = protectedOwnerVerifier(await protectedOwnerToken("fixture-only different password"));
+    await admin.query("UPDATE miopages_wp.wordpress_operator_credentials SET token_sha256=$2 WHERE id=$1", [protectedOwnerId, reset]);
+    await assert.rejects(operator.authorize(ownerSession, "inspect-site-proposal", selection), /Operator authorization refused/);
+    assert.equal((await operator.authorize(await operator.authenticateDevelopmentOwner(reset, protectedOwnerId),
+      "inspect-site-proposal", selection)).operatorId, protectedOwnerId);
     const service = new IntakeService(role, selection, { database: url.pathname.slice(1), answers: {}, provenance: {},
       prepared: prepareC2(), step: 3, protectedScope: async db => { await db.query("SET search_path TO miopages_core_guard, miopages_wp, public"); } });
     const token = newResumeToken();
