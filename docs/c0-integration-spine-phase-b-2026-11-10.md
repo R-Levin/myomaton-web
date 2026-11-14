@@ -1789,3 +1789,43 @@ the existing aggregate $0.50 hard cap. Compare the proposed page set,
 visitor decisions, source evidence and unresolved claims. No live
 provider dispatch is authorized by this checkpoint. See the [official
 model card](https://developers.openai.com/api/docs/models/gpt-5.4-mini).
+
+Protected Core at [the existing development URL](https://wp-acceptance.miopages.com/core)
+runs `9786247d3a11b94c8ac9e81d107f70edd1c73a8f`. The reviewed
+[Linux build](https://github.com/R-Levin/myomaton-web/actions/runs/43546193419)
+passed, and all 163 artifact files matched. Tar SHA-256 was
+`b30c7a36850fc74232aa315ce2e931f33a24768e82916c6efff3d241499cc64a`.
+The first build `fdb0458` refused unapproved generation with a generic
+503. Awaiting the protected operation within its status handler
+corrected that. External HTTPS verified the deployed review assets,
+anonymous 401, authenticated retained C0 draft v15, inquiry readback,
+and a clean 403 for unauthorized generation without changing the draft.
+Both public Core HTML digests matched before and after. The previous
+protected build and config checksums stay in off-webroot rollback
+custody. WordPress and the verified revision 5 receipts were untouched.
+
+Local verification passed 401 app tests, TypeScript, focused ESLint,
+and disposable PostgreSQL coverage of generation, resume, separate
+review, stale evidence, and the existing WordPress preparation compiler.
+The new editor pages and source review build are online. No live model
+proposal exists yet. The two-case site-structure comparison used
+recorded offline outputs and does not establish model quality.
+
+The [exact outbound evidence and limits](site-planning-live-proof-inputs.json)
+bind to manifest fingerprint
+`3437eb2491bd7d44dea7cb707319771158b6d61db1f3ac56b4019e908e4e66d6`.
+The separate projected input fingerprints are C0
+`852a29a77307e671ce56f75b0e879da9a7856ff775ed1c9d36d70d9354775923`
+and fictional C2
+`20a4f3c074a53b53cb641fa14d49443e868711d64e6c1cc8c28a80ab4ac32ddf`.
+The sole provided current C0 interview answer was matched read-only.
+Once authorized, use the exact curated C0 manifest and current draft
+basis in the existing account's private planning grant. Run fictional
+C2 through the separately attributed, off-webroot proof runner without
+granting hosted C0 database access. Both runs share the existing
+metered ledger, with 10 prior requests and $0.005629 estimated usage.
+Use the exact per-input two-request limits and a $0.022429 absolute
+usage ceiling, inclusive of prior usage. The proof runner also
+enforces an aggregate 14-request ceiling. No grant file was created. Retain
+sanitized page/visitor strategy comparison and keep real Private
+WordPress application under its own exact approval.
