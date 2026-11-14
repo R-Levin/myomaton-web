@@ -43,6 +43,7 @@ async function main() {
     const client = db;
     await protectedConnection(client, role, "postgres");
     await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
+    await client.query("SET LOCAL plan_cache_mode = force_generic_plan");
     const before = await client.query(`SELECT count(*)::int AS n FROM ${view}`);
     // Use the actual PostgreSQL view and service SQL under one outer rollback.
     // The service's transactions become savepoints on this connection.
@@ -137,9 +138,21 @@ async function main() {
     assert.equal((await review.delivery(token, approved.version)).packet.plan.pages[0].title, plan.pages[0].title);
     stage = "verify-edited-reload";
     assert.deepEqual(await makeIntake().resume(token), approved);
+    stage = "permission-refusals";
+    await assert.rejects(makeIntake().resume(newResumeToken()), /session_unavailable/);
+    const noPrivilege = async (sql: string, values: unknown[] = []) => {
+      await client.query("SAVEPOINT refused_probe");
+      try { await assert.rejects(client.query(sql, values), { code: "42501" }); }
+      finally { await client.query("ROLLBACK TO SAVEPOINT refused_probe"); await client.query("RELEASE SAVEPOINT refused_probe"); }
+    };
+    await noPrivilege("SELECT 1 FROM public.prospect_intakes LIMIT 1");
+    await noPrivilege("SELECT 1 FROM public.prospect_intake_submissions LIMIT 1");
+    await noPrivilege(`UPDATE ${view} SET web_presence_id=$1 WHERE resume_hash=$2`, [randomUUID(), resumeHash(token)]);
+    await noPrivilege(`UPDATE ${view} SET state='needs_operator_review' WHERE resume_hash=$1`, [resumeHash(token)]);
+    assert.equal((await client.query(`UPDATE ${view} SET version=version+1 WHERE state='needs_operator_review'`)).rowCount, 0);
     assert.equal((await client.query(`SELECT count(*)::int AS n FROM ${view}`)).rows[0].n, before.rows[0].n + 1);
     result = { pages: shape.pages.length, sections: shape.pages.reduce((count, page) => count + page.sections.length, 0),
-      uncompressed, compressed, reloaded: true, edits: true, decisions: true, deliveryInput: true };
+      uncompressed, compressed, reloaded: true, edits: true, decisions: true, deliveryInput: true, restrictedRoleRefusals: true };
   } finally {
     const proofStage = stage;
     try {

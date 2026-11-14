@@ -2121,3 +2121,42 @@ references as distinct history. Keep the existing approval and editorial
 digests. This would let adaptive onboarding and Ongoing improvements use
 the same review workflow without tying proposal size or retention to the
 intake record. The storage design and rollout remain pending.
+
+#### Authorized draft guard rollout and storage verification
+
+The legacy intake suite on the unchanged canonical migrations reproduced
+`Intake owner mismatch` against a fresh database containing only schema.
+The test fixture copies the canonical customer graph from its source and
+expects its pinned, active pilot owner plus a second active site for the
+cross-tenant checks. After seeding those two synthetic graphs in the same
+disposable cluster, all 11 tests passed. No trigger replacement or
+canonical migration change was involved.
+
+The protected-host read-only checks confirmed database `postgres`,
+verified TLS, owner `miopages_migration`, the exact original body hash,
+security invoker with caller search path, the existing two execution ACL
+entries and the enabled intake trigger. No writer lock was present.
+The approved launcher takes an advisory transaction lock and a short
+`NOWAIT` table lock that permits ordinary readers. It retains the
+original function definition in a private file before replacement,
+verifies the unchanged function and trigger identities, ACL and settings,
+and checks the resulting definition before and after commit. The only
+database operation authorized here is the function replacement, with
+exact restoration if the verification fails.
+
+The five-page, 24-section rollback-only verifier passed locally against
+the corrected trigger under forced generic plans. The fixture used
+22,694 uncompressed and 9,049 stored provenance bytes. It verified
+exact original and edited reloads, preservation of the generated source
+relationships, rejection and approval in the synthetic fixture only,
+delivery preparation, capability and table-access refusals, and zero
+residual fixture rows. The companion disposable policy regression also
+verified rejection without a matching submission, acceptance with the
+matching snapshot, and immutability after that transition.
+
+The privileged launcher and the scoped proof are staged off-webroot.
+The existing migration password is available only through the owner's
+established hidden prompt. Before the launcher runs, hosted Core still
+uses the original function. The one hosted rollback-only test, final
+state comparison and any request for fresh live C0/C2 authorization
+remain pending. No model dispatch or WordPress action was taken.
