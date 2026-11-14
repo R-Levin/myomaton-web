@@ -2160,3 +2160,69 @@ established hidden prompt. Before the launcher runs, hosted Core still
 uses the original function. The one hosted rollback-only test, final
 state comparison and any request for fresh live C0/C2 authorization
 remain pending. No model dispatch or WordPress action was taken.
+
+#### Hosted draft storage verification passed
+
+The migration owner applied the approved function-only correction in
+the guarded transaction. A fresh restricted session verified the new
+body SHA-256
+`1ed36464403915c24606bbeaeac6edf40d89320cdb0e11a01894303dd39b7696`,
+unchanged owner and execution ACL, invoker security, caller search path,
+and the enabled trigger. The original definition is retained off-webroot
+with mode 0600, and its original body hash was independently verified.
+Function rollback was unnecessary.
+
+The one hosted run used the existing restricted role and forced generic
+PostgreSQL plans. It saved five pages and 24 sections from an offline
+fixture, comparing a 22,694-byte uncompressed provenance payload with
+9,061 stored bytes. The scoped service reloaded the generated proposal
+exactly, preserved generated source relationships through editing,
+exercised synthetic rejection and approval, prepared a review-bound
+delivery input, and reloaded the edited result. Unknown resume
+capabilities, direct canonical/submission access, tenant reassignment
+and a submission-state write were refused. The restricted view did
+not expose submitted drafts for editing. The disposable regression
+separately verified rejection of an unattested submission, acceptance
+of the matching snapshot and immutability of the submitted intake.
+The fixture transaction rolled back and both the verifier and a fresh
+independent restricted session found zero fixture rows. The hosted
+proof receipt SHA-256 is
+`1fe4bc1615ebd3c4f84a2673e4bc22cb20af10ec33b4ddd69578a8fe1955a2b9`.
+
+Authenticated HTTPS readback verified C0 draft 19 and its retained
+interview and synthetic inquiry. The usage ledger matched its original
+SHA-256. Both public Core HTTPS bodies matched their preserved
+baselines byte for byte. WordPress Delivery 0.0.10 and draft Page IDs
+13 and 14, restored revision 3 and high-water 5 all matched. The hosted
+fixture ran through the deployed service implementation's storage path.
+There was no customer approval, model dispatch, WordPress application
+or publication. Independent, versioned proposal storage remains
+required. Compression serves only as transitional intake compatibility.
+
+#### Proposed fresh C0/C2 comparison authorization
+
+Authorize one new comparison using the pinned [compact evidence and input scope](site-planning-compact-proof-scope.json)
+and the exact existing C0 and fictional C2 input digests. C0 includes
+only already allowed evidence and the single previously approved,
+unconfirmed answer projection. C2 takes only its fictional manifest,
+stays separately attributed, and writes its candidate off-webroot.
+Use `gpt-5.4-mini-2026-03-17` with one count and one generation per
+case, at most 4,000 input and 6,000 output tokens per generation,
+no tools, `store:false`, zero retries and expiry within 24 hours
+and the governing grant. Keep the previous C0 result receipt and the
+earlier uncertain receipt. No model requests have been made under
+this proposed authorization.
+
+The unchanged starting ledger records 14 requests and seven generation
+attempts, with $0.011112 in settled Core estimates and one uncertain
+receipt carrying a $0.005925 estimate. Carry its full $0.008400
+reservation unchanged, for an accounted starting total of $0.019512.
+Request a $0.10 maximum additional authorized spend. Enforce the
+stricter $0.060000 combined request envelopes and $0.079512 cumulative
+ceiling with at most 18 cumulative requests and nine generations.
+Stop on any unexpected ledger, scope or result. Before any dispatch,
+bind the new approval to one distinct, exact comparison identity,
+test that C0's prior dispatch remains deduplicated and unmodified,
+and verify the governing grant and protected build. The earlier
+compact grant is exhausted. Existing WordPress and publication
+approvals do not change.
