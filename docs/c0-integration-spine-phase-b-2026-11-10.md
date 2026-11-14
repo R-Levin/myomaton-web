@@ -2408,3 +2408,47 @@ is the preserved ledger at `894240b`. Additional project cash cost
 was not incurred. Owner minutes are unknown. This increment used
 offline replay to avoid another external generation. Hosted rollout
 and a fresh aggregate grant remain pending.
+
+#### Owner-approved consolidated response recovery and live comparison — November 14, 2026
+
+**Owner approved** one integrated protected rollout and model comparison:
+[Issue #12 approval comment 6880548834](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6880548834).
+This supersedes only the previously proposed $0.06 / zero-retry limit,
+not the immutable C0/C2 evidence scope, security/tenancy gates,
+customer knowledge authority or WordPress publication controls.
+
+Verify and deploy exact reviewed protected Core response-custody build
+`a842527` with rollback and the separate private C0/C2 response
+directories, retention no longer than 24 hours and verified cleanup.
+Test authenticated readback while dispatch remains disabled. Then
+one bounded live cycle with `gpt-5.4-mini-2026-03-17`, the unchanged
+pinned C0/C2 inputs, and `compact/2` output may use **up to three
+generations per case** (six total), one count per generation
+(twelve provider requests total), standard maxima of 4,000 input /
+6,000 output tokens per generation, no tools and `store:false`.
+**New additional AI model authorization cap is $0.25**; grant window
+is at most 24 hours. Prefer recovery and offline diagnosis to another
+provider call. C0 must have a genuine saved Operator-reviewable
+proposal before C2 is dispatched. No blind retry after an uncertain
+provider outcome or budget/identity discrepancy.
+
+**Cumulative cost before new calls** (historical ledger at `894240b`):
+16 requests / eight generations, $0.015506 settled estimated usage
+plus $0.008400 uncertain reservation = **$0.023906 accounted**.
+New additional grant maximum $0.25; inclusive ceiling $0.273906
+if fully used. Six full max-token envelopes at prior standard rates
+would reserve at most $0.18 additional ($0.203906 inclusive), subject
+to rates and preflight checks. Owner attention not measured; avoid
+inventing time/rates. Record actual spend deltas and remaining
+authorization in this handoff at material checkpoints. This is
+not an invoice verification. Original unsuccessful generation
+receipts and source/custody remain immutable.
+
+**Accepted next outcome:** Real model-generated C0 and isolated
+fictional C2 proposals safely persist through authenticated
+Operator review/edit, with actual business-specific page content,
+evidence citations, visitor decisions and unresolved claims available
+to the owner in readable form. Private WordPress application and
+publication remain separate approval gates. Approval recorded,
+**not execution verified**.
+
