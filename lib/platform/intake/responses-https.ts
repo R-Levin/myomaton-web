@@ -36,7 +36,8 @@ export function responsesHttps(key: string, expiresAt: number): ResponsesTranspo
           response.on("end", () => {
             try {
               const id = response.headers["x-request-id"];
-              resolve({ body: JSON.parse(Buffer.concat(chunks).toString("utf8")), requestId: typeof id === "string" ? id : undefined });
+              const rawBody = Buffer.concat(chunks);
+              resolve({ body: JSON.parse(rawBody.toString("utf8")), rawBody, requestId: typeof id === "string" ? id : undefined });
             } catch { unavailable(); }
           });
         });

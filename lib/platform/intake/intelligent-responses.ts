@@ -1,9 +1,10 @@
-import { open, readFile, rename, unlink } from "node:fs/promises";
+import { lstat, open, readFile, realpath, rename, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 import { fingerprint } from "../canonical/model";
 import type { QuestionAttribution, QuestionContext, QuestionProvider } from "./intelligent-model";
 import { presencePlanSchema } from "./presence-plan";
+import { atPlanningStage, PlanningFailureError, type PlanningFailure } from "./planning-diagnostics";
 import { compactSitePlanningFormat, compactSitePlanningInstruction, compactSitePlanningOutput, compactSitePlanningVersion, readCompactSitePlanning, readSitePlanning, sitePlanningFormat, sitePlanningInstruction, type PreparedPlanning } from "./site-planning";
 
 const maxInput = 4_000, maxOutput = 1_200;
@@ -18,13 +19,14 @@ type Rates = ResponsesRates;
 export type ResponsesTransport = {
   send(path: "/v1/responses/input_tokens" | "/v1/responses", request: object): Promise<Reply>;
 };
-type Reply = { body: unknown; requestId?: string };
+type Reply = { body: unknown; requestId?: string; rawBody?: Buffer };
 export type OfflineResponsesTransport = ResponsesTransport & { readonly mode: "offline-test" };
 type Usage = { input: number; cached: number; cacheWrite: number; output: number; reasoning: number };
 type Receipt = QuestionAttribution & { reservedMicros: number; countDispatched: boolean; generationDispatched: boolean;
   countRequestId?: string; generationRequestId?: string; responseId?: string; usage?: Usage; estimatedMicros?: number;
   status: "pending" | "completed" | "rejected" | "uncertain";
   outputLimit?: number;
+  recoveryAuthorized?: true;
   failure?: "output_token_limit" | "content_filter" | "provider_incomplete" | "reservation_exceeded";
 };
 type Ledger = { ratesDigest: string; rateCard: Rates; adapterVersion: string; model: string; tier: "default"; attempts: Receipt[] };
@@ -82,14 +84,14 @@ function responseUsage(body: Record<string, unknown>, counted: number, outputLim
   return { input, cached, cacheWrite, output, reasoning };
 }
 
-function responseProposal(body: Record<string, unknown>, byteLimit: number) {
+function responseProposal(body: Record<string, unknown>, byteLimit?: number) {
   if (!Array.isArray(body.output)) throw Error("Provider output unavailable");
   const outputs = body.output.map(record).filter(item => item.type !== "reasoning");
   const message = outputs[0];
   if (outputs.length !== 1 || message.type !== "message" || message.role !== "assistant" ||
       !Array.isArray(message.content) || message.content.length !== 1) throw Error("Unexpected provider output");
   const item = record(message.content[0]);
-  if (item.type !== "output_text" || typeof item.text !== "string" || Buffer.byteLength(item.text) > byteLimit) throw Error("Provider refusal or invalid output");
+  if (item.type !== "output_text" || typeof item.text !== "string" || (byteLimit !== undefined && Buffer.byteLength(item.text) > byteLimit)) throw Error("Provider refusal or invalid output");
   return JSON.parse(item.text) as unknown;
 }
 
@@ -151,7 +153,7 @@ export const freshCompactComparison = Object.freeze({
   capMicros: 79_512, maxRequests: 18, envelopeMicros: 30_000,
 });
 
-function comparisonWorkDigest(inputDigest: string, compact: boolean, comparisonId?: string) {
+export function comparisonWorkDigest(inputDigest: string, compact: boolean, comparisonId?: string) {
   return fingerprint({ operation: "site-planning", inputDigest, ...(compact && { format: compactSitePlanningVersion }),
     ...(comparisonId && { comparisonId }) });
 }
@@ -161,6 +163,8 @@ type SitePlanningGrant = {
   ownerDigest: string; inputDigest: string; expiresAt: number; capMicros: number; maxRequests: number; maxAdditionalRequests?: number;
   format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; retainedReservation?: string;
 };
+type CompletedResponse = (bytes: Buffer) => Promise<void>;
+
 export function protectedSitePlanningProvider(directory: string, rates: Rates, transport: ResponsesTransport, grant: SitePlanningGrant) {
   const { ownerDigest, inputDigest, expiresAt, capMicros: limit, maxRequests: requests, maxAdditionalRequests = 2 } = grant;
   if (![ownerDigest, inputDigest].every(value => /^[a-f0-9]{64}$/.test(value)) ||
@@ -188,8 +192,8 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
       retainedReservation !== comparison.retainedReservation)) throw Error("Invalid fresh comparison authorization");
   const dispatch = meteredResponsesDispatch(directory, rates, transport, requests, Math.floor(requests / 2), limit,
     compact ? compactSitePlanningOutput : maxOutput, retainedReservation, comparisonId === undefined ? undefined : inputDigest);
-  return async (readCurrent: () => PreparedPlanning | Promise<PreparedPlanning>) => {
-    async function current() {
+  return async (readCurrent: () => PreparedPlanning | Promise<PreparedPlanning>, retain?: CompletedResponse) => {
+    async function checkCurrent() {
       if (Date.now() >= expiresAt) throw Error("Site planning authorization expired");
       const prepared = structuredClone(await readCurrent());
       const ids = [...prepared.input.sources, ...prepared.input.answers].map(item => item.id);
@@ -200,13 +204,52 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
       }
       return prepared;
     }
+    const current = async () => {
+      try { return await checkCurrent(); }
+      catch (error) {
+        if (!retain || error instanceof PlanningFailureError) throw error;
+        throw new PlanningFailureError("evidence_changed");
+      }
+    };
     const prepared = await current();
     const result = await dispatch({ ownerDigest, workDigest: comparisonWorkDigest(inputDigest, compact, comparisonId) },
       { model, instructions: compact ? compactSitePlanningInstruction : sitePlanningInstruction, input: JSON.stringify(prepared.input),
-        text: { format: compact ? compactSitePlanningFormat(prepared) : sitePlanningFormat(prepared) } }, current);
-    await current();
-    return compact ? readCompactSitePlanning(result, prepared) : readSitePlanning(result, prepared);
+        text: { format: compact ? compactSitePlanningFormat(prepared) : sitePlanningFormat(prepared) } }, current, retain);
+    if (!retain) await current();
+    return normalizeSitePlanningResponse(result, prepared, compact);
   };
+}
+
+function normalizeSitePlanningResponse(value: unknown, prepared: PreparedPlanning, compact: boolean) {
+  return atPlanningStage("proposal_shape", () =>
+    compact ? readCompactSitePlanning(value, prepared) : readSitePlanning(value, prepared));
+}
+
+export function replaySitePlanningResponse(bytes: Buffer, prepared: PreparedPlanning, model: string, compact: boolean) {
+  const result = atPlanningStage("response_decode", () => {
+    const body = record(JSON.parse(bytes.toString("utf8")));
+    if (body.model !== model || body.service_tier !== "default") throw new PlanningFailureError("provider_identity");
+    if (body.status !== "completed") throw new PlanningFailureError("provider_incomplete");
+    return responseProposal(body);
+  });
+  return normalizeSitePlanningResponse(result, prepared, compact);
+}
+
+export async function confirmSitePlanningReceipt(directory: string, ownerDigest: string, workDigest: string, bytes: Buffer) {
+  try {
+    const path = join(directory, "onboarding-usage.json");
+    const file = await lstat(path);
+    if (!file.isFile() || await realpath(path) !== path ||
+        (process.platform !== "win32" && (file.uid !== process.getuid?.() || (file.mode & 0o777) !== 0o600))) throw Error();
+    const { attempts } = JSON.parse(await readFile(path, "utf8")) as Ledger;
+    const [receipt, duplicate] = attempts.filter(item => item.ownerDigest === ownerDigest && item.workDigest === workDigest);
+    const reply = record(JSON.parse(bytes.toString("utf8")));
+    const responseId = receiptId(reply.id);
+    if (!responseId || !receipt || duplicate || !receipt.recoveryAuthorized || !receipt.countDispatched || !receipt.generationDispatched || !receipt.usage ||
+        (receipt.status !== "completed" && receipt.status !== "rejected") ||
+        integer(receipt.estimatedMicros) > integer(receipt.reservedMicros) || receipt.responseId !== responseId ||
+        fingerprint(responseUsage(reply, maxInput, receipt.outputLimit ?? maxOutput)) !== fingerprint(receipt.usage)) throw Error();
+  } catch { throw new PlanningFailureError("usage_gate"); }
 }
 
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
@@ -215,10 +258,12 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
   const inputRate = Math.max(rates.inputPerMillion, rates.cachedPerMillion, rates.cacheWritePerMillion);
-  return async ({ ownerDigest, workDigest }: QuestionAttribution, request: { model: string; input: string; instructions: string; text: { format: object } }, recheck?: () => Promise<unknown>) => {
+  return async ({ ownerDigest, workDigest }: QuestionAttribution, request: { model: string; input: string; instructions: string; text: { format: object } }, recheck?: () => Promise<unknown>, retain?: CompletedResponse) => {
     if (![ownerDigest, workDigest].every(value => /^[a-f0-9]{64}$/.test(value))) throw Error("Scoped attribution required");
-    const lock = await open(lockPath, "wx", 0o600);
+    let stage: PlanningFailure = "usage_gate";
+    let lock: Awaited<ReturnType<typeof open>> | undefined;
     try {
+      lock = await open(lockPath, "wx", 0o600);
       const bytes = await readFile(path, "utf8");
       const ledger: Ledger = JSON.parse(bytes);
       if (ledger.ratesDigest !== fingerprint(rates) || fingerprint(ledger.rateCard) !== ledger.ratesDigest || ledger.model !== rates.model || ledger.tier !== "default" ||
@@ -262,6 +307,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
         await rename(next, path);
       }
       await checkpoint();
+      stage = "provider_count";
       const count = await transport.send("/v1/responses/input_tokens", structuredClone(request));
       receipt.countRequestId = receiptId(count.requestId);
       const input = integer(record(count.body).input_tokens);
@@ -269,6 +315,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
         receipt.status = "rejected";
         receipt.estimatedMicros = rates.countMicros;
         await checkpoint();
+        if (retain) throw new PlanningFailureError("input_token_limit");
         throw Error("Input token ceiling exceeded");
       }
       if (recheck) {
@@ -280,17 +327,29 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
           throw error;
         }
       }
+      stage = "usage_gate";
       receipt.generationDispatched = true;
       await checkpoint();
+      stage = "provider_transport";
       const result = await transport.send("/v1/responses", structuredClone({ ...request, service_tier: "default", store: false, max_output_tokens: outputLimit }));
+      stage = "response_decode";
       const body = record(result.body);
       receipt.generationRequestId = receiptId(result.requestId);
       receipt.responseId = receiptId(body.id);
       // A failed checkpoint or ambiguous outcome leaves the durable reservation pending.
       if (body.model !== rates.model || body.service_tier !== "default") {
         await checkpoint();
+        if (retain) throw new PlanningFailureError("provider_identity");
         throw Error("Provider model or tier mismatch");
       }
+      let custodyError: unknown;
+      if (retain && body.status === "completed") {
+        try {
+          if (!result.rawBody) throw new PlanningFailureError("custody_write");
+          await retain(result.rawBody);
+        } catch (error) { custodyError = error; }
+      }
+      stage = "provider_usage";
       let usage: Usage;
       try { usage = responseUsage(body, input, outputLimit); }
       catch (error) { await checkpoint(); throw error; }
@@ -306,17 +365,35 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
           body.status === "incomplete" && reason === "max_output_tokens" ? "output_token_limit" :
             body.status === "incomplete" && reason === "content_filter" ? "content_filter" : "provider_incomplete";
         await checkpoint();
+        if (retain) throw new PlanningFailureError(receipt.failure === "output_token_limit" ? "output_token_limit" :
+          receipt.failure === "reservation_exceeded" ? "provider_usage" : "provider_incomplete");
         throw Object.assign(Error("Uncertain development charge"), { code: receipt.failure });
       }
       let proposal: unknown;
-      try { proposal = responseProposal(body, outputLimit === maxOutput ? 8_000 : 32_000); receipt.status = "completed"; }
+      try { proposal = responseProposal(body, !retain && outputLimit === maxOutput ? 8_000 : undefined); receipt.status = "completed"; }
       catch { receipt.status = "rejected"; }
+      stage = "usage_gate";
       await checkpoint();
-      if (receipt.status === "rejected") throw Error("Provider proposal unavailable");
+      if (custodyError) throw new PlanningFailureError("custody_write");
+      if (retain && recheck) {
+        await recheck();
+        receipt.recoveryAuthorized = true;
+        await checkpoint();
+      }
+      if (receipt.status === "rejected") {
+        if (retain) throw new PlanningFailureError("response_decode");
+        throw Error("Provider proposal unavailable");
+      }
       return proposal;
+    } catch (error) {
+      if (!retain || error instanceof PlanningFailureError) throw error;
+      throw new PlanningFailureError(stage);
     } finally {
-      await lock.close();
-      await unlink(lockPath);
+      if (lock) {
+        await lock.close();
+        try { await unlink(lockPath); }
+        catch (error) { if (!retain) throw error; throw new PlanningFailureError("usage_gate"); }
+      }
     }
   };
 }

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile, realpath } from "node:fs/promises";
+import { join } from "node:path";
 import test from "node:test";
 import { Pool } from "pg";
 import { disposableCluster } from "../../scripts/backup/disposable-cluster";
@@ -12,8 +13,10 @@ import { protectedDevelopmentDraft } from "../../lib/platform/wordpress-delivery
 import { interviewDirection } from "../../lib/platform/intake/interview-direction";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { ProtectedSitePlanning, reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
-import { prepareSitePlanning, readSitePlanning } from "../../lib/platform/intake/site-planning";
+import { prepareSitePlanning } from "../../lib/platform/intake/site-planning";
 import { prepareGeneratedPages } from "../../lib/platform/content-editing/prospect-proposal";
+import { PlanningResponseCustody } from "../../lib/platform/intake/planning-response-custody";
+import { initializeResponsesUsageLedger, protectedSitePlanningProvider } from "../../lib/platform/intake/intelligent-responses";
 import { ProtectedInterview } from "../../lib/platform/intake/protected-interview";
 
 test("Core development policy confines the existing draft writer to the inactive fixture", async () => {
@@ -144,14 +147,31 @@ test("Core development policy confines the existing draft writer to the inactive
     }
     for (const p of draft.pages) p.sectionSourceIds.push([source.id], [source.id], [source.id]);
     const ownerDigest = fingerprint(selection), expiresAt = Date.now() + 60_000;
-    const planning = new ProtectedSitePlanning(service, { model: "offline-test",
-      async input() { return prepareSitePlanning(ownerDigest, [source], [], {
-        ownerDigest, expiresAt, evidenceDigest: fingerprint([source]), approvedAnswerDigests: [],
-      }); },
-      async generate(input) { return readSitePlanning(draft, await input()); },
+    const directory = join(await realpath(cluster.root), "planning");
+    const responses = join(directory, "responses");
+    await mkdir(directory, { mode: 0o700 });
+    await mkdir(responses, { mode: 0o700 });
+    const custody = new PlanningResponseCustody(responses);
+    const rates = { model: "offline-test", verifiedOn: "2026-11-14", inputPerMillion: 750_000, cachedPerMillion: 75_000,
+      outputPerMillion: 4_500_000, cacheWritePerMillion: 0, countMicros: 0 };
+    await initializeResponsesUsageLedger(directory, rates);
+    const projection = prepareSitePlanning(ownerDigest, [source], [], {
+      ownerDigest, expiresAt, evidenceDigest: fingerprint([source]), approvedAnswerDigests: [],
     });
+    let providerRequests = 0;
+    const generate = protectedSitePlanningProvider(directory, rates, { async send(path) {
+      providerRequests++;
+      if (path.endsWith("input_tokens")) return { body: { input_tokens: 350 } };
+      const body = { model: rates.model, service_tier: "default", status: "completed",
+        usage: { input_tokens: 350, input_tokens_details: { cached_tokens: 0 }, output_tokens: 750,
+          output_tokens_details: { reasoning_tokens: 0 }, total_tokens: 1100 },
+        output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(draft) }] }] };
+      return { body, rawBody: Buffer.from(JSON.stringify(body)) };
+    } }, { ownerDigest, inputDigest: projection.inputDigest, expiresAt, maxRequests: 2, capMicros: 8_400 });
+    const planning = new ProtectedSitePlanning(service, { model: rates.model, async input() { return projection; }, generate }, custody);
     await assert.rejects(new ProtectedSitePlanning(service).generate(token, authored.version), /ai_authorization_required/);
     const generated = await planning.generate(token, authored.version);
+    assert.equal(providerRequests, 2);
     const resumed = await service.resume(token);
     assert.deepEqual(resumed, generated);
     const stored = (await role.query("SELECT provenance FROM miopages_wp.core_development_drafts")).rows[0].provenance;

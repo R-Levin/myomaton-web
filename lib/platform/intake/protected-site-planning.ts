@@ -2,6 +2,9 @@ import { randomUUID } from "node:crypto";
 import { choice, fingerprint, object, text } from "../canonical/model";
 import type { Actor } from "../content-editing/proposal";
 import { IntakeError } from "./model";
+import { comparisonWorkDigest, replaySitePlanningResponse } from "./intelligent-responses";
+import { PlanningFailureError, type PlanningFailure } from "./planning-diagnostics";
+import type { PlanningAttempt, PlanningResponseCustody } from "./planning-response-custody";
 import { readPresencePlan, type PresencePlan } from "./presence-plan";
 import type { IntakeService, IntakeView } from "./service";
 import type { PreparedPlanning, readSitePlanning } from "./site-planning";
@@ -11,8 +14,9 @@ type Improvement = { inquiryId: string; draftDigest: string; pagePath: string; s
 type Decision = { status: "approved" | "rejected"; digest: string; actor: Actor; at: string; note: string };
 type Action = Generated["evidence"][number]["action"];
 export type SitePlanningReview = {
-  pending?: { id: string; at: string };
-  failure?: "generation_failed" | "draft_capacity" | "interrupted" | "evidence_changed" | "output_token_limit";
+  pending?: { id: string; at: string; capture?: PlanningAttempt };
+  recovery?: PlanningAttempt;
+  failure?: PlanningFailure;
   proposal?: {
     generated: Generated;
     sources: PreparedPlanning["input"];
@@ -53,59 +57,134 @@ export function reviewedSitePlanning(proposal: Proposal) {
   return { plan, actions, digest, decision: proposal.decisions?.findLast(item => item.digest === digest) };
 }
 
+type PlanningProvider = {
+  model: string;
+  input: (view: IntakeView) => Promise<PreparedPlanning>;
+  generate: (project: () => Promise<PreparedPlanning>, retain?: (bytes: Buffer) => Promise<void>) => Promise<Generated>;
+  format?: "compact/2" | "full";
+  comparisonId?: string;
+};
+
 export class ProtectedSitePlanning {
-  constructor(private intake: IntakeService, private provider?: {
-    model: string;
-    input: (view: IntakeView) => Promise<PreparedPlanning>;
-    generate: (project: () => Promise<PreparedPlanning>) => Promise<Generated>;
-  }) {}
+  constructor(private intake: IntakeService, private provider?: PlanningProvider, private custody?: PlanningResponseCustody) {}
 
   async generate(token: string, version: number) {
     const provider = this.provider;
     if (!provider) throw new IntakeError("ai_authorization_required", 403);
-    const original = await this.intake.resume(token);
-    if (original.version !== version) throw new IntakeError("draft_changed", 409);
-    const basis = sitePlanningBasis(original);
-    try { await provider.input(original); } catch { throw new IntakeError("ai_authorization_required", 403); }
-    const id = randomUUID();
-    await this.intake.editProtectedSitePlanning(token, version, (state, view) => {
-      if (state.pending || state.proposal || view.interview?.pending) throw new IntakeError("draft_changed", 409);
-      return { pending: { id, at: new Date().toISOString() } };
+    const original = await this.intake.resume(token).catch(error => {
+      if (error instanceof IntakeError) throw error;
+      throw new IntakeError("draft_persistence", 503);
     });
-    let sources: PreparedPlanning["input"] | undefined;
-    let generated: Generated | undefined;
-    let generationFailure: SitePlanningReview["failure"] = "generation_failed";
-    try {
-      generated = await provider.generate(async () => {
-        const current = await this.intake.resume(token);
-        if (current.sitePlanning?.pending?.id !== id || sitePlanningBasis(current) !== basis) throw Error("Site planning evidence changed");
-        const projected = await provider.input(current);
-        sources = projected.input;
-        return projected;
-      });
-    } catch (error) {
-      // Keep the input and ledger intact, including an incomplete response reservation.
-      if (error instanceof Error && "code" in error && error.code === "output_token_limit") generationFailure = error.code;
+    if (original.version !== version) throw new IntakeError("draft_changed", 409);
+    let projection: PreparedPlanning;
+    try { projection = await provider.input(original); } catch { throw new IntakeError("ai_authorization_required", 403); }
+    const attempt: PlanningAttempt = {
+      id: randomUUID(), at: new Date().toISOString(), basis: sitePlanningBasis(original),
+      ownerDigest: projection.ownerDigest, inputDigest: projection.inputDigest, model: provider.model,
+      workDigest: comparisonWorkDigest(projection.inputDigest, provider.format === "compact/2", provider.comparisonId),
+    };
+    const custody = this.custody;
+    if (custody) {
+      try { await custody.ready(attempt); }
+      catch { throw new IntakeError("custody_write", 503); }
     }
-    const settle = (proposal: Proposal | undefined, failure: SitePlanningReview["failure"]) =>
-      this.intake.editProtectedSitePlanning(token, undefined, (state, view) => {
-        if (state.pending?.id !== id) throw new IntakeError("draft_changed", 409);
-        if (sitePlanningBasis(view) !== basis) return { failure: "evidence_changed" };
-        return proposal ? { proposal } : { failure };
-      });
     try {
-      return await settle(generated && sources ? { generated, sources, basis, revision: 1, model: provider.model, at: new Date().toISOString() } : undefined, generationFailure);
+      await this.intake.editProtectedSitePlanning(token, version, (state, view) => {
+        if (state.pending || state.proposal || state.recovery || view.interview?.pending ||
+            sitePlanningBasis(view) !== attempt.basis) throw new IntakeError("draft_changed", 409);
+        return { pending: { id: attempt.id, at: attempt.at, ...(custody && { capture: attempt }) } };
+      });
     } catch (error) {
-      if (!(error instanceof IntakeError) || error.code !== "payload_too_large") throw error;
-      return settle(undefined, "draft_capacity");
+      if (error instanceof IntakeError) throw error;
+      throw new IntakeError("draft_persistence", 503);
+    }
+
+    let retained = false;
+    let next: SitePlanningReview;
+    try {
+      const generated = await provider.generate(async () => {
+        const current = await this.intake.resume(token).catch(() => { throw new PlanningFailureError("draft_persistence"); });
+        if (current.sitePlanning?.pending?.id !== attempt.id || sitePlanningBasis(current) !== attempt.basis) {
+          throw new PlanningFailureError("evidence_changed");
+        }
+        const projected = await provider.input(current);
+        if (projected.inputDigest !== projection.inputDigest || projected.ownerDigest !== projection.ownerDigest) {
+          throw new PlanningFailureError("evidence_changed");
+        }
+        return projected;
+      }, custody ? async bytes => {
+        await custody.save(attempt, provider.format ?? "full", projection, bytes);
+        retained = true;
+      } : undefined);
+      if (custody && !retained) throw new PlanningFailureError("custody_write");
+      next = { proposal: this.proposal(attempt, generated, projection.input) };
+    } catch (error) {
+      const failure = error instanceof PlanningFailureError ? error.code :
+        error instanceof Error && "code" in error && error.code === "output_token_limit" ? "output_token_limit" : "provider_transport";
+      next = { failure, ...(custody && { recovery: attempt }) };
+    }
+    return this.settle(token, attempt, next);
+  }
+
+  private proposal(attempt: PlanningAttempt, generated: Generated, sources: PreparedPlanning["input"]): Proposal {
+    if (generated.ownerDigest !== attempt.ownerDigest || generated.inputDigest !== attempt.inputDigest) {
+      throw new PlanningFailureError("evidence_changed");
+    }
+    return { generated, sources, basis: attempt.basis, model: attempt.model, at: attempt.at, revision: 1 };
+  }
+
+  private async settle(token: string, attempt: PlanningAttempt, next: SitePlanningReview, version?: number): Promise<IntakeView> {
+    const save = (state: SitePlanningReview) => this.intake.editProtectedSitePlanning(token, version, (current, view) => {
+      if (current.proposal || (current.pending ?? current.recovery)?.id !== attempt.id) throw new IntakeError("draft_changed", 409);
+      if (sitePlanningBasis(view) !== attempt.basis) {
+        state = { failure: "evidence_changed", ...(this.custody && { recovery: attempt }) };
+      }
+      if (fingerprint(current) === fingerprint(state)) return current;
+      return state;
+    });
+    try { return await save(next); }
+    catch (error) {
+      if (error instanceof IntakeError && error.code === "draft_changed") throw error;
+      if (next.proposal) {
+        // A lost DB acknowledgement can mean the write actually committed.
+        const current = await this.intake.resume(token).catch(() => undefined);
+        if (current?.sitePlanning?.proposal && fingerprint(current.sitePlanning.proposal) === fingerprint(next.proposal)) return current;
+        const failure = error instanceof IntakeError && error.code === "payload_too_large" ? "draft_capacity" : "draft_persistence";
+        try { return await save({ failure, ...(this.custody && { recovery: attempt }) }); }
+        catch { throw new IntakeError("draft_persistence", 503); }
+      }
+      throw new IntakeError("draft_persistence", 503);
     }
   }
 
-  recover(token: string, version: number) {
-    return this.intake.editProtectedSitePlanning(token, version, state => {
-      if (!state.pending || Date.now() - Date.parse(state.pending.at) < 180_000) throw new IntakeError("draft_changed", 409);
-      return { failure: "interrupted" };
-    });
+  async recover(token: string, version: number) {
+    const current = await this.intake.resume(token);
+    const state = current.sitePlanning;
+    const pending = state?.pending;
+    if (current.version !== version || !state || state.proposal ||
+        (pending && Date.now() - Date.parse(pending.at) < 180_000)) throw new IntakeError("draft_changed", 409);
+    if (!pending && !state.recovery) throw new IntakeError("draft_changed", 409);
+    const attempt = pending?.capture ?? state.recovery;
+    if (!attempt || !this.custody) {
+      return this.intake.editProtectedSitePlanning(token, version, () => ({ failure: "interrupted" }));
+    }
+    // A recorded scope change is final for this capture. The receipt is checked separately.
+    if (state.failure === "evidence_changed") return current;
+    if (sitePlanningBasis(current) !== attempt.basis || fingerprint(this.intake.selection) !== attempt.ownerDigest) {
+      return this.settle(token, attempt, { failure: "evidence_changed", recovery: attempt }, version);
+    }
+    let proposal: Proposal;
+    try {
+      const capture = await this.custody.read(attempt);
+      if (!capture) throw new PlanningFailureError(state.failure ?? "interrupted");
+      await this.custody.verifyReceipt(attempt, capture.bytes);
+      const normalized = replaySitePlanningResponse(capture.bytes, capture.prepared, attempt.model, capture.format === "compact/2");
+      proposal = this.proposal(attempt, normalized, capture.prepared.input);
+    } catch (error) {
+      const failure = error instanceof PlanningFailureError ? error.code : "response_decode";
+      return this.settle(token, attempt, { failure, recovery: attempt }, version);
+    }
+    return this.settle(token, attempt, { proposal }, version);
   }
 
   private change(token: string, version: number, digest: unknown, change: (proposal: Proposal) => Proposal) {

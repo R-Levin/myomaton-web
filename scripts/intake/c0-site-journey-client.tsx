@@ -3,6 +3,7 @@ import styles from "../../components/intake/interview.module.css";
 import { prospectPriorities } from "../../lib/platform/intake/adaptive";
 import { prospectDirection, prospectPlanSeed } from "../../lib/platform/intake/prospect-direction";
 import { interviewDirection } from "../../lib/platform/intake/interview-direction";
+import { planningMessages, type PlanningFailure } from "../../lib/platform/intake/planning-diagnostics";
 import type { IntakeView } from "../../lib/platform/intake/service";
 
 import { SitePlanningReviewPanel } from "./site-planning-review-panel";
@@ -19,10 +20,16 @@ async function request(endpoint: string, operation?: object): Promise<JourneyVie
   });
   if (response.status === 401) throw Error("local_access_required");
   if (response.status === 409) throw Error("This draft changed. Reload before saving a different answer.");
-  if (!response.ok) throw Error("Core could not confirm the request. Your selection is still on screen.");
-  const data = await response.json();
-  if (data.state === "not_started") return null;
-  if (data.prepared?.scenario !== "c0") throw Error("The retained MioPages draft is unavailable.");
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    if (operation && "operation" in operation && String(operation.operation).startsWith("site-plan-") &&
+        typeof data?.error === "string" && Object.hasOwn(planningMessages, data.error)) {
+      throw Error(planningMessages[data.error as PlanningFailure]);
+    }
+    throw Error("Core could not confirm the request. Your selection is still on screen.");
+  }
+  if (data?.state === "not_started") return null;
+  if (data?.prepared?.scenario !== "c0") throw Error("The retained MioPages draft is unavailable.");
   return data;
 }
 
@@ -87,6 +94,11 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
       if ("operation" in operation && ["interview-answer", "correct-interview-answer"].includes(String(operation.operation))) {
         setAnswer("");
         setCorrecting(false);
+      }
+      if ("operation" in operation && String(operation.operation).startsWith("site-plan-") && next.sitePlanning?.failure) {
+        setMessage(planningMessages[next.sitePlanning.failure]);
+        setError(true);
+        return;
       }
       setMessage(next.interview?.failure && "operation" in operation && operation.operation === "interview-next"
         ? "Core could not save the model response. Your saved answer is still available."

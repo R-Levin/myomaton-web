@@ -2314,3 +2314,97 @@ survive normalized save, reload, Operator edit/review and later private
 WordPress preview. Only consequential external model spend, protected
 hosted writes and publication require fresh applicable authority.
 
+#### Local proposal response custody and recovery
+
+The proven defect at `894240b` was loss of evidence across stages. Core
+recorded a completed provider response and parsed JSON, then ran a
+second evidence check, semantic normalization and private artifact
+write before committing the draft. All three could return the same
+`generation_failed` status. With no exact response retained, the
+historical C0 failure cannot be assigned to one of them. The recorded
+cost and receipt remain valid. Replaying a new model request would
+produce different evidence.
+
+Core now takes the exact completed HTTP response body into private
+custody after checking model and tier and before validating usage or
+decoding proposal output. Its private record binds the response to
+the draft attempt, tenant, input digest, evidence basis, model and
+ledger work identity. The record contains the exact bounded outbound
+projection and response body, with no authorization headers, database
+credential or raw interview context beyond the permitted projection.
+The hosted application requires an owned off-webroot mode 0700 folder,
+and writes mode 0600 files with an exclusive final name, fsync and an
+integrity readback. Recovery requires a settled usage receipt with a
+durable marker confirming that the post-response authorization and
+evidence recheck passed. The
+provider still uses `store:false`. No additional proposal byte ceiling
+was introduced. Existing transport, token and editorial constraints
+and the transitional intake row limit remain.
+
+The Operator sees allowlisted outcomes for evidence changes, ledger,
+provider count, transport, identity, completeness and usage, response
+decoding, proposal shape, citations, routes, copy, private capture and
+draft persistence. Raw evidence and exception strings stay off the
+browser and logs. The existing protected recovery action checks the
+current draft and reuses the same validator without contacting the
+provider. It refuses changed evidence, unrelated owner/input, tampering,
+an unsettled receipt and expired captures. A valid response recovered
+from a failed draft write remains proposed until the ordinary review
+workflow. C2 keeps a separate capture directory and a separate
+local-only recovery entry point in its existing runner. C0 review
+does not load fictional C2 evidence.
+
+Verification used provider-shaped offline responses covering invalid
+JSON, duplicate citations, invalid visitor routes, unsafe copy,
+missing sections, changed evidence, incompatible usage, private
+write failure, row capacity and simulated database failure. Exact
+response bytes, checksum refusal, expiry, no duplicate provider
+request, and scope isolation were checked. Disposable PostgreSQL
+exercised a substantial provider-shaped draft through the restricted
+writer, reload, edit, review and delivery preparation, including the
+existing synthetic inquiry path. Application regressions and the
+retained WordPress approval digest passed. No hosted mutation or
+provider dispatch was performed.
+
+**Smallest rollout pending explicit authorization.** Verify the Linux
+artifact, back up the current protected build, and replace only that
+build. Provision owned 0700 `site-planning-proof/responses` and
+`site-planning-proof/c2-responses` off-webroot. Permit recovery for up
+to 24 hours from capture. The implementation prunes expired purpose-named
+files before capture; schedule a bounded private expiry sweep or
+remove expired captures at the approved cleanup even if there is no
+further generation. Verify exact authenticated Core readback with
+both dispatch grants inactive. Keep C0 draft 21, ledger, public Core
+and WordPress at their recorded baselines. No migration, privilege
+expansion or new account is required. A failure to write secure
+storage still requires repair before any dispatch. A permanently
+invalid response remains evidence for diagnosis and cannot be
+promoted with missing citations or an invalid route. Independent,
+versioned site proposal storage remains pending for Commercial V1.
+
+**One later comparison.** Obtain a fresh exact authorization for the
+rollout plus the C0-then-fictional-C2 comparison, with the same
+evidence manifest and model and one count and one generation per
+case. Use the existing 4,000 input and 6,000 output caps, `store:false`,
+no tools, no automatic retries and expiry within 24 hours and an
+unexpired governing grant. Start from the verified 16 requests,
+eight generations and $0.023906 accounted including the existing
+reserve. A $0.060000 maximum in added request envelopes would put
+the cumulative ceiling at $0.083906, 20 requests and ten generations.
+The previous identity is consumed. A new exact grant, ledger pin,
+expiry and run identity need to be configured and tested after
+authorization. Require a verified C0 protected Operator readback
+before permitting C2. If there is a failure, use the retained capture
+and stop before another dispatch. Private WordPress preview still
+requires governed review and the existing delivery approvals.
+
+**Running cost at local recovery checkpoint.** Site planning since the
+first C0 comparison has three generations and six requests, with an AI
+delta of $0 and $0.015802 in cumulative usage estimates including the
+earlier uncertain estimate. The $0.008400 reserve puts the task at
+$0.018277 accounted. The inclusive Core total remains 16 requests,
+eight generations, $0.015506 settled and $0.023906 accounted. Evidence
+is the preserved ledger at `894240b`. Additional project cash cost
+was not incurred. Owner minutes are unknown. This increment used
+offline replay to avoid another external generation. Hosted rollout
+and a fresh aggregate grant remain pending.

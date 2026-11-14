@@ -56,6 +56,8 @@ jobs:
         run: npm audit --omit=dev --audit-level=low
       - name: Verify retained approved rendering on Linux
         run: npx tsx --test tests/proposal-preview-compatibility.test.tsx tests/wordpress-private-build-config.test.tsx
+      - name: Verify metered planning and private recovery on Linux
+        run: npx tsx --test tests/site-planning.test.tsx tests/site-planning-recovery.test.tsx
       - name: Verify portable artifact dependency boundary
         run: node --test tests/wordpress-artifact-links.test.mjs
       - name: Verify raw routing boundary and sanitized diagnostics

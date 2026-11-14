@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 import { readFile, lstat, realpath, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fingerprint } from "../lib/platform/canonical/model";
 import { compactSitePlanningVersion, compactSitePlanningOutput, prepareSitePlanning, type PreparedPlanning } from "../lib/platform/intake/site-planning";
-import { freshCompactComparison, protectedSitePlanningProvider, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
+import { comparisonWorkDigest, freshCompactComparison, protectedSitePlanningProvider, replaySitePlanningResponse, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
 import { responsesHttps } from "../lib/platform/intake/responses-https";
+import { PlanningResponseCustody, type PlanningAttempt } from "../lib/platform/intake/planning-response-custody";
+import { PlanningFailureError } from "../lib/platform/intake/planning-diagnostics";
 import type { InterviewEvidence } from "../lib/platform/intake/intelligent-model";
 
 const manifestDigest = "3437eb2491bd7d44dea7cb707319771158b6d61db1f3ac56b4019e908e4e66d6";
@@ -27,10 +30,25 @@ async function safeFile<T>(path: string): Promise<T> {
 async function main() {
   assert.equal(process.platform, "linux");
   assert.equal(await realpath(process.env.HOME ?? ""), home);
-  assert.deepEqual(process.argv.slice(2), ["RUN-FICTIONAL-SITE-PLAN", manifestDigest]);
+  const [mode, pin, reference, ...extra] = process.argv.slice(2);
+  assert.ok(extra.length === 0 && pin === manifestDigest && (mode === "RUN-FICTIONAL-SITE-PLAN" && reference === undefined ||
+    mode === "RECOVER-FICTIONAL-SITE-PLAN" && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/u.test(reference ?? "")));
   for (const path of [privateRoot, proofRoot, join(privateRoot, "core-usage")]) {
     const st = await lstat(path);
     assert.ok(st.isDirectory() && (st.mode & 0o777) === 0o700 && st.uid === process.getuid?.() && await realpath(path) === path);
+  }
+  const custody = new PlanningResponseCustody(join(proofRoot, "c2-responses"), Date.now, join(privateRoot, "core-usage"));
+  const basis = fingerprint({ manifestDigest, fictionalDigest });
+  if (mode === "RECOVER-FICTIONAL-SITE-PLAN") {
+    const attempt = await safeFile<PlanningAttempt>(join(proofRoot, "c2-recovery-" + reference + ".json"));
+    assert.ok(attempt.id === reference && attempt.ownerDigest === ownerDigest && attempt.inputDigest === fictionalDigest &&
+      attempt.basis === basis && attempt.model === "gpt-5.4-mini-2026-03-17");
+    const capture = await custody.read(attempt);
+    if (!capture) throw new PlanningFailureError("interrupted");
+    await custody.verifyReceipt(attempt, capture.bytes);
+    const result = replaySitePlanningResponse(capture.bytes, capture.prepared, attempt.model, capture.format === "compact/2");
+    await saveProposal("c2-recovered-" + attempt.id + ".json", result, attempt.model);
+    return;
   }
   const grantFile = join(proofRoot, "c2-grant.json");
   const grant = await safeFile<Scope>(grantFile);
@@ -78,14 +96,30 @@ async function main() {
     return prepareSitePlanning(ownerDigest, evidence, [], { ownerDigest, expiresAt: grant.expiresAt,
       evidenceDigest: fingerprint(evidence), approvedAnswerDigests: [] });
   };
-  const result = await generate(project);
-  await writeFile(join(proofRoot, fresh ? "c2-generated-b42f6e6.json" : "c2-generated.json"), JSON.stringify({ scenario: "fictional-c2", model: transportSettings.rates.model,
-    proposal: result }, null, 2) + "\n", { flag: "wx", mode: 0o600, flush: true });
-  console.log(JSON.stringify({ status: "PASS", scenario: "fictional-c2", generatedDigest: result.digest }));
+  const prepared = await project();
+  assert.equal(prepared.inputDigest, fictionalDigest);
+  const attempt: PlanningAttempt = { id: randomUUID(), at: new Date().toISOString(),
+    basis, ownerDigest, inputDigest: fictionalDigest, model: transportSettings.rates.model,
+    workDigest: comparisonWorkDigest(fictionalDigest, compact, grant.comparisonId) };
+  await custody.ready(attempt);
+  // C2 has no Core draft. Keep only its nonsecret recovery binding beside the scoped response.
+  await writeFile(join(proofRoot, "c2-recovery-" + attempt.id + ".json"), JSON.stringify(attempt) + "\n",
+    { flag: "wx", mode: 0o600, flush: true });
+  const result = await generate(project, bytes => custody.save(attempt, compact ? "compact/2" : "full", prepared, bytes));
+  await saveProposal(fresh ? "c2-generated-b42f6e6.json" : "c2-generated.json", result, attempt.model);
+}
+
+async function saveProposal(name: string, proposal: ReturnType<typeof replaySitePlanningResponse>, model: string) {
+  try {
+    await writeFile(join(proofRoot, name), JSON.stringify({ scenario: "fictional-c2", model, proposal }) + "\n",
+      { flag: "wx", mode: 0o600, flush: true });
+  } catch { throw new PlanningFailureError("draft_persistence"); }
+  console.log(JSON.stringify({ status: "PASS", scenario: "fictional-c2", generatedDigest: proposal.digest }));
 }
 
 main().catch(error => {
   const message = error instanceof Error ? error.message : "";
-  console.error(JSON.stringify({ status: "BLOCKED", category: /^Responses HTTP status [1-5][0-9]{2}$/u.test(message) ? message : "site-planning-preflight-or-result" }));
+  console.error(JSON.stringify({ status: "BLOCKED", category: error instanceof PlanningFailureError ? error.code :
+    /^Responses HTTP status [1-5][0-9]{2}$/u.test(message) ? message : "site-planning-preflight-or-result" }));
   process.exitCode = 1;
 });

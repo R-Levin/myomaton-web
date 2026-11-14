@@ -47,8 +47,8 @@ test("validates distinct, editable site shapes and visitor decisions against the
   assert.notEqual(x.digest, y.digest);
   assert.doesNotMatch(JSON.stringify(a.input), /Retained private source pointer/);
   assert.equal(sitePlanningFormat(a).strict, true);
-  assert.throws(() => readSitePlanning(draftA, b), /citations refused/);
-  assert.throws(() => readSitePlanning({ ...draftA, pages: [signal("/", "transition", "https://example.test"), draftA.pages[1]] }, a), /visitor action refused/);
+  assert.throws(() => readSitePlanning(draftA, b), { code: "proposal_citations" });
+  assert.throws(() => readSitePlanning({ ...draftA, pages: [signal("/", "transition", "https://example.test"), draftA.pages[1]] }, a), { code: "proposal_route" });
   assert.throws(() => readSitePlanning({ ...draftA, pages: [{ ...draftA.pages[0], sectionSourceIds: [] }, draftA.pages[1]] }, a), /section evidence mismatch/);
 });
 
@@ -192,13 +192,13 @@ test("compact contract preserves substantial C0 and C2 plans without a fixed pag
   assert.deepEqual(compactSitePlanningFormat(c2Input).schema.properties.refs, {
     type: "array", items: { type: "integer", enum: [1, 2] },
   });
-  assert.throws(() => readCompactSitePlanning(fixtures.c0, c2Input), /citations refused/);
+  assert.throws(() => readCompactSitePlanning(fixtures.c0, c2Input), { code: "proposal_citations" });
   const wrong = structuredClone(fixtures.c2);
   wrong.pages[0].sections[0].refs = [1, 1];
-  assert.throws(() => readCompactSitePlanning(wrong, c2Input), /citations refused/);
+  assert.throws(() => readCompactSitePlanning(wrong, c2Input), { code: "proposal_citations" });
   const changed = structuredClone(fixtures.c2);
   changed.pages[0].action.to = "https://example.test/urgent";
-  assert.throws(() => readCompactSitePlanning(changed, c2Input), /visitor action refused/);
+  assert.throws(() => readCompactSitePlanning(changed, c2Input), { code: "proposal_route" });
   const diskSize = (x: typeof a, prepared: typeof c0Input) => Buffer.byteLength(JSON.stringify({ generated: x, sources: prepared.input }));
   assert.ok(6500 + diskSize(a, c0Input) < 14000);
   assert.ok(6500 + diskSize(b, c2Input) < 14000);

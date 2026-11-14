@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { lstat, realpath, readFile, writeFile } from "node:fs/promises";
+import { lstat, realpath, readFile } from "node:fs/promises";
 import { fingerprint, uuid } from "../canonical/model";
 import { protectedConnection, protectedPool } from "../wordpress-delivery/protected-connection";
 import { ProtectedOperator } from "../wordpress-delivery/operator";
@@ -18,6 +18,7 @@ import type { QuestionContext } from "./intelligent-model";
 import { readPresencePlan } from "./presence-plan";
 import { interviewDirection } from "./interview-direction";
 import { ProtectedSitePlanning, reviewedSitePlanning, sitePlanningBasis } from "./protected-site-planning";
+import { PlanningResponseCustody } from "./planning-response-custody";
 import { compactSitePlanningVersion, prepareSitePlanning } from "./site-planning";
 import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
 
@@ -97,7 +98,10 @@ async function openCore() {
     } finally { db.release(); }
   };
   let interview: ProtectedInterview | undefined;
-  let sitePlanning = new ProtectedSitePlanning(intake);
+  const coreHome = await realpath(process.env.HOME ?? "");
+  const privateRoot = coreHome + "/miopages-private-acceptance";
+  const custody = new PlanningResponseCustody(privateRoot + "/site-planning-proof/responses", Date.now, privateRoot + "/core-usage");
+  let sitePlanning = new ProtectedSitePlanning(intake, undefined, custody);
   let sitePlanningEnabled = false;
   const planningFile = process.env.MIOPAGES_PROTECTED_CORE_SITE_PLANNING_SCOPE;
 
@@ -151,6 +155,7 @@ async function openCore() {
             initial.scopeDigest !== comparison.scopeDigest ||
             initial.inputDigest !== comparison.c0)) throw Error("Compact site planning grant exceeds approved scope");
         if (!compact && (fresh || initial.retainedReservation !== undefined)) throw Error("Prior reservation authorization refused");
+        if (grant.ledgerDirectory !== privateRoot + "/core-usage") throw Error("Site planning recovery ledger refused");
         const generate = protectedSitePlanningProvider(grant.ledgerDirectory, grant.rates,
           responsesHttps(process.env.MIOPAGES_OPENAI_DEV_API_KEY ?? "", initial.expiresAt), { ...initial,
             // Absolute ledger ceilings preserve accrued usage in the existing shared ledger.
@@ -159,16 +164,7 @@ async function openCore() {
             maxAdditionalRequests: initial.maxRequests,
           });
         sitePlanning = new ProtectedSitePlanning(intake, { model: grant.rates.model,
-          generate: fresh ? async project => {
-            const directory = home + "/miopages-private-acceptance/site-planning-proof";
-            const storage = await lstat(directory);
-            if (!storage.isDirectory() || storage.uid !== process.getuid?.() ||
-                (storage.mode & 0o777) !== 0o700 || await realpath(directory) !== directory) throw Error("Comparison custody refused");
-            const proposal = await generate(project);
-            await writeFile(directory + "/c0-generated-b42f6e6.json",
-              JSON.stringify(proposal) + "\n", { mode: 0o600, flag: "wx", flush: true });
-            return proposal;
-          } : generate,
+          generate, format: compact ? compactSitePlanningVersion : "full", comparisonId: initial.comparisonId,
           async input(view) {
             const current = await readGrant();
             if (compact) {
@@ -184,7 +180,7 @@ async function openCore() {
             }
             return prepared;
           },
-        });
+        }, custody);
         sitePlanningEnabled = true;
       }
     }

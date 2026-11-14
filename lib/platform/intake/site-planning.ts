@@ -2,6 +2,7 @@ import { choice, fingerprint, object, text } from "../canonical/model";
 import { hash } from "../content-editing/proposal";
 import type { InterviewEvidence, InterviewTurn } from "./intelligent-model";
 import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
+import { atPlanningStage, PlanningFailureError } from "./planning-diagnostics";
 import { presencePlanSchema, readPresencePlan } from "./presence-plan";
 
 type PlanAuthorization = AnswerScope & {
@@ -96,7 +97,7 @@ export function readCompactSitePlanning(value: unknown, prepared: PreparedPlanni
   const root = object(value, ["positioning", "offering", "audience", "refs", "open", "pages"]);
   function cite(refs: unknown) {
     if (!Array.isArray(refs) || refs.some(ref => !Number.isSafeInteger(ref) || ref < 1 || ref > prepared.sourceIds.length)) {
-      throw Error("Site plan citations refused");
+      throw new PlanningFailureError("proposal_citations");
     }
     return refs.map(ref => prepared.sourceIds[ref - 1]);
   }
@@ -126,7 +127,7 @@ export function readSitePlanning(value: unknown, prepared: PreparedPlanning) {
   const permitted = new Set(prepared.sourceIds);
   function citations(value: unknown): string[] {
     if (!Array.isArray(value) || !value.length || new Set(value).size !== value.length ||
-        value.some(id => typeof id !== "string" || !permitted.has(id))) throw Error("Site plan citations refused");
+        value.some(id => typeof id !== "string" || !permitted.has(id))) throw new PlanningFailureError("proposal_citations");
     return [...value];
   }
   if (!Array.isArray(output.pages) || output.pages.length !== plan.pages.length || !Array.isArray(output.unresolved)) {
@@ -135,20 +136,20 @@ export function readSitePlanning(value: unknown, prepared: PreparedPlanning) {
   const evidence = output.pages.map((value, index) => {
     const item = object(value, ["path", "sourceIds", "sectionSourceIds", "actionKind", "destination"]);
     const page = plan.pages[index];
-    const actionKind = choice(item.actionKind, actionKinds);
+    const actionKind = atPlanningStage("proposal_route", () => choice(item.actionKind, actionKinds));
     if (item.path !== page.path || !Array.isArray(item.sectionSourceIds) || item.sectionSourceIds.length !== page.sections.length) {
       throw Error("Site plan page or section evidence mismatch");
     }
-    const destination = item.destination === null ? null : text(item.destination, 120);
+    const destination = item.destination === null ? null : atPlanningStage("proposal_route", () => text(item.destination, 120));
     if (destination === null ? actionKind !== "request-contact" : !paths.has(destination) || destination === page.path) {
-      throw Error("Site plan visitor action refused");
+      throw new PlanningFailureError("proposal_route");
     }
     return { path: page.path, sourceIds: citations(item.sourceIds), sectionSourceIds: item.sectionSourceIds.map(citations),
       action: { kind: actionKind, label: page.action, destination } };
   });
   const draft = {
     status: "proposed" as const, plan, directionSourceIds: citations(output.directionSourceIds), evidence,
-    unresolved: output.unresolved.map(item => text(item, 280)),
+    unresolved: output.unresolved.map(item => atPlanningStage("proposal_content", () => text(item, 280))),
     ownerDigest: prepared.ownerDigest, inputDigest: prepared.inputDigest,
   };
   return { ...draft, digest: fingerprint(draft) };

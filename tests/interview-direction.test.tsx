@@ -44,8 +44,8 @@ test("proposed site plans refuse duplicate paths and markup", () => {
   assert.equal(revised.title.kind === "editorial" && revised.title.text, "Home");
   assert.deepEqual(revised.sections.map(section => section.text?.kind === "editorial" && section.text.text),
     ["Start with the website address.", "Access comes later."]);
-  assert.throws(() => readPresencePlan({ ...plan, pages: [page, page] }), /Invalid proposed Page/);
-  assert.throws(() => readPresencePlan({ ...plan, pages: [{ ...page, title: "<script>" }] }), /Invalid canonical text/);
+  assert.throws(() => readPresencePlan({ ...plan, pages: [page, page] }), { code: "proposal_route" });
+  assert.throws(() => readPresencePlan({ ...plan, pages: [{ ...page, title: "<script>" }] }), { code: "proposal_content" });
 });
 
 test("an exact edited Presence Direction composes a variable Page set with canonical sources", () => {
