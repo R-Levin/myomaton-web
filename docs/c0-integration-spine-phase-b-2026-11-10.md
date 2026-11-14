@@ -1558,3 +1558,65 @@ may legitimately return no plan. Decouple the generation operation
 from answering the last question and bind its full evidence input and
 output for review. Keep the current two-page native target as an
 installation identity constraint rather than a product-level site design.
+
+#### Approved v15 preparation
+
+The owner approved preparation scope
+`1333ddc4e88cb0cdaef0ab379c16f3ac71e0c36dcb18160b2192350d5b70a4da`.
+The approved input and Page/Action mapping alone were transferred over SSH
+to the existing Cloud WordPress Operator account. The receiver verified
+13,757 bytes at SHA-256
+`d1766a4be45f5103ffe47ff630099b48754af2c12faa42e77e9b372a5b7cc9e6`
+and account ownership with directory mode 0700 and file mode 0600. The
+private copy is `~/miopages-wp-review-1333ddc4/input.json`. Keep the
+packet, private review HTML and credential custody out of Git.
+
+Read-only evidence matched both historical signed envelopes and both
+authenticated receipts. The restricted PostgreSQL role independently
+matched the canonical base, active installation and signed high-water
+revision 4 with revision 3 as its predecessor. WordPress still runs
+Delivery 0.0.9 at high-water 4 and materialized revision 3. Home 13 and
+Service 14 remain drafts with their original slugs and exact baseline
+content hashes. The first no-password check caught a receipt comparison
+using the wrong field name. The corrected check passed without writes.
+
+The checksummed Cloud launcher
+`bash ~/miopages-wp-rehearsal/scripts/wordpress-prepare-v15-review.sh`
+requires the existing `miopages_migration` password at a hidden prompt.
+It checks scope, current base, installation and signed recovery evidence
+before creating two short-lived scoped principals. The author can revise
+and preview the exact Page proposals. The reviewer can independently
+inspect them. Neither can approve, authorize a draft, issue or publish.
+Wait for the sanitized result before treating the Page revisions and
+preview events as durable. The existing local review entry is
+`runtime-content/c0-wordpress-private-preview-v15-verified/index.html`,
+with both projected Pages, before/after comparisons and source notes.
+
+The proposed application updates only existing Home 13 and Service 14
+on the target installation, with the exact content hashes and Actions
+above. It would reconcile the native application receipts, restore
+displayed revision 3 using the signed materialized baseline, and
+reconcile the restore receipt with high-water 5 retained. Durable exact
+Page preview approvals, site-level authorization, a compatible WordPress
+installation and separately approved application are pending. No revision
+5 envelope was issued or applied. The protected transfer did not
+authorize a plugin change or public launch.
+
+Local work advanced an evidence-bound site planning operation separate
+from the interview. It reuses the editable Presence Direction model. It
+projects exact approved unconfirmed answers, excludes superseded answers
+and private source pointers, and validates citations at the direction,
+Page and Section levels. Internal visitor links must resolve within the
+proposed page set. Unresolved claims remain review material. Offline
+samples exercised different architectures for managed Web Presence and
+tree service. Next, connect it to the existing metered provider and Core
+proposal review under new authorization for provider dispatch. This
+checkpoint made no provider calls.
+
+Verification passed 400 app tests, TypeScript, focused lint, the
+consolidated PHP gate, both disposable PostgreSQL WordPress integration
+tests and both Node/PHP receipt tests. A subsequent focused rerun passed
+after the planning projection dropped raw interview question text. The
+PHP Windows run does not verify POSIX mode behavior. Cloud preflight
+independently verified private file permissions and the restricted TLS
+session.

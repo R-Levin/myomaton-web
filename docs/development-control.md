@@ -530,7 +530,9 @@ linked synthetic inquiry and private WordPress review input. The native
 apply remains gated by separate approval. The [private revision 5 review and
 recovery checkpoint](c0-integration-spine-phase-b-2026-11-10.md#private-revision-5-review-and-recovery)
 records the v2 rollback correction, local v15 previews and the exact
-preparation scope. Governed Page previews require fresh scoped credentials.
+preparation scope. The [approved v15 preparation handoff](c0-integration-spine-phase-b-2026-11-10.md#approved-v15-preparation)
+records the verified transfer, live revision 3 baseline and governed
+preview gate. Application and publication retain separate approval.
 
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
