@@ -58,11 +58,13 @@ async function main() {
   const generate = protectedSitePlanningProvider(join(privateRoot, "core-usage"), transportSettings.rates,
     responsesHttps(cfg.apiKey, grant.expiresAt), { ownerDigest, inputDigest: fictionalDigest, expiresAt: grant.expiresAt,
       maxRequests: Math.min(compact ? 16 : 14, transportSettings.maxRequests),
-      capMicros: Math.min(compact ? 71_554 : 22_429, transportSettings.capMicros),
-      ...(compact && { format: compactSitePlanningVersion, maxOutputTokens: compactSitePlanningOutput }) });
+      capMicros: Math.min(compact ? 74_029 : 22_429, transportSettings.capMicros),
+      ...(compact && { format: compactSitePlanningVersion, maxOutputTokens: compactSitePlanningOutput,
+        retainedReservation: "5ae4346b9db86020dd9f02f0c8746615acefc018d1d0004c3a3628cdffb581e8" }) });
   const project = async (): Promise<PreparedPlanning> => {
     const current = await safeFile<Scope>(grantFile);
     assert.equal(fingerprint(current), fingerprint(grant));
+    assert.equal(fingerprint(await safeFile(join(privateRoot, "ai-scope.json"))), fingerprint(transportSettings));
     const manifest = await safeFile<Manifest>(join(proofRoot, "site-planning-live-proof-inputs.json"));
     assert.equal(fingerprint(manifest), manifestDigest);
     assert.equal(manifest.c2.answerProjection, null);

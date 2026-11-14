@@ -244,3 +244,45 @@ test("compact generation has a separate grant, reserves its full output budget, 
     assert.deepEqual(calls, ["/v1/responses/input_tokens", "/v1/responses"]);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test("the exact compact comparison can account for an incomplete prior run without changing it", async () => {
+  const { mkdtemp, readFile, rm, writeFile } = await import("node:fs/promises");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { initializeResponsesUsageLedger, protectedSitePlanningProvider } = await import("../lib/platform/intake/intelligent-responses");
+  const { compactSitePlanningVersion, compactSitePlanningOutput } = await import("../lib/platform/intake/site-planning");
+  const { c2 } = await import("./fixtures/site-planning-compact");
+  const root = await mkdtemp(join(tmpdir(), "miopages-retained-reservation-"));
+  try {
+    const rates = { model: "test-model", verifiedOn: "2026-11-14", inputPerMillion: 750_000, cachedPerMillion: 75_000,
+      outputPerMillion: 4_500_000, cacheWritePerMillion: 0, countMicros: 0 };
+    await initializeResponsesUsageLedger(root, rates);
+    const file = join(root, "onboarding-usage.json");
+    const tenant = owner("c2"), evidence = [source("a", "Fictional tree work."), source("b", "Fictional urgent and routine paths.")];
+    const start = Date.now(), expiresAt = start + 60_000;
+    const prepared = prepareSitePlanning(tenant, evidence, [], { ...grant(tenant, evidence), expiresAt }, start);
+    const prior = { ownerDigest: owner("c0"), workDigest: "a".repeat(64), status: "uncertain", countDispatched: true,
+      generationDispatched: true, reservedMicros: 8400, estimatedMicros: 5925 };
+    const ledger = JSON.parse(await readFile(file, "utf8"));
+    ledger.attempts.push(prior);
+    await writeFile(file, JSON.stringify(ledger));
+    const scope = { ownerDigest: tenant, inputDigest: prepared.inputDigest, expiresAt, maxRequests: 4, capMicros: 38400,
+      format: compactSitePlanningVersion, maxOutputTokens: compactSitePlanningOutput, retainedReservation: fingerprint(prior) } as const;
+    let calls = 0;
+    const transport = { async send(path: string) {
+      calls++;
+      if (path.endsWith("input_tokens")) return { body: { input_tokens: 700 } };
+      return { body: { model: rates.model, service_tier: "default", status: "completed",
+        output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(c2) }] }],
+        usage: { input_tokens: 700, input_tokens_details: { cached_tokens: 0 }, output_tokens: 1900,
+          output_tokens_details: { reasoning_tokens: 0 }, total_tokens: 2600 } } };
+    } };
+    await assert.rejects(protectedSitePlanningProvider(root, rates, transport, { ...scope, retainedReservation: "b".repeat(64) })(() => prepared),
+      /Unreconciled development usage/);
+    await assert.rejects(protectedSitePlanningProvider(root, rates, transport, { ...scope, capMicros: 38399 })(() => prepared), /budget exhausted/);
+    assert.equal(calls, 0);
+    assert.equal((await protectedSitePlanningProvider(root, rates, transport, scope)(() => prepared)).status, "proposed");
+    assert.equal(calls, 2);
+    assert.deepEqual(JSON.parse(await readFile(file, "utf8")).attempts[0], prior);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});

@@ -31,7 +31,7 @@ type Config = {
 type SitePlanGrant = AnswerScope & {
   ownerDigest: string; basis: string; inputDigest: string; evidenceDigest: string; sources: QuestionContext["evidence"];
   expiresAt: number; maxRequests: number; capMicros: number; revoked?: boolean;
-  format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; scopeDigest?: string;
+  format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; scopeDigest?: string; retainedReservation?: string;
 };
 type ProviderGrant = AnswerScope & { ownerDigest: string; sources: QuestionContext["evidence"];
   expiresAt: number; maxRequests: number; capMicros: number; rates: ResponsesRates; ledgerDirectory: string; revoked?: boolean };
@@ -141,9 +141,11 @@ async function openCore() {
             initial.expiresAt > Date.now() + 86_400_000 || initial.maxRequests !== 2 ||
             initial.capMicros > 500_000 || !/^[0-9a-f]{64}$/u.test(initial.basis)) throw Error("Protected site planning scope refused");
         const compact = initial.format === compactSitePlanningVersion;
-        if (compact && (initial.expiresAt > grant.expiresAt || grant.revoked === true || initial.capMicros !== 71_554 ||
+        if (compact && (initial.expiresAt > grant.expiresAt || grant.revoked === true || initial.capMicros !== 74_029 ||
+            initial.retainedReservation !== "5ae4346b9db86020dd9f02f0c8746615acefc018d1d0004c3a3628cdffb581e8" ||
             initial.scopeDigest !== "fda4e83664a481649979d7069acd65e0cd52a2bd42caf12b209ff52d4e6b0a6d" ||
             initial.inputDigest !== "852a29a77307e671ce56f75b0e879da9a7856ff775ed1c9d36d70d9354775923")) throw Error("Compact site planning grant exceeds approved scope");
+        if (!compact && initial.retainedReservation !== undefined) throw Error("Prior reservation authorization refused");
         const generate = protectedSitePlanningProvider(grant.ledgerDirectory, grant.rates,
           responsesHttps(process.env.MIOPAGES_OPENAI_DEV_API_KEY ?? "", initial.expiresAt), { ...initial,
             // Absolute ledger ceilings preserve accrued usage in the existing shared ledger.

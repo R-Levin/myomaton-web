@@ -1997,3 +1997,14 @@ retained request or response ID. Keep those identifiers in protected
 custody. Once matched, retain the incomplete receipt and record the
 monetary reconciliation separately before scheduling dispatch. Recheck
 the governing grant expiry and the exact compact artifact at execution.
+
+#### Owner decision on the earlier incomplete charge
+
+The owner instructed Codex to proceed with the exact compact test without
+the project-filtered dashboard export. Project attribution remains
+unverified. For this comparison only, account for the full $0.008400
+reservation of the exact retained receipt, leaving it uncertain and
+unchanged. The absolute ceiling is $0.074029, made up of prior settled
+$0.005629, the retained reservation, and $0.060000 for the two request
+envelopes. It retains the original four new requests, exact input pins
+and no retries. Every other unresolved receipt still blocks dispatch.

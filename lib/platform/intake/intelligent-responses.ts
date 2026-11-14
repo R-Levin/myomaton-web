@@ -143,7 +143,7 @@ function meteredResponsesProvider(directory: string, rates: Rates, transport: Re
 
 type SitePlanningGrant = {
   ownerDigest: string; inputDigest: string; expiresAt: number; capMicros: number; maxRequests: number; maxAdditionalRequests?: number;
-  format?: typeof compactSitePlanningVersion; maxOutputTokens?: number;
+  format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; retainedReservation?: string;
 };
 export function protectedSitePlanningProvider(directory: string, rates: Rates, transport: ResponsesTransport, grant: SitePlanningGrant) {
   const { ownerDigest, inputDigest, expiresAt, capMicros: limit, maxRequests: requests, maxAdditionalRequests = 2 } = grant;
@@ -157,8 +157,12 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
   if (compact ? grant.maxOutputTokens !== compactSitePlanningOutput : grant.format !== undefined || grant.maxOutputTokens !== undefined) {
     throw Error("Invalid site planning output authorization");
   }
+  const { retainedReservation } = grant;
+  if (retainedReservation !== undefined && (!compact || !/^[a-f0-9]{64}$/.test(retainedReservation))) {
+    throw Error("Invalid prior reservation authorization");
+  }
   const dispatch = meteredResponsesDispatch(directory, rates, transport, requests, Math.floor(requests / 2), limit,
-    compact ? compactSitePlanningOutput : maxOutput);
+    compact ? compactSitePlanningOutput : maxOutput, retainedReservation);
   return async (readCurrent: () => PreparedPlanning | Promise<PreparedPlanning>) => {
     async function current() {
       if (Date.now() >= expiresAt) throw Error("Site planning authorization expired");
@@ -181,7 +185,7 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
 }
 
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
-  requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput) {
+  requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string) {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
@@ -193,11 +197,18 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       const ledger: Ledger = JSON.parse(await readFile(path, "utf8"));
       if (ledger.ratesDigest !== fingerprint(rates) || fingerprint(ledger.rateCard) !== ledger.ratesDigest || ledger.model !== rates.model || ledger.tier !== "default" ||
           ledger.adapterVersion !== version || !Array.isArray(ledger.attempts)) throw Error("Usage ledger binding mismatch");
+      let retained = false;
       const spent = ledger.attempts.reduce((total, receipt) => {
+        if (!retained && retainedReservation && receipt.status === "uncertain" && receipt.countDispatched === true &&
+            receipt.generationDispatched === true && fingerprint(receipt) === retainedReservation) {
+          retained = true;
+          return total + integer(receipt.reservedMicros);
+        }
         if (!["completed", "rejected"].includes(receipt.status) || receipt.estimatedMicros === undefined ||
             integer(receipt.estimatedMicros) > integer(receipt.reservedMicros)) throw Error("Unreconciled development usage");
         return total + receipt.estimatedMicros;
       }, 0);
+      if (retainedReservation && !retained) throw Error("Prior reservation evidence mismatch");
       const generations = ledger.attempts.filter(item => item.generationDispatched).length;
       const requests = ledger.attempts.filter(item => item.countDispatched).length + generations;
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");
