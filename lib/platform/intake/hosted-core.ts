@@ -241,18 +241,18 @@ export async function hostedCoreRequest(request: Request) {
         const version = Number(value.version);
         if (typeof value.operation === "string" && value.operation.startsWith("site-plan-")) {
           switch (value.operation) {
-            case "site-plan-generate": return view(app.sitePlanning.generate(app.draftToken, version));
-            case "site-plan-recover": return view(app.sitePlanning.recover(app.draftToken, version));
-            case "site-plan-edit": return view(app.sitePlanning.edit(app.draftToken, version, value.digest, value.plan, value.destinations));
-            case "site-plan-decide": return view(app.sitePlanning.decide(app.draftToken, version, value.digest, value.status, value.note, actor));
-            case "site-plan-delivery": return app.sitePlanning.delivery(app.draftToken, value.version);
+            case "site-plan-generate": return await view(app.sitePlanning.generate(app.draftToken, version));
+            case "site-plan-recover": return await view(app.sitePlanning.recover(app.draftToken, version));
+            case "site-plan-edit": return await view(app.sitePlanning.edit(app.draftToken, version, value.digest, value.plan, value.destinations));
+            case "site-plan-decide": return await view(app.sitePlanning.decide(app.draftToken, version, value.digest, value.status, value.note, actor));
+            case "site-plan-delivery": return await app.sitePlanning.delivery(app.draftToken, value.version);
             case "site-plan-improve": {
               const operations = await app.inquiry();
               const evidence = operations?.recommendation;
               if (!evidence || !operations || evidence.evidenceId !== value.inquiryId || typeof value.pagePath !== "string") {
                 throw new IntakeError("draft_changed", 409);
               }
-              return view(app.sitePlanning.improve(app.draftToken, version, value.digest, { inquiryId: evidence.evidenceId,
+              return await view(app.sitePlanning.improve(app.draftToken, version, value.digest, { inquiryId: evidence.evidenceId,
                 draftDigest: operations.draft.appliedDigest, pagePath: value.pagePath, section: evidence.suggestedSection, synthetic: true }));
             }
             default: throw new IntakeError("invalid_request");
