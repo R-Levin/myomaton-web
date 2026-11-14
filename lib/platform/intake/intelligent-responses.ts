@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { fingerprint } from "../canonical/model";
 import type { QuestionAttribution, QuestionContext, QuestionProvider } from "./intelligent-model";
 import { presencePlanSchema } from "./presence-plan";
+import { readSitePlanning, sitePlanningFormat, sitePlanningInstruction, type PreparedPlanning } from "./site-planning";
 
 const maxInput = 4_000, maxOutput = 1_200;
 const maxRequests = 16, maxGenerations = 8, capMicros = 500_000;
@@ -112,19 +113,72 @@ export function protectedResponsesProvider(directory: string, rates: Rates, tran
   }, true);
 }
 
-function meteredResponsesProvider(directory: string, configuredRates: Rates, transport: ResponsesTransport,
+function meteredResponsesProvider(directory: string, rates: Rates, transport: ResponsesTransport,
   requestLimit: number, generationLimit: number, spendLimit: number,
   project: (context: QuestionContext, attribution: QuestionAttribution) => unknown | Promise<unknown>,
   presencePlanning = false,
 ): QuestionProvider {
+  const model = rates.model;
+  const dispatch = meteredResponsesDispatch(directory, rates, transport, requestLimit, generationLimit, spendLimit);
+  return { version, async propose(context, attribution) {
+    const projected = await project(context, attribution);
+    const { request, initial, sourceIds } = interviewRequest(model, context, projected, presencePlanning);
+    const proposal = await dispatch(attribution, request, presencePlanning ? async () => {
+      const current = await project(context, attribution);
+      if (fingerprint(current) !== fingerprint(projected)) throw Error("Responses projection changed");
+    } : undefined);
+    if (presencePlanning && !initial) {
+      const output = record(proposal), ids = output.sourceIds;
+      if (Array.isArray(ids) && ids.length && ids.every(id => typeof id === "string" && sourceIds.includes(id)) &&
+          new Set(ids).size === ids.length) {
+        return { ...output, sourceIds: [...ids, context.history.at(-1)!.id + ":answer"] };
+      }
+    }
+    return proposal;
+  } };
+}
+
+type SitePlanningGrant = {
+  ownerDigest: string; inputDigest: string; expiresAt: number; capMicros: number; maxRequests: number;
+};
+export function protectedSitePlanningProvider(directory: string, rates: Rates, transport: ResponsesTransport, grant: SitePlanningGrant) {
+  const { ownerDigest, inputDigest, expiresAt, capMicros: limit, maxRequests: requests } = grant;
+  if (![ownerDigest, inputDigest].every(value => /^[a-f0-9]{64}$/.test(value)) ||
+      !Number.isSafeInteger(expiresAt) || !Number.isSafeInteger(limit) || limit < 1 || limit > capMicros ||
+      !Number.isSafeInteger(requests) || requests < 2 || requests > maxRequests || rates.cacheWritePerMillion !== 0) {
+    throw Error("Invalid site planning authorization");
+  }
+  const model = rates.model;
+  const dispatch = meteredResponsesDispatch(directory, rates, transport, requests, Math.floor(requests / 2), limit);
+  return async (readCurrent: () => PreparedPlanning | Promise<PreparedPlanning>) => {
+    async function current() {
+      if (Date.now() >= expiresAt) throw Error("Site planning authorization expired");
+      const prepared = structuredClone(await readCurrent());
+      const ids = [...prepared.input.sources, ...prepared.input.answers].map(item => item.id);
+      if (prepared.ownerDigest !== ownerDigest || prepared.inputDigest !== inputDigest ||
+          fingerprint({ ownerDigest, input: prepared.input }) !== inputDigest ||
+          fingerprint(ids) !== fingerprint(prepared.sourceIds) || Date.now() >= expiresAt) {
+        throw Error("Site planning authorization mismatch");
+      }
+      return prepared;
+    }
+    const prepared = await current();
+    const result = await dispatch({ ownerDigest, workDigest: fingerprint({ operation: "site-planning", inputDigest }) },
+      { model, instructions: sitePlanningInstruction, input: JSON.stringify(prepared.input),
+        text: { format: sitePlanningFormat(prepared) } }, current);
+    await current();
+    return readSitePlanning(result, prepared);
+  };
+}
+
+function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
+  requestLimit: number, generationLimit: number, spendLimit: number) {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
   const inputRate = Math.max(rates.inputPerMillion, rates.cachedPerMillion, rates.cacheWritePerMillion);
-  return { version, async propose(context: QuestionContext, attribution: QuestionAttribution) {
-    const { ownerDigest, workDigest } = attribution;
+  return async ({ ownerDigest, workDigest }: QuestionAttribution, request: { model: string; input: string; instructions: string; text: { format: object } }, recheck?: () => Promise<unknown>) => {
     if (![ownerDigest, workDigest].every(value => /^[a-f0-9]{64}$/.test(value))) throw Error("Scoped attribution required");
-    const projected = await project(context, { ownerDigest, workDigest });
     const lock = await open(lockPath, "wx", 0o600);
     try {
       const ledger: Ledger = JSON.parse(await readFile(path, "utf8"));
@@ -140,34 +194,6 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");
       const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + maxOutput * rates.outputPerMillion) / 1_000_000);
       if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) throw Error("Development budget exhausted");
-      const initial = !context.history.at(-1)?.answer;
-      const initialFormat = { ...format, schema: { ...format.schema, properties: {
-        ...format.schema.properties, question: { type: "string" }, assessment: { type: "null" },
-      } } };
-      const sourceIds = context.evidence.map(source => source.id).filter(id => context.gap.sourceIds.includes(id));
-      function providerFormat(base: typeof format | typeof initialFormat) {
-        if (!presencePlanning) return base;
-        if (!sourceIds.length) throw Error("Protected Responses sources required");
-        return { ...base, schema: { ...base.schema,
-          required: [...base.schema.required, ...(!initial ? ["presencePlan"] : [])],
-          properties: { ...base.schema.properties,
-            sourceIds: { type: "array", minItems: 1, items: { type: "string", enum: sourceIds } },
-            ...(!initial && { presencePlan: { anyOf: [presencePlanSchema, { type: "null" }] } }),
-          },
-        } };
-      }
-      const planningInstruction = presencePlanning
-        ? " Focus on the business itself: customer needs, offer boundaries, verifiable differentiation and buying decisions. Do not ask the owner to design the intake process. After an answer, propose a concise Presence Direction only when the supplied evidence supports it. Derive the page set, positioning, offering, audience, SEO descriptions, visitor action labels and editable sections from evidence. Do not invent claims, destinations, media permissions, or outcomes. Separate the decision addressed by the answer from unresolved business questions. Do not transfer evidence about intake or one service stage to a different stage. Keep sections concise. Use null when a substantive clarification is still needed."
-        : "";
-      const request = { model: rates.model, instructions: instruction + (initial
-        ? " This is the first question. End it with a question mark. Keep the rationale to one short sentence under 180 ASCII characters. Return null for assessment."
-        : " Cite the required answer reference verbatim and at least one of the supplied business source IDs. Keep the rationale and evidence needed under 180 characters each."),
-        input: JSON.stringify(projected), text: { format: providerFormat(initial ? initialFormat : format) } };
-      if (presencePlanning && !initial) request.instructions = instruction.replace(
-        "After an answer, cite its turn ID with :answer and propose",
-        "After an answer, cite the approved business sources and propose",
-      ) + " Core links the current answer automatically. Do not put an answer ID in sourceIds. Keep the rationale and evidence needed under 180 characters each.";
-      request.instructions += planningInstruction;
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation, countDispatched: true, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);
@@ -186,11 +212,9 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
         await checkpoint();
         throw Error("Input token ceiling exceeded");
       }
-      if (presencePlanning) {
-        try {
-          const current = await project(context, { ownerDigest, workDigest });
-          if (fingerprint(current) !== fingerprint(projected)) throw Error("Responses projection changed");
-        } catch (error) {
+      if (recheck) {
+        try { await recheck(); }
+        catch (error) {
           receipt.status = "rejected";
           receipt.estimatedMicros = rates.countMicros;
           await checkpoint();
@@ -225,18 +249,42 @@ function meteredResponsesProvider(directory: string, configuredRates: Rates, tra
       catch { receipt.status = "rejected"; }
       await checkpoint();
       if (receipt.status === "rejected") throw Error("Provider proposal unavailable");
-      if (presencePlanning && !initial) {
-        const output = record(proposal);
-        const ids = output.sourceIds;
-        if (Array.isArray(ids) && ids.length && ids.every(id => typeof id === "string" && sourceIds.includes(id)) &&
-            new Set(ids).size === ids.length) {
-          return { ...output, sourceIds: [...ids, context.history.at(-1)!.id + ":answer"] };
-        }
-      }
       return proposal;
     } finally {
       await lock.close();
       await unlink(lockPath);
     }
-  } };
+  };
+}
+
+function interviewRequest(model: string, context: QuestionContext, projected: unknown, presencePlanning: boolean) {
+  const initial = !context.history.at(-1)?.answer;
+  const initialFormat = { ...format, schema: { ...format.schema, properties: {
+    ...format.schema.properties, question: { type: "string" }, assessment: { type: "null" },
+  } } };
+  const sourceIds = context.evidence.map(source => source.id).filter(id => context.gap.sourceIds.includes(id));
+  function providerFormat(base: typeof format | typeof initialFormat) {
+    if (!presencePlanning) return base;
+    if (!sourceIds.length) throw Error("Protected Responses sources required");
+    return { ...base, schema: { ...base.schema,
+      required: [...base.schema.required, ...(!initial ? ["presencePlan"] : [])],
+      properties: { ...base.schema.properties,
+        sourceIds: { type: "array", minItems: 1, items: { type: "string", enum: sourceIds } },
+        ...(!initial && { presencePlan: { anyOf: [presencePlanSchema, { type: "null" }] } }),
+      },
+    } };
+  }
+  const planningInstruction = presencePlanning
+    ? " Focus on the business itself: customer needs, offer boundaries, verifiable differentiation and buying decisions. Do not ask the owner to design the intake process. After an answer, propose a concise Presence Direction only when the supplied evidence supports it. Derive the page set, positioning, offering, audience, SEO descriptions, visitor action labels and editable sections from evidence. Do not invent claims, destinations, media permissions, or outcomes. Separate the decision addressed by the answer from unresolved business questions. Do not transfer evidence about intake or one service stage to a different stage. Keep sections concise. Use null when a substantive clarification is still needed."
+    : "";
+  const request = { model, instructions: instruction + (initial
+    ? " This is the first question. End it with a question mark. Keep the rationale to one short sentence under 180 ASCII characters. Return null for assessment."
+    : " Cite the required answer reference verbatim and at least one of the supplied business source IDs. Keep the rationale and evidence needed under 180 characters each."),
+    input: JSON.stringify(projected), text: { format: providerFormat(initial ? initialFormat : format) } };
+  if (presencePlanning && !initial) request.instructions = instruction.replace(
+    "After an answer, cite its turn ID with :answer and propose",
+    "After an answer, cite the approved business sources and propose",
+  ) + " Core links the current answer automatically. Do not put an answer ID in sourceIds. Keep the rationale and evidence needed under 180 characters each.";
+  request.instructions += planningInstruction;
+  return { request, initial, sourceIds };
 }

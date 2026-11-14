@@ -76,3 +76,51 @@ test("fails closed for a changed evidence set, wrong tenant, expired grant or un
   assert.throws(() => prepareSitePlanning(tenant, evidence, [], auth, auth.expiresAt), /not authorized/);
   assert.throws(() => prepareSitePlanning(tenant, evidence, [original, correction], grant(tenant, evidence), now), /transmission not approved/);
 });
+
+test("site planning reuses the metered Responses dispatch and refuses a stale projection after count", async () => {
+  const { mkdtemp, readFile, rm } = await import("node:fs/promises");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { initializeResponsesUsageLedger, protectedSitePlanningProvider } = await import("../lib/platform/intake/intelligent-responses");
+  const directory = await mkdtemp(join(tmpdir(), "miopages-planning-"));
+  try {
+    const rates = { model: "test-model", verifiedOn: "2026-11-13", inputPerMillion: 750_000, cachedPerMillion: 75_000,
+      outputPerMillion: 4_500_000, cacheWritePerMillion: 0, countMicros: 0 };
+    await initializeResponsesUsageLedger(directory, rates);
+    const ownerDigest = owner("c0"), evidence = [source("transition", "The business is preparing a managed service.")];
+    const liveNow = Date.now();
+    const prepared = prepareSitePlanning(ownerDigest, evidence, [], { ...grant(ownerDigest, evidence), expiresAt: liveNow + 60_000 }, liveNow);
+    const authorization = { ownerDigest, inputDigest: prepared.inputDigest, expiresAt: liveNow + 60_000, capMicros: 500_000, maxRequests: 4 };
+    const paths: string[] = [];
+    const plan = { plan: { positioning: "Managed Web Presence", offering: "Scoped planning", audience: "Small businesses",
+      pages: [page("/", "Understand the options", "Review the existing site before choosing a path.", "Request a conversation")] },
+      directionSourceIds: ["transition"], pages: [signal("/", "transition", null)], unresolved: ["Eligibility remains open."] };
+    const dispatch = protectedSitePlanningProvider(directory, rates, {
+      async send(path, request) {
+        paths.push(path);
+        assert.doesNotMatch(JSON.stringify(request), /Retained private source pointer/);
+        if (path.endsWith("input_tokens")) return { body: { input_tokens: 100 } };
+        assert.equal((request as { store: boolean }).store, false);
+        return { body: { model: rates.model, service_tier: "default", status: "completed", usage: {
+          input_tokens: 100, input_tokens_details: { cached_tokens: 0 }, output_tokens: 50,
+          output_tokens_details: { reasoning_tokens: 0 }, total_tokens: 150,
+        }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(plan) }] }] } };
+      },
+    }, authorization);
+    const ledger = () => readFile(join(directory, "onboarding-usage.json"), "utf8").then(JSON.parse);
+    assert.equal((await dispatch(() => prepared)).status, "proposed");
+    assert.deepEqual(paths, ["/v1/responses/input_tokens", "/v1/responses"]);
+    await assert.rejects(dispatch(() => prepared), /already dispatched/);
+    const secondEvidence = [source("transition", "Customers first need a website review.")];
+    const second = prepareSitePlanning(ownerDigest, secondEvidence, [], { ...grant(ownerDigest, secondEvidence), expiresAt: liveNow + 60_000 }, liveNow);
+    let reads = 0;
+    const secondDispatch = protectedSitePlanningProvider(directory, rates, {
+      async send(path) { paths.push(path); return { body: { input_tokens: 100 } }; },
+    }, { ...authorization, inputDigest: second.inputDigest });
+    await assert.rejects(secondDispatch(() => ++reads === 1 ? second : prepared), /authorization mismatch/);
+    assert.equal(paths.at(-1), "/v1/responses/input_tokens");
+    assert.equal(paths.length, 3);
+    assert.deepEqual((await ledger()).attempts.map((item: { status: string; generationDispatched: boolean }) =>
+      [item.status, item.generationDispatched]), [["completed", true], ["rejected", false]]);
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});

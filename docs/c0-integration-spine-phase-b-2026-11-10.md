@@ -1681,3 +1681,71 @@ Proposed authorization for owner review:
 
 No new WordPress file, content, plugin, revision, approval or signature
 was changed during independent verification.
+
+#### Hosted revision 5 apply and restore
+
+**PASS.** Executed the owner-approved scope
+`ba185f4c51f60e04c787678df9722ecbf76445596840f23d11f668b753433646`
+on the existing protected `miopages.org` development installation.
+Three independently authenticated, fixture-scoped principals recorded
+the two exact development Page approvals, reviewed the site
+projection, and authorized the native draft. The approved Page
+events were Home
+`9f59c79689dd5a164511524a949df9fb56d65ea33ac42877a214497d96f07a5f`
+and Service
+`82a8177a30fac5a7be11692672c5c1797c54f7c037783fdc902db8111442ac2a`.
+The signed v2 candidate digest was
+`2fd1dd2b6780a5f4e8af35c45f80845578032de06b632b05a9012ff52a455ae0`.
+
+The previously retained 0.0.9 ZIP matched all 14 installed files
+byte for byte. Its SHA-256 is
+`6c3f812f0eb03016f97d433a8ea365c732d12e31c19662c8c1159ace9742fa7e`.
+The first staged 0.0.10 ZIP used Windows line endings. It was replaced
+before installation with exact LF Git blobs from `07992bf`.
+The installed package SHA-256 is
+`ec75ecd6906742aa9eb5a714263720752afbc80ab547d027910de81d9ee4797c`.
+Only the plugin entry point, native envelope verifier and draft
+writer differ. Delivery 0.0.10 is active. The preserved 0.0.9
+directory and original ZIP both remain off-webroot.
+
+| State | Signed high-water | Displayed revision | Home 13 content SHA-256 | Service 14 content SHA-256 |
+| --- | --- | --- | --- | --- |
+| Before and after restore | 4 before, 5 after | 3 | `960fea54ac23eb52c15eb9aedec4e84023903c845160942ebc96256b58999940` | `90c4917bfe9fa5fd7d478df98a972c6cfd26050e47d54a0c735ef369d9cbc39e` |
+| Applied and retried | 5 | 5 | `9a2a218c24ab25bd5f31c6122617f28786ea705a6db9d91d81f8d1bde2d2816b` | `eb3c0a43811f6c6f882317ede97c8e8e0cdbfc8b6d4c513fef12a6b91ab75b5f` |
+
+Both Pages remained drafts with unchanged IDs and slugs. Both
+navigation links and the reviewed reciprocal Actions matched the
+signed revision 5 projection. After restore, the original links
+returned with the original bytes. The exact apply retry produced an
+identical receipt without adding WordPress revisions. Core reconciled
+the HMAC-authenticated apply and restore receipts, and a fresh SSH
+readback confirmed the persisted journals match the WordPress copies.
+Receipt file SHA-256 values are
+`37102465ac26b20163684c5d3c69cb2b9dfd0ad36ed047391d84d51b1ef3f8ad`
+for apply and
+`d024db68cf9a8f2368c16d56cd3fbf02853f0ef6429e142c2ad0f6811f6e36ec`
+for restore. The baseline, application and recovery evidence remain
+in their respective protected directories. The WordPress Page
+inventory and active theme matched throughout. Unauthenticated HTTPS
+to the site and both draft URLs returned 401. No public publication,
+production Core change or additional provider dispatch occurred.
+
+To inspect restored drafts, use the existing site protection and
+WordPress login for [Home 13](https://miopages.org/?page_id=13&preview=true)
+and [Service 14](https://miopages.org/?page_id=14&preview=true).
+The previous private local review remains the way to see the proposed
+revision 5 copy and before/after comparisons after restoration.
+
+Local verification passed 401 application tests, TypeScript, focused
+ESLint, the consolidated PHP smoke gate and four disposable PostgreSQL
+and Node/PHP integration tests. The distinct, evidence-bound site
+planning operation now shares the existing Responses usage ledger,
+token count, expense reservation and request cap. It revalidates the
+authorized input before generation and before returning a plan. An
+offline transport test verified the request sequence, duplicate
+refusal and a changed projection stopping after the token count.
+No generated site plan was sent live or saved into hosted Core.
+Next, connect this operation to authenticated Core review and draft
+persistence, then authorize a bounded live test of exact C0 and
+fictional-business evidence to verify that substantially different
+business needs lead to different page structures and visitor actions.

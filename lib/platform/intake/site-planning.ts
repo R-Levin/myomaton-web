@@ -41,7 +41,7 @@ export function prepareSitePlanning(
   return { input, ownerDigest, inputDigest: fingerprint({ ownerDigest, input }), sourceIds };
 }
 
-type PreparedPlanning = ReturnType<typeof prepareSitePlanning>;
+export type PreparedPlanning = ReturnType<typeof prepareSitePlanning>;
 const shape = (properties: Record<string, unknown>) => ({
   type: "object", properties, required: Object.keys(properties), additionalProperties: false,
 });

@@ -532,8 +532,12 @@ recovery checkpoint](c0-integration-spine-phase-b-2026-11-10.md#private-revision
 records the v2 rollback correction, local v15 previews and the exact
 preparation scope. The [approved v15 preparation handoff](c0-integration-spine-phase-b-2026-11-10.md#approved-v15-preparation)
 records the verified transfer and live revision 3 baseline. The [durable v15 previews and application decision](c0-integration-spine-phase-b-2026-11-10.md#durable-v15-previews-and-application-decision)
-record the two independently verified preview events and exact pending
-application scope. Application and publication retain separate approval.
+record the two independently verified preview events and approved
+application scope. The [hosted revision 5 apply and restore](c0-integration-spine-phase-b-2026-11-10.md#hosted-revision-5-apply-and-restore)
+passed. WordPress displays revision 3 on Home 13 and Service 14, with
+high-water 5, Delivery 0.0.10 active and both receipts reconciled.
+Publication retains separate authority. The next product milestone is
+authenticated Core review and persistence for evidence-bound AI site plans.
 
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
