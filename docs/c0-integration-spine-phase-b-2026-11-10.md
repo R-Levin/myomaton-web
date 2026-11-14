@@ -1895,7 +1895,7 @@ request attribution were not independently verified. The original
 request remains uncertain, the authoritative ledger stays untouched,
 and both cases remain disabled. A matching provider export should
 isolate the development project, model and generation on November 13
-around 10:36 p.m. Eastern (November 14 around 02:36 UTC). The aggregate
+around 9:36 p.m. Eastern (November 14 around 02:36 UTC). The aggregate
 does not establish the original provider completion reason. Preserve
 the original receipt even after its charge is independently reconciled.
 [OpenAI Usage Dashboard](https://platform.openai.com/usage) ·
@@ -1962,3 +1962,38 @@ and all 163 manifest files. Tar SHA-256 is
 `074c30d4a66fce1e33e5bf1335bdaf0276af3e98b5b83fa21590b89bde7d8386`.
 Hosted Core still runs the previous build. Local checks passed 404
 application tests, 14 focused tests, TypeScript and ESLint.
+
+#### Conditional compact comparison blocked at project attribution
+
+Read [owner authorization](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6878168944)
+and its [underlying assessment](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6878148736).
+The conditional approval for the exact comparison at `b307b45` is
+recorded. Both local manifest fingerprints matched the approved
+scope. The owner-reported dashboard figures match the recorded model's
+1,899 total tokens and $0.0059 rounded charge after model filtering.
+They do not establish which development project or request produced
+the dashboard entry. Browser automation could not open an authenticated
+dashboard and no matching provider export was available in the checked
+locations. No credentials or permissions were changed to gain access.
+
+Read-only SSH confirmed the live ledger and preserved copy are still
+byte-identical at SHA-256
+`a3864195d357f662c529d7b5084d14878ceb72c415a9f33d32e2a9aba2beeb18`.
+The last ledger write was 2026-11-14 02:35:44 UTC, which is November
+13 at 9:35:44 p.m. Eastern. Use this host timestamp to locate the
+event, rather than shifting the earlier reported Eastern time.
+The retained record has the provider response ID, 699 input tokens,
+1,200 output tokens, $0.005925 estimated usage and its $0.008400
+reservation. It is still uncertain. Both case grants were absent,
+the total remained 12 requests, and hosted Core still reports
+`9786247`. No dispatch, reconciliation entry, hosted deployment,
+WordPress change or publication occurred. No genuine comparison
+outputs exist for either business.
+
+Next obtain an independently inspectable, project-and-model-filtered
+Usage export for the original UTC window. It must isolate the one
+generation, or provider-side confirmation must correlate it with the
+retained request or response ID. Keep those identifiers in protected
+custody. Once matched, retain the incomplete receipt and record the
+monetary reconciliation separately before scheduling dispatch. Recheck
+the governing grant expiry and the exact compact artifact at execution.
