@@ -4,10 +4,10 @@ import { readFile, lstat, realpath, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fingerprint } from "../lib/platform/canonical/model";
 import { compactSitePlanningVersion, compactSitePlanningOutput, prepareSitePlanning, type PreparedPlanning } from "../lib/platform/intake/site-planning";
-import { comparisonWorkDigest, freshCompactComparison, protectedSitePlanningProvider, replaySitePlanningResponse, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
+import { comparisonWorkDigest, freshCompactComparison, outcomeCompactComparison, protectedSitePlanningProvider, replaySitePlanningResponse, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
 import { responsesHttps } from "../lib/platform/intake/responses-https";
 import { PlanningResponseCustody, type PlanningAttempt } from "../lib/platform/intake/planning-response-custody";
-import { PlanningFailureError } from "../lib/platform/intake/planning-diagnostics";
+import { isInvalidPlanningResponse, PlanningFailureError } from "../lib/platform/intake/planning-diagnostics";
 import type { InterviewEvidence } from "../lib/platform/intake/intelligent-model";
 
 const manifestDigest = "3437eb2491bd7d44dea7cb707319771158b6d61db1f3ac56b4019e908e4e66d6";
@@ -16,7 +16,7 @@ const ownerDigest = fingerprint({ fictionalCase: "c2", operation: "site-planning
 type Manifest = { c2: { sources: Array<Pick<InterviewEvidence, "id" | "kind" | "statement">>; answerProjection: null } };
 const compactScopeDigest = "fda4e83664a481649979d7069acd65e0cd52a2bd42caf12b209ff52d4e6b0a6d";
 type Scope = { manifestDigest: string; inputDigest: string; expiresAt: number; revoked?: boolean;
-  scopeDigest?: string; comparisonId?: string; format?: typeof compactSitePlanningVersion; maxOutputTokens?: number };
+  scopeDigest?: string; comparisonId?: string; comparisonAttempt?: number; previousCapture?: string; c0ReadbackDigest?: string; format?: typeof compactSitePlanningVersion; maxOutputTokens?: number };
 const home = "/home/virtual/vps-bef564/e/e494602172";
 const privateRoot = join(home, "miopages-private-acceptance");
 const proofRoot = join(privateRoot, "site-planning-proof");
@@ -59,11 +59,12 @@ async function main() {
   const transportSettings = await safeFile<{ capMicros: number; maxRequests: number; rates: ResponsesRates; expiresAt: number; revoked?: boolean }>(join(privateRoot, "ai-scope.json"));
   assert.equal(cfg.aiEnabled, true);
   assert.ok(transportSettings.expiresAt >= grant.expiresAt && transportSettings.revoked !== true);
-  const comparison = freshCompactComparison;
+  const outcome = grant.comparisonId === outcomeCompactComparison.id;
+  const comparison = outcome ? outcomeCompactComparison : freshCompactComparison;
   const fresh = grant.comparisonId === comparison.id;
   assert.ok(grant.comparisonId === undefined || fresh);
   const compact = grant.format === compactSitePlanningVersion;
-  assert.ok(!fresh || (compact && transportSettings.maxRequests >= comparison.maxRequests &&
+  assert.ok(!fresh || (compact && transportSettings.maxRequests >= (outcome ? outcomeCompactComparison.baselineRequests + 4 : comparison.maxRequests) &&
     transportSettings.capMicros >= comparison.capMicros));
   if (compact) {
     assert.equal(grant.scopeDigest, compactScopeDigest);
@@ -80,9 +81,9 @@ async function main() {
   assert.equal(transportSettings.rates.countMicros, 0);
   const generate = protectedSitePlanningProvider(join(privateRoot, "core-usage"), transportSettings.rates,
     responsesHttps(cfg.apiKey, grant.expiresAt), { ownerDigest, inputDigest: fictionalDigest, expiresAt: grant.expiresAt,
-      maxRequests: Math.min(fresh ? comparison.maxRequests : compact ? 16 : 14, transportSettings.maxRequests),
+      maxRequests: outcome ? outcomeCompactComparison.maxRequests : Math.min(fresh ? comparison.maxRequests : compact ? 16 : 14, transportSettings.maxRequests),
       capMicros: Math.min(fresh ? comparison.capMicros : compact ? 74_029 : 22_429, transportSettings.capMicros),
-      ...(fresh && { comparisonId: comparison.id }),
+      ...(fresh && { comparisonId: comparison.id, comparisonAttempt: grant.comparisonAttempt }),
       ...(compact && { format: compactSitePlanningVersion, maxOutputTokens: compactSitePlanningOutput,
         retainedReservation: comparison.retainedReservation }) });
   const project = async (): Promise<PreparedPlanning> => {
@@ -96,17 +97,39 @@ async function main() {
     return prepareSitePlanning(ownerDigest, evidence, [], { ownerDigest, expiresAt: grant.expiresAt,
       evidenceDigest: fingerprint(evidence), approvedAnswerDigests: [] });
   };
+  if (outcome) {
+    assert.match(grant.c0ReadbackDigest ?? "", /^[a-f0-9]{64}$/u);
+    if ((grant.comparisonAttempt ?? 0) > 1) {
+      assert.match(grant.previousCapture ?? "", /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/u);
+      const prior = await safeFile<PlanningAttempt>(join(proofRoot, "c2-recovery-" + grant.previousCapture + ".json"));
+      assert.equal(prior.id, grant.previousCapture);
+      assert.equal(prior.basis, basis);
+      assert.equal(prior.ownerDigest, ownerDigest);
+      assert.equal(prior.inputDigest, fictionalDigest);
+      assert.equal(prior.workDigest, comparisonWorkDigest(fictionalDigest, true, comparison.id, grant.comparisonAttempt! - 1));
+      const capture = await custody.read(prior);
+      if (!capture) throw new PlanningFailureError("custody_read");
+      await custody.verifyReceipt(prior, capture.bytes);
+      let invalid = false;
+      try { replaySitePlanningResponse(capture.bytes, capture.prepared, prior.model, true); }
+      catch (error) {
+        if (!(error instanceof PlanningFailureError) || !isInvalidPlanningResponse(error.code)) throw error;
+        invalid = true;
+      }
+      if (!invalid) throw new PlanningFailureError("draft_persistence");
+    }
+  }
   const prepared = await project();
   assert.equal(prepared.inputDigest, fictionalDigest);
   const attempt: PlanningAttempt = { id: randomUUID(), at: new Date().toISOString(),
     basis, ownerDigest, inputDigest: fictionalDigest, model: transportSettings.rates.model,
-    workDigest: comparisonWorkDigest(fictionalDigest, compact, grant.comparisonId) };
+    workDigest: comparisonWorkDigest(fictionalDigest, compact, grant.comparisonId, grant.comparisonAttempt) };
   await custody.ready(attempt);
   // C2 has no Core draft. Keep only its nonsecret recovery binding beside the scoped response.
   await writeFile(join(proofRoot, "c2-recovery-" + attempt.id + ".json"), JSON.stringify(attempt) + "\n",
     { flag: "wx", mode: 0o600, flush: true });
   const result = await generate(project, bytes => custody.save(attempt, compact ? "compact/2" : "full", prepared, bytes));
-  await saveProposal(fresh ? "c2-generated-b42f6e6.json" : "c2-generated.json", result, attempt.model);
+  await saveProposal(outcome ? "c2-generated-c031341.json" : fresh ? "c2-generated-b42f6e6.json" : "c2-generated.json", result, attempt.model);
 }
 
 async function saveProposal(name: string, proposal: ReturnType<typeof replaySitePlanningResponse>, model: string) {

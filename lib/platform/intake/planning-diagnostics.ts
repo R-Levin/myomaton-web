@@ -37,3 +37,8 @@ export function atPlanningStage<T>(code: PlanningFailure, run: () => T): T {
     throw new PlanningFailureError(code);
   }
 }
+
+export function isInvalidPlanningResponse(code: string): code is
+  "proposal_shape" | "proposal_citations" | "proposal_route" | "proposal_content" | "response_decode" {
+  return ["proposal_shape", "proposal_citations", "proposal_route", "proposal_content", "response_decode"].includes(code);
+}

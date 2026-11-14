@@ -3,7 +3,7 @@ import { choice, fingerprint, object, text } from "../canonical/model";
 import type { Actor } from "../content-editing/proposal";
 import { IntakeError } from "./model";
 import { comparisonWorkDigest, replaySitePlanningResponse } from "./intelligent-responses";
-import { PlanningFailureError, type PlanningFailure } from "./planning-diagnostics";
+import { isInvalidPlanningResponse, PlanningFailureError, type PlanningFailure } from "./planning-diagnostics";
 import type { PlanningAttempt, PlanningResponseCustody } from "./planning-response-custody";
 import { readPresencePlan, type PresencePlan } from "./presence-plan";
 import type { IntakeService, IntakeView } from "./service";
@@ -63,6 +63,7 @@ type PlanningProvider = {
   generate: (project: () => Promise<PreparedPlanning>, retain?: (bytes: Buffer) => Promise<void>) => Promise<Generated>;
   format?: "compact/2" | "full";
   comparisonId?: string;
+  comparisonAttempt?: number;
 };
 
 export class ProtectedSitePlanning {
@@ -81,16 +82,36 @@ export class ProtectedSitePlanning {
     const attempt: PlanningAttempt = {
       id: randomUUID(), at: new Date().toISOString(), basis: sitePlanningBasis(original),
       ownerDigest: projection.ownerDigest, inputDigest: projection.inputDigest, model: provider.model,
-      workDigest: comparisonWorkDigest(projection.inputDigest, provider.format === "compact/2", provider.comparisonId),
+      workDigest: comparisonWorkDigest(projection.inputDigest, provider.format === "compact/2", provider.comparisonId, provider.comparisonAttempt),
     };
     const custody = this.custody;
     if (custody) {
       try { await custody.ready(attempt); }
       catch { throw new IntakeError("custody_write", 503); }
     }
+    const prior = original.sitePlanning?.recovery;
+    const retry = prior && (provider.comparisonAttempt ?? 0) > 1 && prior.basis === attempt.basis &&
+      isInvalidPlanningResponse(original.sitePlanning?.failure ?? "");
+    if (retry) {
+      if (!custody) throw new IntakeError("custody_read", 503);
+      let diagnosed = false;
+      try {
+        const capture = await custody.read(prior);
+        if (!capture) throw new PlanningFailureError("custody_read");
+        await custody.verifyReceipt(prior, capture.bytes);
+        try { replaySitePlanningResponse(capture.bytes, capture.prepared, prior.model, capture.format === "compact/2"); }
+        catch (error) {
+          if (!(error instanceof PlanningFailureError) || error.code !== original.sitePlanning?.failure) throw error;
+          diagnosed = true;
+        }
+      } catch (error) {
+        throw new IntakeError(error instanceof PlanningFailureError ? error.code : "custody_read", 503);
+      }
+      if (!diagnosed) throw new IntakeError("draft_persistence", 409);
+    }
     try {
       await this.intake.editProtectedSitePlanning(token, version, (state, view) => {
-        if (state.pending || state.proposal || state.recovery || view.interview?.pending ||
+        if (state.pending || state.proposal || (state.recovery && !retry) || view.interview?.pending ||
             sitePlanningBasis(view) !== attempt.basis) throw new IntakeError("draft_changed", 409);
         return { pending: { id: attempt.id, at: attempt.at, ...(custody && { capture: attempt }) } };
       });

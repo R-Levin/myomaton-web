@@ -4,7 +4,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { fingerprint } from "../canonical/model";
 import type { QuestionAttribution, QuestionContext, QuestionProvider } from "./intelligent-model";
 import { presencePlanSchema } from "./presence-plan";
-import { atPlanningStage, PlanningFailureError, type PlanningFailure } from "./planning-diagnostics";
+import { atPlanningStage, isInvalidPlanningResponse, PlanningFailureError, type PlanningFailure } from "./planning-diagnostics";
 import { compactSitePlanningFormat, compactSitePlanningInstruction, compactSitePlanningOutput, compactSitePlanningVersion, readCompactSitePlanning, readSitePlanning, sitePlanningFormat, sitePlanningInstruction, type PreparedPlanning } from "./site-planning";
 
 const maxInput = 4_000, maxOutput = 1_200;
@@ -27,6 +27,7 @@ type Receipt = QuestionAttribution & { reservedMicros: number; countDispatched: 
   status: "pending" | "completed" | "rejected" | "uncertain";
   outputLimit?: number;
   recoveryAuthorized?: true;
+  proposalValidation?: "valid" | "proposal_shape" | "proposal_citations" | "proposal_route" | "proposal_content" | "response_decode";
   failure?: "output_token_limit" | "content_filter" | "provider_incomplete" | "reservation_exceeded";
 };
 type Ledger = { ratesDigest: string; rateCard: Rates; adapterVersion: string; model: string; tier: "default"; attempts: Receipt[] };
@@ -153,23 +154,40 @@ export const freshCompactComparison = Object.freeze({
   capMicros: 79_512, maxRequests: 18, envelopeMicros: 30_000,
 });
 
-export function comparisonWorkDigest(inputDigest: string, compact: boolean, comparisonId?: string) {
+/** Issue #12 / 6880548834, bound to the immutable post-comparison ledger. */
+export const outcomeCompactComparison = Object.freeze({
+  ...freshCompactComparison,
+  id: "f087d1084e213bdfaa568a17eb81fe52269ce0b57bb151ac5f10708a0f8c34c2",
+  startingLedger: "3b919bb56cee5edba6c67d5217f2bbcf7e0e837bb2666595d798650e38856999",
+  owners: {
+    c0: "304d8a93ae2665e56d333bf4bdcf4b259149d95432d8498c1fe7b41daf929c0c",
+    c2: "85187570b504f6190efe321bfa451f05085273cbfff805c7281caeb32386aad2",
+  },
+  baselineAttempts: 8, baselineRequests: 16, baselineGenerations: 8,
+  maxAttemptsPerCase: 3, maxRequests: 28, capMicros: 273_906, envelopeCapMicros: 180_000,
+});
+
+export function comparisonWorkDigest(inputDigest: string, compact: boolean, comparisonId?: string, comparisonAttempt?: number) {
   return fingerprint({ operation: "site-planning", inputDigest, ...(compact && { format: compactSitePlanningVersion }),
-    ...(comparisonId && { comparisonId }) });
+    ...(comparisonId && { comparisonId }), ...(comparisonAttempt !== undefined && { comparisonAttempt }) });
 }
 
 type SitePlanningGrant = {
-  comparisonId?: string;
+  comparisonId?: string; comparisonAttempt?: number;
   ownerDigest: string; inputDigest: string; expiresAt: number; capMicros: number; maxRequests: number; maxAdditionalRequests?: number;
   format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; retainedReservation?: string;
 };
 type CompletedResponse = (bytes: Buffer) => Promise<void>;
+type NormalizeProposal = (value: unknown) => ReturnType<typeof normalizeSitePlanningResponse>;
 
 export function protectedSitePlanningProvider(directory: string, rates: Rates, transport: ResponsesTransport, grant: SitePlanningGrant) {
   const { ownerDigest, inputDigest, expiresAt, capMicros: limit, maxRequests: requests, maxAdditionalRequests = 2 } = grant;
+  const { comparisonId, comparisonAttempt } = grant;
+  const cycle = outcomeCompactComparison;
+  const outcome = comparisonId === cycle.id;
   if (![ownerDigest, inputDigest].every(value => /^[a-f0-9]{64}$/.test(value)) ||
       !Number.isSafeInteger(expiresAt) || !Number.isSafeInteger(limit) || limit < 1 || limit > capMicros ||
-      !Number.isSafeInteger(requests) || requests < 2 || requests > 20 || maxAdditionalRequests !== 2 || rates.cacheWritePerMillion !== 0) {
+      !Number.isSafeInteger(requests) || requests < 2 || requests > (outcome ? cycle.maxRequests : 20) || maxAdditionalRequests !== 2 || rates.cacheWritePerMillion !== 0) {
     throw Error("Invalid site planning authorization");
   }
   const model = rates.model;
@@ -182,16 +200,24 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
     throw Error("Invalid prior reservation authorization");
   }
   const comparison = freshCompactComparison;
-  const { comparisonId } = grant;
-  if (comparisonId !== undefined && (comparisonId !== comparison.id || !compact ||
+  if (comparisonAttempt !== undefined && !outcome) throw Error("Comparison attempt refused");
+  if (comparisonId !== undefined && (!compact ||
       expiresAt > 1794677438521 || expiresAt > Date.now() + 86_400_000 ||
       rates.model !== "gpt-5.4-mini-2026-03-17" || rates.countMicros !== 0 ||
       rates.inputPerMillion !== 750_000 || rates.cachedPerMillion !== 75_000 || rates.outputPerMillion !== 4_500_000 ||
       ![comparison.c0, comparison.c2].some(digest => digest === inputDigest) ||
-      limit !== comparison.capMicros || requests !== comparison.maxRequests ||
-      retainedReservation !== comparison.retainedReservation)) throw Error("Invalid fresh comparison authorization");
+      retainedReservation !== comparison.retainedReservation)) throw Error("Invalid compact comparison authorization");
+  if (outcome) {
+    const scenario = inputDigest === cycle.c0 ? "c0" : "c2";
+    if (!Number.isInteger(comparisonAttempt) || comparisonAttempt! < 1 || comparisonAttempt! > cycle.maxAttemptsPerCase ||
+        ownerDigest !== cycle.owners[scenario] || limit !== cycle.capMicros || requests < cycle.baselineRequests + 2) {
+      throw Error("Invalid outcome comparison authorization");
+    }
+  } else if (comparisonId !== undefined && (comparisonId !== comparison.id ||
+      limit !== comparison.capMicros || requests !== comparison.maxRequests)) throw Error("Invalid fresh comparison authorization");
   const dispatch = meteredResponsesDispatch(directory, rates, transport, requests, Math.floor(requests / 2), limit,
-    compact ? compactSitePlanningOutput : maxOutput, retainedReservation, comparisonId === undefined ? undefined : inputDigest);
+    compact ? compactSitePlanningOutput : maxOutput, retainedReservation, comparisonId === undefined || outcome ? undefined : inputDigest,
+    outcome ? { inputDigest, attempt: comparisonAttempt! } : undefined);
   return async (readCurrent: () => PreparedPlanning | Promise<PreparedPlanning>, retain?: CompletedResponse) => {
     async function checkCurrent() {
       if (Date.now() >= expiresAt) throw Error("Site planning authorization expired");
@@ -212,11 +238,14 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
       }
     };
     const prepared = await current();
-    const result = await dispatch({ ownerDigest, workDigest: comparisonWorkDigest(inputDigest, compact, comparisonId) },
+    if (outcome && !retain) throw new PlanningFailureError("custody_write");
+    const normalize: NormalizeProposal = value => normalizeSitePlanningResponse(value, prepared, compact);
+    const result = await dispatch({ ownerDigest, workDigest: comparisonWorkDigest(inputDigest, compact, comparisonId, comparisonAttempt) },
       { model, instructions: compact ? compactSitePlanningInstruction : sitePlanningInstruction, input: JSON.stringify(prepared.input),
-        text: { format: compact ? compactSitePlanningFormat(prepared) : sitePlanningFormat(prepared) } }, current, retain);
+        text: { format: compact ? compactSitePlanningFormat(prepared) : sitePlanningFormat(prepared) } },
+      current, retain, outcome ? normalize : undefined);
     if (!retain) await current();
-    return normalizeSitePlanningResponse(result, prepared, compact);
+    return outcome ? result as ReturnType<NormalizeProposal> : normalize(result);
   };
 }
 
@@ -252,13 +281,40 @@ export async function confirmSitePlanningReceipt(directory: string, ownerDigest:
   } catch { throw new PlanningFailureError("usage_gate"); }
 }
 
+type OutcomeLedgerScope = Omit<typeof outcomeCompactComparison, "startingLedger"> & { startingLedger: string };
+
+export function verifyOutcomeLedger(ledger: Ledger, inputDigest: string, attempt: number, cycle: OutcomeLedgerScope = outcomeCompactComparison) {
+  const baseline = JSON.stringify({ ...ledger, attempts: ledger.attempts.slice(0, cycle.baselineAttempts) }) + "\n";
+  if (createHash("sha256").update(baseline).digest("hex") !== cycle.startingLedger) throw Error("Outcome comparison ledger baseline refused");
+
+  const counts = { c0: 0, c2: 0 };
+  const valid = { c0: false, c2: false };
+  const suffix = ledger.attempts.slice(cycle.baselineAttempts);
+  for (const previous of suffix) {
+    const scenario = previous.ownerDigest === cycle.owners.c0 ? "c0" : "c2";
+    if (++counts[scenario] > cycle.maxAttemptsPerCase || valid[scenario] || previous.ownerDigest !== cycle.owners[scenario] ||
+        previous.workDigest !== comparisonWorkDigest(cycle[scenario], true, cycle.id, counts[scenario]) ||
+        previous.reservedMicros !== cycle.envelopeMicros || !previous.countDispatched || !previous.generationDispatched ||
+        !previous.recoveryAuthorized || !previous.usage || !previous.responseId ||
+        (previous.proposalValidation !== "valid" && !isInvalidPlanningResponse(previous.proposalValidation ?? "")) ||
+        (scenario === "c2" && !valid.c0) ||
+        (scenario === "c0" && counts.c2 > 0)) throw Error("Outcome comparison receipt refused");
+    valid[scenario] = previous.proposalValidation === "valid";
+  }
+  const scenario = inputDigest === cycle.c0 ? "c0" : "c2";
+  if (attempt !== counts[scenario] + 1 || valid[scenario] || (scenario === "c2" && !valid.c0) ||
+      (scenario === "c0" && counts.c2 > 0) ||
+      (suffix.length + 1) * cycle.envelopeMicros > cycle.envelopeCapMicros) throw Error("Outcome comparison order or envelope refused");
+}
+
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
-  requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string, comparisonInput?: string) {
+  requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string, comparisonInput?: string,
+  outcome?: { inputDigest: string; attempt: number }) {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
   const inputRate = Math.max(rates.inputPerMillion, rates.cachedPerMillion, rates.cacheWritePerMillion);
-  return async ({ ownerDigest, workDigest }: QuestionAttribution, request: { model: string; input: string; instructions: string; text: { format: object } }, recheck?: () => Promise<unknown>, retain?: CompletedResponse) => {
+  return async ({ ownerDigest, workDigest }: QuestionAttribution, request: { model: string; input: string; instructions: string; text: { format: object } }, recheck?: () => Promise<unknown>, retain?: CompletedResponse, normalize?: NormalizeProposal) => {
     if (![ownerDigest, workDigest].every(value => /^[a-f0-9]{64}$/.test(value))) throw Error("Scoped attribution required");
     let stage: PlanningFailure = "usage_gate";
     let lock: Awaited<ReturnType<typeof open>> | undefined;
@@ -294,8 +350,9 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
               first.workDigest !== comparisonWorkDigest(comparison.c0, true, comparison.id) ||
               first.reservedMicros !== comparison.envelopeMicros))) throw Error("Fresh comparison ledger baseline refused");
       }
+      if (outcome) verifyOutcomeLedger(ledger, outcome.inputDigest, outcome.attempt);
       const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + outputLimit * rates.outputPerMillion) / 1_000_000);
-      if (comparisonInput !== undefined && reservation !== freshCompactComparison.envelopeMicros) throw Error("Fresh comparison request envelope refused");
+      if ((comparisonInput !== undefined || outcome) && reservation !== freshCompactComparison.envelopeMicros) throw Error("Fresh comparison request envelope refused");
       if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) throw Error("Development budget exhausted");
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation,
@@ -378,6 +435,19 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       if (retain && recheck) {
         await recheck();
         receipt.recoveryAuthorized = true;
+        await checkpoint();
+      }
+      if (normalize) {
+        try {
+          if (receipt.status === "rejected") throw new PlanningFailureError("response_decode");
+          proposal = normalize(proposal);
+          receipt.proposalValidation = "valid";
+        } catch (error) {
+          if (!(error instanceof PlanningFailureError) || !isInvalidPlanningResponse(error.code)) throw error;
+          receipt.proposalValidation = error.code;
+          await checkpoint();
+          throw error;
+        }
         await checkpoint();
       }
       if (receipt.status === "rejected") {

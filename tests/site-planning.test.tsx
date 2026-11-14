@@ -286,3 +286,37 @@ test("the exact compact comparison can account for an incomplete prior run witho
     assert.deepEqual(JSON.parse(await readFile(file, "utf8")).attempts[0], prior);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test("the approved outcome scope permits only diagnosed attempts before an ordered C0/C2 completion", async () => {
+  const { createHash } = await import("node:crypto");
+  const { comparisonWorkDigest, outcomeCompactComparison: pin, verifyOutcomeLedger } =
+    await import("../lib/platform/intake/intelligent-responses");
+  type Ledger = Parameters<typeof verifyOutcomeLedger>[0];
+  type Receipt = Ledger["attempts"][number];
+  const receipt = (caseName: "c0" | "c2", index: number, proposalValidation: Receipt["proposalValidation"]): Receipt => ({
+    ownerDigest: pin.owners[caseName], workDigest: comparisonWorkDigest(pin[caseName], true, pin.id, index),
+    status: "completed", countDispatched: true, generationDispatched: true, reservedMicros: 30_000,
+    responseId: "resp_offline", usage: { input: 500, cached: 0, cacheWrite: 0, output: 1000, reasoning: 0 },
+    estimatedMicros: 4_875, recoveryAuthorized: true, proposalValidation,
+  });
+  const base = { attempts: Array.from({ length: 8 }, (_, i) => ({ ...receipt("c0", 1, undefined), workDigest: String(i) })) } as Ledger;
+  const cycle = { ...pin, startingLedger: createHash("sha256").update(JSON.stringify(base) + "\n").digest("hex") };
+  assert.doesNotThrow(() => verifyOutcomeLedger(base, pin.c0, 1, cycle));
+  assert.throws(() => verifyOutcomeLedger(base, pin.c2, 1, cycle), /order/);
+  const state = (...prior: Receipt[]) => ({ ...base, attempts: [...base.attempts, ...prior] });
+  const badC0 = receipt("c0", 1, "proposal_route"), goodC0 = receipt("c0", 2, "valid");
+  assert.throws(() => verifyOutcomeLedger(state(badC0), pin.c2, 1, cycle), /order/);
+  assert.doesNotThrow(() => verifyOutcomeLedger(state(badC0), pin.c0, 2, cycle));
+  assert.throws(() => verifyOutcomeLedger(state(badC0), pin.c0, 3, cycle), /order/);
+  assert.throws(() => verifyOutcomeLedger(state({ ...badC0, recoveryAuthorized: undefined }), pin.c0, 2, cycle), /receipt/);
+  assert.throws(() => verifyOutcomeLedger(state({ ...badC0, proposalValidation: undefined }), pin.c0, 2, cycle), /receipt/);
+  assert.throws(() => verifyOutcomeLedger(state(badC0, goodC0), pin.c0, 3, cycle), /order/);
+  assert.doesNotThrow(() => verifyOutcomeLedger(state(badC0, goodC0), pin.c2, 1, cycle));
+  const badC2 = (i: number) => receipt("c2", i, "proposal_citations");
+  assert.doesNotThrow(() => verifyOutcomeLedger(state(badC0, goodC0, badC2(1)), pin.c2, 2, cycle));
+  assert.throws(() => verifyOutcomeLedger(state(badC0, goodC0, receipt("c2", 1, "valid")), pin.c2, 2, cycle), /order/);
+  const five = state(badC0, receipt("c0", 2, "proposal_shape"), receipt("c0", 3, "valid"), badC2(1), badC2(2));
+  assert.doesNotThrow(() => verifyOutcomeLedger(five, pin.c2, 3, cycle));
+  assert.throws(() => verifyOutcomeLedger({ ...five, attempts: [...five.attempts, badC2(3)] }, pin.c2, 4, cycle), /order/);
+  assert.throws(() => verifyOutcomeLedger({ ...base, attempts: base.attempts.slice(1) }, pin.c0, 1, cycle), /baseline/);
+});

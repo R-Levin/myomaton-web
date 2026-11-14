@@ -12,7 +12,7 @@ import { protectedDevelopmentDraft } from "../wordpress-delivery/cycle-measureme
 import { contactHttp } from "../contact/http";
 import { developmentGuard } from "../contact/boundaries";
 import { ProtectedInterview } from "./protected-interview";
-import { freshCompactComparison, initializeResponsesUsageLedger, protectedResponsesProvider, protectedSitePlanningProvider, type ResponsesRates } from "./intelligent-responses";
+import { freshCompactComparison, outcomeCompactComparison, initializeResponsesUsageLedger, protectedResponsesProvider, protectedSitePlanningProvider, type ResponsesRates } from "./intelligent-responses";
 import { responsesHttps } from "./responses-https";
 import type { QuestionContext } from "./intelligent-model";
 import { readPresencePlan } from "./presence-plan";
@@ -32,7 +32,7 @@ type Config = {
 type SitePlanGrant = AnswerScope & {
   ownerDigest: string; basis: string; inputDigest: string; evidenceDigest: string; sources: QuestionContext["evidence"];
   expiresAt: number; maxRequests: number; capMicros: number; revoked?: boolean;
-  format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; scopeDigest?: string; retainedReservation?: string; comparisonId?: string;
+  format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; scopeDigest?: string; retainedReservation?: string; comparisonId?: string; comparisonAttempt?: number;
 };
 type ProviderGrant = AnswerScope & { ownerDigest: string; sources: QuestionContext["evidence"];
   expiresAt: number; maxRequests: number; capMicros: number; rates: ResponsesRates; ledgerDirectory: string; revoked?: boolean };
@@ -145,12 +145,14 @@ async function openCore() {
             initial.expiresAt > Date.now() + 86_400_000 || initial.maxRequests !== 2 ||
             initial.capMicros > 500_000 || !/^[0-9a-f]{64}$/u.test(initial.basis)) throw Error("Protected site planning scope refused");
         const compact = initial.format === compactSitePlanningVersion;
-        const comparison = freshCompactComparison;
+        const outcome = initial.comparisonId === outcomeCompactComparison.id;
+        const comparison = outcome ? outcomeCompactComparison : freshCompactComparison;
         const fresh = initial.comparisonId === comparison.id;
         if (initial.comparisonId !== undefined && !fresh) throw Error("Invalid comparison identity");
         if (compact && (initial.expiresAt > grant.expiresAt || grant.revoked === true ||
             initial.capMicros !== (fresh ? comparison.capMicros : 74_029) ||
-            (fresh && (grant.maxRequests < comparison.maxRequests || grant.capMicros < comparison.capMicros)) ||
+            (fresh && (grant.maxRequests < (outcome ? outcomeCompactComparison.baselineRequests + 2 : comparison.maxRequests) ||
+              grant.capMicros < comparison.capMicros)) ||
             initial.retainedReservation !== comparison.retainedReservation ||
             initial.scopeDigest !== comparison.scopeDigest ||
             initial.inputDigest !== comparison.c0)) throw Error("Compact site planning grant exceeds approved scope");
@@ -159,12 +161,14 @@ async function openCore() {
         const generate = protectedSitePlanningProvider(grant.ledgerDirectory, grant.rates,
           responsesHttps(process.env.MIOPAGES_OPENAI_DEV_API_KEY ?? "", initial.expiresAt), { ...initial,
             // Absolute ledger ceilings preserve accrued usage in the existing shared ledger.
-            maxRequests: compact ? Math.min(grant.maxRequests, fresh ? comparison.maxRequests : 16) : grant.maxRequests,
+            maxRequests: compact ? Math.min(outcome ? outcomeCompactComparison.maxRequests : grant.maxRequests,
+              fresh ? comparison.maxRequests : 16) : grant.maxRequests,
             capMicros: Math.min(grant.capMicros, initial.capMicros),
             maxAdditionalRequests: initial.maxRequests,
           });
         sitePlanning = new ProtectedSitePlanning(intake, { model: grant.rates.model,
-          generate, format: compact ? compactSitePlanningVersion : "full", comparisonId: initial.comparisonId,
+          generate, format: compact ? compactSitePlanningVersion : "full",
+          comparisonId: initial.comparisonId, comparisonAttempt: initial.comparisonAttempt,
           async input(view) {
             const current = await readGrant();
             if (compact) {
