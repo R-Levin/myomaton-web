@@ -19,7 +19,8 @@ export function SitePlanningReviewPanel({ state, review, enabled, busy, version,
       <p>Generation is in progress. Reload to check for the saved proposal.</p>
       <button disabled={busy} type="button" onClick={() => run({ operation: "site-plan-recover", version })}>Clear generation after three minutes</button>
     </> : <>
-      <p>{state?.failure ? "Core could not save a proposal. Your business evidence and the usage record are retained."
+      <p>{state?.failure === "output_token_limit" ? "The model reached the output limit before it finished. Core retained the usage record."
+        : state?.failure ? "Core could not save a proposal. Your business evidence and the usage record are retained."
         : "Generate a proposed site structure, copy, search descriptions and visitor actions from scoped business evidence."}</p>
       {enabled ? <button disabled={busy} type="button" onClick={() => run({ operation: "site-plan-generate", version })}>Generate site proposal</button>
         : <p>Model dispatch awaits authorization for the exact evidence.</p>}

@@ -1829,3 +1829,53 @@ usage ceiling, inclusive of prior usage. The proof runner also
 enforces an aggregate 14-request ceiling. No grant file was created. Retain
 sanitized page/visitor strategy comparison and keep real Private
 WordPress application under its own exact approval.
+
+#### Bounded live AI site comparison stopped
+
+The [owner-delegated authorization](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6870250745)
+approved only manifest
+`3437eb2491bd7d44dea7cb707319771158b6d61db1f3ac56b4019e908e4e66d6`
+at `df38103`. The protected C0 draft (version 15), its sole current
+provided interview answer, both exact input digests, deployed Core
+`9786247`, the governing expiry, and the settled starting ledger
+were verified before enabling dispatch. Fictional C2 was staged
+off-webroot from the unchanged source with no new tenant, grant or
+customer-data access.
+
+C0 used exactly one Responses token count and one generation at
+`gpt-5.4-mini-2026-03-17`. The receipt recorded 699 input and 1,200
+output tokens, zero cached or reasoning tokens, an estimated $0.005925
+and its original $0.008400 reservation. A valid usage record reached the
+output ceiling and the ledger marked the response uncertain. The
+recorded estimate was within its reservation. The original adapter did
+not retain the provider's incomplete reason or partial text. The
+ceiling is directly supported by usage, while the exact provider
+reason is unavailable. Core refused the result and saved
+`generation_failed` at draft version 17. There is no saved model plan,
+Page/Section output, visitor action, or citation to compare.
+
+The uncertainty stop gate prevented C2 dispatch and there were no
+retries. The temporary C0 grant was withdrawn and the uncertain ledger
+was copied and verified off-webroot. The authoritative ledger remains
+untouched. It records 12 requests and six generation attempts overall,
+with $0.011554 estimated including prior usage. Authenticated HTTPS
+verified the preserved C0 input and inquiry, no new proposal, and
+site planning dispatch disabled. The first loopback check immediately
+after restart arrived before the socket opened. The authenticated
+HTTPS check passed once the existing listener was ready. Prior
+WordPress approvals, publication and receipt boundaries remain intact.
+
+Offline follow-through records an allowlisted provider incomplete code
+and presents the specific output-limit case to an Operator. It still
+marks incomplete usage uncertain and refuses all later dispatches
+until independently reconciled. The focused regression reproduces the
+699/1,200 usage and confirms that no model text or additional request
+is emitted.
+
+Next, verify the recorded charge and completion status through the
+existing OpenAI project usage evidence, keeping the original receipt.
+Prepare a compact evidence-linked generation format and size its
+output offline against both business cases. A new exact authorization
+is required before any new dispatch. Assess actual content, site
+structure and conversion differences only once both cases return
+complete saved plans.

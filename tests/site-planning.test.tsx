@@ -124,3 +124,40 @@ test("site planning reuses the metered Responses dispatch and refuses a stale pr
       [item.status, item.generationDispatched]), [["completed", true], ["rejected", false]]);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
+
+test("an incomplete site plan records an allowlisted limit reason and blocks later dispatch", async () => {
+  const { mkdtemp, readFile, rm } = await import("node:fs/promises");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { initializeResponsesUsageLedger, protectedSitePlanningProvider } = await import("../lib/platform/intake/intelligent-responses");
+  const root = await mkdtemp(join(tmpdir(), "miopages-incomplete-plan-"));
+  try {
+    const rates = { model: "test-model", verifiedOn: "2026-11-13", inputPerMillion: 750_000, cachedPerMillion: 75_000,
+      outputPerMillion: 4_500_000, cacheWritePerMillion: 0, countMicros: 0 };
+    await initializeResponsesUsageLedger(root, rates);
+    const ownerDigest = owner("c0"), evidence = [source("service", "An existing site needs a review.")];
+    const start = Date.now(), expiresAt = start + 60_000;
+    const prepared = prepareSitePlanning(ownerDigest, evidence, [], { ...grant(ownerDigest, evidence), expiresAt }, start);
+    const paths: string[] = [];
+    const run = protectedSitePlanningProvider(root, rates, {
+      async send(path) {
+        paths.push(path);
+        return { body: path.endsWith("input_tokens") ? { input_tokens: 699 } : {
+          model: rates.model, service_tier: "default", status: "incomplete",
+          incomplete_details: { reason: "max_output_tokens", text: "This private value must not reach the ledger." },
+          usage: { input_tokens: 699, input_tokens_details: { cached_tokens: 0 },
+            output_tokens: 1200, output_tokens_details: { reasoning_tokens: 0 }, total_tokens: 1899 },
+        } };
+      },
+    }, { ownerDigest, inputDigest: prepared.inputDigest, expiresAt, capMicros: 22429, maxRequests: 4 });
+    await assert.rejects(run(() => prepared), { code: "output_token_limit" });
+    await assert.rejects(run(() => prepared), /Unreconciled development usage/);
+    const ledger = await readFile(join(root, "onboarding-usage.json"), "utf8");
+    assert.doesNotMatch(ledger, /private value/);
+    const [receipt] = JSON.parse(ledger).attempts;
+    assert.equal(receipt.status, "uncertain");
+    assert.equal(receipt.failure, "output_token_limit");
+    assert.equal(receipt.estimatedMicros, 5925);
+    assert.deepEqual(paths, ["/v1/responses/input_tokens", "/v1/responses"]);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});

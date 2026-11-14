@@ -12,7 +12,7 @@ type Decision = { status: "approved" | "rejected"; digest: string; actor: Actor;
 type Action = Generated["evidence"][number]["action"];
 export type SitePlanningReview = {
   pending?: { id: string; at: string };
-  failure?: "generation_failed" | "draft_capacity" | "interrupted" | "evidence_changed";
+  failure?: "generation_failed" | "draft_capacity" | "interrupted" | "evidence_changed" | "output_token_limit";
   proposal?: {
     generated: Generated;
     sources: PreparedPlanning["input"];
@@ -74,6 +74,7 @@ export class ProtectedSitePlanning {
     });
     let sources: PreparedPlanning["input"] | undefined;
     let generated: Generated | undefined;
+    let generationFailure: SitePlanningReview["failure"] = "generation_failed";
     try {
       generated = await provider.generate(async () => {
         const current = await this.intake.resume(token);
@@ -82,7 +83,10 @@ export class ProtectedSitePlanning {
         sources = projected.input;
         return projected;
       });
-    } catch { /* The usage ledger retains the dispatched request even if review storage fails. */ }
+    } catch (error) {
+      // Keep the input and ledger intact, including an incomplete response reservation.
+      if (error instanceof Error && "code" in error && error.code === "output_token_limit") generationFailure = error.code;
+    }
     const settle = (proposal: Proposal | undefined, failure: SitePlanningReview["failure"]) =>
       this.intake.editProtectedSitePlanning(token, undefined, (state, view) => {
         if (state.pending?.id !== id) throw new IntakeError("draft_changed", 409);
@@ -90,7 +94,7 @@ export class ProtectedSitePlanning {
         return proposal ? { proposal } : { failure };
       });
     try {
-      return await settle(generated && sources ? { generated, sources, basis, revision: 1, model: provider.model, at: new Date().toISOString() } : undefined, "generation_failed");
+      return await settle(generated && sources ? { generated, sources, basis, revision: 1, model: provider.model, at: new Date().toISOString() } : undefined, generationFailure);
     } catch (error) {
       if (!(error instanceof IntakeError) || error.code !== "payload_too_large") throw error;
       return settle(undefined, "draft_capacity");
