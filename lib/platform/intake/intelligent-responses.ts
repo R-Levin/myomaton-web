@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { fingerprint } from "../canonical/model";
 import type { QuestionAttribution, QuestionContext, QuestionProvider } from "./intelligent-model";
 import { presencePlanSchema } from "./presence-plan";
-import { readSitePlanning, sitePlanningFormat, sitePlanningInstruction, type PreparedPlanning } from "./site-planning";
+import { compactSitePlanningFormat, compactSitePlanningInstruction, compactSitePlanningOutput, compactSitePlanningVersion, readCompactSitePlanning, readSitePlanning, sitePlanningFormat, sitePlanningInstruction, type PreparedPlanning } from "./site-planning";
 
 const maxInput = 4_000, maxOutput = 1_200;
 const maxRequests = 16, maxGenerations = 8, capMicros = 500_000;
@@ -24,6 +24,7 @@ type Usage = { input: number; cached: number; cacheWrite: number; output: number
 type Receipt = QuestionAttribution & { reservedMicros: number; countDispatched: boolean; generationDispatched: boolean;
   countRequestId?: string; generationRequestId?: string; responseId?: string; usage?: Usage; estimatedMicros?: number;
   status: "pending" | "completed" | "rejected" | "uncertain";
+  outputLimit?: number;
   failure?: "output_token_limit" | "content_filter" | "provider_incomplete" | "reservation_exceeded";
 };
 type Ledger = { ratesDigest: string; rateCard: Rates; adapterVersion: string; model: string; tier: "default"; attempts: Receipt[] };
@@ -71,24 +72,24 @@ export async function initializeResponsesUsageLedger(directory: string, rates: R
 }
 export const initializeOfflineUsageLedger = initializeResponsesUsageLedger;
 
-function responseUsage(body: Record<string, unknown>, counted: number): Usage {
+function responseUsage(body: Record<string, unknown>, counted: number, outputLimit: number): Usage {
   const usage = record(body.usage), inputDetail = record(usage.input_tokens_details), outputDetail = record(usage.output_tokens_details);
   const input = integer(usage.input_tokens), cached = integer(inputDetail.cached_tokens), cacheWrite = integer(inputDetail.cache_write_tokens ?? 0);
   const output = integer(usage.output_tokens), reasoning = integer(outputDetail.reasoning_tokens);
-  if (input > counted || cached + cacheWrite > input || output > maxOutput || reasoning > output || integer(usage.total_tokens) !== input + output) {
+  if (input > counted || cached + cacheWrite > input || output > outputLimit || reasoning > output || integer(usage.total_tokens) !== input + output) {
     throw Error("Provider usage exceeded validated bounds");
   }
   return { input, cached, cacheWrite, output, reasoning };
 }
 
-function responseProposal(body: Record<string, unknown>) {
+function responseProposal(body: Record<string, unknown>, byteLimit: number) {
   if (!Array.isArray(body.output)) throw Error("Provider output unavailable");
   const outputs = body.output.map(record).filter(item => item.type !== "reasoning");
   const message = outputs[0];
   if (outputs.length !== 1 || message.type !== "message" || message.role !== "assistant" ||
       !Array.isArray(message.content) || message.content.length !== 1) throw Error("Unexpected provider output");
   const item = record(message.content[0]);
-  if (item.type !== "output_text" || typeof item.text !== "string" || Buffer.byteLength(item.text) > 8_000) throw Error("Provider refusal or invalid output");
+  if (item.type !== "output_text" || typeof item.text !== "string" || Buffer.byteLength(item.text) > byteLimit) throw Error("Provider refusal or invalid output");
   return JSON.parse(item.text) as unknown;
 }
 
@@ -142,6 +143,7 @@ function meteredResponsesProvider(directory: string, rates: Rates, transport: Re
 
 type SitePlanningGrant = {
   ownerDigest: string; inputDigest: string; expiresAt: number; capMicros: number; maxRequests: number; maxAdditionalRequests?: number;
+  format?: typeof compactSitePlanningVersion; maxOutputTokens?: number;
 };
 export function protectedSitePlanningProvider(directory: string, rates: Rates, transport: ResponsesTransport, grant: SitePlanningGrant) {
   const { ownerDigest, inputDigest, expiresAt, capMicros: limit, maxRequests: requests, maxAdditionalRequests = 2 } = grant;
@@ -151,7 +153,12 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
     throw Error("Invalid site planning authorization");
   }
   const model = rates.model;
-  const dispatch = meteredResponsesDispatch(directory, rates, transport, requests, Math.floor(requests / 2), limit);
+  const compact = grant.format === compactSitePlanningVersion;
+  if (compact ? grant.maxOutputTokens !== compactSitePlanningOutput : grant.format !== undefined || grant.maxOutputTokens !== undefined) {
+    throw Error("Invalid site planning output authorization");
+  }
+  const dispatch = meteredResponsesDispatch(directory, rates, transport, requests, Math.floor(requests / 2), limit,
+    compact ? compactSitePlanningOutput : maxOutput);
   return async (readCurrent: () => PreparedPlanning | Promise<PreparedPlanning>) => {
     async function current() {
       if (Date.now() >= expiresAt) throw Error("Site planning authorization expired");
@@ -165,16 +172,16 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
       return prepared;
     }
     const prepared = await current();
-    const result = await dispatch({ ownerDigest, workDigest: fingerprint({ operation: "site-planning", inputDigest }) },
-      { model, instructions: sitePlanningInstruction, input: JSON.stringify(prepared.input),
-        text: { format: sitePlanningFormat(prepared) } }, current);
+    const result = await dispatch({ ownerDigest, workDigest: fingerprint({ operation: "site-planning", inputDigest, ...(compact && { format: compactSitePlanningVersion }) }) },
+      { model, instructions: compact ? compactSitePlanningInstruction : sitePlanningInstruction, input: JSON.stringify(prepared.input),
+        text: { format: compact ? compactSitePlanningFormat(prepared) : sitePlanningFormat(prepared) } }, current);
     await current();
-    return readSitePlanning(result, prepared);
+    return compact ? readCompactSitePlanning(result, prepared) : readSitePlanning(result, prepared);
   };
 }
 
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
-  requestLimit: number, generationLimit: number, spendLimit: number) {
+  requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput) {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
@@ -194,10 +201,11 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       const generations = ledger.attempts.filter(item => item.generationDispatched).length;
       const requests = ledger.attempts.filter(item => item.countDispatched).length + generations;
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");
-      const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + maxOutput * rates.outputPerMillion) / 1_000_000);
+      const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + outputLimit * rates.outputPerMillion) / 1_000_000);
       if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) throw Error("Development budget exhausted");
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
-      const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation, countDispatched: true, generationDispatched: false, status: "pending" };
+      const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation,
+        ...(outputLimit !== maxOutput && { outputLimit }), countDispatched: true, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);
       async function checkpoint() {
         const next = path + "." + randomUUID() + ".tmp";
@@ -225,7 +233,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       }
       receipt.generationDispatched = true;
       await checkpoint();
-      const result = await transport.send("/v1/responses", structuredClone({ ...request, service_tier: "default", store: false, max_output_tokens: maxOutput }));
+      const result = await transport.send("/v1/responses", structuredClone({ ...request, service_tier: "default", store: false, max_output_tokens: outputLimit }));
       const body = record(result.body);
       receipt.generationRequestId = receiptId(result.requestId);
       receipt.responseId = receiptId(body.id);
@@ -235,7 +243,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
         throw Error("Provider model or tier mismatch");
       }
       let usage: Usage;
-      try { usage = responseUsage(body, input); }
+      try { usage = responseUsage(body, input, outputLimit); }
       catch (error) { await checkpoint(); throw error; }
       const estimate = rates.countMicros + Math.ceil(((usage.input - usage.cached - usage.cacheWrite) * rates.inputPerMillion +
         usage.cached * rates.cachedPerMillion + usage.cacheWrite * rates.cacheWritePerMillion + usage.output * rates.outputPerMillion) / 1_000_000);
@@ -252,7 +260,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
         throw Object.assign(Error("Uncertain development charge"), { code: receipt.failure });
       }
       let proposal: unknown;
-      try { proposal = responseProposal(body); receipt.status = "completed"; }
+      try { proposal = responseProposal(body, outputLimit === maxOutput ? 8_000 : 32_000); receipt.status = "completed"; }
       catch { receipt.status = "rejected"; }
       await checkpoint();
       if (receipt.status === "rejected") throw Error("Provider proposal unavailable");

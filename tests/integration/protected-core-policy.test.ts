@@ -167,7 +167,24 @@ test("Core development policy confines the existing draft writer to the inactive
     }));
     assert.deepEqual(prepareGeneratedPages(packet, digest, mappings).navigation, ["/", "/storm", "/pruning"]);
     assert.throws(() => prepareGeneratedPages(packet, digest, mappings.map(m => ({ ...m, action: { ...m.action, destination: "/pruning" } }))), /mapping differs/);
-    const changed = await interview.correctAnswer(token, approved.version, corrected.interview!.turns.at(-1)!.id, "Prioritize a new visitor action.");
+    const inquiryEvidence = { inquiryId: randomUUID(), draftDigest: "a".repeat(64), pagePath: "/pruning", synthetic: true as const,
+      section: { heading: "Estimate request", body: "Share the location." } };
+    const improved = await planning.improve(token, approved.version, packet.reviewedDigest, inquiryEvidence);
+    const improvedReview = reviewedSitePlanning(improved.sitePlanning!.proposal!);
+    assert.equal(improvedReview.decision, undefined);
+    await assert.rejects(planning.delivery(token, improved.version), /authorization_required/);
+    const editedImprovement = await planning.edit(token, improved.version, improvedReview.digest, revisedPlan.plan,
+      { "/": "/storm", "/storm": "/", "/pruning": "/" }, { heading: "Plan your request", body: "Include the municipality and access details." });
+    const afterEdit = reviewedSitePlanning(editedImprovement.sitePlanning!.proposal!);
+    const attached = editedImprovement.sitePlanning!.proposal!.improvement!;
+    assert.equal(attached.inquiryId, inquiryEvidence.inquiryId);
+    assert.equal(attached.draftDigest, inquiryEvidence.draftDigest);
+    assert.equal(attached.section.heading, "Plan your request");
+    const repeat = await planning.improve(token, editedImprovement.version, afterEdit.digest, inquiryEvidence);
+    assert.equal(repeat.version, editedImprovement.version);
+    assert.equal(reviewedSitePlanning(repeat.sitePlanning!.proposal!).digest, afterEdit.digest);
+    assert.equal(repeat.sitePlanning!.proposal!.improvement!.section.heading, "Plan your request");
+    const changed = await interview.correctAnswer(token, repeat.version, corrected.interview!.turns.at(-1)!.id, "Prioritize a new visitor action.");
     await assert.rejects(planning.delivery(token, changed.version), /draft_changed/);
 
     await admin.query(await readFile("lib/platform/intake/protected-core-inquiry.sql", "utf8"));

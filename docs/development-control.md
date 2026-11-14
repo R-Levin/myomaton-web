@@ -537,7 +537,7 @@ application scope. The [hosted revision 5 apply and restore](c0-integration-spin
 passed. WordPress displays revision 3 on Home 13 and Service 14, with
 high-water 5, Delivery 0.0.10 active and both receipts reconciled.
 Publication retains separate authority. The next product milestone is
-the [authenticated site-planning review](c0-integration-spine-phase-b-2026-11-10.md#authenticated-site-planning-and-exact-live-decision). The [bounded live comparison stopped](c0-integration-spine-phase-b-2026-11-10.md#bounded-live-ai-site-comparison-stopped) after the C0 generation reached the output ceiling and its receipt was marked uncertain. Resolve that evidence and size the next proof offline before requesting further dispatch authority.
+the [authenticated site-planning review](c0-integration-spine-phase-b-2026-11-10.md#authenticated-site-planning-and-exact-live-decision). The [bounded live comparison stopped](c0-integration-spine-phase-b-2026-11-10.md#bounded-live-ai-site-comparison-stopped) after the C0 generation reached the output ceiling and its receipt was marked uncertain. The [compact proof and usage gate](c0-integration-spine-phase-b-2026-11-10.md#compact-site-planning-and-usage-reconciliation-gate) records tested sizing, the unchanged uncertain ledger and the exact next authorization.
 
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 

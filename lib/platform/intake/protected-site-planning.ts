@@ -112,11 +112,12 @@ export class ProtectedSitePlanning {
     return this.intake.editProtectedSitePlanning(token, version, (state, view) => {
       if (!state.proposal || state.pending || state.proposal.basis !== sitePlanningBasis(view)
         || reviewedSitePlanning(state.proposal).digest !== digest) throw new IntakeError("draft_changed", 409);
-      return { proposal: change(state.proposal) };
+      const proposal = change(state.proposal);
+      return proposal === state.proposal ? state : { proposal };
     });
   }
 
-  edit(token: string, version: number, digest: unknown, value: unknown, targets: unknown) {
+  edit(token: string, version: number, digest: unknown, value: unknown, targets: unknown, editedImprovement?: unknown) {
     return this.change(token, version, digest, proposal => {
       const original = proposal.generated.plan;
       let plan: PresencePlan;
@@ -143,14 +144,26 @@ export class ProtectedSitePlanning {
           for (const key of ["heading", "body"] as const) save(`${i}/${j}/${key}`, section[key], original.pages[i].sections[j][key]);
         }
       }
-      return { ...proposal, changes, routes, revision: proposal.revision + 1 };
+      let improvement = proposal.improvement;
+      if (editedImprovement !== undefined) {
+        if (!improvement) throw new IntakeError("invalid_request");
+        try {
+          const part = object(editedImprovement, ["heading", "body"]);
+          improvement = { ...improvement, section: { heading: text(part.heading, 160, true), body: text(part.body, 1000, true) } };
+        } catch { throw new IntakeError("invalid_request"); }
+      }
+      if (fingerprint(proposal.changes ?? {}) === fingerprint(changes) &&
+          fingerprint(proposal.routes ?? {}) === fingerprint(routes) &&
+          fingerprint(proposal.improvement ?? null) === fingerprint(improvement ?? null)) return proposal;
+      return { ...proposal, changes, routes, ...(improvement && { improvement }), revision: proposal.revision + 1 };
     });
   }
 
   improve(token: string, version: number, digest: unknown, improvement: NonNullable<Proposal["improvement"]>) {
     return this.change(token, version, digest, proposal => {
       if (!proposal.generated.plan.pages.some(page => page.path === improvement.pagePath)) throw new IntakeError("invalid_request");
-      if (proposal.improvement && fingerprint(proposal.improvement) === fingerprint(improvement)) return proposal;
+      if (proposal.improvement?.inquiryId === improvement.inquiryId && proposal.improvement.draftDigest === improvement.draftDigest &&
+          proposal.improvement.pagePath === improvement.pagePath) return proposal;
       return { ...proposal, improvement, revision: proposal.revision + 1 };
     });
   }

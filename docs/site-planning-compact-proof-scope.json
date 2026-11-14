@@ -1,0 +1,24 @@
+{
+  "evidenceManifest": {
+    "commit": "df38103379380e17911228ef19b721e3bf5ec2b5",
+    "path": "docs/site-planning-live-proof-inputs.json",
+    "digest": "3437eb2491bd7d44dea7cb707319771158b6d61db1f3ac56b4019e908e4e66d6"
+  },
+  "inputs": {
+    "c0": "852a29a77307e671ce56f75b0e879da9a7856ff775ed1c9d36d70d9354775923",
+    "fictionalC2": "20a4f3c074a53b53cb641fa14d49443e868711d64e6c1cc8c28a80ab4ac32ddf"
+  },
+  "format": "compact/2",
+  "model": "gpt-5.4-mini-2026-03-17",
+  "maximumCases": 2,
+  "maximumRequests": 4,
+  "maximumGenerations": 2,
+  "maximumInputTokensPerGeneration": 4000,
+  "maximumOutputTokensPerGeneration": 6000,
+  "maximumAdditionalUsd": "0.10",
+  "requestEnvelopeMaximumUsd": "0.060000",
+  "activationHours": 24,
+  "automaticRetries": 0,
+  "responseStorage": false,
+  "tools": []
+}

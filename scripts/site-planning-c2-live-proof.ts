@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile, lstat, realpath, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fingerprint } from "../lib/platform/canonical/model";
-import { prepareSitePlanning, type PreparedPlanning } from "../lib/platform/intake/site-planning";
+import { compactSitePlanningVersion, compactSitePlanningOutput, prepareSitePlanning, type PreparedPlanning } from "../lib/platform/intake/site-planning";
 import { protectedSitePlanningProvider, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
 import { responsesHttps } from "../lib/platform/intake/responses-https";
 import type { InterviewEvidence } from "../lib/platform/intake/intelligent-model";
@@ -11,7 +11,9 @@ const manifestDigest = "3437eb2491bd7d44dea7cb707319771158b6d61db1f3ac56b4019e90
 const fictionalDigest = "20a4f3c074a53b53cb641fa14d49443e868711d64e6c1cc8c28a80ab4ac32ddf";
 const ownerDigest = fingerprint({ fictionalCase: "c2", operation: "site-planning" });
 type Manifest = { c2: { sources: Array<Pick<InterviewEvidence, "id" | "kind" | "statement">>; answerProjection: null } };
-type Scope = { manifestDigest: string; inputDigest: string; expiresAt: number; revoked?: boolean };
+const compactScopeDigest = "fda4e83664a481649979d7069acd65e0cd52a2bd42caf12b209ff52d4e6b0a6d";
+type Scope = { manifestDigest: string; inputDigest: string; expiresAt: number; revoked?: boolean;
+  scopeDigest?: string; format?: typeof compactSitePlanningVersion; maxOutputTokens?: number };
 const home = "/home/virtual/vps-bef564/e/e494602172";
 const privateRoot = join(home, "miopages-private-acceptance");
 const proofRoot = join(privateRoot, "site-planning-proof");
@@ -36,8 +38,18 @@ async function main() {
   assert.equal(grant.inputDigest, fictionalDigest);
   assert.ok(Number.isSafeInteger(grant.expiresAt) && grant.expiresAt <= Date.now() + 86_400_000 && grant.expiresAt > Date.now() && grant.revoked !== true);
   const cfg = await safeFile<{ apiKey: string; aiEnabled: boolean }>(join(privateRoot, "core-config.json"));
-  const transportSettings = await safeFile<{ capMicros: number; maxRequests: number; rates: ResponsesRates }>(join(privateRoot, "ai-scope.json"));
+  const transportSettings = await safeFile<{ capMicros: number; maxRequests: number; rates: ResponsesRates; expiresAt: number; revoked?: boolean }>(join(privateRoot, "ai-scope.json"));
   assert.equal(cfg.aiEnabled, true);
+  assert.ok(transportSettings.expiresAt >= grant.expiresAt && transportSettings.revoked !== true);
+  const compact = grant.format === compactSitePlanningVersion;
+  if (compact) {
+    assert.equal(grant.scopeDigest, compactScopeDigest);
+    assert.equal(grant.maxOutputTokens, compactSitePlanningOutput);
+  } else {
+    assert.equal(grant.format, undefined);
+    assert.equal(grant.scopeDigest, undefined);
+    assert.equal(grant.maxOutputTokens, undefined);
+  }
   assert.equal(transportSettings.rates.model, "gpt-5.4-mini-2026-03-17");
   assert.equal(transportSettings.rates.inputPerMillion, 750_000);
   assert.equal(transportSettings.rates.cachedPerMillion, 75_000);
@@ -45,7 +57,9 @@ async function main() {
   assert.equal(transportSettings.rates.countMicros, 0);
   const generate = protectedSitePlanningProvider(join(privateRoot, "core-usage"), transportSettings.rates,
     responsesHttps(cfg.apiKey, grant.expiresAt), { ownerDigest, inputDigest: fictionalDigest, expiresAt: grant.expiresAt,
-      maxRequests: Math.min(14, transportSettings.maxRequests), capMicros: Math.min(22_429, transportSettings.capMicros) });
+      maxRequests: Math.min(compact ? 16 : 14, transportSettings.maxRequests),
+      capMicros: Math.min(compact ? 71_554 : 22_429, transportSettings.capMicros),
+      ...(compact && { format: compactSitePlanningVersion, maxOutputTokens: compactSitePlanningOutput }) });
   const project = async (): Promise<PreparedPlanning> => {
     const current = await safeFile<Scope>(grantFile);
     assert.equal(fingerprint(current), fingerprint(grant));

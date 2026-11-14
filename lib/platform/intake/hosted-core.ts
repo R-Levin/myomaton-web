@@ -18,7 +18,7 @@ import type { QuestionContext } from "./intelligent-model";
 import { readPresencePlan } from "./presence-plan";
 import { interviewDirection } from "./interview-direction";
 import { ProtectedSitePlanning, reviewedSitePlanning, sitePlanningBasis } from "./protected-site-planning";
-import { prepareSitePlanning } from "./site-planning";
+import { compactSitePlanningVersion, prepareSitePlanning } from "./site-planning";
 import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
 
 export const coreCookie = "__Host-miopages_core";
@@ -31,6 +31,7 @@ type Config = {
 type SitePlanGrant = AnswerScope & {
   ownerDigest: string; basis: string; inputDigest: string; evidenceDigest: string; sources: QuestionContext["evidence"];
   expiresAt: number; maxRequests: number; capMicros: number; revoked?: boolean;
+  format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; scopeDigest?: string;
 };
 type ProviderGrant = AnswerScope & { ownerDigest: string; sources: QuestionContext["evidence"];
   expiresAt: number; maxRequests: number; capMicros: number; rates: ResponsesRates; ledgerDirectory: string; revoked?: boolean };
@@ -139,15 +140,25 @@ async function openCore() {
         if (initial.ownerDigest !== fingerprint(selection) ||
             initial.expiresAt > Date.now() + 86_400_000 || initial.maxRequests !== 2 ||
             initial.capMicros > 500_000 || !/^[0-9a-f]{64}$/u.test(initial.basis)) throw Error("Protected site planning scope refused");
+        const compact = initial.format === compactSitePlanningVersion;
+        if (compact && (initial.expiresAt > grant.expiresAt || grant.revoked === true || initial.capMicros !== 71_554 ||
+            initial.scopeDigest !== "fda4e83664a481649979d7069acd65e0cd52a2bd42caf12b209ff52d4e6b0a6d" ||
+            initial.inputDigest !== "852a29a77307e671ce56f75b0e879da9a7856ff775ed1c9d36d70d9354775923")) throw Error("Compact site planning grant exceeds approved scope");
         const generate = protectedSitePlanningProvider(grant.ledgerDirectory, grant.rates,
           responsesHttps(process.env.MIOPAGES_OPENAI_DEV_API_KEY ?? "", initial.expiresAt), { ...initial,
             // Absolute ledger ceilings preserve accrued usage in the existing shared ledger.
-            maxRequests: grant.maxRequests, capMicros: Math.min(grant.capMicros, initial.capMicros),
+            maxRequests: compact ? Math.min(grant.maxRequests, 16) : grant.maxRequests,
+            capMicros: Math.min(grant.capMicros, initial.capMicros),
             maxAdditionalRequests: initial.maxRequests,
           });
         sitePlanning = new ProtectedSitePlanning(intake, { model: grant.rates.model, generate,
           async input(view) {
             const current = await readGrant();
+            if (compact) {
+              const governing = await privateConfig<ProviderGrant>(providerFile);
+              if (governing.revoked === true || governing.expiresAt < current.expiresAt ||
+                  grantBinding(governing) !== grantBinding(grant)) throw Error("Governing AI authorization changed");
+            }
             if (fingerprint(current) !== binding || current.revoked === true ||
                 current.basis !== sitePlanningBasis(view)) throw Error("Site planning authorization refused");
             return prepareSitePlanning(current.ownerDigest, current.sources, view.interview?.turns ?? [], current);
@@ -243,7 +254,7 @@ export async function hostedCoreRequest(request: Request) {
           switch (value.operation) {
             case "site-plan-generate": return await view(app.sitePlanning.generate(app.draftToken, version));
             case "site-plan-recover": return await view(app.sitePlanning.recover(app.draftToken, version));
-            case "site-plan-edit": return await view(app.sitePlanning.edit(app.draftToken, version, value.digest, value.plan, value.destinations));
+            case "site-plan-edit": return await view(app.sitePlanning.edit(app.draftToken, version, value.digest, value.plan, value.destinations, value.improvementCopy));
             case "site-plan-decide": return await view(app.sitePlanning.decide(app.draftToken, version, value.digest, value.status, value.note, actor));
             case "site-plan-delivery": return await app.sitePlanning.delivery(app.draftToken, value.version);
             case "site-plan-improve": {

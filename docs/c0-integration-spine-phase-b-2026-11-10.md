@@ -1879,3 +1879,76 @@ output offline against both business cases. A new exact authorization
 is required before any new dispatch. Assess actual content, site
 structure and conversion differences only once both cases return
 complete saved plans.
+
+#### Compact site planning and usage reconciliation gate
+
+The November 13 C0 request receipt was checked in the hosted workspace.
+The original ledger and its protected copy match byte for byte at SHA-256
+`a3864195d357f662c529d7b5084d14878ceb72c415a9f33d32e2a9aba2beeb18`.
+The stored provider response usage is 699 input, 1,200 output, zero
+cached and zero reasoning tokens. Standard model rates independently
+recompute to $0.00592425, rounded up to the ledger's $0.005925 USD.
+The provider's independent project usage record was unavailable in this
+session. The dashboard launch failed. The original request state remains
+uncertain, the authoritative ledger was left untouched, and both cases
+remain disabled. A matching provider export should isolate the development
+project, model and single generation on November 13 around 10:36 p.m.
+Eastern (November 14 around 02:36 UTC). A larger aggregate alone does
+not establish an exact match or a recovered completion reason. Preserve
+the original receipt even when its charge is independently reconciled.
+[OpenAI Usage Dashboard](https://platform.openai.com/usage) ·
+[Official model rates](https://developers.openai.com/api/docs/models/gpt-5.4-mini).
+
+The compact response contract puts copy, numeric source citations and
+the action with each Page and Section, eliminating the parallel Page
+metadata array and repeated long source IDs. It validates and normalizes
+into the same persisted review and delivery shape. It refuses missing,
+duplicate or foreign citations, unsafe destinations and malformed copy,
+keeps open questions, and does not choose a page count for the model.
+Older review records and their digests keep the existing representation.
+
+| Authored offline case | Structure | Visitor strategy | Compact tokens | Previous shape tokens | Indented compact |
+| --- | --- | --- | ---: | ---: | ---: |
+| Real C0 evidence | 3 pages, 6 sections | Review-first for an existing website, with a separate conversation path. Launch and Ongoing eligibility remain open. | 733 | 988 | 993 |
+| Fictional C2 evidence | 5 pages, 9 sections | Storm triage and routine pruning estimates have different information and contact needs. Hours, coverage, license and insurance remain unverified. | 1028 | 1204 | 1411 |
+
+Counts are local `o200k_base` estimates for the authored JSON, excluding
+provider framing. Both cases also fit the existing draft byte envelope
+in the offline test. These measurements support a single response for
+each of these two cases at the proposed allowance. They do not
+establish live model quality or how large sites will fit. If a later
+case needs more space, use resumable architecture planning and scoped
+page-writing steps in the existing Core review, with evidence bindings
+and independent decisions per saved stage.
+
+Operator review can now edit the inquiry-recommended section while
+preserving the exact synthetic inquiry and source draft references.
+A changed section invalidates the prior review decision. Reapplying
+the same recommendation to the same Page preserves the Operator's
+edits and current draft version. This records a proposed improvement,
+without claiming real traffic, demand or measured outcomes.
+
+**Prepared authorization.** [Comparison scope](site-planning-compact-proof-scope.json)
+fingerprint `fda4e83664a481649979d7069acd65e0cd52a2bd42caf12b209ff52d4e6b0a6d`.
+Use the exact evidence manifest at `df38103` and its unchanged C0/C2
+input digests. C0 keeps the existing scope and its sole, unconfirmed
+approved answer projection. C2 uses exact fictional evidence, separate
+attribution and off-webroot output without a hosted tenant or C0
+database access. Use `gpt-5.4-mini-2026-03-17`, one token count and one
+generation per case, 4,000 input and 6,000 output tokens per generation,
+no retries or tools, and `store:false`. Activation expires within 24
+hours and by the expiry of any governing grant. The request envelopes
+reserve at most $0.030000 each or $0.060000 combined. The requested
+additional hard cap is $0.10. The prepared implementation uses the
+stricter $0.071554 cumulative ceiling including the known $0.011554
+estimate, contingent on reconciliation, and 16 cumulative requests.
+The product design target is less than $1 total AI cost for a useful,
+reviewable candidate, including research, planning, copy and necessary
+revisions. Track actual usage per operation and assess business relevance
+and Operator effort before adjusting the design.
+
+Next, obtain independent project usage evidence and reconcile outside the
+original receipt, then independently verify the updated Linux artifact and
+activate the exact grants only after owner authorization. Confirm each
+saved plan, citations, visitor destinations and open questions before
+continuing. WordPress approval, application and publication remain separate.

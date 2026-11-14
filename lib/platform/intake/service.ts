@@ -202,7 +202,10 @@ export class IntakeService {
       const row = await this.owned(db, token, true);
       if (row.state !== "draft" || (version !== undefined && row.version !== version)) throw new IntakeError("draft_changed", 409);
       const view = await this.readView(db, row);
-      const provenance = { ...row.provenance, protectedSitePlanning: change(view.sitePlanning ?? {}, view) };
+      const previous = view.sitePlanning ?? {};
+      const state = change(previous, view);
+      if (state === previous) return view;
+      const provenance = { ...row.provenance, protectedSitePlanning: state };
       if (Buffer.byteLength(JSON.stringify(provenance)) > 14_000) throw new IntakeError("payload_too_large", 413);
       const saved = await db.query(`UPDATE ${this.draftTable} SET provenance=$2,version=version+1,updated_at=now() WHERE id=$1 RETURNING *`,
         [row.id, JSON.stringify(provenance)]);

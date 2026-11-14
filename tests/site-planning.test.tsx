@@ -161,3 +161,86 @@ test("an incomplete site plan records an allowlisted limit reason and blocks lat
     assert.deepEqual(paths, ["/v1/responses/input_tokens", "/v1/responses"]);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test("compact contract preserves substantial C0 and C2 plans without a fixed page count", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { readCompactSitePlanning, compactSitePlanningFormat } = await import("../lib/platform/intake/site-planning");
+  const fixtures = await import("./fixtures/site-planning-compact");
+  const manifest = JSON.parse(readFileSync("docs/site-planning-live-proof-inputs.json", "utf8").replace(/^\uFEFF/u, ""));
+  assert.equal(fingerprint(manifest), "3437eb2491bd7d44dea7cb707319771158b6d61db1f3ac56b4019e908e4e66d6");
+  const prepare = (scenario: "c0" | "c2") => {
+    const entry = manifest[scenario];
+    const evidence: InterviewEvidence[] = entry.sources.map((item: InterviewEvidence) => ({ ...item, reference: "Exact manifest", at: new Date(now).toISOString() }));
+    const answer = entry.answerProjection;
+    const turns: InterviewTurn[] = answer ? [{ id: "3f63450c-8522-4e62-b8ba-881800a9970a", gapId: "presence-direction",
+      question: null, rationale: "Fixture", sourceIds: [], respondsTo: null, generatorVersion: "fixture", assessment: null,
+      at: new Date(now).toISOString(), answer: { text: answer, disposition: "provided", at: new Date(now).toISOString() } }] : [];
+    return prepareSitePlanning(owner(scenario), evidence, turns, { ...grant(owner(scenario), evidence),
+      approvedAnswerDigests: answer ? [fingerprint(answer)] : [] }, now);
+  };
+  const c0Input = prepare("c0"), c2Input = prepare("c2");
+  const a = readCompactSitePlanning(fixtures.c0, c0Input), b = readCompactSitePlanning(fixtures.c2, c2Input);
+  assert.deepEqual(a.plan.pages.map(page => page.path), ["/", "/free-review", "/managed-service"]);
+  assert.deepEqual(b.plan.pages.map(page => page.path), ["/", "/storm-damage", "/tree-care-estimates", "/clearing-and-seasonal", "/service-area"]);
+  assert.equal(a.evidence[0].action.destination, "/free-review");
+  assert.equal(b.evidence[0].action.destination, "/storm-damage");
+  assert.notEqual(b.evidence[1].action.label, b.evidence[2].action.label);
+  assert.ok(a.evidence[1].sectionSourceIds[0].includes("3f63450c-8522-4e62-b8ba-881800a9970a:answer"));
+  assert.deepEqual(b.evidence[1].sectionSourceIds, [["c2-visitor-needs"], ["c2-visitor-needs"]]);
+  assert.match(a.unresolved[0], /Launch/);
+  assert.ok(b.unresolved.some(item => /licenses and insurance/.test(item)));
+  assert.deepEqual(compactSitePlanningFormat(c2Input).schema.properties.refs, {
+    type: "array", items: { type: "integer", enum: [1, 2] },
+  });
+  assert.throws(() => readCompactSitePlanning(fixtures.c0, c2Input), /citations refused/);
+  const wrong = structuredClone(fixtures.c2);
+  wrong.pages[0].sections[0].refs = [1, 1];
+  assert.throws(() => readCompactSitePlanning(wrong, c2Input), /citations refused/);
+  const changed = structuredClone(fixtures.c2);
+  changed.pages[0].action.to = "https://example.test/urgent";
+  assert.throws(() => readCompactSitePlanning(changed, c2Input), /visitor action refused/);
+  const diskSize = (x: typeof a, prepared: typeof c0Input) => Buffer.byteLength(JSON.stringify({ generated: x, sources: prepared.input }));
+  assert.ok(6500 + diskSize(a, c0Input) < 14000);
+  assert.ok(6500 + diskSize(b, c2Input) < 14000);
+});
+
+test("compact generation has a separate grant, reserves its full output budget, and retains settled usage", async () => {
+  const { mkdtemp, readFile, rm } = await import("node:fs/promises");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { initializeResponsesUsageLedger, protectedSitePlanningProvider } = await import("../lib/platform/intake/intelligent-responses");
+  const { compactSitePlanningVersion, compactSitePlanningOutput } = await import("../lib/platform/intake/site-planning");
+  const { c2 } = await import("./fixtures/site-planning-compact");
+  const root = await mkdtemp(join(tmpdir(), "miopages-compact-site-"));
+  try {
+    const rates = { model: "test-model", verifiedOn: "2026-11-14", inputPerMillion: 750_000, cachedPerMillion: 75_000,
+      outputPerMillion: 4_500_000, cacheWritePerMillion: 0, countMicros: 0 };
+    await initializeResponsesUsageLedger(root, rates);
+    const tenant = owner("c2"), evidence = [source("c2-offerings", "Fictional tree work."), source("c2-visitor-needs", "Fictional urgent and routine paths.")];
+    const start = Date.now(), expiresAt = start + 60_000;
+    const prepared = prepareSitePlanning(tenant, evidence, [], { ...grant(tenant, evidence), expiresAt }, start);
+    const calls: string[] = [];
+    const transport = { async send(path: string, body: object) {
+      calls.push(path);
+      if (path.endsWith("input_tokens")) return { body: { input_tokens: 900 } };
+      assert.equal((body as { max_output_tokens: number }).max_output_tokens, 6000);
+      assert.equal((body as { store: boolean }).store, false);
+      return { body: { model: rates.model, service_tier: "default", status: "completed", output: [{ type: "message", role: "assistant",
+        content: [{ type: "output_text", text: JSON.stringify(c2) }] }],
+        usage: { input_tokens: 900, input_tokens_details: { cached_tokens: 0 }, output_tokens: 2200,
+          output_tokens_details: { reasoning_tokens: 0 }, total_tokens: 3100 } } };
+    } };
+    const scope = { ownerDigest: tenant, inputDigest: prepared.inputDigest, expiresAt, maxRequests: 2,
+      capMicros: 30_000, format: compactSitePlanningVersion, maxOutputTokens: compactSitePlanningOutput } as const;
+    assert.throws(() => protectedSitePlanningProvider(root, rates, transport, { ...scope, maxOutputTokens: 6001 }), /output authorization/);
+    await assert.rejects(protectedSitePlanningProvider(root, rates, transport, { ...scope, capMicros: 29999 })(() => prepared), /budget exhausted/);
+    assert.deepEqual(calls, []);
+    const run = protectedSitePlanningProvider(root, rates, transport, scope);
+    assert.equal((await run(() => prepared)).plan.pages.length, 5);
+    await assert.rejects(run(() => prepared), /already dispatched/);
+    const [receipt] = JSON.parse(await readFile(join(root, "onboarding-usage.json"), "utf8")).attempts;
+    assert.equal(receipt.reservedMicros, 30000);
+    assert.equal(receipt.estimatedMicros, 10575);
+    assert.deepEqual(calls, ["/v1/responses/input_tokens", "/v1/responses"]);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});

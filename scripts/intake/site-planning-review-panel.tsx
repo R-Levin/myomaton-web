@@ -64,7 +64,8 @@ export function SitePlanningReviewPanel({ state, review, enabled, busy, version,
           sections: item.sections.map((_section, j) => ({ heading: field(`heading-${i}-${j}`), body: field(`body-${i}-${j}`) })),
         }));
         run({ operation: "site-plan-edit", version, digest, plan: { positioning: field("positioning"), offering: field("offering"), audience: field("audience"), pages },
-          destinations: Object.fromEntries(pages.map((item, i) => [item.path, field(`destination-${i}`) || null])) });
+          destinations: Object.fromEntries(pages.map((item, i) => [item.path, field(`destination-${i}`) || null])),
+          ...(proposal.improvement && { improvementCopy: { heading: field("improvement-heading"), body: field("improvement-body") } }) });
       }}>
         <div className={styles.field}>
           <label>Positioning<textarea name="positioning" defaultValue={plan.positioning} required maxLength={500} /></label>
@@ -88,6 +89,10 @@ export function SitePlanningReviewPanel({ state, review, enabled, busy, version,
             </div>)}
           </div>
         </details>)}
+        {proposal.improvement && <div className={styles.field}>
+          <label>Inquiry improvement heading<input name="improvement-heading" defaultValue={proposal.improvement.section.heading} required maxLength={160} /></label>
+          <label>Inquiry improvement content<textarea name="improvement-body" defaultValue={proposal.improvement.section.body} required maxLength={1000} /></label>
+        </div>}
         <button disabled={busy}>Save edits for review</button>
       </form>}
       <h3>Record a review decision</h3>
