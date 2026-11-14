@@ -3,7 +3,7 @@ import { readFile, lstat, realpath, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fingerprint } from "../lib/platform/canonical/model";
 import { compactSitePlanningVersion, compactSitePlanningOutput, prepareSitePlanning, type PreparedPlanning } from "../lib/platform/intake/site-planning";
-import { protectedSitePlanningProvider, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
+import { freshCompactComparison, protectedSitePlanningProvider, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
 import { responsesHttps } from "../lib/platform/intake/responses-https";
 import type { InterviewEvidence } from "../lib/platform/intake/intelligent-model";
 
@@ -13,7 +13,7 @@ const ownerDigest = fingerprint({ fictionalCase: "c2", operation: "site-planning
 type Manifest = { c2: { sources: Array<Pick<InterviewEvidence, "id" | "kind" | "statement">>; answerProjection: null } };
 const compactScopeDigest = "fda4e83664a481649979d7069acd65e0cd52a2bd42caf12b209ff52d4e6b0a6d";
 type Scope = { manifestDigest: string; inputDigest: string; expiresAt: number; revoked?: boolean;
-  scopeDigest?: string; format?: typeof compactSitePlanningVersion; maxOutputTokens?: number };
+  scopeDigest?: string; comparisonId?: string; format?: typeof compactSitePlanningVersion; maxOutputTokens?: number };
 const home = "/home/virtual/vps-bef564/e/e494602172";
 const privateRoot = join(home, "miopages-private-acceptance");
 const proofRoot = join(privateRoot, "site-planning-proof");
@@ -41,7 +41,12 @@ async function main() {
   const transportSettings = await safeFile<{ capMicros: number; maxRequests: number; rates: ResponsesRates; expiresAt: number; revoked?: boolean }>(join(privateRoot, "ai-scope.json"));
   assert.equal(cfg.aiEnabled, true);
   assert.ok(transportSettings.expiresAt >= grant.expiresAt && transportSettings.revoked !== true);
+  const comparison = freshCompactComparison;
+  const fresh = grant.comparisonId === comparison.id;
+  assert.ok(grant.comparisonId === undefined || fresh);
   const compact = grant.format === compactSitePlanningVersion;
+  assert.ok(!fresh || (compact && transportSettings.maxRequests >= comparison.maxRequests &&
+    transportSettings.capMicros >= comparison.capMicros));
   if (compact) {
     assert.equal(grant.scopeDigest, compactScopeDigest);
     assert.equal(grant.maxOutputTokens, compactSitePlanningOutput);
@@ -57,10 +62,11 @@ async function main() {
   assert.equal(transportSettings.rates.countMicros, 0);
   const generate = protectedSitePlanningProvider(join(privateRoot, "core-usage"), transportSettings.rates,
     responsesHttps(cfg.apiKey, grant.expiresAt), { ownerDigest, inputDigest: fictionalDigest, expiresAt: grant.expiresAt,
-      maxRequests: Math.min(compact ? 16 : 14, transportSettings.maxRequests),
-      capMicros: Math.min(compact ? 74_029 : 22_429, transportSettings.capMicros),
+      maxRequests: Math.min(fresh ? comparison.maxRequests : compact ? 16 : 14, transportSettings.maxRequests),
+      capMicros: Math.min(fresh ? comparison.capMicros : compact ? 74_029 : 22_429, transportSettings.capMicros),
+      ...(fresh && { comparisonId: comparison.id }),
       ...(compact && { format: compactSitePlanningVersion, maxOutputTokens: compactSitePlanningOutput,
-        retainedReservation: "5ae4346b9db86020dd9f02f0c8746615acefc018d1d0004c3a3628cdffb581e8" }) });
+        retainedReservation: comparison.retainedReservation }) });
   const project = async (): Promise<PreparedPlanning> => {
     const current = await safeFile<Scope>(grantFile);
     assert.equal(fingerprint(current), fingerprint(grant));
@@ -73,8 +79,8 @@ async function main() {
       evidenceDigest: fingerprint(evidence), approvedAnswerDigests: [] });
   };
   const result = await generate(project);
-  await writeFile(join(proofRoot, "c2-generated.json"), JSON.stringify({ scenario: "fictional-c2", model: transportSettings.rates.model,
-    proposal: result }, null, 2) + "\n", { flag: "wx", mode: 0o600 });
+  await writeFile(join(proofRoot, fresh ? "c2-generated-b42f6e6.json" : "c2-generated.json"), JSON.stringify({ scenario: "fictional-c2", model: transportSettings.rates.model,
+    proposal: result }, null, 2) + "\n", { flag: "wx", mode: 0o600, flush: true });
   console.log(JSON.stringify({ status: "PASS", scenario: "fictional-c2", generatedDigest: result.digest }));
 }
 

@@ -1,6 +1,6 @@
 import { open, readFile, rename, unlink } from "node:fs/promises";
 import { join } from "node:path";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { fingerprint } from "../canonical/model";
 import type { QuestionAttribution, QuestionContext, QuestionProvider } from "./intelligent-model";
 import { presencePlanSchema } from "./presence-plan";
@@ -141,7 +141,23 @@ function meteredResponsesProvider(directory: string, rates: Rates, transport: Re
   } };
 }
 
+export const freshCompactComparison = Object.freeze({
+  id: "287cb7a5cc8d4556731ebba7638cc8cd56dc445ab2377adf580aac8154395dbc",
+  startingLedger: "f660ea22e0ebda5b05848f5d122e5a98887246ab4c843fb0ea70c5d37b05f112",
+  scopeDigest: "fda4e83664a481649979d7069acd65e0cd52a2bd42caf12b209ff52d4e6b0a6d",
+  c0: "852a29a77307e671ce56f75b0e879da9a7856ff775ed1c9d36d70d9354775923",
+  c2: "20a4f3c074a53b53cb641fa14d49443e868711d64e6c1cc8c28a80ab4ac32ddf",
+  retainedReservation: "5ae4346b9db86020dd9f02f0c8746615acefc018d1d0004c3a3628cdffb581e8",
+  capMicros: 79_512, maxRequests: 18, envelopeMicros: 30_000,
+});
+
+function comparisonWorkDigest(inputDigest: string, compact: boolean, comparisonId?: string) {
+  return fingerprint({ operation: "site-planning", inputDigest, ...(compact && { format: compactSitePlanningVersion }),
+    ...(comparisonId && { comparisonId }) });
+}
+
 type SitePlanningGrant = {
+  comparisonId?: string;
   ownerDigest: string; inputDigest: string; expiresAt: number; capMicros: number; maxRequests: number; maxAdditionalRequests?: number;
   format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; retainedReservation?: string;
 };
@@ -161,8 +177,14 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
   if (retainedReservation !== undefined && (!compact || !/^[a-f0-9]{64}$/.test(retainedReservation))) {
     throw Error("Invalid prior reservation authorization");
   }
+  const comparison = freshCompactComparison;
+  const { comparisonId } = grant;
+  if (comparisonId !== undefined && (comparisonId !== comparison.id || !compact ||
+      ![comparison.c0, comparison.c2].some(digest => digest === inputDigest) ||
+      limit !== comparison.capMicros || requests !== comparison.maxRequests ||
+      retainedReservation !== comparison.retainedReservation)) throw Error("Invalid fresh comparison authorization");
   const dispatch = meteredResponsesDispatch(directory, rates, transport, requests, Math.floor(requests / 2), limit,
-    compact ? compactSitePlanningOutput : maxOutput, retainedReservation);
+    compact ? compactSitePlanningOutput : maxOutput, retainedReservation, comparisonId === undefined ? undefined : inputDigest);
   return async (readCurrent: () => PreparedPlanning | Promise<PreparedPlanning>) => {
     async function current() {
       if (Date.now() >= expiresAt) throw Error("Site planning authorization expired");
@@ -176,7 +198,7 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
       return prepared;
     }
     const prepared = await current();
-    const result = await dispatch({ ownerDigest, workDigest: fingerprint({ operation: "site-planning", inputDigest, ...(compact && { format: compactSitePlanningVersion }) }) },
+    const result = await dispatch({ ownerDigest, workDigest: comparisonWorkDigest(inputDigest, compact, comparisonId) },
       { model, instructions: compact ? compactSitePlanningInstruction : sitePlanningInstruction, input: JSON.stringify(prepared.input),
         text: { format: compact ? compactSitePlanningFormat(prepared) : sitePlanningFormat(prepared) } }, current);
     await current();
@@ -185,7 +207,7 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
 }
 
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
-  requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string) {
+  requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string, comparisonInput?: string) {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
@@ -194,7 +216,8 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
     if (![ownerDigest, workDigest].every(value => /^[a-f0-9]{64}$/.test(value))) throw Error("Scoped attribution required");
     const lock = await open(lockPath, "wx", 0o600);
     try {
-      const ledger: Ledger = JSON.parse(await readFile(path, "utf8"));
+      const bytes = await readFile(path, "utf8");
+      const ledger: Ledger = JSON.parse(bytes);
       if (ledger.ratesDigest !== fingerprint(rates) || fingerprint(ledger.rateCard) !== ledger.ratesDigest || ledger.model !== rates.model || ledger.tier !== "default" ||
           ledger.adapterVersion !== version || !Array.isArray(ledger.attempts)) throw Error("Usage ledger binding mismatch");
       let retained = false;
@@ -212,7 +235,19 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       const generations = ledger.attempts.filter(item => item.generationDispatched).length;
       const requests = ledger.attempts.filter(item => item.countDispatched).length + generations;
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");
+      if (comparisonInput !== undefined) {
+        const comparison = freshCompactComparison;
+        const afterC0 = comparisonInput === comparison.c2;
+        const [first, second] = ledger.attempts.slice(7);
+        const baseline = afterC0 ? JSON.stringify({ ...ledger, attempts: ledger.attempts.slice(0, 7) }) + "\n" : bytes;
+        if (createHash("sha256").update(baseline).digest("hex") !== comparison.startingLedger ||
+            requests !== (afterC0 ? 16 : 14) || generations !== (afterC0 ? 8 : 7) ||
+            (afterC0 && (!first || second || first.status !== "completed" ||
+              first.workDigest !== comparisonWorkDigest(comparison.c0, true, comparison.id) ||
+              first.reservedMicros !== comparison.envelopeMicros))) throw Error("Fresh comparison ledger baseline refused");
+      }
       const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + outputLimit * rates.outputPerMillion) / 1_000_000);
+      if (comparisonInput !== undefined && reservation !== freshCompactComparison.envelopeMicros) throw Error("Fresh comparison request envelope refused");
       if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) throw Error("Development budget exhausted");
       if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation,
