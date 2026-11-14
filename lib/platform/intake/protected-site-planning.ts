@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { choice, fingerprint, object, text } from "../canonical/model";
 import type { Actor } from "../content-editing/proposal";
 import { IntakeError } from "./model";
-import { comparisonWorkDigest, replaySitePlanningResponse } from "./intelligent-responses";
+import { comparisonWorkDigest, recoveredOutcomeC0, replaySitePlanningResponse } from "./intelligent-responses";
 import { isInvalidPlanningResponse, PlanningFailureError, type PlanningFailure } from "./planning-diagnostics";
 import type { PlanningAttempt, PlanningResponseCustody } from "./planning-response-custody";
 import { readPresencePlan, type PresencePlan } from "./presence-plan";
@@ -24,6 +24,7 @@ export type SitePlanningReview = {
     at: string;
     basis: string;
     revision: number;
+    recoveryEdit?: { field: "home-search-description"; captureDigest: string; operatorId: string; at: string };
     changes?: Record<string, string>;
     routes?: Record<string, Action["destination"]>;
     improvement?: Improvement & { section: PresencePlan["pages"][number]["sections"][number] };
@@ -178,7 +179,7 @@ export class ProtectedSitePlanning {
     }
   }
 
-  async recover(token: string, version: number) {
+  async recover(token: string, version: number, correction?: { homeDescription: unknown; actor: Actor }) {
     const current = await this.intake.resume(token);
     const state = current.sitePlanning;
     const pending = state?.pending;
@@ -199,9 +200,20 @@ export class ProtectedSitePlanning {
       const capture = await this.custody.read(attempt);
       if (!capture) throw new PlanningFailureError(state.failure ?? "interrupted");
       await this.custody.verifyReceipt(attempt, capture.bytes);
-      const normalized = replaySitePlanningResponse(capture.bytes, capture.prepared, attempt.model, capture.format === "compact/2");
+      if (correction && (state.failure !== "proposal_content" || attempt.workDigest !== recoveredOutcomeC0.workDigest ||
+          capture.sha256 !== recoveredOutcomeC0.captureDigest)) throw new IntakeError("draft_changed", 409);
+      let description: string | undefined;
+      if (correction) {
+        try { description = text(correction.homeDescription, 160); }
+        catch { throw new IntakeError("invalid_request"); }
+      }
+      const normalized = replaySitePlanningResponse(capture.bytes, capture.prepared, attempt.model, capture.format === "compact/2", description);
+      if (correction && normalized.digest !== recoveredOutcomeC0.proposalDigest) throw new IntakeError("draft_changed", 409);
       proposal = this.proposal(attempt, normalized, capture.prepared.input);
+      if (correction) proposal.recoveryEdit = { field: "home-search-description", captureDigest: capture.sha256,
+        operatorId: correction.actor.operatorId, at: new Date().toISOString() };
     } catch (error) {
+      if (error instanceof IntakeError) throw error;
       const failure = error instanceof PlanningFailureError ? error.code : "response_decode";
       return this.settle(token, attempt, { failure, recovery: attempt }, version);
     }

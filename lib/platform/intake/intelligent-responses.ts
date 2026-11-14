@@ -172,7 +172,14 @@ export function comparisonWorkDigest(inputDigest: string, compact: boolean, comp
     ...(comparisonId && { comparisonId }), ...(comparisonAttempt !== undefined && { comparisonAttempt }) });
 }
 
+export const recoveredOutcomeC0 = Object.freeze({
+  proposalDigest: "6904fc782422af25c9e7dab2f15a82edb527f3b03527e26047bd1564583f46cc",
+  workDigest: "4e801d17bf41257b8e6b5adb64aa25f822358551f53e56f762b9d92c82e741b1",
+  captureDigest: "b2222c8209c2d7a08a2c4f3a2996fa16259cad2c2b12d8954a1da87c4a5d750b",
+});
+
 type SitePlanningGrant = {
+  c0ReadbackDigest?: string;
   comparisonId?: string; comparisonAttempt?: number;
   ownerDigest: string; inputDigest: string; expiresAt: number; capMicros: number; maxRequests: number; maxAdditionalRequests?: number;
   format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; retainedReservation?: string;
@@ -217,7 +224,7 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
       limit !== comparison.capMicros || requests !== comparison.maxRequests)) throw Error("Invalid fresh comparison authorization");
   const dispatch = meteredResponsesDispatch(directory, rates, transport, requests, Math.floor(requests / 2), limit,
     compact ? compactSitePlanningOutput : maxOutput, retainedReservation, comparisonId === undefined || outcome ? undefined : inputDigest,
-    outcome ? { inputDigest, attempt: comparisonAttempt! } : undefined);
+    outcome ? { inputDigest, attempt: comparisonAttempt!, c0ReadbackDigest: grant.c0ReadbackDigest } : undefined);
   return async (readCurrent: () => PreparedPlanning | Promise<PreparedPlanning>, retain?: CompletedResponse) => {
     async function checkCurrent() {
       if (Date.now() >= expiresAt) throw Error("Site planning authorization expired");
@@ -240,8 +247,11 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
     const prepared = await current();
     if (outcome && !retain) throw new PlanningFailureError("custody_write");
     const normalize: NormalizeProposal = value => normalizeSitePlanningResponse(value, prepared, compact);
+    const instructions = compact ? compactSitePlanningInstruction : sitePlanningInstruction;
+    const conciseDescriptions = outcome && inputDigest === cycle.c2
+      ? " Aim for 120 characters or fewer for every search description and 250 or fewer for the audience, leaving room below the field limits." : "";
     const result = await dispatch({ ownerDigest, workDigest: comparisonWorkDigest(inputDigest, compact, comparisonId, comparisonAttempt) },
-      { model, instructions: compact ? compactSitePlanningInstruction : sitePlanningInstruction, input: JSON.stringify(prepared.input),
+      { model, instructions: instructions + conciseDescriptions, input: JSON.stringify(prepared.input),
         text: { format: compact ? compactSitePlanningFormat(prepared) : sitePlanningFormat(prepared) } },
       current, retain, outcome ? normalize : undefined);
     if (!retain) await current();
@@ -254,13 +264,20 @@ function normalizeSitePlanningResponse(value: unknown, prepared: PreparedPlannin
     compact ? readCompactSitePlanning(value, prepared) : readSitePlanning(value, prepared));
 }
 
-export function replaySitePlanningResponse(bytes: Buffer, prepared: PreparedPlanning, model: string, compact: boolean) {
+export function replaySitePlanningResponse(bytes: Buffer, prepared: PreparedPlanning, model: string, compact: boolean, homeDescription?: string) {
   const result = atPlanningStage("response_decode", () => {
     const body = record(JSON.parse(bytes.toString("utf8")));
     if (body.model !== model || body.service_tier !== "default") throw new PlanningFailureError("provider_identity");
     if (body.status !== "completed") throw new PlanningFailureError("provider_incomplete");
     return responseProposal(body);
   });
+  if (homeDescription !== undefined) {
+    const root = record(result);
+    if (!compact || !Array.isArray(root.pages)) throw new PlanningFailureError("proposal_shape");
+    const home = root.pages.map(record).find(page => page.path === "/");
+    if (!home || typeof home.seo !== "string" || home.seo.length <= 160) throw new PlanningFailureError("proposal_content");
+    home.seo = homeDescription;
+  }
   return normalizeSitePlanningResponse(result, prepared, compact);
 }
 
@@ -283,7 +300,7 @@ export async function confirmSitePlanningReceipt(directory: string, ownerDigest:
 
 type OutcomeLedgerScope = Omit<typeof outcomeCompactComparison, "startingLedger"> & { startingLedger: string };
 
-export function verifyOutcomeLedger(ledger: Ledger, inputDigest: string, attempt: number, cycle: OutcomeLedgerScope = outcomeCompactComparison) {
+export function verifyOutcomeLedger(ledger: Ledger, inputDigest: string, attempt: number, cycle: OutcomeLedgerScope = outcomeCompactComparison, c0ReadbackDigest?: string) {
   const baseline = JSON.stringify({ ...ledger, attempts: ledger.attempts.slice(0, cycle.baselineAttempts) }) + "\n";
   if (createHash("sha256").update(baseline).digest("hex") !== cycle.startingLedger) throw Error("Outcome comparison ledger baseline refused");
 
@@ -299,7 +316,9 @@ export function verifyOutcomeLedger(ledger: Ledger, inputDigest: string, attempt
         (previous.proposalValidation !== "valid" && !isInvalidPlanningResponse(previous.proposalValidation ?? "")) ||
         (scenario === "c2" && !valid.c0) ||
         (scenario === "c0" && counts.c2 > 0)) throw Error("Outcome comparison receipt refused");
-    valid[scenario] = previous.proposalValidation === "valid";
+    valid[scenario] = previous.proposalValidation === "valid" ||
+      (scenario === "c0" && previous.proposalValidation === "proposal_content" &&
+        previous.workDigest === recoveredOutcomeC0.workDigest && c0ReadbackDigest === recoveredOutcomeC0.proposalDigest);
   }
   const scenario = inputDigest === cycle.c0 ? "c0" : "c2";
   if (attempt !== counts[scenario] + 1 || valid[scenario] || (scenario === "c2" && !valid.c0) ||
@@ -309,7 +328,7 @@ export function verifyOutcomeLedger(ledger: Ledger, inputDigest: string, attempt
 
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
   requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string, comparisonInput?: string,
-  outcome?: { inputDigest: string; attempt: number }) {
+  outcome?: { inputDigest: string; attempt: number; c0ReadbackDigest?: string }) {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
@@ -350,7 +369,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
               first.workDigest !== comparisonWorkDigest(comparison.c0, true, comparison.id) ||
               first.reservedMicros !== comparison.envelopeMicros))) throw Error("Fresh comparison ledger baseline refused");
       }
-      if (outcome) verifyOutcomeLedger(ledger, outcome.inputDigest, outcome.attempt);
+      if (outcome) verifyOutcomeLedger(ledger, outcome.inputDigest, outcome.attempt, outcomeCompactComparison, outcome.c0ReadbackDigest);
       const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + outputLimit * rates.outputPerMillion) / 1_000_000);
       if ((comparisonInput !== undefined || outcome) && reservation !== freshCompactComparison.envelopeMicros) throw Error("Fresh comparison request envelope refused");
       if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) throw Error("Development budget exhausted");

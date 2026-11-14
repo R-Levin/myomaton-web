@@ -116,7 +116,7 @@ export class PlanningResponseCustody {
             fingerprint([...prepared.input.sources, ...prepared.input.answers].map(source => source.id)) !== fingerprint(prepared.sourceIds) ||
             prepared.input.answers.some(answer => answer.confirmation !== "unconfirmed")) throw Error();
         if (this.clock() - capturedAt >= planningResponseRetentionMs) throw new PlanningFailureError("custody_expired");
-        return { ...record, bytes: Buffer.from(record.bytes, "base64") };
+        return { ...record, sha256, bytes: Buffer.from(record.bytes, "base64") };
       } finally { await file.close(); }
     } catch (error) {
       if (error instanceof PlanningFailureError) throw error;

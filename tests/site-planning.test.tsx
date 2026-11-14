@@ -289,7 +289,7 @@ test("the exact compact comparison can account for an incomplete prior run witho
 
 test("the approved outcome scope permits only diagnosed attempts before an ordered C0/C2 completion", async () => {
   const { createHash } = await import("node:crypto");
-  const { comparisonWorkDigest, outcomeCompactComparison: pin, verifyOutcomeLedger } =
+  const { comparisonWorkDigest, outcomeCompactComparison: pin, recoveredOutcomeC0, replaySitePlanningResponse, verifyOutcomeLedger } =
     await import("../lib/platform/intake/intelligent-responses");
   type Ledger = Parameters<typeof verifyOutcomeLedger>[0];
   type Receipt = Ledger["attempts"][number];
@@ -319,4 +319,23 @@ test("the approved outcome scope permits only diagnosed attempts before an order
   assert.doesNotThrow(() => verifyOutcomeLedger(five, pin.c2, 3, cycle));
   assert.throws(() => verifyOutcomeLedger({ ...five, attempts: [...five.attempts, badC2(3)] }, pin.c2, 4, cycle), /order/);
   assert.throws(() => verifyOutcomeLedger({ ...base, attempts: base.attempts.slice(1) }, pin.c0, 1, cycle), /baseline/);
+  const finalC0 = state(badC0, receipt("c0", 2, "proposal_content"), receipt("c0", 3, "proposal_content"));
+  assert.equal(finalC0.attempts.at(-1)?.workDigest, recoveredOutcomeC0.workDigest);
+  assert.throws(() => verifyOutcomeLedger(finalC0, pin.c2, 1, cycle), /order/);
+  assert.throws(() => verifyOutcomeLedger(finalC0, pin.c2, 1, cycle, "a".repeat(64)), /order/);
+  assert.doesNotThrow(() => verifyOutcomeLedger(finalC0, pin.c2, 1, cycle, recoveredOutcomeC0.proposalDigest));
+
+  const { c2 } = await import("./fixtures/site-planning-compact");
+  const evidence = [source("tree", "Fictional tree work."), source("triage", "Fictional storm and estimate needs.")];
+  const prepared = prepareSitePlanning(owner("c2"), evidence, [], grant(owner("c2"), evidence), now);
+  const prose = structuredClone(c2);
+  prose.pages[0].seo = "x".repeat(162);
+  const raw = () => Buffer.from(JSON.stringify({ model: "test", service_tier: "default", status: "completed",
+    output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(prose) }] }] }));
+  assert.throws(() => replaySitePlanningResponse(raw(), prepared, "test", true), { code: "proposal_content" });
+  const repaired = replaySitePlanningResponse(raw(), prepared, "test", true, "Fictional tree and storm assessment.");
+  assert.equal(repaired.plan.pages[0].seoDescription, "Fictional tree and storm assessment.");
+  assert.equal(prose.pages[0].seo.length, 162);
+  prose.pages[0].action.to = "/unscoped";
+  assert.throws(() => replaySitePlanningResponse(raw(), prepared, "test", true, "Fictional tree and storm assessment."), { code: "proposal_route" });
 });

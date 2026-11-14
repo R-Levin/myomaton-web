@@ -39,6 +39,7 @@ export function SitePlanningReviewPanel({ state, review, enabled, busy, version,
     <h2>AI site proposal</h2>
     <p>{decision?.status === "approved" ? "Approved for delivery preparation" : decision?.status === "rejected" ? "Rejected in Operator review" : "Awaiting Operator review"}</p>
     {!review.current && <p role="status">Business evidence changed. This version remains available for inspection.</p>}
+    {proposal.recoveryEdit && <p>Operator preparation corrected the Home search description. The generated copy and evidence elsewhere are retained.</p>}
     <p>{plan.positioning}</p><p>{plan.offering}</p><p>Audience: {plan.audience}</p>
     <details><summary>Evidence behind the direction</summary><ul>{citations(generated.directionSourceIds)}</ul></details>
     {generated.unresolved.length > 0 && <><h3>Open questions</h3><ul>{generated.unresolved.map((item, i) => <li key={i}>{item}</li>)}</ul></>}

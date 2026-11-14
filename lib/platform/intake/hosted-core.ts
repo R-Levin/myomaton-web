@@ -275,6 +275,8 @@ export async function hostedCoreRequest(request: Request) {
           switch (value.operation) {
             case "site-plan-generate": return await view(app.sitePlanning.generate(app.draftToken, version));
             case "site-plan-recover": return await view(app.sitePlanning.recover(app.draftToken, version));
+            case "site-plan-recover-copy": return await view(app.sitePlanning.recover(app.draftToken, version,
+              { homeDescription: value.homeDescription, actor }));
             case "site-plan-edit": return await view(app.sitePlanning.edit(app.draftToken, version, value.digest, value.plan, value.destinations, value.improvementCopy));
             case "site-plan-decide": return await view(app.sitePlanning.decide(app.draftToken, version, value.digest, value.status, value.note, actor));
             case "site-plan-delivery": return await app.sitePlanning.delivery(app.draftToken, value.version);

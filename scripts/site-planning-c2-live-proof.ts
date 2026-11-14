@@ -83,7 +83,7 @@ async function main() {
     responsesHttps(cfg.apiKey, grant.expiresAt), { ownerDigest, inputDigest: fictionalDigest, expiresAt: grant.expiresAt,
       maxRequests: outcome ? outcomeCompactComparison.maxRequests : Math.min(fresh ? comparison.maxRequests : compact ? 16 : 14, transportSettings.maxRequests),
       capMicros: Math.min(fresh ? comparison.capMicros : compact ? 74_029 : 22_429, transportSettings.capMicros),
-      ...(fresh && { comparisonId: comparison.id, comparisonAttempt: grant.comparisonAttempt }),
+      ...(fresh && { comparisonId: comparison.id, comparisonAttempt: grant.comparisonAttempt, c0ReadbackDigest: grant.c0ReadbackDigest }),
       ...(compact && { format: compactSitePlanningVersion, maxOutputTokens: compactSitePlanningOutput,
         retainedReservation: comparison.retainedReservation }) });
   const project = async (): Promise<PreparedPlanning> => {
