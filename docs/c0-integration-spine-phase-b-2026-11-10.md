@@ -2055,3 +2055,69 @@ Next verify the fixed artifact and seek a fresh exact dispatch decision.
 The compact C0 request was consumed, its payload was not retained
 (`store:false`), and this scope permits no retry. A new test also needs
 an unexpired governing grant and updated starting spend/request counts.
+
+#### Protected storage deployment and database guard
+
+The protected Core build at `6d64706cb255087f2fc707c668cc5d28a6759c3e`
+is running at the existing protected HTTPS origin. The
+[Linux production artifact](https://github.com/R-Levin/myomaton-web/actions/runs/43602335416)
+passed independent ZIP, tar and 163-file verification. Only the build
+and its manifest were swapped in the acceptance package. The previous
+build and manifest remain available off-webroot for recovery.
+
+A rollback-only hosted fixture saved a lossless, compressed proposal of
+five pages and 24 sections. The uncompressed review plus retained
+interview provenance exceeded 14 kB and the saved proposal matched the
+offline input. A later reload-and-review step returned PostgreSQL
+`42501`. The run did not record which operation in that combined step
+returned the error. A fresh scoped read returned zero fixture rows.
+Hosted persistence, editing and review have therefore passed only in
+part.
+
+The live function body matches the original intake trigger in migration
+0010. Its combined submission-state predicate and submission lookup can
+check table privileges on a generic query plan even during draft-only
+updates. This was reproduced with the same restricted role policy in
+disposable PostgreSQL. The forward-only SQL in
+[the draft guard correction](../lib/platform/intake/protected-core-draft-guard.sql)
+checks the state in a separate branch. It preserves invoker behavior,
+the managed-site check, all grants and the matching-snapshot requirement
+for actual submission. The focused regression preserves rejection of
+an unattested submission, accepts the matching snapshot and refuses
+edits after submission. All nine targeted tests passed. A separate
+legacy intake suite in a bootstrapped disposable cluster failed its
+fixture owner check and dependent cases. That suite loads the unmodified
+canonical migrations and does not install this correction.
+
+The C0 draft is still at version 19 with its prior capacity-failure
+record, interview evidence and synthetic inquiry. The usage ledger
+matched its recorded hash and the starting totals remain 14 requests
+and seven generation attempts. No provider calls occurred. Both public
+Core HTTPS outputs matched their preserved bytes. Read-only WordPress
+checks matched active Delivery 0.0.10 and the restored content, slugs
+and draft status for Home 13 and Service 14.
+
+Automatic approval review rejected a repeat hosted write after the
+authorization error. The database correction has only been tested
+locally. The next action is specific approval for an authorized
+database owner to replace only `public.prospect_intake_guard()` in a
+transaction, with the original definition retained for rollback. Match
+the current body hash
+`039d1df064a3a7117d7b318b2a09a033bcb68ccd77e12653a2a95df83e4821e3`,
+verify unchanged owner, ACL, invoker settings and enabled trigger, and
+verify the corrected definition before commit. Then rerun one rollback-only
+fixture using [the storage proof](../scripts/site-planning-hosted-storage-proof.ts)
+under the existing restricted role. Require distinct save, reload,
+edit, review and cleanup evidence. Stop on failure. No grants, intake
+data, migration ledger entries, credentials or WordPress state are
+part of the correction. Fresh C0/C2 model authorization follows
+successful hosted verification, with the existing ledger preserved.
+
+Compression is a temporary compatibility measure for the intake row.
+Commercial V1 needs independently versioned, tenant-scoped site proposal
+storage. Bind each generated version to its exact intake evidence and
+retain the original output, Operator edits, scoped decisions and delivery
+references as distinct history. Keep the existing approval and editorial
+digests. This would let adaptive onboarding and Ongoing improvements use
+the same review workflow without tying proposal size or retention to the
+intake record. The storage design and rollout remain pending.

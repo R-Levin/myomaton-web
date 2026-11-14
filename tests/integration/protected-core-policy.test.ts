@@ -25,7 +25,7 @@ test("Core development policy confines the existing draft writer to the inactive
   url.username = "miopages_core_development";
   const password = randomUUID();
   url.password = password;
-  const role = new Pool({ connectionString: url.href, options: "-c search_path=miopages_core_guard,miopages_wp,public" });
+  const role = new Pool({ connectionString: url.href, max: 1, options: "-c search_path=miopages_core_guard,miopages_wp,public" });
   try {
     await migrateWithBootstrapCompatibility(admin);
     await admin.query("CREATE SCHEMA miopages_wp");
@@ -49,7 +49,16 @@ test("Core development policy confines the existing draft writer to the inactive
     const service = new IntakeService(role, selection, { database: url.pathname.slice(1), answers: {}, provenance: {},
       prepared: prepareC2(), step: 3, protectedScope: async db => { await db.query("SET search_path TO miopages_core_guard, miopages_wp, public"); } });
     const token = newResumeToken();
+    // Exercise the generic plan a reused Session Pooler backend can select.
+    await role.query("SET plan_cache_mode = force_generic_plan");
+    await assert.rejects(service.create(token, "DIRECT_START"), {
+      code: "42501", message: "permission denied for table prospect_intake_submissions",
+    });
+    assert.equal((await role.query("SELECT count(*)::int AS n FROM miopages_wp.core_development_drafts")).rows[0].n, 0);
+    await admin.query(await readFile("lib/platform/intake/protected-core-draft-guard.sql", "utf8"));
     const result = await service.create(token, "DIRECT_START");
+    await assert.rejects(admin.query("UPDATE public.prospect_intakes SET state='needs_operator_review',submitted_at=now(),version=version+1"),
+      /Matching submission required/);
     assert.equal(result.version, 2);
     assert.deepEqual(await service.create(token, "DIRECT_START"), result);
     const evidence = [{ id: "offer", kind: "owner-confirmed" as const, at: "2026-11-13", reference: "Fictional policy test",
@@ -213,6 +222,18 @@ test("Core development policy confines the existing draft writer to the inactive
     await assert.rejects(role.query("SELECT * FROM public.contact_submissions"), /permission denied/);
     await assert.rejects(role.query("UPDATE miopages_wp.core_development_inquiries SET delivery_status='pending'"), /permission denied/);
     await assert.rejects(role.query("SELECT * FROM public.prospect_intakes"), /permission denied/);
+    await assert.rejects(role.query("SELECT * FROM public.prospect_intake_submissions"), /permission denied/);
+    // Exercise the legitimate transition through the same guard as its owner.
+    const snapshot = await admin.query(`INSERT INTO public.prospect_intake_submissions
+      (web_presence_id,intake_id,entry_intent,questionnaire_version,draft_version,answers,provenance,digest,submitted_at,expires_at)
+      SELECT web_presence_id,id,entry_intent,questionnaire_version,version,answers,provenance,$1,now(),expires_at
+      FROM public.prospect_intakes RETURNING intake_id,submitted_at::text AS submitted_at`, ["a".repeat(64)]);
+    assert.equal(snapshot.rowCount, 1);
+    const transition = await admin.query(`UPDATE public.prospect_intakes
+      SET state='needs_operator_review',submitted_at=$2,version=version+1 WHERE id=$1 RETURNING state`,
+    [snapshot.rows[0].intake_id, snapshot.rows[0].submitted_at]);
+    assert.equal(transition.rows[0].state, "needs_operator_review");
+    await assert.rejects(admin.query("UPDATE public.prospect_intakes SET version=version+1"), /Submitted intake is immutable/);
     await assert.rejects(role.query("DELETE FROM miopages_wp.core_development_drafts"), /permission denied/);
     await assert.rejects(role.query("UPDATE miopages_wp.core_development_drafts SET web_presence_id=$1", [randomUUID()]), /permission denied/);
     await assert.rejects(role.query("UPDATE miopages_wp.core_development_drafts SET state='needs_operator_review'"), /permission denied/);
