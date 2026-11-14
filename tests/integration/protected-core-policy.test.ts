@@ -126,6 +126,14 @@ test("Core development policy confines the existing draft writer to the inactive
         { path: "/pruning", sourceIds: [source.id], sectionSourceIds: [[source.id]], actionKind: "request-contact", destination: null },
       ],
     };
+    // Reproduce the hosted failure with substantial generated copy and retained
+    // interview provenance. The prior uncompressed representation exceeded 14 kB.
+    const paragraph = "Describe the location, the type of work, and access constraints. Include photos only when you can take them safely. ";
+    for (const page of draft.plan.pages) {
+      page.sections[0].body = paragraph.repeat(8).trim();
+      for (let i = 1; i <= 3; i++) page.sections.push({ heading: "Details for step " + i, body: paragraph.repeat(7).trim() });
+    }
+    for (const p of draft.pages) p.sectionSourceIds.push([source.id], [source.id], [source.id]);
     const ownerDigest = fingerprint(selection), expiresAt = Date.now() + 60_000;
     const planning = new ProtectedSitePlanning(service, { model: "offline-test",
       async input() { return prepareSitePlanning(ownerDigest, [source], [], {
@@ -137,6 +145,9 @@ test("Core development policy confines the existing draft writer to the inactive
     const generated = await planning.generate(token, authored.version);
     const resumed = await service.resume(token);
     assert.deepEqual(resumed, generated);
+    const stored = (await role.query("SELECT provenance FROM miopages_wp.core_development_drafts")).rows[0].provenance;
+    assert.match(stored.protectedSitePlanning, /^deflate-raw\/1:/);
+    assert.ok(Buffer.byteLength(JSON.stringify({ ...stored, protectedSitePlanning: resumed.sitePlanning })) > 14_000);
     assert.equal(resumed.interview?.reviewedPlan?.origin, "operator");
     const original = reviewedSitePlanning(resumed.sitePlanning!.proposal!);
     assert.deepEqual(original.plan.pages.map(page => page.path), ["/", "/storm", "/pruning"]);

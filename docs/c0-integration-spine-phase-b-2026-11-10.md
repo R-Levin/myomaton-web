@@ -2008,3 +2008,50 @@ unchanged. The absolute ceiling is $0.074029, made up of prior settled
 $0.005629, the retained reservation, and $0.060000 for the two request
 envelopes. It retains the original four new requests, exact input pins
 and no retries. Every other unresolved receipt still blocks dispatch.
+
+#### Compact C0 completed but hit the draft storage limit
+
+After the owner waived the dashboard export for this bounded test,
+the exact compact runner used the full reservation for the original
+uncertain receipt. The earlier six receipts were independently compared
+against the byte-preserved ledger copy after the new dispatch and all
+matched. Project attribution remains unverified. The prior receipt
+remains uncertain, with its outcome and accounting fields intact.
+
+The protected build at `64b3f55dce1bdefaf7703299b429fb14edd9dd6b`
+passed [Linux CI](https://github.com/R-Levin/myomaton-web/actions/runs/43601786879).
+Artifact 14116557604 matched its published outer ZIP checksum, inner tar
+SHA-256 `1378c7fdb747f9f037f20dddfd2c2cf6c73434543a0666e33531690f4427235a`,
+and all 163 files before swapping only the protected Core build.
+The previous build was retained off-webroot. Public Core responses on
+both existing hostnames matched their baseline bytes.
+
+C0 used one token count and one generation. The usage receipt completed
+and recorded 578 input tokens, 1,122 output tokens, and zero cached or
+reasoning tokens. The standard-rate estimate is $0.00548250, recorded
+as $0.005483, against a $0.030000 envelope. The model response passed
+structured proposal validation, but combining it with the existing
+interview and provenance exceeded Core's 14 kB draft write limit. Core
+saved `draft_capacity` at version 19. The content was not persisted.
+There is no reliable basis to report its pages, copy, citations, visitor
+actions or unresolved claims. C2 remained disabled and was not dispatched.
+There were no retries, WordPress changes or publication. The grants are
+absent. Authenticated HTTPS confirmed Core is available with the
+preserved interview evidence and synthetic inquiry.
+
+The follow-through changes only protected proposal persistence. It
+stores the review losslessly in a bounded compressed representation
+inside the same restricted intake record and reads older review
+objects as before. The existing row size, tenant checks, optimistic
+version, normalized proposal and approval digests remain intact. A
+disposable PostgreSQL regression uses a substantial plan whose full
+uncompressed review and retained provenance exceed the former write
+limit. It verifies exact reload, review, delivery preparation, and the
+editable synthetic inquiry link through the same scope. A sufficiently
+large or incompressible review still needs a separately scoped storage
+design. The storage fix has not been deployed.
+
+Next verify the fixed artifact and seek a fresh exact dispatch decision.
+The compact C0 request was consumed, its payload was not retained
+(`store:false`), and this scope permits no retry. A new test also needs
+an unexpired governing grant and updated starting spend/request counts.

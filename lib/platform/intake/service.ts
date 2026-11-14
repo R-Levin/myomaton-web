@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { deflateRawSync, inflateRawSync } from "node:zlib";
 import type { Pool, PoolClient } from "pg";
 import type { DeploymentSelection } from "../managed-sites/deployment";
 import { fingerprint } from "../canonical/model";
@@ -10,6 +11,31 @@ import type { SitePlanningReview } from "./protected-site-planning";
 import type { InterviewState } from "./intelligent-model";
 
 const intelligentVersion = "paid-onboarding/3";
+
+// Keep the scoped intake row and its existing write policy. The normalized
+// plan repeats source IDs and review copy, which compress without data loss.
+const maxPlanningReviewBytes = 65_536;
+const compressedReview = "deflate-raw/1:";
+function packPlanningReview(value: SitePlanningReview) {
+  const json = Buffer.from(JSON.stringify(value), "utf8");
+  if (json.length > maxPlanningReviewBytes) throw new IntakeError("payload_too_large", 413);
+  return compressedReview + deflateRawSync(json).toString("base64");
+}
+
+function unpackPlanningReview(value: unknown): SitePlanningReview | undefined {
+  if (value === undefined) return undefined;
+  if (value && typeof value === "object" && !Array.isArray(value)) return value as SitePlanningReview;
+  if (typeof value !== "string" || !value.startsWith(compressedReview)) throw new IntakeError("unavailable", 503);
+  try {
+    const text = value.slice(compressedReview.length);
+    const bytes = Buffer.from(text, "base64");
+    if (!bytes.length || bytes.toString("base64") !== text) throw Error("Invalid review encoding");
+    const decoded = JSON.parse(inflateRawSync(bytes, { maxOutputLength: maxPlanningReviewBytes }).toString("utf8"));
+    if (!decoded || typeof decoded !== "object" || Array.isArray(decoded)) throw Error("Invalid review state");
+    return decoded;
+  } catch { throw new IntakeError("unavailable", 503); }
+}
+
 
 export const draftDays = 30, submissionDays = 90;
 export const newResumeToken = () => randomBytes(32).toString("hex");
@@ -115,7 +141,7 @@ export class IntakeService {
     delete provenance.preparedDigest;
     const interview = provenance.protectedInterview as InterviewState | undefined;
     delete provenance.protectedInterview;
-    const sitePlanning = provenance.protectedSitePlanning as SitePlanningReview | undefined;
+    const sitePlanning = unpackPlanningReview(provenance.protectedSitePlanning);
     delete provenance.protectedSitePlanning;
     const result = { ...view(row), provenance: provenance as Record<string, IntakeEvidence>, prepared: this.rehearsal.prepared };
     if (this.rehearsal.step !== undefined) {
@@ -205,7 +231,7 @@ export class IntakeService {
       const previous = view.sitePlanning ?? {};
       const state = change(previous, view);
       if (state === previous) return view;
-      const provenance = { ...row.provenance, protectedSitePlanning: state };
+      const provenance = { ...row.provenance, protectedSitePlanning: packPlanningReview(state) };
       if (Buffer.byteLength(JSON.stringify(provenance)) > 14_000) throw new IntakeError("payload_too_large", 413);
       const saved = await db.query(`UPDATE ${this.draftTable} SET provenance=$2,version=version+1,updated_at=now() WHERE id=$1 RETURNING *`,
         [row.id, JSON.stringify(provenance)]);
