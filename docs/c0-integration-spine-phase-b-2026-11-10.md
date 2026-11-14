@@ -1888,14 +1888,16 @@ The original ledger and its protected copy match byte for byte at SHA-256
 The stored provider response usage is 699 input, 1,200 output, zero
 cached and zero reasoning tokens. Standard model rates independently
 recompute to $0.00592425, rounded up to the ledger's $0.005925 USD.
-The provider's independent project usage record was unavailable in this
-session. The dashboard launch failed. The original request state remains
-uncertain, the authoritative ledger was left untouched, and both cases
-remain disabled. A matching provider export should isolate the development
-project, model and single generation on November 13 around 10:36 p.m.
-Eastern (November 14 around 02:36 UTC). A larger aggregate alone does
-not establish an exact match or a recovered completion reason. Preserve
-the original receipt even when its charge is independently reconciled.
+The owner read back one dashboard request, 1,899 total tokens and a
+rounded $0.0059. This strongly corroborates the estimate. The dashboard
+did not independently show the 699/1,200 split, and project, model and
+request attribution were not independently verified. The original
+request remains uncertain, the authoritative ledger stays untouched,
+and both cases remain disabled. A matching provider export should
+isolate the development project, model and generation on November 13
+around 10:36 p.m. Eastern (November 14 around 02:36 UTC). The aggregate
+does not establish the original provider completion reason. Preserve
+the original receipt even after its charge is independently reconciled.
 [OpenAI Usage Dashboard](https://platform.openai.com/usage) ·
 [Official model rates](https://developers.openai.com/api/docs/models/gpt-5.4-mini).
 
@@ -1952,3 +1954,11 @@ original receipt, then independently verify the updated Linux artifact and
 activate the exact grants only after owner authorization. Confirm each
 saved plan, citations, visitor destinations and open questions before
 continuing. WordPress approval, application and publication remain separate.
+
+The [Linux production build and smoke](https://github.com/R-Levin/myomaton-web/actions/runs/43600191588)
+passed for `63542dfabc2ad9109ead89edb00cd675e7d718e7`. Artifact
+`14115977882` independently matched its outer ZIP and inner tar checksums
+and all 163 manifest files. Tar SHA-256 is
+`074c30d4a66fce1e33e5bf1335bdaf0276af3e98b5b83fa21590b89bde7d8386`.
+Hosted Core still runs the previous build. Local checks passed 404
+application tests, 14 focused tests, TypeScript and ESLint.
