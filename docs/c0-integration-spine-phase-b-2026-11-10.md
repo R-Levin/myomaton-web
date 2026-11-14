@@ -2277,3 +2277,40 @@ verify that accepted results appear in protected Operator review with
 their provenance intact. The next live operation needs separate
 authorization and the updated ledger. Independent, versioned proposal
 storage remains part of the Commercial V1 direction.
+
+#### Current workstream cost and next outcome — owner procedure update, November 14, 2026
+
+The owner has explicitly prioritized delivering a persistent, reviewable
+generate → edit → private preview product experience over repeated
+penny-level stop gates. The binding development operating rules and
+cost-reporting format are now in
+[development-control](development-control.md#outcome-first-execution-and-proportional-controls--owner-decision-2026-11-14).
+Do not infer a new provider grant from these instructions; do not break
+the current ledger or privacy boundaries.
+
+**Running cost, as of checkpoint `894240b` (not a live current balance):**
+
+| Scope / result | Estimated provider-model usage | Uncertain reservation | Accounting ceiling | Owner time |
+| --- | ---: | ---: | ---: | --- |
+| C0 site-planning comparison: three generations, none retained; C2 zero | $0.015802 (includes $0.005925 uncertain) | $0.008400 replaces the uncertain estimate for accounting | $0.018277 | Several hours reported; exact time/rate unverified |
+| Entire scoped Core AI ledger: 16 requests, eight generations | $0.015506 settled (excludes the $0.005925 uncertain estimate) | $0.008400 | $0.023906 | Not separately measured |
+
+The first row is **included** in the overall Core total, **not** an additional
+charge. Accounted amounts include a reservation and are not invoices.
+No grants are active as of this checkpoint. Known C0 provider-generation
+deltas: $0.005925 (uncertain first run), $0.005483 (subsequent valid
+model output lost to draft capacity), and $0.004394 (latest parseable
+output lost after provider completion). The last receipt had 578 input
+and 880 output tokens. The project has no retained live site
+proposal from these attempts. Track additional runs as deltas against
+this baseline in the same handoff, stating both task subtotal and wider
+Core balance with provider ledger receipt evidence. Do not invent
+unrecorded time or costs.
+
+**Next owner-visible outcome:** Codex instruments and offline-replays
+post-response validation/persistence, preserves recoverable private
+model output under existing custody limits, and makes a real proposal
+survive normalized save, reload, Operator edit/review and later private
+WordPress preview. Only consequential external model spend, protected
+hosted writes and publication require fresh applicable authority.
+
