@@ -1,0 +1,23 @@
+{
+  "model": "gpt-5.4-mini-2026-03-17",
+  "generations": 2,
+  "requests": 4,
+  "totalNewUsdCap": "0.0168",
+  "maxInputTokensPerGeneration": 4000,
+  "maxOutputTokensPerGeneration": 1200,
+  "automaticRetries": 0,
+  "c0": {
+    "sources": [
+      { "id": "c0-service-direction", "kind": "owner-confirmed", "statement": "MioPages is transitioning from its legacy offers to one managed Web Presence service for established, expertise-led small businesses. The managed service includes Launch and ongoing care. The legacy self-managed offers are being retired." },
+      { "id": "c0-entry-paths", "kind": "owner-confirmed", "statement": "A Free Web Presence Review can help an established business understand what to keep or improve before it commits. A short conversation is a distinct entry path. Launch qualification criteria remain unresolved." }
+    ],
+    "answerProjection": "Ask for the current website address and the most important action visitors should take. Discuss access, migration details, and ongoing support after reviewing the site. A first conversation does not determine eligibility for Ongoing care."
+  },
+  "c2": {
+    "sources": [
+      { "id": "c2-offerings", "kind": "synthetic-review", "statement": "A fictional tree service in Bucks and Montgomery Counties serves homeowners and small businesses. It distinguishes routine tree care and pruning estimates from urgent storm-damage assessments. Yard clearing and seasonal work are secondary." },
+      { "id": "c2-visitor-needs", "kind": "synthetic-review", "statement": "Routine callers need to know what photos and job details support an estimate. Urgent callers need safe triage and a verified contact path. Actual emergency hours, response times, coverage limits, licenses and insurance remain unconfirmed." }
+    ],
+    "answerProjection": null
+  }
+}

@@ -1749,3 +1749,43 @@ Next, connect this operation to authenticated Core review and draft
 persistence, then authorize a bounded live test of exact C0 and
 fictional-business evidence to verify that substantially different
 business needs lead to different page structures and visitor actions.
+
+#### Authenticated site planning and exact live decision
+
+Core's existing authenticated intake now supports a separate generated
+site proposal with resumable Operator review. It reuses the restricted
+draft view and existing row version check. Generation stores the
+original model proposal, permitted source excerpts, business-evidence
+binding and model identity. The editor stores changes separately.
+Review is bound to the edited plan and visitor actions. Edits and
+evidence changes prevent stale approval from qualifying for preparation.
+An approved review packet uses the established WordPress Operator
+compiler, and the individual Core Page approval and native authorization
+gates still apply. Unresolved contact destinations block preparation.
+
+The existing protected inquiry report can attach its revision-scoped
+synthetic recommendation to a selected generated Page. That creates a
+new review revision. It establishes no customer interest, lead quality
+or conversion. The hosted scope still contains only C0. The contrasting
+tree service was exercised on disposable PostgreSQL with an offline
+transport. It is not another hosted customer.
+
+[Exact proposed live inputs](site-planning-live-proof-inputs.json) list
+the two proposed model projections. C0 would use only those curated
+business statements and that exact saved unconfirmed answer if it still
+matches Core. No other answers, interview questions, provenance
+pointers, private reviews or credentials may leave Core. C2 is fictional
+and would use only its two fixture statements in a separately attributed
+development proof. The proof does not add C2 to the existing hosted
+C0 database grant. Review actual generation in Core for C0 and in the
+isolated development review for C2.
+
+Proposed authority is one token count and one generation per business
+on `gpt-5.4-mini-2026-03-17`, four requests total, no retries, no external
+tools, provider response storage disabled, and a 24-hour maximum grant.
+Each generation is bounded to 4,000 input and 1,200 output tokens, for
+a combined upper bound of $0.0168 new usage at standard rates under
+the existing aggregate $0.50 hard cap. Compare the proposed page set,
+visitor decisions, source evidence and unresolved claims. No live
+provider dispatch is authorized by this checkpoint. See the [official
+model card](https://developers.openai.com/api/docs/models/gpt-5.4-mini).

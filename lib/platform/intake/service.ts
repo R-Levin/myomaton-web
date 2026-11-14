@@ -6,6 +6,7 @@ import { IntakeError, intakeVersion, legacyIntakeVersion, normalizeAnswers, ques
 import { onboardingVersion } from "./onboarding";
 import { adaptiveFoundationErrors, adaptiveOfferStep, adaptiveOnboardingVersion, adaptiveQuestions, adaptiveScopeStep, prospectPriorities, type PreparedUnderstanding } from "./adaptive";
 import type { OnboardingEntry } from "../activation/service";
+import type { SitePlanningReview } from "./protected-site-planning";
 import type { InterviewState } from "./intelligent-model";
 
 const intelligentVersion = "paid-onboarding/3";
@@ -20,7 +21,7 @@ type Row = { id: string; entry_intent: EntryIntent; questionnaire_version: strin
 export type IntakeEvidence = { source: "c0-discovery" | "rehearsal-response"; confirmation: "prior-approved" | "unconfirmed"; suppliedAt: string; reference: string; author: string };
 export type IntakeView = { questionnaireVersion: string; intent: EntryIntent; state: Row["state"]; answers: Answers; step: number; version: number; expiresAt: string;
   provenance?: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; submission?: { digest: string; submittedAt: string };
-  planningEvidence?: { version: number; evidenceDigest: string }; interview?: InterviewState };
+  planningEvidence?: { version: number; evidenceDigest: string }; interview?: InterviewState; sitePlanning?: SitePlanningReview };
 type Rehearsal = { database: string; answers: Answers; provenance: Record<string, IntakeEvidence>; prepared?: PreparedUnderstanding; intelligentFixtureSchema?: string; step?: number;
   protectedScope?: (db: Pick<PoolClient, "query">) => Promise<void> };
 function view(r: Row): IntakeView { return { questionnaireVersion: r.questionnaire_version, intent: r.entry_intent, state: r.state, answers: r.answers, step: r.step, version: r.version, expiresAt: r.expires_at.toISOString() }; }
@@ -114,9 +115,11 @@ export class IntakeService {
     delete provenance.preparedDigest;
     const interview = provenance.protectedInterview as InterviewState | undefined;
     delete provenance.protectedInterview;
+    const sitePlanning = provenance.protectedSitePlanning as SitePlanningReview | undefined;
+    delete provenance.protectedSitePlanning;
     const result = { ...view(row), provenance: provenance as Record<string, IntakeEvidence>, prepared: this.rehearsal.prepared };
     if (this.rehearsal.step !== undefined) {
-      return { ...result, ...(interview && { interview }), planningEvidence: { version: row.version, evidenceDigest: fingerprint({
+      return { ...result, ...(interview && { interview }), ...(sitePlanning && { sitePlanning }), planningEvidence: { version: row.version, evidenceDigest: fingerprint({
         scope: { webPresenceId: this.selection.webPresenceId, managedSiteId: this.selection.managedSiteId },
         version: row.version, intent: row.entry_intent, answers: row.answers, provenance: row.provenance,
       }) } };
@@ -162,6 +165,7 @@ export class IntakeService {
       const provenance: Record<string, unknown> = {};
       if (this.rehearsal?.prepared) provenance.preparedDigest = r.provenance.preparedDigest;
       if (r.provenance.protectedInterview) provenance.protectedInterview = r.provenance.protectedInterview;
+      if (r.provenance.protectedSitePlanning) provenance.protectedSitePlanning = r.provenance.protectedSitePlanning;
       const at = new Date().toISOString();
       for (const [key, value] of Object.entries(answers)) provenance[key] = fingerprint(r.answers[key] ?? null) === fingerprint(value) && r.provenance[key]
         ? r.provenance[key] : this.rehearsal ? { source: "rehearsal-response", confirmation: "unconfirmed", suppliedAt: at, reference: r.questionnaire_version, author: `rehearsal-customer:${r.id}` } : { source: "prospect-supplied", confirmation: "unconfirmed", suppliedAt: at };
@@ -186,6 +190,19 @@ export class IntakeService {
       const state = change(before, view);
       if (state === before) return view;
       const provenance = { ...row.provenance, protectedInterview: state };
+      if (Buffer.byteLength(JSON.stringify(provenance)) > 14_000) throw new IntakeError("payload_too_large", 413);
+      const saved = await db.query(`UPDATE ${this.draftTable} SET provenance=$2,version=version+1,updated_at=now() WHERE id=$1 RETURNING *`,
+        [row.id, JSON.stringify(provenance)]);
+      return this.readView(db, saved.rows[0]);
+    });
+  }
+  async editProtectedSitePlanning(token: string, version: number | undefined, change: (state: SitePlanningReview, view: IntakeView) => SitePlanningReview) {
+    if (!this.rehearsal?.protectedScope) throw new IntakeError("unavailable", 404);
+    return transaction(this.pool, async db => {
+      const row = await this.owned(db, token, true);
+      if (row.state !== "draft" || (version !== undefined && row.version !== version)) throw new IntakeError("draft_changed", 409);
+      const view = await this.readView(db, row);
+      const provenance = { ...row.provenance, protectedSitePlanning: change(view.sitePlanning ?? {}, view) };
       if (Buffer.byteLength(JSON.stringify(provenance)) > 14_000) throw new IntakeError("payload_too_large", 413);
       const saved = await db.query(`UPDATE ${this.draftTable} SET provenance=$2,version=version+1,updated_at=now() WHERE id=$1 RETURNING *`,
         [row.id, JSON.stringify(provenance)]);

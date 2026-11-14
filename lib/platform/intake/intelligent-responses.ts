@@ -139,13 +139,13 @@ function meteredResponsesProvider(directory: string, rates: Rates, transport: Re
 }
 
 type SitePlanningGrant = {
-  ownerDigest: string; inputDigest: string; expiresAt: number; capMicros: number; maxRequests: number;
+  ownerDigest: string; inputDigest: string; expiresAt: number; capMicros: number; maxRequests: number; maxAdditionalRequests?: number;
 };
 export function protectedSitePlanningProvider(directory: string, rates: Rates, transport: ResponsesTransport, grant: SitePlanningGrant) {
-  const { ownerDigest, inputDigest, expiresAt, capMicros: limit, maxRequests: requests } = grant;
+  const { ownerDigest, inputDigest, expiresAt, capMicros: limit, maxRequests: requests, maxAdditionalRequests = 2 } = grant;
   if (![ownerDigest, inputDigest].every(value => /^[a-f0-9]{64}$/.test(value)) ||
       !Number.isSafeInteger(expiresAt) || !Number.isSafeInteger(limit) || limit < 1 || limit > capMicros ||
-      !Number.isSafeInteger(requests) || requests < 2 || requests > maxRequests || rates.cacheWritePerMillion !== 0) {
+      !Number.isSafeInteger(requests) || requests < 2 || requests > 20 || maxAdditionalRequests !== 2 || rates.cacheWritePerMillion !== 0) {
     throw Error("Invalid site planning authorization");
   }
   const model = rates.model;

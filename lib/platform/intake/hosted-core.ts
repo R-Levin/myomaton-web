@@ -12,11 +12,13 @@ import { protectedDevelopmentDraft } from "../wordpress-delivery/cycle-measureme
 import { contactHttp } from "../contact/http";
 import { developmentGuard } from "../contact/boundaries";
 import { ProtectedInterview } from "./protected-interview";
-import { initializeResponsesUsageLedger, protectedResponsesProvider, type ResponsesRates } from "./intelligent-responses";
+import { initializeResponsesUsageLedger, protectedResponsesProvider, protectedSitePlanningProvider, type ResponsesRates } from "./intelligent-responses";
 import { responsesHttps } from "./responses-https";
 import type { QuestionContext } from "./intelligent-model";
 import { readPresencePlan } from "./presence-plan";
 import { interviewDirection } from "./interview-direction";
+import { ProtectedSitePlanning, reviewedSitePlanning, sitePlanningBasis } from "./protected-site-planning";
+import { prepareSitePlanning } from "./site-planning";
 import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
 
 export const coreCookie = "__Host-miopages_core";
@@ -26,6 +28,10 @@ type Config = {
   prepared: PreparedUnderstanding; step: number;
 };
 
+type SitePlanGrant = AnswerScope & {
+  ownerDigest: string; basis: string; inputDigest: string; evidenceDigest: string; sources: QuestionContext["evidence"];
+  expiresAt: number; maxRequests: number; capMicros: number; revoked?: boolean;
+};
 type ProviderGrant = AnswerScope & { ownerDigest: string; sources: QuestionContext["evidence"];
   expiresAt: number; maxRequests: number; capMicros: number; rates: ResponsesRates; ledgerDirectory: string; revoked?: boolean };
 
@@ -90,6 +96,10 @@ async function openCore() {
     } finally { db.release(); }
   };
   let interview: ProtectedInterview | undefined;
+  let sitePlanning = new ProtectedSitePlanning(intake);
+  let sitePlanningEnabled = false;
+  const planningFile = process.env.MIOPAGES_PROTECTED_CORE_SITE_PLANNING_SCOPE;
+
   const providerFile = process.env.MIOPAGES_PROTECTED_CORE_AI_SCOPE;
   if (providerFile) {
     const grant = await privateConfig<ProviderGrant>(providerFile);
@@ -121,8 +131,33 @@ async function openCore() {
         },
       });
     interview = new ProtectedInterview(intake, provider, grant.sources);
+    if (planningFile) {
+      const readGrant = () => privateConfig<SitePlanGrant>(planningFile);
+      const initial = await readGrant();
+      const binding = fingerprint(initial);
+      if (initial.revoked !== true && initial.expiresAt > Date.now()) {
+        if (initial.ownerDigest !== fingerprint(selection) ||
+            initial.expiresAt > Date.now() + 86_400_000 || initial.maxRequests !== 2 ||
+            initial.capMicros > 500_000 || !/^[0-9a-f]{64}$/u.test(initial.basis)) throw Error("Protected site planning scope refused");
+        const generate = protectedSitePlanningProvider(grant.ledgerDirectory, grant.rates,
+          responsesHttps(process.env.MIOPAGES_OPENAI_DEV_API_KEY ?? "", initial.expiresAt), { ...initial,
+            // Absolute ledger ceilings preserve accrued usage in the existing shared ledger.
+            maxRequests: grant.maxRequests, capMicros: Math.min(grant.capMicros, initial.capMicros),
+            maxAdditionalRequests: initial.maxRequests,
+          });
+        sitePlanning = new ProtectedSitePlanning(intake, { model: grant.rates.model, generate,
+          async input(view) {
+            const current = await readGrant();
+            if (fingerprint(current) !== binding || current.revoked === true ||
+                current.basis !== sitePlanningBasis(view)) throw Error("Site planning authorization refused");
+            return prepareSitePlanning(current.ownerDigest, current.sources, view.interview?.turns ?? [], current);
+          },
+        });
+        sitePlanningEnabled = true;
+      }
+    }
   }
-  return { operators, selection, intake, interview, inquiry, draftToken: cfg.draftToken };
+  return { operators, selection, intake, interview, inquiry, sitePlanning, sitePlanningEnabled, draftToken: cfg.draftToken };
 }
 let core: ReturnType<typeof openCore> | undefined;
 const sessions = new Map<string, { credential: string; expires: number; origin: string }>();
@@ -162,9 +197,14 @@ export async function hostedCoreRequest(request: Request) {
         return context;
       } catch { return null; }
     };
-    const includeOperations = async (view: Awaited<ReturnType<IntakeService["resume"]>>) => ({
-      ...view, interviewEnabled: Boolean(app.interview), operations: await app.inquiry().catch(() => null),
-    });
+    const includeOperations = async (view: Awaited<ReturnType<IntakeService["resume"]>>) => {
+      const proposal = view.sitePlanning?.proposal;
+      return {
+        ...view, interviewEnabled: Boolean(app.interview), operations: await app.inquiry().catch(() => null),
+        sitePlanningEnabled: app.sitePlanningEnabled,
+        ...(proposal && { sitePlanningReview: { ...reviewedSitePlanning(proposal), current: proposal.basis === sitePlanningBasis(view) } }),
+      };
+    };
     if (request.method === "GET") {
       if (!await authenticate(credential)) return reply({ error: "sign_in_required" }, 401);
       try { return reply(await includeOperations(await app.intake.resume(app.draftToken))); }
@@ -193,15 +233,36 @@ export async function hostedCoreRequest(request: Request) {
       }
       const context = await authenticate(credential);
       if (!context) { refusal = reply({ error: "sign_in_required" }, 401); return null; }
-      try { await app.operators.authorize(context, "prepare-site-proposal", app.selection); }
+      let actor;
+      try { actor = await app.operators.authorize(context, "prepare-site-proposal", app.selection); }
       catch { refusal = reply({ error: "authorization_required" }, 403); return null; }
       try {
         const view = async (result: ReturnType<IntakeService["resume"]>) => includeOperations(await result);
+        const version = Number(value.version);
+        if (typeof value.operation === "string" && value.operation.startsWith("site-plan-")) {
+          switch (value.operation) {
+            case "site-plan-generate": return view(app.sitePlanning.generate(app.draftToken, version));
+            case "site-plan-recover": return view(app.sitePlanning.recover(app.draftToken, version));
+            case "site-plan-edit": return view(app.sitePlanning.edit(app.draftToken, version, value.digest, value.plan, value.destinations));
+            case "site-plan-decide": return view(app.sitePlanning.decide(app.draftToken, version, value.digest, value.status, value.note, actor));
+            case "site-plan-delivery": return app.sitePlanning.delivery(app.draftToken, value.version);
+            case "site-plan-improve": {
+              const operations = await app.inquiry();
+              const evidence = operations?.recommendation;
+              if (!evidence || !operations || evidence.evidenceId !== value.inquiryId || typeof value.pagePath !== "string") {
+                throw new IntakeError("draft_changed", 409);
+              }
+              return view(app.sitePlanning.improve(app.draftToken, version, value.digest, { inquiryId: evidence.evidenceId,
+                draftDigest: operations.draft.appliedDigest, pagePath: value.pagePath, section: evidence.suggestedSection, synthetic: true }));
+            }
+            default: throw new IntakeError("invalid_request");
+          }
+        }
         if (value.operation === "accept-development-inquiry") {
           if (Object.keys(value).length !== 1) throw new IntakeError("invalid_request");
           const operations = await app.inquiry(true);
           if (!operations) throw new IntakeError("unavailable", 404);
-          return { ...await app.intake.resume(app.draftToken), interviewEnabled: Boolean(app.interview), operations };
+          return { ...await includeOperations(await app.intake.resume(app.draftToken)), operations };
         }
         if (value.operation === "review-delivery-input") {
           const current = await app.intake.resume(app.draftToken);

@@ -537,7 +537,7 @@ application scope. The [hosted revision 5 apply and restore](c0-integration-spin
 passed. WordPress displays revision 3 on Home 13 and Service 14, with
 high-water 5, Delivery 0.0.10 active and both receipts reconciled.
 Publication retains separate authority. The next product milestone is
-authenticated Core review and persistence for evidence-bound AI site plans.
+the [authenticated site-planning review and exact live decision](c0-integration-spine-phase-b-2026-11-10.md#authenticated-site-planning-and-exact-live-decision).
 
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 

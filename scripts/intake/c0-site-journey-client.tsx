@@ -5,8 +5,12 @@ import { prospectDirection, prospectPlanSeed } from "../../lib/platform/intake/p
 import { interviewDirection } from "../../lib/platform/intake/interview-direction";
 import type { IntakeView } from "../../lib/platform/intake/service";
 
+import { SitePlanningReviewPanel } from "./site-planning-review-panel";
+import type { reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
+
 type Operations = Awaited<ReturnType<typeof import("../../lib/platform/contact/protected-inquiry").protectedInquiry>>;
-type JourneyView = IntakeView & { interviewEnabled?: boolean; operations?: Operations | null };
+type JourneyView = IntakeView & { interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
+  sitePlanningReview?: ReturnType<typeof reviewedSitePlanning> & { current: boolean } };
 async function request(endpoint: string, operation?: object): Promise<JourneyView | null> {
   const response = await fetch(endpoint, {
     method: operation ? "POST" : "GET", cache: "no-store",
@@ -88,6 +92,17 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         ? "Core could not save the model response. Your saved answer is still available."
         : view ? "Saved. Your earlier answers are still available below." : "Your retained answers are ready.");
     } catch (reason) { failed(reason); }
+    finally { setBusy(false); }
+  }
+
+  async function prepareDelivery(operation: object) {
+    setBusy(true); setError(false); setMessage("");
+    try {
+      const response = await fetch(endpoint, { method: "POST", cache: "no-store",
+        headers: { "X-Intake-Request": "1", "Content-Type": "application/json" }, body: JSON.stringify(operation) });
+      if (!response.ok) throw Error("Core could not verify this version for delivery preparation.");
+      setDeliveryInput(await response.json());
+    } catch (error) { failed(error); }
     finally { setBusy(false); }
   }
 
@@ -192,6 +207,15 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           <button disabled={busy || !priority}>Save site priority</button>
         </form>
         {message && <p role={error ? "alert" : "status"}>{message}</p>}
+        {hosted && <SitePlanningReviewPanel state={view.sitePlanning} review={view.sitePlanningReview}
+          enabled={view.sitePlanningEnabled} busy={busy} version={view.version} run={operation => void run(operation)}
+          delivery={operation => void prepareDelivery(operation)} inquiry={view.operations?.recommendation ? {
+            ...view.operations.recommendation, id: view.operations.recommendation.evidenceId,
+          } : null} />}
+        {hosted && deliveryInput && <details open><summary>Exact WordPress review input</summary>
+          <p>Digest {deliveryInput.digest}</p>
+          <textarea readOnly aria-label="Private WordPress review input" rows={8} value={JSON.stringify(deliveryInput, null, 2)} />
+        </details>}
         {(direction || evidenceDirection) && <>
           <h2>Draft assessment and direction</h2>
           {direction && !plan && <p>{direction.finding}</p>}
@@ -247,22 +271,9 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           {hosted && plan && reviewedPlan?.findingId === evidenceDirection?.findingId && <section>
             <h3>Prepare for WordPress review</h3>
             <p>Review exact edited content and its evidence before creating Core Page proposals.</p>
-            <button type="button" disabled={busy} onClick={async () => {
-              setBusy(true); setError(false); setMessage("");
-              try {
-                const response = await fetch(endpoint, { method: "POST", cache: "no-store",
-                  headers: { "X-Intake-Request": "1", "Content-Type": "application/json" },
-                  body: JSON.stringify({ operation: "review-delivery-input", version: view.version }),
-                });
-                if (!response.ok) throw Error("Core could not verify the current review version. Reload before continuing.");
-                setDeliveryInput(await response.json());
-              } catch (error) { failed(error); }
-              finally { setBusy(false); }
-            }}>Prepare review package</button>
-            {deliveryInput && <details open><summary>Exact review input</summary>
-              <p>Digest {deliveryInput.digest}</p>
-              <textarea readOnly aria-label="Private WordPress review input" rows={8} value={JSON.stringify(deliveryInput, null, 2)} />
-            </details>}
+            <button type="button" disabled={busy} onClick={() => void prepareDelivery({ operation: "review-delivery-input", version: view.version })}>
+              Prepare review package
+            </button>
           </section>}
           {!plan && direction && <>
           <nav aria-label="Proposed pages">

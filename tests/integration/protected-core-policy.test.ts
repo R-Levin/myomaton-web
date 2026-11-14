@@ -10,6 +10,10 @@ import { prepareC2 } from "../../scripts/intake/adaptive-sources";
 import { protectedInquiry } from "../../lib/platform/contact/protected-inquiry";
 import { protectedDevelopmentDraft } from "../../lib/platform/wordpress-delivery/cycle-measurement";
 import { interviewDirection } from "../../lib/platform/intake/interview-direction";
+import { fingerprint } from "../../lib/platform/canonical/model";
+import { ProtectedSitePlanning, reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
+import { prepareSitePlanning, readSitePlanning } from "../../lib/platform/intake/site-planning";
+import { prepareGeneratedPages } from "../../lib/platform/content-editing/prospect-proposal";
 import { ProtectedInterview } from "../../lib/platform/intake/protected-interview";
 
 test("Core development policy confines the existing draft writer to the inactive fixture", async () => {
@@ -101,6 +105,70 @@ test("Core development policy confines the existing draft writer to the inactive
     assert.equal(authored.interview?.reviewedPlan?.plan.pages[0].title, "Start with your visitor goal");
     assert.equal(authored.interview?.turns.at(-1)?.presencePlan, undefined);
     assert.deepEqual(await service.resume(token), authored);
+
+
+    const source = { id: "tree-routes", kind: "synthetic-review" as const, reference: "Fictional C2 policy test",
+      at: "2026-11-13", statement: "Storm damage needs triage. Routine pruning needs an estimate. Hours and coverage are unverified." };
+    const draft = {
+      plan: { positioning: "Tree work with appropriate triage", offering: "Storm assessment and routine pruning", audience: "People managing trees on their property",
+        pages: [
+          { path: "/", title: "Tree care", purpose: "Choose based on urgency", seoDescription: "Options for tree care and storm damage.", action: "Check storm damage next steps",
+            sections: [{ heading: "Start with the situation", body: "Storm damage and routine pruning need different information." }] },
+          { path: "/storm", title: "Storm damage", purpose: "Explain information needed for triage", seoDescription: "Prepare for a storm damage assessment.", action: "Request an assessment",
+            sections: [{ heading: "Share the location", body: "Describe damage from a safe place." }] },
+          { path: "/pruning", title: "Planned pruning", purpose: "Prepare a routine estimate", seoDescription: "Plan a pruning estimate for your property.", action: "Request a pruning estimate",
+            sections: [{ heading: "Tell us about the trees", body: "Share the number and general location of trees in the request." }] },
+        ] },
+      directionSourceIds: [source.id], unresolved: ["Emergency coverage and hours are unknown."],
+      pages: [
+        { path: "/", sourceIds: [source.id], sectionSourceIds: [[source.id]], actionKind: "learn", destination: "/storm" },
+        { path: "/storm", sourceIds: [source.id], sectionSourceIds: [[source.id]], actionKind: "request-contact", destination: null },
+        { path: "/pruning", sourceIds: [source.id], sectionSourceIds: [[source.id]], actionKind: "request-contact", destination: null },
+      ],
+    };
+    const ownerDigest = fingerprint(selection), expiresAt = Date.now() + 60_000;
+    const planning = new ProtectedSitePlanning(service, { model: "offline-test",
+      async input() { return prepareSitePlanning(ownerDigest, [source], [], {
+        ownerDigest, expiresAt, evidenceDigest: fingerprint([source]), approvedAnswerDigests: [],
+      }); },
+      async generate(input) { return readSitePlanning(draft, await input()); },
+    });
+    await assert.rejects(new ProtectedSitePlanning(service).generate(token, authored.version), /ai_authorization_required/);
+    const generated = await planning.generate(token, authored.version);
+    const resumed = await service.resume(token);
+    assert.deepEqual(resumed, generated);
+    assert.equal(resumed.interview?.reviewedPlan?.origin, "operator");
+    const original = reviewedSitePlanning(resumed.sitePlanning!.proposal!);
+    assert.deepEqual(original.plan.pages.map(page => page.path), ["/", "/storm", "/pruning"]);
+    assert.equal(original.actions[1].destination, null);
+    assert.equal(resumed.provenance?.protectedSitePlanning, undefined);
+    await assert.rejects(planning.delivery(token, resumed.version), /authorization_required/);
+    const actor = { operatorId: randomUUID(), authorityReference: randomUUID() };
+    const rejected = await planning.decide(token, resumed.version, original.digest, "rejected", "Resolve contact paths.", actor);
+    const editedPlan = structuredClone(original.plan);
+    editedPlan.pages[1].title = "Assess storm damage";
+    await assert.rejects(planning.edit(token, resumed.version, original.digest, editedPlan, {}), /draft_changed/);
+    const revised = await planning.edit(token, rejected.version, original.digest, editedPlan,
+      { "/": "/storm", "/storm": "/", "/pruning": "/" });
+    const revisedPlan = reviewedSitePlanning(revised.sitePlanning!.proposal!);
+    assert.equal(revisedPlan.decision, undefined);
+    assert.equal(revised.sitePlanning?.proposal?.generated.plan.pages[1].title, "Storm damage");
+    const approved = await planning.decide(token, revised.version, revisedPlan.digest, "approved", "Reviewed draft destinations.", actor);
+    const { packet, digest } = await planning.delivery(token, approved.version);
+    assert.equal(packet.plan.pages[1].title, "Assess storm damage");
+    assert.equal(packet.actions[0].destination, "/storm");
+    assert.deepEqual(packet.decision.actor, actor);
+    const mappings = packet.plan.pages.map((page, index) => ({
+      page: { operation: "create-page", slug: page.path, pageId: randomUUID(), purpose: "Scoped test",
+        title: { kind: "canonical", source: { domain: "knowledge", recordId: randomUUID(), revision: 1, fingerprint: "a".repeat(64), field: "offer" } },
+        sections: [{ id: randomUUID(), type: "intro", heading: { kind: "editorial", text: "Business details", rationale: "Policy test" },
+          text: { kind: "canonical", source: { domain: "knowledge", recordId: randomUUID(), revision: 1, fingerprint: "a".repeat(64), field: "offer" } } }] },
+      sectionIds: page.sections.map(() => randomUUID()), action: { id: randomUUID(), type: "page", destination: packet.actions[index].destination },
+    }));
+    assert.deepEqual(prepareGeneratedPages(packet, digest, mappings).navigation, ["/", "/storm", "/pruning"]);
+    assert.throws(() => prepareGeneratedPages(packet, digest, mappings.map(m => ({ ...m, action: { ...m.action, destination: "/pruning" } }))), /mapping differs/);
+    const changed = await interview.correctAnswer(token, approved.version, corrected.interview!.turns.at(-1)!.id, "Prioritize a new visitor action.");
+    await assert.rejects(planning.delivery(token, changed.version), /draft_changed/);
 
     await admin.query(await readFile("lib/platform/intake/protected-core-inquiry.sql", "utf8"));
     assert.equal((await protectedInquiry(role, selection, protectedDevelopmentDraft)).accepted, 0);

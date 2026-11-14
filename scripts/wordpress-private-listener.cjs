@@ -53,6 +53,12 @@ function coreEnvironment(value) {
   else assert.equal(value.apiKey, '');
   privateFile(PRIVATE + '/core-input.json');
   if (value.aiEnabled) privateFile(PRIVATE + '/ai-scope.json');
+  const planning = PRIVATE + '/site-planning-scope.json';
+  let planningConfigured = false;
+  if (value.aiEnabled) {
+    try { privateFile(planning); planningConfigured = true; }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
   const inquiry = PRIVATE + '/inquiry-scope.json';
   let inquiryConfigured = false;
   try { privateFile(inquiry); inquiryConfigured = true; }
@@ -62,6 +68,7 @@ function coreEnvironment(value) {
     MIOPAGES_PROTECTED_CORE_DB_URL: value.databaseUrl, MIOPAGES_WP_DATABASE_CA: value.ca,
     MIOPAGES_PROTECTED_CORE_INPUT: PRIVATE + '/core-input.json',
     ...(inquiryConfigured && { MIOPAGES_PROTECTED_CORE_INQUIRY_SCOPE: inquiry }),
+    ...(planningConfigured && { MIOPAGES_PROTECTED_CORE_SITE_PLANNING_SCOPE: planning }),
     ...(value.aiEnabled && { MIOPAGES_PROTECTED_CORE_AI_SCOPE: PRIVATE + '/ai-scope.json', MIOPAGES_OPENAI_DEV_API_KEY: value.apiKey }) };
 }
 

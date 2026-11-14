@@ -23,7 +23,9 @@ export function composeProspectPage(
   const action = plannedPage?.action ?? direction?.primary.action;
   const binding = fingerprint({ context, primary: action, pageId: page.pageId, slug: page.slug });
   const rationale = `Proposed prospect path: ${action}. Draft v${context.version}, planning binding ${binding}.` +
-    (context.finding ? ` Interview finding ${context.finding.findingId} informs the direction. Review the cited answer and the unresolved evidence before using it.` : "");
+    (context.finding ? (context.finding.answerReference
+      ? ` Interview finding ${context.finding.findingId} informs the direction. Review the cited answer and the unresolved evidence before using it.`
+      : ` Site plan ${context.finding.findingId} informs the direction. Review its citations and unresolved evidence before using it.`) : "");
   if (plannedPage) {
     const ids = identities.map(uuid);
     if (ids.length !== plannedPage.sections.length || new Set(ids).size !== ids.length ||
@@ -54,7 +56,13 @@ export function prepareInterviewPages(value: unknown, expectedDigest: unknown, d
   if (fingerprint(selection) !== hash(expectedDigest) || !Number.isSafeInteger(selection.version) ||
       typeof finding.answerReference !== "string" || !Array.isArray(finding.sourceIds) ||
       !finding.sourceIds.includes(finding.answerReference)) throw Error("Exact interview review packet required");
+  return preparePlannedPages(selection, scope, finding, expectedDigest, destinations);
+}
+
+function preparePlannedPages(selection: Record<string, unknown>, scope: Record<string, unknown>, finding: Record<string, unknown>,
+  expectedDigest: unknown, destinations: unknown) {
   uuid(scope.webPresenceId); uuid(scope.managedSiteId);
+  if (!Number.isSafeInteger(selection.version)) throw Error("Exact planning draft version required");
   const plan = readPresencePlan(finding.plan);
   if (!Array.isArray(destinations) || destinations.length !== plan.pages.length) throw Error("Resolve each Page destination before proposal preparation");
   const allocated = new Set<string>();
@@ -92,4 +100,46 @@ export function prepareInterviewPages(value: unknown, expectedDigest: unknown, d
   if (improvement && !seen.has(improvement.pagePath as string)) throw Error("Improvement Page must be reviewed");
   return { scope, planOrigin: selection.planOrigin === undefined ? undefined : choice(selection.planOrigin, ["model", "operator"]), inputDigest: expectedDigest as string, navigation: plan.pages.map(page => page.path), pages,
     ...(improvement && { improvement }) };
+}
+
+/** Compile an approved Operator site plan through the same canonical Page checks. */
+export function prepareGeneratedPages(value: unknown, expectedDigest: unknown, destinations: unknown) {
+  const packet = object(value, ["scope", "origin", "version", "inputDigest", "generatedDigest", "reviewedDigest", "decision",
+    "plan", "actions", "evidence", "directionSourceIds", "unresolved", "improvement"]);
+  const decision = object(packet.decision, ["status", "digest", "actor", "at", "note"]);
+  if (packet.origin !== "ai-site-planning" || fingerprint(packet) !== hash(expectedDigest) ||
+      decision.status !== "approved" || decision.digest !== hash(packet.reviewedDigest)) throw Error("Current approved site plan required");
+  const plan = readPresencePlan(packet.plan);
+  if (!Array.isArray(packet.actions) || packet.actions.length !== plan.pages.length || !Array.isArray(destinations)) {
+    throw Error("Resolve every reviewed visitor action before delivery");
+  }
+  const actions = new Map(packet.actions.map((item, index) => {
+    const action = object(item, ["from", "kind", "label", "destination"]);
+    const page = plan.pages[index];
+    if (action.from !== page.path || action.label !== page.action ||
+        !plan.pages.some(target => target.path === action.destination) || action.destination === action.from) {
+      throw Error("Approved visitor action still needs a supported destination");
+    }
+    choice(action.kind, ["learn", "compare", "request-contact"]);
+    return [page.path, action];
+  }));
+  const resolved = destinations.map(item => {
+    const mapping = object(item, ["page", "sectionIds", "action"]);
+    const expected = actions.get(pageProposal(mapping.page).slug);
+    const action = object(mapping.action, ["id", "type", "destination"]);
+    if (!expected || action.destination !== expected.destination || action.type !== "page") {
+      throw Error("WordPress mapping differs from the approved visitor intent");
+    }
+    return mapping;
+  });
+  const inputDigest = hash(packet.inputDigest);
+  const generatedDigest = hash(packet.generatedDigest);
+  const improvement = packet.improvement === undefined ? undefined : object(packet.improvement, ["inquiryId", "draftDigest", "pagePath", "section", "synthetic"]);
+  if (improvement && improvement.synthetic !== true) throw Error("Improvement source refused");
+  const editorial = { scope: packet.scope, version: packet.version, evidenceDigest: inputDigest, planOrigin: "model",
+    finding: { findingId: generatedDigest, sourceIds: packet.directionSourceIds,
+      recommendation: "Evidence-bound, Operator-reviewed model plan", unresolved: null, plan },
+    ...(improvement && { improvement: { inquiryId: improvement.inquiryId, draftDigest: improvement.draftDigest, pagePath: improvement.pagePath } }) };
+  return { ...preparePlannedPages(editorial, object(packet.scope, ["webPresenceId", "managedSiteId"]), editorial.finding, expectedDigest, resolved), inputDigest: hash(expectedDigest),
+    generatedDigest: packet.generatedDigest, reviewedDigest: packet.reviewedDigest };
 }
