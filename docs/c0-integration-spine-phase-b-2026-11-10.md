@@ -1620,3 +1620,64 @@ after the planning projection dropped raw interview question text. The
 PHP Windows run does not verify POSIX mode behavior. Cloud preflight
 independently verified private file permissions and the restricted TLS
 session.
+
+#### Durable v15 previews and application decision
+
+The hidden-prompt preparation completed. A fresh Cloud SSH verification
+authenticated both principals and replayed each durable revision through
+the independent reviewer. The two mode-0600 HTML files matched a new
+render byte for byte and their exact recorded preview digests. Both
+proposals remain current, proposed and unapproved. The author had only
+revision and preview grants, and the reviewer had only the inspection
+grant. Both expire at 2026-11-14 05:27:21 UTC. Historic approval evidence
+remains intact. The signed native high-water revision is still 4.
+
+| Page | Core proposal and revision | Exact preview digest | Durable preview event |
+| --- | --- | --- | --- |
+| Home 13 | `e631a860-41a0-455e-9038-b3be357a2782` r2 | `e340530a1ee2575f5134416eaa9c81db1bfc24ee4bcfccabf08fcbfc6cad4210` | `d6c4a5d21efc0224c0c707d3f6491c079d8f8d48dbbd990d83ece61df8d3ff17` |
+| Service 14 | `bc30b7c0-386f-4cf0-b444-f6506f9ce832` r5 | `4ae9f56011651a49e31ea0fffe066a4c33d5eae3e7c25bff4ef3f8657f186e13` | `6c84c776c187b82ae4c619cd738a148d3c344a1cd94279ad101dc1d64b3970ba` |
+
+The exact governed application scope is
+`ba185f4c51f60e04c787678df9722ecbf76445596840f23d11f668b753433646`.
+It binds the original approved preparation scope, the two durable
+preview bindings and events, the exact projected content hashes and
+internal Actions, installation and site proposal, canonical base,
+signed predecessor 4, and materialized rollback to 3. This is the
+review scope fingerprint. Core's signed site candidate digest depends
+on the approval events and can be computed only after they exist.
+
+The owner can open the existing private local review index at
+`runtime-content/c0-wordpress-private-preview-v15-verified/index.html`.
+A new comparison confirmed both local preview bodies match the durable
+Cloud review bodies byte for byte apart from the revision label and
+machine-readable details. The index also links both exact WordPress
+before/after comparisons. The full governed HTML, including exact
+revision labels and machine-readable data, remains in `home.html` and
+`service.html` under the protected Cloud review directory.
+
+Proposed authorization for owner review:
+
+- Approve only the two recorded Core previews for this synthetic
+  non-public revision. Create only the short-lived fixture-specific
+  Page approver with recorded mandate, private projection reviewer
+  and native draft authorizer through existing custody. A read-only
+  grant inventory found no active principals for those operations.
+  Keep those three roles distinct. The current preparation principals
+  have no approval, signing or application authority.
+- Enable the v2 recovery-compatible 0.0.10 delivery plugin on the
+  existing protected development installation exclusively, from
+  `07992bf`, after verifying the current 0.0.9 package and its rollback
+  copy. Use the corresponding protected Core Operator tooling. Recheck
+  the same canonical base, approved previews, active installation and
+  authenticated live recovery evidence before issuance. Stop on drift.
+- Apply only site revision 5 to existing draft Home 13 and Service 14,
+  with reviewed Home-to-Service and Service-to-Home Actions. Verify
+  preserved IDs, slugs and draft status, both exact content SHA-256
+  values, and navigation. Reconcile the authenticated apply receipt,
+  verify an exact retry, then restore the exact displayed revision 3
+  on the same IDs and reconcile the restore receipt. Keep signed
+  high-water 5 and the previous evidence. Stop on a mismatched gate.
+  This scope authorizes neither publication nor provider dispatch.
+
+No new WordPress file, content, plugin, revision, approval or signature
+was changed during independent verification.

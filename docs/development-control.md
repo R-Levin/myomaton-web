@@ -531,8 +531,9 @@ apply remains gated by separate approval. The [private revision 5 review and
 recovery checkpoint](c0-integration-spine-phase-b-2026-11-10.md#private-revision-5-review-and-recovery)
 records the v2 rollback correction, local v15 previews and the exact
 preparation scope. The [approved v15 preparation handoff](c0-integration-spine-phase-b-2026-11-10.md#approved-v15-preparation)
-records the verified transfer, live revision 3 baseline and governed
-preview gate. Application and publication retain separate approval.
+records the verified transfer and live revision 3 baseline. The [durable v15 previews and application decision](c0-integration-spine-phase-b-2026-11-10.md#durable-v15-previews-and-application-decision)
+record the two independently verified preview events and exact pending
+application scope. Application and publication retain separate approval.
 
 ## Next proving focus: authentic C0 interview-to-WordPress rebuild
 
