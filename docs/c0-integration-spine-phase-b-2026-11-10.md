@@ -2226,3 +2226,54 @@ test that C0's prior dispatch remains deduplicated and unmodified,
 and verify the governing grant and protected build. The earlier
 compact grant is exhausted. Existing WordPress and publication
 approvals do not change.
+
+#### Fresh compact comparison stopped after C0
+
+The owner approved the exact `b42f6e6` comparison. The new comparison
+identity bound it to the original seven-receipt ledger, pinned inputs,
+and unchanged model, expiry and spend limits. An offline preflight
+with the real ledger copied to protected temporary storage exercised
+two cases with simulated transport, rejected duplicate and out-of-order
+dispatch, refused crossed input scope and preserved the live ledger.
+Ten focused tests passed. The [Linux build and smoke](https://github.com/R-Levin/myomaton-web/actions/runs/43608798345)
+passed for `c493e6558f03970adb28d781dfd0e870f234e9fd`. Artifact
+14119413241 matched its outer checksum and inner tar SHA-256
+`8d44ac47cd53b50cc437996c27ac5cb295638e9bfac83d0a5ebc3603d89069a6`;
+all 163 files matched before replacing only the protected Core build.
+The prior build and a byte-exact pre-run ledger were retained off-webroot.
+
+Only C0 dispatched, once for count and once for generation. The
+provider completed at 578 input and 880 output tokens, with zero cached
+and reasoning tokens. Core recorded a $0.004394 standard-rate
+estimate from returned usage against a $0.030000 envelope. No provider
+invoice was available in this run. Core reported `generation_failed`
+and saved no proposal at draft version 21. The provider receipt confirms
+a completed response with parseable JSON. The later failure occurred
+before the normalized proposal file was written. The existing code
+collapses semantic validation, the post-response evidence recheck, and
+the protected file write into the same failure status, so the exact
+cause remains unverified. The raw response was not retained under this
+run's controls. No new generation should be used to diagnose it.
+
+The previous seven ledger receipts remain exact. The updated ledger has
+16 requests and eight generations, $0.015506 in settled estimates and
+an unchanged $0.008400 reserve for the earlier uncertain charge,
+for $0.023906 accounted. Updated ledger SHA-256
+`3b919bb56cee5edba6c67d5217f2bbcf7e0e837bb2666595d798650e38856999`.
+The spent C0 grant was moved to protected evidence custody. C2 was
+never activated or dispatched. Neither candidate output exists.
+Authenticated HTTPS confirmed the same C0 evidence basis, the same
+unconfirmed interview answer and the retained synthetic inquiry, with
+generation disabled. Both public Core HTTPS bodies matched their
+baselines. WordPress drafts 13 and 14 remained at restored revision 3
+and high-water 5. No customer approval, WordPress write or publication
+occurred.
+
+Next distinguish post-response evidence mismatch, schema or semantic
+validation, private evidence persistence, and proposal storage failures
+through allowlisted diagnostic stages. Use adversarial offline examples
+of provider-valid JSON with rejected citations, routes and copy, then
+verify that accepted results appear in protected Operator review with
+their provenance intact. The next live operation needs separate
+authorization and the updated ledger. Independent, versioned proposal
+storage remains part of the Commercial V1 direction.
