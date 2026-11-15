@@ -5,6 +5,19 @@ import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
 import { atPlanningStage, PlanningFailureError } from "./planning-diagnostics";
 import { presencePlanSchema, readPresencePlan } from "./presence-plan";
 
+const reviewedAuthority = [
+  "owner-decision", "provisional-direction", "historical", "public-observation", "unresolved",
+] as const;
+
+export type SitePlanningEvidence = InterviewEvidence | {
+  id: string;
+  kind: "reviewed-corpus";
+  authority: typeof reviewedAuthority[number];
+  reference: string;
+  at: string;
+  statement: string;
+};
+
 type PlanAuthorization = AnswerScope & {
   ownerDigest: string;
   evidenceDigest: string;
@@ -13,17 +26,24 @@ type PlanAuthorization = AnswerScope & {
 
 export function prepareSitePlanning(
   ownerDigest: string,
-  evidence: readonly InterviewEvidence[],
+  evidence: readonly SitePlanningEvidence[],
   turns: readonly InterviewTurn[],
   // Trusted Core projection. A saved answer's existence does not grant transmission.
   authorization: PlanAuthorization,
   now = Date.now(),
 ) {
-  const sources = evidence.map(source => ({
-    id: text(source.id, 100),
-    kind: source.kind,
-    statement: text(source.statement, 2000, true),
-  }));
+  const sources = evidence.map(source => {
+    const id = text(source.id, 100);
+    if (source.kind !== "reviewed-corpus") {
+      return { id, kind: source.kind, statement: text(source.statement, 2000, true) };
+    }
+    const at = new Date(source.at).toISOString();
+    if (source.at !== at || !source.reference?.trim()) throw Error("Reviewed planning provenance required");
+    // The evidence digest binds the internal reference and the exact curated statement.
+    // Only the review status, date and curated statement are part of model input.
+    return { id, kind: source.kind, authority: choice(source.authority, reviewedAuthority), at,
+      statement: text(source.statement, Infinity, true) };
+  });
   const superseded = new Set(turns.flatMap(turn => turn.replacesAnswerTo ?? []));
   const current = turns.filter(turn => turn.answer?.disposition === "provided" && !superseded.has(turn.id));
   if (hash(ownerDigest) !== authorization.ownerDigest || !Number.isSafeInteger(authorization.expiresAt) ||

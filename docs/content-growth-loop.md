@@ -234,6 +234,8 @@ the intelligence/security boundaries. See [security and operations](security-ope
 
 ## Distribution and deterministic links
 
+**Owner direction, November 15, 2026.** Native Articles, service-page improvements, internal links and search optimization are the core of Ongoing content marketing. Prioritize work using business knowledge, visitor questions and first-party evidence. Review the change, deliver it through the existing approval and staging path, then check the relevant measures again. Where a reviewed site or Article topic merits amplification, offer optional channel-ready copy with a relevant link, CTA and proposed visual where useful. It can be handed to the customer or an authorized developer/agency partner for manual use. Receiving the material carries no approval or publication authority. Partner access and handoff design remain open. No automated posting or provider connection is needed for this phase. This is product direction for the next connected increment. Implementation and hosted verification are pending. [Ongoing sequencing](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6895322697) · [Article priority](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6895344336) · [Partner handoff](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6895397413)
+
 Preserve the discovery-to-conversion context defined by
 [Conversion Architecture](conversion-architecture.md#page-roles-and-journey-continuity).
 Supporting content should connect to its relevant confirmed offer, appropriate

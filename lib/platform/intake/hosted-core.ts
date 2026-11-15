@@ -20,7 +20,7 @@ import { readPresencePlan } from "./presence-plan";
 import { interviewDirection } from "./interview-direction";
 import { ProtectedSitePlanning, reviewedSitePlanning, sitePlanningBasis } from "./protected-site-planning";
 import { PlanningResponseCustody } from "./planning-response-custody";
-import { compactSitePlanningVersion, prepareSitePlanning } from "./site-planning";
+import { compactSitePlanningVersion, prepareSitePlanning, type SitePlanningEvidence } from "./site-planning";
 import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
 
 export const coreCookie = "__Host-miopages_core";
@@ -31,7 +31,7 @@ type Config = {
 };
 
 type SitePlanGrant = AnswerScope & {
-  ownerDigest: string; basis: string; inputDigest: string; evidenceDigest: string; sources: QuestionContext["evidence"];
+  ownerDigest: string; basis: string; inputDigest: string; evidenceDigest: string; sources: SitePlanningEvidence[];
   expiresAt: number; maxRequests: number; capMicros: number; revoked?: boolean;
   format?: typeof compactSitePlanningVersion; maxOutputTokens?: number; scopeDigest?: string; retainedReservation?: string; comparisonId?: string; comparisonAttempt?: number;
 };

@@ -1,0 +1,162 @@
+[
+  {
+    "id": "offer",
+    "kind": "reviewed-corpus",
+    "authority": "owner-decision",
+    "reference": "docs/miopages-c0-business-brief.md#launch-and-ongoing-offer",
+    "at": "2026-10-06T00:00:00.000Z",
+    "statement": "MioPages is moving from a legacy catalog to one managed Web Presence service. Launch establishes the business understanding, site, approval, visitor path and measurement baseline where supported. Ongoing is part of the service direction: operation, ordinary updates, measurement, prioritized content and conversion improvements, and reporting. The new service is in development. No commercial results or fully operational capabilities are established by this direction."
+  },
+  {
+    "id": "market",
+    "kind": "reviewed-corpus",
+    "authority": "owner-decision",
+    "reference": "docs/miopages-c0-product-model.md#initial-customer-hypothesis",
+    "at": "2026-11-09T00:00:00.000Z",
+    "statement": "The intended market includes startups, established local services and trades, professional and technical businesses and other suitable small organizations. Targeting established firms first is an acquisition choice, not eligibility. Initial working geography is remote United States. Existing-site adoption is an option to explore, not an approved pivot. No demand or conversion rates are established."
+  },
+  {
+    "id": "launch",
+    "kind": "reviewed-corpus",
+    "authority": "provisional-direction",
+    "reference": "docs/miopages-c0-business-brief.md#launch-and-ongoing-offer",
+    "at": "2026-10-06T00:00:00.000Z",
+    "statement": "Standard Launch covers routine supported scope. Expanded Launch concerns materially unusual supported complexity, for example continuity and migration requirements, and is agreed independently. A clear business offer, decisions the owner can make and an achievable visitor path matter more than a preset number of pages. A bespoke app, unsupported commerce and unlimited custom work are outside default scope. Confirm actual support and dependencies before giving a commitment."
+  },
+  {
+    "id": "owner-responsibility",
+    "kind": "reviewed-corpus",
+    "authority": "provisional-direction",
+    "reference": "docs/web-presence-service-model.md#customer-ownership-and-understandable-exit",
+    "at": "2026-10-06T00:00:00.000Z",
+    "statement": "Customers supply business facts and preferences, rights-cleared material, access authority where necessary and consequential approval. MioPages coordinates supported execution. Design direction is bounded and works in service of visitor decisions. Preserve understandable ownership and portability. Exact export formats, commercial terms and exit obligations need verification before public claims."
+  },
+  {
+    "id": "entry-path",
+    "kind": "reviewed-corpus",
+    "authority": "owner-decision",
+    "reference": "docs/progressive-onboarding-and-launch-readiness.md",
+    "at": "2026-11-09T00:00:00.000Z",
+    "statement": "The Free Review is optional and useful to the prospect independently of a sale. It provides an initial understanding, observations, priorities and a next path, which can include no fit. A Review-led customer carries both the public-site observations and their actual Review answers and findings into paid onboarding. Direct Start can enter the same onboarding after fit and commercial confirmation without a Review. A written Review is distinct from the full paid-onboarding report."
+  },
+  {
+    "id": "review-preview",
+    "kind": "reviewed-corpus",
+    "authority": "owner-decision",
+    "reference": "docs/c0-adaptive-onboarding-walkthrough.md#owners-additional-live-c0-interview-corrections-november-9-2026",
+    "at": "2026-11-09T00:00:00.000Z",
+    "statement": "An illustrative Home concept should normally be attempted for a Free Review. An Operator can keep, revise or exclude it before delivery. Do not promise an illustration or imply the prospect received one. A concept is not the post-onboarding site candidate."
+  },
+  {
+    "id": "historic-discovery",
+    "kind": "reviewed-corpus",
+    "authority": "historical",
+    "reference": "docs/c0-discovery-question-recovery-audit.md",
+    "at": "2026-11-10T00:00:00.000Z",
+    "statement": "October 5–6 business discovery survives through partial retained questions and the attributed three-pass synthesis. It is the precursor to the approved C0 brief. A complete verbatim interview is unavailable. The later October 14 Free Web Presence Review is a distinct source with its own interview and approved but undelivered analysis; its older startup emphasis remains useful in light of the later owner correction."
+  },
+  {
+    "id": "saved-draft",
+    "kind": "reviewed-corpus",
+    "authority": "historical",
+    "reference": "docs/c0-strategy-recovery-and-intelligent-onboarding-2026-11-10.md#field-by-field-recovery",
+    "at": "2026-11-10T00:00:00.000Z",
+    "statement": "A separate rehearsal preserved ten unconfirmed draft answers. Their sanitized implications support the Free Review as primary, direct start and a distinct conversation as secondary, continuity for legacy accounts, limits on bespoke work and a distinction between historical proof and outcomes from the new service. An additional keep choice lacked an identified item. An approval of an owner decision elsewhere does not confirm the surrounding rehearsal evidence."
+  },
+  {
+    "id": "retirement",
+    "kind": "reviewed-corpus",
+    "authority": "owner-decision",
+    "reference": "https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6740683772",
+    "at": "2026-11-09T00:00:00.000Z",
+    "statement": "Retire legacy offerings, including QR and self-managed websites, broad support and standalone hosting/email marketing. Retain the separate HostShop account access for legacy account holders. Marketing retirement does not decide redirects, actual contractual obligations or account migration."
+  },
+  {
+    "id": "legacy-site",
+    "kind": "reviewed-corpus",
+    "authority": "public-observation",
+    "reference": "https://miopages.com/",
+    "at": "2026-11-15T00:00:00.000Z",
+    "statement": "The current public homepage still leads with legacy WordPress, hosting and email and links to a separate hosting account sign-in. The Websites page presents builders and broad customization. Keep the legacy account link in a utility location and replace prospect messaging. What is displayed is not evidence for current commitments. The public HostShop sign-in page responds; account continuity still needs authorized verification."
+  },
+  {
+    "id": "proof",
+    "kind": "reviewed-corpus",
+    "authority": "unresolved",
+    "reference": "docs/miopages-c0-business-brief.md#proof-and-trust",
+    "at": "2026-11-15T00:00:00.000Z",
+    "statement": "Historical project evidence requires contribution, dates, exact rights and context before public use; honor existing exclusions. An illustrative Review can show the method with sample data clearly identified. New-service outcome claims, reviews and client logos are not established. No named proof is approved by this source."
+  },
+  {
+    "id": "commercial-review",
+    "kind": "reviewed-corpus",
+    "authority": "unresolved",
+    "reference": "docs/progressive-onboarding-and-launch-readiness.md#miopages-working-commercial-model",
+    "at": "2026-11-15T00:00:00.000Z",
+    "statement": "Later working commercial figures refine the earlier provisional amounts; neither set is an approved public rate. Establish actual public terms, launch capacity, ownership wording, intake destination, recipient and fallback before using transactional calls to action or promising dates, turnaround, scope commitments or outcomes."
+  },
+  {
+    "id": "source-stock",
+    "kind": "reviewed-corpus",
+    "authority": "owner-decision",
+    "reference": "docs/media-acquisition.md",
+    "at": "2026-11-11T00:00:00.000Z",
+    "statement": "The owner declined the reviewed stock options for the C0 Home. Preserve the conceptual Hero and designed illustrative report as visual references; verify source bytes and rights before reusing exact assets. A selected direction does not approve asset delivery. Use typography or purpose-built diagrams where the material benefits."
+  },
+  {
+    "id": "managed-alternatives",
+    "kind": "reviewed-corpus",
+    "authority": "public-observation",
+    "reference": "https://sitecare360.com/faq",
+    "at": "2026-11-15T00:00:00.000Z",
+    "statement": "SiteCare360 markets build and continuing management together and spells out the distinction between owning customer content and buying out website design and code. Its own statements are not independently audited. Make owner responsibility, scope and portability a visible buying decision for MioPages, without making unsupported comparative or policy claims."
+  },
+  {
+    "id": "refresh-alternatives",
+    "kind": "reviewed-corpus",
+    "authority": "public-observation",
+    "reference": "https://siteupdater.com/",
+    "at": "2026-11-15T00:00:00.000Z",
+    "statement": "SiteUpdater leads with an existing-site refresh, uses a site URL for its preview and describes later edits; it differentiates exclusions. Make the existing-site entry practical while offering a separate, valid route for a startup without a URL. A comparable landing page does not prove demand or effectiveness."
+  },
+  {
+    "id": "care-alternatives",
+    "kind": "reviewed-corpus",
+    "authority": "public-observation",
+    "reference": "https://sitecare.com/faqs/",
+    "at": "2026-11-15T00:00:00.000Z",
+    "statement": "SiteCare explains the difference between ordinary content edits and designing new sections or changing functionality. Buyers can reasonably ask which changes are routine, which need scope review and what happens when site problems affect the business. Turn those questions into a clear statement of responsibility rather than a vague promise of updates."
+  },
+  {
+    "id": "outsidemarket",
+    "kind": "reviewed-corpus",
+    "authority": "public-observation",
+    "reference": "https://www.sitecommanderstudio.com/websites",
+    "at": "2026-11-15T00:00:00.000Z",
+    "statement": "A UK comparable makes the project steps, update scope and options easy to find. Use the general pattern of showing responsibilities and decisions at each step. UK commercial terms, response times and uptake are not evidence about US buyers or MioPages."
+  },
+  {
+    "id": "search-guidance",
+    "kind": "reviewed-corpus",
+    "authority": "public-observation",
+    "reference": "https://developers.google.com/search/docs/appearance/ai-features",
+    "at": "2026-11-15T00:00:00.000Z",
+    "statement": "Google recommends ordinary discoverability and useful visible content for generative search features. Use distinct pages where visitor intent differs, internal links, accurate matching structured data and accessible explanations. No search volume, visibility, rankings or AI inclusion are implied."
+  },
+  {
+    "id": "accessible-forms",
+    "kind": "reviewed-corpus",
+    "authority": "public-observation",
+    "reference": "https://www.w3.org/WAI/tutorials/forms/",
+    "at": "2026-11-15T00:00:00.000Z",
+    "statement": "Request only information that serves the task; give visible labels, useful instructions, understandable errors and feedback. Make the website field conditional or optional under a startup path. Send only approved inquiry fields to the assigned recipient, and measure accepted inquiries separately from clicks."
+  },
+  {
+    "id": "ongoing-evidence",
+    "kind": "reviewed-corpus",
+    "authority": "provisional-direction",
+    "reference": "docs/measurement-and-analytics.md",
+    "at": "2026-11-15T00:00:00.000Z",
+    "statement": "Plan first-party observations separately from attribution and customer-confirmed outcomes. A click, inquiry acceptance, notified recipient, qualified lead, and business outcome are separate. Use small evidence-based changes and recheck the same observation period or segment. Synthetic activity may demonstrate behavior but never customer demand or performance."
+  }
+]
