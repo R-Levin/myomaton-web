@@ -23,7 +23,7 @@ async function main() {
     chunks.push(bytes);
   }
   const command = object(JSON.parse(Buffer.concat(chunks).toString("utf8")), ["token", "operation", "input"]);
-  if (length > 65536 && !["prepare", "reconcile-site-draft"].includes(String(command.operation))) throw Error("Protected command too large");
+  if (length > 65536 && !["prepare", "reconcile-site-draft", "issue-retained-site-draft-restore"].includes(String(command.operation))) throw Error("Protected command too large");
   const pool = protectedPool(process.env.MIOPAGES_WP_OPERATOR_URL ?? "", operatorRole, process.env.MIOPAGES_WP_DATABASE_CA);
   let custody: Awaited<ReturnType<typeof openProtectedPresenceWorkspace>> | undefined;
   try {
@@ -136,6 +136,24 @@ async function main() {
               : await service.review.authorizeSiteDraft(context, reviewer, scope, references, input.draft, input.expectedDigest, recovery);
           } finally { secret?.fill(0); }
         } else result = await service.review.previewSiteDraft(context, scope, references, input.draft);
+        break;
+      }
+      case "issue-retained-site-draft-restore": {
+        const p = object(command.input, ["site", "installationId", "envelope", "reviewerToken", "recoveryCredentialId"]);
+        const site = object(p.site, ["organizationId", "webPresenceId", "managedSiteId"]);
+        const reviewer = await service.operator.authenticate(p.reviewerToken);
+        const credentialId = uuid(p.recoveryCredentialId);
+        const key = process.env["MIOPAGES_WP_CREDENTIAL_" + credentialId.toUpperCase().replaceAll("-", "_")] ?? "";
+        if (!/^[a-f0-9]{64}$/u.test(key)) throw Error("Native draft receipt credential unavailable");
+        const secret = Buffer.from(key, "hex");
+        try {
+          result = await service.review.issueRetainedSiteDraftRestore(context, reviewer, {
+            organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId),
+            managedSiteId: uuid(site.managedSiteId),
+          }, uuid(p.installationId), p.envelope, createPrivateKey(process.env.MIOPAGES_WP_SIGNING_KEY ?? ""), {
+            credentialId, secret, journal: new NativeDraftReceiptJournal(process.env.MIOPAGES_WP_NATIVE_DRAFT_RECEIPTS ?? ""),
+          });
+        } finally { secret.fill(0); }
         break;
       }
       case "enroll":

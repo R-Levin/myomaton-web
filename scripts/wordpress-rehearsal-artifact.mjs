@@ -99,13 +99,13 @@ if (core) {
   await cp('scripts/wordpress-private-listener.cjs', path.join(staging, launcher));
   hashes[launcher] = createHash('sha256').update(await readFile(path.join(staging, launcher))).digest('hex');
   for (const [source, executable] of [
-    ["scripts/intake/protected-presence-worker.ts", "protected-presence-worker.mjs"],
-    ["scripts/wordpress-private-operator.ts", "wordpress-private-operator.mjs"],
+    ["scripts/intake/protected-presence-worker.ts", "protected-presence-worker.cjs"],
+    ["scripts/wordpress-private-operator.ts", "wordpress-private-operator.cjs"],
   ]) {
     const relative = path.join(".rehearsal", executable);
     const outfile = path.join(staging, relative);
     await build({ entryPoints: [source], outfile, bundle: true, packages: "external",
-      format: "esm", platform: "node", target: "node22", jsx: "automatic" });
+      format: "cjs", platform: "node", target: "node22", jsx: "automatic" });
     protectedCommands.push(relative);
     hashes[relative] = createHash("sha256").update(await readFile(outfile)).digest("hex");
   }

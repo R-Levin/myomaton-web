@@ -1,11 +1,16 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { createHash, generateKeyPairSync, randomBytes, randomUUID } from "node:crypto";
 import { mkdtemp, realpath, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { NativeDraftReceiptJournal, verifyNativeDraftReceipt, type NativeDraftReceiptExpectation } from "../../lib/platform/wordpress-delivery/native-draft-receipt";
+import { nativeDraftEnvelope, readNativeDraftEnvelope } from "../../lib/platform/wordpress-delivery/native-draft-envelope";
+import { bindSiteDraft } from "../../lib/platform/wordpress-delivery/site-draft";
+import { PrivateReleaseReview } from "../../lib/platform/wordpress-delivery/private-source";
+import type { ProtectedOperator } from "../../lib/platform/wordpress-delivery/operator";
+import { fingerprint } from "../../lib/platform/canonical/model";
 
 test("PHP native draft receipts authenticate exact Core apply and restore readback", () => {
   const key = randomBytes(32), installationId = randomUUID(), siteProposalId = randomUUID();
@@ -98,5 +103,50 @@ test("Core reconciles a changed Page set against its retained receipt and restor
     assert.deepEqual((await journal.record(apply, key, receipt(apply, [15, 13]))).posts.map(post => post.id), [15, 13]);
     await assert.rejects(journal.record(restore, key, receipt(restore, [13, 15])), /differs from previous/);
     assert.deepEqual((await journal.record(restore, key, receipt(restore, [13, 14]))).posts.map(post => post.id), [13, 14]);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("an independent original authorizer can reissue an exact restore from authenticated apply receipts", async () => {
+  const root = await mkdtemp(path.join(await realpath(tmpdir()), "miopages-retained-restore-"));
+  const journal = new NativeDraftReceiptJournal(root);
+  try {
+    const site = { organizationId: randomUUID(), webPresenceId: randomUUID(), managedSiteId: randomUUID() };
+    const installationId = randomUUID(), siteProposalId = randomUUID(), credentialId = randomUUID(), secret = randomBytes(32);
+    const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+    const publicKeyBase64 = Buffer.from(publicKey.export({ format: "jwk" }).x!, "base64url").toString("base64");
+    const keyId = "fixture";
+    const page = { id: randomUUID(), path: "/", title: "Home", sections: [{
+      id: randomUUID(), type: "intro", content: { heading: "Draft", text: "Fixture" },
+    }] };
+    const member = { ...site, proposalId: randomUUID(), revision: 1, approvalId: fingerprint("approval"),
+      previewDigest: fingerprint("preview"), sourceDigest: fingerprint("source"), projectionDigest: fingerprint([page]), pages: [page] };
+    const draft = { siteProposalId, installationId, navigation: ["/"], actions: [] };
+    const first = bindSiteDraft(site, [member], { ...draft, revision: 1, previousDigest: null });
+    const next = bindSiteDraft(site, [member], { ...draft, revision: 2, previousDigest: first.digest });
+    const apply = nativeDraftEnvelope(next, keyId, publicKeyBase64, privateKey, "apply");
+    const expected: NativeDraftReceiptExpectation = { installationId, siteProposalId, operation: "apply",
+      requestedDigest: next.digest, appliedDigest: next.digest, revision: 2, paths: ["/"] };
+    const operator = { authorize: async (actor: string) => ({ operatorId: actor, authorityReference: actor + "-grant" }) } as unknown as ProtectedOperator;
+    const review = new PrivateReleaseReview(null!, operator, async () => { /* Fixture supplies authorization readback below. */ });
+    review.nativeDraftReceiptDecision = async () => ({ expected, credentialId, keyId, publicKey: publicKeyBase64,
+      signed: readNativeDraftEnvelope(apply, keyId, publicKeyBase64), reviewerId: "reviewer", authorizerGrant: "authorizer-grant" });
+    const recover = (actor = "authorizer", signer = privateKey) => review.issueRetainedSiteDraftRestore(actor, "reviewer", site,
+      installationId, apply, signer, { credentialId, secret, journal });
+    await assert.rejects(recover(), { code: "ENOENT" });
+    for (const prior of [first, next]) {
+      const proof = { ...expected, appliedDigest: prior.digest, requestedDigest: prior.digest, revision: prior.candidate.revision };
+      const php = spawnSync("php", ["wordpress/miopages-delivery/tests/native-draft-receipt.php"], { encoding: "utf8",
+        input: JSON.stringify({ key: secret.toString("hex"), result: { ...proof, applied: { siteProposalId, digest: prior.digest,
+          revision: proof.revision, posts: { "/": { ID: 13, post_status: "draft", post_content: "Fixture" } } } } }) });
+      assert.equal(php.status, 0, php.stderr);
+      await journal.record(proof, secret, JSON.parse(php.stdout));
+    }
+    await assert.rejects(recover("reviewer"), /Independent original/);
+    await assert.rejects(recover("foreign"), /Independent original/);
+    await assert.rejects(recover("authorizer", generateKeyPairSync("ed25519").privateKey), /signer does not match/);
+    const restore = readNativeDraftEnvelope(await recover(), keyId, publicKeyBase64);
+    assert.equal(restore.operation, "restore");
+    assert.equal(restore.digest, next.digest);
+    assert.equal(restore.candidate.previousDigest, first.digest);
   } finally { await rm(root, { recursive: true, force: true }); }
 });

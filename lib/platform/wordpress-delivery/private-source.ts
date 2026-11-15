@@ -161,11 +161,41 @@ export class PrivateReleaseReview {
           ...(!restore && !draft.rollback && { appliedBaseline: hash(draft.previousDigest) }) }),
         ...(!restore && draft.media && { media: draft.media, pageIds: draft.pages.map(page => page.id) }) };
       await db.query("COMMIT");
-      return { expected, credentialId: uuid(installation.credential_id) };
+      return { expected, credentialId: uuid(installation.credential_id), signed,
+        keyId: installation.key_id as string, publicKey: installation.public_key as string,
+        reviewerId: reviewer.operatorId, authorizerGrant: latest.authorizer_grant_id as string };
     } catch (error) {
       await db.query("ROLLBACK");
       throw error;
     } finally { db.release(); }
+  }
+
+  async issueRetainedSiteDraftRestore(context: unknown, reviewer: unknown, site: Site,
+    installationId: string, applyEnvelope: unknown, key: KeyObject, recovery: RecoveryEvidence) {
+    const decision = await this.nativeDraftReceiptDecision(reviewer, site, installationId, applyEnvelope);
+    const { expected, signed } = decision;
+    const candidate = signed.candidate;
+    if (expected.operation !== "apply" || candidate.revision < 2 || recovery.credentialId !== decision.credentialId) {
+      throw Error("Exact applied draft recovery evidence required");
+    }
+    const authorizer = await this.operator.authorize(context, "authorize-native-draft", site);
+    if (authorizer.operatorId === decision.reviewerId || authorizer.authorityReference !== decision.authorizerGrant) {
+      throw Error("Independent original site authorization required");
+    }
+
+    // Recovery reuses the immutable applied envelope and authenticated readback.
+    // Withdrawn or changed media rights must not prevent restoring the prior draft.
+    await recovery.journal.verifyAppliedBaseline(expected, recovery.secret);
+    const base = { installationId: expected.installationId, siteProposalId: expected.siteProposalId,
+      paths: expected.baselinePaths ?? expected.paths };
+    if (expected.materializedBaseline) {
+      await recovery.journal.verifyMaterializedBaseline({ ...base, ...expected.materializedBaseline }, recovery.secret);
+    } else {
+      const digest = hash(candidate.previousDigest);
+      await recovery.journal.verifyAppliedBaseline({ ...base, requestedDigest: digest, appliedDigest: digest,
+        revision: candidate.revision - 1 }, recovery.secret);
+    }
+    return nativeDraftEnvelope(signed, decision.keyId, decision.publicKey, key, "restore");
   }
 
   private async siteDraft(context: unknown, site: Site, references: readonly { proposalId: string; approvalId: string }[], draft: unknown,

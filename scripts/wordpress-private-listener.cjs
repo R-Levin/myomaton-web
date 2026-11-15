@@ -191,9 +191,9 @@ async function runWorkflow(args) {
   const env = coreEnvironment(JSON.parse(privateFile(PRIVATE + '/core-config.json')));
   if (activate || operation === 'INSPECT-WORKFLOW-MANIFEST') delete env.MIOPAGES_OPENAI_DEV_API_KEY;
   else assert.ok(env.MIOPAGES_OPENAI_DEV_API_KEY && resourceGate(process.memoryUsage().rss, availableMemory()));
-  const module = WEB + '/.rehearsal/protected-presence-worker.mjs';
-  assert.ok(fs.lstatSync(module).isFile() && fs.realpathSync(module) === module);
-  const child = spawn('/usr/bin/node', ['--max-old-space-size=192', module, ...args], { cwd: WEB, env, stdio: 'inherit' });
+  const worker = WEB + '/.rehearsal/protected-presence-worker.cjs';
+  assert.ok(fs.lstatSync(worker).isFile() && fs.realpathSync(worker) === worker);
+  const child = spawn('/usr/bin/node', ['--max-old-space-size=192', worker, ...args], { cwd: WEB, env, stdio: 'inherit' });
   process.once('SIGINT', () => child.kill('SIGINT'));
   process.once('SIGTERM', () => child.kill('SIGTERM'));
   process.exitCode = await new Promise((resolve, reject) => {
