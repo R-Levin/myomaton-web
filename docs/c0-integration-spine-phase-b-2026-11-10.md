@@ -2543,7 +2543,7 @@ its protected copy still exists with mode 0600. HTTPS sign-in with
 that token is refused. A separate read-only query under the scoped
 role verified C0 draft 28 and the exact saved proposal digest
 `6904fc782422af25c9e7dab2f15a82edb527f3b03527e26047bd1564583f46cc`.
-This is draft persistence evidence. Owner login is still blocked.
+This established draft persistence before access was restored.
 
 The local candidate adds a normal username and password form for
 `owner` at the existing protected Core URL. The owner chooses and
@@ -2588,3 +2588,25 @@ generations and $0 estimated provider spend. The inclusive Core
 checkpoint remains 24 requests, 12 generations and $0.046522 accounted
 including $0.008400 reserved. Other incremental project cash cost and
 owner minutes have not been measured.
+
+#### Protected owner login verified
+
+The approved build `740e3c1d983aa442d53ee45ecb0f5c8a90755a9d` is
+running on the existing protected Core host. Its Linux artifact
+passed all 163 file checks and the previous build remains in protected
+rollback storage. The owner ran the password setup with hidden prompts.
+The launcher returned PASS after HTTPS sign-in as `owner`,
+authenticated proposal readback and HTTPS sign-out.
+
+A separate read-only query under the restricted development role
+verified the persistent credential on the existing C0 principal, both
+original scoped grants and zero other active credentials in that scope.
+C0 draft 28 still has proposal digest
+`6904fc782422af25c9e7dab2f15a82edb527f3b03527e26047bd1564583f46cc`.
+The deployment checks matched the existing usage ledger, both public
+HTTPS response bodies and the restored private WordPress revision.
+The owner can now open
+[Protected Core](https://wp-acceptance.miopages.com/core), sign in with
+the password saved in their password manager and open **AI site proposal**.
+Personal review of the proposal is pending. The access recovery made
+zero model requests.
