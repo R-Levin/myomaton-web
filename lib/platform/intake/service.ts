@@ -9,6 +9,7 @@ import { adaptiveFoundationErrors, adaptiveOfferStep, adaptiveOnboardingVersion,
 import type { OnboardingEntry } from "../activation/service";
 import type { SitePlanningReview } from "./protected-site-planning";
 import type { InterviewState } from "./intelligent-model";
+import { workflowContextFromIntake } from "./presence-workflow-context";
 
 const intelligentVersion = "paid-onboarding/3";
 
@@ -158,6 +159,10 @@ export class IntakeService {
     return { ...result, submission: { digest: snapshot.digest, submittedAt: snapshot.submitted_at.toISOString() } };
   }
   async resume(token: string) { return this.readView(this.pool, await this.owned(this.pool, token)); }
+  async workflowContext(token: string) {
+    const row = await this.owned(this.pool, token);
+    return workflowContextFromIntake(this.selection, row.id, await this.readView(this.pool, row));
+  }
   async create(token: string, intent: EntryIntent) {
     if (!["FREE_REVIEW", "DIRECT_START"].includes(intent) || this.rehearsal && intent !== "DIRECT_START") throw new IntakeError("invalid_intent");
     return transaction(this.pool, async db => {

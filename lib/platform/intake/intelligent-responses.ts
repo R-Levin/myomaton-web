@@ -26,6 +26,8 @@ type Receipt = QuestionAttribution & { reservedMicros: number; countDispatched: 
   countRequestId?: string; generationRequestId?: string; responseId?: string; usage?: Usage; estimatedMicros?: number;
   status: "pending" | "completed" | "rejected" | "uncertain";
   outputLimit?: number;
+  inputLimit?: number;
+  workflowScope?: string;
   recoveryAuthorized?: true;
   proposalValidation?: "valid" | "proposal_shape" | "proposal_citations" | "proposal_route" | "proposal_content" | "response_decode";
   failure?: "output_token_limit" | "content_filter" | "provider_incomplete" | "reservation_exceeded";
@@ -85,7 +87,7 @@ function responseUsage(body: Record<string, unknown>, counted: number, outputLim
   return { input, cached, cacheWrite, output, reasoning };
 }
 
-function responseProposal(body: Record<string, unknown>, byteLimit?: number) {
+export function responseProposal(body: Record<string, unknown>, byteLimit?: number) {
   if (!Array.isArray(body.output)) throw Error("Provider output unavailable");
   const outputs = body.output.map(record).filter(item => item.type !== "reasoning");
   const message = outputs[0];
@@ -300,7 +302,7 @@ export async function confirmSitePlanningReceipt(directory: string, ownerDigest:
     if (!responseId || !receipt || duplicate || !receipt.recoveryAuthorized || !receipt.countDispatched || !receipt.generationDispatched || !receipt.usage ||
         (receipt.status !== "completed" && receipt.status !== "rejected") ||
         integer(receipt.estimatedMicros) > integer(receipt.reservedMicros) || receipt.responseId !== responseId ||
-        fingerprint(responseUsage(reply, maxInput, receipt.outputLimit ?? maxOutput)) !== fingerprint(receipt.usage)) throw Error();
+        fingerprint(responseUsage(reply, receipt.inputLimit ?? maxInput, receipt.outputLimit ?? maxOutput)) !== fingerprint(receipt.usage)) throw Error();
   } catch { throw new PlanningFailureError("usage_gate"); }
 }
 
@@ -332,13 +334,29 @@ export function verifyOutcomeLedger(ledger: Ledger, inputDigest: string, attempt
       (suffix.length + 1) * cycle.envelopeMicros > cycle.envelopeCapMicros) throw Error("Outcome comparison order or envelope refused");
 }
 
+export type WorkflowUsageScope = {
+  id: string; startingLedger: string; baselineAttempts: number;
+  requests: number; generations: number; capMicros: number; inputTokens: number; inputBytes: number;
+};
+
+export function meteredPresenceWorkflow(directory: string, rates: Rates, transport: ResponsesTransport,
+  scope: WorkflowUsageScope, outputLimit: number, retainedReservation?: string) {
+  const fields = [scope.baselineAttempts, scope.requests, scope.generations, scope.capMicros, scope.inputTokens, scope.inputBytes, outputLimit];
+  if (![scope.id, scope.startingLedger, ...(retainedReservation ? [retainedReservation] : [])].every(value => /^[a-f0-9]{64}$/u.test(value)) ||
+      fields.some(value => !Number.isSafeInteger(value) || value < 0) ||
+      scope.requests < 2 || scope.generations < 1 || scope.generations * 2 > scope.requests ||
+      scope.capMicros < 1 || scope.inputTokens < 1 || scope.inputBytes < 1 || outputLimit < 16) throw Error("Workflow budget refused");
+  return meteredResponsesDispatch(directory, rates, transport, 0, 0, 0, outputLimit, retainedReservation, undefined, undefined, structuredClone(scope));
+}
+
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
   requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string, comparisonInput?: string,
-  outcome?: { inputDigest: string; attempt: number; c0ReadbackDigest?: string }) {
+  outcome?: { inputDigest: string; attempt: number; c0ReadbackDigest?: string }, workflow?: WorkflowUsageScope) {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
   const inputRate = Math.max(rates.inputPerMillion, rates.cachedPerMillion, rates.cacheWritePerMillion);
+  const inputLimit = workflow?.inputTokens ?? maxInput;
   return async ({ ownerDigest, workDigest }: QuestionAttribution, request: { model: string; input: string; instructions: string; text: { format: object } }, recheck?: () => Promise<unknown>, retain?: CompletedResponse, normalize?: NormalizeProposal) => {
     if (![ownerDigest, workDigest].every(value => /^[a-f0-9]{64}$/.test(value))) throw Error("Scoped attribution required");
     let stage: PlanningFailure = "usage_gate";
@@ -376,12 +394,26 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
               first.reservedMicros !== comparison.envelopeMicros))) throw Error("Fresh comparison ledger baseline refused");
       }
       if (outcome) verifyOutcomeLedger(ledger, outcome.inputDigest, outcome.attempt, outcomeCompactComparison, outcome.c0ReadbackDigest);
-      const reservation = rates.countMicros + Math.ceil((maxInput * inputRate + outputLimit * rates.outputPerMillion) / 1_000_000);
+      const reservation = rates.countMicros + Math.ceil((inputLimit * inputRate + outputLimit * rates.outputPerMillion) / 1_000_000);
       if ((comparisonInput !== undefined || outcome) && reservation !== freshCompactComparison.envelopeMicros) throw Error("Fresh comparison request envelope refused");
-      if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) throw Error("Development budget exhausted");
-      if (Buffer.byteLength(request.input) > 12_000) throw Error("Input envelope exceeded");
+      if (workflow) {
+        const baseline = JSON.stringify({ ...ledger, attempts: ledger.attempts.slice(0, workflow.baselineAttempts) }) + "\n";
+        const recent = ledger.attempts.slice(workflow.baselineAttempts);
+        if (ledger.attempts.length < workflow.baselineAttempts ||
+            createHash("sha256").update(baseline).digest("hex") !== workflow.startingLedger ||
+            recent.some(item => item.workflowScope !== workflow.id || item.ownerDigest !== ownerDigest)) throw Error("Workflow ledger baseline refused");
+        const runGenerations = recent.filter(item => item.generationDispatched).length;
+        const runRequests = recent.filter(item => item.countDispatched).length + runGenerations;
+        const runSpent = recent.reduce((sum, item) => sum + integer(item.estimatedMicros), 0);
+        if (runRequests + 2 > workflow.requests || runGenerations >= workflow.generations ||
+            runSpent + reservation > workflow.capMicros) throw Error("Workflow budget exhausted");
+      } else if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) {
+        throw Error("Development budget exhausted");
+      }
+      if (Buffer.byteLength(request.input) > (workflow?.inputBytes ?? 12_000)) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation,
-        ...(outputLimit !== maxOutput && { outputLimit }), countDispatched: true, generationDispatched: false, status: "pending" };
+        ...(outputLimit !== maxOutput && { outputLimit }), ...(workflow && { inputLimit, workflowScope: workflow.id }),
+        countDispatched: true, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);
       async function checkpoint() {
         const next = path + "." + randomUUID() + ".tmp";
@@ -393,7 +425,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       const count = await transport.send("/v1/responses/input_tokens", structuredClone(request));
       receipt.countRequestId = receiptId(count.requestId);
       const input = integer(record(count.body).input_tokens);
-      if (input > maxInput) {
+      if (input > inputLimit) {
         receipt.status = "rejected";
         receipt.estimatedMicros = rates.countMicros;
         await checkpoint();

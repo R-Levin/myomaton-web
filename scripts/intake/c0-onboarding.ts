@@ -1,5 +1,6 @@
 import { randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import { once } from "node:events";
+import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { Readable } from "node:stream";
 import { build } from "esbuild";
@@ -13,6 +14,10 @@ import { intakeHttp, sessionToken } from "../../lib/platform/intake/http";
 import { IntakeService, type IntakeEvidence } from "../../lib/platform/intake/service";
 import { prepareC0, prepareC2 } from "./adaptive-sources";
 import { readRetainedC0 } from "./retained-c0";
+import { PresenceWorkflow } from "../../lib/platform/intake/presence-workflow";
+import { workflowFixture } from "./presence-workflow-fixture";
+import { FirstPartyMeasurement, type MeasurementSource } from "../../lib/platform/measurement/first-party";
+import { fingerprint } from "../../lib/platform/canonical/model";
 
 const host = "127.0.0.1", port = 4320;
 const headers = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer",
@@ -33,12 +38,13 @@ function prefill() {
     offer: evidence("approved offer summary"), serviceArea: evidence("remote/national US; mapped to Nationwide") } };
 }
 
-export async function createC0Onboarding(bin: string, adaptive = false, retainedFile?: string) {
+export async function createC0Onboarding(bin: string, adaptive = false, retainedFile?: string, runWorkflow = false) {
   const retained = retainedFile ? await readRetainedC0(retainedFile) : undefined;
   if (retained && !adaptive) throw Error("Retained C0 requires adaptive intake");
-  const accessCode = retained && randomBytes(16).toString("hex");
-  const accessCookie = retained && randomBytes(32).toString("hex");
-  const entry = retained ? "scripts/intake/c0-site-journey-entry.tsx"
+  const privateReview = Boolean(retained || runWorkflow);
+  const accessCode = privateReview ? randomBytes(16).toString("hex") : undefined;
+  const accessCookie = privateReview ? randomBytes(32).toString("hex") : undefined;
+  const entry = privateReview ? "scripts/intake/c0-site-journey-entry.tsx"
     : adaptive ? "scripts/intake/adaptive-onboarding-client.tsx" : "scripts/intake/c0-onboarding-client.tsx";
   const client = await build({ entryPoints: { onboarding: entry }, bundle: true, write: false,
     outdir: "onboarding", jsx: "automatic", platform: "browser", define: { "process.env.NODE_ENV": '"production"' }, minify: true });
@@ -50,6 +56,8 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
   const pool = new Pool({ connectionString: cluster.url });
   try {
     await migrateWithBootstrapCompatibility(pool);
+    if (runWorkflow) await pool.query(await readFile(new URL("../../lib/platform/intake/presence-workflow.sql", import.meta.url), "utf8"));
+    const workflow = runWorkflow ? new PresenceWorkflow(pool, workflowFixture) : undefined;
     async function scope(name: string) {
       const organization = randomUUID(), webPresenceId = randomUUID(), managedSiteId = randomUUID();
       await pool.query("INSERT INTO organizations(id,name,status) VALUES($1,$2,'active')", [organization, name]);
@@ -59,10 +67,33 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
     }
     const database = new URL(cluster.url).pathname.slice(1);
     const selection = await scope("C0 onboarding rehearsal");
+    let localSnapshot: (() => ReturnType<FirstPartyMeasurement["snapshot"]>) | undefined;
+    if (runWorkflow) {
+      await pool.query(await readFile(new URL("../../lib/platform/measurement/first-party.sql", import.meta.url), "utf8"));
+      const measurement = new FirstPartyMeasurement(pool);
+      const end = Date.now();
+      const iso = (offset: number) => new Date(end + offset).toISOString();
+      const source: MeasurementSource = { id: randomUUID(), selection, environment: "synthetic", activatedAt: iso(-60_000),
+        coverage: ["page-observed", "action-selected", "contact-accepted"],
+        revision: fingerprint("Recorded measurement example"), routes: { "/": ["read-service"] } };
+      await measurement.record(source, { id: randomUUID(), kind: "page-observed", at: iso(-30_000),
+        page: "/", action: null, attribution: "campaign" });
+      await measurement.record(source, { id: randomUUID(), kind: "action-selected", at: iso(-20_000),
+        page: "/", action: "read-service", attribution: null });
+      localSnapshot = () => measurement.snapshot(source, iso(-60_000), iso(0));
+    }
     const c0 = retained ?? (adaptive ? { answers: {}, provenance: {}, prepared: await prepareC0() } : prefill());
+    if (runWorkflow && "prepared" in c0 && c0.prepared) {
+      c0.prepared.sources.push({
+        id: "market-correction", kind: "Owner-confirmed", title: "November 9 market correction",
+        reference: "docs/miopages-c0-product-model.md#initial-customer-hypothesis", date: "2026-11-09",
+        detail: "This owner decision supersedes any interpretation that startups are excluded.",
+        entries: [{ label: "Audience", value: "Startups remain an important market alongside established local service, professional and technical firms." }],
+      });
+    }
     const service = new IntakeService(pool, selection, { database, ...c0 });
     const routes = new Map([["/api/onboarding", service]]);
-    if (adaptive && !retained) routes.set("/api/onboarding/customer-2", new IntakeService(pool, await scope("Fictional C2 onboarding rehearsal"),
+    if (adaptive && !privateReview) routes.set("/api/onboarding/customer-2", new IntakeService(pool, await scope("Fictional C2 onboarding rehearsal"),
       { database, answers: {}, provenance: {}, prepared: prepareC2() }));
     const abuse = developmentGuard(120);
     function listener() {
@@ -87,11 +118,11 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
             if (accessCookie && sessionToken(request, "miopages_local_journey") !== accessCookie) {
               return send(401, "application/json", '{"error":"local_access_required"}');
             }
-            const response = await intakeHttp(request, intake, abuse, true);
+            const response = await intakeHttp(request, intake, abuse, true, false, workflow, localSnapshot);
             const body = await response.text();
             res.writeHead(response.status, { ...headers, ...Object.fromEntries(response.headers) }).end(body);
           } else if (req.method !== "GET") send(405, "text/plain", "Unsupported request.");
-          else if (route === "/onboarding" || route === "/" || adaptive && !retained && route === "/onboarding/customer-2") send(200, "text/html; charset=utf-8", page);
+          else if (route === "/onboarding" || route === "/" || adaptive && !privateReview && route === "/onboarding/customer-2") send(200, "text/html; charset=utf-8", page);
           else if (route && assets.has(route)) send(200, route.endsWith(".css") ? "text/css; charset=utf-8" : "text/javascript; charset=utf-8", assets.get(route)!);
           else send(404, "text/plain", "Unknown rehearsal page.");
         } catch { send(503, "text/plain", "Local rehearsal unavailable."); }
@@ -104,16 +135,18 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
 
 async function main() {
   const retained = process.argv[2] === "--retained-c0";
-  const adaptive = retained || process.argv[2] === "--adaptive";
-  if (retained ? process.argv.length !== 4 : process.argv.length > (adaptive ? 3 : 2)) throw Error("Unexpected rehearsal argument");
-  const listenPort = retained ? 4322 : adaptive ? 4321 : port;
-  const rehearsal = await createC0Onboarding(process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin", adaptive, retained ? process.argv[3] : undefined);
+  const runWorkflow = process.argv[2] === "--workflow";
+  const adaptive = retained || runWorkflow || process.argv[2] === "--adaptive";
+  if (retained ? process.argv.length !== 4 : process.argv.length > (runWorkflow ? 4 : adaptive ? 3 : 2)) throw Error("Unexpected rehearsal argument");
+  const listenPort = runWorkflow ? 4338 : retained ? 4322 : adaptive ? 4321 : port;
+  const rehearsal = await createC0Onboarding(process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin", adaptive,
+    retained || runWorkflow ? process.argv[3] : undefined, runWorkflow);
   const server = rehearsal.listener();
   try {
     server.listen(listenPort, host); await once(server, "listening");
     console.log(`Customer 0 onboarding rehearsal: http://${host}:${listenPort}/onboarding (Ctrl+C closes the disposable session)`);
     if (rehearsal.accessCode) console.log(`Local browser access code: ${rehearsal.accessCode}`);
-    if (adaptive && !retained) console.log(`Fictional Customer 2: http://${host}:${listenPort}/onboarding/customer-2`);
+    if (adaptive && !retained && !runWorkflow) console.log(`Fictional Customer 2: http://${host}:${listenPort}/onboarding/customer-2`);
     await new Promise<void>(resolve => { process.once("SIGINT", resolve); process.once("SIGTERM", resolve); });
   } finally {
     if (server.listening) { server.closeAllConnections(); await new Promise<void>(resolve => server.close(() => resolve())); }

@@ -7,10 +7,13 @@ import { planningMessages, type PlanningFailure } from "../../lib/platform/intak
 import type { IntakeView } from "../../lib/platform/intake/service";
 
 import { SitePlanningReviewPanel } from "./site-planning-review-panel";
+import { PresenceWorkflowPanel } from "./presence-workflow-panel";
+import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
+import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-party";
 import type { reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
 
 type Operations = Awaited<ReturnType<typeof import("../../lib/platform/contact/protected-inquiry").protectedInquiry>>;
-type JourneyView = IntakeView & { interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
+type JourneyView = IntakeView & { firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
   sitePlanningReview?: ReturnType<typeof reviewedSitePlanning> & { current: boolean } };
 async function request(endpoint: string, operation?: object): Promise<JourneyView | null> {
   const response = await fetch(endpoint, {
@@ -154,7 +157,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
       </form> : !view ? <>
         <p>Continue with the business information you already provided.</p>
         <button disabled={busy || error} onClick={() => void run({ operation: "begin" })}>Resume retained onboarding</button>
-      </> : <>
+      </> : view.workflowAvailable ? <PresenceWorkflowPanel workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run} /> : <>
         <h2>What we understand</h2>
         <p>MioPages is transitioning to one managed Web Presence service, with Launch followed by Ongoing care. Earlier site observations and Review material are kept with their original sources.</p>
         {view.prepared && <p className={styles.hint}>{view.prepared.reviewGap}</p>}

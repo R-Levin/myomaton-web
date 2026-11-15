@@ -4,8 +4,34 @@ import { loopbackOrigin } from "./availability";
 import type { ContactAbuseGuard } from "../contact/boundaries";
 import type { IntakeService } from "./service";
 import { newResumeToken } from "./service";
+import type { PresenceWorkflow } from "./presence-workflow";
+import type { PerformanceSnapshot } from "../measurement/first-party";
 
 export const intakeCookie = "miopages_intake";
+
+async function updateLocalWorkflow(workflow: PresenceWorkflow, context: Awaited<ReturnType<IntakeService["workflowContext"]>>, input: Record<string, unknown>) {
+  const keys = input.operation === "workflow-start" ? ["operation"] :
+    input.operation === "workflow-correct" ? ["operation", "version", "finding", "correction"] : ["operation", "version"];
+  if (Object.keys(input).some(key => !keys.includes(key))) throw new IntakeError("invalid_request");
+  if (input.operation === "workflow-start") return workflow.start(context);
+  const version = input.version;
+  if (typeof version !== "number" || !Number.isSafeInteger(version) || version < 1) throw new IntakeError("invalid_request");
+  const customer = { id: "local-customer", role: "customer", simulated: true } as const;
+  switch (input.operation) {
+    case "workflow-next": return workflow.advance(context, version);
+    case "workflow-recover": return workflow.recover(context, version);
+    case "workflow-correct": {
+      if (typeof input.finding !== "string" || typeof input.correction !== "string" || !input.correction.trim() ||
+          input.correction.length > 8_000 || /[<>\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/u.test(input.correction)) {
+        throw new IntakeError("invalid_request");
+      }
+      return workflow.correctReport(context, version, input.finding, input.correction, customer);
+    }
+    case "workflow-confirm": return workflow.confirmReport(context, version, customer);
+    case "workflow-review": return workflow.reviewCandidate(context, version, { id: "local-operator", role: "operator", simulated: true });
+    default: throw new IntakeError("invalid_request");
+  }
+}
 export function localBrowserRequest(request: Request) {
   // Next development may normalize request.url to an internal hostname. Use the
   // HTTP authority for origin checks, never forwarded headers or tenant selection.
@@ -20,17 +46,23 @@ export function sessionToken(request: Request, cookieName = intakeCookie) {
   const token = candidates[0].slice(cookieName.length + 1);
   return /^[a-f0-9]{64}$/.test(token) ? token : null;
 }
-export async function intakeHttp(request: Request, service: IntakeService, abuse: ContactAbuseGuard, enabled: boolean, sharedDevelopment = false) {
+export async function intakeHttp(request: Request, service: IntakeService, abuse: ContactAbuseGuard, enabled: boolean, sharedDevelopment = false,
+  workflow?: PresenceWorkflow, snapshot?: () => Promise<PerformanceSnapshot>) {
   const cookieName = service.isOnboarding ? service.onboardingCookie : sharedDevelopment ? "miopages_intake_shared_development" : intakeCookie;
   const reply = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store", "Vary": "Cookie" } });
   if (!enabled || !loopbackOrigin(request.url)) return reply({ error: "unavailable" }, 503);
   if (request.headers.get("x-intake-request") !== "1") return reply({ error: "invalid_origin" }, 403);
   if (request.method !== "GET" && request.headers.get("origin") !== new URL(request.url).origin) return reply({ error: "invalid_origin" }, 403);
   let token = sessionToken(request, cookieName), fresh = false;
+  async function withWorkflow(view: Awaited<ReturnType<IntakeService["resume"]>>) {
+    if (!workflow || !token) return view;
+    return { ...view, workflowAvailable: true, workflow: await workflow.review(await service.workflowContext(token)),
+      ...(snapshot && { firstParty: await snapshot() }) };
+  }
   try {
     // Scope-only guard avoids storing IPs/contact data. Not a production spam defense.
     if (!await abuse.allow(`${service.selection.webPresenceId}:intake`)) return reply({ error: "rate_limited" }, 429);
-    if (request.method === "GET") return token ? reply(await service.resume(token)) : reply({ state: "not_started" });
+    if (request.method === "GET") return token ? reply(await withWorkflow(await service.resume(token))) : reply({ state: "not_started" });
     if (request.method !== "POST") return reply({ error: "invalid_method" }, 405);
     let error: IntakeError | undefined;
     const response = await contactHttp(request, async value => {
@@ -38,11 +70,16 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
       try {
         if (!value || typeof value !== "object" || Array.isArray(value)) throw new IntakeError("invalid_request");
         const input = value as Record<string, unknown>;
+        if (typeof input.operation === "string" && input.operation.startsWith("workflow-")) {
+          if (!workflow || !token) throw new IntakeError("session_unavailable", 404);
+          await updateLocalWorkflow(workflow, await service.workflowContext(token), input);
+          return await withWorkflow(await service.resume(token));
+        }
         const keys = input.operation === "save" ? ["operation", "version", "answers", "step"]
           : input.operation === "site-priority" ? ["operation", "version", "priority"]
           : input.operation === "submit" ? ["operation", "version"] : ["operation"];
         if (Object.keys(input).some(k => !keys.includes(k))) throw new IntakeError("invalid_request");
-        if (input.operation === "begin") { if (!token) { token = newResumeToken(); fresh = true; } return await service.create(token, service.isOnboarding ? "DIRECT_START" : "FREE_REVIEW"); }
+        if (input.operation === "begin") { if (!token) { token = newResumeToken(); fresh = true; } return await withWorkflow(await service.create(token, service.isOnboarding ? "DIRECT_START" : "FREE_REVIEW")); }
         if (!token) throw new IntakeError("session_unavailable", 404);
         if (input.operation === "save") return await service.save(token, input.version as number, input.answers, input.step as number);
         if (input.operation === "site-priority") return await service.saveSitePriority(token, input.version as number, input.priority);

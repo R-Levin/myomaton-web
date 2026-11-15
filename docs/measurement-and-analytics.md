@@ -42,9 +42,7 @@ owns gates. Optional external sources never gate core V1 measurement/reporting.
 | Commercial V1 / incomplete | First-party visits/page/site activity, important Action events, Contact acceptance/delivery, available referral/UTM attribution, normalized useful trends, a concise Performance Snapshot and baseline → recommendation/change → remeasurement. Production privacy/security and event semantics must be implemented first. |
 | Future extensions | Optional GBP investigation, richer provider integrations, expanded technical-health automation and deeper attribution/reporting. Existing technical monitoring obligations still apply before production; this is not their deferral. |
 
-No first-party visit/click analytics collector, GA4/Search Console integration,
-normalized measurement store, outcome-confirmation UI or analytics dashboard is
-implemented today. Existing Action rendering is not click measurement. See
+The local Core workflow now has a PostgreSQL first-party store and Performance Snapshot, using a scoped synthetic event source. It separates covered zero from unknown and shows an investigation with a later measurement plan. No live collector is active. Existing Action rendering is not click measurement. Public ingress, active-interval provenance through outages, attribution and bot/internal filtering, outcome confirmation, and GA4/Search Console remain separate. See [the local readback](c0-integration-spine-phase-b-2026-11-10.md#core-intake-to-site-workflow-with-durable-local-review) and
 [Contact measurement boundaries](contact-forms.md#delivery-and-measurement-boundaries)
 for the precise implemented hook and production activation limits.
 
