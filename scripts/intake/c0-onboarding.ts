@@ -42,6 +42,7 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
   const retained = retainedFile ? await readRetainedC0(retainedFile) : undefined;
   if (retained && !adaptive) throw Error("Retained C0 requires adaptive intake");
   const privateReview = Boolean(retained || runWorkflow);
+  const accessCookieName = runWorkflow ? "miopages_presence_workflow_access" : "miopages_local_journey";
   const accessCode = privateReview ? randomBytes(16).toString("hex") : undefined;
   const accessCookie = privateReview ? randomBytes(32).toString("hex") : undefined;
   const entry = privateReview ? "scripts/intake/c0-site-journey-entry.tsx"
@@ -109,13 +110,13 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
             const code = req.headers["x-local-access"];
             if (typeof code !== "string" || !/^[a-f0-9]{32}$/.test(code) ||
                 !timingSafeEqual(Buffer.from(code), Buffer.from(accessCode))) return send(403, "text/plain", "Access code refused.");
-            res.setHeader("Set-Cookie", `miopages_local_journey=${accessCookie}; Path=/api/onboarding; HttpOnly; SameSite=Strict`);
+            res.setHeader("Set-Cookie", `${accessCookieName}=${accessCookie}; Path=/api/onboarding; HttpOnly; SameSite=Strict`);
             return send(204, "text/plain", "");
           }
           if (intake && (req.method === "GET" || req.method === "POST")) {
             const request = new Request(`http://${host}:${addr.port}${route}`, { method: req.method, headers: new Headers(req.headers as Record<string, string>),
               ...(req.method === "POST" && { body: Readable.toWeb(req), duplex: "half" }) } as RequestInit);
-            if (accessCookie && sessionToken(request, "miopages_local_journey") !== accessCookie) {
+            if (accessCookie && sessionToken(request, accessCookieName) !== accessCookie) {
               return send(401, "application/json", '{"error":"local_access_required"}');
             }
             const response = await intakeHttp(request, intake, abuse, true, false, workflow, localSnapshot);

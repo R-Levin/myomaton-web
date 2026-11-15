@@ -30,6 +30,23 @@ test("the existing local Core interface persists a report, correction, revised s
     } });
     assert.equal(authenticated.status, 204);
     let cookie = authenticated.headers.get("set-cookie")!.split(";")[0];
+    assert.match(cookie, /^miopages_presence_workflow_access=/u);
+    // Browsers send an older 127.0.0.1 cookie across ports. The current review
+    // access is valid even when that other disposable intake is gone.
+    const earlierDraft = "miopages_adaptive_c0=" + "a1".repeat(32);
+    const oldCookieRead = await fetch(api, { headers: { Cookie: cookie + "; " + earlierDraft, "X-Intake-Request": "1" } });
+    assert.deepEqual({ status: oldCookieRead.status, body: await oldCookieRead.json() }, { status: 200, body: { state: "not_started" } });
+    assert.equal(oldCookieRead.headers.has("set-cookie"), false);
+    const priorAccess = cookie.replace("miopages_presence_workflow_access=", "miopages_local_journey=");
+    assert.equal((await fetch(api, { headers: { Cookie: priorAccess, "X-Intake-Request": "1" } })).status, 401);
+    cookie += "; " + earlierDraft;
+    const staleWorkflow = await fetch(api, { headers: {
+      Cookie: cookie + "; miopages_presence_workflow_draft=" + "a2".repeat(32), "X-Intake-Request": "1",
+    } });
+    assert.equal(staleWorkflow.status, 200);
+    assert.deepEqual(await staleWorkflow.json(), { state: "not_started" });
+    assert.equal(staleWorkflow.headers.get("set-cookie"),
+      "miopages_presence_workflow_draft=; Path=/api/onboarding; HttpOnly; SameSite=Strict; Max-Age=0");
     const post = (value: unknown) => fetch(api, { method: "POST", headers: {
       Origin: origin, Cookie: cookie, "Content-Type": "application/json", "X-Intake-Request": "1",
     }, body: JSON.stringify(value) });
@@ -41,7 +58,9 @@ test("the existing local Core interface persists a report, correction, revised s
     assert.equal(opened.firstParty.counts["contact-accepted"], 0);
     assert.equal(opened.firstParty.customerOutcome, null);
     assert.equal(opened.firstParty.environment, "synthetic");
-    cookie += "; " + begin.headers.get("set-cookie")!.split(";")[0];
+    const newDraft = begin.headers.get("set-cookie")!.split(";")[0];
+    assert.match(newDraft, /^miopages_presence_workflow_draft=/u);
+    cookie += "; " + newDraft;
     let state: PresenceWorkflowView;
     async function run(operation: string, extra = {}) {
       const response = await post({ operation: "workflow-" + operation,

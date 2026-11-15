@@ -48,7 +48,12 @@ export function sessionToken(request: Request, cookieName = intakeCookie) {
 }
 export async function intakeHttp(request: Request, service: IntakeService, abuse: ContactAbuseGuard, enabled: boolean, sharedDevelopment = false,
   workflow?: PresenceWorkflow, snapshot?: () => Promise<PerformanceSnapshot>) {
-  const cookieName = service.isOnboarding ? service.onboardingCookie : sharedDevelopment ? "miopages_intake_shared_development" : intakeCookie;
+  // Loopback cookies are shared across ports. This disposable workflow must
+  // never adopt the resume cookie of an earlier local intake.
+  const cookieName = workflow ? "miopages_presence_workflow_draft" :
+    service.isOnboarding ? service.onboardingCookie : sharedDevelopment ? "miopages_intake_shared_development" : intakeCookie;
+  const cookiePath = service.isOnboarding ? "/api/onboarding" : "/api/intake";
+  const sessionCookie = (value: string, age: number) => `${cookieName}=${value}; Path=${cookiePath}; HttpOnly; SameSite=Strict; Max-Age=${age}`;
   const reply = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store", "Vary": "Cookie" } });
   if (!enabled || !loopbackOrigin(request.url)) return reply({ error: "unavailable" }, 503);
   if (request.headers.get("x-intake-request") !== "1") return reply({ error: "invalid_origin" }, 403);
@@ -89,9 +94,16 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
     });
     if (error) return reply({ error: error.code, fieldErrors: error.fields }, error.status);
     response.headers.set("Vary", "Cookie");
-    if (fresh && response.ok) response.headers.set("Set-Cookie", `${cookieName}=${token}; Path=${service.isOnboarding ? "/api/onboarding" : "/api/intake"}; HttpOnly; SameSite=Strict; Max-Age=2592000`);
+    if (fresh && response.ok) response.headers.set("Set-Cookie", sessionCookie(token!, 2_592_000));
     return response;
   } catch (e) {
+    if (workflow && request.method === "GET" && e instanceof IntakeError && e.code === "session_unavailable" && e.status === 404) {
+      // A restarted rehearsal has a new disposable database. A stale resume
+      // token should clear only this workflow's cookie after access is verified.
+      const response = reply({ state: "not_started" });
+      response.headers.set("Set-Cookie", sessionCookie("", 0));
+      return response;
+    }
     return e instanceof IntakeError ? reply({ error: e.code, fieldErrors: e.fields }, e.status) : reply({ error: "unavailable" }, 503);
   }
 }
