@@ -175,6 +175,18 @@ Interpret precisely:
 
 ---
 
+### Direction accepted — November 15, 2026 (local implementation continuation authorized)
+
+**Owner response:** “OK I am good with this direction. If you are good, we can continue.” This accepts the **development direction** in P0-9 and P0-10: production-representative, quality-led iterative Core+AI report/whole-site generation, existing image acquisition reuse with actual FPO placement, and review of the **real hosted Core→WordPress** system including a minimum actual Media Library copy/attachment mapping and private preview. Development remains the overall priority; continuity stays a ChatGPT/Codex process discipline.
+
+**Authorized next work:** Continue the already approved *local* development and verification on the active Codex worktree; extend the existing reusable orchestration/media/WP interfaces, do a bounded read-only host compatibility review where already permitted, and prepare **one consolidated, executable revised authorization** for internet-hosted model/research/image activity, protected database/host changes, and private WordPress staging. Do not interrupt progress to request approval for ordinary local engineering.
+
+**NOT implied:** This conversational acceptance does **not** approve the old `878b7e5` manifest or any new number for provider spend, protected-source transmission, hosted migrations/writes, WordPress media installation/staging, public release, customer approval, merge or publication. Request one specific reviewed approval at the genuine external-run/hosted-write gate, not serial microapprovals. Proposed $20/seven-day values remain proposals until the executable manifest is reviewed.
+
+**Success criterion:** Core genuinely operates research and multipass AI writing/revision, records source/cost/decision evidence, presents a customer-readable report and full reviewed website candidate, and—after explicit separate protected execution/host-write authorization—places properly tracked real FPO images in a private hosted WordPress site, with WordPress attachment identity linked to Core master Assets and accurate rollback. No arbitrary Page/Section limit, no uncontrolled research or spend, no Codex-authored substitute for Core AI results.
+
+**Next actor:** Codex implements and tests the integrated local prerequisites and supplies a consolidated authorization candidate, then owner approves protected run. ChatGPT reviews source fidelity, product/UX quality and Git continuity; existing Issue #12 remains the coordination record.
+
 ## Forward-maintenance template: add a new owner-marked critical conversation
 
 For every future explicitly important owner conversation, append a chronological, referenced entry; update `docs/development-control.md` only when the navigation/priority policy changes. Preserve prior entries and mark supersession instead of erasure.
