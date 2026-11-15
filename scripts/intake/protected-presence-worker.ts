@@ -25,7 +25,7 @@ async function main() {
       }
       const { rows } = await pool.query("SELECT intake_id FROM miopages_core_workflow.authorized_intake");
       if (rows.length !== 1 || rows[0].intake_id !== context.intakeId) throw Error("Protected workflow policy refused");
-      const plan = await privateWorkflowBytes(join(workspace.root, "c0-protected-workflow-authorization.json"), workspace.root);
+      const plan = await privateWorkflowBytes(join(workspace.root, "c0-hosted-presence-run.json"), workspace.root);
       const ledger = await privateWorkflowBytes(join(workspace.ledgerDirectory, "onboarding-usage.json"), workspace.root);
       if (process.argv[3] === "f7cf560dfdb8f16e809dc0ba535c5d86520a28654953c28b14c84558bab00545") {
         throw Error("The 24-hour C0 launch manifest was superseded");

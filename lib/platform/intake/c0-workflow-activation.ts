@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { fingerprint, object } from "../canonical/model";
+import { fingerprint, object, uuid } from "../canonical/model";
 import { c0DisclosureManifest } from "./c0-workflow-knowledge";
 import type { WorkflowContext } from "./presence-workflow";
 import type { PresenceWorkflowGrant } from "./presence-workflow-provider";
@@ -14,11 +14,34 @@ export function c0HostedRunGrant(context: WorkflowContext, bytes: Buffer, approv
   if (plan.schema !== "miopages.c0-hosted-presence/2" || fingerprint(plan.scope) !== fingerprint(context.scope)) throw Error("Hosted run scope refused");
   // Host/plugin installation and actual staging are separate approval operations
   // enumerated in the reviewed manifest. This compiler enables worker dispatch only.
-  const rollout = object(plan.rollout, ["commit", "artifactSha256", "wordpressOrigin", "installationId", "privateOnly", "expiresAt"]);
-  if (typeof rollout.commit !== "string" || !/^[a-f0-9]{40}$/u.test(rollout.commit) || rollout.wordpressOrigin !== "https://miopages.org" ||
+  const rollout = object(plan.rollout, ["commit", "artifactSha256", "coreOrigin", "wordpressOrigin", "wordpressPluginSha256",
+    "installationId", "siteProposalId", "privateOnly", "expiresAt", "rollback", "retentionDays", "policy"]);
+  if (typeof rollout.commit !== "string" || !/^[a-f0-9]{40}$/u.test(rollout.commit) ||
+      rollout.coreOrigin !== "https://wp-acceptance.miopages.com" || rollout.wordpressOrigin !== "https://miopages.org" ||
       rollout.privateOnly !== true || typeof rollout.installationId !== "string" ||
       !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/u.test(rollout.installationId)) throw Error("Reviewed WordPress rehearsal scope required");
   hash(rollout.artifactSha256);
+  hash(rollout.wordpressPluginSha256);
+  uuid(rollout.siteProposalId);
+  const rollback = object(rollout.rollback, ["materializedRevision", "materializedDigest", "highWater", "highWaterDigest", "pages"]);
+  if (!Number.isSafeInteger(rollback.materializedRevision) || !Number.isSafeInteger(rollback.highWater) ||
+      Number(rollback.materializedRevision) < 1 || Number(rollback.highWater) < Number(rollback.materializedRevision) ||
+      !Array.isArray(rollback.pages) || !rollback.pages.length ||
+      !Number.isSafeInteger(rollout.retentionDays) || Number(rollout.retentionDays) < 1 || Number(rollout.retentionDays) > 30) {
+    throw Error("Hosted rollback and retention scope refused");
+  }
+  hash(rollback.materializedDigest);
+  hash(rollback.highWaterDigest);
+  for (const page of rollback.pages) {
+    const record = object(page, ["path", "id", "wordPressId", "slug", "sha256"]);
+    if (typeof record.path !== "string" || !record.path.startsWith("/") || typeof record.slug !== "string" ||
+        !Number.isSafeInteger(record.wordPressId) || Number(record.wordPressId) < 1) throw Error("Hosted rollback Page refused");
+    uuid(record.id);
+    hash(record.sha256);
+  }
+  const policy = object(rollout.policy, ["workflowSqlSha256", "rolePolicySha256"]);
+  hash(policy.workflowSqlSha256);
+  hash(policy.rolePolicySha256);
   const expiresAt = typeof rollout.expiresAt === "string" ? Date.parse(rollout.expiresAt) : NaN;
   if (!Number.isFinite(expiresAt) || expiresAt <= now || expiresAt > now + 7 * 86_400_000) throw Error("Exact hosted expiry required");
   const source = object(plan.sourceEvidence, ["contextDigest", "exactCandidates", "approvedCorrections"]);

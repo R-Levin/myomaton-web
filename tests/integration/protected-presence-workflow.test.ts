@@ -313,7 +313,11 @@ test("restricted Core worker discovers research, retains a substantial provider-
             maxSourceBytes: 450_000 },
           images: { model: imageProvider.model, briefs: [{ id: "concept", label: "Concept illustration", prompt: safePrompt }] },
           rollout: { commit: "0".repeat(40), artifactSha256: "0".repeat(64), wordpressOrigin: "https://miopages.org",
-            installationId: randomUUID(), privateOnly: true, expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() },
+            wordpressPluginSha256: "0".repeat(64), coreOrigin: "https://wp-acceptance.miopages.com", siteProposalId: randomUUID(),
+            installationId: randomUUID(), privateOnly: true, retentionDays: 30, expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            policy: { workflowSqlSha256: "0".repeat(64), rolePolicySha256: "0".repeat(64) },
+            rollback: { materializedRevision: 3, highWater: 5, materializedDigest: "0".repeat(64), highWaterDigest: "0".repeat(64),
+              pages: [{ path: "/", id: randomUUID(), wordPressId: 13, slug: "home", sha256: "0".repeat(64) }] } },
         };
         const proposed = Buffer.from(JSON.stringify(newPlan));
         const proposedDigest = createHash("sha256").update(proposed).digest("hex");

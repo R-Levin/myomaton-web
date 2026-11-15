@@ -63,8 +63,12 @@ function coreEnvironment(value) {
   let inquiryConfigured = false;
   try { privateFile(inquiry); inquiryConfigured = true; }
   catch (error) { if (error.code !== 'ENOENT') throw error; }
+  let workflowConfigured = false;
+  try { privateFile(PRIVATE + '/presence-workflow-grant.json'); workflowConfigured = true; }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
   return { PATH: '/usr/bin:/bin', HOME, LANG: 'C.UTF-8', NODE_ENV: 'production', NEXT_TELEMETRY_DISABLED: '1',
     MIOPAGES_ROUTING_MODE: 'shared-hostnames', MIOPAGES_PROTECTED_CORE: 'enabled', MIOPAGES_PROTECTED_CORE_ORIGIN: ORIGIN,
+    ...(workflowConfigured && { MIOPAGES_PROTECTED_WORKFLOW: 'review' }),
     MIOPAGES_PROTECTED_CORE_DB_URL: value.databaseUrl, MIOPAGES_WP_DATABASE_CA: value.ca,
     MIOPAGES_PROTECTED_CORE_INPUT: PRIVATE + '/core-input.json',
     ...(inquiryConfigured && { MIOPAGES_PROTECTED_CORE_INQUIRY_SCOPE: inquiry }),
@@ -122,6 +126,7 @@ async function main() {
   assert.equal(process.platform, 'linux'); assert.equal(process.getuid(), 3326411);
   assert.equal(fs.realpathSync(process.env.HOME), HOME);
   const flags = process.argv.slice(2);
+  if (flags[0] === '--workflow') return runWorkflow(flags.slice(1));
   assert.ok(flags.length <= 2 && new Set(flags).size === flags.length && flags.every(flag => ['--smoke', '--core'].includes(flag)));
   const core = flags.includes('--core');
   const root = fs.lstatSync(PRIVATE);
@@ -172,6 +177,29 @@ async function main() {
   child.once('error', () => { void stop('spawn-failed', true); });
   child.once('exit', () => { if (!stopped) void stop('unexpected-child-exit', true); });
   event('private-listener-spawned', { pid: child.pid, bind: '127.0.0.1', port: 8081 });
+}
+
+async function runWorkflow(args) {
+  const [operation, digest] = args;
+  const activate = operation === 'ACTIVATE-EXACT-WORKFLOW-GRANT';
+  assert.ok(args.length === (activate ? 2 : 1) && (activate ? /^[a-f0-9]{64}$/.test(digest) : [
+    'INSPECT-WORKFLOW-MANIFEST', 'WATCH-AUTHORIZED-WORKFLOW', 'RECOVER-RETAINED-WORKFLOW-RESEARCH',
+  ].includes(operation)));
+  const root = fs.lstatSync(PRIVATE);
+  assert.ok(root.isDirectory() && !root.isSymbolicLink() && root.uid === process.getuid() && (root.mode & 511) === 448);
+  assert.equal(fs.realpathSync(WEB), WEB);
+  const env = coreEnvironment(JSON.parse(privateFile(PRIVATE + '/core-config.json')));
+  if (activate || operation === 'INSPECT-WORKFLOW-MANIFEST') delete env.MIOPAGES_OPENAI_DEV_API_KEY;
+  else assert.ok(env.MIOPAGES_OPENAI_DEV_API_KEY && resourceGate(process.memoryUsage().rss, availableMemory()));
+  const module = WEB + '/.rehearsal/protected-presence-worker.mjs';
+  assert.ok(fs.lstatSync(module).isFile() && fs.realpathSync(module) === module);
+  const child = spawn('/usr/bin/node', ['--max-old-space-size=192', module, ...args], { cwd: WEB, env, stdio: 'inherit' });
+  process.once('SIGINT', () => child.kill('SIGINT'));
+  process.once('SIGTERM', () => child.kill('SIGTERM'));
+  process.exitCode = await new Promise((resolve, reject) => {
+    child.once('error', reject);
+    child.once('exit', code => resolve(code ?? 1));
+  });
 }
 
 module.exports = { configuration, childEnvironment, procStat, resourceGate, ownedMembers, HOME, WEB, PRIVATE };

@@ -74,6 +74,7 @@ jobs:
           name: ${{ github.ref_name == 'codex/first-operational-cycle-2026-11-12' && 'protected-core-linux-x64' || 'wordpress-rehearsal-linux-x64' }}
           path: |
             runtime-content/wordpress-rehearsal-artifact/*.tar.gz
+            runtime-content/wordpress-rehearsal-artifact/miopages-delivery-development.zip
             runtime-content/wordpress-rehearsal-artifact/*.sha256
             runtime-content/wordpress-rehearsal-artifact/rehearsal-build.json
           if-no-files-found: error

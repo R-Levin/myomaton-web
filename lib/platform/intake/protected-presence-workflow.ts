@@ -37,22 +37,22 @@ async function verifyDirectory(path: string) {
   if (!status.isDirectory() || status.uid !== process.getuid?.() || (status.mode & 0o777) !== 0o700 ||
       await realpath(path) !== path) throw Error("Protected workflow directory refused");
 }
-export async function protectedWorkflowWorkspace(): Promise<Workspace> {
+export async function protectedWorkflowWorkspace(requireEvidence = true): Promise<Workspace> {
   const home = await realpath(process.env.HOME ?? "");
   const root = join(home, "miopages-private-acceptance");
   const ledgerDirectory = join(root, "core-usage");
   const referenceDirectory = join(root, "presence-workflow-evidence");
   await verifyDirectory(root);
   await verifyDirectory(ledgerDirectory);
-  await verifyDirectory(referenceDirectory);
+  if (requireEvidence) await verifyDirectory(referenceDirectory);
   return { root, ledgerDirectory, referenceDirectory, visualDirectory: join(root, "presence-workflow-media"), grantFile: join(root, "presence-workflow-grant.json") };
 }
 
 type ProtectedInput = { webPresenceId: string; managedSiteId: string; draftToken: string; answers: unknown;
   provenance: Record<string, IntakeEvidence>; prepared: PreparedUnderstanding; step: number };
 
-export async function openProtectedPresenceWorkspace() {
-  const workspace = await protectedWorkflowWorkspace();
+export async function openProtectedPresenceWorkspace(requireEvidence = true) {
+  const workspace = await protectedWorkflowWorkspace(requireEvidence);
   const input = await privateWorkflowFile<ProtectedInput>(join(workspace.root, "core-input.json"), workspace.root);
   const selection = { webPresenceId: input.webPresenceId, managedSiteId: input.managedSiteId };
   if (fingerprint(selection) !== fingerprint(protectedOwnerScope) || input.step !== 3 || input.prepared.scenario !== "c0" ||

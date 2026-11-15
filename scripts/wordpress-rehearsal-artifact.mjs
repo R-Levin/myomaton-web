@@ -1,6 +1,7 @@
 // CI only: exercise and package a Linux build. No hosted credentials or deploy.
 import assert from "node:assert/strict";
-import { spawn, execFileSync } from "node:child_process";
+import { spawn, spawnSync, execFileSync } from "node:child_process";
+import { build } from "esbuild";
 import { createHash } from "node:crypto";
 import { cp, lstat, mkdir, readdir, readFile, readlink, rm, symlink, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -92,16 +93,42 @@ for (const item of [".next", "public", "package.json", "package-lock.json", "nex
 await mkdir(path.join(staging, '.rehearsal'));
 await cp('scripts/wordpress-private-server.cjs', path.join(staging, '.rehearsal/private-server.cjs'));
 hashes['.rehearsal/private-server.cjs'] = createHash('sha256').update(await readFile('scripts/wordpress-private-server.cjs')).digest('hex');
+const protectedCommands = [];
 if (core) {
   const launcher = '.rehearsal/private-listener.cjs';
   await cp('scripts/wordpress-private-listener.cjs', path.join(staging, launcher));
   hashes[launcher] = createHash('sha256').update(await readFile(path.join(staging, launcher))).digest('hex');
+  for (const [source, executable] of [
+    ["scripts/intake/protected-presence-worker.ts", "protected-presence-worker.mjs"],
+    ["scripts/wordpress-private-operator.ts", "wordpress-private-operator.mjs"],
+  ]) {
+    const relative = path.join(".rehearsal", executable);
+    const outfile = path.join(staging, relative);
+    await build({ entryPoints: [source], outfile, bundle: true, packages: "external",
+      format: "esm", platform: "node", target: "node22", jsx: "automatic" });
+    protectedCommands.push(relative);
+    hashes[relative] = createHash("sha256").update(await readFile(outfile)).digest("hex");
+  }
+  for (const file of ["lib/platform/intake/presence-workflow.sql", "lib/platform/intake/protected-presence-workflow-policy.sql",
+    "docs/miopages-c0-business-brief.md", "docs/c0-discovery-question-recovery-audit.md", "docs/miopages-c0-product-model.md"]) {
+    await mkdir(path.dirname(path.join(staging, file)), { recursive: true });
+    await copyEntry(file);
+  }
 }
 // Emulate npm ci at the destination, then test the relocated bytes and rewritten
 // links. This temporary dependency link is removed before creating the archive.
 await symlink(path.resolve("node_modules"), path.join(staging, "node_modules"), "dir");
 let routingSmokeResult;
-try { routingSmokeResult = await smoke(path.resolve(staging)); }
+try {
+  routingSmokeResult = await smoke(path.resolve(staging));
+  for (const [index, command] of protectedCommands.entries()) {
+    const result = spawnSync(process.execPath, [command, "INVALID"], { cwd: staging, input: "",
+      encoding: "utf8", timeout: 10_000, env: { PATH: process.env.PATH, HOME: process.env.HOME, NODE_ENV: "production" } });
+    assert.equal(result.status, 1, "Packaged protected entry must fail safely without configuration");
+    assert.match(result.stderr, index === 0 ? /"status":"BLOCKED"/u : /Protected command refused/u);
+    assert.equal(result.stdout, "");
+  }
+}
 finally { await unlink(path.join(staging, "node_modules")); }
 for (const [file, digest] of Object.entries(hashes)) {
   assert.equal(createHash("sha256").update(await readFile(path.join(staging, file))).digest("hex"), digest, "Smoke changed packaged file: " + file);
@@ -111,11 +138,25 @@ const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf
 assert.match(sourceCommit, /^[a-f0-9]{40}$/);
 const manifest = { sourceCommit, node: process.version, platform: process.platform, arch: process.arch,
   isolatedRuntimeSmoke: "PASS", normalCoreDatabaseCredential: false, privateRoutingBuild: true,
-  entrypoint: '.rehearsal/private-server.cjs', routingSmoke: routingSmokeResult, files: hashes, symlinks: links };
+  entrypoint: '.rehearsal/private-server.cjs', routingSmoke: routingSmokeResult, files: hashes, symlinks: links,
+  ...(core && { protectedCommands, unconfiguredCommandsRefused: true }) };
 await writeFile(path.join(staging, "rehearsal-build.json"), JSON.stringify(manifest, null, 2) + "\n");
 const archive = path.join(output, core ? "protected-core-linux-x64.tar.gz" : "wordpress-rehearsal-linux-x64.tar.gz");
 execFileSync("tar", ["--exclude=./.next/cache", "-czf", archive, "-C", staging, "."]);
 const sha256 = createHash("sha256").update(await readFile(archive)).digest("hex");
 await writeFile(archive + ".sha256", sha256 + "  " + path.basename(archive) + "\n");
 await writeFile(path.join(output, "rehearsal-build.json"), JSON.stringify(manifest, null, 2) + "\n");
-console.log(JSON.stringify({ status: "PASS", sourceCommit, isolatedRuntimeSmoke: true, sha256, hostedChanges: 0 }));
+let wordpressPlugin;
+if (core) {
+  const plugin = "miopages-delivery";
+  const files = execFileSync("git", ["ls-tree", "-r", "--name-only", sourceCommit, "wordpress/" + plugin], { encoding: "utf8" })
+    .trim().split("\n").filter(file => !file.startsWith("wordpress/" + plugin + "/tests/"))
+    .map(file => file.slice("wordpress/".length));
+  assert.ok(files.includes(plugin + "/miopages-delivery.php"));
+  const zip = path.resolve(output, "miopages-delivery-development.zip");
+  execFileSync("zip", ["-X", "-q", zip, ...files], { cwd: "wordpress" });
+  wordpressPlugin = createHash("sha256").update(await readFile(zip)).digest("hex");
+  await writeFile(zip + ".sha256", wordpressPlugin + "  " + path.basename(zip) + "\n");
+}
+console.log(JSON.stringify({ status: "PASS", sourceCommit, isolatedRuntimeSmoke: true, sha256, wordpressPlugin,
+  protectedCommands: protectedCommands.length, hostedChanges: 0 }));

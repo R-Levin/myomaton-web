@@ -22,7 +22,9 @@ const allowedDraftKeys = new Set([
   "intake:conversationHandoff", "intake:proof", "intake:proofDetails", "intake:foundationGoal", "intake:sitePriority",
 ]);
 
-export async function addC0WorkflowKnowledge(context: WorkflowContext, root = resolve("docs"), protectedRead = false): Promise<WorkflowContext> {
+export async function addC0WorkflowKnowledge(context: WorkflowContext, root = resolve("docs"), protectedRead = false,
+  readPublicReference?: (file: string) => string): Promise<WorkflowContext> {
+  if (protectedRead && readPublicReference) throw Error("Worker sources must use protected custody");
   const evidence = [...context.evidence];
   const hasActualReview = ["earlier-review-answer", "earlier-review-assessment"].every(kind => evidence.some(source => source.kind === kind));
   if (!hasActualReview || !evidence.some(source => source.kind === "owner-confirmed")) throw Error("Retained C0 discovery and separate Free Review required");
@@ -33,7 +35,7 @@ export async function addC0WorkflowKnowledge(context: WorkflowContext, root = re
       if (!metadata.isFile() || metadata.uid !== process.getuid?.() || (metadata.mode & 0o777) !== 0o600 ||
           await realpath(name) !== name) throw Error("Protected reference file refused");
     }
-    const source = (await readFile(name, "utf8")).replace(/\r\n/g, "\n");
+    const source = (readPublicReference ? readPublicReference(file) : await readFile(name, "utf8")).replace(/\r\n/g, "\n");
     if (prefix === "current-c0-direction") {
       const correction = source.match(/^\*\*Owner correction during the live C0[^\n]*(?:\n(?!\n)[^\n]+)*/mu)?.[0];
       if (!correction?.includes("Startups remain an important market")) throw Error("C0 audience correction refused");
