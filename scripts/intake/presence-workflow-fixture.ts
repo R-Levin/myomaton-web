@@ -51,6 +51,7 @@ function fixture({ input, work }: WorkflowRun) {
       };
     }
     case "editorial":
-      return { summary: "Local fixture check. The planned conversation cannot accept an inquiry.", concerns: [{ path: "/project", concern: "Verify a recipient before activating the form." }] };
+      return { summary: "Local fixture check. The planned conversation cannot accept an inquiry.",
+        concerns: input.revisionRequest ? [] : [{ path: "/project", concern: "Clarify what an existing-site visitor should bring." }] };
   }
 }

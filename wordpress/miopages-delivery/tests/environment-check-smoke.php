@@ -21,6 +21,15 @@ $unknown = $check('/srv/account/public_html', false, '/srv/account');
 ensureResult(str_starts_with($unknown, 'Unknown'), 'unresolvable document root not guessed');
 $sibling = $check('/other/wordpress', '/srv/account/public_html', '/srv/account');
 ensureResult(str_starts_with($sibling, 'Unknown'), 'unrelated paths not treated as secure');
+$profile = [MioPages_Environment_Check::class, 'connectorStatus'];
+ensureResult(str_starts_with($profile(80299, true, true, true, true), 'Current delivery adapter incompatible'),
+    'legacy PHP is audit only');
+ensureResult(str_starts_with($profile(80400, true, true, false, true), 'CLI not verified'),
+    'browser diagnostic does not imply a working transport worker');
+ensureResult(str_contains($profile(80400, true, true, true, false), 'storage unverified'),
+    'standard CLI does not prove private root');
+ensureResult(str_contains($profile(80400, true, true, true, true), 'verify outbound TLS'),
+    'configuration does not imply reachability or rollback');
 $report = MioPages_Environment_Check::report();
 ensureResult(isset($report['Sodium detached verification'], $report['Private storage candidate']),
     'report contains crypto and private storage eligibility');

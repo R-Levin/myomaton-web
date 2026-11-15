@@ -95,13 +95,15 @@ test("the existing local Core interface persists a report, correction, revised s
     assert.equal(state!.report?.findings[1].body, correction);
     assert.equal(state!.report?.findings[0].body, first.report?.findings[0].body);
     let progress = await run("confirm");
-    for (let step = 0; progress.next !== "operator-review" && step < 10; step++) progress = await run("next");
+    for (let step = 0; progress.next !== "operator-review" && step < 12; step++) {
+      progress = await run(progress.next === "editorial-review" ? "revise" : "next");
+    }
     assert.equal(progress.next, "operator-review");
     assert.equal(state!.pages.length, 2);
     assert.equal(state!.pages[1].sections[0].body, correction);
     assert.equal(state!.pages[0].actions.length, 2);
     assert.equal(state!.pages[0].actions[0].destination, null);
-    assert.ok(state!.editorial?.concerns.length);
+    assert.equal(state!.editorial?.concerns.length, 0);
     await run("review");
     assert.equal(state!.operatorReview?.actor.simulated, true);
     const response = await fetch(api, { headers: { Cookie: cookie, "X-Intake-Request": "1" } });

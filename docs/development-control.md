@@ -3,6 +3,12 @@
 Status: **active Git continuity checkpoint**. Originally recorded 2026-11-01; updated after hosted synthetic C0 verification on 2026-11-01.
 This file is the first-read **navigation and operational handoff** when merged to `main`. It does not supersede source code, immutable database state, approved product contracts or live provider evidence. Do not claim current runtime/database state from Git alone.
 
+## Owner-critical recovery sources
+
+At every new or interrupted MioPages session, first read [current main development control](https://github.com/R-Levin/myomaton-web/blob/main/docs/development-control.md), then the full [owner-critical conversation index](https://github.com/R-Levin/myomaton-web/blob/main/docs/owner-critical-conversations.md). Follow the exact linked owner decisions and Issues #12 and #10, then reconcile with the current development branch, working tree and grants. Main maintains the critical-conversation index. This branch maintains its implementation checkpoint. Apply later owner decisions and record important conversations there during the work, with their authority and supersession. Product development remains the overall priority. [Continuity and priority decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6898063682)
+
+**Current C0 recovery point.** The [protected worker and activation checkpoint](c0-integration-spine-phase-b-2026-11-10.md#protected-c0-generation-worker-and-exact-activation-plan) supersedes the prior local fixture review as the next action. Core's restricted local proof passed. Use its **RECOVERY / RESUME HERE** and the exact pending [authorization manifest](c0-protected-workflow-authorization.json) before any hosted writes or external dispatch.
+
 ## Outcome-first execution and proportional controls — owner decision, 2026-11-14
 
 **Approved operating rule.** The owner directs MioPages development by product outcomes and explicitly rejects repeated penny-level authorizations, arbitrary miniature data limits, and serial approvals for routine technical implementation. **Founder attention and elapsed development time are scarce resources**. A safeguard must be justified by a concrete risk, its likely consequence, and the time/effort it adds. This direction supersedes contrary informal micro-gating habits; it does **not** itself authorize additional spending, protected-data transmission, hosted writes, merging, publication, or changes to explicit active grants.

@@ -28,6 +28,7 @@ async function updateLocalWorkflow(workflow: PresenceWorkflow, context: Awaited<
       return workflow.correctReport(context, version, input.finding, input.correction, customer);
     }
     case "workflow-confirm": return workflow.confirmReport(context, version, customer);
+    case "workflow-revise": return workflow.requestEditorialRevision(context, version, { id: "local-operator", role: "operator", simulated: true });
     case "workflow-review": return workflow.reviewCandidate(context, version, { id: "local-operator", role: "operator", simulated: true });
     default: throw new IntakeError("invalid_request");
   }

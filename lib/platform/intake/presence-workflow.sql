@@ -1,5 +1,5 @@
--- Local proof installs these tables in its disposable PostgreSQL database only.
--- Grants, retention and migration ordering require review before hosted use.
+-- The disposable proof uses public. Protected installation must use its
+-- dedicated schema and reviewed row security in the same transaction.
 CREATE TABLE presence_workflow_events (
   web_presence_id uuid NOT NULL,
   managed_site_id uuid NOT NULL,

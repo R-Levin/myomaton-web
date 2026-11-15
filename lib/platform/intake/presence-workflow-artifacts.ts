@@ -1,8 +1,8 @@
 import { choice, object, text } from "../canonical/model";
 import { canonicalPagePath } from "../managed-sites/paths";
 
-export const evidenceKinds = ["owner-confirmed", "earlier-review-answer", "earlier-review-assessment", "website-observation", "customer-unconfirmed", "public-research"] as const;
-export type PresenceEvidence = { id: string; kind: typeof evidenceKinds[number]; label: string; reference: string; date: string | null; content: string; rawDigest?: string };
+export const evidenceKinds = ["owner-confirmed", "earlier-review-answer", "earlier-review-assessment", "website-observation", "customer-unconfirmed", "historical-discovery", "service-direction", "public-research"] as const;
+export type PresenceEvidence = { id: string; kind: typeof evidenceKinds[number]; label: string; reference: string; date: string | null; content: string; rawDigest?: string; discoveredFrom?: string };
 const findingStates = ["established", "proposed", "unresolved"] as const;
 const actionKinds = ["navigate", "request-review", "start-onboarding", "request-contact", "existing-account"] as const;
 const visualStates = ["text-only", "asset-needed", "rights-review"] as const;

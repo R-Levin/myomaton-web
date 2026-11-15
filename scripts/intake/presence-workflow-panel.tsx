@@ -13,8 +13,8 @@ const failureLabel: Record<string, string> = {
   "outcome-unknown": "Core could not verify whether this step finished. Recovery does not send the step again.",
 };
 
-export function PresenceWorkflowPanel({ workflow, snapshot, busy, run }: {
-  workflow: PresenceWorkflowView | null; snapshot?: PerformanceSnapshot; busy: boolean; run: (input: object) => Promise<void>;
+export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }: {
+  hosted: boolean; workflow: PresenceWorkflowView | null; snapshot?: PerformanceSnapshot; busy: boolean; run: (input: object) => Promise<void>;
 }) {
   const [finding, setFinding] = useState<{ id: string; version: number }>();
   const [correction, setCorrection] = useState("");
@@ -24,14 +24,15 @@ export function PresenceWorkflowPanel({ workflow, snapshot, busy, run }: {
     ...(workflow && { version: workflow.version }), ...extra });
   return <section aria-label="Business report and website">
     <h2>Business report and website</h2>
-    <p className={styles.hint}>Local rehearsal. Research and model responses are recorded examples. Customer and Operator decisions are simulated.</p>
-    {!workflow ? <button type="button" disabled={busy} onClick={() => void submit("start")}>Start the local workflow</button> : <>
+    <p className={styles.hint}>{hosted ? "Protected development review. Operator decisions apply to this candidate. Customer approval and publication are separate." : "Local rehearsal. Research and model responses are recorded examples. Customer and Operator decisions are simulated."}</p>
+    {!workflow ? <button type="button" disabled={busy} onClick={() => void submit("start")}>{hosted ? "Start protected workflow" : "Start the local workflow"}</button> : <>
       <p>Saved workflow revision {workflow.version} · {workflow.entry === "FREE_REVIEW" ? "Started with a Free Review" : "Started directly"}</p>
       {workflow.failure && <p role="alert">{failureLabel[workflow.failure]}</p>}
       {workflow.recoverable && <button type="button" disabled={busy} onClick={() => void submit("recover")}>Recover retained result</button>}
       {workflow.next === "evidence-changed" && <p>Onboarding evidence changed. This saved version needs reconciliation before work can continue.</p>}
       {workflow.next === "in-progress" && <p>Core is waiting for this operation. Reload to check its status.</p>}
-      {nextLabel[workflow.next] && <button type="button" disabled={busy} onClick={() => void submit("next")}>{nextLabel[workflow.next]}</button>}
+      {hosted && nextLabel[workflow.next] && <p>Waiting for Core to run {nextLabel[workflow.next].toLowerCase()}.</p>}
+      {!hosted && nextLabel[workflow.next] && <button type="button" disabled={busy} onClick={() => void submit("next")}>{nextLabel[workflow.next]}</button>}
 
       {workflow.report && <article aria-label="Business Understanding Report">
         <h3>{workflow.report.title}</h3>
@@ -46,8 +47,9 @@ export function PresenceWorkflowPanel({ workflow, snapshot, busy, run }: {
           {!workflow.failure && workflow.next !== "in-progress" && workflow.next !== "evidence-changed" &&
             <button type="button" disabled={busy} onClick={() => { setFinding({ id: item.id, version: workflow.version }); setCorrection(""); }}>Correct {item.heading.toLowerCase()}</button>}
         </section>)}
-        {workflow.confirmation ? <p>This report revision has a simulated customer confirmation.</p> :
-          workflow.next === "customer-review" && <button type="button" disabled={busy} onClick={() => void submit("confirm")}>Confirm this report in the rehearsal</button>}
+        {workflow.confirmation ? <p>{hosted ? "Reviewed to continue development." : "This report revision has a simulated customer confirmation."}</p> :
+          workflow.next === "customer-review" && <button type="button" disabled={busy} onClick={() => void submit(hosted ? "continue" : "confirm")}>
+            {hosted ? "Continue to development site planning" : "Confirm this report in the rehearsal"}</button>}
         {finding?.version === workflow.version && workflow.report.findings.some(item => item.id === finding.id) && <div className={styles.field}>
           <label htmlFor="workflow-correction">Correction to this finding</label>
           <textarea id="workflow-correction" value={correction} maxLength={8000} onChange={event => setCorrection(event.target.value)} />
@@ -91,7 +93,8 @@ export function PresenceWorkflowPanel({ workflow, snapshot, busy, run }: {
       {workflow.editorial && <section aria-label="Editorial review">
         <h3>Editorial review</h3><p>{workflow.editorial.summary}</p>
         <ul>{workflow.editorial.concerns.map(({ path, concern }, i) => <li key={i}>{path} · {concern}</li>)}</ul>
-        {workflow.next === "operator-review" && <button type="button" disabled={busy} onClick={() => void submit("review")}>Record simulated Operator review</button>}
+        {workflow.next === "editorial-review" && <button type="button" disabled={busy} onClick={() => void submit("revise")}>Queue the flagged pages for revision</button>}
+        {workflow.next === "operator-review" && <button type="button" disabled={busy} onClick={() => void submit("review")}>{hosted ? "Record Operator site review" : "Record simulated Operator review"}</button>}
         {workflow.operatorReview && <p>Operator review saved. WordPress preparation requires separate authorization.</p>}
       </section>}
       <details><summary>Source history and open conflicts</summary>

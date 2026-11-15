@@ -1,0 +1,247 @@
+{
+  "status": "proposed-awaiting-owner-authorization",
+  "scope": "One protected MioPages C0 development run. WordPress and publication are outside this run.",
+  "sourceEvidence": {
+    "record": "Checksummed retained C0 copy and versioned canonical source sections",
+    "selectedDigest": "a16c550dd064124e2c604166ade93e70fe3ee8ed7fbce940e0af66c44fc93648",
+    "exactCandidates": [
+      {
+        "id": "discovery",
+        "kind": "owner-confirmed",
+        "bytes": 329,
+        "digest": "d92b1890389f973c135095740f1ce84971ccbb0b14b32b218e793433c09bf237"
+      },
+      {
+        "id": "site",
+        "kind": "website-observation",
+        "bytes": 374,
+        "digest": "62c4a46dc0f3dd6546564cb3f6340315ad569f1b97c8024f6f574399b911df02"
+      },
+      {
+        "id": "review-answers",
+        "kind": "earlier-review-answer",
+        "bytes": 1236,
+        "digest": "8ae7d236106b0d72579bbbb7580f918ea21aac72a3ba91854751cc59d84dd32e"
+      },
+      {
+        "id": "review-assessment",
+        "kind": "earlier-review-assessment",
+        "bytes": 5834,
+        "digest": "3548b06255141d7e7c28fe5044a6ecede98aa78e4f9b074d43bcdc5f0bc8dda4"
+      },
+      {
+        "id": "direction",
+        "kind": "owner-confirmed",
+        "bytes": 406,
+        "digest": "5ea9e9ecd431e2cdd5dda372d353bbe65482a2abd4e57872a65ace5a2f3d74f1"
+      },
+      {
+        "id": "intake:proof",
+        "kind": "customer-unconfirmed",
+        "bytes": 994,
+        "digest": "7a73a38c9a2216338421822f3633dc4ac1e8ba74a4c964b33f59ffc80700dd12"
+      },
+      {
+        "id": "intake:workExcluded",
+        "kind": "customer-unconfirmed",
+        "bytes": 915,
+        "digest": "65b52745d20adb02396aa5f2ed8b2a20151dcc490eecbc83081060cc86406284"
+      },
+      {
+        "id": "intake:workIncluded",
+        "kind": "customer-unconfirmed",
+        "bytes": 972,
+        "digest": "b790d9e06afe8c116d79a00f3b849b961b541c23a1af3a3a45b21f84f14f6c1c"
+      },
+      {
+        "id": "intake:reviewHandoff",
+        "kind": "customer-unconfirmed",
+        "bytes": 1319,
+        "digest": "4ce10942cf4620c7be9cb384ce8eac21d4b9447b4415c2dca3a1c8345d1010db"
+      },
+      {
+        "id": "intake:sourceCorrection",
+        "kind": "customer-unconfirmed",
+        "bytes": 885,
+        "digest": "abe53dacf6dad0f28ed47eb5d108387b260877a259046850557ff94624b12990"
+      },
+      {
+        "id": "approved-brief:1",
+        "kind": "service-direction",
+        "bytes": 1486,
+        "digest": "67a45b9b0358b8d727beb32828ecfcf9f9e856c57dd2f8eaf2468ba507a00e10"
+      },
+      {
+        "id": "approved-brief:2",
+        "kind": "service-direction",
+        "bytes": 1712,
+        "digest": "743c941aafb993cbdffeb54dc8885bc445d0f057d41b73510b141d2fc2186819"
+      },
+      {
+        "id": "approved-brief:3",
+        "kind": "service-direction",
+        "bytes": 639,
+        "digest": "b5b3115d3ee67b43da9bb830363d26abc09be2f1a061b2373c10954ec5c8ee4a"
+      },
+      {
+        "id": "approved-brief:4",
+        "kind": "service-direction",
+        "bytes": 1129,
+        "digest": "d4e8c20bb2acf44e2c47eee6addb7c119e73b54828265d3257fcf36afbbe6066"
+      },
+      {
+        "id": "discovery-recovery:1",
+        "kind": "historical-discovery",
+        "bytes": 957,
+        "digest": "b18fe5e33b79b58af70d6fc9d5c677ab3be5ae86599d3e6b55ee2a28ab1f9689"
+      },
+      {
+        "id": "discovery-recovery:2",
+        "kind": "historical-discovery",
+        "bytes": 1572,
+        "digest": "1776301e240ff90efd2d0a8fc1a915fc2955643f26458875146b5303358a99ab"
+      },
+      {
+        "id": "c0-market-correction",
+        "kind": "owner-confirmed",
+        "bytes": 1209,
+        "digest": "3dd0070a40778fba5c85c0e49ceedf9ecd2d627865f26b446abc12d01a1e8982"
+      },
+      {
+        "id": "current-c0-direction:1",
+        "kind": "service-direction",
+        "bytes": 1523,
+        "digest": "5a8deb458fb1ad4112978fc10ed41f7b461c6b1c31fe7f47d65a543132d7be0b"
+      },
+      {
+        "id": "current-c0-direction:2",
+        "kind": "service-direction",
+        "bytes": 4304,
+        "digest": "e73c1c72d585b2e45697670e75d7c617d0098ad1bf8261978d953a31d4d12b87"
+      },
+      {
+        "id": "current-c0-direction:3",
+        "kind": "service-direction",
+        "bytes": 6241,
+        "digest": "a97d55b0480ed74dbeedcc5b57057090d6f1d0fe0262824d23a67c7646a8edbb"
+      }
+    ],
+    "excluded": [
+      "intake:publicRoute",
+      "intake:visitorRoute",
+      "intake:sourceDecision",
+      "intake:siteDisposition",
+      "intake:rehearsalCommitment"
+    ],
+    "gate": "Compare the exact candidate source digest set against the authenticated hosted C0 intake before activation. If a digest differs, stop. Recompute case identity only inside protected custody. A newly typed correction is not authorized by this manifest."
+  },
+  "provider": {
+    "api": "https://api.openai.com/v1/responses",
+    "count": "https://api.openai.com/v1/responses/input_tokens",
+    "model": "gpt-5.4-mini-2026-03-17",
+    "store": false,
+    "tools": [],
+    "maxInputTokens": 32000,
+    "maxOutputTokens": 12000,
+    "maximumGenerations": 12,
+    "maximumTotalRequests": 24,
+    "maximumDeliberateRetries": 2,
+    "maximumEditorialRevisions": 1,
+    "automaticRetries": 0,
+    "additionalCapUsd": "1.00",
+    "perGenerationEnvelopeUsd": "0.078000",
+    "maximumCostAtTwelveEnvelopesUsd": "0.936000",
+    "expiryHours": 24
+  },
+  "research": {
+    "readsMaximum": 11,
+    "roots": [
+      {
+        "id": "research:miopages",
+        "url": "https://miopages.com/",
+        "label": "C0 existing public site"
+      },
+      {
+        "id": "research:standard",
+        "url": "https://sitecare360.com/",
+        "label": "Managed website comparable"
+      },
+      {
+        "id": "research:refresh",
+        "url": "https://siteupdater.com/",
+        "label": "Existing site refresh comparable"
+      },
+      {
+        "id": "research:international",
+        "url": "https://www.sitecommanderstudio.com/websites",
+        "label": "Non-US managed design comparable"
+      },
+      {
+        "id": "research:search",
+        "url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "label": "Google Search guidance"
+      },
+      {
+        "id": "research:accessibility",
+        "url": "https://www.w3.org/WAI/tutorials/forms/",
+        "label": "W3C accessible forms"
+      }
+    ],
+    "maxSourceBytes": 450000,
+    "discovery": {
+      "maxDiscovered": 5,
+      "excerptCharacters": 3500,
+      "terms": [
+        "website",
+        "hosting",
+        "maintenance",
+        "pricing",
+        "ownership",
+        "accessibility",
+        "search",
+        "support"
+      ],
+      "prefixes": {
+        "https://miopages.com": [
+          "/websites",
+          "/web-hosting-and-email",
+          "/web-support"
+        ],
+        "https://sitecare360.com": [
+          "/faq",
+          "/services"
+        ],
+        "https://siteupdater.com": [
+          "/pricing",
+          "/faq"
+        ],
+        "https://www.sitecommanderstudio.com": [
+          "/websites"
+        ],
+        "https://developers.google.com": [
+          "/search/docs/fundamentals",
+          "/search/docs/essentials"
+        ],
+        "https://www.w3.org": [
+          "/WAI/tutorials/forms"
+        ]
+      }
+    }
+  },
+  "existingLedger": {
+    "digest": "664b5c1f8cfd82d10ee13de24a4d218288b476089e7e3a4d125a2c25b1e55d53",
+    "attempts": 12,
+    "requests": 24,
+    "generations": 12,
+    "settledUsd": "0.038122",
+    "uncertainReserveUsd": "0.008400",
+    "accountedUsd": "0.046522",
+    "newCumulativeCeilingUsd": "1.046522"
+  },
+  "output": {
+    "host": "wp-acceptance.miopages.com",
+    "review": "https://wp-acceptance.miopages.com/core",
+    "scope": "Existing C0 intake only. Protected workflow tables in Supabase, exact owner-scoped review and existing project quota ledger. No customer confirmation is inferred from development continuation.",
+    "retention": "Retain established Core artifacts. Restrict the new research, raw provider responses and workflow record to the first 30 days of review and recovery. At day 30, review removal or an explicit extension for this run. Earlier records are outside this retention decision."
+  }
+}

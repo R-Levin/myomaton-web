@@ -22,6 +22,7 @@ import { ProtectedSitePlanning, reviewedSitePlanning, sitePlanningBasis } from "
 import { PlanningResponseCustody } from "./planning-response-custody";
 import { compactSitePlanningVersion, prepareSitePlanning, type SitePlanningEvidence } from "./site-planning";
 import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
+import { composePresenceCase, protectedWorkflowWorkspace, reviewWorkflowChange } from "./protected-presence-workflow";
 
 export const coreCookie = "__Host-miopages_core";
 type Config = {
@@ -190,7 +191,9 @@ async function openCore() {
       }
     }
   }
-  return { operators, selection, intake, interview, inquiry, sitePlanning, sitePlanningEnabled, draftToken: cfg.draftToken };
+  const presenceCase = process.env.MIOPAGES_PROTECTED_WORKFLOW === "review"
+    ? async () => composePresenceCase(pool, intake, cfg.draftToken, await protectedWorkflowWorkspace(), { kind: "review" }) : undefined;
+  return { operators, selection, intake, interview, inquiry, sitePlanning, sitePlanningEnabled, presenceCase, draftToken: cfg.draftToken };
 }
 let core: ReturnType<typeof openCore> | undefined;
 const sessions = new Map<string, { credential: string; expires: number; origin: string; owner: boolean }>();
@@ -238,9 +241,14 @@ export async function hostedCoreRequest(request: Request) {
     };
     const includeOperations = async (view: Awaited<ReturnType<IntakeService["resume"]>>) => {
       const proposal = view.sitePlanning?.proposal;
+      // A pending or invalid workflow grant must not interrupt the prior protected owner review.
+      const workflowReview = app.presenceCase && await app.presenceCase()
+        .then(async scope => ({ workflowAvailable: true, workflow: await (await scope.open()).review(await scope.context()) }))
+        .catch(() => undefined);
       return {
         ...view, interviewEnabled: Boolean(app.interview), operations: await app.inquiry().catch(() => null),
         sitePlanningEnabled: app.sitePlanningEnabled,
+        ...workflowReview,
         ...(proposal && { sitePlanningReview: { ...reviewedSitePlanning(proposal), current: proposal.basis === sitePlanningBasis(view) } }),
       };
     };
@@ -294,6 +302,12 @@ export async function hostedCoreRequest(request: Request) {
       try {
         const view = async (result: ReturnType<IntakeService["resume"]>) => includeOperations(await result);
         const version = Number(value.version);
+        if (typeof value.operation === "string" && value.operation.startsWith("workflow-") && app.presenceCase) {
+          const scope = await app.presenceCase();
+          await reviewWorkflowChange(await scope.open(), await scope.context(), value.operation, version,
+            { id: actor.operatorId, role: "operator", simulated: false }, { finding: value.finding, correction: value.correction });
+          return await view(app.intake.resume(app.draftToken));
+        }
         if (typeof value.operation === "string" && value.operation.startsWith("site-plan-")) {
           switch (value.operation) {
             case "site-plan-generate": return await view(app.sitePlanning.generate(app.draftToken, version));

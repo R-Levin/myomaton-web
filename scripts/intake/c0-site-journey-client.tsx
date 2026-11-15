@@ -157,7 +157,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
       </form> : !view ? <>
         <p>Continue with the business information you already provided.</p>
         <button disabled={busy || error} onClick={() => void run({ operation: "begin" })}>Resume retained onboarding</button>
-      </> : view.workflowAvailable ? <PresenceWorkflowPanel workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run} /> : <>
+      </> : view.workflowAvailable ? <PresenceWorkflowPanel hosted={hosted} workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run} /> : <>
         <h2>What we understand</h2>
         <p>MioPages is transitioning to one managed Web Presence service, with Launch followed by Ongoing care. Earlier site observations and Review material are kept with their original sources.</p>
         {view.prepared && <p className={styles.hint}>{view.prepared.reviewGap}</p>}

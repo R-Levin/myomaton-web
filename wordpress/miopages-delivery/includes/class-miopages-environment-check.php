@@ -21,6 +21,13 @@ final class MioPages_Environment_Check
 
         return [
             'PHP runtime' => PHP_VERSION . ' (' . PHP_SAPI . ')',
+            'Connector runtime' => self::connectorStatus(
+                PHP_VERSION_ID,
+                function_exists('sodium_crypto_sign_verify_detached'),
+                function_exists('wp_safe_remote_post'),
+                defined('WP_CLI') && WP_CLI,
+                defined('MIOPAGES_PRIVATE_PULL') && is_array(MIOPAGES_PRIVATE_PULL)
+            ),
             'Sodium detached verification' => function_exists('sodium_crypto_sign_verify_detached')
                 ? 'Available' : 'Unavailable — stop',
             'Local locking (flock)' => function_exists('flock') ? 'Function available; behavior unverified' : 'Unavailable — stop',
@@ -31,6 +38,20 @@ final class MioPages_Environment_Check
             'Filesystem writes performed' => 'None',
             'WordPress publication performed' => 'None',
         ];
+    }
+
+    public static function connectorStatus(int $php, bool $sodium, bool $httpApi, bool $cli, bool $privatePullConfigured): string
+    {
+        if ($php < 80300 || !$sodium || !$httpApi) {
+            return 'Current delivery adapter incompatible; audit only';
+        }
+        if (!$cli) {
+            return 'CLI not verified in this session; audit only until a supported worker is proven';
+        }
+        if (!$privatePullConfigured) {
+            return 'CLI and transport functions found; private pull configuration and storage unverified';
+        }
+        return 'Current adapter prerequisites detected; verify outbound TLS, storage rights, identity and rollback separately';
     }
 
     /**

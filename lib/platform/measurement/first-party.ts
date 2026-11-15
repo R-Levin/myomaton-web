@@ -46,6 +46,29 @@ export class FirstPartyMeasurement {
     if (stored?.digest !== digest) throw Error("Conflicting or unscoped measurement receipt");
   }
 
+  async syncAcceptedContacts(source: MeasurementSource, from: string, to: string,
+    targets: readonly { definition: string; canonicalPage: string; route: string }[]) {
+    const start = timestamp(from), end = timestamp(to);
+    if (start < timestamp(source.activatedAt) || start >= end || Date.parse(end) > this.clock() ||
+        !source.coverage.includes("contact-accepted") || !targets.length) throw Error("Contact coverage refused");
+    const receipts = new Map(targets.map(item => [uuid(item.definition) + "/" + uuid(item.canonicalPage), item.route]));
+    if (receipts.size !== targets.length || targets.some(target => !Object.hasOwn(source.routes, target.route))) {
+      throw Error("Contact target binding refused");
+    }
+    const { rows } = await this.pool.query<{ id: string; created_at: Date; page_id: string; contact_definition_id: string }>(`
+      SELECT id,created_at,page_id,contact_definition_id FROM contact_submissions
+      WHERE web_presence_id=$1 AND managed_site_id=$2 AND created_at >= $3 AND created_at < $4
+      AND contact_definition_id=ANY($5::uuid[]) AND page_id=ANY($6::uuid[])
+      ORDER BY created_at,id`, [...scope(source).slice(0, 2), start, end,
+        targets.map(target => target.definition), targets.map(target => target.canonicalPage)]);
+    for (const row of rows) {
+      const page = receipts.get(row.contact_definition_id + "/" + row.page_id);
+      if (page) await this.record(source, { id: row.id, kind: "contact-accepted", at: row.created_at.toISOString(), page,
+        action: null, attribution: null });
+    }
+    return this.snapshot(source, start, end);
+  }
+
   async snapshot(source: MeasurementSource, from: string, to: string) {
     const starts = timestamp(from), ends = timestamp(to), activatedAt = timestamp(source.activatedAt);
     if (starts >= ends || Date.parse(ends) > this.clock()) throw Error("Invalid measurement period");

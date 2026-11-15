@@ -7,6 +7,8 @@ import { readMigrationFiles } from "drizzle-orm/migrator";
 import { schemaSignature } from "./schema-fidelity";
 import { tables } from "../../scripts/customer-updates/myomaton-secondary-pages-v1";
 import { acceptContactSubmission, contactOperationalReadback } from "../../lib/platform/contact/submissions";
+import { FirstPartyMeasurement, type MeasurementSource } from "../../lib/platform/measurement/first-party";
+import { readFile } from "node:fs/promises";
 import { contactPresentations } from "../../lib/platform/contact/presentation";
 import { startProductionFixture } from "./production-server";
 import { assetRoot } from "../../lib/platform/assets/local-storage";
@@ -126,6 +128,25 @@ test("Contact upgrade/fresh replay preserves public state; isolated submission o
       const later = request(); await acceptContactSubmission(p, first.selection, later, { ...options, servicePolicy: { contactRetentionDays: { allowSiteOverride: true } } });
       const row = (await p.query("SELECT * FROM contact_submissions WHERE idempotency_key=$1", [later.idempotencyKey])).rows[0];
       assert.equal(row.expires_at.getTime() - row.created_at.getTime(), 7 * 86400000);
+    });
+    await t.test("measurement reads exact accepted receipts without copying delivery or customer payloads", async () => {
+      await p.query(await readFile(new URL("../../lib/platform/measurement/first-party.sql", import.meta.url), "utf8"));
+      const start = new Date(Date.now() - 60_000).toISOString(), through = new Date().toISOString();
+      const sink = new FirstPartyMeasurement(p);
+      const source: MeasurementSource = { id: randomUUID(), selection: { webPresenceId: first.wp, managedSiteId: first.site },
+        revision: "d0".repeat(32), environment: "synthetic", activatedAt: start, routes: { "/contact": [] }, coverage: ["contact-accepted"] };
+      const targets = [{ definition: first.definition, canonicalPage: first.page, route: "/contact" }];
+      const report = await sink.syncAcceptedContacts(source, start, through, targets);
+      assert.equal(report.counts["contact-accepted"], 2);
+      assert.equal(report.notification, null);
+      assert.equal(report.customerOutcome, null);
+      const again = await sink.syncAcceptedContacts(source, start, through, targets);
+      assert.deepEqual(again, report);
+      assert.equal((await sink.syncAcceptedContacts({
+        ...source, selection: { webPresenceId: foreign.wp, managedSiteId: foreign.site },
+      }, start, through, targets)).counts["contact-accepted"], 0);
+      const exported = JSON.stringify((await p.query("SELECT * FROM first_party_events")).rows);
+      assert.doesNotMatch(exported, /visitor@example.test|delivery_route|Hello/u);
     });
     await t.test("invalid input, inactive or foreign ownership/definition refuses without writes", async () => {
       const before = await count();
