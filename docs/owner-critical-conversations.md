@@ -1,0 +1,143 @@
+# Owner-designated critical conversations and decisions — mandatory recovery index
+
+**Status:** Active, owner-directed canonical continuity index. **Priority: P0 development-process reliability.**
+**Created:** 2026-11-15 following repeated harmful loss of strategic context at ChatGPT conversation boundaries.
+**Repository:** `R-Levin/myomaton-web`. **Companion first read:** [development-control.md](development-control.md). **Live execution ledger:** [Issue #12](https://github.com/R-Levin/myomaton-web/issues/12); [adaptive onboarding acceptance #10](https://github.com/R-Levin/myomaton-web/issues/10).
+**Purpose:** Preserve the owner's **explicitly designated important ChatGPT conversations**, their detailed substantive decisions and exact source pointers. Make continuity **a mandatory retrieval-and-reconciliation operation** rather than a memory-dependent courtesy.
+
+> **Owner correction, 2026-11-15:** Losing the architectural discussion whenever a chat reaches its length limit is a serious development failure. It wastes founder time and produces decisions detached from the product. Correcting this failure is a top development priority. Do not respond to a new conversation as though these decisions were never made. Do not require the owner to re-explain recorded product philosophy.
+
+## Mandatory new-chat and interrupted-chat recovery procedure (read before advising or dispatching)
+
+1. **Read `docs/development-control.md` from current GitHub `main`, THEN read this entire critical-conversation index.** Do not rely on a remembered excerpt or the current chat transcript alone. Read the current active branch's development-control too: `main` may lag active work. If inaccessible, report this **before** proposing major actions; retrieve available Issue #12 records instead. Never pretend that unfetched sources were read.
+2. **Read the exact owner-decision source links in the entries below** for all decisions relevant to the requested work. For broad strategy, Core operating model, Codex responsibilities or handoff tasks, read **all priority-P0 entries**, not merely the latest issue comment. Read the latest Issue #12 comments, current commits and linked contracts and Issue #10 as relevant.
+3. **Reconcile chronology and authority:** owner decisions > later explicit owner corrections/supersessions > approved contracts > proposals > Codex implementations/test receipts > hypotheses. Explicitly distinguish customer truth, owner decisions, simulations, live verification, missing data, pending approvals and historical results. Source dates and authority travel with the claim.
+4. **Verify actual repository state:** remote `main` SHA, active branch and HEAD, comparison/divergence, open PRs and concurrent GitHub branches. Codex must additionally inspect actual local worktrees/uncommitted state before edits. Do not confuse remote Git with local or hosted truth. Avoid editing active Codex-owned files from a separate session.
+5. **Answer from recovered decisions, not guesses.** Identify remaining material ambiguities only after checking source links and relevant Project/Library/prior-context resources. Never say an important decision was forgotten/underweighted when the owner explicitly marked it critical and it is recorded here; instead recover it before assessing.
+6. **Record every new owner-marked important conversation** in this file **during the same development cycle**: date/topic; precise owner statement/decision and strategic rationale; implications for full product; what is approved vs discussed; superseded guidance; source links or evidence/location; active work affected and recovery pointer. Update Issue #12 with the file/commit. When a user says “this is important,” “record this,” “do not forget,” “foundational,” or corrects a fundamental misunderstanding, treat it as an immediate capture trigger.
+7. **At each Codex handoff and before a likely chat cutoff:** verify this index, current Issue #12 handoff, branch/HEAD, implementation status, grants and next action are retrievable on GitHub. If the chat ends unexpectedly, the next chat starts at steps 1–5, not at an invented reconstruction. A GitHub comment is **not** a Codex dispatch. Do not claim a Git write succeeded without readback.
+8. **Continuity acceptance test:** from a fresh GitHub-only retrieval, an assistant must correctly explain **(a)** Core versus AI API versus ChatGPT/Work versus Codex versus owner responsibilities, **(b)** the whole Entry→Ongoing cycle, **(c)** the active genuine C0 API product milestone and its approval gates, **(d)** the blog-centered Ongoing and first-party metrics direction, **(e)** current Git/branch/status, and **(f)** open ambiguities—without asking the owner to repeat any recorded decision. Record failures as P0 product/process defects in existing GitHub continuity records and repair them, not as routine memory gaps.
+
+**Scope and limitations:** This index contains durable, source-labeled *decision reconstructions*, not a claim to have archived verbatim private chats. Where direct chat permalinks or full transcripts are unavailable, link the earliest durable Git comment and name the missing primary source. Never invent quotations or assert full recovery from a summary. Do not write secrets, unapproved personal customer records, private credentials or protected model responses into public Git.
+
+---
+
+## P0-1 — 2026-11-15: Core autonomously marshals the complete MioPages service
+
+**Explicitly marked foundational by the owner. MUST be read in every new project chat.**
+
+**Primary owner decision record:** [Issue #12 comment 6896133594](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6896133594). **Preceding correction on authorship:** [6896045555](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6896045555). **Active integrated assignment:** [6897105246](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6897105246).
+
+**Decision and distinction:**
+- **MioPages is one AI-assisted managed Web Presence service** that learns the business, creates and operates its presence, converts visitors to leads, measures and improves; it is not simply website creation or hosting.
+- **MioPages Core in production** must run and coordinate routine customer-facing operations and administrative intelligence. It owns persisted tenant/account/customer knowledge, service case/work-item progression, research and tool instructions, protected AI API dispatch, evidence and response custody, generated questions/reports/strategies/site artifacts, Operator/customer/partner tasks and communications, review/approval routing, status, schedule, retries/recovery, WordPress integration, leads, measurement, reporting and ongoing recommendations. The founder and Codex must **not** manually shuttle routine customer artifacts or act as hidden dispatchers.
+- **AI API and production-compatible research services** provide genuine substantive intelligence: research, competitor/search/sector observations, synthesis, original deep follow-up questions, report, Presence Direction, site/blog copy, structured output and critical editorial redrafting. The API does *not* implicitly approve business truth, customer intent, spending, publication or code changes.
+- **Core's service lifecycle must be connected by one shared durable knowledge/evidence model:** (1) optional Free Review OR Direct Start and progressive intake; (2) commercial/account provisioning, role/ownership/portability/partner assignment and authority; (3) deep research-backed adaptive knowledge transfer and customer corrections; (4) customer-readable Business Understanding/Presence Direction and complete site creation; (5) Operator tasks, private WordPress staging, distinct human reviews and approved launch; (6) first-party metrics, report, researched blog/site optimization, approved release, remeasurement and continuous knowledge enrichment. Startups and established businesses remain eligible; no mandatory Free Review for direct start.
+- **Core's minimal orchestration unit** has tenant/case identity, stage, evidence/input version, responsible actor (Core/tool/API, Operator, Customer, approved Partner), next action, prerequisites and authority, durable result/receipt, failure/lease/retry/unknown outcome and resumability. Reuse canonical interfaces; insert temporary labeled fixtures *at their intended boundaries* instead of a second permanent demo architecture or autonomous agent swarm.
+- **When technical human intervention is needed**, Core creates a bounded Operator task with accurate inputs/instructions/state and verified result; it does not require ongoing behind-the-scenes Codex mediation.
+- **Authority is separated:** evidence and AI proposals ≠ canonical customer-confirmed truth ≠ Operator QA ≠ customer factual confirmation ≠ release approval ≠ public publication. The full customer lifecycle is the product acceptance target, while the near-term genuine C0 API site/report remains a necessary early slice, not the finished service.
+
+**Owner assessment/acceptance:** A customer/prospect event can flow through permitted AI research, report, exact correction and governed private stage, then a measurable and reviewed Ongoing iteration. Core makes the next step observable, persists state, and recovers interruption. Any unimplemented interface is visibly a beacon/fixture. Production readiness is **not** inferred from tests.
+
+**Status:** Owner architectural direction approved; portions implemented in local technical proofs only. No new external model grant, hosted write, publication or merge from this decision alone.
+
+## P0-2 — 2026-11-15: ChatGPT/Work and Codex are for improving Core itself, NOT running customers' Web Presence services
+
+**Owner decision record:** [Issue #12 comment 6896512725](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6896512725), reinforced by [6896133594](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6896133594).
+
+**Two distinct, nonconfusable loops:**
+1. **Customer Ongoing, inside MioPages Core:** customer evidence, search/market research, visits/Actions/leads and performance → AI/Core observation and recommendation → appropriate Operator/customer review/approval → WordPress/content change → measurement and future iteration. Core manages customer-facing tasks, including human exceptions and partner delivery.
+2. **MioPages software/product evolution, outside the customer runtime:** Core exposes privacy-safe failures, defects, quality gaps, operating friction, feature opportunities and costs → ChatGPT/Work helps product/UX/strategy, prioritization, acceptance and Git continuity → Codex develops, runs, verifies and diagnoses scoped changes in isolated branches/worktrees → ChatGPT/owner reviews actual customer-visible outcomes → authorized merge/deployment/rollback → observe and improve.
+
+**Specific responsibilities:**
+- **Owner:** product strategy, priorities, true business/customer acceptance, protected transmission/spend, merge, deployment and publication gates.
+- **ChatGPT/Work:** strategy and critical product review, researching actual repository/decision context, meaningful work packages, acceptance criteria and coordinating review/continuity. Work is an execution mode, not a separate authority.
+- **Codex:** software engineering, local development/debugging, tests, infrastructure verification within granted scope and sanitized Git evidence; **not** a source of purported production AI-generated customer collateral. In production, Codex is not the operational staff for routine customer service.
+- **Core:** runtime service operation and AI/tool orchestration; it may suggest product-improvement issues through a privacy-safe reviewed handoff but may **not** self-modify code, create unreviewed public Git issues containing protected evidence, merge, deploy or grant its own permissions.
+
+**Continuity consequence:** Code and service improvements must use *existing GitHub Issues/PRs/contracts*, with exact source, business/UX acceptance, implementation evidence and rollback. Do not open a competing roadmap or interpret posting an Issue comment as starting a Codex job.
+
+**Status:** Owner direction; a repeatable minimal Git improvement loop exists as project procedure. Automated Core→product-feedback issue creation is a future governed integration, not verified production.
+
+## P0-3 — 2026-11-15: Genuine Core+AI generation and deep C0 knowledge; reject Codex-authored stand-ins as product proof
+
+**Owner correction:** [Issue #12 comment 6896045555](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6896045555). **Full research/report/site objective:** [6886774731](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6886774731). **Repaired source/structure scope:** [6895776195](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6895776195). **Later ChatGPT evaluation of 0df0881:** [6897680289](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6897680289).
+
+**What the owner rejected:** A small generated draft using only a couple of source statements and an unconfirmed answer did not prove business understanding. A subsequently authored seven-page website and report at `47576bf` were **written by Codex**. They are useful editorial benchmarks only; they **must not** be labeled API-generated, treated as customer-approved truth, secretly fed into a generation as an answer key or counted toward Core AI acceptance. The shallow 10-step local interview and scripted two-page correction demo prove narrower persistence/propagation, **not** intelligent interview or editorial competence. The owner should **not** be asked to retest these fixtures.
+
+**Required actual product test:** Pin authentic earlier C0 discovery, approved business direction, separate Free Review, owner corrections and appropriately marked unconfirmed answers as a *source-labeled substitute for completed onboarding*, since a full genuine paid adaptive interview has **not** been completed. Core, through authorized *product-operable* research/search/retrieval and protected AI API multipass calls, must produce:
+- **One independently readable Business Understanding Report and researched Presence Direction**: business identity, offerings and exclusions, buyers/startup+established applicability, sector/comparable evidence, search/decision questions, differentiation and substantiation needs, visitor conversion/actions and their actual valid destinations, old-site keep/improve/replace/retire/exclude decisions, visual direction, Ongoing/blog/content/measurement opportunities, uncertainty and exact owner corrections. Source/date/reference details accessible but not dumped over the customer report.
+- **One full site candidate** driven by business needs, not a fixed Page or question quota: complete original copy for all justified Pages/Sections, navigation, distinct Actions/destinations, internal links, SEO/search metadata, structured article/blog opportunities, section-level visual/asset briefs and rights/source status; governed human corrections, AI editorial critique/redraft and private WordPress preview when separately eligible.
+- **Traceable process:** actual Core service case, retained evidence and scope, authorized external research with dated URLs and limitations, actual metered API requests/responses and output custody, revisioned customer/Operator review, exact corrections affecting downstream artifacts, worker/retry/interruption recovery. Nothing hand-authored by Codex in the place of AI production work.
+
+**Approval boundaries:** Local wiring/offline validation under current grants can proceed; external research/model data transmission and spending require one proportionate reviewed aggregate grant covering exact outbound C0 categories/domains, provider/model, budget and retries, expiry and custody. Hosted/protected writes, WordPress application, owner/customer approval, publication and merge have their own gates. The previously suggested $0.70 cap was **not** approved by the owner.
+
+**Known verified historical checkpoint, not product acceptance:** active branch `codex/first-operational-cycle-2026-11-12` at `0df088139823e527a01e64d3d3d55c0e1268481f` on 2026-11-15; [Codex handoff 6897638171](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6897638171). The local Postgres orchestration/correction/recovery, bounded synthetic first-party snapshot and offline provider-shaped path were verified by Codex; AI research/report/site were fixtures and WordPress stage was not part of that run. Before reuse, inspect current branch/head and latest Issue #12 checkpoint; this SHA will age.
+
+## P0-4 — 2026-11-15: The central Ongoing value is blog/site/content improvement and real first-party metrics, not social posting
+
+**Owner records:** [6895322697](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6895322697) → **clarified/superseded emphasis by** [6895344336](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6895344336) → [partner handoff nuance 6895397413](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6895397413).
+
+**Required ongoing operating model:**
+- First-party MioPages signals for visits/landing activities, meaningful Actions, accepted Contact submissions **distinct from notification delivery, qualified leads and confirmed outcomes**; privacy- and tenant-safe ingestion, explicit no-data-versus-zero and coverage timestamps; GA4/Search Console optional enrichment, not a prerequisite.
+- Original researched blog/Article content and useful maintained Page/service/FAQ/case content with proper rights, editorial quality, audience needs, organic internal linking to commercially important pages, on-page/discovery optimization, measurable visitor goals and substantive site improvement.
+- Observe/research → prioritize → propose → Operator/customer review → stage → authorized publish/modify → remeasure; do not hallucinate traffic, conversion effects or source certainty.
+- **Social-ready copy is a small optional derivative** of reviewed site/blog content, not a replacement for native content strategy or a required social-posting service. Draft text/links/image briefs may be sent to an **authorized customer, agency or developer partner** with role/permission/approval boundaries; initial manual posting is acceptable. Do not assume the sender or recipient approved automatic publishing.
+
+**Status:** Owner product direction. First-party synthetic receipt/dedup/snapshot locally tested; live C0 collection and Ongoing full cycle not yet verified. Do not derail the current genuine C0 AI deliverable while advancing compatible measurement/Ongoing work.
+
+## P0-5 — 2026-11-15: Public C0 launch is a separate thread; primary goal is evidence-based marketing measurement, not active prospecting
+
+**Owner record:** [Issue #12 comment 6896821893](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6896821893). **Related named conversation:** “MioPages — Public Launch & Prospecting” (separate ChatGPT thread; no verified direct chat permalink in this index).
+
+The separate public-site effort handles `miopages.com` content, HostShop/customer access, visitor paths and authorized go-live. Its initial commercial purpose is credible public presence and beginning to *observe actual marketing/search/discovery performance*, not launching a prospecting campaign. The product/Core thread prepares lawful tenant-scoped first-party measurement and Ongoing so real C0 site events can eventually be used. Record exact collector start and unknown coverage, not fabricated earlier baseline. Public site work does **not** authorize unpublished Core candidate deployment, external WP writes, new API spend or a traffic success claim.
+
+## P0-6 — 2026-11-15: Hosted Core / Supabase growth and externally hosted WordPress need tested portability, not a presumed migration
+
+**Owner request and feasibility decisions:** [Issue #12 comment 6896687674](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6896687674); [Codex checkpoint 6897638171](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6897638171). **Underlying contract:** [WordPress delivery feasibility](wordpress-delivery-feasibility.md).
+
+Retain provider-neutral central Core orchestrating customer/AI/jobs independent of WordPress host. Use existing 20i Cloud + Supabase PG17 for pilot as supported by actual observations; measure concurrency, durable worker/queue, memory, PostgreSQL sessions, backup/restore and operational thresholds before claiming capacity or demanding upgrades. No unsupported “100 customers” inference. Offer (A) standardized managed MioPages WordPress, and (B) *connected/adopted* existing outside-hosted WordPress with agreed editable scope—no forced host/DNS/mail migration, no blanket overwrite of existing builders/plugins/theme/content. Prove opt-in authentication, capability/constraints, polling/pull/receipts, safe private staging, drift/readback, revision rollback and approved managed scope on a distinct nonproduction host. Existing plugin PHP/CLI/off-webroot dependencies make compatibility an **open technical question**, not an established easy integration.
+
+**Status:** Read-only feasibility and narrow hosted/local samples, not verified off-host WP compatibility or production capacity; changes/deployment remain gated.
+
+## P0-7 — 2026-11-08 through 2026-11-15: Reject shallow onboarding and false “technical proof = customer acceptance”
+
+**Owner rejection:** [Issue #10](https://github.com/R-Levin/myomaton-web/issues/10). **Contract:** [full paid onboarding knowledge-transfer contract](paid-onboarding-knowledge-transfer-contract.md). **C0 report/site reset:** [Issue #12 comment 6886774731](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6886774731).
+
+The owner rejected the fixed ten-step questionnaire as an actual full paid interview; it is a saved/resumable **technical storage prototype**. Real MioPages discovery is a prepared, progressive, AI-generated deep conversation with rich answers and source/document ingestion, second-order questions, negative decisions on legacy site material, contradiction/authority tracking, relevant unknowns, and no fixed question count. Optional Free Review and Direct Start use the same resumable intake: Review produces an independent assessment and attempts a grounded Home concept by default for Operator discretion; Direct Start never depends on a prior Review. A deep customer-readable report and credible entire site plus authorized stage are customer-valued results, not end-point counts or passing tests. Do not force founder to repeat known C0 facts. The original Oct 5–6 conversation is not fully recovered verbatim here; surviving approved material and newer owner corrections are authoritative within their scope, with gaps explicitly labeled.
+
+---
+
+## P0-8 — 2026-11-15: Repeated chat resets are themselves a priority development defect (THIS conversation)
+
+**Source:** Owner's explicit instruction in the 2026-11-15 continuation chat to create this Git record, preserve specially important conversations *in detail* and reference them when ChatGPT hits its conversation limit. The chat permalink is **not verified/available**; this file and a same-day Issue #12 checkpoint are the durable source.
+
+**Problem observed:** At chat limits, the next assistant retrieves a partial development handoff but underweights, overlooks or reconstructs already-discussed *foundational owner decisions*, forcing repeated correction and expensive context repair. This is a product-development reliability problem even if code/tests are intact.
+
+**Decision:** Treat continuity as **P0**. The authoritative recovery chain is **development-control → this file → exact key Git comments/contracts → latest Issue #12 handoff → verified branch/source → next bounded execution**. This is mandatory before any substantive product decisions. Critical owner conversations must be captured as durable decisions **at the time of discussion**, not only as a compressed summary at chat death. New-chat assistants must compare recovered decisions against the current question before responding.
+
+**Required next improvement by ChatGPT/Codex:** Exercise a **cold-start recovery audit** based only on GitHub retrieval; document missing-source links, stale state, supersession or incomplete coverage; improve the index and low-friction update/handoff procedure. Do not hijack or pause the ongoing genuine C0 development for an unnecessary general agent or project-management system; prioritize the continuity fix in coordination and acceptance while preserving currently running Codex work. A manual statement “I will remember” is **not** a verifiable remedy.
+
+**Acceptance:** After a forced new chat, the assistant can reproduce these central priorities and their source/status accurately without owner re-explanation, and new owner-marked critical decisions are visibly recorded with commit + Issue #12 link before the next interruption. If something was not captured, state the precise unavailable primary source rather than inventing it.
+
+---
+
+## Forward-maintenance template: add a new owner-marked critical conversation
+
+For every future explicitly important owner conversation, append a chronological, referenced entry; update `docs/development-control.md` only when the navigation/priority policy changes. Preserve prior entries and mark supersession instead of erasure.
+
+- **ID / date / thread/topic / owner emphasis:**
+- **Primary record link(s):** direct chat permalink only if verified, otherwise exact Issue comment(s) and linked canonical docs.
+- **Exact owner decision(s), constraints, why this affects the whole product:**
+- **What is not decided or approved; what older plan it supersedes:**
+- **Implementation/verification status with exact commit or receipt; no claim of live truth without check:**
+- **One next bounded owner/Codex/ChatGPT action and objective acceptance:**
+- **Recovery note for next chat, plus date/commit and Issue #12 entry confirming retrieval:**
+
+### Historical coverage gaps that are NOT license to make up a new product plan
+
+1. The full original Oct 5–6 C0 interview transcript may not be retrievable from Git; the approved business brief and source-labeled later materials survive. Get richer direct source only if it materially changes an immediate product decision.
+2. No verified direct ChatGPT permalink is available in this document for the separate Public Launch thread or this last conversation; relevant decisions have been preserved in exact GitHub comments and in this reconstruction.
+3. Git cannot inspect live hosted processes, today's database contents, the owner's local worktrees, or the protected AI ledger. Verify separately within authorized scope; do not treat missing runtime evidence as a forgotten strategic decision.
+
+**Process owner:** ChatGPT for decision/recovery capture and critical review; Codex for durable repo/documentation/test changes within scope; owner for priorities and real approvals. **Canonical location:** this file plus existing Issue #12, not another tracker.
