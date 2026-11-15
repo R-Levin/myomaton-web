@@ -1,5 +1,14 @@
 # MioPages development control and continuity
 
+## P0: owner-critical conversation continuity (mandatory on EVERY new chat)
+
+**Read [Owner-designated critical conversations and decisions](owner-critical-conversations.md) immediately after this file, before any substantive MioPages recommendation, Codex direction, source interpretation or recovery answer.** This requirement is an explicit 2026-11-15 owner instruction following repeated serious chat-boundary context failures. The file is the detailed, source-linked record of specially important owner conversations, especially: **Core must autonomously coordinate the entire AI-assisted managed Web Presence service; ChatGPT/Work and Codex maintain/improve Core itself, not perform customers' routine service; genuine product-operated AI must author reports/sites; Ongoing is blog/site/measurement-led; and chat continuity is a P0 development problem.**
+
+**Recovery order:** current GitHub `main` development-control → owner-critical-conversations.md **in full** → exact linked owner comments/contracts → latest Issue #12 and #10 handoffs → verify active branch/HEAD and concurrent worktrees → reconcile decisions versus implementation and permissions. If this file or index cannot be retrieved, **stop substantive strategy/dispatch** and report the precise source access gap. Main is often stale relative to Codex work; inspect both. Never ask the owner to restate a decision that Git already records.
+
+**Capture trigger:** The same cycle in which the owner calls a discussion important/foundational or corrects a strategic misunderstanding, append a detailed, source-linked entry to the owner-critical index, then checkpoint in existing Issue #12. Preserve exact authority, supersession and acceptance implications, not just a summary sentence. At chat cutoffs, resume through this index. Repeated failure to recover an indexed decision is a P0 process defect requiring a cold-start recovery audit, not a reason to restart product strategy. No new roadmap is authorized by this protocol.
+
+
 Status: **active Git continuity checkpoint**. Originally recorded 2026-11-01; updated after hosted synthetic C0 verification on 2026-11-01.
 This file is the first-read **navigation and operational handoff** when merged to `main`. It does not supersede source code, immutable database state, approved product contracts or live provider evidence. Do not claim current runtime/database state from Git alone.
 
