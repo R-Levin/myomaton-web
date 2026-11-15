@@ -108,6 +108,18 @@ The owner rejected the fixed ten-step questionnaire as an actual full paid inter
 
 ---
 
+## Priority clarification — November 15, 2026: continuity serves development, not the reverse
+
+**Explicit owner correction (this conversation):** “Continuity is our chat/codex function priority now, but development remains our overall priority.”
+
+Interpret precisely:
+- **Overall project priority:** Deliver and continually improve the commercially useful, integrated MioPages managed Web Presence service—especially the currently active Core-operated genuine AI-generated C0 report/site, while advancing measurement, Ongoing, and external WordPress compatibility in parallel.
+- **Highest ChatGPT/Codex process priority:** Reliable decision recovery, source continuity, focused handoffs and avoiding founder repetition. This is a **quality prerequisite for efficient product development**, not a new product feature track, autonomous workflow initiative or permission to suspend the existing Codex assignment.
+- **Execution implication:** Apply the already committed recovery/index procedure at each chat boundary and maintain it during normal work. Run a bounded cold-start recovery test, correct deficiencies, then continue product implementation. No recurring separate continuity project, wide audit or repeated debate absent an observed failure.
+- **Authority:** This is a sequencing/operating clarification; no new model spend, protected transmission, production writes, merge or publication approval.
+
+**This clarification supersedes any reading of “P0 continuity” that would place documentation/process work ahead of actual MioPages product delivery.** The previously recorded severity of repeated context loss is retained.
+
 ## P0-8 — 2026-11-15: Repeated chat resets are themselves a priority development defect (THIS conversation)
 
 **Source:** Owner's explicit instruction in the 2026-11-15 continuation chat to create this Git record, preserve specially important conversations *in detail* and reference them when ChatGPT hits its conversation limit. The chat permalink is **not verified/available**; this file and a same-day Issue #12 checkpoint are the durable source.
