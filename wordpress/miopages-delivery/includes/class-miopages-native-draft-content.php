@@ -21,10 +21,9 @@ final class MioPages_Native_Draft_Content
         $paths = array_column($pages, 'path');
         if (count($paths) !== count(array_unique($paths))
             || count($paths) !== count($postIds)
-            || count($paths) !== count($navigation)
-            || count($navigation) !== count(array_unique($navigation))
+            || !in_array('/', $navigation, true) || count($navigation) !== count(array_unique($navigation))
             || array_diff($paths, array_keys($postIds)) !== []
-            || array_diff($paths, $navigation) !== []) {
+            || array_diff($navigation, $paths) !== []) {
             throw new InvalidArgumentException('Native draft target set mismatch.');
         }
         if (count(array_unique($postIds)) !== count($postIds)) {
@@ -52,7 +51,7 @@ final class MioPages_Native_Draft_Content
             }
             $blocks = [self::paragraph(implode(' · ', $links))];
             foreach ($page['sections'] as $section) {
-                if ($section['type'] !== 'intro') {
+                if (!in_array($section['type'], ['hero', 'intro', 'relationship', 'collection', 'cta'], true)) {
                     throw new InvalidArgumentException('Native draft section is unsupported.');
                 }
                 $blocks[] = '<!-- wp:heading --><h2 class="wp-block-heading">'
@@ -63,7 +62,7 @@ final class MioPages_Native_Draft_Content
                     $attachment = $attachments[$sectionId];
                     $id = $attachment['id'];
                     $image = $attachment['media'];
-                    $src = admin_url('admin-post.php?action=miopages_native_draft_image&attachment=' . $id);
+                    $src = MioPages_Native_Draft_Media::url($id);
                     $blocks[] = '<!-- wp:image {"id":' . $id . '} --><figure class="wp-block-image">'
                         . '<img class="wp-image-' . $id . '" src="' . esc_url($src)
                         . '" alt="' . esc_attr($image['alt']) . '" width="' . $image['width']

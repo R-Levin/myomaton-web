@@ -1,4 +1,9 @@
-import { createPrivateKey } from "node:crypto";
+import { createPrivateKey, randomUUID } from "node:crypto";
+import { lstat, open, realpath } from "node:fs/promises";
+import { join } from "node:path";
+import { composePresenceCase, openProtectedPresenceWorkspace } from "../lib/platform/intake/protected-presence-workflow";
+import { workflowDeliveryInput } from "../lib/platform/intake/presence-workflow-delivery";
+import { siteBase } from "../lib/platform/content-editing/proposal-context";
 import { object, uuid } from "../lib/platform/canonical/model";
 import { prepareGeneratedPages, prepareInterviewPages } from "../lib/platform/content-editing/prospect-proposal";
 import { binding, hash, pageProposal, proposalScope } from "../lib/platform/content-editing/proposal";
@@ -18,14 +23,43 @@ async function main() {
     chunks.push(bytes);
   }
   const command = object(JSON.parse(Buffer.concat(chunks).toString("utf8")), ["token", "operation", "input"]);
-  if (length > 65536 && command.operation !== "reconcile-site-draft") throw Error("Protected command too large");
+  if (length > 65536 && !["prepare", "reconcile-site-draft"].includes(String(command.operation))) throw Error("Protected command too large");
   const pool = protectedPool(process.env.MIOPAGES_WP_OPERATOR_URL ?? "", operatorRole, process.env.MIOPAGES_WP_DATABASE_CA);
+  let custody: Awaited<ReturnType<typeof openProtectedPresenceWorkspace>> | undefined;
   try {
-    const service = protectedOperatorServices(pool, db => protectedConnection(db, operatorRole), process.env.MIOPAGES_WP_CORE_ORIGIN ?? "");
+    let selected: { workflow: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["open"]>>;
+      context: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>> } | undefined;
+    const workflows = ["review-workflow-pages", "prepare", "preview", "approve", "preview-site-draft", "authorize-site-draft",
+      "issue-site-draft-bundle", "issue-site-draft-restore"];
+    if (process.env.MIOPAGES_WP_WORKFLOW_VISUALS === "enabled" && workflows.includes(String(command.operation))) {
+      custody = await openProtectedPresenceWorkspace();
+      const run = composePresenceCase(custody.pool, custody.intake, custody.token, custody.workspace, { kind: "review" });
+      selected = { workflow: await run.open(), context: await run.context() };
+    }
+    const service = protectedOperatorServices(pool, db => protectedConnection(db, operatorRole), process.env.MIOPAGES_WP_CORE_ORIGIN ?? "",
+      selected && { root: custody!.workspace.visualDirectory!, resolve: selected.workflow.privateVisualResolver(selected.context) });
     const context = await service.operator.authenticate(command.token);
     const proposals = service.proposals(context);
     let result: unknown;
     switch (command.operation) {
+      case "review-workflow-pages": {
+        if (!selected) throw Error("Protected workflow review disabled");
+        const input = object(command.input, ["baselinePages"]);
+        const scope = selected.context.scope;
+        const view = await selected.workflow.review(selected.context);
+        if (!view) throw Error("Reviewed workflow unavailable");
+        const db = await pool.connect();
+        try {
+          await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+          await protectedConnection(db, operatorRole);
+          await service.operator.authorizeIn(db, context, "prepare-site-proposal", scope);
+          const base = await siteBase(db, scope);
+          result = workflowDeliveryInput(selected.context, view, input.baselinePages ?? null, base.pages);
+          await db.query("COMMIT");
+        } catch (error) { await db.query("ROLLBACK"); throw error; }
+        finally { db.release(); }
+        break;
+      }
       case "review-interview-pages":
       case "review-generated-pages": {
         const p = object(command.input, ["packet", "digest", "destinations"]);
@@ -58,12 +92,14 @@ async function main() {
       case "preview-site-draft":
       case "authorize-site-draft":
       case "issue-site-draft":
+      case "issue-site-draft-bundle":
       case "issue-site-draft-restore": {
-        const issuing = command.operation === "issue-site-draft" || command.operation === "issue-site-draft-restore";
+        const bundling = command.operation === "issue-site-draft-bundle";
+        const issuing = bundling || command.operation === "issue-site-draft" || command.operation === "issue-site-draft-restore";
         const authorizing = command.operation !== "preview-site-draft";
         const input = object(command.input, ["site", "references", "draft", ...(authorizing ? ["reviewerToken", "expectedDigest", "recoveryCredentialId"] : [])]);
         const site = object(input.site, ["organizationId", "webPresenceId", "managedSiteId"]);
-        if (!Array.isArray(input.references) || input.references.length < 1 || input.references.length > 16) {
+        if (!Array.isArray(input.references) || input.references.length < 1) {
           throw Error("Invalid draft page references");
         }
         const references = input.references.map(value => {
@@ -81,7 +117,19 @@ async function main() {
           const recovery = credentialId && secret ? { credentialId, secret,
             journal: new NativeDraftReceiptJournal(process.env.MIOPAGES_WP_NATIVE_DRAFT_RECEIPTS ?? "") } : undefined;
           try {
-            result = issuing
+            if (bundling) {
+              if (!selected || !custody) throw Error("Protected draft bundle custody unavailable");
+              const directory = join(custody.workspace.root, "native-draft-bundles");
+              const stat = await lstat(directory);
+              if (!stat.isDirectory() || stat.uid !== process.getuid?.() || (stat.mode & 0o777) !== 0o700 ||
+                  await realpath(directory) !== directory) throw Error("Protected draft bundle directory refused");
+              const bundle = await service.review.issueSiteDraftBundle(context, reviewer, scope, references, input.draft,
+                input.expectedDigest, createPrivateKey(process.env.MIOPAGES_WP_SIGNING_KEY ?? ""), recovery);
+              const name = hash(input.expectedDigest) + "-" + randomUUID() + ".json";
+              const file = await open(join(directory, name), "wx", 0o600);
+              try { await file.writeFile(JSON.stringify(bundle) + "\n"); await file.sync(); } finally { await file.close(); }
+              result = { file: name, copies: bundle.copies.length, digest: hash(input.expectedDigest) };
+            } else result = issuing
               ? await service.review.issueSiteDraft(context, reviewer, scope, references, input.draft, input.expectedDigest,
                 createPrivateKey(process.env.MIOPAGES_WP_SIGNING_KEY ?? ""),
                 command.operation === "issue-site-draft-restore" ? "restore" : "apply", recovery)
@@ -129,7 +177,9 @@ async function main() {
       default: throw Error("Unsupported protected command");
     }
     console.log(JSON.stringify(result));
-  } finally { await pool.end(); }
+  } finally {
+    try { await custody?.pool.end(); } finally { await pool.end(); }
+  }
 }
 
 main().catch(() => { console.error("Protected command refused or failed. Verify state before retry."); process.exitCode = 1; });

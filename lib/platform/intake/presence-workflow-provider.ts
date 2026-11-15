@@ -6,6 +6,8 @@ import { marketSources, retrievePublicResearch, validateDiscovery, validateMarke
   type PublicResearchSource, type ResearchDiscovery } from "./presence-workflow-research";
 import { WorkflowBlocked, type PresenceWorkflowOperations, type WorkflowContext, type WorkflowRun } from "./presence-workflow";
 
+import type { PresenceImageGrant } from "./presence-workflow-visual";
+
 type ModelStage = keyof typeof artifactSchemas;
 export type PresenceWorkflowGrant = {
   contextDigest: string;
@@ -15,6 +17,7 @@ export type PresenceWorkflowGrant = {
   researchResponseBytes: number;
   discovery?: ResearchDiscovery;
   marketSearch?: MarketSearch;
+  images?: PresenceImageGrant;
   maxRetries?: number;
   maxEditorialRevisions?: number;
   ledger: WorkflowUsageScope;

@@ -60,6 +60,7 @@ export class SiteReleaseService {
       if (history.some(e => e.operation === "release" && e.proposal_id === expected.proposalId && e.revision === expected.revision)) throw Error("Proposal revision already released; new proposal/approval required");
       const revision = state.revisions.at(-1), approval = state.approval, event = state.events.find(e => e.hash === approvalEvent);
       if (state.state !== "APPROVED" || !revision || !approval || event?.action !== "approve" || fingerprint(event.approval) !== fingerprint(approval) || fingerprint(revision.binding) !== fingerprint(expected) || fingerprint(approval.binding) !== fingerprint(expected) || approval.previewDigest !== previewDigest) throw Error("Exact current approved proposal/revision/preview required");
+      if (revision.page.workflowReview || revision.candidate.privateMedia) throw Error("Private visual review cannot release canonical content");
       const customer = object(approval.customer, ["kind", "subjectId", "authorityReference"]);
       if (!["business-representative", "accepted-authority"].includes(String(customer.kind))) throw Error("Customer mandate required"); text(customer.subjectId); text(customer.authorityReference, 500);
       const base = await siteBase(c, scope);

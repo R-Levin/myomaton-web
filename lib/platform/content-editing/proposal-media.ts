@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { and, eq } from "drizzle-orm";
 import { readManagedObject } from "../assets/local-storage";
 import { validateStoredMedia } from "../assets/media-validation";
-import { presentImage } from "../assets/source";
+import { presentImage, type SectionImage } from "../assets/source";
 import { choice, fingerprint, object, text, uuid } from "../canonical/model";
 import { assets } from "../db/schema/assets";
 import type { VerifyUploadAgreement } from "../acquisition/customer-upload";
@@ -41,10 +41,30 @@ export type ProposalMedia = {
   priorUsage: Usage | null;
 };
 
-export async function resolveProposalCandidate(c: PoolClient, scope: Scope, page: PageProposal, base: SiteBase, mediaRoot?: string, verifyAgreement?: VerifyUploadAgreement) {
-  const resolved = await resolvePage(c, scope, page, base);
+export type PrivateProposalMedia = Omit<ProposalMedia, "evidence"> & {
+  evidence: {
+    source: "private-generated";
+    permission: "non-public-draft-only";
+    sourceDigest: string;
+    provenanceDigest: string;
+    reviewDigest: string;
+    reference: string;
+  };
+};
+
+export type ResolvePrivateVisuals = (scope: Scope, page: PageProposal, resolved: Awaited<ReturnType<typeof resolvePage>>["candidate"]) =>
+  Promise<{ media: PrivateProposalMedia[]; images: Record<string, SectionImage> }>;
+
+export async function resolveProposalCandidate(c: PoolClient, scope: Scope, page: PageProposal, base: SiteBase, mediaRoot?: string,
+  verifyAgreement?: VerifyUploadAgreement, resolvePrivateVisuals?: ResolvePrivateVisuals) {
+  const resolved = await resolvePage(c, scope, page, base, Boolean(resolvePrivateVisuals));
+  if (page.workflowReview) {
+    if (!resolvePrivateVisuals) throw Error("Protected visual approval required");
+    const { media, images } = await resolvePrivateVisuals(scope, page, resolved.candidate);
+    return { ...resolved, candidate: { ...resolved.candidate, privateMedia: media }, image: undefined, privateImages: images };
+  }
   const target = page.sections.find(section => section.image);
-  if (!target?.image) return { ...resolved, image: undefined };
+  if (!target?.image) return { ...resolved, image: undefined, privateImages: undefined };
   if (!mediaRoot) throw Error("Disposable proposal media is unavailable");
   await requireDisposableMedia(c);
   const priorSections = base.sections.filter(section => section.page_id === page.pageId);
@@ -94,7 +114,7 @@ export async function resolveProposalCandidate(c: PoolClient, scope: Scope, page
   return {
     ...resolved,
     candidate: { ...resolved.candidate, media },
-    image: { ...image, src: await verifiedProposalImage(mediaRoot, scope, media) },
+    image: { ...image, src: await verifiedProposalImage(mediaRoot, scope, media) }, privateImages: undefined,
   };
 }
 

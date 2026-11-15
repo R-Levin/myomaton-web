@@ -4,7 +4,7 @@ import { projectContent } from "../canonical/projections";
 import { fingerprint, uuid } from "../canonical/model";
 import { readProposalState } from "../content-editing/proposal-postgres";
 import { resolvePage, siteBase } from "../content-editing/proposal-context";
-import { resolveProposalCandidate } from "../content-editing/proposal-media";
+import { resolveProposalCandidate, type ResolvePrivateVisuals } from "../content-editing/proposal-media";
 import { hash, pageProposal } from "../content-editing/proposal";
 import { proposalPreview } from "../content-editing/proposal-preview";
 import { validatePages, type ReviewedProjection, type Site } from "./authority";
@@ -14,9 +14,11 @@ import { nativeDraftEnvelope, readNativeDraftEnvelope } from "./native-draft-env
 import { prepareNativeDraftMedia } from "./native-draft-media";
 import type { NativeDraftReceiptExpectation, NativeDraftReceiptJournal } from "./native-draft-receipt";
 
+type WorkflowMedia = { root: string; resolve: ResolvePrivateVisuals };
+
 type RecoveryEvidence = { journal: NativeDraftReceiptJournal; secret: Buffer; credentialId: string };
 
-async function approvedProjection(db: PoolClient, site: Site, proposalId: string, approvalId: string, mediaRoot?: string) {
+async function approvedProjection(db: PoolClient, site: Site, proposalId: string, approvalId: string, mediaRoot?: string, workflowMedia?: WorkflowMedia) {
   const identity = (await db.query(`SELECT p.created_at,g.operator_id,g.id AS grant_id,g.customer
     FROM site_change_proposals p JOIN wordpress_proposal_approvals a ON a.proposal_id=p.id
     JOIN wordpress_operator_grants g ON g.id=a.grant_id AND g.permission='approve-site-proposal'
@@ -38,17 +40,15 @@ async function approvedProjection(db: PoolClient, site: Site, proposalId: string
   if (base.graph.organization.id !== site.organizationId || fingerprint(base) !== revision.binding.baseFingerprint) {
     throw Error("Stale canonical source");
   }
-  const withMedia = Boolean(revision.candidate.media || revision.page.sections.some(section => section.image));
-  if (withMedia && !mediaRoot) throw Error("Private staging v1 excludes media-bound content");
-  const resolved = withMedia
-    ? await resolveProposalCandidate(db, scope, pageProposal(revision.page), base, mediaRoot)
-    : { ...await resolvePage(db, scope, pageProposal(revision.page), base), image: undefined };
-  const reviewedMedia = withMedia ? revision.candidate.media : undefined;
-  const media = reviewedMedia && mediaRoot
-    ? (await prepareNativeDraftMedia(mediaRoot, scope.webPresenceId, revision.page.pageId, reviewedMedia)).descriptor : undefined;
+  const withMedia = Boolean(revision.candidate.media || revision.candidate.privateMedia || revision.page.sections.some(section => section.image));
+  const root = revision.page.workflowReview ? workflowMedia?.root : mediaRoot;
+  if (withMedia && !root) throw Error("Private staging v1 excludes media-bound content");
+  const resolved = withMedia || revision.page.workflowReview
+    ? await resolveProposalCandidate(db, scope, pageProposal(revision.page), base, mediaRoot, undefined, workflowMedia?.resolve)
+    : { ...await resolvePage(db, scope, pageProposal(revision.page), base), image: undefined, privateImages: undefined };
   if (fingerprint(resolved.candidate) !== fingerprint(revision.candidate)
     || fingerprint(resolved.resolved) !== fingerprint(revision.resolved)
-    || fingerprint(proposalPreview(revision, resolved.image)) !== approved.approval.previewDigest) throw Error("Changed approved candidate");
+    || fingerprint(proposalPreview(revision, resolved.image, resolved.privateImages)) !== approved.approval.previewDigest) throw Error("Changed approved candidate");
 
   for (const copy of resolved.resolved) {
     if (copy.origin.kind !== "canonical") continue;
@@ -71,10 +71,12 @@ async function approvedProjection(db: PoolClient, site: Site, proposalId: string
   const pages = [{ id: revision.page.pageId, path: revision.page.slug, title: resolved.candidate.title,
     sections: resolved.candidate.sections.map(s => ({ id: s.id, type: s.type,
       content: { heading: s.content.heading, text: s.content.text ?? "" } })) }];
-  validatePages(pages);
+  validatePages(pages, Boolean(workflowMedia));
+  const media = resolved.candidate.privateMedia ?? (resolved.candidate.media ? [resolved.candidate.media] : []);
+  const copies = root ? await Promise.all(media.map(item => prepareNativeDraftMedia(root, scope.webPresenceId, revision.page.pageId, item))) : [];
   return { pages, projectionDigest: fingerprint(pages), sourceDigest: revision.binding.baseFingerprint,
     approvalId, previewDigest: approved.approval.previewDigest, revision: revision.binding.revision,
-    approver: identity.operator_id as string, ...(media && { media }) };
+    approver: identity.operator_id as string, copies, ...(copies.length && { media: copies.map(copy => copy.descriptor) }) };
 }
 
 export async function reviewedPrivateSource(db: PoolClient, site: Site): Promise<ReviewedProjection | null> {
@@ -85,14 +87,15 @@ export async function reviewedPrivateSource(db: PoolClient, site: Site): Promise
   const reviewer = (await db.query(`SELECT operator_id FROM wordpress_operator_grants WHERE id=$1 AND web_presence_id=$2
     AND managed_site_id=$3 AND permission='review-private-stage' AND revoked_at IS NULL`,
   [record.reviewer_grant_id, site.webPresenceId, site.managedSiteId])).rows[0];
-  const { approver, ...projection } = await approvedProjection(db, site, record.proposal_id, record.approval_digest);
+  const { approver, copies, media, ...projection } = await approvedProjection(db, site, record.proposal_id, record.approval_digest);
+  if (copies.length || media) return null;
   if (!reviewer || reviewer.operator_id === approver || record.projection_digest !== projection.projectionDigest) return null;
   return { ...site, ...projection, releaseId: record.id, releaseDigest: fingerprint(record), version: 1, publishable: true };
 }
 
 export class PrivateReleaseReview {
   constructor(private pool: Pool, private operator: ProtectedOperator, private boundary: (db: PoolClient) => Promise<void>,
-    private disposableMediaRoot?: string) {}
+    private disposableMediaRoot?: string, private workflowMedia?: WorkflowMedia) {}
 
   // Review-only. A digest returned here does not grant draft materialization.
   async previewSiteDraft(context: unknown, site: Site, references: readonly { proposalId: string; approvalId: string }[], draft: unknown) {
@@ -110,6 +113,15 @@ export class PrivateReleaseReview {
     const preview = await this.siteDraft(reviewer, site, references, draft, { context, digest: hash(expectedDigest), key, operation, recovery });
     if (!("envelope" in preview)) throw Error("Native draft issuance refused");
     return preview.envelope;
+  }
+
+  async issueSiteDraftBundle(context: unknown, reviewer: unknown, site: Site,
+    references: readonly { proposalId: string; approvalId: string }[], draft: unknown, expectedDigest: unknown, key: KeyObject,
+    recovery?: RecoveryEvidence) {
+    const preview = await this.siteDraft(reviewer, site, references, draft, { context, digest: hash(expectedDigest), key, recovery });
+    if (!("envelope" in preview) || !preview.envelope || !preview.copies) throw Error("Native draft bundle issuance refused");
+    const unique = new Map(preview.copies.map(copy => [copy.descriptor.copyDigest, copy.bytes]));
+    return { envelope: preview.envelope, copies: Array.from(unique, ([copyDigest, bytes]) => ({ copyDigest, bytesBase64: bytes.toString("base64") })) };
   }
 
   async nativeDraftReceiptDecision(context: unknown, site: Site, installationId: string, envelope: unknown) {
@@ -143,7 +155,10 @@ export class PrivateReleaseReview {
         revision: restore ? draft.rollback?.revision ?? draft.revision - 1 : draft.revision,
         ...(draft.rollback && (restore ? { requestedRevision: draft.revision } : { materializedBaseline: {
           requestedDigest: hash(draft.previousDigest), appliedDigest: draft.rollback.digest, revision: draft.rollback.revision,
-        } })), paths: draft.pages.map(page => page.path),
+        } })), paths: (restore ? draft.baselinePages ?? draft.pages : draft.pages).map(page => page.path),
+        ...(draft.baselinePages && { baselinePaths: draft.baselinePages.map(page => page.path),
+          requestedPaths: draft.pages.map(page => page.path),
+          ...(!restore && !draft.rollback && { appliedBaseline: hash(draft.previousDigest) }) }),
         ...(!restore && draft.media && { media: draft.media, pageIds: draft.pages.map(page => page.id) }) };
       await db.query("COMMIT");
       return { expected, credentialId: uuid(installation.credential_id) };
@@ -155,7 +170,7 @@ export class PrivateReleaseReview {
 
   private async siteDraft(context: unknown, site: Site, references: readonly { proposalId: string; approvalId: string }[], draft: unknown,
     decision?: { context: unknown; digest: string; key?: KeyObject; operation?: "apply" | "restore"; recovery?: RecoveryEvidence }) {
-    if (!Array.isArray(references) || references.length < 1 || references.length > 16) throw Error("Invalid draft page references");
+    if (!Array.isArray(references) || references.length < 1) throw Error("Invalid draft page references");
     site = { organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
     const db = await this.pool.connect();
     try {
@@ -166,7 +181,7 @@ export class PrivateReleaseReview {
       const members = [];
       for (const ref of references) {
         const proposalId = uuid(ref.proposalId);
-        const projection = await approvedProjection(db, site, proposalId, hash(ref.approvalId), this.disposableMediaRoot);
+        const projection = await approvedProjection(db, site, proposalId, hash(ref.approvalId), this.disposableMediaRoot, this.workflowMedia);
         if (projection.approver === reviewer.operatorId) throw Error("Independent projection reviewer required");
         members.push({ ...site, ...projection, proposalId });
       }
@@ -188,6 +203,13 @@ export class PrivateReleaseReview {
         if (revision > 1 && !(await db.query(`SELECT 1 FROM wordpress_native_draft_authorizations WHERE installation_id=$1
           AND site_proposal_id=$2 AND revision=$3 AND candidate_digest=$4`,
         [installationId, siteProposalId, revision - 1, previousDigest])).rowCount) throw Error("Prior draft authorization mismatch");
+        if (result.candidate.baselinePages && !rollback) {
+          const evidence = decision.recovery;
+          if (!evidence || evidence.credentialId !== installation.credential_id) throw Error("Prior Page receipt required");
+          await evidence.journal.verifyAppliedBaseline({ installationId, siteProposalId,
+            requestedDigest: hash(previousDigest), appliedDigest: hash(previousDigest), revision: revision - 1,
+            paths: result.candidate.baselinePages.map(page => page.path) }, evidence.secret);
+        }
         if (rollback) {
           const evidence = decision.recovery;
           if (!evidence || evidence.credentialId !== installation.credential_id) throw Error("Installation recovery evidence required");
@@ -196,7 +218,7 @@ export class PrivateReleaseReview {
           [installationId, siteProposalId, rollback.revision, rollback.digest]);
           if (prior.rowCount !== 1) throw Error("Rollback authorization missing");
           await evidence.journal.verifyMaterializedBaseline({ installationId, siteProposalId, requestedDigest: hash(previousDigest),
-            appliedDigest: rollback.digest, revision: rollback.revision, paths: result.candidate.pages.map(page => page.path) }, evidence.secret);
+            appliedDigest: rollback.digest, revision: rollback.revision, paths: (result.candidate.baselinePages ?? result.candidate.pages).map(page => page.path) }, evidence.secret);
         }
         const head = (await db.query(`SELECT revision FROM wordpress_native_draft_authorizations
           WHERE installation_id=$1 AND site_proposal_id=$2 ORDER BY revision DESC LIMIT 1`, [installationId, siteProposalId])).rows[0]?.revision ?? 0;
@@ -212,7 +234,7 @@ export class PrivateReleaseReview {
           if (head !== revision) throw Error("Native draft authorization superseded");
           const envelope = nativeDraftEnvelope(result, installation.key_id, installation.public_key, decision.key, decision.operation ?? "apply");
           await db.query("COMMIT");
-          return { ...result, envelope };
+          return { ...result, envelope, copies: members.flatMap(member => member.copies) };
         }
       }
       await db.query("COMMIT");

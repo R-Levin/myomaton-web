@@ -1,12 +1,14 @@
 import type { Pool, PoolClient } from "pg";
 import { fingerprint } from "../canonical/model";
 import { PostgresProposalPersistence } from "../content-editing/proposal-postgres";
+import type { ResolvePrivateVisuals } from "../content-editing/proposal-media";
 import { SiteProposalService } from "../content-editing/proposals";
 import { ProtectedOperator } from "./operator";
 import { PrivateReleaseReview } from "./private-source";
 import { WordPressDelivery } from "./service";
 
-export function protectedOperatorServices(pool: Pool, boundary: (db: PoolClient) => Promise<void>, origin: string) {
+export function protectedOperatorServices(pool: Pool, boundary: (db: PoolClient) => Promise<void>, origin: string,
+  privateVisuals?: { root: string; resolve: ResolvePrivateVisuals }) {
   const operator = new ProtectedOperator(pool, boundary);
   return {
     operator,
@@ -29,9 +31,9 @@ export function protectedOperatorServices(pool: Pool, boundary: (db: PoolClient)
               [binding.proposalId, event.hash, actor.authorityReference]);
           }
         },
-      }));
+      }), undefined, undefined, privateVisuals?.resolve);
     },
-    review: new PrivateReleaseReview(pool, operator, boundary),
+    review: new PrivateReleaseReview(pool, operator, boundary, undefined, privateVisuals),
     delivery: new WordPressDelivery(pool, async (context, action, site, db) =>
       (await operator.authorizeIn(db, context, action, site)).operatorId, async () => null, origin, undefined, boundary),
   };

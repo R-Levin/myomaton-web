@@ -1,6 +1,6 @@
 import { createHash, createPublicKey, sign, verify, type KeyObject } from "node:crypto";
 import { fingerprint, object } from "../canonical/model";
-import { nativeDraftRollback, type bindSiteDraft } from "./site-draft";
+import { nativeDraftBaseline, nativeDraftRollback, verifyNativeMediaPlacements, type bindSiteDraft } from "./site-draft";
 import { readNativeDraftMedia } from "./native-draft-media";
 
 type Preview = ReturnType<typeof bindSiteDraft>;
@@ -14,7 +14,7 @@ export function nativeDraftEnvelope(preview: Preview, keyId: string, publicKeyBa
     throw Error("Native draft signer does not match installation");
   }
   if (operation === "restore" && !preview.candidate.previousDigest) throw Error("Native draft has no predecessor to restore");
-  const version = preview.candidate.media?.length ? 3 : preview.candidate.rollback ? 2 : 1;
+  const version = preview.candidate.baselinePages ? 4 : preview.candidate.media?.length ? 3 : preview.candidate.rollback ? 2 : 1;
   const now = Date.now();
   const payload = Buffer.from(JSON.stringify({ schema: "miopages.wordpress.native-draft", version, operation,
     purpose: "non-public-draft-only", issuedAt: Math.floor(now / 1000), expiresAt: Math.floor(now / 1000) + 900,
@@ -30,7 +30,7 @@ export function nativeDraftEnvelope(preview: Preview, keyId: string, publicKeyBa
 
 export function readNativeDraftEnvelope(wire: unknown, keyId: string, publicKeyBase64: string) {
   const envelope = object(wire, ["schema", "version", "keyId", "payloadBase64", "payloadSha256", "signatureBase64"]);
-  if (envelope.schema !== "miopages.wordpress.native-draft-envelope" || (envelope.version !== 1 && envelope.version !== 2 && envelope.version !== 3) || envelope.keyId !== keyId ||
+  if (envelope.schema !== "miopages.wordpress.native-draft-envelope" || ![1, 2, 3, 4].includes(Number(envelope.version)) || typeof envelope.version !== "number" || envelope.keyId !== keyId ||
       typeof envelope.payloadBase64 !== "string" || envelope.payloadBase64.length > 934_000 ||
       typeof envelope.signatureBase64 !== "string" || envelope.signatureBase64.length !== 88) throw Error("Native draft envelope refused");
   const bytes = Buffer.from(envelope.payloadBase64, "base64"), signature = Buffer.from(envelope.signatureBase64, "base64");
@@ -46,16 +46,21 @@ export function readNativeDraftEnvelope(wire: unknown, keyId: string, publicKeyB
   if (payload.schema !== "miopages.wordpress.native-draft" || payload.version !== envelope.version || payload.purpose !== "non-public-draft-only" ||
       !["apply", "restore"].includes(payload.operation) || !Number.isSafeInteger(payload.issuedAt) ||
       payload.issuedAt > Math.floor(Date.now() / 1000) + 60 || payload.expiresAt - payload.issuedAt !== 900 ||
-      payload.digest !== fingerprint(payload.candidate) || Object.hasOwn(payload.candidate, "media") !== (payload.version === 3) ||
-      (payload.version !== 3 && Object.hasOwn(payload.candidate, "rollback") !== (payload.version === 2))) throw Error("Native draft envelope claim mismatch");
-  if (payload.version === 3) {
+      payload.digest !== fingerprint(payload.candidate) ||
+      Object.hasOwn(payload.candidate, "baselinePages") !== (payload.version === 4) ||
+      (payload.version < 4 && Object.hasOwn(payload.candidate, "media") !== (payload.version === 3)) ||
+      (payload.version < 3 && Object.hasOwn(payload.candidate, "rollback") !== (payload.version === 2))) throw Error("Native draft envelope claim mismatch");
+  if (Object.hasOwn(payload.candidate, "media")) {
     const media = payload.candidate.media;
-    if (!Array.isArray(media) || !media.length || media.length > payload.candidate.pages.length ||
-        new Set(media.map(item => readNativeDraftMedia(item).pageId)).size !== media.length) throw Error("Native draft media claim mismatch");
-    for (const item of media) {
-      if (!payload.candidate.pages.some(page => page.id === item.pageId &&
-          page.sections.some(section => section.id === item.sectionId && section.type === "intro"))) throw Error("Native draft media placement mismatch");
-    }
+    if (!Array.isArray(media) || !media.length) throw Error("Native draft media claim mismatch");
+    verifyNativeMediaPlacements(media.map(readNativeDraftMedia), payload.candidate.pages);
+  }
+  if (payload.version === 4) {
+    if (payload.candidate.revision < 2 || !payload.candidate.previousDigest) throw Error("Native draft membership baseline missing");
+    const baseline = nativeDraftBaseline(payload.candidate.baselinePages);
+    if (fingerprint(baseline) !== fingerprint(payload.candidate.baselinePages) ||
+        payload.candidate.pages.some(page => baseline.some(prior => (prior.id === page.id || prior.path === page.path) &&
+          (prior.id !== page.id || prior.path !== page.path)))) throw Error("Native draft membership claim mismatch");
   }
   if (payload.candidate.rollback) {
     const rollback = nativeDraftRollback(payload.candidate.rollback, payload.candidate.revision);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
 import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-party";
 import styles from "../../components/intake/interview.module.css";
@@ -79,7 +79,10 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
           {page.sections.map((section, i) => <section key={i}><h5>{section.heading}</h5><p>{section.body}</p>
             <details><summary>Visual direction and references</summary><p>{section.visual.brief}</p>
               <p>{section.visual.purpose} · {section.visual.altIntent} · {section.visual.status}</p>
-              <p>Evidence: {section.sourceIds.join(", ")}</p></details></section>)}
+              <p>Evidence: {section.sourceIds.join(", ")}</p></details>
+            {hosted && workflow.next === "review-complete" && section.visual.status === "asset-needed" && workflow.visuals &&
+              <VisualReview key={page.path + "/" + i} path={page.path} index={i} altIntent={section.visual.altIntent}
+                workflow={workflow} busy={busy} submit={submit} />}</section>)}
           <h5>Visitor actions</h5><ul>{page.actions.map((action, i) => <li key={i}>
             {action.kind === "navigate" && action.destination ?
               <button type="button" onClick={() => setSelected(action.destination!)} disabled={!workflow.pages.some(draft => draft.path === action.destination)}>{action.label}</button>
@@ -120,4 +123,64 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
       </details>}
     </section>}
   </section>;
+}
+
+function VisualReview({ workflow, path, index, altIntent, busy, submit }: {
+  workflow: PresenceWorkflowView; path: string; index: number; altIntent: string; busy: boolean;
+  submit: (operation: string, options?: object) => Promise<void>;
+}) {
+  const visual = workflow.visuals?.filter(item => item.placement.path === path && item.placement.sectionIndex === index).at(-1);
+  const [brief, setBrief] = useState("");
+  const [reference, setReference] = useState("");
+  const [alt, setAlt] = useState(altIntent);
+  const [preview, setPreview] = useState<{ id: string; url: string }>();
+  const [previewFailed, setPreviewFailed] = useState(false);
+  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview.url); }, [preview]);
+  const visibleImage = visual && (visual.state === "review" || visual.state === "approved");
+  const previewImage = async () => {
+    if (!visual) return;
+    setPreviewFailed(false);
+    try {
+      const response = await fetch("/api/protected-core", { cache: "no-store", headers: {
+        "X-Intake-Request": "1", "X-MioPages-Workflow-Image": visual.id,
+      } });
+      if (!response.ok || response.headers.get("content-type") !== "image/png") throw Error();
+      setPreview({ id: visual.id, url: URL.createObjectURL(await response.blob()) });
+    } catch { setPreviewFailed(true); }
+  };
+  const decide = (decision: "approved" | "rejected" | "revoked") => submit("visual-decide", {
+    visual: { id: visual?.id, provenanceDigest: visual?.result?.provenanceDigest, decision, reference, alt },
+  });
+  return <fieldset>
+    <legend>Provisional image</legend>
+    {(!visual || visual.state === "revoked" || visual.state === "rejected") && Boolean(workflow.visualBriefs?.length) && <>
+      <label>Authorized illustration brief <select value={brief} onChange={event => setBrief(event.target.value)}>
+        <option value="">Choose a brief</option>
+        {workflow.visualBriefs?.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}
+      </select></label>
+      <button type="button" disabled={busy || !brief} onClick={() => void submit("visual-queue", { visual: { path, index, briefId: brief } })}>Queue illustration</button>
+    </>}
+    {visual && <p>{({
+      queued: "Queued for the protected worker", running: "Waiting for the image result", review: "Review needed",
+      approved: "Approved for this non-public draft", revoked: "Private use withdrawn", rejected: "Image rejected",
+      unverified: "Outcome unverified. The worker will keep the reservation for reconciliation.",
+    })[visual.state]}</p>}
+    {visibleImage && <>
+      <button type="button" onClick={() => void previewImage()}>Show image</button>
+      {previewFailed && <p role="alert">The private image could not be verified.</p>}
+      {preview?.id === visual.id && visual.result &&
+        // The private response is served via an authenticated fetch and temporary object URL.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={preview.url} alt={visual.decision?.alt ?? alt} width={visual.result.width} height={visual.result.height}
+          style={{ maxWidth: "100%", height: "auto" }} />}
+      <label>Decision reason or permission reference
+        <input value={reference} maxLength={350} onChange={event => setReference(event.target.value)} /></label>
+      {visual.state === "review" ? <>
+        <label>Image alt text <input value={alt} maxLength={500} onChange={event => setAlt(event.target.value)} /></label>
+        <button type="button" disabled={busy || preview?.id !== visual.id || !reference.trim() || !alt.trim()}
+          onClick={() => void decide("approved")}>Approve for private draft</button>
+        <button type="button" disabled={busy || !reference.trim()} onClick={() => void decide("rejected")}>Reject image</button>
+      </> : <button type="button" disabled={busy || !reference.trim()} onClick={() => void decide("revoked")}>Withdraw private approval</button>}
+    </>}
+  </fieldset>;
 }

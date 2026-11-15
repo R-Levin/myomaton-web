@@ -3,7 +3,7 @@ import { managedKey, readManagedObject } from "../assets/local-storage";
 import { validateStoredMedia } from "../assets/media-validation";
 import { fingerprint, object, text, uuid } from "../canonical/model";
 import { hash } from "../content-editing/proposal";
-import type { ProposalMedia } from "../content-editing/proposal-media";
+import type { PrivateProposalMedia, ProposalMedia } from "../content-editing/proposal-media";
 
 export type NativeDraftMedia = ReturnType<typeof readNativeDraftMedia>;
 
@@ -23,7 +23,7 @@ export function readNativeDraftMedia(value: unknown) {
   };
 }
 
-export async function prepareNativeDraftMedia(root: string, webPresenceId: string, pageId: string, media: ProposalMedia) {
+export async function prepareNativeDraftMedia(root: string, webPresenceId: string, pageId: string, media: ProposalMedia | PrivateProposalMedia) {
   const master = await readManagedObject(root, webPresenceId, "objects/" + hash(media.preparedDigest));
   await validateStoredMedia(master, media.mimeType, { width: media.width, height: media.height });
   const { data: bytes, info } = await sharp(master).rotate()

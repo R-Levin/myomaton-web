@@ -31,14 +31,14 @@ const exact = (value: object, keys: string) => Object.keys(value).sort().join(",
 const text = (value: string, limit: number) =>
   typeof value === "string" && Buffer.byteLength(value) <= limit && !/[<>\x00]/.test(value);
 
-export function validatePages(pages: Page[]) {
+export function validatePages(pages: Page[], nativeDraft = false) {
   const paths = new Set<string>(), pageIds = new Set<string>(), sectionIds = new Set<string>();
-  if (!Array.isArray(pages) || pages.length < 1 || pages.length > 16) throw Error("Projection pages refused");
+  if (!Array.isArray(pages) || pages.length < 1 || (!nativeDraft && pages.length > 16)) throw Error("Projection pages refused");
   for (const page of pages) {
     if (!exact(page, "id,path,sections,title") || !id(page.id) || !text(page.title, 160) || !page.title.trim()
       || !text(page.path, 160) || !/^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*\/?)?$/.test(page.path)
       || paths.has(page.path) || pageIds.has(page.id)
-      || !Array.isArray(page.sections) || page.sections.length < 1 || page.sections.length > 32) {
+      || !Array.isArray(page.sections) || page.sections.length < 1 || (!nativeDraft && page.sections.length > 32)) {
       throw Error("Projection page refused");
     }
     paths.add(page.path);
@@ -47,7 +47,7 @@ export function validatePages(pages: Page[]) {
       if (Object.keys(extra).length || !id(sectionId) || sectionIds.has(sectionId)
         || !["hero", "intro", "relationship", "collection", "cta"].includes(type)
         || !exact(content, "heading,text") || !text(content.heading, 300) || !content.heading.trim()
-        || !text(content.text, 10000)) throw Error("Projection section refused");
+        || !text(content.text, nativeDraft ? 700_000 : 10000)) throw Error("Projection section refused");
       sectionIds.add(sectionId);
     }
   }

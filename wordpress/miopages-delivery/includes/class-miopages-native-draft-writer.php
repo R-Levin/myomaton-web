@@ -52,19 +52,50 @@ final class MioPages_Native_Draft_Writer
                 || count(array_unique($logicalIds)) !== count($logicalIds)) {
                 throw new RuntimeException('Native draft logical Page identity invalid.');
             }
+            $archive = $state['archive'] ?? [];
+            $baseline = $candidate['baselinePages'] ?? null;
+            $priorPosts = $current['posts'] ?? [];
             if ($current !== null) {
                 self::verifyDrafts($current);
-                $currentIds = $current['logicalPageIds'] ?? null;
-                $currentPaths = array_keys($current['posts']);
-                sort($currentPaths);
-                if ($currentPaths !== array_keys($logicalIds) || ($currentIds !== null && $currentIds !== $logicalIds)) {
+                if ($baseline === null) {
+                    $currentIds = $current['logicalPageIds'] ?? null;
+                    $currentPaths = array_keys($current['posts']);
+                    sort($currentPaths);
+                    if ($currentPaths !== array_keys($logicalIds) || ($currentIds !== null && $currentIds !== $logicalIds)) {
+                        throw new RuntimeException('Native draft logical Page identity changed.');
+                    }
+                } else {
+                    self::verifyBaseline($current, $baseline);
+                    foreach ($current['logicalPageIds'] as $path => $logicalId) {
+                        if (!isset($logicalIds[$path])) {
+                            $archive[$path] = ['logicalId' => $logicalId, 'post' => $current['posts'][$path]];
+                        }
+                    }
+                }
+            }
+            foreach ($logicalIds as $path => $logicalId) {
+                if (isset($current['logicalPageIds'][$path]) && $current['logicalPageIds'][$path] !== $logicalId) {
                     throw new RuntimeException('Native draft logical Page identity changed.');
+                }
+                foreach (($current['logicalPageIds'] ?? []) as $knownPath => $knownId) {
+                    if ($knownPath !== $path && ($knownId === $logicalId || rtrim($knownPath, '/') === rtrim($path, '/'))) {
+                        throw new RuntimeException('Native draft Page route identity changed.');
+                    }
+                }
+                foreach ($archive as $knownPath => $saved) {
+                    if ($knownPath === $path && $saved['logicalId'] === $logicalId) {
+                        self::verifyDrafts(['posts' => [$saved['post']]]);
+                        $priorPosts[$path] = $saved['post'];
+                        unset($archive[$path]);
+                    } elseif ($knownPath === $path || $saved['logicalId'] === $logicalId || rtrim($knownPath, '/') === rtrim($path, '/')) {
+                        throw new RuntimeException('Native draft archived Page identity changed.');
+                    }
                 }
             }
             $ids = [];
             foreach ($candidate['pages'] as $page) {
                 $path = $page['path'];
-                $ids[$path] = $current['posts'][$path]['ID'] ?? self::savePost([
+                $ids[$path] = $priorPosts[$path]['ID'] ?? self::savePost([
                     'post_type' => 'page', 'post_status' => 'draft',
                     'post_title' => $page['title'], 'post_content' => '',
                 ]);
@@ -72,9 +103,8 @@ final class MioPages_Native_Draft_Writer
             $attachments = MioPages_Native_Draft_Media::attach($candidate, $ids, $current['attachments'] ?? []);
             $posts = MioPages_Native_Draft_Content::posts($candidate, $ids, $attachments);
             foreach ($posts as $path => &$post) {
-                $post['post_name'] = $current['posts'][$path]['post_name']
-                    ?? self::newSlug($path, $post['ID']);
-                self::updateDraft($post, $current['posts'][$path] ?? null);
+                $post['post_name'] = $priorPosts[$path]['post_name'] ?? self::newSlug($path, $post['ID']);
+                self::updateDraft($post, $priorPosts[$path] ?? null);
             }
             unset($post);
             $next = ['siteProposalId' => $candidate['siteProposalId'], 'revision' => $candidate['revision'],
@@ -94,7 +124,8 @@ final class MioPages_Native_Draft_Writer
                 }
                 unset($post);
             }
-            return ['current' => $next, 'previous' => $previous, 'highWaterRevision' => $candidate['revision']];
+            return ['current' => $next, 'previous' => $previous, 'highWaterRevision' => $candidate['revision'],
+                ...($archive === [] ? [] : ['archive' => $archive])];
         });
         return ['operation' => 'apply', 'installationId' => $candidate['installationId'],
             'requestedDigest' => $digest, 'applied' => $applied];
@@ -120,22 +151,45 @@ final class MioPages_Native_Draft_Writer
                 throw new RuntimeException('Native draft restoration predecessor mismatch.');
             }
             self::verifyDrafts($current);
+            $archive = $state['archive'] ?? [];
+            $baseline = $candidate['baselinePages'] ?? null;
+            if ($baseline !== null) {
+                self::verifyBaseline($previous, $baseline);
+            }
             if (isset($current['logicalPageIds'])) {
-                if (($previous['logicalPageIds'] ?? null) !== $current['logicalPageIds']) {
+                if ($baseline === null && ($previous['logicalPageIds'] ?? null) !== $current['logicalPageIds']) {
                     throw new RuntimeException('Native draft restoration identity mismatch.');
                 }
-                foreach ($current['posts'] as $path => $post) {
-                    $prior = $previous['posts'][$path] ?? null;
-                    if ($prior === null || $prior['ID'] !== $post['ID'] || $prior['post_name'] !== $post['post_name']) {
+                foreach ($previous['posts'] as $path => $prior) {
+                    $post = $current['posts'][$path] ?? null;
+                    if ($post === null && $baseline !== null && ($archive[$path]['post'] ?? null) === $prior
+                        && $archive[$path]['logicalId'] === $previous['logicalPageIds'][$path]) {
+                        unset($archive[$path]);
+                        continue; // The retired draft remains intact. Readback below verifies this.
+                    }
+                    if ($post === null || $prior['ID'] !== $post['ID'] || $prior['post_name'] !== $post['post_name']) {
                         throw new RuntimeException('Native draft restoration target mismatch.');
                     }
                     self::updateDraft($prior, $post);
                 }
+                foreach (array_diff_key($current['posts'], $previous['posts']) as $path => $post) {
+                    $archive[$path] = ['logicalId' => $current['logicalPageIds'][$path], 'post' => $post];
+                }
             }
             self::verifyDrafts($previous);
             return ['current' => $previous, 'previous' => null, 'restoredFrom' => $digest,
-                'highWaterRevision' => $state['highWaterRevision']];
+                'highWaterRevision' => $state['highWaterRevision'], ...($archive === [] ? [] : ['archive' => $archive])];
         });
+    }
+
+    private static function verifyBaseline(array $current, array $baseline): void
+    {
+        $ids = array_column($baseline, 'id', 'path');
+        $paths = array_keys($ids);
+        ksort($ids);
+        if ($ids !== ($current['logicalPageIds'] ?? null) || $paths !== array_keys($current['posts'])) {
+            throw new RuntimeException('Native draft Page membership baseline mismatch.');
+        }
     }
 
     private static function newSlug(string $path, int $id): string

@@ -37,7 +37,8 @@ export async function siteBase(c: PoolClient, scope: Scope) {
   owned.navigationItems = (await c.query("SELECT i.* FROM navigation_items i JOIN navigations n ON n.id=i.navigation_id WHERE n.web_presence_id=$1 ORDER BY i.id", [scope.webPresenceId])).rows;
   return { graph: graph[0], pages, sections, ...owned };
 }
-export async function resolvePage(c: PoolClient, scope: Scope, page: PageProposal, base: Awaited<ReturnType<typeof siteBase>>) {
+export async function resolvePage(c: PoolClient, scope: Scope, page: PageProposal, base: Awaited<ReturnType<typeof siteBase>>, authorizedWorkflow = false) {
+  if (page.workflowReview && !authorizedWorkflow) throw Error("Protected workflow review boundary required");
   const current = base.pages.find(p => p.id === page.pageId);
   if (page.operation === "create-page" ? current || base.pages.some(p => p.slug === page.slug) : !current || current.slug !== page.slug) throw Error("Page destination conflict or foreign Page");
   if (page.operation === "create-page" && (await c.query("SELECT id FROM pages WHERE id=$1", [page.pageId])).rowCount) throw Error("Foreign Page identity");
@@ -63,7 +64,7 @@ export async function resolvePage(c: PoolClient, scope: Scope, page: PageProposa
   };
   const candidate: Candidate = { title: await resolve(page.title, "title", 300), sections: [] };
   for (const [index, s] of page.sections.entries()) {
-    const content = { heading: await resolve(s.heading, `sections/${index}/heading`, 300), ...(s.text ? { text: await resolve(s.text, `sections/${index}/text`, 2000) } : {}), ...(s.actionId ? { actionId: s.actionId } : {}) };
+    const content = { heading: await resolve(s.heading, `sections/${index}/heading`, 300), ...(s.text ? { text: await resolve(s.text, `sections/${index}/text`, page.workflowReview ? Infinity : 2000) } : {}), ...(s.actionId ? { actionId: s.actionId } : {}) };
     let action;
     if (s.actionId) {
       const row = (await c.query("SELECT * FROM actions WHERE id=$1 AND web_presence_id=$2", [s.actionId, scope.webPresenceId])).rows[0];
@@ -75,6 +76,6 @@ export async function resolvePage(c: PoolClient, scope: Scope, page: PageProposa
     if (!normalized) throw Error("Unsupported proposal Section");
     candidate.sections.push({ id: s.id, type: normalized.type, variant: normalized.variant, name: content.heading, content, configuration: normalized.configuration, ...(action ? { action } : {}) });
   }
-  if (!resolved.some(r => r.origin.kind === "canonical")) throw Error("At least one confirmed canonical factual source required");
+  if (!page.workflowReview && !resolved.some(r => r.origin.kind === "canonical")) throw Error("At least one confirmed canonical factual source required");
   return { candidate, resolved, baseFingerprint: fingerprint(base) };
 }

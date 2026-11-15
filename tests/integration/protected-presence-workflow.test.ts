@@ -12,56 +12,58 @@ import { readRetainedC0 } from "../../scripts/intake/retained-c0";
 import { prepareC0 } from "../../scripts/intake/adaptive-sources";
 import { IntakeService } from "../../lib/platform/intake/service";
 import { c0DisclosureManifest } from "../../lib/platform/intake/c0-workflow-knowledge";
-import { c0ActivationGrant } from "../../lib/platform/intake/c0-workflow-activation";
+import { c0ActivationGrant, c0HostedRunGrant } from "../../lib/platform/intake/c0-workflow-activation";
 import { fingerprint } from "../../lib/platform/canonical/model";
-import { initializeResponsesUsageLedger, meteredPresenceWorkflowImage } from "../../lib/platform/intake/intelligent-responses";
-import { acquirePresenceVisual, presenceVisualPlacement, presenceVisualRequest } from "../../lib/platform/intake/presence-workflow-visual";
+import { initializeResponsesUsageLedger } from "../../lib/platform/intake/intelligent-responses";
+import { presenceVisualPlacement, presenceVisualRequest } from "../../lib/platform/intake/presence-workflow-visual";
 import { openAIImageProvider } from "../../lib/platform/acquisition/openai";
-import { readManagedObject } from "../../lib/platform/assets/local-storage";
+import type { PageProposal } from "../../lib/platform/content-editing/proposal";
+import { workflowDeliveryInput } from "../../lib/platform/intake/presence-workflow-delivery";
 import { nativeDraftEnvelope } from "../../lib/platform/wordpress-delivery/native-draft-envelope";
 import { prepareNativeDraftMedia } from "../../lib/platform/wordpress-delivery/native-draft-media";
 import { bindSiteDraft } from "../../lib/platform/wordpress-delivery/site-draft";
 import { verifyNativeDraftReceipt } from "../../lib/platform/wordpress-delivery/native-draft-receipt";
-import type { PresenceWorkflowView, WorkflowContext } from "../../lib/platform/intake/presence-workflow";
+import type { PresenceWorkflowView, WorkflowContext, PresenceWorkflow } from "../../lib/platform/intake/presence-workflow";
 import { composePresenceCase, recoverPresenceResearch, reviewWorkflowChange, workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
 import type { PresenceWorkflowGrant } from "../../lib/platform/intake/presence-workflow-provider";
 import { publicResearchAddress } from "../../lib/platform/intake/presence-workflow-egress";
 
-async function proveProvisionalImage(context: WorkflowContext, view: PresenceWorkflowView, directory: string,
-  grant: PresenceWorkflowGrant, rates: Parameters<typeof initializeResponsesUsageLedger>[1]) {
+async function proveProvisionalImage(context: WorkflowContext, start: PresenceWorkflowView, root: string,
+  reopen: () => Promise<PresenceWorkflow>, calls: () => number) {
+  let view = start;
   const selection = presenceVisualPlacement(context, view, "/", 0);
   assert.throws(() => presenceVisualPlacement({ ...context, intakeId: randomUUID() }, view, "/", 0), /reviewed website/);
   assert.throws(() => presenceVisualPlacement(context, view, "/", 99), /needs an image/);
-  const root = join(directory, "private-master");
-  await mkdir(root, { mode: 0o700 });
-  const request = presenceVisualRequest("An abstract illustration of organized information and continuing care");
-  const png = await sharp({ create: { width: 1536, height: 1024, channels: 3, background: "#6843cf" } }).png().toBuffer();
-  let calls = 0;
-  const provider = openAIImageProvider({ key: "offline-only", model: "gpt-image-2.5-sunburst-2026-09-08",
-    transport: async (url, init) => {
-      assert.equal(url, "https://api.openai.com/v1/images/generations");
-      assert.equal(init?.redirect, "error");
-      const body = JSON.parse(String(init?.body));
-      assert.equal(body.prompt, request.prompt);
-      assert.equal(body.size, "1536x1024");
-      assert.equal(body.quality, "medium");
-      calls++;
-      return new Response(JSON.stringify({ data: [{ b64_json: png.toString("base64") }] }), { headers: { "x-request-id": "img_offline" } });
-    } });
-  const recheck = async () => {
-    assert.deepEqual(presenceVisualPlacement(context, view, "/", 0), selection);
-  };
-  const attribution = { ownerDigest: fingerprint(context.scope), workDigest: fingerprint({ selection, request }) };
-  const run = (scope = grant.ledger) => meteredPresenceWorkflowImage(directory, rates, scope, attribution, provider.model,
-    () => acquirePresenceVisual(provider, selection, request, root, randomUUID(), recheck), recheck);
-  await assert.rejects(run({ ...grant.ledger, capMicros: 499_999 }), /budget/);
-  assert.equal(calls, 0);
-  const image = await run();
-  await assert.rejects(run(), /duplicate/);
-  assert.equal(calls, 1);
-  assert.equal(image.rightsStatus, "pending-review");
-  const master = await readManagedObject(root, selection.owner, "objects/" + image.masterDigest);
+  const author = { id: "test-placement-author", role: "operator", simulated: false, authority: "prepare-fixture" } as const;
+  const reviewer = { id: "test-visual-reviewer", role: "operator", simulated: false, authority: "review-fixture" } as const;
+  let worker = await reopen();
+  assert.equal(start.visuals?.length, 0);
+  await assert.rejects(worker.queueVisual(context, view.version, { ...author, authority: undefined }, "/", 0, "concept"), { code: "unavailable" });
+  await assert.rejects(worker.queueVisual(context, view.version, author, "/", 0, "unapproved"), { code: "workflow_not_ready" });
+  view = (await worker.queueVisual(context, view.version, author, "/", 0, "concept"))!;
+  await assert.rejects(worker.queueVisual(context, view.version, author, "/", 0, "concept"), { code: "workflow_not_ready" });
+  view = (await worker.queueVisual(context, view.version, author, "/", 1, "concept"))!;
+  assert.equal(calls(), 0);
+  worker = await reopen();
+  view = (await workPresenceCase(worker, context))!;
+  view = (await workPresenceCase(worker, context))!;
+  assert.deepEqual(view.visuals?.map(item => item.state), ["review", "review"]);
+  assert.equal(calls(), 2);
+  const unresolved = view.visuals![0];
+  const master = await worker.visualImage(context, unresolved.id);
   assert.equal((await sharp(master).metadata()).width, 1536);
+  await assert.rejects(worker.visualImage({ ...context, intakeId: randomUUID() }, unresolved.id), { code: "unavailable" });
+  const review = (visual: NonNullable<PresenceWorkflowView["visuals"]>[number], decision = "approved") => ({
+    id: visual.id, provenanceDigest: visual.result!.provenanceDigest, decision, alt: "Illustration for Section " + visual.placement.sectionIndex,
+    reference: "Offline exact private-use decision",
+  });
+  await assert.rejects(worker.decideVisual(context, view.version, reviewer, { ...review(unresolved), provenanceDigest: "0".repeat(64) }),
+    { code: "workflow_not_ready" });
+  for (const visual of view.visuals!) view = (await worker.decideVisual(context, view.version, reviewer, review(visual)))!;
+  assert.deepEqual(view.visuals?.map(item => item.state), ["approved", "approved"]);
+  worker = await reopen();
+  assert.deepEqual(await worker.review(context), view);
+  assert.equal(calls(), 2);
   const scope = { ...context.scope, organizationId: randomUUID() };
   const project = (path: string) => {
     const page = view.pages.find(item => item.path === path)!;
@@ -70,14 +72,32 @@ async function proveProvisionalImage(context: WorkflowContext, view: PresenceWor
     })) };
   };
   const home = project("/"), service = project("/service");
-  const imageCopy = await prepareNativeDraftMedia(root, selection.owner, home.id, {
-    sectionId: home.sections[0].id, assetId: randomUUID(), usageId: randomUUID(), role: "image",
-    configuration: { image: { altText: "Abstract illustration of organized information", decorative: false } },
-    preparedDigest: image.masterDigest, mimeType: "image/png", width: image.width, height: image.height, priorUsage: null,
-    // Explicit fixture permission stands in for independent media review here.
-    evidence: { source: "synthetic-project-raster", sourceDigest: image.provenanceDigest,
-      permission: "disposable-preview-release", reference: "Offline automated fixture only" },
-  });
+  const editorial = (text: string) => ({ kind: "editorial" as const, text, rationale: "Reviewed test selection" });
+  const input: PageProposal = { pageId: home.id, slug: "/", operation: "create-page", title: editorial(home.title), purpose: "Verify protected placement",
+    workflowReview: { intakeId: context.intakeId, candidateDigest: view.operatorReview!.target },
+    sections: home.sections.map((section, index) => {
+      const approved = view.visuals!.find(item => item.placement.sectionIndex === index);
+      return { id: section.id, type: "intro", heading: editorial(section.content.heading), text: editorial(section.content.text),
+        ...(approved && { image: { ...approved.association!, altText: approved.decision!.alt! } }) };
+    }) };
+  const candidate = { title: home.title, sections: home.sections.map(section => ({
+    ...section, variant: "stack", name: section.content.heading, configuration: {},
+  })) };
+  const resolve = worker.privateVisualResolver(context);
+  const eligible = await resolve(context.scope, input, candidate);
+  assert.equal(eligible.media.length, 2);
+  assert.ok(eligible.media.every(media => media.evidence.permission === "non-public-draft-only"));
+  await assert.rejects(resolve(context.scope, { ...input, workflowReview: { ...input.workflowReview!, intakeId: randomUUID() } }, candidate), /protected visual review/);
+  const edited = structuredClone(candidate);
+  edited.sections[0].content.text += " Changed after image review.";
+  await assert.rejects(resolve(context.scope, input, edited), /copy changed/);
+  const [imageCopy, second] = await Promise.all(eligible.media.map(media => prepareNativeDraftMedia(root, selection.owner, home.id, media)));
+  assert.notEqual(imageCopy.descriptor.usageId, second.descriptor.usageId);
+  const prepared = workflowDeliveryInput(context, view, [{ id: home.id, path: "/" }, { id: service.id, path: "/service" }], []);
+  assert.equal(prepared.pages.length, 5);
+  assert.equal(prepared.pages.find(page => page.slug === "/")?.pageId, home.id);
+  assert.equal(prepared.pages.find(page => page.slug === "/")?.sections.filter(section => section.image).length, 2);
+  assert.ok(prepared.pages.every(page => page.workflowReview?.candidateDigest === view.operatorReview?.target));
   const member = (page: typeof home) => ({ ...scope, proposalId: randomUUID(), revision: 1,
     approvalId: fingerprint("fixture approval " + page.path), previewDigest: fingerprint("fixture preview " + page.path),
     sourceDigest: view.contextDigest, projectionDigest: fingerprint([page]), pages: [page] });
@@ -86,7 +106,7 @@ async function proveProvisionalImage(context: WorkflowContext, view: PresenceWor
     actions: [{ id: randomUUID(), from: "/", destination: "/service", type: "page", label: "Explore the service" }] };
   const homeReview = member(home), serviceReview = member(service);
   const baseline = bindSiteDraft(scope, [homeReview, serviceReview], { ...draftSelection, revision: 1, previousDigest: null });
-  const draft = bindSiteDraft(scope, [{ ...homeReview, media: imageCopy.descriptor }, serviceReview],
+  const draft = bindSiteDraft(scope, [{ ...homeReview, media: [imageCopy.descriptor] }, serviceReview],
     { ...draftSelection, revision: 2, previousDigest: baseline.digest });
   assert.equal(draft.candidate.media?.[0].copyDigest, createHash("sha256").update(imageCopy.bytes).digest("hex"));
   const { privateKey, publicKey } = generateKeyPairSync("ed25519");
@@ -110,6 +130,11 @@ async function proveProvisionalImage(context: WorkflowContext, view: PresenceWor
   assert.equal(receipt.attachments[0].postId, receipt.posts[0].id);
   assert.throws(() => verifyNativeDraftReceipt(wire, secret, { ...expected, pageIds: [service.id, home.id] }), /placement/);
   assert.throws(() => verifyNativeDraftReceipt(wire, secret, { ...expected, media: [] }), /authorization/);
+  view = (await worker.decideVisual(context, view.version, reviewer, review(view.visuals![0], "revoked")))!;
+  await assert.rejects(worker.visualImage(context, view.visuals![0].id), { code: "unavailable" });
+  await assert.rejects(resolve(context.scope, input, candidate), /approved private image placements/);
+  assert.equal(calls(), 2);
+  return view;
 }
 
 const readSql = (file: string) => readFile(new URL("../../lib/platform/intake/" + file, import.meta.url), "utf8");
@@ -160,7 +185,21 @@ test("restricted Core worker discovers research, retains a substantial provider-
     const rates = { model: "gpt-5.4-mini-2026-03-17", verifiedOn: "2026-11-15", countMicros: 0,
       inputPerMillion: 750_000, outputPerMillion: 4_500_000, cachedPerMillion: 75_000, cacheWritePerMillion: 0 };
     await initializeResponsesUsageLedger(ledgerDirectory, rates);
-    const workspace = { root: ledgerDirectory, grantFile: join(ledgerDirectory, "unused-test-grant.json"), ledgerDirectory };
+    const visualDirectory = join(ledgerDirectory, "private-master");
+    await mkdir(visualDirectory, { mode: 0o700 });
+    const workspace = { root: ledgerDirectory, grantFile: join(ledgerDirectory, "unused-test-grant.json"), ledgerDirectory, visualDirectory };
+    const png = await sharp({ create: { width: 1536, height: 1024, channels: 3, background: "#6843cf" } }).png().toBuffer();
+    const safePrompt = "An abstract illustration of organized information and continuing care";
+    let imageCalls = 0;
+    const imageProvider = openAIImageProvider({ key: "offline-only", model: "gpt-image-2.5-sunburst-2026-09-08",
+      transport: async (url, init) => {
+        assert.equal(url, "https://api.openai.com/v1/images/generations");
+        const body = JSON.parse(String(init?.body));
+        assert.equal(body.prompt, presenceVisualRequest(safePrompt).prompt);
+        imageCalls++;
+        return new Response(JSON.stringify({ data: [{ b64_json: png.toString("base64") }] }), { headers: { "x-request-id": "img_offline" } });
+      },
+    });
     const client = await setup.pool.connect();
     try {
       await client.query("SET ROLE miopages_core_development");
@@ -170,7 +209,7 @@ test("restricted Core worker discovers research, retains a substantial provider-
       let reportAttempts = 0;
       let searchRequests = 0;
       let missingMarketRead = true;
-      const composition = composePresenceCase(restricted, intake, token, workspace, { kind: "offline-test", rates,
+      const composition = composePresenceCase(restricted, intake, token, workspace, { kind: "offline-test", rates, imageProvider,
         readGrant: async () => grant,
         async fetchPage(url, init) {
           assert.equal(init?.redirect, "error");
@@ -261,16 +300,38 @@ test("restricted Core worker discovers research, retains a substantial provider-
         assert.equal(c0ActivationGrant(context, bytes, hash, ledger).approvedSources.length, 20);
         assert.throws(() => c0ActivationGrant(context, bytes, "0".repeat(64), ledger), /exact owner-reviewed manifest/i);
         assert.throws(() => c0ActivationGrant(context, bytes, hash, Buffer.from("{}")), /baseline|attempts/i);
+        const newPlan = {
+          schema: "miopages.c0-hosted-presence/2", scope: context.scope,
+          sourceEvidence: { contextDigest: manifest.contextDigest, exactCandidates: proposal.sourceEvidence.exactCandidates.map(
+            ({ id, digest }: { id: string; digest: string }) => ({ id, digest })), approvedCorrections: [] },
+          existingLedger: { digest: createHash("sha256").update(ledger).digest("hex"), attempts: 1,
+            uncertainReservation: fingerprint(JSON.parse(ledger.toString("utf8")).attempts[0]), uncertainMicros: 8_400 },
+          provider: { model: rates.model, store: false, automaticRetries: 0, requests: 60, generations: 30, maxInputTokens: 64_000,
+            maxInputBytes: 320_000, maxOutputTokens: 20_000, additionalCapMicros: 20_000_000, maxRetries: 2, maxEditorialRevisions: 3 },
+          research: { roots: [{ id: "research:seed", url: "https://example.org/", label: "Market reference" }],
+            market: { publicQuery: "small business website management and service buying considerations", maxToolCalls: 4, maxSources: 10, minimumNewOrigins: 3 },
+            maxSourceBytes: 450_000 },
+          images: { model: imageProvider.model, briefs: [{ id: "concept", label: "Concept illustration", prompt: safePrompt }] },
+          rollout: { commit: "0".repeat(40), artifactSha256: "0".repeat(64), wordpressOrigin: "https://miopages.org",
+            installationId: randomUUID(), privateOnly: true, expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() },
+        };
+        const proposed = Buffer.from(JSON.stringify(newPlan));
+        const proposedDigest = createHash("sha256").update(proposed).digest("hex");
+        assert.equal(c0HostedRunGrant(context, proposed, proposedDigest, ledger).ledger.capMicros, 20_000_000);
+        assert.throws(() => c0HostedRunGrant(context, proposed, hash, ledger), /exact owner-reviewed/i);
+        assert.throws(() => c0HostedRunGrant(context, proposed, proposedDigest, Buffer.from("{}")), /ledger changed/i);
+        assert.throws(() => c0HostedRunGrant({ ...context, intakeId: randomUUID() }, proposed, proposedDigest, ledger), /projection differs/i);
       }
       const grant: PresenceWorkflowGrant = {
         contextDigest: manifest.contextDigest, approvedSources: manifest.approvedSourceCandidates.map(source => source.digest),
-        approvedCorrections: [], maxRetries: 1, maxEditorialRevisions: 1, maxOutputTokens: 12_000, expiresAt: Date.now() + 180_000,
+        approvedCorrections: [], maxRetries: 1, maxEditorialRevisions: 1, maxOutputTokens: 12_000,
+        images: { model: imageProvider.model, briefs: [{ id: "concept", label: "Concept illustration", prompt: safePrompt }] }, expiresAt: Date.now() + 180_000,
         researchSources: [{ id: "research:competitor", url: "https://example.org/", label: "Market reference" }],
         marketSearch: { publicQuery: "managed website services for small businesses, buying considerations and trust",
           maxToolCalls: 2, maxSources: 4, minimumNewOrigins: 2 },
         researchResponseBytes: 12_000, ledger: { id: fingerprint("offline-only grant"), baselineAttempts: 0,
           startingLedger: createHash("sha256").update(await readFile(ledgerFile)).digest("hex"),
-          requests: 28, generations: 14, capMicros: 1_800_000, inputTokens: 24_000, inputBytes: 120_000 },
+          requests: 32, generations: 16, capMicros: 1_800_000, inputTokens: 24_000, inputBytes: 120_000 },
       };
       const owner = { id: "test-verified-operator", role: "operator", simulated: false } as const;
       let worker = await composition.open();
@@ -322,7 +383,7 @@ test("restricted Core worker discovers research, retains a substantial provider-
       view = (await reviewWorkflowChange(worker, context, "workflow-review", view.version, owner))!;
       assert.equal(view.next, "review-complete");
       assert.equal(searchRequests, 1);
-      await proveProvisionalImage(context, view, ledgerDirectory, grant, rates);
+      view = await proveProvisionalImage(context, view, visualDirectory, composition.open, () => imageCalls);
       assert.deepEqual(await (await composition.open()).review(context), view);
       const { rows: [size] } = await client.query("SELECT count(*)::int AS captured, max(octet_length(bytes)) AS largest FROM miopages_core_workflow.presence_workflow_outputs");
       assert.ok(size.captured >= 12 && size.largest > 10_000);

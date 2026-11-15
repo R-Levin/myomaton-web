@@ -18,6 +18,7 @@ $lint = [
     'includes/class-miopages-native-draft-envelope.php',
     'includes/class-miopages-native-draft-receipt.php',
     'tests/native-draft-media.php',
+    'tests/native-draft-membership.php',
     'tests/core-pull-compat.php',
     'tests/node-issuer-compat.php',
 ];
@@ -52,8 +53,10 @@ foreach ($suites as $path) {
 $run(['node', $root . '/scripts/wordpress-cross-runtime-signature-proof.mjs'],
     'Node-to-PHP signed envelope compatibility');
 
+$run(['node', $root . '/scripts/wordpress-native-draft-membership-proof.mjs'], 'Native Page membership and private file proof');
+
 if ($failures > 0) {
     echo "FAIL: consolidated WordPress offline gate ({$failures} failed checks).\n";
     exit(1);
 }
-echo "PASS: consolidated WordPress offline gate (" . count($lint) . " lints, " . count($suites) . " smoke suites, 1 Node-to-PHP compatibility test).\n";
+echo "PASS: consolidated WordPress offline gate (" . count($lint) . " lints, " . count($suites) . " smoke suites, 2 Node-to-PHP compatibility tests).\n";

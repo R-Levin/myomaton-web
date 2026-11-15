@@ -2,12 +2,19 @@ import { createHash } from "node:crypto";
 import { lstat, realpath } from "node:fs/promises";
 import { isAbsolute, sep } from "node:path";
 import { prepareManagedBytes } from "../assets/ingestion";
-import { provisionManagedObject } from "../assets/local-storage";
+import { provisionManagedObject, readManagedObject } from "../assets/local-storage";
 import type { ImageProvider, ImageRequest } from "../acquisition/contracts";
-import { fingerprint, text, uuid } from "../canonical/model";
+import { fingerprint, object, text, uuid } from "../canonical/model";
 import type { PresenceWorkflowView, WorkflowContext } from "./presence-workflow";
+import { validateStoredMedia } from "../assets/media-validation";
+import { hash } from "../content-editing/proposal";
 
-export function presenceVisualPlacement(context: WorkflowContext, view: PresenceWorkflowView, path: string, sectionIndex: number) {
+export type PresenceVisualPlacement = {
+  owner: string; site: string; intake: string; path: string; sectionIndex: number;
+  sectionDigest: string; candidateDigest: string; purpose: string; brief: string; altIntent: string;
+};
+
+export function presenceVisualPlacement(context: WorkflowContext, view: PresenceWorkflowView, path: string, sectionIndex: number): PresenceVisualPlacement {
   const decision = view.operatorReview;
   if (view.contextDigest !== fingerprint(context) || view.next !== "review-complete" || !decision || decision.target !== fingerprint({
     confirmation: view.confirmation?.target, direction: view.direction, blueprint: view.blueprint, pages: view.pages, editorial: view.editorial,
@@ -24,7 +31,62 @@ export function presenceVisualPlacement(context: WorkflowContext, view: Presence
   };
 }
 
-export type PresenceVisualPlacement = ReturnType<typeof presenceVisualPlacement>;
+export type PresenceImageGrant = { model: string; briefs: readonly { id: string; label: string; prompt: string }[] };
+export type PresenceVisualResult = Awaited<ReturnType<typeof acquirePresenceVisual>>;
+export type PresenceVisual = {
+  id: string;
+  placement: PresenceVisualPlacement;
+  briefId: string;
+  requestDigest: string;
+  requester: { id: string; authority: string };
+  leaseUntil?: number;
+  state: "queued" | "running" | "review" | "approved" | "rejected" | "revoked" | "unverified";
+  result?: PresenceVisualResult;
+  association?: { assetId: string; usageId: string };
+  decision?: {
+    scope: "non-public-draft-only";
+    at: string;
+    reviewer: { id: string; authority: string };
+    reference: string;
+    alt: string | null;
+    provenanceDigest: string;
+  };
+};
+export type PresenceVisualOperations = {
+  briefs: readonly { id: string; label: string; requestDigest: string }[];
+  requestable: boolean;
+  execute?: (visual: PresenceVisual, retain: (value: PresenceVisualResult) => Promise<void>) => Promise<PresenceVisualResult>;
+  recover: (visual: PresenceVisual, bytes: Buffer) => Promise<PresenceVisualResult>;
+  read: (visual: PresenceVisual) => Promise<Buffer>;
+};
+
+export function validatePresenceImageGrant(value: unknown): PresenceImageGrant {
+  const grant = object(value, ["model", "briefs"]);
+  if (grant.model !== "gpt-image-2.5-sunburst-2026-09-08" || !Array.isArray(grant.briefs) || !grant.briefs.length) {
+    throw Error("Exact private image grant required");
+  }
+  const briefs = grant.briefs.map(raw => {
+    const brief = object(raw, ["id", "label", "prompt"]);
+    if (typeof brief.id !== "string" || !/^[a-z0-9-]{1,64}$/u.test(brief.id)) throw Error("Visual brief identity refused");
+    return { id: brief.id, label: text(brief.label, 160), prompt: text(brief.prompt, 3000, true) };
+  });
+  if (new Set(briefs.map(brief => brief.id)).size !== briefs.length) throw Error("Duplicate authorized visual brief");
+  return { model: grant.model, briefs };
+}
+
+export async function readPresenceVisual(root: string, visual: PresenceVisual) {
+  const result = visual.result;
+  if (!result || result.selection !== fingerprint(visual.placement) || result.prompt !== visual.requestDigest) {
+    throw Error("Retained visual provenance differs from placement");
+  }
+  const { provenanceDigest, usage, actualMicros, ...provenance } = result;
+  if (typeof usage !== "object" || (actualMicros !== null && (!Number.isSafeInteger(actualMicros) || actualMicros < 0)) ||
+      fingerprint(provenance) !== provenanceDigest ||
+      result.provider !== "openai" || result.rightsStatus !== "pending-review") throw Error("Retained visual source refused");
+  const bytes = await readManagedObject(root, visual.placement.owner, "objects/" + hash(result.masterDigest));
+  await validateStoredMedia(bytes, "image/png", result);
+  return bytes;
+}
 
 // Bind the already allowed outbound prompt, not raw research, customer answers,
 // section copy, or unreviewed model instructions. This helper performs no I/O.

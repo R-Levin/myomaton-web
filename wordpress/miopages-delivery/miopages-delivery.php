@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MioPages Delivery (Development Proof)
  * Description: Restricted, read-only C0 fixture preview for the MioPages WordPress delivery feasibility proof.
- * Version: 0.0.11
+ * Version: 0.0.12
  * Requires PHP: 8.3
  * Text Domain: miopages-delivery
  */
@@ -21,6 +21,18 @@ require_once __DIR__ . '/includes/class-miopages-private-staging.php';
 if (defined('WP_CLI') && WP_CLI && defined('MIOPAGES_NATIVE_DRAFT_IDENTITY') && is_array(MIOPAGES_NATIVE_DRAFT_IDENTITY)) {
     require_once __DIR__ . '/includes/class-miopages-native-draft-writer.php';
     require_once __DIR__ . '/includes/class-miopages-native-draft-receipt.php';
+    WP_CLI::add_command('miopages native-draft-media', static function (): void {
+        try {
+            $wire = stream_get_contents(STDIN, 3800001);
+            if (!is_string($wire)) {
+                throw new RuntimeException('Native draft media input unavailable.');
+            }
+            $digest = MioPages_Native_Draft_Media::stage($wire, MIOPAGES_NATIVE_DRAFT_IDENTITY);
+            WP_CLI::line(wp_json_encode(['status' => 'staged-private', 'copyDigest' => $digest]));
+        } catch (Throwable $error) {
+            WP_CLI::error('Native draft media staging refused. Verify current private media before retry.');
+        }
+    });
     WP_CLI::add_command('miopages native-draft', static function (): void {
         try {
             $pull = defined('MIOPAGES_PRIVATE_PULL') ? MIOPAGES_PRIVATE_PULL : null;
@@ -69,6 +81,18 @@ if (defined('WP_CLI') && WP_CLI && defined('MIOPAGES_PRIVATE_PULL') && is_array(
 
 if (defined('MIOPAGES_NATIVE_DRAFT_MEDIA_DIRECTORY') && defined('MIOPAGES_NATIVE_DRAFT_IDENTITY')) {
     require_once __DIR__ . '/includes/class-miopages-native-draft-media.php';
+    add_filter('wp_get_attachment_url', static function ($url, $id) {
+        if (get_post_meta((int) $id, '_miopages_private_draft', true) !== '1') {
+            return $url;
+        }
+        $installation = MIOPAGES_NATIVE_DRAFT_IDENTITY['installationId'] ?? null;
+        return is_string($installation) && MioPages_Native_Draft_Media::previewAllowed($installation, (int) $id)
+            ? MioPages_Native_Draft_Media::url((int) $id) : false;
+    }, 10, 2);
+    // Shared immutable copies remain available to retained rollback evidence.
+    add_filter('pre_delete_attachment', static function ($decision, $post) {
+        return get_post_meta($post->ID, '_miopages_private_draft', true) === '1' ? false : $decision;
+    }, 10, 2);
     add_action('admin_post_miopages_native_draft_image', static function (): void {
         header('Cache-Control: private, no-store');
         header('X-Content-Type-Options: nosniff');

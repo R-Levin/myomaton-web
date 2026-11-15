@@ -404,6 +404,19 @@ export async function meteredPresenceWorkflowImage<T extends { requestId: string
   }
 }
 
+export async function confirmPresenceWorkflowImage(directory: string, scope: WorkflowUsageScope, attribution: QuestionAttribution,
+  model: string, result: unknown) {
+  const file = join(directory, "onboarding-usage.json");
+  const info = await lstat(file);
+  if (!info.isFile() || await realpath(file) !== file ||
+      (process.platform !== "win32" && (info.uid !== process.getuid?.() || (info.mode & 0o777) !== 0o600))) throw Error("Private image ledger refused");
+  const ledger = JSON.parse(await readFile(file, "utf8")) as Ledger;
+  const [receipt, duplicate] = recentWorkflow(ledger, scope, attribution.ownerDigest).filter(item => item.workDigest === attribution.workDigest);
+  if (!receipt || duplicate || receipt.status !== "completed" || receipt.countDispatched || !receipt.generationDispatched ||
+      receipt.reservedMicros !== imageEnvelopeMicros || receipt.estimatedMicros !== imageEnvelopeMicros ||
+      receipt.imageRun?.model !== model || receipt.imageRun.resultDigest !== fingerprint(result)) throw Error("Exact image usage receipt required");
+}
+
 function verifiedSpend(ledger: Ledger, retainedReservation?: string) {
   let retained = false;
   const spent = ledger.attempts.reduce((total, receipt) => {

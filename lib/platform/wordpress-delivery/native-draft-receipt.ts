@@ -15,6 +15,9 @@ export type NativeDraftReceiptExpectation = {
   paths: readonly string[];
   media?: readonly NativeDraftMedia[];
   pageIds?: readonly string[];
+  baselinePaths?: readonly string[];
+  appliedBaseline?: string;
+  requestedPaths?: readonly string[];
   requestedRevision?: number;
   materializedBaseline?: { requestedDigest: string; appliedDigest: string; revision: number };
 };
@@ -27,7 +30,7 @@ export function verifyNativeDraftReceipt(value: unknown, secret: Buffer, expecte
 
 function verifyReceipt(value: unknown, secret: Buffer, expected: NativeDraftReceiptExpectation, historicalMedia: boolean) {
   const wire = object(value, ["receiptBase64", "mac"]);
-  if (secret.length !== 32 || typeof wire.receiptBase64 !== "string" || wire.receiptBase64.length > 64_000) {
+  if (secret.length !== 32 || typeof wire.receiptBase64 !== "string" || wire.receiptBase64.length > 1_048_576) {
     throw Error("Native draft receipt encoding refused");
   }
   const bytes = Buffer.from(wire.receiptBase64, "base64");
@@ -44,7 +47,7 @@ function verifyReceipt(value: unknown, secret: Buffer, expected: NativeDraftRece
       body.operation !== expected.operation || requestedDigest !== expected.requestedDigest || appliedDigest !== expected.appliedDigest ||
       (expected.operation === "apply" ? requestedDigest !== appliedDigest : requestedDigest === appliedDigest) ||
       typeof body.revision !== "number" || !Number.isSafeInteger(body.revision) || body.revision < 1 || body.revision !== expected.revision ||
-      !Array.isArray(body.posts) || body.posts.length < 1 || body.posts.length > 16 || body.posts.length !== expected.paths.length) {
+      !Array.isArray(body.posts) || body.posts.length < 1 || body.posts.length !== expected.paths.length) {
     throw Error("Native draft receipt decision mismatch");
   }
   const posts = body.posts.map((value, index) => {
@@ -54,7 +57,7 @@ function verifyReceipt(value: unknown, secret: Buffer, expected: NativeDraftRece
     return { path: expected.paths[index], id: post.id, contentSha256: hash(post.contentSha256) };
   });
   if (new Set(posts.map(post => post.id)).size !== posts.length) throw Error("Duplicate native draft receipt post");
-  if (body.version === 2 && (!Array.isArray(body.attachments) || !body.attachments.length || body.attachments.length > posts.length)) {
+  if (body.version === 2 && (!Array.isArray(body.attachments) || !body.attachments.length)) {
     throw Error("Native draft attachment count refused");
   }
   const attachments = (body.attachments as unknown[] | undefined)?.map(value => {
@@ -70,7 +73,8 @@ function verifyReceipt(value: unknown, secret: Buffer, expected: NativeDraftRece
     return { id: item.id, postId: item.postId as number, media };
   });
   if (attachments && (new Set(attachments.map(item => item.id)).size !== attachments.length ||
-      new Set(attachments.map(item => item.postId)).size !== attachments.length)) throw Error("Duplicate native draft attachment");
+      new Set(attachments.map(item => item.media.sectionId)).size !== attachments.length ||
+      new Set(attachments.map(item => item.media.usageId)).size !== attachments.length)) throw Error("Duplicate native draft attachment");
   if ((!historicalMedia || expected.media) &&
       fingerprint(attachments?.map(item => item.media) ?? []) !== fingerprint(expected.media ?? [])) {
     throw Error("Native draft receipt media differs from authorization");
@@ -94,10 +98,15 @@ export class NativeDraftReceiptJournal {
 
   async read(installationId: string, digest: string, operation: "apply" | "restore") {
     const file = await this.file(installationId, digest, operation), stat = await lstat(file);
-    if (!stat.isFile() || stat.size > 68_000 || (process.getuid && (stat.uid !== process.getuid() || (stat.mode & 0o777) !== 0o600))) {
+    if (!stat.isFile() || stat.size > 1_055_000 || (process.getuid && (stat.uid !== process.getuid() || (stat.mode & 0o777) !== 0o600))) {
       throw Error("Stored native draft receipt refused");
     }
     return JSON.parse(await readFile(file, "utf8")) as unknown;
+  }
+
+  async verifyAppliedBaseline(expected: Omit<NativeDraftReceiptExpectation, "operation">, secret: Buffer) {
+    return verifyReceipt(await this.read(expected.installationId, expected.appliedDigest, "apply"), secret,
+      { ...expected, operation: "apply" }, true);
   }
 
   async verifyMaterializedBaseline(expected: Omit<NativeDraftReceiptExpectation, "operation">, secret: Buffer) {
@@ -115,10 +124,15 @@ export class NativeDraftReceiptJournal {
   async record(expected: NativeDraftReceiptExpectation, secret: Buffer, wire: unknown) {
     const verify = (value: unknown) => verifyReceipt(value, secret, expected, expected.operation === "restore");
     const verified = verify(wire);
-    if (expected.operation === "apply" && expected.materializedBaseline) {
-      const baseline = await this.verifyMaterializedBaseline({ installationId: expected.installationId,
-        siteProposalId: expected.siteProposalId, paths: expected.paths, ...expected.materializedBaseline }, secret);
-      if (baseline.posts.some((post, index) => post.id !== verified.posts[index].id)) {
+    if (expected.operation === "apply" && (expected.materializedBaseline || expected.appliedBaseline)) {
+      const selection = { installationId: expected.installationId, siteProposalId: expected.siteProposalId,
+        paths: expected.baselinePaths ?? expected.paths };
+      const baseline = expected.materializedBaseline
+        ? await this.verifyMaterializedBaseline({ ...selection, ...expected.materializedBaseline }, secret)
+        : await this.verifyAppliedBaseline({ ...selection, requestedDigest: expected.appliedBaseline!,
+          appliedDigest: expected.appliedBaseline!, revision: expected.revision - 1 }, secret);
+      const original = new Map(baseline.posts.map(post => [post.path, post.id]));
+      if (verified.posts.some(post => original.has(post.path) && original.get(post.path) !== post.id)) {
         throw Error("Applied draft differs from materialized Page identities");
       }
     }
@@ -128,7 +142,7 @@ export class NativeDraftReceiptJournal {
       }, true);
       verifyReceipt(await this.read(expected.installationId, expected.requestedDigest, "apply"), secret, {
         ...expected, operation: "apply", appliedDigest: expected.requestedDigest, revision: expected.requestedRevision ?? expected.revision + 1,
-        media: undefined, pageIds: undefined,
+        media: undefined, pageIds: undefined, paths: expected.requestedPaths ?? expected.paths,
       }, true);
       if (fingerprint(previous.posts) !== fingerprint(verified.posts) ||
           fingerprint(previous.attachments ?? []) !== fingerprint(verified.attachments ?? [])) throw Error("Restored draft differs from previous readback");

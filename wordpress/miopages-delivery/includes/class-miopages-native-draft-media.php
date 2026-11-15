@@ -14,10 +14,10 @@ final class MioPages_Native_Draft_Media
     {
         $media = $candidate['media'] ?? null;
         if (!is_array($media) || !array_is_list($media) || $media === []
-            || !is_array($candidate['pages'] ?? null) || count($media) > count($candidate['pages'])) {
+            || !is_array($candidate['pages'] ?? null)) {
             throw new InvalidArgumentException('Native draft media claims refused.');
         }
-        $usedPages = [];
+        $usedSections = [];
         $usages = [];
         foreach ($media as $item) {
             if (!is_array($item) || count($item) !== 10) {
@@ -37,21 +37,21 @@ final class MioPages_Native_Draft_Media
                 || min($item['width'], $item['height']) < 1 || max($item['width'], $item['height']) > 1600
                 || !is_string($item['alt'] ?? null) || trim($item['alt']) === '' || strlen($item['alt']) > 2000
                 || preg_match('/[<>\x00-\x1f\x7f]/', $item['alt'])
-                || isset($usedPages[$item['pageId']]) || isset($usages[$item['usageId']])) {
+                || isset($usedSections[$item['sectionId']]) || isset($usages[$item['usageId']])) {
                 throw new InvalidArgumentException('Native draft media placement refused.');
             }
             $pages = array_values(array_filter($candidate['pages'], static fn($page) => ($page['id'] ?? null) === $item['pageId']));
             $targets = array_filter($pages[0]['sections'] ?? [], static fn($section) =>
-                ($section['id'] ?? null) === $item['sectionId'] && ($section['type'] ?? null) === 'intro');
+                ($section['id'] ?? null) === $item['sectionId'] && in_array($section['type'] ?? null, ['hero', 'intro', 'relationship', 'collection', 'cta'], true));
             if (count($pages) !== 1 || count($targets) !== 1) {
                 throw new InvalidArgumentException('Native draft media placement mismatch.');
             }
-            $usedPages[$item['pageId']] = true;
+            $usedSections[$item['sectionId']] = true;
             $usages[$item['usageId']] = true;
         }
     }
 
-    public static function bytes(array $item): string
+    private static function file(array $item): string
     {
         $directory = defined('MIOPAGES_NATIVE_DRAFT_MEDIA_DIRECTORY') ? MIOPAGES_NATIVE_DRAFT_MEDIA_DIRECTORY : '';
         $pull = defined('MIOPAGES_PRIVATE_PULL') ? MIOPAGES_PRIVATE_PULL : [];
@@ -70,7 +70,13 @@ final class MioPages_Native_Draft_Media
                 throw new RuntimeException('Private draft media must be outside web roots.');
             }
         }
-        $file = $directory . '/' . $item['copyDigest'] . '.webp';
+        return $directory . '/' . $item['copyDigest'] . '.webp';
+    }
+
+    public static function bytes(array $item): string
+    {
+        $file = self::file($item);
+        $owner = posix_geteuid();
         clearstatcache(true, $file);
         $before = @lstat($file);
         if (!$before || !is_file($file) || realpath($file) !== $file || $before['uid'] !== $owner
@@ -93,6 +99,61 @@ final class MioPages_Native_Draft_Media
         } finally {
             fclose($handle);
         }
+    }
+
+    /** Store only a copy identified by a valid apply envelope. Safe to repeat. */
+    public static function stage(string $wire, array $identity): string
+    {
+        if (!defined('WP_CLI') || !WP_CLI || !current_user_can('edit_pages') || !current_user_can('upload_files') || strlen($wire) > 3800000) {
+            throw new RuntimeException('Native draft media requires scoped CLI composition.');
+        }
+        $input = json_decode($wire, true, 60, JSON_THROW_ON_ERROR);
+        if (!is_array($input) || count($input) !== 3 || !is_array($input['envelope'] ?? null) || !is_string($input['bytesBase64'] ?? null)
+            || !is_string($input['copyDigest'] ?? null) || strlen($input['bytesBase64']) > 2666668) {
+            throw new InvalidArgumentException('Native draft media transfer refused.');
+        }
+        $payload = MioPages_Native_Draft_Envelope::verify(json_encode($input['envelope'], JSON_THROW_ON_ERROR), $identity);
+        $matches = array_values(array_filter($payload['candidate']['media'] ?? [], static fn($item) => $item['copyDigest'] === $input['copyDigest']));
+        if ($payload['operation'] !== 'apply' || $matches === []) {
+            throw new InvalidArgumentException('Native draft media transfer lacks apply authority.');
+        }
+        $bytes = base64_decode($input['bytesBase64'], true);
+        if ($bytes === false || base64_encode($bytes) !== $input['bytesBase64']) {
+            throw new InvalidArgumentException('Native draft media encoding refused.');
+        }
+        $item = $matches[0];
+        foreach ($matches as $match) {
+            self::verifyBytes($match, $bytes);
+        }
+        $file = self::file($item);
+        clearstatcache(true, $file);
+        if (@lstat($file) === false) {
+            $temporary = dirname($file) . '/.' . bin2hex(random_bytes(16)) . '.tmp';
+            $handle = @fopen($temporary, 'xb');
+            if ($handle === false) {
+                throw new RuntimeException('Private draft media staging file unavailable.');
+            }
+            try {
+                try {
+                    if (!chmod($temporary, 0600) || fwrite($handle, $bytes) !== strlen($bytes) || !fflush($handle) || !fsync($handle)) {
+                        throw new RuntimeException('Private draft media write failed.');
+                    }
+                } finally {
+                    fclose($handle);
+                }
+                if (!@link($temporary, $file) && @lstat($file) === false) {
+                    throw new RuntimeException('Private draft media commit unavailable.');
+                }
+            } finally {
+                if (!unlink($temporary)) {
+                    throw new RuntimeException('Private draft media staging cleanup failed.');
+                }
+            }
+        }
+        if (!hash_equals(self::bytes($item), $bytes)) {
+            throw new RuntimeException('Private draft media copy readback mismatch.');
+        }
+        return $item['copyDigest'];
     }
 
     public static function verifyBytes(array $item, string $bytes): void
@@ -118,10 +179,13 @@ final class MioPages_Native_Draft_Media
             if (!current_user_can('upload_files') || !current_user_can('edit_post', $postId)) {
                 throw new RuntimeException('Private draft attachment permission refused.');
             }
-            // Bytes are deliberately never registered under wp-content/uploads.
+            // Use WordPress's native file mapping with a protected absolute path.
+            // A later authorized release can export the verified local copy.
             $id = wp_insert_attachment(['post_title' => 'MioPages provisional image', 'post_mime_type' => 'image/webp',
-                'post_status' => 'private'], false, $postId, true, false);
-            if (!is_int($id) || $id < 1 || !update_post_meta($id, '_wp_attachment_image_alt', $item['alt'])) {
+                'post_status' => 'private'], self::file($item), $postId, true, false);
+            if (!is_int($id) || $id < 1 || !update_post_meta($id, '_miopages_private_draft', '1')
+                || !update_post_meta($id, '_wp_attachment_image_alt', wp_slash($item['alt']))
+                || !wp_update_attachment_metadata($id, self::metadata($item))) {
                 throw new RuntimeException('Private draft attachment write failed.');
             }
             $attachments[$item['sectionId']] = ['id' => $id, 'postId' => $postId, 'media' => $item];
@@ -135,14 +199,45 @@ final class MioPages_Native_Draft_Media
         $post = get_post($attachment['id']);
         if (!$post || $post->post_type !== 'attachment' || $post->post_status !== 'private'
             || (int) $post->post_parent !== $attachment['postId'] || $post->post_mime_type !== 'image/webp'
-            || get_post_meta($attachment['id'], '_wp_attached_file', true) !== ''
+            || get_post_meta($attachment['id'], '_miopages_private_draft', true) !== '1'
+            || get_attached_file($attachment['id'], true) !== self::file($attachment['media'])
+            || wp_get_attachment_metadata($attachment['id'], true) !== self::metadata($attachment['media'])
             || get_post_meta($attachment['id'], '_wp_attachment_image_alt', true) !== $attachment['media']['alt']) {
             throw new RuntimeException('Private draft attachment readback failed.');
         }
         return self::bytes($attachment['media']);
     }
 
+    private static function metadata(array $item): array
+    {
+        // Preserve native width/height without generating routable derivatives.
+        return ['width' => $item['width'], 'height' => $item['height'], 'file' => $item['copyDigest'] . '.webp', 'sizes' => []];
+    }
+
+    public static function url(int $id): string
+    {
+        return admin_url('admin-post.php?action=miopages_native_draft_image&attachment=' . $id);
+    }
+
+    public static function previewAllowed(string $installation, int $attachmentId): bool
+    {
+        try {
+            return self::currentAttachment($installation, $attachmentId) !== null;
+        } catch (Throwable $error) {
+            return false;
+        }
+    }
+
     public static function previewBytes(string $installation, int $attachmentId): string
+    {
+        $item = self::currentAttachment($installation, $attachmentId);
+        if ($item === null) {
+            throw new RuntimeException('Private draft image unavailable.');
+        }
+        return self::verifyAttachment($item);
+    }
+
+    private static function currentAttachment(string $installation, int $attachmentId): ?array
     {
         global $wpdb;
         $key = 'miopages_native_draft_' . hash('sha256', $installation);
@@ -154,9 +249,9 @@ final class MioPages_Native_Draft_Media
             }
             $page = get_post($item['postId']);
             if ($page && $page->post_type === 'page' && $page->post_status === 'draft') {
-                return self::verifyAttachment($item);
+                return $item;
             }
         }
-        throw new RuntimeException('Private draft image unavailable.');
+        return null;
     }
 }

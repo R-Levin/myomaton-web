@@ -71,3 +71,32 @@ test("the protected Core journal accepts exact retries and checks restore agains
     await assert.rejects(journal.record({ ...recover, requestedRevision: 2 }, key, receipt(recover, 14)), /decision mismatch/);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test("Core reconciles a changed Page set against its retained receipt and restores the exact prior membership", async () => {
+  const root = await mkdtemp(path.join(await realpath(tmpdir()), "miopages-membership-receipt-"));
+  try {
+    const journal = new NativeDraftReceiptJournal(root);
+    const key = randomBytes(32), installationId = randomUUID(), siteProposalId = randomUUID();
+    const prior = "a".repeat(64), proposed = "b".repeat(64);
+    const first: NativeDraftReceiptExpectation = { installationId, siteProposalId, operation: "apply",
+      requestedDigest: prior, appliedDigest: prior, revision: 1, paths: ["/", "/historical"] };
+    const apply: NativeDraftReceiptExpectation = { ...first, requestedDigest: proposed, appliedDigest: proposed, revision: 2,
+      paths: ["/new", "/"], baselinePaths: first.paths, appliedBaseline: prior };
+    const restore: NativeDraftReceiptExpectation = { ...first, operation: "restore", requestedDigest: proposed,
+      requestedPaths: apply.paths, requestedRevision: 2 };
+    const receipt = (selection: NativeDraftReceiptExpectation, ids: number[]) => {
+      const response = spawnSync("php", ["wordpress/miopages-delivery/tests/native-draft-receipt.php"], { encoding: "utf8",
+        input: JSON.stringify({ key: key.toString("hex"), result: {
+          ...selection, applied: { siteProposalId, digest: selection.appliedDigest, revision: selection.revision,
+            posts: Object.fromEntries(selection.paths.map((route, index) => [route, { ID: ids[index], post_status: "draft", post_content: route }])) },
+        } }) });
+      assert.equal(response.status, 0, response.stderr);
+      return JSON.parse(response.stdout);
+    };
+    await journal.record(first, key, receipt(first, [13, 14]));
+    await assert.rejects(journal.record(apply, key, receipt(apply, [15, 16])), /materialized Page identities/);
+    assert.deepEqual((await journal.record(apply, key, receipt(apply, [15, 13]))).posts.map(post => post.id), [15, 13]);
+    await assert.rejects(journal.record(restore, key, receipt(restore, [13, 15])), /differs from previous/);
+    assert.deepEqual((await journal.record(restore, key, receipt(restore, [13, 14]))).posts.map(post => post.id), [13, 14]);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});

@@ -4,10 +4,13 @@ import { fingerprint, object, text } from "../canonical/model";
 import type { DeploymentSelection } from "../managed-sites/deployment";
 import type { EntryIntent } from "./model";
 import { IntakeError } from "./model";
+import { presenceVisualPlacement, type PresenceVisual, type PresenceVisualOperations } from "./presence-workflow-visual";
 import {
   readBlueprint, readDirection, readEditorial, readPage, readReport, type PresenceEvidence,
   type WorkflowBlueprint, type WorkflowDirection, type WorkflowEditorial, type WorkflowPage, type WorkflowReport,
 } from "./presence-workflow-artifacts";
+
+import type { ResolvePrivateVisuals } from "../content-editing/proposal-media";
 
 export type WorkflowContext = {
   scope: DeploymentSelection;
@@ -18,7 +21,7 @@ export type WorkflowContext = {
   conflicts: string[];
 };
 export type WorkflowOperation = "research" | "report" | "direction" | "blueprint" | "page" | "editorial";
-export type WorkflowActor = { id: string; role: "customer" | "operator"; simulated: boolean };
+export type WorkflowActor = { id: string; role: "customer" | "operator"; simulated: boolean; authority?: string };
 type Actor = WorkflowActor;
 type Work = {
   operation: WorkflowOperation;
@@ -50,6 +53,7 @@ type State = {
   work: Work | null;
   failure: Failure | null;
   retry?: { previous: string; count: number };
+  visuals?: PresenceVisual[];
 };
 type Task = Pick<Work, "operation" | "path">;
 export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest"> &
@@ -59,6 +63,7 @@ export interface PresenceWorkflowOperations {
   readonly mode: State["mode"];
   readonly maxRetries?: number;
   readonly maxEditorialRevisions?: number;
+  readonly visuals?: PresenceVisualOperations;
   preflight?(run: WorkflowRun): Promise<void>;
   run(run: WorkflowRun, retain: (bytes: Buffer) => Promise<void>): Promise<unknown>;
   recover(run: WorkflowRun, bytes: Buffer): Promise<unknown>;
@@ -104,7 +109,7 @@ class WorkflowStore {
     return state;
   }
 
-  async retain(context: WorkflowContext, work: Work, bytes: Buffer) {
+  async retain(context: WorkflowContext, work: Pick<Work, "attempt">, bytes: Buffer) {
     const digest = contentDigest(bytes);
     await this.pool.query(`
       INSERT INTO ${this.outputs} (web_presence_id,managed_site_id,intake_id,attempt_id,bytes,digest)
@@ -114,7 +119,7 @@ class WorkflowStore {
     if (contentDigest((await this.output(context, work)) ?? Buffer.alloc(0)) !== digest) throw Error("Conflicting retained output");
   }
 
-  async output(context: WorkflowContext, work: Work) {
+  async output(context: WorkflowContext, work: Pick<Work, "attempt">) {
     const { rows: [row] } = await this.pool.query<{ bytes: Buffer; digest: string }>(`
       SELECT bytes, digest FROM ${this.outputs}
       WHERE web_presence_id=$1 AND managed_site_id=$2 AND intake_id=$3 AND attempt_id=$4`, [...identity(context), work.attempt]);
@@ -182,7 +187,9 @@ export class PresenceWorkflow {
     return { version, mode, contextDigest: state.contextDigest, research, report, confirmation, corrections, direction, blueprint, pages, editorial, operatorReview,
       failure, next, pendingOperation: state.work?.operation ?? null, recoverable: current && Boolean(state.work && (state.failure || state.work.until <= this.clock())),
       sources: state.sourceSnapshot.evidence, limitations: state.sourceSnapshot.limitations,
-      conflicts: state.sourceSnapshot.conflicts, entry: state.sourceSnapshot.entry };
+      conflicts: state.sourceSnapshot.conflicts, entry: state.sourceSnapshot.entry,
+      ...(this.operations.visuals && current && { visualBriefs: this.operations.visuals.requestable ? this.operations.visuals.briefs : [],
+        visuals: (state.visuals ?? []).filter(visual => visual.placement.candidateDigest === state.operatorReview?.target) }) };
   }
 
   async start(context: WorkflowContext) {
@@ -276,7 +283,7 @@ export class PresenceWorkflow {
     const state = await this.current(context, version);
     if (actor.role !== (developmentCorrection ? "operator" : "customer") || actor.simulated !== (state.mode === "fixture")) throw new IntakeError("unavailable", 403);
     const priorFinding = state.report?.findings.find(item => item.id === finding);
-    if (state.work || !state.report || !priorFinding) throw new IntakeError("workflow_not_ready", 409);
+    if (state.work || state.visuals?.some(visual => visual.state === "running") || !state.report || !priorFinding) throw new IntakeError("workflow_not_ready", 409);
     const note = { finding: priorFinding, text: text(correction, 8_000, true), actor,
       reportDigest: fingerprint(state.report), at: new Date(this.clock()).toISOString() };
     return this.view(context, await this.store.append(context, version, { ...state,
@@ -319,6 +326,132 @@ export class PresenceWorkflow {
     if (!state.report || state.confirmation || state.work) throw new IntakeError("workflow_not_ready", 409);
     const confirmation = { actor, at: new Date(this.clock()).toISOString(), target: fingerprint(state.report), decision: developmentContinuation ? "development-continuation" : "confirmed" } as const;
     return this.view(context, await this.store.append(context, version, { ...state, confirmation }));
+  }
+
+  private visualActor(actor: Actor, state: State) {
+    if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || !actor.authority) {
+      throw new IntakeError("unavailable", 403);
+    }
+    return { id: text(actor.id, 160), authority: text(actor.authority, 300) };
+  }
+
+  async queueVisual(context: WorkflowContext, version: number, actor: Actor, path: string, index: number, briefId: unknown) {
+    const state = await this.current(context, version);
+    const requester = this.visualActor(actor, state);
+    const brief = this.operations.visuals?.briefs.find(option => option.id === briefId);
+    if (!brief || !this.operations.visuals?.requestable) throw new IntakeError("workflow_not_ready", 409);
+    const placement = presenceVisualPlacement(context, this.view(context, state)!, path, index);
+    const visuals = state.visuals ?? [];
+    if (visuals.some(item => fingerprint(item.placement) === fingerprint(placement) &&
+        !["rejected", "revoked"].includes(item.state))) throw new IntakeError("workflow_not_ready", 409);
+    const visual: PresenceVisual = { id: randomUUID(), placement, briefId: brief.id, requestDigest: brief.requestDigest, requester, state: "queued" };
+    return this.view(context, await this.store.append(context, version, { ...state, visuals: [...visuals, visual] }));
+  }
+
+  private async saveVisual(context: WorkflowContext, state: State, visual: PresenceVisual) {
+    return this.store.append(context, state.version, { ...state, visuals: state.visuals?.map(entry => entry.id === visual.id ? visual : entry) });
+  }
+
+  async advanceVisual(context: WorkflowContext, version: number) {
+    const state = await this.current(context, version);
+    const ops = this.operations.visuals;
+    if (!ops?.execute || !state.operatorReview || state.work) throw new IntakeError("workflow_not_ready", 409);
+    const visual = state.visuals?.find(item => item.placement.candidateDigest === state.operatorReview?.target &&
+      ["queued", "running", "unverified"].includes(item.state));
+    if (!visual || (visual.state === "running" && (visual.leaseUntil ?? 0) > this.clock())) return this.view(context, state);
+
+    // A claimed or uncertain image can only be recovered, never re-dispatched.
+    const attempt = { attempt: visual.id };
+    let working = state;
+    try {
+      if (visual.state === "queued") {
+        working = await this.saveVisual(context, state, { ...visual, state: "running", leaseUntil: this.clock() + 180_000 });
+        await ops.execute(visual, result => this.store.retain(context, attempt, Buffer.from(JSON.stringify(result))));
+      }
+      const bytes = await this.store.output(context, attempt);
+      if (!bytes) throw Error("Image outcome unavailable");
+      const result = await ops.recover(visual, bytes);
+      return this.view(context, await this.saveVisual(context, working, { ...visual, result, state: "review" }));
+    } catch {
+      if (working === state && visual.state === "queued") throw new IntakeError("draft_changed", 409);
+      return this.view(context, visual.state === "unverified" ? state :
+        await this.saveVisual(context, working, { ...visual, state: "unverified" }));
+    }
+  }
+
+  async decideVisual(context: WorkflowContext, version: number, actor: Actor, input: unknown) {
+    const state = await this.current(context, version);
+    const reviewer = this.visualActor(actor, state);
+    const decision = object(input, ["id", "provenanceDigest", "decision", "reference", "alt"]);
+    const visual = state.visuals?.find(item => item.id === decision.id);
+    if (!visual?.result || !this.operations.visuals || !state.operatorReview ||
+        fingerprint(presenceVisualPlacement(context, this.view(context, state)!, visual.placement.path, visual.placement.sectionIndex)) !== fingerprint(visual.placement) ||
+        decision.provenanceDigest !== visual.result.provenanceDigest) throw new IntakeError("workflow_not_ready", 409);
+    const next = decision.decision;
+    if (next !== "approved" && next !== "rejected" && next !== "revoked" ||
+        (next === "revoked" ? visual.state !== "approved" : visual.state !== "review")) throw new IntakeError("workflow_not_ready", 409);
+    await this.operations.visuals.read(visual);
+    return this.view(context, await this.saveVisual(context, state, { ...visual, state: next,
+      ...(next === "approved" && { association: { assetId: randomUUID(), usageId: randomUUID() } }), decision: {
+      scope: "non-public-draft-only", at: new Date(this.clock()).toISOString(), reviewer, reference: text(decision.reference, 350),
+      provenanceDigest: visual.result.provenanceDigest, alt: next === "approved" ? text(decision.alt, 500) : null,
+    } }));
+  }
+
+  private async resolveVisualProjection(context: WorkflowContext, scope: Parameters<ResolvePrivateVisuals>[0],
+    page: Parameters<ResolvePrivateVisuals>[1], resolved: Parameters<ResolvePrivateVisuals>[2]) {
+    const view = await this.review(context);
+    if (fingerprint(scope) !== fingerprint(context.scope) || page.workflowReview?.intakeId !== context.intakeId ||
+        view?.next !== "review-complete" || !view.operatorReview || view.operatorReview.target !== page.workflowReview?.candidateDigest ||
+        !this.operations.visuals) throw Error("Current protected visual review required");
+    const reviewedPage = view.pages.find(item => item.path === page.slug);
+    if (!reviewedPage || reviewedPage.heading !== resolved.title || !resolved.sections.length ||
+        reviewedPage.sections.length !== resolved.sections.length ||
+        resolved.sections.some((section, i) => section.content.heading !== reviewedPage.sections[i].heading ||
+          (section.content.text ?? "") !== reviewedPage.sections[i].body || section.action)) throw Error("Reviewed Page shape or copy changed");
+    const choices = view.visuals?.filter(item => item.placement.path === page.slug && item.state === "approved") ?? [];
+    const wanted = page.sections.flatMap((section, index) => section.image ? [{ index, section, image: section.image }] : []);
+    if (choices.length !== wanted.length || new Set(wanted.map(item => item.image.usageId)).size !== wanted.length) {
+      throw Error("Exact approved private image placements required");
+    }
+    const placements = await Promise.all(wanted.map(async ({ index, section, image }) => {
+      const approved = choices.find(value => value.placement.sectionIndex === index && value.association?.assetId === image.assetId &&
+        value.association?.usageId === image.usageId);
+      const decision = approved?.decision, result = approved?.result;
+      const currentSection = resolved.sections[index];
+      const reviewedSection = reviewedPage.sections[index];
+      if (!approved || !decision || !result || decision.scope !== "non-public-draft-only" ||
+          decision.provenanceDigest !== result.provenanceDigest || decision.alt !== image.altText ||
+          fingerprint(reviewedSection) !== approved.placement.sectionDigest || currentSection.id !== section.id ||
+          currentSection.content.heading !== reviewedSection.heading || (currentSection.content.text ?? "") !== reviewedSection.body) {
+        throw Error("Protected image rights, reviewed copy or placement changed");
+      }
+      const bytes = await this.operations.visuals!.read(approved);
+      const media = {
+        sectionId: section.id, usageId: image.usageId, assetId: image.assetId, role: "image" as const, priorUsage: null,
+        configuration: { image: { altText: image.altText, decorative: false as const } }, preparedDigest: result.masterDigest,
+        mimeType: "image/png" as const, width: result.width, height: result.height,
+        evidence: { source: "private-generated" as const, permission: decision.scope, sourceDigest: result.sourceDigest,
+          provenanceDigest: result.provenanceDigest, reviewDigest: fingerprint({ decision, association: approved.association }), reference: decision.reference },
+      };
+      return { media, image: { assetId: media.assetId, alt: image.altText, width: result.width, height: result.height,
+        src: "data:image/png;base64," + bytes.toString("base64") } };
+    }));
+    return { media: placements.map(item => item.media),
+      images: Object.fromEntries(placements.map(item => [item.media.sectionId, item.image])) };
+  }
+
+  privateVisualResolver(context: WorkflowContext): ResolvePrivateVisuals {
+    return (scope, page, resolved) => this.resolveVisualProjection(context, scope, page, resolved);
+  }
+
+  async visualImage(context: WorkflowContext, id: string) {
+    const review = await this.review(context);
+    const visual = review?.visuals?.find(entry => entry.id === id);
+    if (review?.next !== "review-complete" || !this.operations.visuals || !visual || !["review", "approved"].includes(visual.state)) {
+      throw new IntakeError("unavailable", 404);
+    }
+    return this.operations.visuals.read(visual);
   }
 
   async reviewCandidate(context: WorkflowContext, version: number, actor: Actor) {

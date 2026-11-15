@@ -60,21 +60,26 @@ function current_user_can(string $permission, int $id = 0): bool
 $denyDraftImages = false;
 function wp_insert_attachment(array $post, string|false $file, int $parent, bool $error, bool $hooks): int
 {
-    check($file === false, 'Media must not become a public attachment file.');
-    return wp_insert_post($post + ['post_type' => 'attachment', 'post_parent' => $parent]);
+    check(is_string($file) && str_starts_with($file, MIOPAGES_NATIVE_DRAFT_MEDIA_DIRECTORY . '/'), 'Media must map to a protected attachment file.');
+    $id = wp_insert_post($post + ['post_type' => 'attachment', 'post_parent' => $parent]);
+    update_post_meta($id, '_wp_attached_file', $file);
+    return $id;
 }
-function update_post_meta(int $id, string $key, string $value): bool
+function update_post_meta(int $id, string $key, mixed $value): bool
 {
     global $wpdb;
     $wpdb->attachmentMeta[$id][$key] = $value;
     return true;
 }
-function get_post_meta(int $id, string $key, bool $single): string
+function get_post_meta(int $id, string $key, bool $single): mixed
 {
     global $wpdb;
     return $wpdb->attachmentMeta[$id][$key] ?? '';
 }
-function wp_slash(array $post): array { return $post; }
+function wp_slash(mixed $post): mixed { return $post; }
+function get_attached_file(int $id, bool $unfiltered): string { return get_post_meta($id, '_wp_attached_file', true); }
+function wp_update_attachment_metadata(int $id, array $metadata): bool { return update_post_meta($id, '_wp_attachment_metadata', $metadata); }
+function wp_get_attachment_metadata(int $id, bool $unfiltered): array { return get_post_meta($id, '_wp_attachment_metadata', true); }
 function is_wp_error(mixed $value): bool { return false; }
 function clean_post_cache(int $id): void {}
 function sanitize_title(string $title): string { return $title; }

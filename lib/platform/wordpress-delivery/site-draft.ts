@@ -1,6 +1,7 @@
 import { normalizeDestination } from "../actions/model";
 import { fingerprint, object, text, uuid } from "../canonical/model";
 import { hash } from "../content-editing/proposal";
+import { canonicalPagePath } from "../managed-sites/paths";
 import { validatePages, type ReviewedProjection, type Site } from "./authority";
 import { readNativeDraftMedia, type NativeDraftMedia } from "./native-draft-media";
 
@@ -8,7 +9,7 @@ import { readNativeDraftMedia, type NativeDraftMedia } from "./native-draft-medi
 // validates what an exact non-public draft authorization would cover.
 export type ReviewedDraftPage = Site & Pick<ReviewedProjection, "approvalId" | "previewDigest" | "sourceDigest" | "projectionDigest" | "revision" | "pages"> & {
   proposalId: string;
-  media?: NativeDraftMedia;
+  media?: readonly NativeDraftMedia[];
 };
 
 export function nativeDraftRollback(value: unknown, revision: number) {
@@ -18,14 +19,39 @@ export function nativeDraftRollback(value: unknown, revision: number) {
   return { revision: rollback.revision, digest: hash(rollback.digest) };
 }
 
+export function verifyNativeMediaPlacements(media: readonly NativeDraftMedia[], pages: ReviewedProjection["pages"]) {
+  const sectionIds = new Set<string>(), usages = new Set<string>();
+  for (const item of media) {
+    if (sectionIds.has(item.sectionId) || usages.has(item.usageId) || !pages.some(page => page.id === item.pageId &&
+      page.sections.some(section => section.id === item.sectionId && ["hero", "intro", "relationship", "collection", "cta"].includes(section.type)))) {
+      throw Error("Draft media placement differs from reviewed Section");
+    }
+    sectionIds.add(item.sectionId);
+    usages.add(item.usageId);
+  }
+}
+
+export function nativeDraftBaseline(value: unknown) {
+  if (!Array.isArray(value) || !value.length) throw Error("Exact prior Page set required");
+  const pages = value.map(raw => {
+    const page = object(raw, ["id", "path"]);
+    const path = canonicalPagePath(page.path);
+    if (!path) throw Error("Invalid prior Page path");
+    return { id: uuid(page.id), path };
+  });
+  if (!pages.some(page => page.path === "/") || new Set(pages.map(page => page.path.replace(/\/$/u, ""))).size !== pages.length ||
+      new Set(pages.map(page => page.id)).size !== pages.length) throw Error("Conflicting prior Page identities");
+  return pages;
+}
+
 export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[], input: unknown) {
   const scope = { organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
-  const selection = object(input, ["siteProposalId", "installationId", "revision", "previousDigest", "rollback", "navigation", "actions"]);
+  const selection = object(input, ["siteProposalId", "installationId", "revision", "previousDigest", "rollback", "baselinePages", "navigation", "actions"]);
   if (typeof selection.revision !== "number" || !Number.isSafeInteger(selection.revision) || selection.revision < 1) throw Error("Invalid draft revision");
   const revision = selection.revision;
   const previousDigest = revision === 1 && selection.previousDigest === null ? null : hash(selection.previousDigest);
   if (revision === 1 && previousDigest !== null) throw Error("Initial draft must have no predecessor");
-  if (reviewed.length < 1 || reviewed.length > 16) throw Error("Invalid draft page count");
+  if (reviewed.length < 1) throw Error("Invalid draft page count");
   const sourceDigest = hash(reviewed[0].sourceDigest);
   const proposals = new Set<string>();
   const approvals = reviewed.map(member => {
@@ -41,22 +67,27 @@ export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[]
       projectionDigest: hash(member.projectionDigest), pageId: uuid(member.pages[0].id) };
   });
   const pages = structuredClone(reviewed.flatMap(member => member.pages));
-  validatePages(pages);
-  const media = reviewed.flatMap(member => {
-    if (!member.media) return [];
-    const item = readNativeDraftMedia(member.media);
-    const page = member.pages[0];
-    if (item.pageId !== page.id || !page.sections.some(section => section.id === item.sectionId && section.type === "intro")) {
-      throw Error("Draft media placement differs from reviewed Page");
+  validatePages(pages, true);
+  const media = reviewed.flatMap(member => (member.media ?? []).map(raw => {
+    const item = readNativeDraftMedia(raw);
+    if (item.pageId !== member.pages[0].id) throw Error("Draft visual belongs to another reviewed Page");
+    return item;
+  }));
+  verifyNativeMediaPlacements(media, pages);
+  const baselinePages = selection.baselinePages === undefined ? undefined : nativeDraftBaseline(selection.baselinePages);
+  if (baselinePages) {
+    if (!previousDigest) throw Error("Prior Page set requires an applied revision");
+    for (const page of pages) {
+      if (baselinePages.some(prior => (prior.path === page.path || prior.id === page.id) &&
+          (prior.path !== page.path || prior.id !== page.id))) throw Error("Draft Page identity changed");
     }
-    return [item];
-  });
-  if (new Set(media.map(item => item.usageId)).size !== media.length) throw Error("Duplicate draft media usage");
+  }
   const paths = new Set(pages.map(page => page.path));
   if (!paths.has("/") || paths.size !== new Set(pages.map(page => page.path.replace(/\/$/u, ""))).size) throw Error("Invalid draft routes");
-  if (!Array.isArray(selection.navigation) || selection.navigation.length !== pages.length ||
-      new Set(selection.navigation).size !== pages.length || selection.navigation.some(item => !paths.has(item))) throw Error("Invalid draft navigation");
-  if (!Array.isArray(selection.actions) || selection.actions.length > 32) throw Error("Invalid draft actions");
+  if (!Array.isArray(selection.navigation) || !selection.navigation.includes("/") ||
+      new Set(selection.navigation).size !== selection.navigation.length ||
+      selection.navigation.some(item => !paths.has(item))) throw Error("Invalid draft navigation");
+  if (!Array.isArray(selection.actions)) throw Error("Invalid draft actions");
   const actions = selection.actions.map(value => {
     const action = object(value, ["id", "label", "from", "type", "destination"]);
     if (typeof action.from !== "string" || !paths.has(action.from) || (action.type !== "contact" && action.type !== "page")) throw Error("Invalid draft action scope");
@@ -70,6 +101,6 @@ export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[]
   const rollback = selection.rollback === undefined ? undefined : nativeDraftRollback(selection.rollback, revision);
   if (rollback?.digest === previousDigest) throw Error("Materialized rollback digest must differ from signed predecessor");
   const candidate = { scope, siteProposalId: uuid(selection.siteProposalId), installationId: uuid(selection.installationId), revision,
-    previousDigest, ...(rollback && { rollback }), ...(media.length && { media }), sourceDigest, approvals, pages, navigation: [...selection.navigation] as string[], actions };
+    previousDigest, ...(rollback && { rollback }), ...(baselinePages && { baselinePages }), ...(media.length && { media }), sourceDigest, approvals, pages, navigation: [...selection.navigation] as string[], actions };
   return { candidate, digest: fingerprint(candidate) };
 }

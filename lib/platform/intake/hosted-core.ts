@@ -254,8 +254,18 @@ export async function hostedCoreRequest(request: Request) {
     };
     if (request.method === "GET") {
       if (!await authenticate(credential, active?.owner)) return reply({ error: "sign_in_required" }, 401);
-      try { return reply(await includeOperations(await app.intake.resume(app.draftToken))); }
+      try {
+        const image = request.headers.get("x-miopages-workflow-image");
+        if (image !== null) {
+          if (!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/u.test(image) || !app.presenceCase) return reply({ error: "unavailable" }, 404);
+          const scope = await app.presenceCase();
+          const bytes = await (await scope.open()).visualImage(await scope.context(), image);
+          return new Response(new Uint8Array(bytes), { headers: { ...headers, "Content-Type": "image/png" } });
+        }
+        return reply(await includeOperations(await app.intake.resume(app.draftToken)));
+      }
       catch (error) {
+        if (request.headers.has("x-miopages-workflow-image")) return reply({ error: "unavailable" }, 404);
         if (error instanceof IntakeError && error.code === "session_unavailable") return reply({ state: "not_started" });
         throw error;
       }
@@ -297,7 +307,7 @@ export async function hostedCoreRequest(request: Request) {
       const context = await authenticate(credential, active?.owner);
       if (!context) { refusal = reply({ error: "sign_in_required" }, 401); return null; }
       let actor;
-      try { actor = await app.operators.authorize(context, "prepare-site-proposal", app.selection); }
+      try { actor = await app.operators.authorize(context, value.operation === "workflow-visual-decide" ? "review-private-stage" : "prepare-site-proposal", app.selection); }
       catch { refusal = reply({ error: "authorization_required" }, 403); return null; }
       try {
         const view = async (result: ReturnType<IntakeService["resume"]>) => includeOperations(await result);
@@ -305,7 +315,9 @@ export async function hostedCoreRequest(request: Request) {
         if (typeof value.operation === "string" && value.operation.startsWith("workflow-") && app.presenceCase) {
           const scope = await app.presenceCase();
           await reviewWorkflowChange(await scope.open(), await scope.context(), value.operation, version,
-            { id: actor.operatorId, role: "operator", simulated: false }, { finding: value.finding, correction: value.correction });
+            { id: actor.operatorId, role: "operator", simulated: false,
+              ...(String(value.operation).startsWith("workflow-visual-") && { authority: actor.authorityReference }) },
+            { finding: value.finding, correction: value.correction, visual: value.visual });
           return await view(app.intake.resume(app.draftToken));
         }
         if (typeof value.operation === "string" && value.operation.startsWith("site-plan-")) {
