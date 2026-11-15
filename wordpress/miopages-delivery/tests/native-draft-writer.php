@@ -14,18 +14,22 @@ final class DraftTestDatabase
     public string $last_error = '';
     public array $pages = [];
     public array $history = [];
+    public array $attachmentMeta = [];
     public ?array $state = null;
     private array $before;
 
     public function prepare(string $sql, ...$args): array { return [$sql, $args]; }
     public function get_col(array $query): array { return ['InnoDB', 'InnoDB', 'InnoDB']; }
-    public function get_var(array $query): string { return '1'; }
+    public function get_var(array $query): string
+    {
+        return str_contains($query[0], 'SELECT option_value') ? json_encode($this->state, JSON_THROW_ON_ERROR) : '1';
+    }
     public function query(string $sql): int
     {
         if ($sql === 'START TRANSACTION') {
-            $this->before = [$this->pages, $this->history, $this->state];
+            $this->before = [$this->pages, $this->history, $this->state, $this->attachmentMeta];
         } elseif ($sql === 'ROLLBACK') {
-            [$this->pages, $this->history, $this->state] = $this->before;
+            [$this->pages, $this->history, $this->state, $this->attachmentMeta] = $this->before;
         }
         return 1;
     }
@@ -48,7 +52,28 @@ final class DraftTestDatabase
     }
 }
 
-function current_user_can(string $permission): bool { return $permission === 'edit_pages'; }
+function current_user_can(string $permission, int $id = 0): bool
+{
+    global $denyDraftImages;
+    return in_array($permission, ['edit_pages', 'upload_files'], true) || ($permission === 'edit_post' && $id > 0 && !$denyDraftImages);
+}
+$denyDraftImages = false;
+function wp_insert_attachment(array $post, string|false $file, int $parent, bool $error, bool $hooks): int
+{
+    check($file === false, 'Media must not become a public attachment file.');
+    return wp_insert_post($post + ['post_type' => 'attachment', 'post_parent' => $parent]);
+}
+function update_post_meta(int $id, string $key, string $value): bool
+{
+    global $wpdb;
+    $wpdb->attachmentMeta[$id][$key] = $value;
+    return true;
+}
+function get_post_meta(int $id, string $key, bool $single): string
+{
+    global $wpdb;
+    return $wpdb->attachmentMeta[$id][$key] ?? '';
+}
 function wp_slash(array $post): array { return $post; }
 function is_wp_error(mixed $value): bool { return false; }
 function clean_post_cache(int $id): void {}

@@ -69,7 +69,8 @@ final class MioPages_Native_Draft_Writer
                     'post_title' => $page['title'], 'post_content' => '',
                 ]);
             }
-            $posts = MioPages_Native_Draft_Content::posts($candidate, $ids);
+            $attachments = MioPages_Native_Draft_Media::attach($candidate, $ids, $current['attachments'] ?? []);
+            $posts = MioPages_Native_Draft_Content::posts($candidate, $ids, $attachments);
             foreach ($posts as $path => &$post) {
                 $post['post_name'] = $current['posts'][$path]['post_name']
                     ?? self::newSlug($path, $post['ID']);
@@ -78,6 +79,9 @@ final class MioPages_Native_Draft_Writer
             unset($post);
             $next = ['siteProposalId' => $candidate['siteProposalId'], 'revision' => $candidate['revision'],
                 'digest' => $digest, 'posts' => $posts, 'logicalPageIds' => $logicalIds];
+            if ($attachments !== []) {
+                $next['attachments'] = $attachments;
+            }
             self::verifyDrafts($next);
             // The signed predecessor of a forward revision after a restore is
             // the high-water authorization, not the currently materialized content.
@@ -199,6 +203,9 @@ final class MioPages_Native_Draft_Writer
     private static function verifyDrafts(array $revision): void
     {
         global $wpdb;
+        foreach ($revision['attachments'] ?? [] as $attachment) {
+            MioPages_Native_Draft_Media::verifyAttachment($attachment);
+        }
         foreach ($revision['posts'] as $expected) {
             $row = $wpdb->get_row($wpdb->prepare(
                 "SELECT post_type,post_status,post_title,post_content,post_name FROM {$wpdb->posts} WHERE ID=%d FOR UPDATE",

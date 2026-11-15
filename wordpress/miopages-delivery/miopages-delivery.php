@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MioPages Delivery (Development Proof)
  * Description: Restricted, read-only C0 fixture preview for the MioPages WordPress delivery feasibility proof.
- * Version: 0.0.10
+ * Version: 0.0.11
  * Requires PHP: 8.3
  * Text Domain: miopages-delivery
  */
@@ -66,6 +66,27 @@ if (defined('WP_CLI') && WP_CLI && defined('MIOPAGES_PRIVATE_PULL') && is_array(
     });
 }
 
+
+if (defined('MIOPAGES_NATIVE_DRAFT_MEDIA_DIRECTORY') && defined('MIOPAGES_NATIVE_DRAFT_IDENTITY')) {
+    require_once __DIR__ . '/includes/class-miopages-native-draft-media.php';
+    add_action('admin_post_miopages_native_draft_image', static function (): void {
+        header('Cache-Control: private, no-store');
+        header('X-Content-Type-Options: nosniff');
+        try {
+            $id = filter_input(INPUT_GET, 'attachment', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            $installation = MIOPAGES_NATIVE_DRAFT_IDENTITY['installationId'] ?? null;
+            if (($_SERVER['REQUEST_METHOD'] ?? null) !== 'GET' || !is_int($id) || !is_string($installation)) {
+                throw new RuntimeException('Private image request refused.');
+            }
+            $bytes = MioPages_Native_Draft_Media::previewBytes($installation, $id);
+            header('Content-Type: image/webp');
+            echo $bytes;
+        } catch (Throwable $error) {
+            status_header(404);
+        }
+        exit;
+    });
+}
 
 add_action('admin_menu', static function (): void {
     add_management_page(

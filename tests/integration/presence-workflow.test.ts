@@ -151,6 +151,8 @@ test("the existing local Core interface persists a report, correction, revised s
     const partial = await measurement.snapshot(source, "2026-11-15T14:00:00.000Z", "2026-11-15T15:00:00.000Z");
     assert.equal(partial.counts["action-selected"], null);
     const covered = await measurement.snapshot(source, "2026-11-15T14:10:00.000Z", "2026-11-15T15:00:00.000Z");
+    assert.equal(covered.sourceId, source.id);
+    assert.equal(covered.revision, source.revision);
     assert.deepEqual(covered.counts, { "page-observed": 0, "action-selected": 1, "contact-accepted": null });
     const live = await measurement.snapshot({ ...source, environment: "live", coverage: [] }, "2026-11-15T14:10:00.000Z", "2026-11-15T15:00:00.000Z");
     assert.equal(live.counts["action-selected"], null);

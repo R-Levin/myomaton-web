@@ -179,8 +179,8 @@ export class PresenceWorkflow {
     const next = !current ? "evidence-changed" : state.failure ? "recover" : state.work ? "in-progress" :
       nextTask(state)?.operation ?? (!state.confirmation ? "customer-review" : state.editorial?.concerns.length ? "editorial-review" : !state.operatorReview ? "operator-review" : "review-complete");
     const { research, report, confirmation, corrections, direction, blueprint, pages, editorial, operatorReview, version, mode, failure } = state;
-    return { version, mode, research, report, confirmation, corrections, direction, blueprint, pages, editorial, operatorReview,
-      failure, next, recoverable: current && Boolean(state.work && (state.failure || state.work.until <= this.clock())),
+    return { version, mode, contextDigest: state.contextDigest, research, report, confirmation, corrections, direction, blueprint, pages, editorial, operatorReview,
+      failure, next, pendingOperation: state.work?.operation ?? null, recoverable: current && Boolean(state.work && (state.failure || state.work.until <= this.clock())),
       sources: state.sourceSnapshot.evidence, limitations: state.sourceSnapshot.limitations,
       conflicts: state.sourceSnapshot.conflicts, entry: state.sourceSnapshot.entry };
   }

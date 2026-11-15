@@ -14,6 +14,10 @@ $lint = [
     'includes/class-miopages-release-store.php',
     'includes/class-miopages-private-staging.php',
     'includes/class-miopages-release-pull.php',
+    'includes/class-miopages-native-draft-media.php',
+    'includes/class-miopages-native-draft-envelope.php',
+    'includes/class-miopages-native-draft-receipt.php',
+    'tests/native-draft-media.php',
     'tests/core-pull-compat.php',
     'tests/node-issuer-compat.php',
 ];

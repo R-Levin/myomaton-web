@@ -330,6 +330,10 @@ canonical knowledge require existing trusted authority and approval.
 
 **Read-only code inventory:** inspect schema/types for Pages/Sections/Assets/Actions and existing release/rollback, authorization and renderer input. Write a module-to-adapter mapping and a complete **sample synthetic release manifest**. No migrations, deploys, secrets, live hostname changes, new customer provisioning or hosted writes in this first task.
 
+## Signed media for private native drafts
+
+The local native-draft v3 connector binds reviewed placement and an optimized WebP copy to the exact existing draft authorization. WordPress uses an installation-scoped off-webroot file for the bytes and manages the native attachment row. Authenticated preview checks the current draft and permission to edit that Page. Core retains the master and checks the attachment identity, parent Page and copy digest in the receipt. Text-only release and rollback remain supported. Protected hosted media eligibility, variable Page membership, Linux artifact verification and actual authenticated WordPress readback remain open. [Development and verification](c0-integration-spine-phase-b-2026-11-10.md#market-discovery-and-governed-draft-media-2026-11-15)
+
 ## Host and connector readiness checkpoint
 
 On November 15 the protected development account reported 1 visible CPU, 1,707 MiB total and 746 MiB available memory, about 39.4 GiB free disk and a listener on its existing development port. The verified TLS PostgreSQL session returned about 14.2 MiB database size, one visible client backend including the probe and a database server setting of 60 maximum connections. The sample does not establish typical demand, Session Pooler capacity, queue lag, current backup tier or public runtime headroom.

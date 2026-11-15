@@ -2,11 +2,13 @@ import { normalizeDestination } from "../actions/model";
 import { fingerprint, object, text, uuid } from "../canonical/model";
 import { hash } from "../content-editing/proposal";
 import { validatePages, type ReviewedProjection, type Site } from "./authority";
+import { readNativeDraftMedia, type NativeDraftMedia } from "./native-draft-media";
 
 // Page review remains the source of content authority. This composition
 // validates what an exact non-public draft authorization would cover.
 export type ReviewedDraftPage = Site & Pick<ReviewedProjection, "approvalId" | "previewDigest" | "sourceDigest" | "projectionDigest" | "revision" | "pages"> & {
   proposalId: string;
+  media?: NativeDraftMedia;
 };
 
 export function nativeDraftRollback(value: unknown, revision: number) {
@@ -40,6 +42,16 @@ export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[]
   });
   const pages = structuredClone(reviewed.flatMap(member => member.pages));
   validatePages(pages);
+  const media = reviewed.flatMap(member => {
+    if (!member.media) return [];
+    const item = readNativeDraftMedia(member.media);
+    const page = member.pages[0];
+    if (item.pageId !== page.id || !page.sections.some(section => section.id === item.sectionId && section.type === "intro")) {
+      throw Error("Draft media placement differs from reviewed Page");
+    }
+    return [item];
+  });
+  if (new Set(media.map(item => item.usageId)).size !== media.length) throw Error("Duplicate draft media usage");
   const paths = new Set(pages.map(page => page.path));
   if (!paths.has("/") || paths.size !== new Set(pages.map(page => page.path.replace(/\/$/u, ""))).size) throw Error("Invalid draft routes");
   if (!Array.isArray(selection.navigation) || selection.navigation.length !== pages.length ||
@@ -58,6 +70,6 @@ export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[]
   const rollback = selection.rollback === undefined ? undefined : nativeDraftRollback(selection.rollback, revision);
   if (rollback?.digest === previousDigest) throw Error("Materialized rollback digest must differ from signed predecessor");
   const candidate = { scope, siteProposalId: uuid(selection.siteProposalId), installationId: uuid(selection.installationId), revision,
-    previousDigest, ...(rollback && { rollback }), sourceDigest, approvals, pages, navigation: [...selection.navigation] as string[], actions };
+    previousDigest, ...(rollback && { rollback }), ...(media.length && { media }), sourceDigest, approvals, pages, navigation: [...selection.navigation] as string[], actions };
   return { candidate, digest: fingerprint(candidate) };
 }

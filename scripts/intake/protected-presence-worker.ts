@@ -9,7 +9,7 @@ import { adaptiveOnboardingVersion, type PreparedUnderstanding } from "../../lib
 import { normalizeAnswers } from "../../lib/platform/intake/model";
 import { protectedOwnerScope } from "../../lib/platform/intake/protected-owner";
 import { protectedConnection, protectedPool } from "../../lib/platform/wordpress-delivery/protected-connection";
-import { composePresenceCase, privateWorkflowBytes, privateWorkflowFile, protectedWorkflowRole, protectedWorkflowWorkspace, workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
+import { composePresenceCase, privateWorkflowBytes, privateWorkflowFile, protectedWorkflowRole, protectedWorkflowWorkspace, recoverPresenceResearch, workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
 import type { PresenceWorkflowGrant } from "../../lib/platform/intake/presence-workflow-provider";
 
 type Input = { webPresenceId: string; managedSiteId: string; draftToken: string; answers: unknown;
@@ -18,8 +18,9 @@ type Input = { webPresenceId: string; managedSiteId: string; draftToken: string;
 async function main() {
   const action = process.argv[2];
   const activating = action === "ACTIVATE-EXACT-WORKFLOW-GRANT";
+  const recoverResearch = action === "RECOVER-RETAINED-WORKFLOW-RESEARCH";
   if (process.argv.length !== (activating ? 4 : 3) ||
-      !["ACTIVATE-EXACT-WORKFLOW-GRANT", "INSPECT-WORKFLOW-MANIFEST", "WATCH-AUTHORIZED-WORKFLOW"].includes(action)) throw Error("Workflow command refused");
+      !["ACTIVATE-EXACT-WORKFLOW-GRANT", "INSPECT-WORKFLOW-MANIFEST", "WATCH-AUTHORIZED-WORKFLOW", "RECOVER-RETAINED-WORKFLOW-RESEARCH"].includes(action)) throw Error("Workflow command refused");
   const workspace = await protectedWorkflowWorkspace();
   const input = await privateWorkflowFile<Input>(join(workspace.root, "core-input.json"), workspace.root);
   const selection = { webPresenceId: input.webPresenceId, managedSiteId: input.managedSiteId };
@@ -40,7 +41,7 @@ async function main() {
         if (result.rowCount !== 1) throw Error("Protected C0 scope refused");
       },
     });
-    const mode = action !== "WATCH-AUTHORIZED-WORKFLOW" ? { kind: "review" as const } :
+    const mode = action !== "WATCH-AUTHORIZED-WORKFLOW" && !recoverResearch ? { kind: "review" as const } :
       { kind: "worker" as const, apiKey: process.env.MIOPAGES_OPENAI_DEV_API_KEY ?? "" };
     const workflowCase = composePresenceCase(pool, intake, input.draftToken, workspace, mode);
     if (mode.kind === "review") {
@@ -53,6 +54,9 @@ async function main() {
       if (rows.length !== 1 || rows[0].intake_id !== context.intakeId) throw Error("Protected workflow policy refused");
       const plan = await privateWorkflowBytes(join(workspace.root, "c0-protected-workflow-authorization.json"), workspace.root);
       const ledger = await privateWorkflowBytes(join(workspace.ledgerDirectory, "onboarding-usage.json"), workspace.root);
+      if (process.argv[3] === "f7cf560dfdb8f16e809dc0ba535c5d86520a28654953c28b14c84558bab00545") {
+        throw Error("The 24-hour C0 launch manifest was superseded");
+      }
       const grant = c0ActivationGrant(context, plan, process.argv[3], ledger);
       const file = await open(workspace.grantFile, "wx", 0o600);
       try { await file.writeFile(JSON.stringify(grant) + "\n"); await file.sync(); } finally { await file.close(); }
@@ -61,6 +65,12 @@ async function main() {
     }
     const grant = await privateWorkflowFile<PresenceWorkflowGrant>(workspace.grantFile, workspace.root);
     const workflow = await workflowCase.open();
+    if (recoverResearch) {
+      const review = await recoverPresenceResearch(workflow, await workflowCase.context());
+      console.log(JSON.stringify({ status: review?.next, version: review?.version, failure: review?.failure }));
+      if (review?.failure) process.exitCode = 1;
+      return;
+    }
     let lastVersion = 0;
     while (Date.now() < grant.expiresAt) {
       const review = await workPresenceCase(workflow, await workflowCase.context());

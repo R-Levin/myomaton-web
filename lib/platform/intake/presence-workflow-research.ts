@@ -4,9 +4,51 @@ import { JSDOM } from "jsdom";
 import { text } from "../canonical/model";
 import type { PresenceEvidence } from "./presence-workflow-artifacts";
 
-export type PublicResearchSource = { id: string; url: string; label: string };
+export type PublicResearchSource = { id: string; url: string; label: string; discoveredFrom?: string };
 export type ResearchDiscovery = { prefixes: Readonly<Record<string, readonly string[]>>; terms: readonly string[]; maxDiscovered: number; excerptCharacters?: number };
 type Link = { url: string; title: string; from: string; score: number };
+
+function safeResearchUrl(url: URL) {
+  const host = url.hostname;
+  return url.protocol === "https:" && !url.port && !url.username && !url.password && !url.search && !url.hash &&
+    /^[a-z0-9](?:[a-z0-9.-]+)\.[a-z]{2,}$/u.test(host) && !isIP(host) &&
+    !/\.(?:localhost|local|internal|test)$/u.test(host) && /^\/[a-z0-9_./-]*$/iu.test(url.pathname);
+}
+
+export type MarketSearch = { publicQuery: string; maxToolCalls: number; maxSources: number; minimumNewOrigins: number };
+
+export function validateMarketSearch(value: MarketSearch) {
+  if (!/^[a-z][a-z ,'-]{19,359}[a-z]$/iu.test(value.publicQuery) ||
+      !Number.isSafeInteger(value.maxToolCalls) || value.maxToolCalls < 1 || value.maxToolCalls > 10 ||
+      !Number.isSafeInteger(value.maxSources) || value.maxSources < 1 || value.maxSources > 16 ||
+      !Number.isSafeInteger(value.minimumNewOrigins) || value.minimumNewOrigins < 1 || value.minimumNewOrigins > value.maxSources) {
+    throw Error("Market search scope refused");
+  }
+}
+
+export function marketSources(response: unknown, seeds: readonly PublicResearchSource[], scope: MarketSearch) {
+  validateMarketSearch(scope);
+  const body = response as { output?: { type: string; status: string; action?: { sources?: { type: string; url: string }[] } }[] };
+  if (!Array.isArray(body?.output)) throw Error("Market search response refused");
+  const known = new Set(seeds.map(source => new URL(source.url).hostname.replace(/^www\./u, "")));
+  const discovered: PublicResearchSource[] = [];
+  for (const output of body.output) {
+    if (output.type !== "web_search_call" || output.status !== "completed" || !Array.isArray(output.action?.sources)) continue;
+    for (const source of output.action.sources) {
+      if (source?.type !== "url" || typeof source.url !== "string" || source.url.length > 500) continue;
+      const target = URL.parse(source.url);
+      if (!target || target.href !== source.url || !safeResearchUrl(target)) continue;
+      const host = target.hostname.replace(/^www\./u, "");
+      if (known.has(host)) continue;
+      known.add(host);
+      discovered.push({ id: "research:market-" + createHash("sha256").update(source.url).digest("hex").slice(0, 24),
+        url: source.url, label: host, discoveredFrom: "OpenAI Web Search" });
+      if (discovered.length === scope.maxSources) return discovered;
+    }
+  }
+  if (discovered.length < scope.minimumNewOrigins) throw Error("Market search returned too few independently fetchable origins");
+  return discovered;
+}
 
 export function researchUrlAllowed(url: URL, sources: readonly PublicResearchSource[], discovery?: ResearchDiscovery) {
   if (url.protocol !== "https:" || url.port || url.username || url.password || url.search || url.hash ||
@@ -97,7 +139,7 @@ export async function retrievePublicResearch(sources: readonly PublicResearchSou
         date: new Date(clock()).toISOString().slice(0, 10), content, rawDigest, ...(discoveredFrom && { discoveredFrom }) });
     } finally { dom.window.close(); }
   }
-  for (const source of sources) await readSource(source, true);
+  for (const source of sources) await readSource(source, true, source.discoveredFrom);
   if (discovery) {
     const ranked = [...links.values()].sort((a, b) => b.score - a.score || a.url.localeCompare(b.url)).slice(0, discovery.maxDiscovered);
     for (const link of ranked) {

@@ -6,6 +6,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/class-miopages-native-draft-media.php';
+
 final class MioPages_Native_Draft_Envelope
 {
     private const PREFIX = "MioPages-WP-Native-Draft-v";
@@ -18,7 +20,7 @@ final class MioPages_Native_Draft_Envelope
         $envelope = json_decode($wire, true, 48, JSON_THROW_ON_ERROR);
         if (!is_array($envelope) || count($envelope) !== 6
             || ($envelope['schema'] ?? null) !== 'miopages.wordpress.native-draft-envelope'
-            || !in_array($envelope['version'] ?? null, [1, 2], true) || !is_string($identity['keyId'] ?? null)
+            || !in_array($envelope['version'] ?? null, [1, 2, 3], true) || !is_string($identity['keyId'] ?? null)
             || ($envelope['keyId'] ?? null) !== $identity['keyId']) {
             throw new InvalidArgumentException('Native draft envelope refused.');
         }
@@ -45,12 +47,20 @@ final class MioPages_Native_Draft_Envelope
         }
         $candidate = $payload['candidate'];
         $rollback = $candidate['rollback'] ?? null;
-        if ($payload['version'] === 1 ? array_key_exists('rollback', $candidate) : (
+        if ($payload['version'] === 3) {
+            MioPages_Native_Draft_Media::validate($candidate);
+        } elseif (array_key_exists('media', $candidate)) {
+            throw new InvalidArgumentException('Native draft media version refused.');
+        }
+        $requiresRollback = $payload['version'] === 2;
+        if (($requiresRollback && !array_key_exists('rollback', $candidate))
+            || ($payload['version'] === 1 && array_key_exists('rollback', $candidate))
+            || (array_key_exists('rollback', $candidate) && (
             !is_array($rollback) || count($rollback) !== 2 || !is_int($rollback['revision'] ?? null)
             || !is_int($candidate['revision'] ?? null) || $rollback['revision'] < 1
             || $rollback['revision'] >= $candidate['revision'] - 1
             || !is_string($rollback['digest'] ?? null) || !preg_match('/^[a-f0-9]{64}$/D', $rollback['digest'])
-            || $rollback['digest'] === ($candidate['previousDigest'] ?? null))) {
+            || $rollback['digest'] === ($candidate['previousDigest'] ?? null)))) {
             throw new InvalidArgumentException('Native draft rollback claim refused.');
         }
         foreach (['organizationId', 'webPresenceId', 'managedSiteId', 'installationId'] as $field) {

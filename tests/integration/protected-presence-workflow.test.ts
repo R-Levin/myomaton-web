@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
-import { readFile, rm, mkdtemp, rmdir } from "node:fs/promises";
+import { createHash, generateKeyPairSync, randomBytes, randomUUID } from "node:crypto";
+import { spawnSync } from "node:child_process";
+import sharp from "sharp";
+import { readFile, rm, mkdir, mkdtemp, realpath, rmdir } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { test } from "node:test";
@@ -12,17 +14,110 @@ import { IntakeService } from "../../lib/platform/intake/service";
 import { c0DisclosureManifest } from "../../lib/platform/intake/c0-workflow-knowledge";
 import { c0ActivationGrant } from "../../lib/platform/intake/c0-workflow-activation";
 import { fingerprint } from "../../lib/platform/canonical/model";
-import { initializeResponsesUsageLedger } from "../../lib/platform/intake/intelligent-responses";
-import { composePresenceCase, reviewWorkflowChange, workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
+import { initializeResponsesUsageLedger, meteredPresenceWorkflowImage } from "../../lib/platform/intake/intelligent-responses";
+import { acquirePresenceVisual, presenceVisualPlacement, presenceVisualRequest } from "../../lib/platform/intake/presence-workflow-visual";
+import { openAIImageProvider } from "../../lib/platform/acquisition/openai";
+import { readManagedObject } from "../../lib/platform/assets/local-storage";
+import { nativeDraftEnvelope } from "../../lib/platform/wordpress-delivery/native-draft-envelope";
+import { prepareNativeDraftMedia } from "../../lib/platform/wordpress-delivery/native-draft-media";
+import { bindSiteDraft } from "../../lib/platform/wordpress-delivery/site-draft";
+import { verifyNativeDraftReceipt } from "../../lib/platform/wordpress-delivery/native-draft-receipt";
+import type { PresenceWorkflowView, WorkflowContext } from "../../lib/platform/intake/presence-workflow";
+import { composePresenceCase, recoverPresenceResearch, reviewWorkflowChange, workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
 import type { PresenceWorkflowGrant } from "../../lib/platform/intake/presence-workflow-provider";
 import { publicResearchAddress } from "../../lib/platform/intake/presence-workflow-egress";
+
+async function proveProvisionalImage(context: WorkflowContext, view: PresenceWorkflowView, directory: string,
+  grant: PresenceWorkflowGrant, rates: Parameters<typeof initializeResponsesUsageLedger>[1]) {
+  const selection = presenceVisualPlacement(context, view, "/", 0);
+  assert.throws(() => presenceVisualPlacement({ ...context, intakeId: randomUUID() }, view, "/", 0), /reviewed website/);
+  assert.throws(() => presenceVisualPlacement(context, view, "/", 99), /needs an image/);
+  const root = join(directory, "private-master");
+  await mkdir(root, { mode: 0o700 });
+  const request = presenceVisualRequest("An abstract illustration of organized information and continuing care");
+  const png = await sharp({ create: { width: 1536, height: 1024, channels: 3, background: "#6843cf" } }).png().toBuffer();
+  let calls = 0;
+  const provider = openAIImageProvider({ key: "offline-only", model: "gpt-image-2.5-sunburst-2026-09-08",
+    transport: async (url, init) => {
+      assert.equal(url, "https://api.openai.com/v1/images/generations");
+      assert.equal(init?.redirect, "error");
+      const body = JSON.parse(String(init?.body));
+      assert.equal(body.prompt, request.prompt);
+      assert.equal(body.size, "1536x1024");
+      assert.equal(body.quality, "medium");
+      calls++;
+      return new Response(JSON.stringify({ data: [{ b64_json: png.toString("base64") }] }), { headers: { "x-request-id": "img_offline" } });
+    } });
+  const recheck = async () => {
+    assert.deepEqual(presenceVisualPlacement(context, view, "/", 0), selection);
+  };
+  const attribution = { ownerDigest: fingerprint(context.scope), workDigest: fingerprint({ selection, request }) };
+  const run = (scope = grant.ledger) => meteredPresenceWorkflowImage(directory, rates, scope, attribution, provider.model,
+    () => acquirePresenceVisual(provider, selection, request, root, randomUUID(), recheck), recheck);
+  await assert.rejects(run({ ...grant.ledger, capMicros: 499_999 }), /budget/);
+  assert.equal(calls, 0);
+  const image = await run();
+  await assert.rejects(run(), /duplicate/);
+  assert.equal(calls, 1);
+  assert.equal(image.rightsStatus, "pending-review");
+  const master = await readManagedObject(root, selection.owner, "objects/" + image.masterDigest);
+  assert.equal((await sharp(master).metadata()).width, 1536);
+  const scope = { ...context.scope, organizationId: randomUUID() };
+  const project = (path: string) => {
+    const page = view.pages.find(item => item.path === path)!;
+    return { id: randomUUID(), path, title: page.heading, sections: page.sections.map(section => ({
+      id: randomUUID(), type: "intro", content: { heading: section.heading, text: section.body },
+    })) };
+  };
+  const home = project("/"), service = project("/service");
+  const imageCopy = await prepareNativeDraftMedia(root, selection.owner, home.id, {
+    sectionId: home.sections[0].id, assetId: randomUUID(), usageId: randomUUID(), role: "image",
+    configuration: { image: { altText: "Abstract illustration of organized information", decorative: false } },
+    preparedDigest: image.masterDigest, mimeType: "image/png", width: image.width, height: image.height, priorUsage: null,
+    // Explicit fixture permission stands in for independent media review here.
+    evidence: { source: "synthetic-project-raster", sourceDigest: image.provenanceDigest,
+      permission: "disposable-preview-release", reference: "Offline automated fixture only" },
+  });
+  const member = (page: typeof home) => ({ ...scope, proposalId: randomUUID(), revision: 1,
+    approvalId: fingerprint("fixture approval " + page.path), previewDigest: fingerprint("fixture preview " + page.path),
+    sourceDigest: view.contextDigest, projectionDigest: fingerprint([page]), pages: [page] });
+  const installationId = randomUUID(), siteProposalId = randomUUID();
+  const draftSelection = { siteProposalId, installationId, navigation: ["/", "/service"],
+    actions: [{ id: randomUUID(), from: "/", destination: "/service", type: "page", label: "Explore the service" }] };
+  const homeReview = member(home), serviceReview = member(service);
+  const baseline = bindSiteDraft(scope, [homeReview, serviceReview], { ...draftSelection, revision: 1, previousDigest: null });
+  const draft = bindSiteDraft(scope, [{ ...homeReview, media: imageCopy.descriptor }, serviceReview],
+    { ...draftSelection, revision: 2, previousDigest: baseline.digest });
+  assert.equal(draft.candidate.media?.[0].copyDigest, createHash("sha256").update(imageCopy.bytes).digest("hex"));
+  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+  const publicKeyBase64 = Buffer.from(publicKey.export({ format: "jwk" }).x!, "base64url").toString("base64");
+  const envelope = nativeDraftEnvelope(draft, "test-key", publicKeyBase64, privateKey, "apply");
+  assert.equal(envelope.version, 3);
+  const secret = randomBytes(32);
+  const php = spawnSync("php", ["wordpress/miopages-delivery/tests/native-draft-media.php"], { encoding: "utf8", input: JSON.stringify({
+    identity: { ...scope, installationId, keyId: "test-key", publicKeyBase64 }, envelope,
+    baseline: nativeDraftEnvelope(baseline, "test-key", publicKeyBase64, privateKey, "apply"),
+    restore: nativeDraftEnvelope(draft, "test-key", publicKeyBase64, privateKey, "restore"),
+    bytes: imageCopy.bytes.toString("base64"), secret: secret.toString("hex"),
+  }) });
+  assert.equal(php.status, 0, php.stderr);
+  const { wire, posix } = JSON.parse(php.stdout.trim());
+  if (process.platform !== "win32") assert.equal(posix, true, "POSIX custody and native attachment rollback must be exercised");
+  const expected = { installationId, siteProposalId, operation: "apply" as const, requestedDigest: draft.digest,
+    appliedDigest: draft.digest, revision: 2, paths: ["/", "/service"], pageIds: [home.id, service.id], media: [imageCopy.descriptor] };
+  const receipt = verifyNativeDraftReceipt(wire, secret, expected);
+  assert.ok(receipt.attachments?.[0].id);
+  assert.equal(receipt.attachments[0].postId, receipt.posts[0].id);
+  assert.throws(() => verifyNativeDraftReceipt(wire, secret, { ...expected, pageIds: [service.id, home.id] }), /placement/);
+  assert.throws(() => verifyNativeDraftReceipt(wire, secret, { ...expected, media: [] }), /authorization/);
+}
 
 const readSql = (file: string) => readFile(new URL("../../lib/platform/intake/" + file, import.meta.url), "utf8");
 
 test("restricted Core worker discovers research, retains a substantial provider-shaped site and revises one flagged page", async () => {
   const bin = process.env.PG_BIN_DIR ?? "C:/Program Files/PostgreSQL/18/bin";
   const setup = await createC0Onboarding(bin, true);
-  const ledgerDirectory = await mkdtemp(join(tmpdir(), "miopages-protected-workflow-proof-"));
+  const ledgerDirectory = await mkdtemp(join(await realpath(tmpdir()), "miopages-protected-workflow-proof-"));
   const ledgerFile = join(ledgerDirectory, "onboarding-usage.json");
   try {
     const retainedPath = process.env.MIOPAGES_LOCAL_WORKFLOW_RETAINED;
@@ -73,11 +168,14 @@ test("restricted Core worker discovers research, retains a substantial provider-
       const fetches: string[] = [], passes: string[] = [];
       let audits = 0;
       let reportAttempts = 0;
+      let searchRequests = 0;
+      let missingMarketRead = true;
       const composition = composePresenceCase(restricted, intake, token, workspace, { kind: "offline-test", rates,
         readGrant: async () => grant,
         async fetchPage(url, init) {
           assert.equal(init?.redirect, "error");
           fetches.push(String(url));
+          if (missingMarketRead && String(url) === "https://public-example.com/offer") throw Error("Simulated public endpoint unavailability");
           const links = '<a href="/services/maintenance">Maintenance service</a> <a href="/login">Login</a> <a href="https://outside.example/">External</a>';
           const response = new Response("<main>Retained public evidence for tests. " + (fetches.length === 1 ? links : "") + "</main>",
             { headers: { "content-type": "text/html" } });
@@ -86,8 +184,27 @@ test("restricted Core worker discovers research, retains a substantial provider-
         },
         transport: { async send(route, raw) {
           if (route.endsWith("input_tokens")) return { body: { input_tokens: 9600 } };
-          const request = raw as { store: boolean; input: string; text: { format: { name: string } } };
+          const request = raw as { store: boolean; input: string; text?: { format: { name: string } };
+            max_tool_calls?: number; tools?: unknown; include?: unknown };
           assert.equal(request.store, false);
+          if (!request.text) {
+            searchRequests++;
+            assert.equal(request.input, "managed website services for small businesses, buying considerations and trust");
+            assert.deepEqual(request.tools, [{ type: "web_search" }]);
+            assert.deepEqual(request.include, ["web_search_call.action.sources"]);
+            assert.equal(request.max_tool_calls, 2);
+            const body = { id: "resp_recorded_search", model: rates.model, status: "completed", service_tier: "default",
+              usage: { input_tokens: 3000, input_tokens_details: { cached_tokens: 0 }, output_tokens: 60,
+                output_tokens_details: { reasoning_tokens: 0 }, total_tokens: 3060 },
+              output: [{ type: "web_search_call", status: "completed", action: { sources: [
+                { type: "url", url: "https://research-source.com/guide" },
+                { type: "url", url: "https://www.research-source.com/repeated" },
+                { type: "url", url: "https://public-example.com/offer" },
+                { type: "url", url: "https://127.0.0.1/refuse" },
+                { type: "url", url: "https://credential-example.com/trace?ignored=yes" },
+              ] } }] };
+            return { body, rawBody: Buffer.from(JSON.stringify(body)) };
+          }
           const input = JSON.parse(request.input);
           const names = input.evidence.map((entry: { id: string }) => entry.id);
           assert.ok(!names.includes("intake:destinations"));
@@ -149,17 +266,34 @@ test("restricted Core worker discovers research, retains a substantial provider-
         contextDigest: manifest.contextDigest, approvedSources: manifest.approvedSourceCandidates.map(source => source.digest),
         approvedCorrections: [], maxRetries: 1, maxEditorialRevisions: 1, maxOutputTokens: 12_000, expiresAt: Date.now() + 180_000,
         researchSources: [{ id: "research:competitor", url: "https://example.org/", label: "Market reference" }],
-        discovery: { terms: ["maintenance"], prefixes: { "https://example.org": ["/services"] }, maxDiscovered: 2 },
+        marketSearch: { publicQuery: "managed website services for small businesses, buying considerations and trust",
+          maxToolCalls: 2, maxSources: 4, minimumNewOrigins: 2 },
         researchResponseBytes: 12_000, ledger: { id: fingerprint("offline-only grant"), baselineAttempts: 0,
           startingLedger: createHash("sha256").update(await readFile(ledgerFile)).digest("hex"),
-          requests: 28, generations: 14, capMicros: 1_000_000, inputTokens: 24_000, inputBytes: 120_000 },
+          requests: 28, generations: 14, capMicros: 1_800_000, inputTokens: 24_000, inputBytes: 120_000 },
       };
       const owner = { id: "test-verified-operator", role: "operator", simulated: false } as const;
       let worker = await composition.open();
       await reviewWorkflowChange(worker, context, "workflow-start", 0, owner);
       let view = (await workPresenceCase(worker, context))!;
+      assert.equal(view.failure, "outcome-unknown");
+      assert.equal(view.pendingOperation, "research");
+      assert.equal(view.recoverable, true);
+      missingMarketRead = false;
+      worker = await composition.open();
+      view = (await recoverPresenceResearch(worker, context))!;
+      assert.equal(view.next, "report");
+      view = (await workPresenceCase(worker, context))!;
       assert.equal(view.failure, "output-invalid");
-      assert.deepEqual(fetches, ["https://example.org/", "https://example.org/services/maintenance"]);
+      const marketUrls = ["https://public-example.com/offer", "https://research-source.com/guide"];
+      assert.deepEqual(fetches.slice(0, 2).sort(), marketUrls);
+      assert.deepEqual(fetches.slice(2, 4).sort(), marketUrls);
+      assert.deepEqual(fetches.slice(4), ["https://example.org/"]);
+      const usage = JSON.parse(await readFile(ledgerFile, "utf8"));
+      assert.equal(usage.attempts[0].countDispatched, false);
+      assert.equal(usage.attempts[0].webSearchCalls, 1);
+      assert.equal(usage.attempts[0].reservedMicros, 374_000);
+      assert.equal(usage.attempts[0].estimatedMicros, 12_520);
       assert.equal(await workPresenceCase(worker, context).then(v => v?.version), view.version);
       worker = await composition.open();
       view = (await reviewWorkflowChange(worker, context, "workflow-retry", view.version, owner))!;
@@ -187,6 +321,8 @@ test("restricted Core worker discovers research, retains a substantial provider-
       assert.equal(passes.filter(item => item === "page/ongoing").length, 1);
       view = (await reviewWorkflowChange(worker, context, "workflow-review", view.version, owner))!;
       assert.equal(view.next, "review-complete");
+      assert.equal(searchRequests, 1);
+      await proveProvisionalImage(context, view, ledgerDirectory, grant, rates);
       assert.deepEqual(await (await composition.open()).review(context), view);
       const { rows: [size] } = await client.query("SELECT count(*)::int AS captured, max(octet_length(bytes)) AS largest FROM miopages_core_workflow.presence_workflow_outputs");
       assert.ok(size.captured >= 12 && size.largest > 10_000);
@@ -202,6 +338,7 @@ test("restricted Core worker discovers research, retains a substantial provider-
   } finally {
     await setup.stop();
     await rm(ledgerFile, { force: true });
+    await rm(join(ledgerDirectory, "private-master"), { recursive: true, force: true });
     await rmdir(ledgerDirectory);
   }
 });

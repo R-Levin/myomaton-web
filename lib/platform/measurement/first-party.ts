@@ -79,7 +79,7 @@ export class FirstPartyMeasurement {
     [...scope(source), starts, ends]);
     const counts = Object.fromEntries(kinds.map(kind => [kind, source.coverage.includes(kind) && starts >= activatedAt
       ? rows.find(row => row.kind === kind)?.count ?? 0 : null])) as Record<Kind, number | null>;
-    return { environment: source.environment, from: starts, to: ends, activatedAt, counts,
+    return { environment: source.environment, sourceId: source.id, revision: source.revision, from: starts, to: ends, activatedAt, counts,
       notification: null, qualifiedLead: null, customerOutcome: null,
       recommendation: (counts["action-selected"] ?? 0) > 0 && counts["contact-accepted"] === 0
         ? { observation: "Selections were recorded and no Contact acceptance was observed in the covered period.",

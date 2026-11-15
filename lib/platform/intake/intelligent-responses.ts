@@ -28,6 +28,8 @@ type Receipt = QuestionAttribution & { reservedMicros: number; countDispatched: 
   outputLimit?: number;
   inputLimit?: number;
   workflowScope?: string;
+  webSearchCalls?: number;
+  imageRun?: { model: string; requestId?: string; resultDigest: string };
   recoveryAuthorized?: true;
   proposalValidation?: "valid" | "proposal_shape" | "proposal_citations" | "proposal_route" | "proposal_content" | "response_decode";
   failure?: "output_token_limit" | "content_filter" | "provider_incomplete" | "reservation_exceeded";
@@ -299,10 +301,11 @@ export async function confirmSitePlanningReceipt(directory: string, ownerDigest:
     const [receipt, duplicate] = attempts.filter(item => item.ownerDigest === ownerDigest && item.workDigest === workDigest);
     const reply = record(JSON.parse(bytes.toString("utf8")));
     const responseId = receiptId(reply.id);
-    if (!responseId || !receipt || duplicate || !receipt.recoveryAuthorized || !receipt.countDispatched || !receipt.generationDispatched || !receipt.usage ||
+    if (!responseId || !receipt || duplicate || !receipt.recoveryAuthorized || (!receipt.countDispatched && !receipt.webSearchCalls) || !receipt.generationDispatched || !receipt.usage ||
         (receipt.status !== "completed" && receipt.status !== "rejected") ||
         integer(receipt.estimatedMicros) > integer(receipt.reservedMicros) || receipt.responseId !== responseId ||
-        fingerprint(responseUsage(reply, receipt.inputLimit ?? maxInput, receipt.outputLimit ?? maxOutput)) !== fingerprint(receipt.usage)) throw Error();
+        fingerprint(responseUsage(reply, receipt.inputLimit ?? maxInput, receipt.outputLimit ?? maxOutput)) !== fingerprint(receipt.usage) ||
+        (receipt.webSearchCalls !== undefined && searchCalls(reply) !== receipt.webSearchCalls)) throw Error();
   } catch { throw new PlanningFailureError("usage_gate"); }
 }
 
@@ -339,26 +342,128 @@ export type WorkflowUsageScope = {
   requests: number; generations: number; capMicros: number; inputTokens: number; inputBytes: number;
 };
 
+const workflowImageModel = "gpt-image-2.5-sunburst-2026-09-08";
+const imageEnvelopeMicros = 500_000;
+
+const workflowDebit = (receipt: Receipt) => integer(receipt.webSearchCalls ? receipt.reservedMicros : receipt.estimatedMicros);
+
+function recentWorkflow(ledger: Ledger, workflow: WorkflowUsageScope, ownerDigest: string) {
+  const baseline = JSON.stringify({ ...ledger, attempts: ledger.attempts.slice(0, workflow.baselineAttempts) }) + "\n";
+  const recent = ledger.attempts.slice(workflow.baselineAttempts);
+  if (ledger.attempts.length < workflow.baselineAttempts ||
+      createHash("sha256").update(baseline).digest("hex") !== workflow.startingLedger ||
+      recent.some(item => item.workflowScope !== workflow.id || item.ownerDigest !== ownerDigest)) throw Error("Workflow ledger baseline refused");
+  return recent;
+}
+
+// Images share the existing Responses ledger and lock. The full image envelope
+// remains charged against this run until independently reconciled.
+export async function meteredPresenceWorkflowImage<T extends { requestId: string | null; model: string }>(
+  directory: string, rates: Rates, workflow: WorkflowUsageScope, attribution: QuestionAttribution,
+  model: string, dispatch: () => Promise<T>, recheck: () => Promise<void>, retainedReservation?: string,
+) {
+  if (model !== workflowImageModel || ![attribution.ownerDigest, attribution.workDigest].every(value => /^[a-f0-9]{64}$/u.test(value))) {
+    throw Error("Workflow image scope refused");
+  }
+  const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
+  const lock = await open(lockPath, "wx", 0o600);
+  try {
+    const ledger = JSON.parse(await readFile(path, "utf8")) as Ledger;
+    if (ledger.ratesDigest !== fingerprint(rates) || fingerprint(ledger.rateCard) !== ledger.ratesDigest ||
+        ledger.model !== rates.model || ledger.tier !== "default" || ledger.adapterVersion !== version || !Array.isArray(ledger.attempts)) {
+      throw Error("Usage ledger binding mismatch");
+    }
+    verifiedSpend(ledger, retainedReservation);
+    const recent = recentWorkflow(ledger, workflow, attribution.ownerDigest);
+    const generations = recent.filter(item => item.generationDispatched).length;
+    const requests = recent.filter(item => item.countDispatched).length + generations;
+    const spend = recent.reduce((sum, item) => sum + workflowDebit(item), 0);
+    if (generations >= workflow.generations || requests + 1 > workflow.requests ||
+        spend + imageEnvelopeMicros > workflow.capMicros ||
+        ledger.attempts.some(item => item.workDigest === attribution.workDigest)) throw Error("Workflow image budget or duplicate refused");
+    await recheck();
+    const receipt: Receipt = { ...attribution, reservedMicros: imageEnvelopeMicros, workflowScope: workflow.id,
+      countDispatched: false, generationDispatched: true, status: "pending" };
+    ledger.attempts.push(receipt);
+    async function checkpoint() {
+      const next = path + "." + randomUUID() + ".tmp";
+      await durableWrite(next, ledger);
+      await rename(next, path);
+    }
+    await checkpoint();
+    const result = await dispatch();
+    if (result.model !== model) throw Error("Workflow image model differs");
+    receipt.imageRun = { model, requestId: receiptId(result.requestId), resultDigest: fingerprint(result) };
+    receipt.estimatedMicros = imageEnvelopeMicros;
+    receipt.status = "completed";
+    await checkpoint();
+    return result;
+  } finally {
+    await lock.close();
+    await unlink(lockPath);
+  }
+}
+
+function verifiedSpend(ledger: Ledger, retainedReservation?: string) {
+  let retained = false;
+  const spent = ledger.attempts.reduce((total, receipt) => {
+    if (!retained && retainedReservation && receipt.status === "uncertain" && receipt.countDispatched === true &&
+        receipt.generationDispatched === true && fingerprint(receipt) === retainedReservation) {
+      retained = true;
+      return total + integer(receipt.reservedMicros);
+    }
+    if (!["completed", "rejected"].includes(receipt.status) || receipt.estimatedMicros === undefined ||
+        integer(receipt.estimatedMicros) > integer(receipt.reservedMicros)) throw Error("Unreconciled development usage");
+    return total + receipt.estimatedMicros;
+  }, 0);
+  if (retainedReservation && !retained) throw Error("Prior reservation evidence mismatch");
+  return spent;
+}
+
+const researchInputLimit = 400_000; // Documented context window of the pinned model.
+const researchToolMicros = 10_000; // Default-tier Web Search per-call fee, plus token usage.
+type ResponsesRequest = { model: string; input: string; instructions: string; text?: { format: object } };
+
+function searchCalls(body: Record<string, unknown>) {
+  if (!Array.isArray(body.output)) throw Error("Research tool usage unavailable");
+  const items = body.output.map(record);
+  if (items.some(item => !["web_search_call", "reasoning", "message"].includes(String(item.type)))) {
+    throw Error("Unexpected research tool");
+  }
+  return items.filter(item => item.type === "web_search_call").length;
+}
+
 export function meteredPresenceWorkflow(directory: string, rates: Rates, transport: ResponsesTransport,
-  scope: WorkflowUsageScope, outputLimit: number, retainedReservation?: string) {
+  scope: WorkflowUsageScope, outputLimit: number, retainedReservation?: string, researchCalls?: number) {
   const fields = [scope.baselineAttempts, scope.requests, scope.generations, scope.capMicros, scope.inputTokens, scope.inputBytes, outputLimit];
   if (![scope.id, scope.startingLedger, ...(retainedReservation ? [retainedReservation] : [])].every(value => /^[a-f0-9]{64}$/u.test(value)) ||
       fields.some(value => !Number.isSafeInteger(value) || value < 0) ||
       scope.requests < 2 || scope.generations < 1 || scope.generations * 2 > scope.requests ||
       scope.capMicros < 1 || scope.inputTokens < 1 || scope.inputBytes < 1 || outputLimit < 16) throw Error("Workflow budget refused");
-  return meteredResponsesDispatch(directory, rates, transport, 0, 0, 0, outputLimit, retainedReservation, undefined, undefined, structuredClone(scope));
+  if (researchCalls !== undefined && (rates.model !== "gpt-5.4-mini-2026-03-17" ||
+      !Number.isSafeInteger(researchCalls) || researchCalls < 1 || researchCalls > 10)) throw Error("Research tool budget refused");
+  return meteredResponsesDispatch(directory, rates, transport, 0, 0, 0, outputLimit, retainedReservation, undefined, undefined,
+    structuredClone(scope), researchCalls);
 }
 
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
   requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string, comparisonInput?: string,
-  outcome?: { inputDigest: string; attempt: number; c0ReadbackDigest?: string }, workflow?: WorkflowUsageScope) {
+  outcome?: { inputDigest: string; attempt: number; c0ReadbackDigest?: string }, workflow?: WorkflowUsageScope, researchCalls?: number) {
   const rates = structuredClone(configuredRates);
   validateRates(rates);
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
   const inputRate = Math.max(rates.inputPerMillion, rates.cachedPerMillion, rates.cacheWritePerMillion);
-  const inputLimit = workflow?.inputTokens ?? maxInput;
-  return async ({ ownerDigest, workDigest }: QuestionAttribution, request: { model: string; input: string; instructions: string; text: { format: object } }, recheck?: () => Promise<unknown>, retain?: CompletedResponse, normalize?: NormalizeProposal) => {
-    if (![ownerDigest, workDigest].every(value => /^[a-f0-9]{64}$/.test(value))) throw Error("Scoped attribution required");
+  return async ({ ownerDigest, workDigest }: QuestionAttribution, request: ResponsesRequest, recheck?: () => Promise<unknown>,
+    retain?: CompletedResponse, normalize?: NormalizeProposal) => {
+    if (![ownerDigest, workDigest].every(value => /^[a-f0-9]{64}$/.test(value)) || request.model !== rates.model) {
+      throw Error("Scoped attribution and exact provider model required");
+    }
+    const toolLimit = request.text ? 0 : researchCalls;
+    if (toolLimit === undefined || (toolLimit > 0 && (!retain || !recheck))) throw Error("Research authorization required");
+    const search = toolLimit > 0;
+    const inputLimit = search ? researchInputLimit : workflow?.inputTokens ?? maxInput;
+    const requestCost = search ? 0 : rates.countMicros;
+    const operations = search ? 1 : 2;
     let stage: PlanningFailure = "usage_gate";
     let lock: Awaited<ReturnType<typeof open>> | undefined;
     try {
@@ -367,18 +472,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       const ledger: Ledger = JSON.parse(bytes);
       if (ledger.ratesDigest !== fingerprint(rates) || fingerprint(ledger.rateCard) !== ledger.ratesDigest || ledger.model !== rates.model || ledger.tier !== "default" ||
           ledger.adapterVersion !== version || !Array.isArray(ledger.attempts)) throw Error("Usage ledger binding mismatch");
-      let retained = false;
-      const spent = ledger.attempts.reduce((total, receipt) => {
-        if (!retained && retainedReservation && receipt.status === "uncertain" && receipt.countDispatched === true &&
-            receipt.generationDispatched === true && fingerprint(receipt) === retainedReservation) {
-          retained = true;
-          return total + integer(receipt.reservedMicros);
-        }
-        if (!["completed", "rejected"].includes(receipt.status) || receipt.estimatedMicros === undefined ||
-            integer(receipt.estimatedMicros) > integer(receipt.reservedMicros)) throw Error("Unreconciled development usage");
-        return total + receipt.estimatedMicros;
-      }, 0);
-      if (retainedReservation && !retained) throw Error("Prior reservation evidence mismatch");
+      const spent = verifiedSpend(ledger, retainedReservation);
       const generations = ledger.attempts.filter(item => item.generationDispatched).length;
       const requests = ledger.attempts.filter(item => item.countDispatched).length + generations;
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");
@@ -394,18 +488,14 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
               first.reservedMicros !== comparison.envelopeMicros))) throw Error("Fresh comparison ledger baseline refused");
       }
       if (outcome) verifyOutcomeLedger(ledger, outcome.inputDigest, outcome.attempt, outcomeCompactComparison, outcome.c0ReadbackDigest);
-      const reservation = rates.countMicros + Math.ceil((inputLimit * inputRate + outputLimit * rates.outputPerMillion) / 1_000_000);
+      const reservation = requestCost + toolLimit * researchToolMicros + Math.ceil((inputLimit * inputRate + outputLimit * rates.outputPerMillion) / 1_000_000);
       if ((comparisonInput !== undefined || outcome) && reservation !== freshCompactComparison.envelopeMicros) throw Error("Fresh comparison request envelope refused");
       if (workflow) {
-        const baseline = JSON.stringify({ ...ledger, attempts: ledger.attempts.slice(0, workflow.baselineAttempts) }) + "\n";
-        const recent = ledger.attempts.slice(workflow.baselineAttempts);
-        if (ledger.attempts.length < workflow.baselineAttempts ||
-            createHash("sha256").update(baseline).digest("hex") !== workflow.startingLedger ||
-            recent.some(item => item.workflowScope !== workflow.id || item.ownerDigest !== ownerDigest)) throw Error("Workflow ledger baseline refused");
+        const recent = recentWorkflow(ledger, workflow, ownerDigest);
         const runGenerations = recent.filter(item => item.generationDispatched).length;
         const runRequests = recent.filter(item => item.countDispatched).length + runGenerations;
-        const runSpent = recent.reduce((sum, item) => sum + integer(item.estimatedMicros), 0);
-        if (runRequests + 2 > workflow.requests || runGenerations >= workflow.generations ||
+        const runSpent = recent.reduce((sum, item) => sum + workflowDebit(item), 0);
+        if (runRequests + operations > workflow.requests || runGenerations >= workflow.generations ||
             runSpent + reservation > workflow.capMicros) throw Error("Workflow budget exhausted");
       } else if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) {
         throw Error("Development budget exhausted");
@@ -413,7 +503,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       if (Buffer.byteLength(request.input) > (workflow?.inputBytes ?? 12_000)) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation,
         ...(outputLimit !== maxOutput && { outputLimit }), ...(workflow && { inputLimit, workflowScope: workflow.id }),
-        countDispatched: true, generationDispatched: false, status: "pending" };
+        countDispatched: !search, generationDispatched: false, status: "pending" };
       ledger.attempts.push(receipt);
       async function checkpoint() {
         const next = path + "." + randomUUID() + ".tmp";
@@ -421,22 +511,25 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
         await rename(next, path);
       }
       await checkpoint();
-      stage = "provider_count";
-      const count = await transport.send("/v1/responses/input_tokens", structuredClone(request));
-      receipt.countRequestId = receiptId(count.requestId);
-      const input = integer(record(count.body).input_tokens);
-      if (input > inputLimit) {
-        receipt.status = "rejected";
-        receipt.estimatedMicros = rates.countMicros;
-        await checkpoint();
-        if (retain) throw new PlanningFailureError("input_token_limit");
-        throw Error("Input token ceiling exceeded");
+      let input = inputLimit;
+      if (!search) {
+        stage = "provider_count";
+        const count = await transport.send("/v1/responses/input_tokens", structuredClone(request));
+        receipt.countRequestId = receiptId(count.requestId);
+        input = integer(record(count.body).input_tokens);
+        if (input > inputLimit) {
+          receipt.status = "rejected";
+          receipt.estimatedMicros = requestCost;
+          await checkpoint();
+          if (retain) throw new PlanningFailureError("input_token_limit");
+          throw Error("Input token ceiling exceeded");
+        }
       }
       if (recheck) {
         try { await recheck(); }
         catch (error) {
           receipt.status = "rejected";
-          receipt.estimatedMicros = rates.countMicros;
+          receipt.estimatedMicros = requestCost;
           await checkpoint();
           throw error;
         }
@@ -445,7 +538,9 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       receipt.generationDispatched = true;
       await checkpoint();
       stage = "provider_transport";
-      const result = await transport.send("/v1/responses", structuredClone({ ...request, service_tier: "default", store: false, max_output_tokens: outputLimit }));
+      const result = await transport.send("/v1/responses", structuredClone({ ...request, service_tier: "default", store: false, max_output_tokens: outputLimit,
+        ...(search && { tools: [{ type: "web_search" }], tool_choice: { type: "web_search" },
+          max_tool_calls: toolLimit, include: ["web_search_call.action.sources"] }) }));
       stage = "response_decode";
       const body = record(result.body);
       receipt.generationRequestId = receiptId(result.requestId);
@@ -465,9 +560,14 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       }
       stage = "provider_usage";
       let usage: Usage;
-      try { usage = responseUsage(body, input, outputLimit); }
-      catch (error) { await checkpoint(); throw error; }
-      const estimate = rates.countMicros + Math.ceil(((usage.input - usage.cached - usage.cacheWrite) * rates.inputPerMillion +
+      try {
+        usage = responseUsage(body, input, outputLimit);
+        if (search) {
+          receipt.webSearchCalls = searchCalls(body);
+          if (receipt.webSearchCalls < 1 || receipt.webSearchCalls > toolLimit) throw Error("Research tool budget unverified");
+        }
+      } catch (error) { await checkpoint(); throw error; }
+      const estimate = requestCost + (receipt.webSearchCalls ?? 0) * researchToolMicros + Math.ceil(((usage.input - usage.cached - usage.cacheWrite) * rates.inputPerMillion +
         usage.cached * rates.cachedPerMillion + usage.cacheWrite * rates.cacheWritePerMillion + usage.output * rates.outputPerMillion) / 1_000_000);
       receipt.usage = usage;
       receipt.estimatedMicros = estimate;
@@ -484,7 +584,10 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
         throw Object.assign(Error("Uncertain development charge"), { code: receipt.failure });
       }
       let proposal: unknown;
-      try { proposal = responseProposal(body, !retain && outputLimit === maxOutput ? 8_000 : undefined); receipt.status = "completed"; }
+      try {
+        proposal = search ? body : responseProposal(body, !retain && outputLimit === maxOutput ? 8_000 : undefined);
+        receipt.status = "completed";
+      }
       catch { receipt.status = "rejected"; }
       stage = "usage_gate";
       await checkpoint();

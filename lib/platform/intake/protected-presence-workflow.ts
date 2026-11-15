@@ -69,7 +69,10 @@ export function composePresenceCase(pool: Pool, intake: IntakeService, token: st
         : capability.kind === "offline-test" ? capability.transport : { send: noOutbound };
       const fetchPage = capability.kind === "worker" ? pinnedResearchFetch(url => researchUrlAllowed(url, grant.researchSources, grant.discovery), grant.researchResponseBytes)
         : capability.kind === "offline-test" ? capability.fetchPage : noOutbound;
-      const operations = createResponsesPresenceWorkflow({ grant, readGrant, readContext: context, ledgerDirectory: workspace.ledgerDirectory, rates, transport, fetchPage });
+      const operations = createResponsesPresenceWorkflow({ grant, readGrant, readContext: context, ledgerDirectory: workspace.ledgerDirectory, rates, transport, fetchPage,
+        fetchMarketPages: sources => capability.kind === "worker"
+          ? pinnedResearchFetch(url => researchUrlAllowed(url, sources), grant.researchResponseBytes) : fetchPage,
+      });
       return new PresenceWorkflow(pool, capability.kind === "review" ? { ...operations, run: noOutbound } : operations, {}, Date.now, "protected");
     },
   };
@@ -85,6 +88,13 @@ export async function workPresenceCase(workflow: PresenceWorkflow, current: Awai
     } else return previous;
   }
   return previous;
+}
+
+export async function recoverPresenceResearch(workflow: PresenceWorkflow,
+  current: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>>) {
+  const review = await workflow.review(current);
+  if (!review?.recoverable || review.pendingOperation !== "research") throw Error("Retained research recovery unavailable");
+  return workflow.recover(current, review.version);
 }
 
 export async function reviewWorkflowChange(workflow: PresenceWorkflow,

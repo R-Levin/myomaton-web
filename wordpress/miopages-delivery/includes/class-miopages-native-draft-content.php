@@ -13,7 +13,7 @@ final class MioPages_Native_Draft_Content
      * and IDs allocated by its materializer. The caller must authenticate the
      * candidate and verify the target posts before using these inputs.
      */
-    public static function posts(array $candidate, array $postIds): array
+    public static function posts(array $candidate, array $postIds, array $attachments = []): array
     {
         $pages = $candidate['pages'];
         $navigation = $candidate['navigation'];
@@ -58,6 +58,17 @@ final class MioPages_Native_Draft_Content
                 $blocks[] = '<!-- wp:heading --><h2 class="wp-block-heading">'
                     . esc_html($section['content']['heading']) . '</h2><!-- /wp:heading -->';
                 $blocks[] = self::paragraph(nl2br(esc_html($section['content']['text']), false));
+                $sectionId = $section['id'] ?? '';
+                if (isset($attachments[$sectionId])) {
+                    $attachment = $attachments[$sectionId];
+                    $id = $attachment['id'];
+                    $image = $attachment['media'];
+                    $src = admin_url('admin-post.php?action=miopages_native_draft_image&attachment=' . $id);
+                    $blocks[] = '<!-- wp:image {"id":' . $id . '} --><figure class="wp-block-image">'
+                        . '<img class="wp-image-' . $id . '" src="' . esc_url($src)
+                        . '" alt="' . esc_attr($image['alt']) . '" width="' . $image['width']
+                        . '" height="' . $image['height'] . '" /></figure><!-- /wp:image -->';
+                }
             }
             foreach ($actions as $action) {
                 if ($action['from'] === $path) {

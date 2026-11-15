@@ -4,17 +4,19 @@ import { projectContent } from "../canonical/projections";
 import { fingerprint, uuid } from "../canonical/model";
 import { readProposalState } from "../content-editing/proposal-postgres";
 import { resolvePage, siteBase } from "../content-editing/proposal-context";
+import { resolveProposalCandidate } from "../content-editing/proposal-media";
 import { hash, pageProposal } from "../content-editing/proposal";
 import { proposalPreview } from "../content-editing/proposal-preview";
 import { validatePages, type ReviewedProjection, type Site } from "./authority";
 import { customerMandate, type ProtectedOperator } from "./operator";
 import { bindSiteDraft } from "./site-draft";
 import { nativeDraftEnvelope, readNativeDraftEnvelope } from "./native-draft-envelope";
+import { prepareNativeDraftMedia } from "./native-draft-media";
 import type { NativeDraftReceiptExpectation, NativeDraftReceiptJournal } from "./native-draft-receipt";
 
 type RecoveryEvidence = { journal: NativeDraftReceiptJournal; secret: Buffer; credentialId: string };
 
-async function approvedProjection(db: PoolClient, site: Site, proposalId: string, approvalId: string) {
+async function approvedProjection(db: PoolClient, site: Site, proposalId: string, approvalId: string, mediaRoot?: string) {
   const identity = (await db.query(`SELECT p.created_at,g.operator_id,g.id AS grant_id,g.customer
     FROM site_change_proposals p JOIN wordpress_proposal_approvals a ON a.proposal_id=p.id
     JOIN wordpress_operator_grants g ON g.id=a.grant_id AND g.permission='approve-site-proposal'
@@ -36,13 +38,17 @@ async function approvedProjection(db: PoolClient, site: Site, proposalId: string
   if (base.graph.organization.id !== site.organizationId || fingerprint(base) !== revision.binding.baseFingerprint) {
     throw Error("Stale canonical source");
   }
-  if (revision.candidate.media || revision.page.sections.some(section => section.image)) {
-    throw Error("Private staging v1 excludes media-bound content");
-  }
-  const resolved = await resolvePage(db, scope, pageProposal(revision.page), base);
+  const withMedia = Boolean(revision.candidate.media || revision.page.sections.some(section => section.image));
+  if (withMedia && !mediaRoot) throw Error("Private staging v1 excludes media-bound content");
+  const resolved = withMedia
+    ? await resolveProposalCandidate(db, scope, pageProposal(revision.page), base, mediaRoot)
+    : { ...await resolvePage(db, scope, pageProposal(revision.page), base), image: undefined };
+  const reviewedMedia = withMedia ? revision.candidate.media : undefined;
+  const media = reviewedMedia && mediaRoot
+    ? (await prepareNativeDraftMedia(mediaRoot, scope.webPresenceId, revision.page.pageId, reviewedMedia)).descriptor : undefined;
   if (fingerprint(resolved.candidate) !== fingerprint(revision.candidate)
     || fingerprint(resolved.resolved) !== fingerprint(revision.resolved)
-    || fingerprint(proposalPreview(revision)) !== approved.approval.previewDigest) throw Error("Changed approved candidate");
+    || fingerprint(proposalPreview(revision, resolved.image)) !== approved.approval.previewDigest) throw Error("Changed approved candidate");
 
   for (const copy of resolved.resolved) {
     if (copy.origin.kind !== "canonical") continue;
@@ -56,7 +62,7 @@ async function approvedProjection(db: PoolClient, site: Site, proposalId: string
   }
   const ids = [revision.page.pageId, ...resolved.candidate.sections.map(s => s.id),
     ...base.sections.filter(s => s.page_id === revision.page.pageId).map(s => s.id)];
-  if ((await db.query("SELECT 1 FROM asset_usages WHERE entity_id=ANY($1::uuid[]) LIMIT 1", [ids])).rowCount) {
+  if (!withMedia && (await db.query("SELECT 1 FROM asset_usages WHERE entity_id=ANY($1::uuid[]) LIMIT 1", [ids])).rowCount) {
     throw Error("Private staging v1 excludes media-bound content");
   }
   if (resolved.candidate.sections.some(s => s.action || s.content.actionId || s.type === "cta")) {
@@ -68,7 +74,7 @@ async function approvedProjection(db: PoolClient, site: Site, proposalId: string
   validatePages(pages);
   return { pages, projectionDigest: fingerprint(pages), sourceDigest: revision.binding.baseFingerprint,
     approvalId, previewDigest: approved.approval.previewDigest, revision: revision.binding.revision,
-    approver: identity.operator_id as string };
+    approver: identity.operator_id as string, ...(media && { media }) };
 }
 
 export async function reviewedPrivateSource(db: PoolClient, site: Site): Promise<ReviewedProjection | null> {
@@ -85,7 +91,8 @@ export async function reviewedPrivateSource(db: PoolClient, site: Site): Promise
 }
 
 export class PrivateReleaseReview {
-  constructor(private pool: Pool, private operator: ProtectedOperator, private boundary: (db: PoolClient) => Promise<void>) {}
+  constructor(private pool: Pool, private operator: ProtectedOperator, private boundary: (db: PoolClient) => Promise<void>,
+    private disposableMediaRoot?: string) {}
 
   // Review-only. A digest returned here does not grant draft materialization.
   async previewSiteDraft(context: unknown, site: Site, references: readonly { proposalId: string; approvalId: string }[], draft: unknown) {
@@ -136,7 +143,8 @@ export class PrivateReleaseReview {
         revision: restore ? draft.rollback?.revision ?? draft.revision - 1 : draft.revision,
         ...(draft.rollback && (restore ? { requestedRevision: draft.revision } : { materializedBaseline: {
           requestedDigest: hash(draft.previousDigest), appliedDigest: draft.rollback.digest, revision: draft.rollback.revision,
-        } })), paths: draft.pages.map(page => page.path) };
+        } })), paths: draft.pages.map(page => page.path),
+        ...(!restore && draft.media && { media: draft.media, pageIds: draft.pages.map(page => page.id) }) };
       await db.query("COMMIT");
       return { expected, credentialId: uuid(installation.credential_id) };
     } catch (error) {
@@ -158,7 +166,7 @@ export class PrivateReleaseReview {
       const members = [];
       for (const ref of references) {
         const proposalId = uuid(ref.proposalId);
-        const projection = await approvedProjection(db, site, proposalId, hash(ref.approvalId));
+        const projection = await approvedProjection(db, site, proposalId, hash(ref.approvalId), this.disposableMediaRoot);
         if (projection.approver === reviewer.operatorId) throw Error("Independent projection reviewer required");
         members.push({ ...site, ...projection, proposalId });
       }
