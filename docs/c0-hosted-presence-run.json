@@ -1,0 +1,211 @@
+{
+  "schema": "miopages.c0-hosted-presence/2",
+  "scope": {
+    "webPresenceId": "819d007a-595d-4374-a2f0-96b900d46559",
+    "managedSiteId": "1d92a248-416f-4e22-baaf-d2f1fca70352"
+  },
+  "sourceEvidence": {
+    "contextDigest": "3eb8ab4ce60605d9094d741c0cee663b0fcc90d3d670398031650dd4573302f2",
+    "exactCandidates": [
+      {
+        "id": "discovery",
+        "digest": "d92b1890389f973c135095740f1ce84971ccbb0b14b32b218e793433c09bf237"
+      },
+      {
+        "id": "site",
+        "digest": "62c4a46dc0f3dd6546564cb3f6340315ad569f1b97c8024f6f574399b911df02"
+      },
+      {
+        "id": "review-answers",
+        "digest": "8ae7d236106b0d72579bbbb7580f918ea21aac72a3ba91854751cc59d84dd32e"
+      },
+      {
+        "id": "review-assessment",
+        "digest": "3548b06255141d7e7c28fe5044a6ecede98aa78e4f9b074d43bcdc5f0bc8dda4"
+      },
+      {
+        "id": "direction",
+        "digest": "5ea9e9ecd431e2cdd5dda372d353bbe65482a2abd4e57872a65ace5a2f3d74f1"
+      },
+      {
+        "id": "intake:proof",
+        "digest": "7a73a38c9a2216338421822f3633dc4ac1e8ba74a4c964b33f59ffc80700dd12"
+      },
+      {
+        "id": "intake:workExcluded",
+        "digest": "65b52745d20adb02396aa5f2ed8b2a20151dcc490eecbc83081060cc86406284"
+      },
+      {
+        "id": "intake:workIncluded",
+        "digest": "b790d9e06afe8c116d79a00f3b849b961b541c23a1af3a3a45b21f84f14f6c1c"
+      },
+      {
+        "id": "intake:reviewHandoff",
+        "digest": "4ce10942cf4620c7be9cb384ce8eac21d4b9447b4415c2dca3a1c8345d1010db"
+      },
+      {
+        "id": "intake:sourceCorrection",
+        "digest": "abe53dacf6dad0f28ed47eb5d108387b260877a259046850557ff94624b12990"
+      },
+      {
+        "id": "approved-brief:1",
+        "digest": "67a45b9b0358b8d727beb32828ecfcf9f9e856c57dd2f8eaf2468ba507a00e10"
+      },
+      {
+        "id": "approved-brief:2",
+        "digest": "743c941aafb993cbdffeb54dc8885bc445d0f057d41b73510b141d2fc2186819"
+      },
+      {
+        "id": "approved-brief:3",
+        "digest": "b5b3115d3ee67b43da9bb830363d26abc09be2f1a061b2373c10954ec5c8ee4a"
+      },
+      {
+        "id": "approved-brief:4",
+        "digest": "d4e8c20bb2acf44e2c47eee6addb7c119e73b54828265d3257fcf36afbbe6066"
+      },
+      {
+        "id": "discovery-recovery:1",
+        "digest": "b18fe5e33b79b58af70d6fc9d5c677ab3be5ae86599d3e6b55ee2a28ab1f9689"
+      },
+      {
+        "id": "discovery-recovery:2",
+        "digest": "1776301e240ff90efd2d0a8fc1a915fc2955643f26458875146b5303358a99ab"
+      },
+      {
+        "id": "c0-market-correction",
+        "digest": "3dd0070a40778fba5c85c0e49ceedf9ecd2d627865f26b446abc12d01a1e8982"
+      },
+      {
+        "id": "current-c0-direction:1",
+        "digest": "5a8deb458fb1ad4112978fc10ed41f7b461c6b1c31fe7f47d65a543132d7be0b"
+      },
+      {
+        "id": "current-c0-direction:2",
+        "digest": "e73c1c72d585b2e45697670e75d7c617d0098ad1bf8261978d953a31d4d12b87"
+      },
+      {
+        "id": "current-c0-direction:3",
+        "digest": "a97d55b0480ed74dbeedcc5b57057090d6f1d0fe0262824d23a67c7646a8edbb"
+      }
+    ],
+    "approvedCorrections": []
+  },
+  "existingLedger": {
+    "digest": "664b5c1f8cfd82d10ee13de24a4d218288b476089e7e3a4d125a2c25b1e55d53",
+    "attempts": 12,
+    "uncertainReservation": "5ae4346b9db86020dd9f02f0c8746615acefc018d1d0004c3a3628cdffb581e8",
+    "uncertainMicros": 8400
+  },
+  "provider": {
+    "model": "gpt-5.4-mini-2026-03-17",
+    "store": false,
+    "automaticRetries": 0,
+    "requests": 80,
+    "generations": 40,
+    "maxInputTokens": 64000,
+    "maxInputBytes": 320000,
+    "maxOutputTokens": 20000,
+    "additionalCapMicros": 20000000,
+    "maxRetries": 2,
+    "maxEditorialRevisions": 3
+  },
+  "research": {
+    "roots": [
+      {
+        "id": "research:miopages",
+        "url": "https://miopages.com/",
+        "label": "C0 existing public site"
+      },
+      {
+        "id": "research:standard",
+        "url": "https://sitecare360.com/",
+        "label": "Managed website comparable"
+      },
+      {
+        "id": "research:refresh",
+        "url": "https://siteupdater.com/",
+        "label": "Existing site refresh comparable"
+      },
+      {
+        "id": "research:international",
+        "url": "https://www.sitecommanderstudio.com/websites",
+        "label": "Non-US managed design comparable"
+      },
+      {
+        "id": "research:search",
+        "url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "label": "Google Search guidance"
+      },
+      {
+        "id": "research:accessibility",
+        "url": "https://www.w3.org/WAI/tutorials/forms/",
+        "label": "W3C accessible forms"
+      }
+    ],
+    "market": {
+      "publicQuery": "small business managed website services, buying considerations, existing website transitions and ongoing care",
+      "maxToolCalls": 4,
+      "maxSources": 12,
+      "minimumNewOrigins": 3
+    },
+    "maxSourceBytes": 450000
+  },
+  "images": {
+    "model": "gpt-image-2.5-sunburst-2026-09-08",
+    "briefs": [
+      {
+        "id": "launch-and-care",
+        "label": "Launch and continuing care",
+        "prompt": "A warm, editorial, abstract still life of a newly arranged workspace and a small plant with new growth. Use muted teal, warm cream and soft daylight, with clear forms and generous negative space. Convey the idea of getting a website started and giving it continuing care without depicting an actual client, a real website or a service outcome."
+      },
+      {
+        "id": "adoption-and-handoff",
+        "label": "Existing website transition",
+        "prompt": "An editorial illustration of two overlapping sheets and a small set of orderly stationery on a quiet desk, suggesting an intentional handoff and continuity. Muted slate and cream with restrained teal accents. Keep the composition spacious and readable as a wide crop. No brands, writing or representational screens."
+      },
+      {
+        "id": "visibility-and-next-step",
+        "label": "Visibility and visitor next step",
+        "prompt": "A minimal editorial illustration of a soft beam of daylight revealing an open path through geometric paper shapes. Use warm cream, muted slate and teal. Convey discoverability and a clear next step with an understated composition, without implying metrics, traffic or commercial results."
+      }
+    ]
+  },
+  "rollout": {
+    "commit": "eb2518f61bd4dfa0ba5cd460057a4e713a5c24f6",
+    "artifactSha256": "f5f4decfbff35cb16bdb6e217bb31cab05d831a9b83f63b8652dafcf8e981ea3",
+    "coreOrigin": "https://wp-acceptance.miopages.com",
+    "wordpressOrigin": "https://miopages.org",
+    "wordpressPluginSha256": "38668108f522d24da4fbf1b52a96b818539a645116cda135725ba453bd4d3862",
+    "installationId": "d84ebc69-46d5-4c64-adc6-ac7b87468f89",
+    "siteProposalId": "1e28f792-624d-4141-96db-45c4ba05e17d",
+    "privateOnly": true,
+    "expiresAt": "2026-11-22T21:00:00.000Z",
+    "retentionDays": 30,
+    "policy": {
+      "workflowSqlSha256": "15bb73a6b0dcbcab4538edb9cdf7423d5cf3fae02a41097141943cbb292bcae6",
+      "rolePolicySha256": "a03c64a143ed0f3fd2e1cef7154f1f3f593b789c0226d2442b453d8acc45d03e"
+    },
+    "rollback": {
+      "materializedRevision": 3,
+      "materializedDigest": "85786f251ed5b93e42d9ae2b8c7247d85d99280aa9b1bc5932a1321330a043db",
+      "highWater": 5,
+      "highWaterDigest": "2fd1dd2b6780a5f4e8af35c45f80845578032de06b632b05a9012ff52a455ae0",
+      "pages": [
+        {
+          "path": "/",
+          "id": "e3252729-a647-4bd8-9124-83facde5ac26",
+          "wordPressId": 13,
+          "slug": "home-miopages-13",
+          "sha256": "960fea54ac23eb52c15eb9aedec4e84023903c845160942ebc96256b58999940"
+        },
+        {
+          "path": "/service",
+          "id": "8324102e-7436-4bfd-87b0-1271d4b1b533",
+          "wordPressId": 14,
+          "slug": "service-miopages-14",
+          "sha256": "90c4917bfe9fa5fd7d478df98a972c6cfd26050e47d54a0c735ef369d9cbc39e"
+        }
+      ]
+    }
+  }
+}
