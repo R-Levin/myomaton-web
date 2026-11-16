@@ -29,25 +29,32 @@ export function workflowDeliveryInput(context: WorkflowContext, view: PresenceWo
     return pageProposal({ operation: owned ? "replace-page" : "create-page", pageId, slug: page.path,
       title: editorial(page.heading), purpose: view.blueprint!.pages.find(entry => entry.path === page.path)!.purpose,
       workflowReview: { intakeId: context.intakeId, candidateDigest: review.target },
+      ...(page.composition && { composition: page.composition, navigationLabel: view.blueprint!.pages.find(entry => entry.path === page.path)!.label }),
       sections: page.sections.map((section, index) => {
         const approved = view.visuals?.find(item => item.placement.path === page.path &&
           item.placement.sectionIndex === index && item.state === "approved");
         if (approved && (!approved.association || !approved.decision?.alt)) throw Error("Approved placement evidence incomplete");
-        return { id: logicalId({ pageId, section: index }), type: "intro", heading: editorial(section.heading), text: editorial(section.body),
+        return { id: logicalId({ pageId, section: index }), type: section.role ?? "intro", heading: editorial(section.heading), text: editorial(section.body),
           ...(approved && { image: { ...approved.association!, altText: approved.decision!.alt! } }) };
       }),
     } satisfies PageProposal);
   });
   if (!view.blueprint.navigation.includes("/")) throw Error("Private navigation requires Home");
   const actions = view.pages.flatMap(page => {
-    const navigation = new Map<string, string>();
-    for (const action of page.actions) if (action.kind === "navigate" && action.destination) navigation.set(action.destination, action.label);
+    const nativePage = pages.find(item => item.slug === page.path)!;
+    const navigation = new Map<string, { label: string; sectionId?: string }>();
+    for (const action of page.actions) if (action.destination && action.destination !== page.path &&
+      view.blueprint!.pages.some(target => target.path === action.destination) &&
+      (action.kind === "navigate" || (page.composition && action.kind !== "existing-account"))) {
+      navigation.set(action.destination, { label: action.label,
+        ...(page.composition && action.sectionIndex !== undefined && { sectionId: nativePage.sections[action.sectionIndex].id }) });
+    }
     for (const link of page.internalLinks) {
       const target = view.blueprint!.pages.find(entry => entry.path === link);
-      if (target && !navigation.has(link)) navigation.set(link, target.label);
+      if (target && !navigation.has(link)) navigation.set(link, { label: target.label });
     }
-    return [...navigation].map(([destination, label]) => ({ id: logicalId({ site: context.scope.managedSiteId, from: page.path, destination }),
-      type: "page" as const, from: page.path, destination, label }));
+    return [...navigation].map(([destination, location]) => ({ id: logicalId({ site: context.scope.managedSiteId, from: page.path, destination }),
+      type: "page" as const, from: page.path, destination, ...location }));
   });
   return { scope: context.scope, candidateDigest: review.target, pages, navigation: view.blueprint.navigation,
     actions, ...(baseline.length && { baselinePages: baseline }) };

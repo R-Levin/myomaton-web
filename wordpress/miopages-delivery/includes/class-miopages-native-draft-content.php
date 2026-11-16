@@ -41,10 +41,45 @@ final class MioPages_Native_Draft_Content
             }
         }
 
+        $byPath = array_column($pages, null, 'path');
+        foreach ($actions as $action) {
+            if (!array_key_exists('sectionId', $action)) {
+                continue;
+            }
+            $page = $byPath[$action['from']];
+            $sections = array_column($page['sections'], 'type', 'id');
+            if (($page['composition'] ?? null) !== 'managed-v1' || $action['destination'] === $action['from']
+                || !is_string($action['sectionId'])
+                || !in_array($sections[$action['sectionId']] ?? null, ['hero', 'cta'], true)) {
+                throw new InvalidArgumentException('Native draft Action placement is unsupported.');
+            }
+        }
+
         $titles = array_column($pages, 'title', 'path');
+        $labels = $titles;
+        foreach ($pages as $page) {
+            if (($page['composition'] ?? null) === 'managed-v1') {
+                $label = $page['navigationLabel'] ?? null;
+                if (!is_string($label) || trim($label) === '' || strlen($label) > 100) {
+                    throw new InvalidArgumentException('Invalid managed navigation label.');
+                }
+                $labels[$page['path']] = $label;
+            }
+        }
         $posts = [];
         foreach ($pages as $page) {
             $path = $page['path'];
+            if (array_key_exists('composition', $page)) {
+                if ($page['composition'] !== 'managed-v1') {
+                    throw new InvalidArgumentException('Unknown managed composition.');
+                }
+                $posts[$path] = [
+                    'ID' => $postIds[$path], 'post_type' => 'page', 'post_status' => 'draft',
+                    'post_title' => $page['title'],
+                    'post_content' => self::composed($page, $postIds, $navigation, $labels, $actions, $attachments),
+                ];
+                continue;
+            }
             $links = [];
             foreach ($navigation as $target) {
                 $links[] = self::link($postIds[$target], $titles[$target]);
@@ -85,14 +120,83 @@ final class MioPages_Native_Draft_Content
         return $posts;
     }
 
+    private static function composed(array $page, array $postIds, array $navigation, array $titles, array $actions, array $attachments): string
+    {
+        $path = $page['path'];
+        $links = [];
+        foreach ($navigation as $target) {
+            $links[] = $target === $path ? '<span aria-current="page">' . esc_html($titles[$target]) . '</span>'
+                : self::link($postIds[$target], $titles[$target]);
+        }
+        $blocks = ['<!-- wp:html --><nav class="miopages-draft-nav" aria-label="Site navigation">'
+            . implode('', $links) . '</nav><!-- /wp:html -->'];
+        $placedActions = [];
+        $related = [];
+        foreach ($actions as $action) {
+            if ($action['from'] !== $path || $action['destination'] === $path) {
+                continue;
+            }
+            if (isset($action['sectionId'])) {
+                $placedActions[$action['sectionId']][] = $action;
+            } else {
+                $related[] = self::link($postIds[$action['destination']], $action['label']);
+            }
+        }
+        foreach ($page['sections'] as $index => $section) {
+            $type = $section['type'];
+            if (!in_array($type, ['hero', 'intro', 'cta'], true) || (($index === 0) !== ($type === 'hero'))) {
+                throw new InvalidArgumentException('Invalid managed composition hierarchy.');
+            }
+            $id = $section['id'];
+            $tag = $type === 'hero' ? 'h1' : 'h2';
+            $attrs = $type === 'hero' ? ' {"level":1}' : '';
+            $content = '<!-- wp:heading' . $attrs . ' --><' . $tag . ' class="wp-block-heading">'
+                . esc_html($section['content']['heading']) . '</' . $tag . '><!-- /wp:heading -->';
+            $content .= self::paragraph(nl2br(esc_html($section['content']['text']), false));
+            if (!empty($placedActions[$id])) {
+                $buttons = [];
+                foreach ($placedActions[$id] as $action) {
+                    $buttons[] = '<!-- wp:button --><div class="wp-block-button">'
+                        . self::link($postIds[$action['destination']], $action['label'], 'wp-block-button__link wp-element-button')
+                        . '</div><!-- /wp:button -->';
+                }
+                $content .= '<!-- wp:buttons --><div class="wp-block-buttons">' . implode('', $buttons) . '</div><!-- /wp:buttons -->';
+            }
+            $media = $attachments[$id] ?? null;
+            $style = $type === 'cta' && empty($placedActions[$id]) ? 'intro' : $type;
+            $class = 'miopages-draft-section miopages-draft-' . $style . ($media ? ' miopages-draft-with-image' : '');
+            $blocks[] = '<!-- wp:group {"tagName":"section","className":"' . $class . '"} -->'
+                . '<section class="wp-block-group ' . $class . '">'
+                . '<!-- wp:group {"className":"miopages-draft-copy"} --><div class="wp-block-group miopages-draft-copy">'
+                . $content . '</div><!-- /wp:group -->' . ($media ? self::image($media) : '') . '</section><!-- /wp:group -->';
+        }
+        if ($related !== []) {
+            $blocks[] = '<!-- wp:html --><nav class="miopages-draft-related" aria-label="Related pages">'
+                . implode('', $related) . '</nav><!-- /wp:html -->';
+        }
+        return '<!-- wp:group {"className":"miopages-composed"} --><div class="wp-block-group miopages-composed">'
+            . implode("\n", $blocks) . '</div><!-- /wp:group -->';
+    }
+
+    private static function image(array $attachment): string
+    {
+        $id = $attachment['id'];
+        $image = $attachment['media'];
+        return '<!-- wp:image {"id":' . $id . '} --><figure class="wp-block-image">'
+            . '<img class="wp-image-' . $id . '" src="' . esc_url(MioPages_Native_Draft_Media::url($id))
+            . '" alt="' . esc_attr($image['alt']) . '" width="' . $image['width'] . '" height="' . $image['height']
+            . '" /></figure><!-- /wp:image -->';
+    }
+
     private static function paragraph(string $html): string
     {
         return '<!-- wp:paragraph --><p>' . $html . '</p><!-- /wp:paragraph -->';
     }
 
-    private static function link(int $postId, string $label): string
+    private static function link(int $postId, string $label, string $class = ''): string
     {
-        return '<a href="' . esc_url(home_url('/?page_id=' . $postId . '&preview=true')) . '">'
+        return '<a' . ($class !== '' ? ' class="' . esc_attr($class) . '"' : '') . ' href="'
+            . esc_url(home_url('/?page_id=' . $postId . '&preview=true')) . '">'
             . esc_html($label) . '</a>';
     }
 }

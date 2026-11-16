@@ -65,10 +65,11 @@ async function approvedProjection(db: PoolClient, site: Site, proposalId: string
   if (!withMedia && (await db.query("SELECT 1 FROM asset_usages WHERE entity_id=ANY($1::uuid[]) LIMIT 1", [ids])).rowCount) {
     throw Error("Private staging v1 excludes media-bound content");
   }
-  if (resolved.candidate.sections.some(s => s.action || s.content.actionId || s.type === "cta")) {
+  if (resolved.candidate.sections.some(s => s.action || s.content.actionId || (s.type === "cta" && !revision.page.composition))) {
     throw Error("Private staging v1 excludes action-bound content");
   }
   const pages = [{ id: revision.page.pageId, path: revision.page.slug, title: resolved.candidate.title,
+    ...(revision.page.composition && { composition: revision.page.composition, navigationLabel: revision.page.navigationLabel }),
     sections: resolved.candidate.sections.map(s => ({ id: s.id, type: s.type,
       content: { heading: s.content.heading, text: s.content.text ?? "" } })) }];
   validatePages(pages, Boolean(workflowMedia));

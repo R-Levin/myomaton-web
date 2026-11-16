@@ -6,3 +6,26 @@ Requires at least: 6.6
 Requires PHP: 8.0
 Text Domain: miopages-managed-site
 */
+
+body:has(.miopages-composed) main > .wp-block-post-title,
+body:has(.miopages-composed) header .wp-block-navigation { display: none; }
+
+body:has(.miopages-composed) main.wp-block-group { padding-top: clamp(.75rem, 2vw, 2rem) !important; }
+body:has(.miopages-composed) main.wp-block-group > .wp-block-post-content { max-width: 72rem; }
+main .wp-block-post-content > .miopages-composed { max-width: 72rem; }
+.miopages-draft-nav, .miopages-draft-related { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; padding: 1.1rem 0; }
+.miopages-draft-nav [aria-current] { font-weight: 700; }
+.miopages-draft-section { padding: clamp(1.5rem, 5vw, 4rem); margin-block: 1.3rem; }
+.miopages-draft-section .miopages-draft-copy { min-width: 0; }
+.miopages-draft-section h1 { max-width: 18ch; font-size: clamp(1.95rem, 4vw, 3.75rem); letter-spacing: -.035em; text-wrap: balance; }
+.miopages-draft-hero .miopages-draft-copy > p { font-size: clamp(1rem, 1.5vw, 1.2rem); }
+.miopages-draft-section p { max-width: 60ch; }
+.miopages-draft-hero { background: var(--wp--preset--color--support); border-radius: 1.25rem; }
+.miopages-draft-intro { padding-block: clamp(1.3rem, 3vw, 2.5rem); border-block-end: 1px solid #ded8e7; }
+.miopages-draft-cta { background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand); border-radius: 1.25rem; }
+.miopages-draft-cta .wp-block-button__link { background: var(--wp--preset--color--on-brand); color: var(--wp--preset--color--brand); }
+.miopages-draft-with-image { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center; gap: clamp(1rem, 3vw, 3rem); }
+.miopages-draft-with-image figure { margin: 0; min-width: 0; }
+.miopages-draft-with-image img { display: block; width: 100%; height: auto; border-radius: .8rem; }
+.miopages-composed :focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+@media (max-width: 680px) { .miopages-draft-with-image { grid-template-columns: minmax(0, 1fr); } }

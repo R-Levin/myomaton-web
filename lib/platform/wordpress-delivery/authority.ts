@@ -4,7 +4,7 @@ import { releaseBase } from "../content-editing/release";
 import { releaseHistory } from "../content-editing/releases";
 
 export type Site = { organizationId: string; webPresenceId: string; managedSiteId: string };
-type Page = { id: string; path: string; title: string; sections: {
+type Page = { id: string; path: string; title: string; composition?: "managed-v1"; navigationLabel?: string; sections: {
   id: string; type: string; content: { heading: string; text: string };
 }[] };
 export type ReviewedProjection = Site & {
@@ -35,12 +35,15 @@ export function validatePages(pages: Page[], nativeDraft = false) {
   const paths = new Set<string>(), pageIds = new Set<string>(), sectionIds = new Set<string>();
   if (!Array.isArray(pages) || pages.length < 1 || (!nativeDraft && pages.length > 16)) throw Error("Projection pages refused");
   for (const page of pages) {
-    if (!exact(page, "id,path,sections,title") || !id(page.id) || !text(page.title, 160) || !page.title.trim()
+    const composed = nativeDraft && page.composition === "managed-v1";
+    if (!exact(page, composed ? "composition,id,navigationLabel,path,sections,title" : "id,path,sections,title") || !id(page.id) || !text(page.title, 160) || !page.title.trim()
       || !text(page.path, 160) || !/^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*\/?)?$/.test(page.path)
       || paths.has(page.path) || pageIds.has(page.id)
       || !Array.isArray(page.sections) || page.sections.length < 1 || (!nativeDraft && page.sections.length > 32)) {
       throw Error("Projection page refused");
     }
+    if (composed && (!text(page.navigationLabel!, 100) || !page.navigationLabel!.trim() || page.sections[0].type !== "hero" || page.sections.slice(1).some(section => section.type === "hero") ||
+      page.sections.some(section => !["hero", "intro", "cta"].includes(section.type)))) throw Error("Composed Page sections refused");
     paths.add(page.path);
     pageIds.add(page.id);
     for (const { id: sectionId, type, content, ...extra } of page.sections) {

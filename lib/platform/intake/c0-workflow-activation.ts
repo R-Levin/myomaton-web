@@ -58,12 +58,13 @@ export function c0HostedRunGrant(context: WorkflowContext, bytes: Buffer, approv
   if (new Set(approvedSources).size !== approvedSources.length || !context.evidence.some(item =>
       item.kind === "owner-confirmed" && approvedSources.includes(fingerprint(item)))) throw Error("Hosted sources refused");
   const provider = object(plan.provider, ["model", "store", "automaticRetries", "requests", "generations", "maxInputTokens",
-    "maxInputBytes", "maxOutputTokens", "additionalCapMicros", "maxRetries", "maxEditorialRevisions"]);
+    "maxInputBytes", "maxOutputTokens", "additionalCapMicros", "maxRetries", "maxEditorialRevisions", "siteComposition"]);
   const bound = (value: unknown, min: number, max: number) => {
     if (typeof value !== "number" || !Number.isSafeInteger(value) || value < min || value > max) throw Error("Hosted usage bound refused");
     return value;
   };
-  if (provider.model !== "gpt-5.4-mini-2026-03-17" || provider.store !== false || provider.automaticRetries !== 0) throw Error("Hosted provider scope refused");
+  if (provider.model !== "gpt-5.4-mini-2026-03-17" || provider.store !== false || provider.automaticRetries !== 0 ||
+      (provider.siteComposition !== undefined && provider.siteComposition !== "managed-v1")) throw Error("Hosted provider scope refused");
   const generations = bound(provider.generations, 1, 128);
   const requests = bound(provider.requests, generations * 2, 256);
   const research = object(plan.research, ["roots", "market", "maxSourceBytes"]);
@@ -96,6 +97,7 @@ export function c0HostedRunGrant(context: WorkflowContext, bytes: Buffer, approv
     expiresAt, maxOutputTokens: bound(provider.maxOutputTokens, 1000, 64_000),
     maxRetries: bound(provider.maxRetries, 0, generations), maxEditorialRevisions: bound(provider.maxEditorialRevisions, 0, generations),
     retainedReservation: uncertain,
+    ...(provider.siteComposition === "managed-v1" && { siteComposition: provider.siteComposition }),
     ledger: { id: fingerprint({ approvedDigest, context: current.contextDigest }), startingLedger: digest, baselineAttempts: attempts,
       requests, generations, capMicros: bound(provider.additionalCapMicros, 1, 20_000_000),
       inputTokens: bound(provider.maxInputTokens, 1000, 300_000), inputBytes: bound(provider.maxInputBytes, 1000, 900_000) },

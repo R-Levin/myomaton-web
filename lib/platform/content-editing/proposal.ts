@@ -9,6 +9,8 @@ export type Copy = { kind: "canonical"; source: Source } | { kind: "editorial"; 
 export type ProposedImage = { assetId: string; usageId: string; altText: string };
 export type PageProposal = { operation: "create-page" | "replace-page"; pageId: string; slug: string; title: Copy; purpose: string;
   workflowReview?: { intakeId: string; candidateDigest: string };
+  composition?: "managed-v1";
+  navigationLabel?: string;
   sections: { id: string; type: "hero" | "intro" | "cta"; heading: Copy; text?: Copy; actionId?: string; image?: ProposedImage }[] };
 export type Actor = { operatorId: string; authorityReference: string };
 export type CustomerAuthority = { kind: "business-representative" | "accepted-authority"; subjectId: string; authorityReference: string };
@@ -44,9 +46,11 @@ function copy(value: unknown, max: number): Copy {
   return { kind: "canonical", source: { domain: choice(s.domain, ["knowledge", "offering"]), recordId: uuid(s.recordId), revision: Number(s.revision), fingerprint: hash(s.fingerprint), field: key(s.field) } };
 }
 export function pageProposal(value: unknown): PageProposal {
-  const p = object(value, ["operation", "pageId", "slug", "title", "purpose", "sections", "workflowReview"]);
+  const p = object(value, ["operation", "pageId", "slug", "title", "purpose", "sections", "workflowReview", "composition", "navigationLabel"]);
   const workflow = p.workflowReview === undefined ? undefined : object(p.workflowReview, ["intakeId", "candidateDigest"]);
   const workflowReview = workflow && { intakeId: uuid(workflow.intakeId), candidateDigest: hash(workflow.candidateDigest) };
+  const composition = p.composition === undefined ? undefined : choice(p.composition, ["managed-v1"] as const);
+  if (composition ? !workflowReview : p.navigationLabel !== undefined) throw Error("Composed Page requires protected workflow review");
   const slug = canonicalPagePath(p.slug); if (!slug) throw Error("Supported Page path required");
   if (!Array.isArray(p.sections) || p.sections.length < 1 || (!workflowReview && p.sections.length > 6)) throw Error("One to six supported Sections required");
   const sections = p.sections.map(value => {
@@ -62,6 +66,7 @@ export function pageProposal(value: unknown): PageProposal {
   });
   if (!workflowReview && sections.filter(s => s.image).length > 1) throw Error("Only one proposed Intro image is supported");
   if (new Set(sections.map(s => s.id)).size !== sections.length) throw Error("Duplicate Section identity");
-  return { operation: choice(p.operation, ["create-page", "replace-page"]), pageId: uuid(p.pageId), slug, title: copy(p.title, 300), purpose: text(p.purpose, 500), ...(workflowReview && { workflowReview }), sections };
+  if (composition && (sections[0].type !== "hero" || sections.slice(1).some(section => section.type === "hero"))) throw Error("Composed Page needs one opening Hero");
+  return { ...(composition && { composition, navigationLabel: text(p.navigationLabel, 100) }), operation: choice(p.operation, ["create-page", "replace-page"]), pageId: uuid(p.pageId), slug, title: copy(p.title, 300), purpose: text(p.purpose, 500), ...(workflowReview && { workflowReview }), sections };
 }
 export function revisionDigest(value: Omit<Revision, "binding">, identity: Omit<Binding, "digest">) { return fingerprint({ ...identity, ...value }); }

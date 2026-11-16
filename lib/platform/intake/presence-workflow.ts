@@ -154,7 +154,8 @@ function nextTask(state: State): Task | null {
   if (!state.confirmation) return null;
   if (!state.direction) return { operation: "direction" };
   if (!state.blueprint) return { operation: "blueprint" };
-  const missing = state.blueprint.pages.find(page => !state.pages.some(draft => draft.path === page.path));
+  const missing = state.blueprint.pages.find(page => page.path === "/" && !state.pages.some(draft => draft.path === "/")) ??
+    state.blueprint.pages.find(page => !state.pages.some(draft => draft.path === page.path));
   if (missing) return { operation: "page", path: missing.path };
   if (!state.editorial) return { operation: "editorial" };
   return null;
@@ -465,7 +466,10 @@ export class PresenceWorkflow {
         view?.next !== "review-complete" || !view.operatorReview || view.operatorReview.target !== page.workflowReview?.candidateDigest ||
         !this.operations.visuals) throw Error("Current protected visual review required");
     const reviewedPage = view.pages.find(item => item.path === page.slug);
-    if (!reviewedPage || reviewedPage.heading !== resolved.title || !resolved.sections.length ||
+    if (!reviewedPage || reviewedPage.composition !== page.composition ||
+        (page.composition && page.navigationLabel !== view.blueprint?.pages.find(item => item.path === page.slug)?.label) ||
+        (reviewedPage.composition && resolved.sections.some((section, index) => section.type !== reviewedPage.sections[index]?.role)) ||
+        reviewedPage.heading !== resolved.title || !resolved.sections.length ||
         reviewedPage.sections.length !== resolved.sections.length ||
         resolved.sections.some((section, i) => section.content.heading !== reviewedPage.sections[i].heading ||
           (section.content.text ?? "") !== reviewedPage.sections[i].body || section.action)) throw Error("Reviewed Page shape or copy changed");

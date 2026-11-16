@@ -89,13 +89,18 @@ export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[]
       selection.navigation.some(item => !paths.has(item))) throw Error("Invalid draft navigation");
   if (!Array.isArray(selection.actions)) throw Error("Invalid draft actions");
   const actions = selection.actions.map(value => {
-    const action = object(value, ["id", "label", "from", "type", "destination"]);
+    const action = object(value, ["id", "label", "from", "type", "destination", "sectionId"]);
     if (typeof action.from !== "string" || !paths.has(action.from) || (action.type !== "contact" && action.type !== "page")) throw Error("Invalid draft action scope");
     const destination = normalizeDestination(action.type, action.destination);
     // This first draft binds internal page targets. A Contact action points to
     // its private page, whose native form integration has separate authority.
     if (!destination || !paths.has(destination)) throw Error("Invalid draft action destination");
-    return { id: uuid(action.id), label: text(action.label, 100), from: action.from, type: action.type, destination };
+    const sectionId = action.sectionId === undefined ? undefined : uuid(action.sectionId);
+    if (sectionId && (action.type !== "page" || destination === action.from || !pages.some(page => page.path === action.from &&
+      page.composition === "managed-v1" && page.sections.some(section => section.id === sectionId && ["hero", "cta"].includes(section.type))))) {
+      throw Error("Invalid draft Action placement");
+    }
+    return { id: uuid(action.id), label: text(action.label, 100), from: action.from, type: action.type, destination, ...(sectionId && { sectionId }) };
   });
   if (new Set(actions.map(action => action.id)).size !== actions.length) throw Error("Duplicate draft action");
   const rollback = selection.rollback === undefined ? undefined : nativeDraftRollback(selection.rollback, revision);

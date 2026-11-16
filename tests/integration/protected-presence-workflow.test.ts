@@ -67,17 +67,20 @@ async function proveProvisionalImage(context: WorkflowContext, start: PresenceWo
   const scope = { ...context.scope, organizationId: randomUUID() };
   const project = (path: string) => {
     const page = view.pages.find(item => item.path === path)!;
-    return { id: randomUUID(), path, title: page.heading, sections: page.sections.map(section => ({
-      id: randomUUID(), type: "intro", content: { heading: section.heading, text: section.body },
+    return { id: randomUUID(), path, title: page.heading,
+      ...(page.composition && { composition: page.composition, navigationLabel: view.blueprint!.pages.find(item => item.path === path)!.label }),
+      sections: page.sections.map(section => ({
+      id: randomUUID(), type: section.role ?? "intro", content: { heading: section.heading, text: section.body },
     })) };
   };
   const home = project("/"), service = project("/service");
   const editorial = (text: string) => ({ kind: "editorial" as const, text, rationale: "Reviewed test selection" });
   const input: PageProposal = { pageId: home.id, slug: "/", operation: "create-page", title: editorial(home.title), purpose: "Verify protected placement",
     workflowReview: { intakeId: context.intakeId, candidateDigest: view.operatorReview!.target },
+    ...(home.composition && { composition: home.composition, navigationLabel: home.navigationLabel }),
     sections: home.sections.map((section, index) => {
       const approved = view.visuals!.find(item => item.placement.sectionIndex === index);
-      return { id: section.id, type: "intro", heading: editorial(section.content.heading), text: editorial(section.content.text),
+      return { id: section.id, type: section.type, heading: editorial(section.content.heading), text: editorial(section.content.text),
         ...(approved && { image: { ...approved.association!, altText: approved.decision!.alt! } }) };
     }) };
   const candidate = { title: home.title, sections: home.sections.map(section => ({
@@ -269,12 +272,13 @@ test("restricted Core worker discovers research, retains a substantial provider-
             case "direction": output = { positioning: "Integration-test position", approach: passages("Direction"), visitorDecisions: ["Test intent"], ...cited }; break;
             case "blueprint": output = { pages: paths.map(path => ({ path, label: "Proof " + path, purpose: "Verify generated shape", ...cited })), navigation: paths,
               articles: [{ title: "Illustrative Article label", question: "What should be in the result?", target: "/ongoing", ...cited }] }; break;
-            case "page": output = { path: input.pagePath, heading: "Draft " + input.pagePath, searchTitle: "Scope proof", searchDescription: "Recorded provider response shape",
+            case "page": output = { composition: "managed-v1", path: input.pagePath, heading: "Draft " + input.pagePath, searchTitle: "Scope proof", searchDescription: "Recorded provider response shape",
               sections: Array.from({ length: 6 }, (_, index) => ({
+                role: index === 0 ? "hero" : index === 5 ? "cta" : "intro",
                 heading: "Block " + index, body: passages(input.previous ? "Editorial revision" : "Initial draft"), ...cited,
                 visual: { purpose: "Explain", brief: "Use a text diagram", status: "asset-needed", altIntent: "Explain the steps in text" },
-              })), actions: [{ label: "Read more", kind: "navigate", destination: input.pagePath === "/" ? "/service" : "/" },
-                { label: "Contact", kind: "request-contact", destination: null }], internalLinks: [input.pagePath === "/" ? "/service" : "/"] }; break;
+              })), actions: [{ label: "Read more", kind: "navigate", destination: input.pagePath === "/" ? "/service" : "/", sectionIndex: 0 },
+                { label: "Contact", kind: "request-contact", destination: null, sectionIndex: 5 }], internalLinks: [input.pagePath === "/" ? "/service" : "/"] }; break;
             case "editorial":
               output = { summary: "Editorial format proof", concerns: audits++ === 0 ? [{ path: "/service", concern: "Rewrite one repeated explanation" }] : [] }; break;
             default: assert.fail("Unexpected pass");
@@ -328,7 +332,7 @@ test("restricted Core worker discovers research, retains a substantial provider-
       }
       const grant: PresenceWorkflowGrant = {
         contextDigest: manifest.contextDigest, approvedSources: manifest.approvedSourceCandidates.map(source => source.digest),
-        approvedCorrections: [], maxRetries: 1, maxEditorialRevisions: 1, maxOutputTokens: 12_000,
+        approvedCorrections: [], maxRetries: 1, maxEditorialRevisions: 1, maxOutputTokens: 12_000, siteComposition: "managed-v1",
         images: { model: imageProvider.model, briefs: [{ id: "concept", label: "Concept illustration", prompt: safePrompt }] }, expiresAt: Date.now() + 180_000,
         researchSources: [{ id: "research:competitor", url: "https://example.org/", label: "Market reference" }],
         marketSearch: { publicQuery: "managed website services for small businesses, buying considerations and trust",
@@ -373,6 +377,9 @@ test("restricted Core worker discovers research, retains a substantial provider-
       view = (await workPresenceCase(worker, context))!;
       assert.equal(view.next, "editorial-review");
       assert.equal(view.pages.length, 5);
+      assert.equal(view.pages[0].composition, "managed-v1");
+      assert.deepEqual(view.pages[0].sections.map(section => section.role), ["hero", "intro", "intro", "intro", "intro", "cta"]);
+      assert.equal(view.pages[0].actions[0].sectionIndex, 0);
       const prior = view.pages.find(item => item.path === "/service");
       const other = view.pages.find(item => item.path === "/ongoing");
       await assert.rejects(reviewWorkflowChange(worker, context, "workflow-review", view.version, owner), { code: "workflow_not_ready" });
