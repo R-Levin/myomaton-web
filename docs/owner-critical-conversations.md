@@ -244,6 +244,64 @@ Interpret precisely:
 
 ---
 
+## P0-14 — Living customer-owned Business Knowledge Base: the reusable intelligence of MioPages (November 16, 2026)
+
+**Owner-approved product direction / explicit detailed-capture request.** After discussing whether the Customer should receive and maintain the comprehensive information/understanding set used by MioPages, the owner affirmed the concept: **“Yes. This is going to be a real benefit and can basically fine tune the system in a highly usable and understandable way. Please capture in detail.”** The owner earlier proposed an **editable KB/FAQ-like format** that the Customer or authorized Operator can access and update at any time. This is now an accepted **product requirement and strategic customer benefit**, not just a speculative UX enhancement. The particular screen layouts, labels, edit widgets, notifications and phased implementation details below are recommended design directions rather than specifically approved pixel or delivery contracts.
+
+### Product purpose and distinction
+
+MioPages is entrusted with learning, using and continually improving its understanding of a business; the customer must be able to **see, understand, correct and enrich that working knowledge**, without operating a WordPress page builder or repeatedly answering the same questions. This is a core customer-facing control and trust benefit and a practical mechanism for improving future recommendations and service outcomes.
+
+- **Business Understanding Report**: a point-in-time, source-grounded AI *interpretation* of the business, its market, customer needs, opportunities, contradictions, recommendations and unknowns. It is reviewable and revisioned, but not a substitute for authoritative business records.
+- **My Business / What MioPages Knows (working title)**: the customer's **living, structured, correctable knowledge view** inside the authenticated Customer Portal, also available in appropriately authorized Operator context. It shows the facts, important claims, preferences, operations and priorities MioPages actually uses. It is not a standalone document or parallel CRM/KB database.
+- **Presence Direction and site/content**: downstream proposals derived from source-labeled confirmed knowledge plus explicitly reviewable reasoning. WordPress is the governed renderer/delivery target; it does not become a competing source of truth for MioPages business knowledge.
+- A downloadable printable/exportable **snapshot** may be useful for customer convenience and portability; if offered, it is a versioned derivative, not the authoritative editing surface.
+
+### Information model and content depth
+
+Retain/reuse the existing canonical Core Knowledge, Offering, Organization/Web Presence, structured answers and evidence/revision contracts. Group the **customer-readable presentation** by intuitive business topics rather than database fields, and expand adaptively per business; illustrative groups:
+
+1. Identity, business background, history, purpose, goals and stage of development.
+2. Services/products/offerings **in depth**: audiences, specifics, delivery, inclusions/exclusions, pricing or quote policy when authorized, capacity and operational constraints.
+3. Customers, markets, territories, buyer situations/questions, decision process and objections.
+4. Positioning, differentiation, key claims, supporting proof, permissions, qualifications and trust materials.
+5. Published contact details, service locations/hours, valid visitor Actions, inquiry/booking routes, response responsibilities and applicable lead definitions.
+6. Brand voice, terminology, visual/content preferences, existing assets, publication permissions.
+7. Existing website/pages/media, business profiles, marketing/discovery context, integrations and necessary ownership or access status (without displaying credentials).
+8. Content/FAQ knowledge, recurring customer questions, planned announcements, priorities and future developments.
+9. Open questions, contradictory evidence, aging facts and explicit exclusions/unavailable information, where appropriate.
+
+Do not impose a rigid nine-section customer template, fixed-question quota or excessively large form. Topics and groups may be expanded, collapsed, repeated or omitted according to business complexity. Keep **customer's own factual answers and usable business documents/material** distinct from public observations, operator notes, AI inferences, approved facts and publishable claims. Respect privacy and prevent leakage of nonpublic commercial, account or contact details.
+
+### Interaction and trust contract
+
+- Lead with a **clear, concise, approachable “here is what we currently understand”** overview, focused on meaningful summaries and unresolved issues rather than raw interview transcripts or audit logs.
+- Each meaningful fact/group should be **viewable and correctable inline**, with simple natural-language elaboration and additional relevant material where supported; offer **Confirm**, **Correct**, **Add missing information**, **Ask/clarify**, and **Not applicable** only as relevant and authorized. FAQ-style expandable questions can make the interface understandable; underneath must remain structured, normalized, provenance/authority-aware records, not arbitrary editable HTML or a second content system.
+- Where useful, display a compact **status and basis**: confirmed by the customer, operator-proposed, publicly observed, inferred, disputed, unknown, stale, pending review; include cited sources and timestamps on demand, not an unavoidable raw-source dump. Show what knowledge the system uses *now* versus drafts/pending corrections.
+- **Customer can return at any time** during Launch and Ongoing to supplement or update knowledge, and sees current changes/status and unresolved items in the portal. Authorized Operators can propose or enter updates within explicit authority; Operator QA does **not** impersonate Customer fact confirmation, approve unrelated customer claims or publish by itself.
+- Submission is a **reviewed knowledge change**, not a silent edit of the live website, irreversible overwrite of past evidence or automatic public approval. Save exact text and actor/role, version, source, reason, previous value, proposed value and status; support concurrency/stale-revision refusal, corrections and history. Material or high-consequence claims, rights, pricing, qualifications, guarantees and live-bound contact/operational routes require the proper authoritative review.
+- **Show consequences** when a change affects the service: which affected Offerings, planned/published Pages, FAQ/Article material, visitor Actions, measurement interpretation, future interviews, recommendations or operational procedures may need reassessment. Core should produce a bounded, traceable impact proposal and authorized follow-on tasks, not silently republish every occurrence. Corrected knowledge must shape subsequent AI questions, Presence Direction, drafts, Ongoing reports and improvement work; never re-ask facts that remain valid.
+- **Don't overburden the customer** with exhaustive reapproval; targeted confirmations when material facts are missing, contradictory or old; no manufactured tasks, questionnaires or confirmation quotas. Operators handle review and exceptions as needed in the same account workflow. Avoid leaking internal work queue complexity to customers.
+
+### Where in the lifecycle
+
+- **During Entry / Free Review:** reuse whatever information has been gathered, with appropriate source/confirmation status; no mandatory complete profile or deep paid onboarding for Free Review or Direct Start.
+- **During deeper paid Understanding:** progressively build the knowledge view from confirmed intake, research, uploaded materials and corrections. Present a consolidated customer-readable **“Here is what we understand about your business”** for factual confirmation/omission correction **before substantive final Presence Direction approval and before launch-bound business claims are accepted**. Do not turn this into a duplicative form or an arbitrary fifth approval gate. Preliminary Core analysis/site drafting can proceed with clearly marked open knowledge; material gaps block only affected commitments/release decisions.
+- **Direction and Launch:** use a revision-specific confirmed knowledge basis to drive the site; make the impact of new corrections visible before propagating to Pages, assets, visitor routes and production, with the distinct customer/operator/WordPress launch gates.
+- **Ongoing:** retain the same **My Business** view as a persistent service feature, feeding trusted changes and evolving knowledge into monitoring, updated FAQ/articles, conversion/SEO opportunities, approvals and remeasurement. Where appropriate, invite the customer through an authenticated link to review significant changes or missing facts; avoid relying on email attachments or unapproved automatic notifications.
+
+### Implementation and acceptance, not a parallel product
+
+**Reuse existing foundations:** [canonical Knowledge/Offering](canonical-foundation.md), [progressive onboarding](progressive-onboarding-and-launch-readiness.md#paid-understanding-gap-analysis-and-presence-direction), [deep adaptive intake contract](paid-onboarding-knowledge-transfer-contract.md), [customer journey and knowledge authority](customer-journey-and-change-management.md), [Customer Portal contract](platform-service-architecture.md#miopages-customer), the protected C0 AI report/direction and the P0-13 Operator/Customer shell work. This builds the **existing shared knowledge foundation into a coherent customer control**, not an independent wiki, second questionnaire, WordPress-admin editing surface or stand-alone AI tutor.
+
+**Bounded next development step (Codex, in parallel with current hosted C0 site generation):** define one customer-readable knowledge projection of existing structured Core state inside an authenticated, role/tenant-scoped **My Business** portal module; show sourced status, a small set of material groups, and a functional **correct/confirm/add** interaction with persisted revision and appropriate review/impact status. Integrate one tested correction into an actual downstream recommendation or draft in an isolated disposable case. Leverage the separately requested **Flag a correction** proof (P0-13) without using the live C0 case as a disposable test or replacing the current report. Gradually expand information coverage and customer UX through genuine use; do not hold the hosted C0 private site hostage to full commercial KB completion.
+
+**Objective acceptance:** A scoped Customer/Operator can see **the same Core knowledge** that informed an assessment/site; tell confirmed facts apart from observations/inferences; correct a business fact, reload and see its persisted status; observe a justified downstream change or reviewable impact; encounter refusal of stale/unauthorized/cross-tenant updates; return during Ongoing without re-entering known material. Prove with genuine browser interaction, storage and authority checks; label any local fixture versus hosted proof. **No new model/provider transmission, protected hosted write, merge, account creation, permission escalation, public publication or spend is authorized by this discussion.**
+
+**Recovery and authority:** This entry *promotes* the previously [proposed living KB/FAQ UX in Issue #12](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6921117117) to an **owner-approved core product requirement**, while keeping implementation choices as proposals. Supports P0-11 actionable UX and P0-13 portal/correction requirements. Owner's new statement is a **product decision, not itself approval of the pending exact Core artifact replacement** `419b884`; that protected deployment still requires its own explicit owner action. Continue the accepted C0 report→Presence Direction→full site sequence as separately authorized.
+
+---
+
 ## Forward-maintenance template: add a new owner-marked critical conversation
 
 For every future explicitly important owner conversation, append a chronological, referenced entry; update `docs/development-control.md` only when the navigation/priority policy changes. Preserve prior entries and mark supersession instead of erasure.
