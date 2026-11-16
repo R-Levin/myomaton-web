@@ -265,7 +265,7 @@ export class PresenceWorkflow {
         case "research": next = { ...state, research: readResearch(output, ids) }; break;
         case "report": next = { ...state, report: readReport(output, sources, state.mode === "provider") }; break;
         case "direction": next = { ...state, direction: readDirection(output, ids) }; break;
-        case "blueprint": next = { ...state, blueprint: readBlueprint(output, ids) }; break;
+        case "blueprint": next = { ...state, blueprint: readBlueprint(output, ids, state.mode === "provider") }; break;
         case "page": {
           const page = readPage(output, work.path!, paths, ids, this.destinations);
           // Keep the exact sitemap order when selected pages are redrafted.

@@ -7,7 +7,7 @@ import { planningMessages, type PlanningFailure } from "../../lib/platform/intak
 import type { IntakeView } from "../../lib/platform/intake/service";
 
 import { SitePlanningReviewPanel } from "./site-planning-review-panel";
-import { PresenceWorkflowPanel } from "./presence-workflow-panel";
+import { isPresenceWorkflowWorking, PresenceWorkflowPanel } from "./presence-workflow-panel";
 import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
 import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-party";
 import type { reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
@@ -15,9 +15,9 @@ import type { reviewedSitePlanning } from "../../lib/platform/intake/protected-s
 type Operations = Awaited<ReturnType<typeof import("../../lib/platform/contact/protected-inquiry").protectedInquiry>>;
 type JourneyView = IntakeView & { firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
   sitePlanningReview?: ReturnType<typeof reviewedSitePlanning> & { current: boolean } };
-async function request(endpoint: string, operation?: object): Promise<JourneyView | null> {
+async function request(endpoint: string, operation?: object, signal?: AbortSignal): Promise<JourneyView | null> {
   const response = await fetch(endpoint, {
-    method: operation ? "POST" : "GET", cache: "no-store",
+    method: operation ? "POST" : "GET", cache: "no-store", signal,
     headers: { "X-Intake-Request": "1", ...(operation && { "Content-Type": "application/json" }) },
     ...(operation && { body: JSON.stringify(operation) }),
   });
@@ -68,6 +68,35 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
     setMessage(reason instanceof Error ? reason.message : "Core could not confirm the request.");
   }
   useEffect(() => { request(endpoint).then(adopt).catch(failed).finally(() => setBusy(false)); }, [endpoint]);
+
+  const pollWorkflow = hosted && isPresenceWorkflowWorking(view?.workflow);
+  useEffect(() => {
+    if (!pollWorkflow || busy || locked) return;
+    const pending = new AbortController();
+    let timer: number | undefined;
+    async function refresh() {
+      if (!document.hidden) {
+        try {
+          const next = await request(endpoint, undefined, pending.signal);
+          if (pending.signal.aborted) return;
+          if (next?.workflow) {
+            setView(current => current?.workflow && next.workflow &&
+              next.version >= current.version && next.workflow.version >= current.workflow.version ? next : current);
+          }
+        } catch (reason) {
+          if (pending.signal.aborted) return;
+          if (reason instanceof Error && reason.message === "local_access_required") {
+            setView(null);
+            setLocked(true);
+            return;
+          }
+        }
+      }
+      if (!pending.signal.aborted) timer = window.setTimeout(refresh, 5_000);
+    }
+    timer = window.setTimeout(refresh, 5_000);
+    return () => { pending.abort(); window.clearTimeout(timer); };
+  }, [pollWorkflow, busy, locked, endpoint]);
   async function unlock() {
     setBusy(true);
     setMessage("");
@@ -106,7 +135,8 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
       }
       setMessage(next.interview?.failure && "operation" in operation && operation.operation === "interview-next"
         ? "Core could not save the model response. Your saved answer is still available."
-        : view ? "Saved. Your earlier answers are still available below." : "Your retained answers are ready.");
+        : "operation" in operation && operation.operation === "workflow-continue"
+          ? "Report review saved." : view ? "Saved. Your earlier answers are still available below." : "Your retained answers are ready.");
     } catch (reason) { failed(reason); }
     finally { setBusy(false); }
   }

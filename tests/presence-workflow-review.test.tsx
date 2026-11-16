@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { test } from "node:test";
+import { setTimeout as delay } from "node:timers/promises";
+import { JSDOM } from "jsdom";
 import { build } from "esbuild";
 import { createElement, type ComponentType } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -46,4 +48,80 @@ test("the owner sees an operational status before the report and decisions with 
     assert.ok(reviewed.includes(text), text);
   }
   assert.doesNotMatch(reviewed, /source body marker|<details[^>]*\bopen[=>\s]/u);
+});
+
+test("the signed-in browser follows a saved development continuation to the website proposal without another click", async () => {
+  const { outputFiles } = await build({
+    stdin: { contents: `
+      import { createElement } from "react";
+      import { createRoot } from "react-dom/client";
+      import { Journey } from "./scripts/intake/c0-site-journey-client";
+      createRoot(document.querySelector("#root")).render(createElement(Journey, { hosted: true }));`,
+      resolveDir: process.cwd(), loader: "tsx" },
+    bundle: true, write: false, platform: "browser", format: "iife", jsx: "automatic",
+    define: { "process.env.NODE_ENV": '"production"' }, loader: { ".module.css": "empty" },
+  });
+  const dom = new JSDOM('<div id="root"></div>', { pretendToBeVisual: true, runScripts: "outside-only",
+    url: "https://core.example.test/core" });
+  let revision = 6;
+  let complete = false;
+  let requests = 0;
+  let continuation = 0;
+  const nativeTimer = dom.window.setTimeout.bind(dom.window);
+  dom.window.setTimeout = (fn, ms, ...args) => nativeTimer(fn, ms === 5_000 ? 30 : ms, ...args);
+  dom.window.fetch = async (endpoint, options) => {
+    assert.equal(endpoint, "/api/protected-core");
+    assert.equal(new Headers(options?.headers).get("X-Intake-Request"), "1");
+    if (options?.method === "POST") {
+      assert.deepEqual(JSON.parse(String(options.body)), { operation: "workflow-continue", version: 6 });
+      revision = 7;
+      continuation++;
+    } else {
+      assert.equal(options?.method, "GET");
+      requests++;
+    }
+    const queued = revision === 7;
+    const draft = complete && queued;
+    const workflow = {
+      version: draft ? 10 : revision, mode: "provider", contextDigest: "fixture",
+      report: { title: "Saved assessment", summary: "Existing evidence", findings: [] },
+      corrections: [], sources: [], limitations: [], conflicts: [], research: null, failure: null,
+      next: draft ? "operator-review" : queued ? "direction" : "customer-review",
+      confirmation: queued ? { decision: "development-continuation" } : null,
+      direction: draft ? { positioning: "One managed offer", approach: "Launch and continuing care", visitorDecisions: [] } : null,
+      blueprint: draft ? { pages: [{ path: "/", label: "Home" }], navigation: ["/"], articles: [] } : null,
+      pages: draft ? [{ path: "/", heading: "Proposed Home", sections: [], actions: [], internalLinks: [] }] : [],
+      editorial: draft ? { summary: "Ready to review", concerns: [] } : null,
+    };
+    return Response.json({ state: "draft", version: 28, prepared: { scenario: "c0" }, answers: {}, workflowAvailable: true, workflow });
+  };
+  const text = () => dom.window.document.body.textContent ?? "";
+  async function observe(value: string) {
+    for (let tries = 0; tries < 100; tries++) {
+      if (text().includes(value)) return;
+      await delay(20);
+    }
+    assert.fail("Browser did not render " + value + ": " + text());
+  }
+  try {
+    dom.window.eval(outputFiles[0].text);
+    await observe("Continue to development site planning");
+    const button = [...dom.window.document.querySelectorAll("button")].find(item =>
+      item.textContent === "Continue to development site planning");
+    assert.ok(button);
+    button.click();
+    await observe("Website planning queued");
+    assert.equal(revision, 7);
+    assert.equal(continuation, 1);
+    complete = true;
+    await observe("Website proposal ready for review");
+    assert.match(text(), /One managed offer/);
+    assert.match(text(), /Proposed Home/);
+    const readsAtReview = requests;
+    await delay(100);
+    assert.equal(requests, readsAtReview);
+    assert.equal(continuation, 1);
+  } finally {
+    dom.window.close();
+  }
 });

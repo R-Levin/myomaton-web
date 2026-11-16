@@ -8,7 +8,7 @@ import { fingerprint } from "../lib/platform/canonical/model";
 import { initializeResponsesUsageLedger, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
 import { createResponsesPresenceWorkflow, type PresenceWorkflowGrant } from "../lib/platform/intake/presence-workflow-provider";
 import type { WorkflowContext, WorkflowInput, WorkflowOperation, WorkflowRun } from "../lib/platform/intake/presence-workflow";
-import { readReport } from "../lib/platform/intake/presence-workflow-artifacts";
+import { readBlueprint, readReport } from "../lib/platform/intake/presence-workflow-artifacts";
 import { validateResearchSources } from "../lib/platform/intake/presence-workflow-research";
 
 test("Core retrieves only pinned public sources and sends source-bound stages through the existing usage and recovery rules", async () => {
@@ -97,4 +97,28 @@ test("Core retrieves only pinned public sources and sends source-bound stages th
     await rm(ledgerPath, { force: true });
     await rmdir(directory);
   }
+});
+
+test("provider blueprint recovery preserves Page identity and resolves only exact unambiguous labels", () => {
+  const plan = {
+    pages: [
+      { path: "/", label: "Home", purpose: "Start here", sourceIds: ["owner", "owner"] },
+      { path: "/service", label: "Service", purpose: "Explain the offer", sourceIds: ["owner"] },
+    ],
+    navigation: ["Home", "Service"],
+    articles: [{ title: "Guide", question: "Where to start?", target: "/service", sourceIds: ["owner", "owner"] }],
+  };
+  assert.throws(() => readBlueprint(plan, ["owner"]), /Repeated artifact identity/);
+  const normalized = readBlueprint(plan, ["owner"], true);
+  assert.deepEqual(normalized.navigation, ["/", "/service"]);
+  assert.deepEqual(normalized.pages[0], { ...plan.pages[0], sourceIds: ["owner"] });
+  assert.deepEqual(normalized.articles[0], { ...plan.articles[0], sourceIds: ["owner"] });
+  assert.throws(() => readBlueprint({ ...plan, navigation: ["Home", "/"] }, ["owner"], true), /Repeated artifact identity/);
+  assert.throws(() => readBlueprint({ ...plan, navigation: ["Home", "Missing"] }, ["owner"], true), /Unknown artifact reference/);
+  assert.throws(() => readBlueprint({
+    ...plan, pages: [plan.pages[0], { ...plan.pages[1], label: "Home" }],
+  }, ["owner"], true), /Unknown artifact reference/);
+  assert.throws(() => readBlueprint({
+    ...plan, pages: [plan.pages[0], { ...plan.pages[1], sourceIds: ["missing"] }],
+  }, ["owner"], true), /Unknown artifact reference/);
 });

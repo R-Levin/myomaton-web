@@ -368,6 +368,7 @@ test("restricted Core worker discovers research, retains a substantial provider-
       assert.equal(view.next, "customer-review");
       view = (await reviewWorkflowChange(worker, context, "workflow-continue", view.version, owner))!;
       assert.equal(view.confirmation?.decision, "development-continuation");
+      assert.equal((await (await composition.open()).review(context))?.next, "direction");
       view = (await workPresenceCase(worker, context))!;
       assert.equal(view.next, "editorial-review");
       assert.equal(view.pages.length, 5);

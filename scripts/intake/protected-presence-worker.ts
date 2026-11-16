@@ -12,11 +12,13 @@ async function main() {
   const inspecting = action === "INSPECT-WORKFLOW-MANIFEST";
   const recoverResearch = action === "RECOVER-RETAINED-WORKFLOW-RESEARCH";
   const recoverReport = action === "RECOVER-RETAINED-WORKFLOW-REPORT";
+  const recoverBlueprint = action === "RECOVER-RETAINED-WORKFLOW-BLUEPRINT";
+  const recoverFromCustody = recoverReport || recoverBlueprint;
   if (process.argv.length !== (activating ? 4 : 3) ||
-      !(activating || inspecting || recoverResearch || recoverReport || action === "WATCH-AUTHORIZED-WORKFLOW")) throw Error("Workflow command refused");
+      !(activating || inspecting || recoverResearch || recoverFromCustody || action === "WATCH-AUTHORIZED-WORKFLOW")) throw Error("Workflow command refused");
   const { workspace, pool, intake, token } = await openProtectedPresenceWorkspace();
   try {
-    const mode = activating || inspecting || recoverReport ? { kind: "review" as const } :
+    const mode = activating || inspecting || recoverFromCustody ? { kind: "review" as const } :
       { kind: "worker" as const, apiKey: process.env.MIOPAGES_OPENAI_DEV_API_KEY ?? "" };
     const workflowCase = composePresenceCase(pool, intake, token, workspace, mode);
     if (activating || inspecting) {
@@ -40,8 +42,9 @@ async function main() {
     }
     const grant = await privateWorkflowFile<PresenceWorkflowGrant>(workspace.grantFile, workspace.root);
     const workflow = await workflowCase.open();
-    if (recoverResearch || recoverReport) {
-      const review = await recoverRetainedPresenceOutput(workflow, await workflowCase.context(), recoverReport ? "report" : "research");
+    if (recoverResearch || recoverFromCustody) {
+      const operation = recoverResearch ? "research" : recoverBlueprint ? "blueprint" : "report";
+      const review = await recoverRetainedPresenceOutput(workflow, await workflowCase.context(), operation);
       console.log(JSON.stringify({ status: review?.next, version: review?.version, failure: review?.failure }));
       if (review?.failure) process.exitCode = 1;
       return;

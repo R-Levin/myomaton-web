@@ -74,19 +74,27 @@ export function readDirection(value: unknown, ids: readonly string[]) {
   return { positioning: copy(direction.positioning), approach: copy(direction.approach),
     visitorDecisions: list(direction.visitorDecisions, copy), sourceIds: references(direction.sourceIds, ids) };
 }
-export function readBlueprint(value: unknown, ids: readonly string[]) {
+export function readBlueprint(value: unknown, ids: readonly string[], normalizeProviderReferences = false) {
+  // Source repetition carries no additional meaning. Validate every ID even when deduplicating.
+  const citedSources = (value: unknown) => references(normalizeProviderReferences && Array.isArray(value) ? [...new Set(value)] : value, ids);
   const blueprint = object(value, ["pages", "navigation", "articles"]);
   const pages = list(blueprint.pages, value => {
     const page = object(value, ["path", "label", "purpose", "sourceIds"]);
-    return { path: path(page.path), label: copy(page.label), purpose: copy(page.purpose), sourceIds: references(page.sourceIds, ids) };
+    return { path: path(page.path), label: copy(page.label), purpose: copy(page.purpose), sourceIds: citedSources(page.sourceIds) };
   });
   const paths = pages.map(page => page.path);
   unique(paths);
   if (!paths.includes("/")) throw Error("Home is missing");
-  return { pages, navigation: references(blueprint.navigation, paths), articles: list(blueprint.articles, value => {
+  // A label can stand in for its path only when it resolves to one declared Page.
+  const navigation = normalizeProviderReferences && Array.isArray(blueprint.navigation) ? blueprint.navigation.map(item => {
+    if (typeof item !== "string" || item.startsWith("/") || paths.includes(item)) return item;
+    const matches = pages.filter(page => page.label === item);
+    return matches.length === 1 ? matches[0].path : item;
+  }) : blueprint.navigation;
+  return { pages, navigation: references(navigation, paths), articles: list(blueprint.articles, value => {
     const article = object(value, ["title", "question", "target", "sourceIds"]);
     const [target] = references([article.target], paths);
-    return { title: copy(article.title), question: copy(article.question), target, sourceIds: references(article.sourceIds, ids) };
+    return { title: copy(article.title), question: copy(article.question), target, sourceIds: citedSources(article.sourceIds) };
   }, false) };
 }
 export function readPage(value: unknown, exactPath: string, paths: readonly string[], ids: readonly string[],

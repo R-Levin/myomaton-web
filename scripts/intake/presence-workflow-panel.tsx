@@ -8,6 +8,15 @@ const nextLabel: Record<string, string> = {
   research: "Gather research", report: "Prepare the business report", direction: "Prepare Presence Direction",
   blueprint: "Plan the website", page: "Draft the next page", editorial: "Check the whole site",
 };
+const activeStep: Record<string, string> = {
+  research: "Gathering research", report: "Writing the business assessment", direction: "Preparing Presence Direction",
+  blueprint: "Designing the site structure", page: "Drafting site pages", editorial: "Checking the complete draft",
+};
+
+export function isPresenceWorkflowWorking(workflow: PresenceWorkflowView | null | undefined) {
+  return Boolean(workflow && !workflow.failure && (workflow.next === "in-progress" || Object.hasOwn(activeStep, workflow.next)));
+}
+
 const failureLabel: Record<string, string> = {
   "operation-blocked": "Core stopped before it could complete this operation.",
   "output-invalid": "Core retained the response but could not validate it for review.",
@@ -55,13 +64,16 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
   const [selected, setSelected] = useState("/");
   const sources = new Map([...workflow?.sources ?? [], ...workflow?.research ?? []].map(source => [source.id, source]));
   const page = workflow?.pages.find(item => item.path === selected) ?? workflow?.pages[0];
+  const working = isPresenceWorkflowWorking(workflow);
+  const step = workflow && activeStep[workflow.pendingOperation ?? workflow.next];
+  const siteReview = workflow?.next === "editorial-review" || workflow?.next === "operator-review";
   const submit = (operation: string, extra?: object) => run({ operation: "workflow-" + operation,
     ...(workflow && { version: workflow.version }), ...extra });
   return <section aria-label="Business report and website">
     <h2>Business report and website</h2>
     <p className={styles.hint}>{hosted ? "Protected development review. Operator decisions apply to this candidate. Customer approval and publication are separate." : "Local rehearsal. Research and model responses are recorded examples. Customer and Operator decisions are simulated."}</p>
     {!workflow ? <button type="button" disabled={busy} onClick={() => void submit("start")}>{hosted ? "Start protected workflow" : "Start the local workflow"}</button> : <>
-      {hosted && !workflow.report && !workflow.failure && workflow.next !== "evidence-changed" && (
+      {hosted && !workflow.report && working && (
         <div role="status" className={styles.workflowStatus}>
           <h3>{workflow.next === "in-progress" ? "Core is working" : "Your assessment is queued"}</h3>
           <p>Core will use your saved business information and public research to prepare the Business Understanding Report. You can review the findings when the report is ready.</p>
@@ -73,8 +85,16 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
       </div>}
       {workflow.recoverable && <button type="button" disabled={busy} onClick={() => void submit("recover")}>Recover retained result</button>}
       {workflow.next === "evidence-changed" && <p>Onboarding evidence changed. Core needs to reconcile the changes before continuing.</p>}
-      {workflow.report && hosted && !workflow.failure && (nextLabel[workflow.next] || workflow.next === "in-progress") &&
-        <p role="status">Core is preparing the site. {nextLabel[workflow.next] ? `Next up: ${nextLabel[workflow.next].toLowerCase()}.` : "Check back for the next saved result."}</p>}
+      {hosted && workflow.confirmation && working && <div role="status" className={styles.workflowStatus}>
+        <h3>{workflow.next === "in-progress" ? step ?? "Core is preparing your website" : "Website planning queued"}</h3>
+        {workflow.next !== "in-progress" && step && <p><strong>Next step</strong> {step}</p>}
+        <p>Your report review is saved. Core is preparing Presence Direction and the website. You can leave and return. This page checks for saved progress while it’s open.</p>
+      </div>}
+      {hosted && siteReview && <div role="status" className={styles.workflowStatus}>
+        <h3>{workflow.next === "editorial-review" ? "Website draft needs editorial review" : "Website proposal ready for review"}</h3>
+        <p>Inspect the proposed pages, visitor actions, and editorial findings. Customer acceptance and publication follow separate reviews.</p>
+        <a href="#proposed-website">Go to the proposed website</a>
+      </div>}
       {!hosted && nextLabel[workflow.next] && <button type="button" disabled={busy} onClick={() => void submit("next")}>{nextLabel[workflow.next]}</button>}
 
       {workflow.report && <article aria-label="Business Understanding Report" className={styles.workflowReport}>
@@ -98,6 +118,7 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
                 <button type="button" className={styles.secondary} disabled={busy}
                   onClick={() => { setFinding({ id: item.id, version: workflow.version }); setCorrection(""); }}>Flag a correction</button>}
               {finding?.version === workflow.version && finding.id === item.id && <div className={styles.field}>
+                {workflow.confirmation && <p>Saving this correction pauses site planning. The report and its dependent drafts will need a fresh review.</p>}
                 <label htmlFor="workflow-correction">Correction to {item.heading}</label>
                 <textarea id="workflow-correction" value={correction} maxLength={8000} onChange={event => setCorrection(event.target.value)} />
                 <button type="button" disabled={busy || !correction.trim()}
@@ -107,8 +128,8 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
             </section>)}
           </section>;
         })}
-        {workflow.confirmation ? <p>{hosted ? "Reviewed for development site planning." : "This report revision has a simulated customer confirmation."}</p> :
-          workflow.next === "customer-review" && <div className={styles.workflowStatus}>
+        {workflow.confirmation && !hosted && <p>This report revision has a simulated customer confirmation.</p>}
+        {!workflow.confirmation && workflow.next === "customer-review" && <div className={styles.workflowStatus}>
             <h4>Ready for site planning?</h4>
             {hosted && <p>This records permission to draft the proposed website. Customer confirmation and publication remain separate.</p>}
             <button type="button" disabled={busy} onClick={() => void submit(hosted ? "continue" : "confirm")}>
@@ -123,7 +144,7 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
         <h3>Presence Direction</h3><p>{workflow.direction.positioning}</p><p>{workflow.direction.approach}</p>
         <ul>{workflow.direction.visitorDecisions.map(decision => <li key={decision}>{decision}</li>)}</ul>
       </section>}
-      {workflow.blueprint && <section aria-label="Proposed website">
+      {workflow.blueprint && <section id="proposed-website" aria-label="Proposed website">
         <h3>Proposed website</h3>
         <p>{workflow.pages.length} of {workflow.blueprint.pages.length} proposed pages drafted.</p>
         <nav aria-label="Proposed site navigation">
