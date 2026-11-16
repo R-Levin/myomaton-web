@@ -17,6 +17,12 @@ on:
       - 'scripts/wordpress-rehearsal-artifact.mjs'
       - 'scripts/wordpress-artifact-links.mjs'
       - 'scripts/wordpress-private-server.cjs'
+      - 'scripts/wordpress-private-listener.cjs'
+      - 'scripts/intake/c0-site-journey-client.tsx'
+      - 'scripts/intake/presence-workflow-panel.tsx'
+      - 'scripts/intake/protected-presence-worker.ts'
+      - 'tests/presence-workflow-provider.test.tsx'
+      - 'tests/presence-workflow-review.test.tsx'
       - 'scripts/wordpress-routing-smoke.mjs'
       - 'tests/wordpress-private-server.test.mjs'
       - 'tests/wordpress-private-build-config.test.tsx'
@@ -57,7 +63,7 @@ jobs:
       - name: Verify retained approved rendering on Linux
         run: npx tsx --test tests/proposal-preview-compatibility.test.tsx tests/wordpress-private-build-config.test.tsx
       - name: Verify metered planning and private recovery on Linux
-        run: npx tsx --test tests/site-planning.test.tsx tests/site-planning-recovery.test.tsx
+        run: npx tsx --test tests/site-planning.test.tsx tests/site-planning-recovery.test.tsx tests/presence-workflow-provider.test.tsx tests/presence-workflow-review.test.tsx
       - name: Verify portable artifact dependency boundary
         run: node --test tests/wordpress-artifact-links.test.mjs
       - name: Verify raw routing boundary and sanitized diagnostics

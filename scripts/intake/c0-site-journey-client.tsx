@@ -70,6 +70,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
   useEffect(() => { request(endpoint).then(adopt).catch(failed).finally(() => setBusy(false)); }, [endpoint]);
 
   const pollWorkflow = hosted && isPresenceWorkflowWorking(view?.workflow);
+  const workflowVersion = view?.workflow?.version;
   useEffect(() => {
     if (!pollWorkflow || busy || locked) return;
     const pending = new AbortController();
@@ -79,9 +80,10 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         try {
           const next = await request(endpoint, undefined, pending.signal);
           if (pending.signal.aborted) return;
-          if (next?.workflow) {
+          if (next?.workflow && workflowVersion !== undefined && next.workflow.version >= workflowVersion) {
             setView(current => current?.workflow && next.workflow &&
               next.version >= current.version && next.workflow.version >= current.workflow.version ? next : current);
+            if (!isPresenceWorkflowWorking(next.workflow)) return;
           }
         } catch (reason) {
           if (pending.signal.aborted) return;
@@ -96,7 +98,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
     }
     timer = window.setTimeout(refresh, 5_000);
     return () => { pending.abort(); window.clearTimeout(timer); };
-  }, [pollWorkflow, busy, locked, endpoint]);
+  }, [pollWorkflow, workflowVersion, busy, locked, endpoint]);
   async function unlock() {
     setBusy(true);
     setMessage("");
