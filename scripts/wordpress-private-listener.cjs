@@ -182,14 +182,15 @@ async function main() {
 async function runWorkflow(args) {
   const [operation, digest] = args;
   const activate = operation === 'ACTIVATE-EXACT-WORKFLOW-GRANT';
+  const keylessRecovery = ['RECOVER-RETAINED-WORKFLOW-REPORT', 'RECOVER-RETAINED-WORKFLOW-BLUEPRINT', 'RECOVER-RETAINED-WORKFLOW-PAGE', 'RECOVER-RETAINED-WORKFLOW-EDITORIAL'];
   assert.ok(args.length === (activate ? 2 : 1) && (activate ? /^[a-f0-9]{64}$/.test(digest) : [
-    'INSPECT-WORKFLOW-MANIFEST', 'WATCH-AUTHORIZED-WORKFLOW', 'RECOVER-RETAINED-WORKFLOW-RESEARCH', 'RECOVER-RETAINED-WORKFLOW-REPORT', 'RECOVER-RETAINED-WORKFLOW-BLUEPRINT', 'RECOVER-RETAINED-WORKFLOW-PAGE',
+    'INSPECT-WORKFLOW-MANIFEST', 'WATCH-AUTHORIZED-WORKFLOW', 'RECOVER-RETAINED-WORKFLOW-RESEARCH', ...keylessRecovery,
   ].includes(operation)));
   const root = fs.lstatSync(PRIVATE);
   assert.ok(root.isDirectory() && !root.isSymbolicLink() && root.uid === process.getuid() && (root.mode & 511) === 448);
   assert.equal(fs.realpathSync(WEB), WEB);
   const env = coreEnvironment(JSON.parse(privateFile(PRIVATE + '/core-config.json')));
-  if (activate || operation === 'INSPECT-WORKFLOW-MANIFEST' || ['RECOVER-RETAINED-WORKFLOW-REPORT', 'RECOVER-RETAINED-WORKFLOW-BLUEPRINT', 'RECOVER-RETAINED-WORKFLOW-PAGE'].includes(operation)) delete env.MIOPAGES_OPENAI_DEV_API_KEY;
+  if (activate || operation === 'INSPECT-WORKFLOW-MANIFEST' || keylessRecovery.includes(operation)) delete env.MIOPAGES_OPENAI_DEV_API_KEY;
   else assert.ok(env.MIOPAGES_OPENAI_DEV_API_KEY && resourceGate(process.memoryUsage().rss, availableMemory()));
   const worker = WEB + '/.rehearsal/protected-presence-worker.cjs';
   assert.ok(fs.lstatSync(worker).isFile() && fs.realpathSync(worker) === worker);

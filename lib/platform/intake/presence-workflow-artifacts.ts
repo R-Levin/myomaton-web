@@ -32,6 +32,12 @@ export const artifactSchemas = {
   editorial: shape({ summary: string, concerns: array(shape({ path: string, concern: string })) }),
 };
 
+export type ArtifactIssue = "citation" | "page-binding" | "action-destination" | "shape-or-content";
+
+export class ArtifactValidationError extends Error {
+  constructor(readonly issue: ArtifactIssue, message: string) { super(message); }
+}
+
 const copy = (value: unknown) => text(value, Infinity, true);
 function list<T>(value: unknown, map: (item: unknown) => T, required = true): T[] {
   if (!Array.isArray(value) || (required && !value.length)) throw Error("Invalid artifact list");
@@ -40,10 +46,10 @@ function list<T>(value: unknown, map: (item: unknown) => T, required = true): T[
 function unique(values: readonly string[]) {
   if (new Set(values).size !== values.length) throw Error("Repeated artifact identity");
 }
-function references(value: unknown, allowed: readonly string[], required = true) {
+function references(value: unknown, allowed: readonly string[], required = true, issue: ArtifactIssue = "page-binding") {
   const entries = list(value, item => text(item, 160), required);
   unique(entries);
-  if (entries.some(entry => !allowed.includes(entry))) throw Error("Unknown artifact reference");
+  if (entries.some(entry => !allowed.includes(entry))) throw new ArtifactValidationError(issue, "Unknown artifact reference");
   return entries;
 }
 function path(value: unknown) {
@@ -58,7 +64,7 @@ export function readReport(value: unknown, sources: readonly PresenceEvidence[],
   const findings = list(report.findings, value => {
     const finding = object(value, ["id", "heading", "body", "status", "sourceIds"]);
     let status = choice(finding.status, findingStates);
-    const sourceIds = references(finding.sourceIds, ids);
+    const sourceIds = citedSources(finding.sourceIds, ids, allowCertaintyDowngrade);
     if (status === "established" && !sourceIds.every(id => knownSources.includes(sources.find(source => source.id === id)!.kind))) {
       if (!allowCertaintyDowngrade) throw Error("Established finding lacks confirmed evidence");
       // Retain the provider wording as a proposal and keep the exact response in custody.
@@ -69,14 +75,14 @@ export function readReport(value: unknown, sources: readonly PresenceEvidence[],
   unique(findings.map(finding => finding.id));
   return { title: copy(report.title), summary: copy(report.summary), findings };
 }
-export function readDirection(value: unknown, ids: readonly string[]) {
+export function readDirection(value: unknown, ids: readonly string[], normalizeProviderReferences = false) {
   const direction = object(value, ["positioning", "approach", "visitorDecisions", "sourceIds"]);
   return { positioning: copy(direction.positioning), approach: copy(direction.approach),
-    visitorDecisions: list(direction.visitorDecisions, copy), sourceIds: references(direction.sourceIds, ids) };
+    visitorDecisions: list(direction.visitorDecisions, copy), sourceIds: citedSources(direction.sourceIds, ids, normalizeProviderReferences) };
 }
 function citedSources(value: unknown, ids: readonly string[], normalizeProviderReferences: boolean) {
   // Source repetition carries no additional meaning. Validate every ID even when deduplicating.
-  return references(normalizeProviderReferences && Array.isArray(value) ? [...new Set(value)] : value, ids);
+  return references(normalizeProviderReferences && Array.isArray(value) ? [...new Set(value)] : value, ids, true, "citation");
 }
 
 export function readBlueprint(value: unknown, ids: readonly string[], normalizeProviderReferences = false) {
@@ -94,7 +100,8 @@ export function readBlueprint(value: unknown, ids: readonly string[], normalizeP
     const matches = pages.filter(page => page.label === item);
     return matches.length === 1 ? matches[0].path : item;
   }) : blueprint.navigation;
-  return { pages, navigation: references(navigation, paths), articles: list(blueprint.articles, value => {
+  return { pages, navigation: references(normalizeProviderReferences && Array.isArray(navigation) ? [...new Set(navigation)] : navigation, paths),
+    articles: list(blueprint.articles, value => {
     const article = object(value, ["title", "question", "target", "sourceIds"]);
     const [target] = references([article.target], paths);
     return { title: copy(article.title), question: copy(article.question), target, sourceIds: citedSources(article.sourceIds, ids, normalizeProviderReferences) };
@@ -103,7 +110,7 @@ export function readBlueprint(value: unknown, ids: readonly string[], normalizeP
 export function readPage(value: unknown, exactPath: string, paths: readonly string[], ids: readonly string[],
   destinations: Partial<Record<Exclude<typeof actionKinds[number], "navigate">, string>>, normalizeProviderReferences = false) {
   const page = object(value, ["path", "heading", "searchTitle", "searchDescription", "sections", "actions", "internalLinks"]);
-  if (page.path !== exactPath) throw Error("Page does not match the blueprint");
+  if (page.path !== exactPath) throw new ArtifactValidationError("page-binding", "Page does not match the blueprint");
   const sections = list(page.sections, value => {
     const section = object(value, ["heading", "body", "sourceIds", "visual"]);
     const visual = object(section.visual, ["purpose", "brief", "altIntent", "status"]);
@@ -119,10 +126,10 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
       if (normalizeProviderReferences && destination === exactPath) {
         return { label: copy(action.label), kind, destination: null, unresolvedDestination: destination };
       }
-      throw Error("Unknown Action destination");
+      throw new ArtifactValidationError("action-destination", "Unknown Action destination");
     }
     if (kind !== "navigate" && destination !== null && destination !== destinations[kind]) {
-      if (!normalizeProviderReferences) throw Error("Unknown Action destination");
+      if (!normalizeProviderReferences) throw new ArtifactValidationError("action-destination", "Unknown Action destination");
       return { label: copy(action.label), kind, destination: null };
     }
     return { label: copy(action.label), kind, destination };
@@ -133,13 +140,30 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
     sections, actions, internalLinks: links?.filter(link => otherPaths.includes(link)) ?? references(page.internalLinks, otherPaths, false),
     ...(unresolvedLinks?.length && { unresolvedLinks }) };
 }
-export function readEditorial(value: unknown, paths: readonly string[]) {
+export function readEditorial(value: unknown, paths: readonly string[], normalizeProviderReferences = false) {
   const editorial = object(value, ["summary", "concerns"]);
-  return { summary: copy(editorial.summary), concerns: list(editorial.concerns, value => {
-    const concern = object(value, ["path", "concern"]);
-    const [pagePath] = references([concern.path], paths);
-    return { path: pagePath, concern: copy(concern.concern) };
-  }, false) };
+  const items = list(editorial.concerns, value => {
+    const item = object(value, ["path", "concern"]);
+    return { target: copy(item.path), concern: copy(item.concern) };
+  }, false);
+  const concerns: { path: string; concern: string }[] = [];
+  const unassigned: { suggestedTarget: string; concern: string }[] = [];
+  const seen = new Set<string>();
+  for (const { target, concern } of items) {
+    if (normalizeProviderReferences) {
+      const key = JSON.stringify([target, concern]);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if (!paths.includes(target)) {
+        // This is advisory text. It never selects a Page, Action or revision.
+        unassigned.push({ suggestedTarget: target, concern });
+        continue;
+      }
+    }
+    const [pagePath] = references([target], paths);
+    concerns.push({ path: pagePath, concern });
+  }
+  return { summary: copy(editorial.summary), concerns, ...(unassigned.length > 0 && { unassigned }) };
 }
 
 export type WorkflowReport = ReturnType<typeof readReport>;

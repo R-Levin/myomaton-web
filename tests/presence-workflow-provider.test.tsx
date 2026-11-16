@@ -8,7 +8,7 @@ import { fingerprint } from "../lib/platform/canonical/model";
 import { initializeResponsesUsageLedger, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
 import { createResponsesPresenceWorkflow, type PresenceWorkflowGrant } from "../lib/platform/intake/presence-workflow-provider";
 import type { WorkflowContext, WorkflowInput, WorkflowOperation, WorkflowRun } from "../lib/platform/intake/presence-workflow";
-import { readBlueprint, readPage, readReport } from "../lib/platform/intake/presence-workflow-artifacts";
+import { ArtifactValidationError, readBlueprint, readDirection, readEditorial, readPage, readReport } from "../lib/platform/intake/presence-workflow-artifacts";
 import { validateResearchSources } from "../lib/platform/intake/presence-workflow-research";
 
 test("Core retrieves only pinned public sources and sends source-bound stages through the existing usage and recovery rules", async () => {
@@ -119,7 +119,10 @@ test("provider blueprint recovery preserves Page identity and resolves only exac
   assert.deepEqual(normalized.navigation, ["/", "/service"]);
   assert.deepEqual(normalized.pages[0], { ...plan.pages[0], sourceIds: ["owner"] });
   assert.deepEqual(normalized.articles[0], { ...plan.articles[0], sourceIds: ["owner"] });
-  assert.throws(() => readBlueprint({ ...plan, navigation: ["Home", "/"] }, ["owner"], true), /Repeated artifact identity/);
+  assert.deepEqual(readBlueprint({ ...plan, navigation: ["Home", "/", "/service", "/service"] }, ["owner"], true).navigation,
+    ["/", "/service"]);
+  assert.throws(() => readBlueprint({ ...normalized, navigation: ["/", "/"] }, ["owner"]), /Repeated artifact identity/);
+  assert.throws(() => readBlueprint({ ...plan, pages: [plan.pages[0], plan.pages[0]] }, ["owner"], true), /Repeated artifact identity/);
   assert.throws(() => readBlueprint({ ...plan, navigation: ["Home", "Missing"] }, ["owner"], true), /Unknown artifact reference/);
   assert.throws(() => readBlueprint({
     ...plan, pages: [plan.pages[0], { ...plan.pages[1], label: "Home" }],
@@ -151,4 +154,28 @@ test("provider Page recovery quarantines unverified actions and preserves unreso
     /Unknown Action destination/);
   assert.throws(() => readPage({ ...page, internalLinks: ["https://example.test/"] }, "/", ["/", "/service"], ["owner"], {}, true),
     /Invalid Page path/);
+});
+
+test("provider artifact settlement retains editorial suggestions as advice and refuses foreign citations", () => {
+  const draft = {
+    summary: "Check the full candidate.",
+    concerns: [
+      { path: "/service", concern: "Verify the service terms." },
+      { path: "/service", concern: "Verify the service terms." },
+      { path: "Across the Home and Service pages", concern: "Confirm the proposed destinations." },
+      { path: "/unknown", concern: "Keep this proposed path inactive." },
+    ],
+  };
+  const expected = {
+    summary: draft.summary,
+    concerns: [draft.concerns[0]],
+    unassigned: draft.concerns.slice(2).map(({ path, concern }) => ({ suggestedTarget: path, concern })),
+  };
+  assert.deepEqual(readEditorial(draft, ["/", "/service"], true), expected);
+  assert.throws(() => readEditorial(draft, ["/", "/service"]), /Unknown artifact reference/);
+  assert.throws(() => readEditorial({ ...draft, concerns: [{ path: "/unknown", concern: "<script>" }] }, ["/"], true), /Invalid canonical text/);
+  const direction = { positioning: "A clear service", approach: "Explain the offer", visitorDecisions: ["Ask for a review"], sourceIds: ["owner", "owner"] };
+  assert.deepEqual(readDirection(direction, ["owner"], true).sourceIds, ["owner"]);
+  assert.throws(() => readDirection({ ...direction, sourceIds: ["main", "foreign", "foreign"] }, ["main"], true),
+    error => error instanceof ArtifactValidationError && error.issue === "citation");
 });

@@ -23,6 +23,13 @@ const failureLabel: Record<string, string> = {
   "outcome-unknown": "Core could not verify whether this step finished. Recovery does not send the step again.",
 };
 
+const artifactIssueLabel = {
+  citation: "A citation falls outside the approved evidence.",
+  "page-binding": "A page reference does not match the candidate’s page set.",
+  "action-destination": "An action destination does not match a verified route.",
+  "shape-or-content": "The returned content does not meet the review format.",
+};
+
 const findingGroups = [
   { status: "established", label: "Findings grounded in confirmed evidence" },
   { status: "proposed", label: "Interpretations to review" },
@@ -88,6 +95,7 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
       )}
       {workflow.failure && <div className={styles.workflowStatus} role="alert">
         <h3>{workflow.report ? "Core paused" : "Your assessment is paused"}</h3>
+        {workflow.artifactIssue && <p>{artifactIssueLabel[workflow.artifactIssue]}</p>}
         <p>{failureLabel[workflow.failure]} {workflow.recoverable ? "The saved response can be checked without another provider request." : "Your saved business information is still here."}</p>
       </div>}
       {workflow.recoverable && <button type="button" disabled={busy} onClick={() => void submit("recover")}>Recover retained result</button>}
@@ -161,6 +169,12 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
               onClick={() => setSelected(path)}>{item.label}</button>;
           })}
         </nav>
+        {workflow.pages.some(draft => !workflow.blueprint!.navigation.includes(draft.path)) &&
+          <nav aria-label="Additional drafted pages">
+            {workflow.pages.filter(draft => !workflow.blueprint!.navigation.includes(draft.path)).map(draft =>
+              <button type="button" key={draft.path} aria-pressed={page?.path === draft.path}
+                onClick={() => setSelected(draft.path)}>{draft.heading}</button>)}
+          </nav>}
         {page && <article>
           <h4>{page.heading}</h4>
           {page.sections.map((section, i) => <section key={i}><h5>{section.heading}</h5><p>{section.body}</p>
@@ -189,7 +203,14 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
           <p>These paths and actions are inactive until their destinations are verified.</p>
           <ul>{pendingLinks.map(({ key, heading, requirement }) => <li key={key}><strong>{heading}</strong> · {requirement}</li>)}</ul>
         </section>}
-        {workflow.next === "editorial-review" && <button type="button" disabled={busy} onClick={() => void submit("revise")}>Queue the flagged pages for revision</button>}
+        {Boolean(workflow.editorial.unassigned?.length) && <section aria-label="Editorial findings awaiting a page assignment">
+          <h4>Editorial findings awaiting a page assignment</h4>
+          <p>These findings require a scope review before Core can revise or approve pages.</p>
+          <ul>{workflow.editorial.unassigned!.map(({ suggestedTarget, concern }) =>
+            <li key={JSON.stringify([suggestedTarget, concern])}><strong>{suggestedTarget}</strong> · {concern}</li>)}</ul>
+        </section>}
+        {workflow.next === "editorial-review" && !workflow.editorial.unassigned?.length &&
+          <button type="button" disabled={busy} onClick={() => void submit("revise")}>Queue the flagged pages for revision</button>}
         {workflow.next === "operator-review" && <button type="button" disabled={busy} onClick={() => void submit("review")}>{hosted ? "Record Operator site review" : "Record simulated Operator review"}</button>}
         {workflow.operatorReview && <p>Operator review saved. WordPress preparation requires separate authorization.</p>}
       </section>}

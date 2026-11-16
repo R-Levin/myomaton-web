@@ -15,10 +15,17 @@ export function MyBusinessPanel({ business }: { business: MyBusinessView }) {
     <p>These confirmed records describe your business and its offerings. The business report below can contain interpretations and open questions.</p>
     {!business.facts.length && !business.offerings.length && <p>No confirmed records are available in this workspace.</p>}
     {business.facts.length > 0 && <dl>{business.facts.map(item => <div key={item.id}>
-      <dt>{factLabels[item.kind]}</dt><dd>{item.value}<br /><small>{descriptions(item)}</small></dd>
+      <dt>{factLabels[item.kind]}</dt><dd>{item.value}<br /><small>{descriptions(item)}</small>
+        {item.history.length > 0 && <details><summary>Earlier confirmed wording</summary>
+          <ul>{item.history.map(prior => <li key={prior.revision}>Revision {prior.revision} · {prior.confirmedAt.slice(0, 10)} · {prior.value}</li>)}</ul>
+        </details>}
+      </dd>
     </div>)}</dl>}
     {business.offerings.map(item => <article key={item.id}>
       <h3>{item.name}</h3><p>{item.summary}</p><p><small>{descriptions(item)}</small></p>
+      {item.history.length > 0 && <details><summary>Earlier confirmed offering</summary>
+        <ul>{item.history.map(prior => <li key={prior.revision}>Revision {prior.revision} · {prior.confirmedAt.slice(0, 10)} · {prior.name} · {prior.summary}</li>)}</ul>
+      </details>}
     </article>)}
     <p><a href="#business-report-and-website">Review Core’s business report and flag an interpretation</a></p>
   </section>;

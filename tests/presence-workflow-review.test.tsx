@@ -48,18 +48,25 @@ test("the owner sees an operational status before the report and decisions with 
     assert.ok(reviewed.includes(text), text);
   }
   assert.doesNotMatch(reviewed, /source body marker|<details[^>]*\bopen[=>\s]/u);
-  const site = new JSDOM(render({
-    ...pending, version: 11, next: "operator-review",
-    editorial: { summary: "Review the offer.", concerns: [] },
+  const result = new JSDOM(render({
+    ...pending, version: 11, next: "editorial-review",
+    editorial: { summary: "Review the offer.", concerns: [], unassigned: [
+      { suggestedTarget: "Across the site", concern: "Verify how contact requests are handled." },
+    ] },
     pages: [{
       path: "/", heading: "Home", searchTitle: "Home", searchDescription: "Home", sections: [], internalLinks: [],
       unresolvedLinks: ["/undeclared"],
       actions: [{ label: "Existing account", kind: "existing-account", destination: null },
         { label: "Read Home", kind: "navigate", destination: null, unresolvedDestination: "/" }],
     }],
-  })).window.document.querySelector('[aria-label="Unresolved destinations"]');
+  })).window.document;
+  const site = result.querySelector('[aria-label="Unresolved destinations"]');
   assert.match(site?.textContent ?? "", /Suggested path \/undeclared.*Existing account needs a verified destination.*Read Home points back to this page/u);
   assert.equal(site?.querySelector("a, button"), null);
+  const unassigned = result.querySelector('[aria-label="Editorial findings awaiting a page assignment"]');
+  assert.match(unassigned?.textContent ?? "", /Across the site.*Verify how contact requests are handled/u);
+  assert.equal(unassigned?.querySelector("a, button"), null);
+  assert.doesNotMatch(result.body.textContent ?? "", /Queue the flagged pages|Record Operator site review/);
 });
 
 test("the signed-in browser follows a saved development continuation to the website proposal without another click", async () => {

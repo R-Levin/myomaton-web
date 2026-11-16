@@ -1,7 +1,7 @@
 import { fingerprint } from "../canonical/model";
 import { confirmSitePlanningReceipt, meteredPresenceWorkflow, responseProposal, type ResponsesRates, type ResponsesTransport,
   type WorkflowUsageScope } from "./intelligent-responses";
-import { artifactSchemas } from "./presence-workflow-artifacts";
+import { ArtifactValidationError, artifactSchemas } from "./presence-workflow-artifacts";
 import { marketSources, retrievePublicResearch, validateDiscovery, validateMarketSearch, validateResearchSources, type MarketSearch,
   type PublicResearchSource, type ResearchDiscovery } from "./presence-workflow-research";
 import { WorkflowBlocked, type PresenceWorkflowOperations, type WorkflowContext, type WorkflowRun } from "./presence-workflow";
@@ -32,7 +32,7 @@ const instructions: Record<ModelStage, string> = {
   direction: "Propose the Presence Direction. Explain positioning, buying decisions, the conversion paths, search and ongoing content needs. Distinguish the proposed offer, verified present capability (including documented human delivery), and launch dependencies. Explain what changes when an owner correction affects the strategy.",
   blueprint: "Plan a complete site. Let the supplied business and visitor decisions justify each page. Cover navigation, the two onboarding entry paths where applicable and useful Article topics linked to a relevant page. Use the exact declared Page paths in navigation and articles, and cite each source ID at most once per item. Do not assume a number of pages or articles.",
   page: "Draft original, complete copy for the exact page requested. When a previous page and editorial concerns are supplied, preserve accurate elements and revise the exact deficiencies. Include search metadata, actions, internal links restricted to exact paths of other declared Pages and an editorial visual brief per section. Do not invent contacts, prices, permissions, case studies, outcomes or operational promises. Use a null destination for every non-navigation action unless its exact destination is explicitly supplied. An observed or historical route is not an authorized destination. Describe intended service as proposed where delivery is not yet supported by evidence. Documented Operator work may support delivery without automation.",
-  editorial: "Critically review the complete candidate for duplication, buyer relevance, offer coverage, meaningful actions, accessibility and unsupported claims. List only issues requiring redrafting. Report unverified inquiry or publication prerequisites in the summary so that they remain visible without demanding invented claims. An editorial opinion is not an approval.",
+  editorial: "Critically review the complete candidate for duplication, buyer relevance, offer coverage, meaningful actions, accessibility and unsupported claims. Use an exact supplied Page path for every issue requiring redrafting. Report site-wide findings and unverified inquiry or publication prerequisites in the summary so that they remain visible without demanding invented claims. An editorial opinion is not an approval.",
 };
 
 function workScope(run: WorkflowRun, grant: PresenceWorkflowGrant) {
@@ -130,7 +130,7 @@ export function createResponsesPresenceWorkflow(config: {
       return Object.entries(value).every(([key, item]) => key !== "sourceIds"
         ? allowed(item) : Array.isArray(item) && item.every(id => ids.has(id)));
     }
-    if (!allowed(output)) return null; // Artifacts fail normal validation with the exact retained answer still in custody.
+    if (!allowed(output)) return new ArtifactValidationError("citation", "Citation outside the approved evidence");
     return output;
   }
   return {

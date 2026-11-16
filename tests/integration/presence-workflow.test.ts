@@ -70,7 +70,8 @@ test("the existing local Core interface persists a report, correction, revised s
     await writeCanonical(setup.pool, { domain: "knowledge", id: knowledgeId, webPresenceId: setup.selection.webPresenceId,
       expectedVersion: Number(guard.row.version), expectedFingerprint: guard.fingerprint, responsibleIdentity: approved.by,
       changeReason: "Workspace evidence visibility regression", payload: { ...known, approval: approved, entries: [
-        ...known.entries,
+        ...known.entries.map((entry: { kind: string; value: string }) => entry.kind === "audience"
+          ? { ...entry, value: "Small businesses exploring a managed presence.", evidence } : entry),
         { key: "internal-test", kind: "constraint", value: "Internal business detail", evidence: { ...evidence, visibility: "internal" } },
         { key: "provisional-test", kind: "constraint", value: "Provisional business detail",
           evidence: { sourceKind: "customer", sourceReference: evidence.sourceReference, visibility: "public", confirmation: "provisional" } },
@@ -84,7 +85,12 @@ test("the existing local Core interface persists a report, correction, revised s
     assert.equal(opened.firstParty.counts["contact-accepted"], 0);
     assert.equal(opened.firstParty.customerOutcome, null);
     assert.equal(opened.firstParty.environment, "synthetic");
-    assert.ok(opened.myBusiness.facts.some((fact: { kind: string }) => fact.kind === "audience"));
+    const audience = opened.myBusiness.facts.find((fact: { kind: string }) => fact.kind === "audience");
+    assert.equal(audience.value, "Small businesses exploring a managed presence.");
+    assert.equal(audience.revision, 2);
+    assert.equal(audience.history.length, 1);
+    assert.equal(audience.history[0].revision, 1);
+    assert.notEqual(audience.history[0].value, audience.value);
     assert.equal(opened.myBusiness.offerings.length, 1);
     assert.doesNotMatch(JSON.stringify(opened.myBusiness), /Foreign business detail|Internal business detail|Provisional business detail|Private source reference/);
     const newDraft = begin.headers.get("set-cookie")!.split(";")[0];
@@ -157,6 +163,7 @@ test("the existing local Core interface persists a report, correction, revised s
       await see("Customer rehearsal participant");
       await see("My Business");
       assert.match(page.querySelector("#my-business")?.textContent ?? "", /Who you serve.*Confirmed/u);
+      await see("Earlier confirmed wording");
       const heading = [...page.querySelectorAll("h5")].find(item => item.textContent ===
         first.report?.findings.find(item => item.id === input.finding)?.heading);
       const flag = heading?.closest("section")?.querySelector("button");
@@ -238,6 +245,48 @@ test("the existing local Core interface persists a report, correction, revised s
     const changed = await reopened.review({ ...secondContext, evidence: secondContext.evidence.map(source => ({ ...source, content: "Changed source" })) });
     assert.equal(changed?.next, "evidence-changed");
     assert.deepEqual(changed?.sources, secondContext.evidence);
+
+    const editorialToken = "c7".repeat(32);
+    await secondIntake.create(editorialToken, "FREE_REVIEW");
+    const editorialContext = { ...secondContext, intakeId: (await secondIntake.workflowContext(editorialToken)).intakeId };
+    const returned = { summary: "Check the whole draft.", concerns: [
+      { path: "Across the Home and Project drafts", concern: "Verify the contact and intake route." },
+    ] };
+    let editorialDispatches = 0;
+    const providerMode = new PresenceWorkflow(setup.pool, {
+      ...workflowFixture, mode: "provider",
+      async run(run, retain) {
+        if (run.work.operation !== "editorial") return workflowFixture.run(run, retain);
+        editorialDispatches++;
+        await retain(Buffer.from(JSON.stringify(returned)));
+        return null; // Previous reader rejects a completed response that was retained.
+      },
+    });
+    const editorialActor = { id: "scoped-editorial-operator", role: "operator", simulated: false } as const;
+    let editorialView = (await providerMode.start(editorialContext))!;
+    while (editorialView.next !== "recover") {
+      if (editorialView.next === "customer-review") {
+        editorialView = (await providerMode.confirmReport(editorialContext, editorialView.version, editorialActor, true))!;
+      } else {
+        editorialView = (await providerMode.advance(editorialContext, editorialView.version))!;
+      }
+    }
+    assert.equal(editorialView.artifactIssue, "shape-or-content");
+    assert.equal(editorialView.pendingOperation, "editorial");
+    const receiptCount = async () => (await setup.pool.query(
+      "SELECT count(*)::int AS total FROM presence_workflow_outputs WHERE intake_id=$1", [editorialContext.intakeId])).rows[0].total;
+    const beforeEditorialRecovery = await receiptCount();
+    const ready = (await providerMode.recover(editorialContext, editorialView.version))!;
+    assert.equal(ready.next, "editorial-review");
+    assert.equal(ready.failure, null);
+    assert.equal(ready.artifactIssue, undefined);
+    assert.deepEqual(ready.editorial?.unassigned, [{ suggestedTarget: returned.concerns[0].path, concern: returned.concerns[0].concern }]);
+    assert.equal(ready.pages.length, 2);
+    assert.equal(await receiptCount(), beforeEditorialRecovery);
+    assert.equal(editorialDispatches, 1);
+    await assert.rejects(providerMode.advance(editorialContext, ready.version), { code: "workflow_not_ready" });
+    await assert.rejects(providerMode.requestEditorialRevision(editorialContext, ready.version, editorialActor), { code: "workflow_not_ready" });
+    await assert.rejects(providerMode.reviewCandidate(editorialContext, ready.version, editorialActor), { code: "workflow_not_ready" });
 
     const now = Date.parse("2026-11-15T15:00:00Z");
     const measurement = new FirstPartyMeasurement(setup.pool, () => now);

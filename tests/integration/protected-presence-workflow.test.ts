@@ -350,6 +350,7 @@ test("restricted Core worker discovers research, retains a substantial provider-
       assert.equal(view.next, "report");
       view = (await workPresenceCase(worker, context))!;
       assert.equal(view.failure, "output-invalid");
+      assert.equal(view.artifactIssue, "citation");
       const marketUrls = ["https://public-example.com/offer", "https://research-source.com/guide"];
       assert.deepEqual(fetches.slice(0, 2).sort(), marketUrls);
       assert.deepEqual(fetches.slice(2, 4).sort(), marketUrls);

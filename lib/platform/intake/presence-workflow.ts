@@ -6,7 +6,7 @@ import type { EntryIntent } from "./model";
 import { IntakeError } from "./model";
 import { presenceVisualPlacement, type PresenceVisual, type PresenceVisualOperations } from "./presence-workflow-visual";
 import {
-  readBlueprint, readDirection, readEditorial, readPage, readReport, type PresenceEvidence,
+  ArtifactValidationError, readBlueprint, readDirection, readEditorial, readPage, readReport, type ArtifactIssue, type PresenceEvidence,
   type WorkflowBlueprint, type WorkflowDirection, type WorkflowEditorial, type WorkflowPage, type WorkflowReport,
 } from "./presence-workflow-artifacts";
 
@@ -52,6 +52,7 @@ type State = {
   operatorReview: Decision | null;
   work: Work | null;
   failure: Failure | null;
+  artifactIssue?: ArtifactIssue | null;
   retry?: { previous: string; count: number };
   visuals?: PresenceVisual[];
 };
@@ -182,10 +183,13 @@ export class PresenceWorkflow {
     if (!state) return null;
     const current = state.contextDigest === fingerprint(context);
     const next = !current ? "evidence-changed" : state.failure ? "recover" : state.work ? "in-progress" :
-      nextTask(state)?.operation ?? (!state.confirmation ? "customer-review" : state.editorial?.concerns.length ? "editorial-review" : !state.operatorReview ? "operator-review" : "review-complete");
+      nextTask(state)?.operation ?? (!state.confirmation ? "customer-review" :
+        state.editorial && (state.editorial.concerns.length || state.editorial.unassigned?.length) ? "editorial-review" :
+          !state.operatorReview ? "operator-review" : "review-complete");
     const { research, report, confirmation, corrections, direction, blueprint, pages, editorial, operatorReview, version, mode, failure } = state;
     return { version, mode, contextDigest: state.contextDigest, research, report, confirmation, corrections, direction, blueprint, pages, editorial, operatorReview,
-      failure, next, pendingOperation: state.work?.operation ?? null, recoverable: current && Boolean(state.work && (state.failure || state.work.until <= this.clock())),
+      failure, ...(failure === "output-invalid" && state.artifactIssue && { artifactIssue: state.artifactIssue }),
+      next, pendingOperation: state.work?.operation ?? null, recoverable: current && Boolean(state.work && (state.failure || state.work.until <= this.clock())),
       sources: state.sourceSnapshot.evidence, limitations: state.sourceSnapshot.limitations,
       conflicts: state.sourceSnapshot.conflicts, entry: state.sourceSnapshot.entry,
       ...(this.operations.visuals && current && { visualBriefs: this.operations.visuals.requestable ? this.operations.visuals.briefs : [],
@@ -250,8 +254,10 @@ export class PresenceWorkflow {
     return this.settle(context, state, output);
   }
 
-  private async fail(context: WorkflowContext, state: State, failure: Failure) {
-    return this.view(context, state.failure === failure ? state : await this.store.append(context, state.version, { ...state, failure }));
+  private async fail(context: WorkflowContext, state: State, failure: Failure, artifactIssue = state.artifactIssue) {
+    const next = state.failure === failure && state.artifactIssue === artifactIssue ? state :
+      await this.store.append(context, state.version, { ...state, failure, ...(artifactIssue && { artifactIssue }) });
+    return this.view(context, next);
   }
 
   private async settle(context: WorkflowContext, state: State, output: unknown) {
@@ -260,23 +266,28 @@ export class PresenceWorkflow {
     const ids = sources.map(source => source.id);
     const paths = state.blueprint?.pages.map(page => page.path) ?? [];
     let next: State;
+    const provider = state.mode === "provider";
     try {
+      if (output instanceof ArtifactValidationError) throw output;
       switch (work.operation) {
         case "research": next = { ...state, research: readResearch(output, ids) }; break;
-        case "report": next = { ...state, report: readReport(output, sources, state.mode === "provider") }; break;
-        case "direction": next = { ...state, direction: readDirection(output, ids) }; break;
-        case "blueprint": next = { ...state, blueprint: readBlueprint(output, ids, state.mode === "provider") }; break;
+        case "report": next = { ...state, report: readReport(output, sources, provider) }; break;
+        case "direction": next = { ...state, direction: readDirection(output, ids, provider) }; break;
+        case "blueprint": next = { ...state, blueprint: readBlueprint(output, ids, provider) }; break;
         case "page": {
-          const page = readPage(output, work.path!, paths, ids, this.destinations, state.mode === "provider");
+          const page = readPage(output, work.path!, paths, ids, this.destinations, provider);
           // Keep the exact sitemap order when selected pages are redrafted.
           const drafts = new Map([...state.pages, page].map(draft => [draft.path, draft]));
           next = { ...state, pages: paths.flatMap(path => drafts.get(path) ?? []) };
           break;
         }
-        case "editorial": next = { ...state, editorial: readEditorial(output, paths) }; break;
+        case "editorial": next = { ...state, editorial: readEditorial(output, paths, provider) }; break;
       }
-    } catch { return this.fail(context, state, "output-invalid"); }
-    return this.view(context, await this.store.append(context, state.version, { ...next, work: null, failure: null, ...(state.retry && { retry: { ...state.retry, previous: "" } }) }));
+    } catch (error) {
+      return this.fail(context, state, "output-invalid", error instanceof ArtifactValidationError ? error.issue : "shape-or-content");
+    }
+    return this.view(context, await this.store.append(context, state.version, { ...next, work: null, failure: null,
+      ...(state.artifactIssue && { artifactIssue: null }), ...(state.retry && { retry: { ...state.retry, previous: "" } }) }));
   }
 
   async correctReport(context: WorkflowContext, version: number, finding: string, correction: unknown, actor: Actor, developmentCorrection = false) {
@@ -310,7 +321,9 @@ export class PresenceWorkflow {
   async requestEditorialRevision(context: WorkflowContext, version: number, actor: Actor) {
     const state = await this.current(context, version);
     if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture")) throw new IntakeError("unavailable", 403);
-    if (state.work || !state.editorial?.concerns.length || state.operatorReview) throw new IntakeError("workflow_not_ready", 409);
+    if (state.work || !state.editorial?.concerns.length || state.editorial.unassigned?.length || state.operatorReview) {
+      throw new IntakeError("workflow_not_ready", 409);
+    }
     const paths = [...new Set(state.editorial.concerns.map(item => item.path))];
     const ordinal = (state.revisionRequest?.ordinal ?? 0) + 1;
     if (ordinal > (this.operations.maxEditorialRevisions ?? 1)) throw new IntakeError("workflow_not_ready", 409);
@@ -457,7 +470,9 @@ export class PresenceWorkflow {
   async reviewCandidate(context: WorkflowContext, version: number, actor: Actor) {
     const state = await this.current(context, version);
     if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture")) throw new IntakeError("unavailable", 403);
-    if (!state.editorial || state.editorial.concerns.length || state.work || state.operatorReview) throw new IntakeError("workflow_not_ready", 409);
+    if (!state.editorial || state.editorial.concerns.length || state.editorial.unassigned?.length || state.work || state.operatorReview) {
+      throw new IntakeError("workflow_not_ready", 409);
+    }
     const target = fingerprint({ confirmation: state.confirmation?.target, direction: state.direction, blueprint: state.blueprint,
       pages: state.pages, editorial: state.editorial });
     const operatorReview = { actor, at: new Date(this.clock()).toISOString(), target, decision: "reviewed" } as const;
