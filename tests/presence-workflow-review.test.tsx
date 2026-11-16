@@ -93,7 +93,9 @@ test("the signed-in browser follows a saved development continuation to the webs
       pages: draft ? [{ path: "/", heading: "Proposed Home", sections: [], actions: [], internalLinks: [] }] : [],
       editorial: draft ? { summary: "Ready to review", concerns: [] } : null,
     };
-    return Response.json({ state: "draft", version: 28, prepared: { scenario: "c0" }, answers: {}, workflowAvailable: true, workflow });
+    return Response.json({ state: "draft", version: 28, prepared: { scenario: "c0" }, answers: {}, workflowAvailable: true, workflow,
+      portal: { role: "operator", identity: "Authorized Operator", account: "MioPages", site: "C0 development site",
+        environment: "protected-development" } });
   };
   const text = () => dom.window.document.body.textContent ?? "";
   async function observe(value: string) {
@@ -106,6 +108,9 @@ test("the signed-in browser follows a saved development continuation to the webs
   try {
     dom.window.eval(outputFiles[0].text);
     await observe("Continue to development site planning");
+    assert.match(text(), /Operator workspace/);
+    assert.match(text(), /Authorized Operator/);
+    assert.match(text(), /C0 development site/);
     const button = [...dom.window.document.querySelectorAll("button")].find(item =>
       item.textContent === "Continue to development site planning");
     assert.ok(button);

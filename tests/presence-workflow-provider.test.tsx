@@ -8,7 +8,7 @@ import { fingerprint } from "../lib/platform/canonical/model";
 import { initializeResponsesUsageLedger, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
 import { createResponsesPresenceWorkflow, type PresenceWorkflowGrant } from "../lib/platform/intake/presence-workflow-provider";
 import type { WorkflowContext, WorkflowInput, WorkflowOperation, WorkflowRun } from "../lib/platform/intake/presence-workflow";
-import { readBlueprint, readReport } from "../lib/platform/intake/presence-workflow-artifacts";
+import { readBlueprint, readPage, readReport } from "../lib/platform/intake/presence-workflow-artifacts";
 import { validateResearchSources } from "../lib/platform/intake/presence-workflow-research";
 
 test("Core retrieves only pinned public sources and sends source-bound stages through the existing usage and recovery rules", async () => {
@@ -77,6 +77,12 @@ test("Core retrieves only pinned public sources and sends source-bound stages th
     const work = makeRun("report", { ...base, research });
     const changed = makeRun("report", { ...base, evidence: [{ ...context.evidence[0], content: "Unapproved" }], research });
     await assert.rejects(provider.run(changed, retain), /authorization/i);
+    const newCorrection = makeRun("report", { ...base, research, corrections: [{
+      finding: { id: "business", heading: "Offer", body: "Proposed service scope", status: "proposed", sourceIds: ["owner"] },
+      text: "New private correction outside the existing transmission authorization.",
+      actor: { id: "owner-test", role: "operator", simulated: false }, reportDigest: fingerprint(report), at: new Date().toISOString(),
+    }] });
+    await assert.rejects(provider.run(newCorrection, retain), /authorization/i);
     assert.deepEqual(requested, []);
     assert.deepEqual(await provider.run(work, retain), report);
     assert.deepEqual(requested, ["/v1/responses/input_tokens", "/v1/responses"]);
@@ -121,4 +127,24 @@ test("provider blueprint recovery preserves Page identity and resolves only exac
   assert.throws(() => readBlueprint({
     ...plan, pages: [plan.pages[0], { ...plan.pages[1], sourceIds: ["missing"] }],
   }, ["owner"], true), /Unknown artifact reference/);
+});
+
+test("provider Page recovery quarantines unverified actions and preserves unresolved suggestions without wiring them", () => {
+  const page = {
+    path: "/", heading: "Home", searchTitle: "Home", searchDescription: "See our offer.",
+    sections: [{ heading: "Useful next step", body: "Read the service details.", sourceIds: ["owner", "owner"],
+      visual: { purpose: "Show the offer", brief: "Concept image", altIntent: "Show the setting", status: "asset-needed" } }],
+    actions: [{ label: "Account", kind: "existing-account", destination: "https://example.test/account" },
+      { label: "Our service", kind: "navigate", destination: "/service" }],
+    internalLinks: ["/service", "/unverified"],
+  };
+  const normalized = readPage(page, "/", ["/", "/service"], ["owner"], {}, true);
+  assert.deepEqual(normalized.actions, [{ ...page.actions[0], destination: null }, page.actions[1]]);
+  assert.deepEqual(normalized.internalLinks, ["/service"]);
+  assert.deepEqual(normalized.unresolvedLinks, ["/unverified"]);
+  assert.deepEqual(normalized.sections[0].sourceIds, ["owner"]);
+  assert.throws(() => readPage({ ...page, actions: [{ ...page.actions[1], destination: "/unknown" }] }, "/", ["/", "/service"], ["owner"], {}, true),
+    /Unknown Action destination/);
+  assert.throws(() => readPage({ ...page, internalLinks: ["https://example.test/"] }, "/", ["/", "/service"], ["owner"], {}, true),
+    /Invalid Page path/);
 });

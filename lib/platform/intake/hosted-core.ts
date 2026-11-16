@@ -6,7 +6,7 @@ import { protectedOwnerId, protectedOwnerScope, protectedOwnerSessionSeconds, pr
 import { ProtectedOperator } from "../wordpress-delivery/operator";
 import { IntakeService, type IntakeEvidence } from "./service";
 import { adaptiveOnboardingVersion, type PreparedUnderstanding } from "./adaptive";
-import { IntakeError, normalizeAnswers } from "./model";
+import { type IntakePortalWorkspace, IntakeError, normalizeAnswers } from "./model";
 import { sessionToken } from "./http";
 import { protectedInquiry } from "../contact/protected-inquiry";
 import { protectedDevelopmentDraft } from "../wordpress-delivery/cycle-measurement";
@@ -246,7 +246,10 @@ export async function hostedCoreRequest(request: Request) {
         .then(async scope => ({ workflowAvailable: true, workflow: await (await scope.open()).review(await scope.context()) }))
         .catch(() => undefined);
       return {
-        ...view, interviewEnabled: Boolean(app.interview), operations: await app.inquiry().catch(() => null),
+        ...view,
+        portal: { role: "operator", identity: active?.owner ? "MioPages owner" : "Authorized Operator",
+          account: "MioPages", site: "C0 development site", environment: "protected-development" } satisfies IntakePortalWorkspace,
+        interviewEnabled: Boolean(app.interview), operations: await app.inquiry().catch(() => null),
         sitePlanningEnabled: app.sitePlanningEnabled,
         ...workflowReview,
         ...(proposal && { sitePlanningReview: { ...reviewedSitePlanning(proposal), current: proposal.basis === sitePlanningBasis(view) } }),

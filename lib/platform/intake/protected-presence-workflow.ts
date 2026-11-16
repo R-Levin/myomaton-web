@@ -170,7 +170,7 @@ export async function workPresenceCase(workflow: PresenceWorkflow, current: Awai
 }
 
 export async function recoverRetainedPresenceOutput(workflow: PresenceWorkflow,
-  current: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>>, operation: "research" | "report" | "blueprint") {
+  current: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>>, operation: "research" | "report" | "blueprint" | "page") {
   const review = await workflow.review(current);
   if (!review?.recoverable || review.pendingOperation !== operation) throw Error("Retained workflow recovery unavailable");
   return workflow.recover(current, review.version);

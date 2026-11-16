@@ -1,5 +1,5 @@
 import { contactHttp } from "../contact/http";
-import { IntakeError } from "./model";
+import { IntakeError, type IntakePortalWorkspace } from "./model";
 import { loopbackOrigin } from "./availability";
 import type { ContactAbuseGuard } from "../contact/boundaries";
 import type { IntakeService } from "./service";
@@ -63,6 +63,8 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
   async function withWorkflow(view: Awaited<ReturnType<IntakeService["resume"]>>) {
     if (!workflow || !token) return view;
     return { ...view, workflowAvailable: true, workflow: await workflow.review(await service.workflowContext(token)),
+      portal: { role: "customer", identity: "Customer rehearsal participant", account: "MioPages C0 rehearsal",
+        site: "Disposable draft", environment: "local-rehearsal" } satisfies IntakePortalWorkspace,
       ...(snapshot && { firstParty: await snapshot() }) };
   }
   try {

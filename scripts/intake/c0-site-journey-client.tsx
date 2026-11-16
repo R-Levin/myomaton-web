@@ -4,6 +4,7 @@ import { prospectPriorities } from "../../lib/platform/intake/adaptive";
 import { prospectDirection, prospectPlanSeed } from "../../lib/platform/intake/prospect-direction";
 import { interviewDirection } from "../../lib/platform/intake/interview-direction";
 import { planningMessages, type PlanningFailure } from "../../lib/platform/intake/planning-diagnostics";
+import type { IntakePortalWorkspace } from "../../lib/platform/intake/model";
 import type { IntakeView } from "../../lib/platform/intake/service";
 
 import { SitePlanningReviewPanel } from "./site-planning-review-panel";
@@ -13,7 +14,7 @@ import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-p
 import type { reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
 
 type Operations = Awaited<ReturnType<typeof import("../../lib/platform/contact/protected-inquiry").protectedInquiry>>;
-type JourneyView = IntakeView & { firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
+type JourneyView = IntakeView & { portal?: IntakePortalWorkspace; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
   sitePlanningReview?: ReturnType<typeof reviewedSitePlanning> & { current: boolean } };
 async function request(endpoint: string, operation?: object, signal?: AbortSignal): Promise<JourneyView | null> {
   const response = await fetch(endpoint, {
@@ -164,8 +165,9 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
   const authored = evidenceDirection && !evidenceDirection.plan;
   const plan = activeReviewedPlan?.plan ?? evidenceDirection?.plan;
   const editorDraft = plan ?? (hosted && authored && view ? prospectPlanSeed(view.answers) : null);
+  const workspace = !locked ? view?.portal : undefined;
   return <div className={styles.shell}>
-    <header><strong>MioPages</strong><span>{hosted ? "Protected Operator development" : "Private local development"}</span>
+    <header><strong>MioPages</strong><span>{workspace ? (workspace.role === "operator" ? "Operator workspace" : "Customer rehearsal") : hosted ? "Protected Core" : "Private local development"}</span>
       {hosted && view && <button type="button" disabled={busy} onClick={async () => {
         setBusy(true);
         try {
@@ -178,6 +180,15 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
     </header>
     <main className={styles.card} aria-busy={busy}>
       <h1>Review your Web Presence</h1>
+      {workspace && <aside className={styles.portalContext} aria-label="Signed-in workspace">
+        <dl>
+          <div><dt>Signed in as</dt><dd>{workspace.identity}</dd></div>
+          <div><dt>Account</dt><dd>{workspace.account}</dd></div>
+          <div><dt>Site</dt><dd>{workspace.site}</dd></div>
+        </dl>
+        {workspace.environment === "local-rehearsal" && <p>Local rehearsal with simulated customer and Operator decisions.</p>}
+        {view?.workflowAvailable && <nav aria-label="Workspace"><a href="#business-report-and-website">Business report and website</a></nav>}
+      </aside>}
       {locked ? <form onSubmit={event => { event.preventDefault(); void unlock(); }}>
         {hosted && <div className={styles.field}><label htmlFor="owner-username">Username</label>
           <input id="owner-username" name="username" value="owner" autoComplete="username" readOnly /></div>}

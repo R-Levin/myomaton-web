@@ -74,6 +74,14 @@ export function questionsFor(version: string): Question[] {
 const onboardingQuestions = paidQuestions(questionsV2);
 export function fieldApplies(field: Field, answers: Answers) { return matches(field.when, answers) && (!field.whenAny || field.whenAny.some(c => matches(c, answers))); }
 // Keep low-level v1 helper defaults for existing callers; session consumers pass their stored version.
+export type IntakePortalWorkspace = {
+  role: "operator" | "customer";
+  identity: string;
+  account: string;
+  site: string;
+  environment: "protected-development" | "local-rehearsal";
+};
+
 export class IntakeError extends Error {
   constructor(public code: string, public status = 400, public fields: Record<string, string> = {}) { super(code); }
 }

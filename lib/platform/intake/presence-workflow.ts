@@ -267,7 +267,7 @@ export class PresenceWorkflow {
         case "direction": next = { ...state, direction: readDirection(output, ids) }; break;
         case "blueprint": next = { ...state, blueprint: readBlueprint(output, ids, state.mode === "provider") }; break;
         case "page": {
-          const page = readPage(output, work.path!, paths, ids, this.destinations);
+          const page = readPage(output, work.path!, paths, ids, this.destinations, state.mode === "provider");
           // Keep the exact sitemap order when selected pages are redrafted.
           const drafts = new Map([...state.pages, page].map(draft => [draft.path, draft]));
           next = { ...state, pages: paths.flatMap(path => drafts.get(path) ?? []) };

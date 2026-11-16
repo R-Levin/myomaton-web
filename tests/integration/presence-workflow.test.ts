@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import { once } from "node:events";
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
+import { setTimeout as delay } from "node:timers/promises";
+import { JSDOM } from "jsdom";
 import { createC0Onboarding } from "../../scripts/intake/c0-onboarding";
 import { workflowFixture } from "../../scripts/intake/presence-workflow-fixture";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { FirstPartyMeasurement, type MeasurementSource } from "../../lib/platform/measurement/first-party";
-import { PresenceWorkflow, type PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
+import { PresenceWorkflow, type PresenceWorkflowView, type WorkflowContext } from "../../lib/platform/intake/presence-workflow";
 import { IntakeService } from "../../lib/platform/intake/service";
 
 test("the existing local Core interface persists a report, correction, revised site and performance snapshot", async () => {
@@ -88,12 +90,80 @@ test("the existing local Core interface persists a report, correction, revised s
     await run("next");
     assert.equal(state!.next, "blueprint");
     const correction = "Ask existing-site visitors which booking or form path must survive the handoff.";
-    await run("correct", { finding: "existing-website", correction });
-    assert.equal(state!.direction, null);
-    assert.equal(state!.confirmation, null);
+    const reviewed = state;
+    const read = () => fetch(api, { headers: { Cookie: cookie, "X-Intake-Request": "1" } });
+    const input = { operation: "workflow-correct", version: reviewed.version, finding: "existing-website", correction };
+    assert.equal((await post({ ...input, correction: " " })).status, 400);
+    assert.equal((await post({ ...input, version: first.version })).status, 409);
+    assert.equal((await post({ ...input, actor: { role: "operator" } })).status, 400);
+    assert.equal((await fetch(api, { method: "POST", headers: {
+      Origin: origin, "Content-Type": "application/json", "X-Intake-Request": "1",
+    }, body: JSON.stringify(input) })).status, 401);
+    const { rows: [bound] } = await setup.pool.query(
+      "SELECT intake_id, payload->'sourceSnapshot' AS source FROM presence_workflow_events WHERE version=$1", [reviewed.version]);
+    const context: WorkflowContext = { ...bound.source, scope: setup.selection, intakeId: bound.intake_id };
+    const scoped = new PresenceWorkflow(setup.pool, workflowFixture);
+    await assert.rejects(scoped.correctReport(context, reviewed.version, input.finding, correction,
+      { id: "wrong-role", role: "operator", simulated: true }), { code: "unavailable" });
+    await assert.rejects(scoped.correctReport({ ...context, scope: { ...context.scope, webPresenceId: randomUUID() } },
+      reviewed.version, input.finding, correction, { id: "foreign-account", role: "customer", simulated: true }), { code: "draft_changed" });
+
+    const outputsBeforeCorrection = (await setup.pool.query("SELECT count(*)::int AS total FROM presence_workflow_outputs")).rows[0].total;
+    const browser = new JSDOM('<div id="onboarding"></div>', { pretendToBeVisual: true, runScripts: "outside-only", url: origin + "/onboarding" });
+    const page = browser.window.document;
+    const see = async (message: string) => {
+      for (let attempt = 0; attempt < 100; attempt++) {
+        if (page.body.textContent?.includes(message)) return;
+        await delay(20);
+      }
+      assert.fail("Expected correction browser state: " + message);
+    };
+    browser.window.fetch = (path, options) => {
+      assert.equal(path, "/api/onboarding");
+      const headers = new Headers(options?.headers);
+      headers.set("Cookie", cookie);
+      if (options?.method === "POST") headers.set("Origin", origin);
+      return fetch(api, { ...options, headers });
+    };
+    try {
+      browser.window.eval(boot);
+      await see("Customer rehearsal participant");
+      const heading = [...page.querySelectorAll("h5")].find(item => item.textContent ===
+        first.report?.findings.find(item => item.id === input.finding)?.heading);
+      const flag = heading?.closest("section")?.querySelector("button");
+      assert.equal(flag?.textContent, "Flag a correction");
+      flag?.click();
+      await see("Saving this correction pauses site planning");
+      const field = page.querySelector("textarea#workflow-correction");
+      assert.ok(field);
+      Object.getOwnPropertyDescriptor(browser.window.HTMLTextAreaElement.prototype, "value")?.set?.call(field, correction);
+      field.dispatchEvent(new browser.window.Event("input", { bubbles: true }));
+      await delay(20);
+      const save = [...page.querySelectorAll("button")].find(item => item.textContent === "Save correction for a new report");
+      assert.ok(save && !save.disabled);
+      save.click();
+      await see("Saved corrections");
+    } finally { browser.window.close(); }
+    const reloaded = await (await read()).json();
+    assert.equal(reloaded.portal.role, "customer");
+    assert.equal(reloaded.portal.environment, "local-rehearsal");
+    state = reloaded.workflow;
+    assert.equal(state.version, reviewed.version + 1);
+    assert.equal(state.direction, null);
+    assert.equal(state.confirmation, null);
+    assert.equal(state.next, "report");
+    assert.equal(state.corrections[0].text, correction);
+    assert.equal(state.corrections[0].actor.role, "customer");
+    assert.equal(state.corrections[0].reportDigest, fingerprint(reviewed.report));
+    assert.equal((await setup.pool.query("SELECT count(*)::int AS total FROM presence_workflow_outputs")).rows[0].total, outputsBeforeCorrection);
+    const { rows: [priorEvent] } = await setup.pool.query(
+      "SELECT payload FROM presence_workflow_events WHERE intake_id=$1 AND version=$2", [context.intakeId, reviewed.version]);
+    assert.deepEqual(priorEvent.payload.direction, reviewed.direction);
+    assert.deepEqual(priorEvent.payload.confirmation, reviewed.confirmation);
     await run("next");
     assert.equal(state!.report?.findings[1].body, correction);
     assert.equal(state!.report?.findings[0].body, first.report?.findings[0].body);
+    assert.equal((await post({ operation: "workflow-next", version: state.version })).status, 409);
     let progress = await run("confirm");
     for (let step = 0; progress.next !== "operator-review" && step < 12; step++) {
       progress = await run(progress.next === "editorial-review" ? "revise" : "next");
@@ -101,6 +171,7 @@ test("the existing local Core interface persists a report, correction, revised s
     assert.equal(progress.next, "operator-review");
     assert.equal(state!.pages.length, 2);
     assert.equal(state!.pages[1].sections[0].body, correction);
+    assert.equal(progress.direction?.approach, correction);
     assert.equal(state!.pages[0].actions.length, 2);
     assert.equal(state!.pages[0].actions[0].destination, null);
     assert.equal(state!.editorial?.concerns.length, 0);

@@ -69,7 +69,7 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
   const siteReview = workflow?.next === "editorial-review" || workflow?.next === "operator-review";
   const submit = (operation: string, extra?: object) => run({ operation: "workflow-" + operation,
     ...(workflow && { version: workflow.version }), ...extra });
-  return <section aria-label="Business report and website">
+  return <section id="business-report-and-website" aria-label="Business report and website">
     <h2>Business report and website</h2>
     <p className={styles.hint}>{hosted ? "Protected development review. Operator decisions apply to this candidate. Customer approval and publication are separate." : "Local rehearsal. Research and model responses are recorded examples. Customer and Operator decisions are simulated."}</p>
     {!workflow ? <button type="button" disabled={busy} onClick={() => void submit("start")}>{hosted ? "Start protected workflow" : "Start the local workflow"}</button> : <>
@@ -167,7 +167,8 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
             {action.kind === "navigate" && action.destination ?
               <button type="button" onClick={() => setSelected(action.destination!)} disabled={!workflow.pages.some(draft => draft.path === action.destination)}>{action.label}</button>
               : <span>{action.label} · {action.destination ?? "destination awaiting verification"}</span>}</li>)}</ul>
-          <details><summary>Search metadata and internal links</summary><p>{page.searchTitle}</p><p>{page.searchDescription}</p><p>{page.internalLinks.join(", ")}</p></details>
+          <details><summary>Search metadata and internal links</summary><p>{page.searchTitle}</p><p>{page.searchDescription}</p><p>{page.internalLinks.join(", ")}</p>
+            {page.unresolvedLinks && <p>Suggested paths awaiting verification: {page.unresolvedLinks.join(", ")}</p>}</details>
         </article>}
         {workflow.blueprint.articles.length > 0 && <details><summary>Planned Articles</summary>
           {workflow.blueprint.articles.map((article, i) => <p key={i}><strong>{article.title}</strong> · {article.question} · Relates to {article.target}</p>)}

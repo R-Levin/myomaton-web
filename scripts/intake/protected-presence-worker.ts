@@ -13,7 +13,8 @@ async function main() {
   const recoverResearch = action === "RECOVER-RETAINED-WORKFLOW-RESEARCH";
   const recoverReport = action === "RECOVER-RETAINED-WORKFLOW-REPORT";
   const recoverBlueprint = action === "RECOVER-RETAINED-WORKFLOW-BLUEPRINT";
-  const recoverFromCustody = recoverReport || recoverBlueprint;
+  const recoverPage = action === "RECOVER-RETAINED-WORKFLOW-PAGE";
+  const recoverFromCustody = recoverReport || recoverBlueprint || recoverPage;
   if (process.argv.length !== (activating ? 4 : 3) ||
       !(activating || inspecting || recoverResearch || recoverFromCustody || action === "WATCH-AUTHORIZED-WORKFLOW")) throw Error("Workflow command refused");
   const { workspace, pool, intake, token } = await openProtectedPresenceWorkspace();
@@ -43,7 +44,7 @@ async function main() {
     const grant = await privateWorkflowFile<PresenceWorkflowGrant>(workspace.grantFile, workspace.root);
     const workflow = await workflowCase.open();
     if (recoverResearch || recoverFromCustody) {
-      const operation = recoverResearch ? "research" : recoverBlueprint ? "blueprint" : "report";
+      const operation = recoverResearch ? "research" : recoverBlueprint ? "blueprint" : recoverPage ? "page" : "report";
       const review = await recoverRetainedPresenceOutput(workflow, await workflowCase.context(), operation);
       console.log(JSON.stringify({ status: review?.next, version: review?.version, failure: review?.failure }));
       if (review?.failure) process.exitCode = 1;

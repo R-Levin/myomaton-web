@@ -74,13 +74,16 @@ export function readDirection(value: unknown, ids: readonly string[]) {
   return { positioning: copy(direction.positioning), approach: copy(direction.approach),
     visitorDecisions: list(direction.visitorDecisions, copy), sourceIds: references(direction.sourceIds, ids) };
 }
-export function readBlueprint(value: unknown, ids: readonly string[], normalizeProviderReferences = false) {
+function citedSources(value: unknown, ids: readonly string[], normalizeProviderReferences: boolean) {
   // Source repetition carries no additional meaning. Validate every ID even when deduplicating.
-  const citedSources = (value: unknown) => references(normalizeProviderReferences && Array.isArray(value) ? [...new Set(value)] : value, ids);
+  return references(normalizeProviderReferences && Array.isArray(value) ? [...new Set(value)] : value, ids);
+}
+
+export function readBlueprint(value: unknown, ids: readonly string[], normalizeProviderReferences = false) {
   const blueprint = object(value, ["pages", "navigation", "articles"]);
   const pages = list(blueprint.pages, value => {
     const page = object(value, ["path", "label", "purpose", "sourceIds"]);
-    return { path: path(page.path), label: copy(page.label), purpose: copy(page.purpose), sourceIds: citedSources(page.sourceIds) };
+    return { path: path(page.path), label: copy(page.label), purpose: copy(page.purpose), sourceIds: citedSources(page.sourceIds, ids, normalizeProviderReferences) };
   });
   const paths = pages.map(page => page.path);
   unique(paths);
@@ -94,17 +97,17 @@ export function readBlueprint(value: unknown, ids: readonly string[], normalizeP
   return { pages, navigation: references(navigation, paths), articles: list(blueprint.articles, value => {
     const article = object(value, ["title", "question", "target", "sourceIds"]);
     const [target] = references([article.target], paths);
-    return { title: copy(article.title), question: copy(article.question), target, sourceIds: citedSources(article.sourceIds) };
+    return { title: copy(article.title), question: copy(article.question), target, sourceIds: citedSources(article.sourceIds, ids, normalizeProviderReferences) };
   }, false) };
 }
 export function readPage(value: unknown, exactPath: string, paths: readonly string[], ids: readonly string[],
-  destinations: Partial<Record<Exclude<typeof actionKinds[number], "navigate">, string>>) {
+  destinations: Partial<Record<Exclude<typeof actionKinds[number], "navigate">, string>>, normalizeProviderReferences = false) {
   const page = object(value, ["path", "heading", "searchTitle", "searchDescription", "sections", "actions", "internalLinks"]);
   if (page.path !== exactPath) throw Error("Page does not match the blueprint");
   const sections = list(page.sections, value => {
     const section = object(value, ["heading", "body", "sourceIds", "visual"]);
     const visual = object(section.visual, ["purpose", "brief", "altIntent", "status"]);
-    return { heading: copy(section.heading), body: copy(section.body), sourceIds: references(section.sourceIds, ids),
+    return { heading: copy(section.heading), body: copy(section.body), sourceIds: citedSources(section.sourceIds, ids, normalizeProviderReferences),
       visual: { purpose: copy(visual.purpose), brief: copy(visual.brief), altIntent: copy(visual.altIntent), status: choice(visual.status, visualStates) } };
   });
   const otherPaths = paths.filter(candidate => candidate !== exactPath);
@@ -112,13 +115,18 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
     const action = object(value, ["label", "kind", "destination"]);
     const kind = choice(action.kind, actionKinds);
     const destination = action.destination === null ? null : text(action.destination, 500);
-    if (kind === "navigate" ? !otherPaths.includes(destination ?? "") : destination !== null && destination !== destinations[kind]) {
-      throw Error("Unknown Action destination");
+    if (kind === "navigate" && !otherPaths.includes(destination ?? "")) throw Error("Unknown Action destination");
+    if (kind !== "navigate" && destination !== null && destination !== destinations[kind]) {
+      if (!normalizeProviderReferences) throw Error("Unknown Action destination");
+      return { label: copy(action.label), kind, destination: null };
     }
     return { label: copy(action.label), kind, destination };
   });
+  const links = normalizeProviderReferences ? [...new Set(list(page.internalLinks, item => path(item), false))] : undefined;
+  const unresolvedLinks = links?.filter(link => !otherPaths.includes(link));
   return { path: exactPath, heading: copy(page.heading), searchTitle: copy(page.searchTitle), searchDescription: copy(page.searchDescription),
-    sections, actions, internalLinks: references(page.internalLinks, otherPaths, false) };
+    sections, actions, internalLinks: links?.filter(link => otherPaths.includes(link)) ?? references(page.internalLinks, otherPaths, false),
+    ...(unresolvedLinks?.length && { unresolvedLinks }) };
 }
 export function readEditorial(value: unknown, paths: readonly string[]) {
   const editorial = object(value, ["summary", "concerns"]);

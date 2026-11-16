@@ -50,4 +50,9 @@
 .sourceArchive summary, .sourceReferences summary { cursor: pointer; font-weight: 600; }
 .sourceReferences li { margin-bottom: .75rem; }
 .sourceRecord { white-space: pre-wrap; }
+.portalContext { padding: .85rem 1rem; margin-block: 1rem; border: 1px solid #c8b8eb; border-radius: .5rem; }
+.portalContext dl { display: flex; flex-wrap: wrap; gap: .5rem 1.75rem; margin: 0 0 .6rem; }
+.portalContext dt { color: #574763; font-size: .85rem; }
+.portalContext dd { margin: 0; font-weight: bold; }
+.card .portalContext p { margin: .4rem 0; font-size: .9rem; }
 @media (max-width: 480px) { .field { margin-bottom: 1.5rem; } .actions { margin-top: 1.5rem; } .shell header { font-size: .9rem; } }
