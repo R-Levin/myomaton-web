@@ -10,6 +10,8 @@ import { disposableCluster } from "../backup/disposable-cluster";
 import { migrateWithBootstrapCompatibility } from "../db/bootstrap";
 import { developmentGuard } from "../../lib/platform/contact/boundaries";
 import { normalizeKnowledge, normalizeOffering } from "../../lib/platform/canonical/model";
+import { writeCanonical } from "../../lib/platform/canonical/writes";
+import { readMyBusiness } from "../../lib/platform/intake/my-business";
 import { intakeHttp, sessionToken } from "../../lib/platform/intake/http";
 import { IntakeService, type IntakeEvidence } from "../../lib/platform/intake/service";
 import { prepareC0, prepareC2 } from "./adaptive-sources";
@@ -71,6 +73,16 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
     let localSnapshot: (() => ReturnType<FirstPartyMeasurement["snapshot"]>) | undefined;
     if (runWorkflow) {
       await pool.query(await readFile(new URL("../../lib/platform/measurement/first-party.sql", import.meta.url), "utf8"));
+      const current = reviewed.after.business_knowledge.find(row => row.web_presence_id === reviewed.target.webPresenceId)!;
+      const offer = reviewed.after.offerings.find(row => row.web_presence_id === reviewed.target.webPresenceId)!;
+      const knowledge = normalizeKnowledge(current.payload);
+      const offering = normalizeOffering(offer.payload);
+      const creation = { webPresenceId: selection.webPresenceId, expectedVersion: null, expectedFingerprint: null,
+        changeReason: "Load approved repository C0 records into the disposable workspace" };
+      await writeCanonical(pool, { ...creation, domain: "knowledge", id: randomUUID(), payload: knowledge,
+        responsibleIdentity: knowledge.approval.by });
+      await writeCanonical(pool, { ...creation, domain: "offering", id: randomUUID(), payload: { ...offering, actionIds: [] },
+        responsibleIdentity: offering.approval.by, offering: { type: "service", status: "active", key: offer.key, name: offer.name } });
       const measurement = new FirstPartyMeasurement(pool);
       const end = Date.now();
       const iso = (offset: number) => new Date(end + offset).toISOString();
@@ -119,7 +131,9 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
             if (accessCookie && sessionToken(request, accessCookieName) !== accessCookie) {
               return send(401, "application/json", '{"error":"local_access_required"}');
             }
-            const response = await intakeHttp(request, intake, abuse, true, false, workflow, localSnapshot);
+            const response = await intakeHttp(request, intake, abuse, true, false, workflow, {
+              snapshot: localSnapshot, ...(workflow && { business: (id: string) => readMyBusiness(pool, id) }),
+            });
             const body = await response.text();
             res.writeHead(response.status, { ...headers, ...Object.fromEntries(response.headers) }).end(body);
           } else if (req.method !== "GET") send(405, "text/plain", "Unsupported request.");

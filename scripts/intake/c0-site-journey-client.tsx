@@ -9,12 +9,14 @@ import type { IntakeView } from "../../lib/platform/intake/service";
 
 import { SitePlanningReviewPanel } from "./site-planning-review-panel";
 import { isPresenceWorkflowWorking, PresenceWorkflowPanel } from "./presence-workflow-panel";
+import type { MyBusinessView } from "../../lib/platform/intake/my-business";
+import { MyBusinessPanel } from "./my-business-panel";
 import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
 import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-party";
 import type { reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
 
 type Operations = Awaited<ReturnType<typeof import("../../lib/platform/contact/protected-inquiry").protectedInquiry>>;
-type JourneyView = IntakeView & { portal?: IntakePortalWorkspace; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
+type JourneyView = IntakeView & { portal?: IntakePortalWorkspace; myBusiness?: MyBusinessView; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
   sitePlanningReview?: ReturnType<typeof reviewedSitePlanning> & { current: boolean } };
 async function request(endpoint: string, operation?: object, signal?: AbortSignal): Promise<JourneyView | null> {
   const response = await fetch(endpoint, {
@@ -187,7 +189,9 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           <div><dt>Site</dt><dd>{workspace.site}</dd></div>
         </dl>
         {workspace.environment === "local-rehearsal" && <p>Local rehearsal with simulated customer and Operator decisions.</p>}
-        {view?.workflowAvailable && <nav aria-label="Workspace"><a href="#business-report-and-website">Business report and website</a></nav>}
+        {view?.workflowAvailable && <nav aria-label="Workspace">
+          {view.myBusiness && <a href="#my-business">My Business</a>}{" "}<a href="#business-report-and-website">Business report and website</a>
+        </nav>}
       </aside>}
       {locked ? <form onSubmit={event => { event.preventDefault(); void unlock(); }}>
         {hosted && <div className={styles.field}><label htmlFor="owner-username">Username</label>
@@ -200,7 +204,10 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
       </form> : !view ? <>
         <p>Continue with the business information you already provided.</p>
         <button disabled={busy || error} onClick={() => void run({ operation: "begin" })}>Resume retained onboarding</button>
-      </> : view.workflowAvailable ? <PresenceWorkflowPanel hosted={hosted} workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run} /> : <>
+      </> : view.workflowAvailable ? <>
+        {view.myBusiness && <MyBusinessPanel business={view.myBusiness} />}
+        <PresenceWorkflowPanel hosted={hosted} workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run} />
+      </> : <>
         <h2>What we understand</h2>
         <p>MioPages is transitioning to one managed Web Presence service, with Launch followed by Ongoing care. Earlier site observations and Review material are kept with their original sources.</p>
         {view.prepared && <p className={styles.hint}>{view.prepared.reviewGap}</p>}

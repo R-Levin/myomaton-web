@@ -7,6 +7,7 @@ import { JSDOM } from "jsdom";
 import { createC0Onboarding } from "../../scripts/intake/c0-onboarding";
 import { workflowFixture } from "../../scripts/intake/presence-workflow-fixture";
 import { fingerprint } from "../../lib/platform/canonical/model";
+import { inspectCanonical, writeCanonical } from "../../lib/platform/canonical/writes";
 import { FirstPartyMeasurement, type MeasurementSource } from "../../lib/platform/measurement/first-party";
 import { PresenceWorkflow, type PresenceWorkflowView, type WorkflowContext } from "../../lib/platform/intake/presence-workflow";
 import { IntakeService } from "../../lib/platform/intake/service";
@@ -52,6 +53,29 @@ test("the existing local Core interface persists a report, correction, revised s
     const post = (value: unknown) => fetch(api, { method: "POST", headers: {
       Origin: origin, Cookie: cookie, "Content-Type": "application/json", "X-Intake-Request": "1",
     }, body: JSON.stringify(value) });
+    const foreignOrganization = randomUUID(), foreignPresence = randomUUID();
+    await setup.pool.query("INSERT INTO organizations(id,name,status) VALUES($1,'Unrelated business','active')", [foreignOrganization]);
+    await setup.pool.query("INSERT INTO web_presences(id,organization_id,name,status) VALUES($1,$2,'Unrelated business','active')", [foreignPresence, foreignOrganization]);
+    const approved = { by: "Fixture owner", at: "2026-01-01T00:00:00Z", scope: "public" };
+    const evidence = { sourceKind: "customer", sourceReference: "Private source reference",
+      visibility: "public", confirmation: "confirmed", confirmedBy: approved.by, confirmedAt: approved.at };
+    await writeCanonical(setup.pool, { domain: "knowledge", id: randomUUID(), webPresenceId: foreignPresence, expectedVersion: null,
+      expectedFingerprint: null, responsibleIdentity: approved.by, changeReason: "Foreign workspace access regression",
+      payload: { identityEvidence: [], approval: approved,
+        entries: [{ key: "foreign-test", kind: "constraint", value: "Foreign business detail", evidence }] } });
+    const { rows: [{ id: knowledgeId, payload: known }] } = await setup.pool.query(
+      "SELECT id, payload FROM business_knowledge WHERE web_presence_id=$1", [setup.selection.webPresenceId]);
+    const guard = await inspectCanonical(setup.pool, "knowledge", setup.selection.webPresenceId, knowledgeId);
+    assert.ok(guard);
+    await writeCanonical(setup.pool, { domain: "knowledge", id: knowledgeId, webPresenceId: setup.selection.webPresenceId,
+      expectedVersion: Number(guard.row.version), expectedFingerprint: guard.fingerprint, responsibleIdentity: approved.by,
+      changeReason: "Workspace evidence visibility regression", payload: { ...known, approval: approved, entries: [
+        ...known.entries,
+        { key: "internal-test", kind: "constraint", value: "Internal business detail", evidence: { ...evidence, visibility: "internal" } },
+        { key: "provisional-test", kind: "constraint", value: "Provisional business detail",
+          evidence: { sourceKind: "customer", sourceReference: evidence.sourceReference, visibility: "public", confirmation: "provisional" } },
+      ] } });
+    assert.equal((await post({ operation: "begin", webPresenceId: foreignPresence })).status, 400);
     const begin = await post({ operation: "begin" });
     assert.equal(begin.status, 200);
     const opened = await begin.json();
@@ -60,6 +84,9 @@ test("the existing local Core interface persists a report, correction, revised s
     assert.equal(opened.firstParty.counts["contact-accepted"], 0);
     assert.equal(opened.firstParty.customerOutcome, null);
     assert.equal(opened.firstParty.environment, "synthetic");
+    assert.ok(opened.myBusiness.facts.some((fact: { kind: string }) => fact.kind === "audience"));
+    assert.equal(opened.myBusiness.offerings.length, 1);
+    assert.doesNotMatch(JSON.stringify(opened.myBusiness), /Foreign business detail|Internal business detail|Provisional business detail|Private source reference/);
     const newDraft = begin.headers.get("set-cookie")!.split(";")[0];
     assert.match(newDraft, /^miopages_presence_workflow_draft=/u);
     cookie += "; " + newDraft;
@@ -128,6 +155,8 @@ test("the existing local Core interface persists a report, correction, revised s
     try {
       browser.window.eval(boot);
       await see("Customer rehearsal participant");
+      await see("My Business");
+      assert.match(page.querySelector("#my-business")?.textContent ?? "", /Who you serve.*Confirmed/u);
       const heading = [...page.querySelectorAll("h5")].find(item => item.textContent ===
         first.report?.findings.find(item => item.id === input.finding)?.heading);
       const flag = heading?.closest("section")?.querySelector("button");
@@ -147,6 +176,7 @@ test("the existing local Core interface persists a report, correction, revised s
     const reloaded = await (await read()).json();
     assert.equal(reloaded.portal.role, "customer");
     assert.equal(reloaded.portal.environment, "local-rehearsal");
+    assert.deepEqual(reloaded.myBusiness, opened.myBusiness);
     state = reloaded.workflow;
     assert.equal(state.version, reviewed.version + 1);
     assert.equal(state.direction, null);

@@ -6,6 +6,7 @@ import type { IntakeService } from "./service";
 import { newResumeToken } from "./service";
 import type { PresenceWorkflow } from "./presence-workflow";
 import type { PerformanceSnapshot } from "../measurement/first-party";
+import type { MyBusinessView } from "./my-business";
 
 export const intakeCookie = "miopages_intake";
 
@@ -48,7 +49,9 @@ export function sessionToken(request: Request, cookieName = intakeCookie) {
   return /^[a-f0-9]{64}$/.test(token) ? token : null;
 }
 export async function intakeHttp(request: Request, service: IntakeService, abuse: ContactAbuseGuard, enabled: boolean, sharedDevelopment = false,
-  workflow?: PresenceWorkflow, snapshot?: () => Promise<PerformanceSnapshot>) {
+  workflow?: PresenceWorkflow, workspace?: {
+    snapshot?: () => Promise<PerformanceSnapshot>; business?: (webPresenceId: string) => Promise<MyBusinessView>;
+  }) {
   // Loopback cookies are shared across ports. This disposable workflow must
   // never adopt the resume cookie of an earlier local intake.
   const cookieName = workflow ? "miopages_presence_workflow_draft" :
@@ -65,7 +68,8 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
     return { ...view, workflowAvailable: true, workflow: await workflow.review(await service.workflowContext(token)),
       portal: { role: "customer", identity: "Customer rehearsal participant", account: "MioPages C0 rehearsal",
         site: "Disposable draft", environment: "local-rehearsal" } satisfies IntakePortalWorkspace,
-      ...(snapshot && { firstParty: await snapshot() }) };
+      ...(workspace?.snapshot && { firstParty: await workspace.snapshot() }),
+      ...(workspace?.business && { myBusiness: await workspace.business(service.selection.webPresenceId) }) };
   }
   try {
     // Scope-only guard avoids storing IPs/contact data. Not a production spam defense.
