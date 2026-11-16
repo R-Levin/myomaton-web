@@ -48,6 +48,18 @@ test("the owner sees an operational status before the report and decisions with 
     assert.ok(reviewed.includes(text), text);
   }
   assert.doesNotMatch(reviewed, /source body marker|<details[^>]*\bopen[=>\s]/u);
+  const site = new JSDOM(render({
+    ...pending, version: 11, next: "operator-review",
+    editorial: { summary: "Review the offer.", concerns: [] },
+    pages: [{
+      path: "/", heading: "Home", searchTitle: "Home", searchDescription: "Home", sections: [], internalLinks: [],
+      unresolvedLinks: ["/undeclared"],
+      actions: [{ label: "Existing account", kind: "existing-account", destination: null },
+        { label: "Read Home", kind: "navigate", destination: null, unresolvedDestination: "/" }],
+    }],
+  })).window.document.querySelector('[aria-label="Unresolved destinations"]');
+  assert.match(site?.textContent ?? "", /Suggested path \/undeclared.*Existing account needs a verified destination.*Read Home points back to this page/u);
+  assert.equal(site?.querySelector("a, button"), null);
 });
 
 test("the signed-in browser follows a saved development continuation to the website proposal without another click", async () => {

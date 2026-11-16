@@ -143,6 +143,10 @@ test("provider Page recovery quarantines unverified actions and preserves unreso
   assert.deepEqual(normalized.internalLinks, ["/service"]);
   assert.deepEqual(normalized.unresolvedLinks, ["/unverified"]);
   assert.deepEqual(normalized.sections[0].sourceIds, ["owner"]);
+  const selfNavigation = { ...page, sections: normalized.sections, actions: [{ label: "See this page", kind: "navigate", destination: "/" }] };
+  assert.deepEqual(readPage(selfNavigation, "/", ["/", "/service"], ["owner"], {}, true).actions,
+    [{ label: "See this page", kind: "navigate", destination: null, unresolvedDestination: "/" }]);
+  assert.throws(() => readPage(selfNavigation, "/", ["/", "/service"], ["owner"], {}), /Unknown Action destination/);
   assert.throws(() => readPage({ ...page, actions: [{ ...page.actions[1], destination: "/unknown" }] }, "/", ["/", "/service"], ["owner"], {}, true),
     /Unknown Action destination/);
   assert.throws(() => readPage({ ...page, internalLinks: ["https://example.test/"] }, "/", ["/", "/service"], ["owner"], {}, true),

@@ -115,7 +115,12 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
     const action = object(value, ["label", "kind", "destination"]);
     const kind = choice(action.kind, actionKinds);
     const destination = action.destination === null ? null : text(action.destination, 500);
-    if (kind === "navigate" && !otherPaths.includes(destination ?? "")) throw Error("Unknown Action destination");
+    if (kind === "navigate" && !otherPaths.includes(destination ?? "")) {
+      if (normalizeProviderReferences && destination === exactPath) {
+        return { label: copy(action.label), kind, destination: null, unresolvedDestination: destination };
+      }
+      throw Error("Unknown Action destination");
+    }
     if (kind !== "navigate" && destination !== null && destination !== destinations[kind]) {
       if (!normalizeProviderReferences) throw Error("Unknown Action destination");
       return { label: copy(action.label), kind, destination: null };

@@ -67,6 +67,13 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
   const working = isPresenceWorkflowWorking(workflow);
   const step = workflow && activeStep[workflow.pendingOperation ?? workflow.next];
   const siteReview = workflow?.next === "editorial-review" || workflow?.next === "operator-review";
+  const pendingLinks = workflow?.pages.flatMap(({ path, heading, unresolvedLinks, actions }) => {
+    const paths = (unresolvedLinks ?? []).map(link => `Suggested path ${link} has no verified destination.`);
+    const inactive = actions.filter(action => action.destination === null).map(action => action.unresolvedDestination
+      ? `${action.label} points back to this page (${action.unresolvedDestination}). Review where it should lead.`
+      : `${action.label} needs a verified destination.`);
+    return [...paths, ...inactive].map((requirement, index) => ({ key: path + ":" + index, heading, requirement }));
+  }) ?? [];
   const submit = (operation: string, extra?: object) => run({ operation: "workflow-" + operation,
     ...(workflow && { version: workflow.version }), ...extra });
   return <section id="business-report-and-website" aria-label="Business report and website">
@@ -177,6 +184,11 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
       {workflow.editorial && <section aria-label="Editorial review">
         <h3>Editorial review</h3><p>{workflow.editorial.summary}</p>
         <ul>{workflow.editorial.concerns.map(({ path, concern }, i) => <li key={i}>{path} · {concern}</li>)}</ul>
+        {pendingLinks.length > 0 && <section aria-label="Unresolved destinations">
+          <h4>Unresolved destinations</h4>
+          <p>These paths and actions are inactive until their destinations are verified.</p>
+          <ul>{pendingLinks.map(({ key, heading, requirement }) => <li key={key}><strong>{heading}</strong> · {requirement}</li>)}</ul>
+        </section>}
         {workflow.next === "editorial-review" && <button type="button" disabled={busy} onClick={() => void submit("revise")}>Queue the flagged pages for revision</button>}
         {workflow.next === "operator-review" && <button type="button" disabled={busy} onClick={() => void submit("review")}>{hosted ? "Record Operator site review" : "Record simulated Operator review"}</button>}
         {workflow.operatorReview && <p>Operator review saved. WordPress preparation requires separate authorization.</p>}
