@@ -4,6 +4,7 @@ import { fingerprint, object, text } from "../canonical/model";
 import type { DeploymentSelection } from "../managed-sites/deployment";
 import type { EntryIntent } from "./model";
 import { IntakeError } from "./model";
+import { editorialDecision, editorialFindings, withEditorialHistory, type EditorialDecision, type EditorialFinding } from "./presence-editorial-decisions";
 import { presenceVisualPlacement, type PresenceVisual, type PresenceVisualOperations } from "./presence-workflow-visual";
 import {
   ArtifactValidationError, readBlueprint, readDirection, readEditorial, readPage, readReport, type ArtifactIssue, type PresenceEvidence,
@@ -48,6 +49,8 @@ type State = {
   blueprint: WorkflowBlueprint | null;
   pages: WorkflowPage[];
   editorial: WorkflowEditorial | null;
+  editorialFindings?: EditorialFinding[];
+  editorialDecisions?: EditorialDecision[];
   revisionRequest?: RevisionRequest | null;
   operatorReview: Decision | null;
   work: Work | null;
@@ -130,6 +133,21 @@ class WorkflowStore {
   }
 }
 
+function savedEditorialFindings(state: State) {
+  return state.editorialFindings ?? editorialFindings(state.editorial, state.version);
+}
+
+function editorialProgress(state: State) {
+  const findings = withEditorialHistory(savedEditorialFindings(state), state.editorialDecisions ?? []);
+  const pages = new Map(state.pages.map(page => [page.path, page]));
+  const assigned = findings.flatMap(finding => {
+    const decision = finding.history.at(-1);
+    return decision?.status === "assigned" && decision.pages.every(({ path, baseline }) =>
+      pages.has(path) && fingerprint(pages.get(path)) === baseline) ? [{ finding, decision }] : [];
+  });
+  return { findings, assigned, open: findings.some(finding => finding.history.at(-1)?.status !== "resolved") };
+}
+
 function nextTask(state: State): Task | null {
   if (!state.research) return { operation: "research" };
   if (!state.report) return { operation: "report" };
@@ -182,12 +200,17 @@ export class PresenceWorkflow {
   private view(context: WorkflowContext, state: State | null) {
     if (!state) return null;
     const current = state.contextDigest === fingerprint(context);
+    const editorial = editorialProgress(state);
+    const canQueueEditorialRevision = current && Boolean(state.editorial) && !state.work && !state.operatorReview &&
+      (state.revisionRequest?.ordinal ?? 0) < (this.operations.maxEditorialRevisions ?? 1) &&
+      Boolean(state.editorial?.concerns.length || editorial.assigned.length);
     const next = !current ? "evidence-changed" : state.failure ? "recover" : state.work ? "in-progress" :
       nextTask(state)?.operation ?? (!state.confirmation ? "customer-review" :
-        state.editorial && (state.editorial.concerns.length || state.editorial.unassigned?.length) ? "editorial-review" :
+        state.editorial && (state.editorial.concerns.length || editorial.open) ? "editorial-review" :
           !state.operatorReview ? "operator-review" : "review-complete");
-    const { research, report, confirmation, corrections, direction, blueprint, pages, editorial, operatorReview, version, mode, failure } = state;
-    return { version, mode, contextDigest: state.contextDigest, research, report, confirmation, corrections, direction, blueprint, pages, editorial, operatorReview,
+    const { research, report, confirmation, corrections, direction, blueprint, pages, operatorReview, version, mode, failure } = state;
+    return { version, mode, contextDigest: state.contextDigest, research, report, confirmation, corrections, direction, blueprint, pages, editorial: state.editorial, operatorReview,
+      ...(editorial.findings.length > 0 && { editorialFindings: editorial.findings }), canQueueEditorialRevision,
       failure, ...(failure === "output-invalid" && state.artifactIssue && { artifactIssue: state.artifactIssue }),
       next, pendingOperation: state.work?.operation ?? null, recoverable: current && Boolean(state.work && (state.failure || state.work.until <= this.clock())),
       sources: state.sourceSnapshot.evidence, limitations: state.sourceSnapshot.limitations,
@@ -281,7 +304,12 @@ export class PresenceWorkflow {
           next = { ...state, pages: paths.flatMap(path => drafts.get(path) ?? []) };
           break;
         }
-        case "editorial": next = { ...state, editorial: readEditorial(output, paths, provider) }; break;
+        case "editorial": {
+          const editorial = readEditorial(output, paths, provider);
+          next = { ...state, editorial, editorialFindings: [...savedEditorialFindings(state),
+            ...editorialFindings(editorial, state.version + 1)] };
+          break;
+        }
       }
     } catch (error) {
       return this.fail(context, state, "output-invalid", error instanceof ArtifactValidationError ? error.issue : "shape-or-content");
@@ -300,6 +328,7 @@ export class PresenceWorkflow {
     return this.view(context, await this.store.append(context, version, { ...state,
       corrections: [...state.corrections.filter(item => item.finding.id !== finding), note],
       report: null, confirmation: null, direction: null, blueprint: null, pages: [], editorial: null, revisionRequest: null, operatorReview: null,
+      editorialFindings: savedEditorialFindings(state),
       ...(state.retry && { retry: { ...state.retry, previous: "" } }),
     }));
   }
@@ -318,18 +347,36 @@ export class PresenceWorkflow {
       retry: { previous: attempt.attempt, count: count + 1 } }));
   }
 
+  async decideEditorialFinding(context: WorkflowContext, version: number, actor: Actor, input: unknown) {
+    const state = await this.current(context, version);
+    if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || (!actor.simulated && !actor.authority)) {
+      throw new IntakeError("unavailable", 403);
+    }
+    if (!state.editorial || state.work || state.operatorReview) throw new IntakeError("workflow_not_ready", 409);
+    const { findings } = editorialProgress(state);
+    const decision = editorialDecision(input, findings, state.pages, state.sourceSnapshot.evidence, actor, version, this.clock());
+    return this.view(context, await this.store.append(context, version, {
+      ...state, editorialFindings: savedEditorialFindings(state), editorialDecisions: [...state.editorialDecisions ?? [], decision],
+    }));
+  }
+
   async requestEditorialRevision(context: WorkflowContext, version: number, actor: Actor) {
     const state = await this.current(context, version);
     if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture")) throw new IntakeError("unavailable", 403);
-    if (state.work || !state.editorial?.concerns.length || state.editorial.unassigned?.length || state.operatorReview) {
-      throw new IntakeError("workflow_not_ready", 409);
-    }
-    const paths = [...new Set(state.editorial.concerns.map(item => item.path))];
+    if (!state.editorial || state.work || state.operatorReview) throw new IntakeError("workflow_not_ready", 409);
+    const { assigned } = editorialProgress(state);
+    const concerns = [...state.editorial.concerns, ...assigned.flatMap(({ finding, decision }) =>
+      decision.pages.map(page => ({ path: page.path, concern: finding.concern })))];
+    if (!concerns.length) throw new IntakeError("workflow_not_ready", 409);
+    const paths = [...new Set(concerns.map(item => item.path))];
     const ordinal = (state.revisionRequest?.ordinal ?? 0) + 1;
     if (ordinal > (this.operations.maxEditorialRevisions ?? 1)) throw new IntakeError("workflow_not_ready", 409);
-    const revisionRequest = { paths, audit: state.editorial, priorPages: state.pages.filter(page => paths.includes(page.path)),
-      actor, at: new Date(this.clock()).toISOString(), ordinal };
+    const at = new Date(this.clock()).toISOString();
+    const revisionRequest = { paths, audit: { summary: state.editorial.summary, concerns }, priorPages: state.pages.filter(page => paths.includes(page.path)),
+      actor, at, ordinal };
+    const queued = assigned.map(({ decision }) => ({ ...decision, status: "queued" as const, actor, at, basedOnVersion: version }));
     return this.view(context, await this.store.append(context, version, { ...state, revisionRequest, editorial: null,
+      editorialFindings: savedEditorialFindings(state), editorialDecisions: [...state.editorialDecisions ?? [], ...queued],
       pages: state.pages.filter(page => !paths.includes(page.path)) }));
   }
 
@@ -470,11 +517,11 @@ export class PresenceWorkflow {
   async reviewCandidate(context: WorkflowContext, version: number, actor: Actor) {
     const state = await this.current(context, version);
     if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture")) throw new IntakeError("unavailable", 403);
-    if (!state.editorial || state.editorial.concerns.length || state.editorial.unassigned?.length || state.work || state.operatorReview) {
+    if (!state.editorial || state.editorial.concerns.length || editorialProgress(state).open || state.work || state.operatorReview) {
       throw new IntakeError("workflow_not_ready", 409);
     }
     const target = fingerprint({ confirmation: state.confirmation?.target, direction: state.direction, blueprint: state.blueprint,
-      pages: state.pages, editorial: state.editorial });
+      pages: state.pages, editorial: state.editorial, ...(state.editorialDecisions?.length && { editorialDecisions: state.editorialDecisions }) });
     const operatorReview = { actor, at: new Date(this.clock()).toISOString(), target, decision: "reviewed" } as const;
     return this.view(context, await this.store.append(context, version, { ...state, operatorReview }));
   }

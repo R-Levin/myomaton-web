@@ -1,4 +1,5 @@
 import type { MyBusinessView } from "../../lib/platform/intake/my-business";
+import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
 
 const factLabels = {
   audience: "Who you serve", goal: "Business goals", "service-area": "Where you serve",
@@ -7,7 +8,10 @@ const factLabels = {
 
 const sources = { customer: "Customer", operator: "Operator", "public-reference": "Public reference" };
 
-export function MyBusinessPanel({ business }: { business: MyBusinessView }) {
+export function MyBusinessPanel({ business, corrections = [] }: {
+  business: MyBusinessView; corrections?: PresenceWorkflowView["corrections"];
+}) {
+  const customerCorrections = corrections.filter(item => item.actor.role === "customer");
   const descriptions = (item: MyBusinessView["facts"][number] | MyBusinessView["offerings"][number]) =>
     `Confirmed ${item.confirmedAt.slice(0, 10)} · ${sources[item.source]} source · revision ${item.revision}`;
   return <section id="my-business" aria-labelledby="my-business-heading">
@@ -27,6 +31,11 @@ export function MyBusinessPanel({ business }: { business: MyBusinessView }) {
         <ul>{item.history.map(prior => <li key={prior.revision}>Revision {prior.revision} · {prior.confirmedAt.slice(0, 10)} · {prior.name} · {prior.summary}</li>)}</ul>
       </details>}
     </article>)}
+    {customerCorrections.length > 0 && <section aria-label="Your submitted corrections">
+      <h3>Your submitted corrections</h3>
+      <p>These notes are kept with the report. Confirmed business records above have their own review.</p>
+      <ul>{customerCorrections.map(item => <li key={item.finding.id}><strong>{item.finding.heading}</strong> · {item.text}</li>)}</ul>
+    </section>}
     <p><a href="#business-report-and-website">Review Core’s business report and flag an interpretation</a></p>
   </section>;
 }

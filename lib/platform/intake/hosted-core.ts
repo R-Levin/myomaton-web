@@ -239,16 +239,20 @@ export async function hostedCoreRequest(request: Request) {
         return context;
       } catch { return null; }
     };
-    const includeOperations = async (view: Awaited<ReturnType<IntakeService["resume"]>>) => {
+    const includeOperations = async (view: Awaited<ReturnType<IntakeService["resume"]>>,
+      context: NonNullable<Awaited<ReturnType<typeof authenticate>>>) => {
       const proposal = view.sitePlanning?.proposal;
       // A pending or invalid workflow grant must not interrupt the prior protected owner review.
       const workflowReview = app.presenceCase && await app.presenceCase()
         .then(async scope => ({ workflowAvailable: true, workflow: await (await scope.open()).review(await scope.context()) }))
         .catch(() => undefined);
+      const canTriage = workflowReview?.workflow?.editorial &&
+        await app.operators.authorize(context, "prepare-site-proposal", app.selection).then(() => true, () => false);
       return {
         ...view,
         portal: { role: "operator", identity: active?.owner ? "MioPages owner" : "Authorized Operator",
-          account: "MioPages", site: "C0 development site", environment: "protected-development" } satisfies IntakePortalWorkspace,
+          account: "MioPages", site: "C0 development site", environment: "protected-development",
+          ...(canTriage && { editorialDecisionsAvailable: true }) } satisfies IntakePortalWorkspace,
         interviewEnabled: Boolean(app.interview), operations: await app.inquiry().catch(() => null),
         sitePlanningEnabled: app.sitePlanningEnabled,
         ...workflowReview,
@@ -256,7 +260,8 @@ export async function hostedCoreRequest(request: Request) {
       };
     };
     if (request.method === "GET") {
-      if (!await authenticate(credential, active?.owner)) return reply({ error: "sign_in_required" }, 401);
+      const context = await authenticate(credential, active?.owner);
+      if (!context) return reply({ error: "sign_in_required" }, 401);
       try {
         const image = request.headers.get("x-miopages-workflow-image");
         if (image !== null) {
@@ -265,7 +270,7 @@ export async function hostedCoreRequest(request: Request) {
           const bytes = await (await scope.open()).visualImage(await scope.context(), image);
           return new Response(new Uint8Array(bytes), { headers: { ...headers, "Content-Type": "image/png" } });
         }
-        return reply(await includeOperations(await app.intake.resume(app.draftToken)));
+        return reply(await includeOperations(await app.intake.resume(app.draftToken), context));
       }
       catch (error) {
         if (request.headers.has("x-miopages-workflow-image")) return reply({ error: "unavailable" }, 404);
@@ -313,14 +318,15 @@ export async function hostedCoreRequest(request: Request) {
       try { actor = await app.operators.authorize(context, value.operation === "workflow-visual-decide" ? "review-private-stage" : "prepare-site-proposal", app.selection); }
       catch { refusal = reply({ error: "authorization_required" }, 403); return null; }
       try {
-        const view = async (result: ReturnType<IntakeService["resume"]>) => includeOperations(await result);
+        const view = async (result: ReturnType<IntakeService["resume"]>) => includeOperations(await result, context);
         const version = Number(value.version);
         if (typeof value.operation === "string" && value.operation.startsWith("workflow-") && app.presenceCase) {
           const scope = await app.presenceCase();
           await reviewWorkflowChange(await scope.open(), await scope.context(), value.operation, version,
             { id: actor.operatorId, role: "operator", simulated: false,
-              ...(String(value.operation).startsWith("workflow-visual-") && { authority: actor.authorityReference }) },
-            { finding: value.finding, correction: value.correction, visual: value.visual });
+              ...((value.operation.startsWith("workflow-visual-") || value.operation === "workflow-editorial-decision") &&
+                { authority: actor.authorityReference }) },
+            { finding: value.finding, correction: value.correction, visual: value.visual, editorial: value.editorial });
           return await view(app.intake.resume(app.draftToken));
         }
         if (typeof value.operation === "string" && value.operation.startsWith("site-plan-")) {
@@ -348,7 +354,7 @@ export async function hostedCoreRequest(request: Request) {
           if (Object.keys(value).length !== 1) throw new IntakeError("invalid_request");
           const operations = await app.inquiry(true);
           if (!operations) throw new IntakeError("unavailable", 404);
-          return { ...await includeOperations(await app.intake.resume(app.draftToken)), operations };
+          return { ...await view(app.intake.resume(app.draftToken)), operations };
         }
         if (value.operation === "review-delivery-input") {
           const current = await app.intake.resume(app.draftToken);

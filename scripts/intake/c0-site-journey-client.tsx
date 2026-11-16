@@ -190,7 +190,10 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         </dl>
         {workspace.environment === "local-rehearsal" && <p>Local rehearsal with simulated customer and Operator decisions.</p>}
         {view?.workflowAvailable && <nav aria-label="Workspace">
-          {view.myBusiness && <a href="#my-business">My Business</a>}{" "}<a href="#business-report-and-website">Business report and website</a>
+          {view.myBusiness && <><a href="#my-business">My Business</a>{" "}</>}
+          <a href="#business-report-and-website">Business report and website</a>
+          {view.workflow?.blueprint && <>{" "}<a href="#proposed-website">Proposed website</a></>}
+          {view.workflow?.editorial && <>{" "}<a href="#editorial-review">Editorial review</a></>}
         </nav>}
       </aside>}
       {locked ? <form onSubmit={event => { event.preventDefault(); void unlock(); }}>
@@ -205,8 +208,9 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         <p>Continue with the business information you already provided.</p>
         <button disabled={busy || error} onClick={() => void run({ operation: "begin" })}>Resume retained onboarding</button>
       </> : view.workflowAvailable ? <>
-        {view.myBusiness && <MyBusinessPanel business={view.myBusiness} />}
-        <PresenceWorkflowPanel hosted={hosted} workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run} />
+        {view.myBusiness && <MyBusinessPanel business={view.myBusiness} corrections={view.workflow?.corrections} />}
+        <PresenceWorkflowPanel hosted={hosted} workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run}
+          canTriage={workspace?.role === "operator" && workspace.editorialDecisionsAvailable === true} />
       </> : <>
         <h2>What we understand</h2>
         <p>MioPages is transitioning to one managed Web Presence service, with Launch followed by Ongoing care. Earlier site observations and Review material are kept with their original sources.</p>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { PresenceEvidence } from "../../lib/platform/intake/presence-workflow-artifacts";
 import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
+import { EditorialFindingPanel } from "./editorial-finding-panel";
 import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-party";
 import styles from "../../components/intake/interview.module.css";
 
@@ -63,8 +64,9 @@ function SourceReferences({ sources, includeRecords = false }: { sources: Presen
   </details>;
 }
 
-export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }: {
+export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run, canTriage = false }: {
   hosted: boolean; workflow: PresenceWorkflowView | null; snapshot?: PerformanceSnapshot; busy: boolean; run: (input: object) => Promise<void>;
+  canTriage?: boolean;
 }) {
   const [finding, setFinding] = useState<{ id: string; version: number }>();
   const [correction, setCorrection] = useState("");
@@ -195,7 +197,7 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
           {workflow.blueprint.articles.map((article, i) => <p key={i}><strong>{article.title}</strong> · {article.question} · Relates to {article.target}</p>)}
         </details>}
       </section>}
-      {workflow.editorial && <section aria-label="Editorial review">
+      {workflow.editorial && <section id="editorial-review" aria-label="Editorial review">
         <h3>Editorial review</h3><p>{workflow.editorial.summary}</p>
         <ul>{workflow.editorial.concerns.map(({ path, concern }, i) => <li key={i}>{path} · {concern}</li>)}</ul>
         {pendingLinks.length > 0 && <section aria-label="Unresolved destinations">
@@ -203,15 +205,20 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
           <p>These paths and actions are inactive until their destinations are verified.</p>
           <ul>{pendingLinks.map(({ key, heading, requirement }) => <li key={key}><strong>{heading}</strong> · {requirement}</li>)}</ul>
         </section>}
-        {Boolean(workflow.editorial.unassigned?.length) && <section aria-label="Editorial findings awaiting a page assignment">
-          <h4>Editorial findings awaiting a page assignment</h4>
-          <p>These findings require a scope review before Core can revise or approve pages.</p>
-          <ul>{workflow.editorial.unassigned!.map(({ suggestedTarget, concern }) =>
-            <li key={JSON.stringify([suggestedTarget, concern])}><strong>{suggestedTarget}</strong> · {concern}</li>)}</ul>
-        </section>}
-        {workflow.next === "editorial-review" && !workflow.editorial.unassigned?.length &&
+        {Boolean(workflow.editorialFindings?.length || workflow.editorial.unassigned?.length) &&
+          <section aria-label="Editorial findings awaiting a page assignment">
+            <h4>Editorial findings and decisions</h4>
+            <p>Open findings stay in review. Page assignments can be queued separately.</p>
+            <ul>{workflow.editorialFindings
+              ? workflow.editorialFindings.map(item => <EditorialFindingPanel key={item.id} finding={item} workflow={workflow}
+                canEdit={canTriage && !workflow.operatorReview && ["editorial-review", "operator-review"].includes(workflow.next)}
+                busy={busy} save={editorial => submit("editorial-decision", { editorial })} />)
+              : workflow.editorial.unassigned?.map(({ suggestedTarget, concern }) =>
+                <li key={JSON.stringify([suggestedTarget, concern])}><strong>{suggestedTarget}</strong> · {concern}</li>)}</ul>
+          </section>}
+        {workflow.next === "editorial-review" && workflow.canQueueEditorialRevision && (!hosted || canTriage) &&
           <button type="button" disabled={busy} onClick={() => void submit("revise")}>Queue the flagged pages for revision</button>}
-        {workflow.next === "operator-review" && <button type="button" disabled={busy} onClick={() => void submit("review")}>{hosted ? "Record Operator site review" : "Record simulated Operator review"}</button>}
+        {workflow.next === "operator-review" && (!hosted || canTriage) && <button type="button" disabled={busy} onClick={() => void submit("review")}>{hosted ? "Record Operator site review" : "Record simulated Operator review"}</button>}
         {workflow.operatorReview && <p>Operator review saved. WordPress preparation requires separate authorization.</p>}
       </section>}
       {workflow.report && <details className={styles.sourceArchive}><summary>Source history and open conflicts</summary>

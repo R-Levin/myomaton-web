@@ -80,6 +80,7 @@ export type IntakePortalWorkspace = {
   account: string;
   site: string;
   environment: "protected-development" | "local-rehearsal";
+  editorialDecisionsAvailable?: true;
 };
 
 export class IntakeError extends Error {

@@ -177,7 +177,7 @@ export async function recoverRetainedPresenceOutput(workflow: PresenceWorkflow,
 }
 
 export async function reviewWorkflowChange(workflow: PresenceWorkflow,
-  current: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>>, operation: unknown, version: number, actor: WorkflowActor, details?: { finding?: unknown; correction?: unknown; visual?: unknown }) {
+  current: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>>, operation: unknown, version: number, actor: WorkflowActor, details?: { finding?: unknown; correction?: unknown; visual?: unknown; editorial?: unknown }) {
   // Existing protected Operator can continue a development report. This grants
   // no authority to confirm business facts as a customer or publish anything.
   switch (operation) {
@@ -189,6 +189,7 @@ export async function reviewWorkflowChange(workflow: PresenceWorkflow,
     }
     case "workflow-recover": return workflow.recover(current, version);
     case "workflow-retry": return workflow.retryRejectedOutput(current, version, actor);
+    case "workflow-editorial-decision": return workflow.decideEditorialFinding(current, version, actor, details?.editorial);
     case "workflow-revise": return workflow.requestEditorialRevision(current, version, actor);
     case "workflow-review": return workflow.reviewCandidate(current, version, actor);
     case "workflow-visual-queue": {

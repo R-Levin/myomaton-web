@@ -179,6 +179,8 @@ test("the existing local Core interface persists a report, correction, revised s
       assert.ok(save && !save.disabled);
       save.click();
       await see("Saved corrections");
+      await see("Your submitted corrections");
+      assert.match(page.querySelector("#my-business")?.textContent ?? "", /Ask existing-site visitors/);
     } finally { browser.window.close(); }
     const reloaded = await (await read()).json();
     assert.equal(reloaded.portal.role, "customer");
@@ -250,19 +252,27 @@ test("the existing local Core interface persists a report, correction, revised s
     await secondIntake.create(editorialToken, "FREE_REVIEW");
     const editorialContext = { ...secondContext, intakeId: (await secondIntake.workflowContext(editorialToken)).intakeId };
     const returned = { summary: "Check the whole draft.", concerns: [
-      { path: "Across the Home and Project drafts", concern: "Verify the contact and intake route." },
+      { path: "Across the Home and Project drafts", concern: "Explain what visitors should bring to the project conversation." },
+      { path: "Website operations", concern: "Verify the contact and intake route." },
     ] };
     let editorialDispatches = 0;
     const providerMode = new PresenceWorkflow(setup.pool, {
       ...workflowFixture, mode: "provider",
       async run(run, retain) {
-        if (run.work.operation !== "editorial") return workflowFixture.run(run, retain);
+        if (run.input.revisionRequest && run.work.operation === "page") {
+          assert.equal(run.work.path, "/project");
+          const draft = run.input.revisionRequest.priorPages[0];
+          const revised = { ...draft, sections: draft.sections.map(section => ({ ...section, body: "Bring your current website address." })) };
+          await retain(Buffer.from(JSON.stringify(revised)));
+          return revised;
+        }
+        if (run.work.operation !== "editorial" || run.input.revisionRequest) return workflowFixture.run(run, retain);
         editorialDispatches++;
         await retain(Buffer.from(JSON.stringify(returned)));
         return null; // Previous reader rejects a completed response that was retained.
       },
     });
-    const editorialActor = { id: "scoped-editorial-operator", role: "operator", simulated: false } as const;
+    const editorialActor = { id: "scoped-editorial-operator", role: "operator", simulated: false, authority: "prepare-site-proposal:fixture" } as const;
     let editorialView = (await providerMode.start(editorialContext))!;
     while (editorialView.next !== "recover") {
       if (editorialView.next === "customer-review") {
@@ -280,13 +290,53 @@ test("the existing local Core interface persists a report, correction, revised s
     assert.equal(ready.next, "editorial-review");
     assert.equal(ready.failure, null);
     assert.equal(ready.artifactIssue, undefined);
-    assert.deepEqual(ready.editorial?.unassigned, [{ suggestedTarget: returned.concerns[0].path, concern: returned.concerns[0].concern }]);
+    assert.deepEqual(ready.editorial?.unassigned, returned.concerns.map(({ path, concern }) => ({ suggestedTarget: path, concern })));
     assert.equal(ready.pages.length, 2);
     assert.equal(await receiptCount(), beforeEditorialRecovery);
     assert.equal(editorialDispatches, 1);
     await assert.rejects(providerMode.advance(editorialContext, ready.version), { code: "workflow_not_ready" });
     await assert.rejects(providerMode.requestEditorialRevision(editorialContext, ready.version, editorialActor), { code: "workflow_not_ready" });
     await assert.rejects(providerMode.reviewCandidate(editorialContext, ready.version, editorialActor), { code: "workflow_not_ready" });
+    const [projectFinding, operationalFinding] = ready.editorialFindings!;
+    const reviseProject = { findingId: projectFinding.id, status: "assigned", paths: ["/project"], rationale: "This concerns the project conversation." };
+    await assert.rejects(providerMode.decideEditorialFinding(editorialContext, ready.version, { ...editorialActor, authority: undefined }, reviseProject),
+      { code: "unavailable" });
+    await assert.rejects(providerMode.decideEditorialFinding(editorialContext, ready.version, { ...editorialActor, role: "customer" }, reviseProject),
+      { code: "unavailable" });
+    await assert.rejects(providerMode.decideEditorialFinding(editorialContext, ready.version, editorialActor, { ...reviseProject, paths: ["/outside"] }),
+      { code: "invalid_request" });
+    await assert.rejects(providerMode.decideEditorialFinding(editorialContext, ready.version, editorialActor, { ...reviseProject, actor: editorialActor }),
+      { code: "invalid_request" });
+    await assert.rejects(providerMode.decideEditorialFinding(editorialContext, ready.version, editorialActor, {
+      findingId: projectFinding.id, status: "resolved", rationale: "Other site's source.",
+      evidence: { kind: "source", sourceId: "unknown" },
+    }), { code: "workflow_not_ready" });
+    const open = (await providerMode.decideEditorialFinding(editorialContext, ready.version, editorialActor,
+      { findingId: operationalFinding.id, status: "open", rationale: "A real inquiry destination is still needed." }))!;
+    await assert.rejects(providerMode.decideEditorialFinding(editorialContext, ready.version, editorialActor, reviseProject), { code: "draft_changed" });
+    const assigned = (await providerMode.decideEditorialFinding(editorialContext, open.version, editorialActor, reviseProject))!;
+    assert.equal(assigned.canQueueEditorialRevision, true);
+    assert.equal(await receiptCount(), beforeEditorialRecovery, "Operator triage must never call the provider");
+    const queued = (await providerMode.requestEditorialRevision(editorialContext, assigned.version, editorialActor))!;
+    assert.deepEqual(queued.pages, [ready.pages[0]]);
+    assert.equal(queued.editorialFindings?.[0].history.at(-1)?.status, "queued");
+    const redrafted = (await providerMode.advance(editorialContext, queued.version))!;
+    const revisedAudit = (await providerMode.advance(editorialContext, redrafted.version))!;
+    assert.equal(revisedAudit.pages[1].sections[0].body, "Bring your current website address.");
+    assert.deepEqual(revisedAudit.pages[0], ready.pages[0]);
+    const decision = { findingId: projectFinding.id, status: "resolved", rationale: "The revised draft now asks for the current URL.",
+      evidence: { kind: "revised-pages" } };
+    const resolved = (await providerMode.decideEditorialFinding(editorialContext, revisedAudit.version, editorialActor, decision))!;
+    const history = resolved.editorialFindings!;
+    assert.equal(history[0].concern, projectFinding.concern);
+    assert.equal(history[0].suggestedTarget, projectFinding.suggestedTarget);
+    assert.deepEqual(history[0].history.map(item => item.status), ["assigned", "queued", "resolved"]);
+    assert.equal(history[1].history.at(-1)?.status, "open");
+    assert.equal(resolved.next, "editorial-review");
+    assert.equal(resolved.operatorReview, null);
+    assert.deepEqual((await providerMode.review(editorialContext))?.editorialFindings, history);
+    assert.equal(editorialDispatches, 1);
+    await assert.rejects(providerMode.reviewCandidate(editorialContext, resolved.version, editorialActor), { code: "workflow_not_ready" });
 
     const now = Date.parse("2026-11-15T15:00:00Z");
     const measurement = new FirstPartyMeasurement(setup.pool, () => now);
