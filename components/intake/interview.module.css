@@ -31,4 +31,23 @@
 .field input:not([type=checkbox]):not([type=radio]), .field textarea { margin-bottom: .75rem; }
 .shell footer { margin: 2rem auto 0; font-size: .9rem; flex-wrap: wrap; }
 .visuallyHidden, .field > label.visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.workflowStatus { margin: 1rem 0 1.5rem; padding: 1rem 1.25rem; border: 1px solid #c8b8eb; border-radius: .5rem; background: #f4effc; }
+.workflowStatus h3, .workflowStatus h4 { margin: 0 0 .4rem; }
+.card .workflowStatus p:last-child { margin-bottom: 0; }
+.workflowReport { margin-block: 1.25rem 2rem; }
+.card .reportOverview { display: block; margin: 0; padding: 1.25rem; background: #f4effc; border-radius: .5rem; }
+.reportOverview h3 { margin: 0 0 .65rem; font-size: clamp(1.25rem, 3vw, 1.7rem); line-height: 1.3; }
+.card .reportOverview p:last-child { margin-bottom: 0; }
+.card .reportLabel { font-size: .9rem; font-weight: bold; margin-bottom: .35rem; }
+.findingGroup { margin-top: 1.5rem; }
+.findingGroup h4 { margin: 0 0 .7rem; font-size: 1.1rem; }
+.findingCard { margin-bottom: .75rem; padding: .85rem 1rem; border: 1px solid #d8cde9; border-radius: .5rem; }
+.findingCard h5 { margin: 0 0 .4rem; font-size: 1rem; }
+.card .findingCard p { margin-bottom: .65rem; }
+.findingCard button, .sourceReferences button { margin-top: .55rem; }
+.findingCard .field { margin: .9rem 0 0; }
+.sourceArchive, .sourceReferences { margin-block: .5rem; }
+.sourceArchive summary, .sourceReferences summary { cursor: pointer; font-weight: 600; }
+.sourceReferences li { margin-bottom: .75rem; }
+.sourceRecord { white-space: pre-wrap; }
 @media (max-width: 480px) { .field { margin-bottom: 1.5rem; } .actions { margin-top: 1.5rem; } .shell header { font-size: .9rem; } }

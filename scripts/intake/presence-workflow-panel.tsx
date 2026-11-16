@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { PresenceEvidence } from "../../lib/platform/intake/presence-workflow-artifacts";
 import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
 import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-party";
 import styles from "../../components/intake/interview.module.css";
@@ -13,12 +14,46 @@ const failureLabel: Record<string, string> = {
   "outcome-unknown": "Core could not verify whether this step finished. Recovery does not send the step again.",
 };
 
+const findingGroups = [
+  { status: "established", label: "Findings grounded in confirmed evidence" },
+  { status: "proposed", label: "Interpretations to review" },
+  { status: "unresolved", label: "Open decisions" },
+] as const;
+
+const sourceLabels: Record<PresenceEvidence["kind"], string> = {
+  "owner-confirmed": "Owner-confirmed knowledge",
+  "earlier-review-answer": "Prior Review answer",
+  "earlier-review-assessment": "Prior Review assessment",
+  "website-observation": "Website observation",
+  "customer-unconfirmed": "Unconfirmed interview answer",
+  "historical-discovery": "Historical discovery",
+  "service-direction": "Recorded service direction",
+  "public-research": "Public research",
+};
+
+function SourceReferences({ sources, includeRecords = false }: { sources: PresenceEvidence[]; includeRecords?: boolean }) {
+  const [openRecord, setOpenRecord] = useState<string>();
+  if (!sources.length) return null;
+  return <details className={styles.sourceReferences}>
+    <summary>{includeRecords ? "Browse source records" : `Evidence · ${sources[0].label}${sources.length > 1 ? ` and ${sources.length - 1} more` : ""}`}</summary>
+    <ul>{sources.map(source => <li key={source.id}>
+      <strong>{source.label}</strong> · {sourceLabels[source.kind]}{source.date ? ` · ${source.date}` : ""}
+      <div className={styles.hint}>{source.reference}</div>
+      {includeRecords && <button className={styles.secondary} type="button" aria-expanded={openRecord === source.id}
+        onClick={() => setOpenRecord(openRecord === source.id ? undefined : source.id)}>
+        {openRecord === source.id ? "Hide source record" : "Show source record"}</button>}
+      {openRecord === source.id && <p className={styles.sourceRecord}>{source.content}</p>}
+    </li>)}</ul>
+  </details>;
+}
+
 export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }: {
   hosted: boolean; workflow: PresenceWorkflowView | null; snapshot?: PerformanceSnapshot; busy: boolean; run: (input: object) => Promise<void>;
 }) {
   const [finding, setFinding] = useState<{ id: string; version: number }>();
   const [correction, setCorrection] = useState("");
   const [selected, setSelected] = useState("/");
+  const sources = new Map([...workflow?.sources ?? [], ...workflow?.research ?? []].map(source => [source.id, source]));
   const page = workflow?.pages.find(item => item.path === selected) ?? workflow?.pages[0];
   const submit = (operation: string, extra?: object) => run({ operation: "workflow-" + operation,
     ...(workflow && { version: workflow.version }), ...extra });
@@ -26,35 +61,59 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
     <h2>Business report and website</h2>
     <p className={styles.hint}>{hosted ? "Protected development review. Operator decisions apply to this candidate. Customer approval and publication are separate." : "Local rehearsal. Research and model responses are recorded examples. Customer and Operator decisions are simulated."}</p>
     {!workflow ? <button type="button" disabled={busy} onClick={() => void submit("start")}>{hosted ? "Start protected workflow" : "Start the local workflow"}</button> : <>
-      <p>Saved workflow revision {workflow.version} · {workflow.entry === "FREE_REVIEW" ? "Started with a Free Review" : "Started directly"}</p>
-      {workflow.failure && <p role="alert">{failureLabel[workflow.failure]}</p>}
+      {hosted && !workflow.report && !workflow.failure && workflow.next !== "evidence-changed" && (
+        <div role="status" className={styles.workflowStatus}>
+          <h3>{workflow.next === "in-progress" ? "Core is working" : "Your assessment is queued"}</h3>
+          <p>Core will use your saved business information and public research to prepare the Business Understanding Report. You can review the findings when the report is ready.</p>
+        </div>
+      )}
+      {workflow.failure && <div className={styles.workflowStatus} role="alert">
+        <h3>{workflow.report ? "Core paused" : "Your assessment is paused"}</h3>
+        <p>{failureLabel[workflow.failure]} {workflow.recoverable ? "The saved response can be checked without another provider request." : "Your saved business information is still here."}</p>
+      </div>}
       {workflow.recoverable && <button type="button" disabled={busy} onClick={() => void submit("recover")}>Recover retained result</button>}
-      {workflow.next === "evidence-changed" && <p>Onboarding evidence changed. This saved version needs reconciliation before work can continue.</p>}
-      {workflow.next === "in-progress" && <p>Core is waiting for this operation. Reload to check its status.</p>}
-      {hosted && nextLabel[workflow.next] && <p>Waiting for Core to run {nextLabel[workflow.next].toLowerCase()}.</p>}
+      {workflow.next === "evidence-changed" && <p>Onboarding evidence changed. Core needs to reconcile the changes before continuing.</p>}
+      {workflow.report && hosted && !workflow.failure && (nextLabel[workflow.next] || workflow.next === "in-progress") &&
+        <p role="status">Core is preparing the site. {nextLabel[workflow.next] ? `Next up: ${nextLabel[workflow.next].toLowerCase()}.` : "Check back for the next saved result."}</p>}
       {!hosted && nextLabel[workflow.next] && <button type="button" disabled={busy} onClick={() => void submit("next")}>{nextLabel[workflow.next]}</button>}
 
-      {workflow.report && <article aria-label="Business Understanding Report">
-        <h3>{workflow.report.title}</h3>
-        <p>{workflow.report.summary}</p>
-        {workflow.report.findings.map(item => <section key={item.id}>
-          <h4>{item.heading}</h4>
-          <p><strong>{item.status === "established" ? "Supported finding" : item.status === "unresolved" ? "Open question" : "Proposed interpretation"}</strong> · {item.body}</p>
-          <details><summary>Evidence</summary>{item.sourceIds.map(id => {
-            const source = [...workflow.sources, ...workflow.research ?? []].find(source => source.id === id);
-            return source && <p key={id}>{source.label} · {source.kind} · {source.reference}</p>;
-          })}</details>
-          {!workflow.failure && workflow.next !== "in-progress" && workflow.next !== "evidence-changed" &&
-            <button type="button" disabled={busy} onClick={() => { setFinding({ id: item.id, version: workflow.version }); setCorrection(""); }}>Correct {item.heading.toLowerCase()}</button>}
-        </section>)}
-        {workflow.confirmation ? <p>{hosted ? "Reviewed to continue development." : "This report revision has a simulated customer confirmation."}</p> :
-          workflow.next === "customer-review" && <button type="button" disabled={busy} onClick={() => void submit(hosted ? "continue" : "confirm")}>
-            {hosted ? "Continue to development site planning" : "Confirm this report in the rehearsal"}</button>}
-        {finding?.version === workflow.version && workflow.report.findings.some(item => item.id === finding.id) && <div className={styles.field}>
-          <label htmlFor="workflow-correction">Correction to this finding</label>
-          <textarea id="workflow-correction" value={correction} maxLength={8000} onChange={event => setCorrection(event.target.value)} />
-          <button type="button" disabled={busy || !correction.trim()} onClick={() => void submit("correct", { finding: finding.id, correction })}>Save correction for a new report</button>
-        </div>}
+      {workflow.report && <article aria-label="Business Understanding Report" className={styles.workflowReport}>
+        <header className={styles.reportOverview}>
+          <p className={styles.reportLabel}>{hosted ? "AI-generated assessment" : "Recorded example assessment"}</p>
+          <h3>{workflow.report.title}</h3>
+          <p>{workflow.report.summary}</p>
+          {workflow.next === "customer-review" &&
+            <p>Check the offer and who it serves, then review the interpretations and open decisions. Flag anything that would send the website in the wrong direction.</p>}
+        </header>
+        {findingGroups.map(({ status, label }) => {
+          const findings = workflow.report!.findings.filter(item => item.status === status);
+          if (!findings.length) return null;
+          return <section key={status} className={styles.findingGroup}>
+            <h4>{label}</h4>
+            {findings.map(item => <section key={item.id} className={styles.findingCard}>
+              <h5>{item.heading}</h5>
+              <p>{item.body}</p>
+              <SourceReferences sources={item.sourceIds.map(id => sources.get(id)).filter(source => source !== undefined)} />
+              {!workflow.failure && workflow.next !== "in-progress" && workflow.next !== "evidence-changed" &&
+                <button type="button" className={styles.secondary} disabled={busy}
+                  onClick={() => { setFinding({ id: item.id, version: workflow.version }); setCorrection(""); }}>Flag a correction</button>}
+              {finding?.version === workflow.version && finding.id === item.id && <div className={styles.field}>
+                <label htmlFor="workflow-correction">Correction to {item.heading}</label>
+                <textarea id="workflow-correction" value={correction} maxLength={8000} onChange={event => setCorrection(event.target.value)} />
+                <button type="button" disabled={busy || !correction.trim()}
+                  onClick={() => void submit("correct", { finding: finding.id, correction })}>{hosted ? "Save correction privately" : "Save correction for a new report"}</button>
+                {hosted && <p className={styles.hint}>Core keeps this correction private. Sending it to the provider requires authorization.</p>}
+              </div>}
+            </section>)}
+          </section>;
+        })}
+        {workflow.confirmation ? <p>{hosted ? "Reviewed for development site planning." : "This report revision has a simulated customer confirmation."}</p> :
+          workflow.next === "customer-review" && <div className={styles.workflowStatus}>
+            <h4>Ready for site planning?</h4>
+            {hosted && <p>This records permission to draft the proposed website. Customer confirmation and publication remain separate.</p>}
+            <button type="button" disabled={busy} onClick={() => void submit(hosted ? "continue" : "confirm")}>
+              {hosted ? "Continue to development site planning" : "Confirm this report in the rehearsal"}</button>
+          </div>}
       </article>}
       {workflow.corrections.length > 0 && <details><summary>Saved corrections</summary>
         {workflow.corrections.map(item => <p key={item.finding.id}><strong>{item.finding.heading}</strong> · {item.text}</p>)}
@@ -100,13 +159,12 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run }:
         {workflow.next === "operator-review" && <button type="button" disabled={busy} onClick={() => void submit("review")}>{hosted ? "Record Operator site review" : "Record simulated Operator review"}</button>}
         {workflow.operatorReview && <p>Operator review saved. WordPress preparation requires separate authorization.</p>}
       </section>}
-      <details><summary>Source history and open conflicts</summary>
-        {workflow.limitations.map(item => <p key={item}>{item}</p>)}{workflow.conflicts.map(item => <p key={item}>{item}</p>)}
-        {[...workflow.sources, ...workflow.research ?? []].map(source => <details key={source.id}>
-          <summary>{source.label} · {source.date ?? "date unavailable"}</summary>
-          <p>{source.reference}</p><p>{source.content}</p>
-        </details>)}
-      </details>
+      {workflow.report && <details className={styles.sourceArchive}><summary>Source history and open conflicts</summary>
+        {(workflow.limitations.length > 0 || workflow.conflicts.length > 0) && <ul>
+          {[...workflow.limitations, ...workflow.conflicts].map((item, index) => <li key={index}>{item}</li>)}
+        </ul>}
+        <SourceReferences sources={[...sources.values()]} includeRecords />
+      </details>}
     </>}
     {snapshot && <section aria-label="Performance Snapshot">
       <h3>Performance Snapshot</h3>

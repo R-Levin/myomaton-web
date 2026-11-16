@@ -3,21 +3,23 @@ import { join } from "node:path";
 import { open } from "node:fs/promises";
 import { c0DisclosureManifest } from "../../lib/platform/intake/c0-workflow-knowledge";
 import { c0HostedRunGrant } from "../../lib/platform/intake/c0-workflow-activation";
-import { composePresenceCase, openProtectedPresenceWorkspace, privateWorkflowBytes, privateWorkflowFile, recoverPresenceResearch, workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
+import { composePresenceCase, openProtectedPresenceWorkspace, privateWorkflowBytes, privateWorkflowFile, recoverRetainedPresenceOutput, workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
 import type { PresenceWorkflowGrant } from "../../lib/platform/intake/presence-workflow-provider";
 
 async function main() {
   const action = process.argv[2];
   const activating = action === "ACTIVATE-EXACT-WORKFLOW-GRANT";
+  const inspecting = action === "INSPECT-WORKFLOW-MANIFEST";
   const recoverResearch = action === "RECOVER-RETAINED-WORKFLOW-RESEARCH";
+  const recoverReport = action === "RECOVER-RETAINED-WORKFLOW-REPORT";
   if (process.argv.length !== (activating ? 4 : 3) ||
-      !["ACTIVATE-EXACT-WORKFLOW-GRANT", "INSPECT-WORKFLOW-MANIFEST", "WATCH-AUTHORIZED-WORKFLOW", "RECOVER-RETAINED-WORKFLOW-RESEARCH"].includes(action)) throw Error("Workflow command refused");
+      !(activating || inspecting || recoverResearch || recoverReport || action === "WATCH-AUTHORIZED-WORKFLOW")) throw Error("Workflow command refused");
   const { workspace, pool, intake, token } = await openProtectedPresenceWorkspace();
   try {
-    const mode = action !== "WATCH-AUTHORIZED-WORKFLOW" && !recoverResearch ? { kind: "review" as const } :
+    const mode = activating || inspecting || recoverReport ? { kind: "review" as const } :
       { kind: "worker" as const, apiKey: process.env.MIOPAGES_OPENAI_DEV_API_KEY ?? "" };
     const workflowCase = composePresenceCase(pool, intake, token, workspace, mode);
-    if (mode.kind === "review") {
+    if (activating || inspecting) {
       const context = await workflowCase.context();
       if (!activating) {
         console.log(JSON.stringify(c0DisclosureManifest(context)));
@@ -38,8 +40,8 @@ async function main() {
     }
     const grant = await privateWorkflowFile<PresenceWorkflowGrant>(workspace.grantFile, workspace.root);
     const workflow = await workflowCase.open();
-    if (recoverResearch) {
-      const review = await recoverPresenceResearch(workflow, await workflowCase.context());
+    if (recoverResearch || recoverReport) {
+      const review = await recoverRetainedPresenceOutput(workflow, await workflowCase.context(), recoverReport ? "report" : "research");
       console.log(JSON.stringify({ status: review?.next, version: review?.version, failure: review?.failure }));
       if (review?.failure) process.exitCode = 1;
       return;

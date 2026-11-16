@@ -24,7 +24,7 @@ import { prepareNativeDraftMedia } from "../../lib/platform/wordpress-delivery/n
 import { bindSiteDraft } from "../../lib/platform/wordpress-delivery/site-draft";
 import { verifyNativeDraftReceipt } from "../../lib/platform/wordpress-delivery/native-draft-receipt";
 import type { PresenceWorkflowView, WorkflowContext, PresenceWorkflow } from "../../lib/platform/intake/presence-workflow";
-import { composePresenceCase, recoverPresenceResearch, reviewWorkflowChange, workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
+import { composePresenceCase, recoverRetainedPresenceOutput, reviewWorkflowChange, workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
 import type { PresenceWorkflowGrant } from "../../lib/platform/intake/presence-workflow-provider";
 import { publicResearchAddress } from "../../lib/platform/intake/presence-workflow-egress";
 
@@ -346,7 +346,7 @@ test("restricted Core worker discovers research, retains a substantial provider-
       assert.equal(view.recoverable, true);
       missingMarketRead = false;
       worker = await composition.open();
-      view = (await recoverPresenceResearch(worker, context))!;
+      view = (await recoverRetainedPresenceOutput(worker, context, "research"))!;
       assert.equal(view.next, "report");
       view = (await workPresenceCase(worker, context))!;
       assert.equal(view.failure, "output-invalid");

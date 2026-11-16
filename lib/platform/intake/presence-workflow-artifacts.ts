@@ -52,15 +52,17 @@ function path(value: unknown) {
   return result;
 }
 const knownSources: readonly PresenceEvidence["kind"][] = ["owner-confirmed"];
-export function readReport(value: unknown, sources: readonly PresenceEvidence[]) {
+export function readReport(value: unknown, sources: readonly PresenceEvidence[], allowCertaintyDowngrade = false) {
   const report = object(value, ["title", "summary", "findings"]);
   const ids = sources.map(source => source.id);
   const findings = list(report.findings, value => {
     const finding = object(value, ["id", "heading", "body", "status", "sourceIds"]);
-    const status = choice(finding.status, findingStates);
+    let status = choice(finding.status, findingStates);
     const sourceIds = references(finding.sourceIds, ids);
     if (status === "established" && !sourceIds.every(id => knownSources.includes(sources.find(source => source.id === id)!.kind))) {
-      throw Error("Established finding lacks confirmed evidence");
+      if (!allowCertaintyDowngrade) throw Error("Established finding lacks confirmed evidence");
+      // Retain the provider wording as a proposal and keep the exact response in custody.
+      status = "proposed";
     }
     return { id: text(finding.id, 160), heading: copy(finding.heading), body: copy(finding.body), status, sourceIds };
   });

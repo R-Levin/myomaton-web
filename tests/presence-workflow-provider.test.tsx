@@ -8,6 +8,7 @@ import { fingerprint } from "../lib/platform/canonical/model";
 import { initializeResponsesUsageLedger, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
 import { createResponsesPresenceWorkflow, type PresenceWorkflowGrant } from "../lib/platform/intake/presence-workflow-provider";
 import type { WorkflowContext, WorkflowInput, WorkflowOperation, WorkflowRun } from "../lib/platform/intake/presence-workflow";
+import { readReport } from "../lib/platform/intake/presence-workflow-artifacts";
 import { validateResearchSources } from "../lib/platform/intake/presence-workflow-research";
 
 test("Core retrieves only pinned public sources and sends source-bound stages through the existing usage and recovery rules", async () => {
@@ -35,6 +36,7 @@ test("Core retrieves only pinned public sources and sends source-bound stages th
     let activeGrant = grant;
     const report = { title: "Report", summary: "Test only.", findings: [
       { id: "business", heading: "Offer", body: "Launch with ongoing care", status: "established", sourceIds: ["owner"] },
+      { id: "market", heading: "Opportunity", body: "Consider a market position", status: "established", sourceIds: ["owner", "research:market"] },
     ] };
     const responseBody = { id: "resp_offline_workflow", model: rates.model, status: "completed", service_tier: "default",
       usage: { input_tokens: 5000, input_tokens_details: { cached_tokens: 0 }, output_tokens: 60,
@@ -78,7 +80,15 @@ test("Core retrieves only pinned public sources and sends source-bound stages th
     assert.deepEqual(requested, []);
     assert.deepEqual(await provider.run(work, retain), report);
     assert.deepEqual(requested, ["/v1/responses/input_tokens", "/v1/responses"]);
-    assert.deepEqual(await provider.recover(work, kept!), report);
+    const retained = await provider.recover(work, kept!);
+    assert.deepEqual(retained, report);
+    assert.deepEqual(kept, Buffer.from(JSON.stringify(responseBody)));
+    const sources = [...context.evidence, ...research!];
+    assert.throws(() => readReport(retained, sources), /lacks confirmed evidence/);
+    assert.deepEqual(readReport(retained, sources, true).findings,
+      [report.findings[0], { ...report.findings[1], status: "proposed" }]);
+    assert.throws(() => readReport({ ...report, findings: [{ ...report.findings[1], sourceIds: ["unknown"] }] }, sources, true),
+      /Unknown artifact reference/);
     await assert.rejects(provider.run(makeRun("direction", { ...base, research, report: report as WorkflowInput["report"] }), retain), { code: "usage_gate" });
     activeGrant = { ...grant, revoked: true };
     await assert.rejects(provider.run(work, retain), /authorization/i);

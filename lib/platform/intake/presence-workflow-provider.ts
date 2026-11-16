@@ -28,7 +28,7 @@ export type PresenceWorkflowGrant = {
 };
 
 const instructions: Record<ModelStage, string> = {
-  report: "Write a customer-readable Business Understanding Report. Explain the business, offer, audiences, fit, differentiation, buyer needs, evidence and material uncertainties. Reconcile conflicts with the confirmed scope. Carry forward corrections explicitly, without making a draft or research observation a fact.",
+  report: "Write a customer-readable Business Understanding Report. Explain the business, offer, audiences, fit, differentiation, buyer needs, evidence and material uncertainties. Reconcile conflicts with the confirmed scope. Carry forward corrections explicitly. Only use the established status when every cited source is owner-confirmed. Use proposed for interpretations or mixed sources and unresolved for necessary decisions.",
   direction: "Propose the Presence Direction. Explain positioning, buying decisions, the conversion paths, search and ongoing content needs. Explain what changes when an owner correction affects the strategy.",
   blueprint: "Plan a complete site. Let the supplied business and visitor decisions justify each page. Cover navigation, the two onboarding entry paths where applicable and useful Article topics linked to a relevant page. Do not assume a number of pages or articles.",
   page: "Draft original, complete copy for the exact page requested. When a previous page and editorial concerns are supplied, preserve accurate elements and revise the exact deficiencies. Include search metadata, supported or unverified actions (use null when unverified), internal links and an editorial visual brief per section. Do not invent contacts, prices, permissions, case studies, outcomes or operational promises.",

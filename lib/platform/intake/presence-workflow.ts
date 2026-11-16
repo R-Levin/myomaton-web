@@ -263,7 +263,7 @@ export class PresenceWorkflow {
     try {
       switch (work.operation) {
         case "research": next = { ...state, research: readResearch(output, ids) }; break;
-        case "report": next = { ...state, report: readReport(output, sources) }; break;
+        case "report": next = { ...state, report: readReport(output, sources, state.mode === "provider") }; break;
         case "direction": next = { ...state, direction: readDirection(output, ids) }; break;
         case "blueprint": next = { ...state, blueprint: readBlueprint(output, ids) }; break;
         case "page": {

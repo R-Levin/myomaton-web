@@ -169,10 +169,10 @@ export async function workPresenceCase(workflow: PresenceWorkflow, current: Awai
   return previous;
 }
 
-export async function recoverPresenceResearch(workflow: PresenceWorkflow,
-  current: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>>) {
+export async function recoverRetainedPresenceOutput(workflow: PresenceWorkflow,
+  current: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>>, operation: "research" | "report") {
   const review = await workflow.review(current);
-  if (!review?.recoverable || review.pendingOperation !== "research") throw Error("Retained research recovery unavailable");
+  if (!review?.recoverable || review.pendingOperation !== operation) throw Error("Retained workflow recovery unavailable");
   return workflow.recover(current, review.version);
 }
 
