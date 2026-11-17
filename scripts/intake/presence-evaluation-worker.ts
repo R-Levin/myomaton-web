@@ -17,9 +17,11 @@ import type { WorkflowContext } from "../../lib/platform/intake/presence-workflo
 import type { PresenceWorkflowGrant } from "../../lib/platform/intake/presence-workflow-provider";
 import { protectedConnection } from "../../lib/platform/wordpress-delivery/protected-connection";
 import { migrateWithBootstrapCompatibility } from "../db/bootstrap";
+import { commercialApproval, openCommercialActivation } from "./commercial-evaluation-activation";
 
 const digest = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 const manifestFile = "docs/presence-evaluation-activation.json";
+const retainedManifestSha256 = "82f78a03b7a523a9a16600a29ab21cfcae91eac87582a6ea17d465c4f2fdfc7a";
 type Options = { scenario: EvaluationScenario; approval: string; databaseUrl: string; home: string };
 
 async function createPrivate(path: string, bytes: string | Buffer) {
@@ -53,7 +55,7 @@ async function readOriginal(plan: EvaluationManifest, connection: { url: string;
   } finally { await pool.end(); }
 }
 
-async function seedEvaluation(pool: Pool, item: EvaluationManifest["cases"][EvaluationScenario], token: string) {
+async function seedEvaluation(pool: Pool, item: Pick<EvaluationManifest["cases"][EvaluationScenario], "organizationId" | "scope" | "entry" | "intakeId">, token: string) {
   await migrateWithBootstrapCompatibility(pool);
   const db = await pool.connect();
   try {
@@ -77,16 +79,21 @@ async function seedEvaluation(pool: Pool, item: EvaluationManifest["cases"][Eval
 
 export async function openEvaluationWorker(options: Options, allowExpiredReview = false) {
   if (process.platform !== "linux" || process.env.NODE_ENV === "production") throw Error("Linux development worker required");
-  const plan = readEvaluationManifest(await readFile(manifestFile), options.approval, allowExpiredReview ? null : Date.now());
-  const item = plan.cases[options.scenario];
+  const isCommercial = options.approval === commercialApproval;
+  if (isCommercial && options.scenario !== "c0") throw Error("Commercial C0 scope required");
+  const parent = join(await realpath(options.home), "miopages-private-acceptance");
+  if (parent.includes("/public_html/")) throw Error("Off-webroot evaluation workspace required");
+  await verifyDirectory(parent);
+  const manifestBytes = await readFile(manifestFile);
+  const plan = readEvaluationManifest(manifestBytes, isCommercial ? retainedManifestSha256 : options.approval,
+    isCommercial || allowExpiredReview ? null : Date.now());
+  const commercial = isCommercial ? await openCommercialActivation(parent, allowExpiredReview) : null;
+  const item = commercial?.item ?? plan.cases[options.scenario];
   const name = "migration_rehearsal_" + item.intakeId.replaceAll("-", "");
   const url = new URL(options.databaseUrl);
   const port = Number(url.port);
   if (url.protocol !== "postgresql:" || url.hostname !== "127.0.0.1" || url.pathname !== "/" + name ||
       port < 1024 || port === 5432 || !url.username || !url.password || url.search || url.hash) throw Error("Dedicated loopback evaluation database required");
-  const parent = join(await realpath(options.home), "miopages-private-acceptance");
-  if (parent.includes("/public_html/")) throw Error("Off-webroot evaluation workspace required");
-  await verifyDirectory(parent);
   const group = join(parent, "presence-evaluation");
   const root = join(group, item.intakeId);
   const workspace = { root, grantFile: join(root, "grant.json"), ledgerDirectory: join(root, "usage"), visualDirectory: join(root, "media") };
@@ -105,7 +112,12 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
       privateWorkflowFile<{ context: WorkflowContext; token: string }>(contextFile, root),
       privateWorkflowFile<PresenceWorkflowGrant>(workspace.grantFile, root),
     ]);
-    const compiled = evaluationGrant(plan, options.approval, options.scenario, context);
+    const commercialBinding = commercial ? await privateWorkflowFile<{ activation: string; grant: string }>(join(root, "activation.json"), root) : null;
+    if (commercial && (commercialBinding?.activation !== commercial.fingerprint || commercialBinding?.grant !== fingerprint(storedGrant))) {
+      throw Error("Stored commercial activation differs");
+    }
+    if (commercial && apiKey) await commercial.verifyGrant(pool);
+    const compiled = commercial ? storedGrant : evaluationGrant(plan, options.approval, options.scenario, context);
     if (fingerprint(storedGrant) !== fingerprint(compiled) || !/^[0-9a-f]{64}$/u.test(token)) throw Error("Local evaluation grant or token differs");
     const bound = composeIsolatedPresenceEvaluation(pool, intake, token, context, workspace,
       apiKey === undefined ? { kind: "review" } : { kind: "worker", apiKey });
@@ -114,18 +126,20 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
   function protectedConfig() {
     return privateWorkflowFile<{ databaseUrl: string; ca: string; aiEnabled: boolean; apiKey: string }>(join(parent, "core-config.json"), parent);
   }
-  return { stop: () => pool.end(), openCase, async providerKey() {
+  return { stop: () => pool.end(), openCase, reviewer: commercial && ((token: unknown) => commercial.reviewer(pool, token)), async providerKey() {
     const config = await protectedConfig();
     if (!config.aiEnabled || !/^sk-[a-zA-Z0-9_-]{20,512}$/u.test(config.apiKey)) throw Error("Approved development provider credential required");
     return config.apiKey;
   }, async activate() {
     const end = Date.parse(plan.approval.expiresAt);
     const remaining = end - Date.now();
-    if (remaining <= 0 || remaining > 72 * 3600_000) throw Error("Evaluation approval window refused");
+    if (!commercial && (remaining <= 0 || remaining > 72 * 3600_000)) throw Error("Evaluation approval window refused");
     const config = options.scenario === "c0" ? await protectedConfig() : undefined;
-    const context = config ? await readOriginal(plan, { url: config.databaseUrl, ca: config.ca }) : bindFictionalEvaluation(plan);
+    const original = config ? await readOriginal(plan, { url: config.databaseUrl, ca: config.ca }) : bindFictionalEvaluation(plan);
+    const prepared = commercial ? await commercial.compile(original) : null;
+    const context = prepared?.context ?? original;
     const token = randomBytes(32).toString("hex");
-    const grant = evaluationGrant(plan, options.approval, options.scenario, context);
+    const grant = prepared?.grant ?? evaluationGrant(plan, options.approval, options.scenario, context);
     await mkdir(group, { mode: 0o700, recursive: true });
     await verifyDirectory(group);
     await mkdir(root, { mode: 0o700 });
@@ -134,18 +148,23 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
     await createPrivate(contextFile, JSON.stringify({ context, token }) + "\n");
     await seedEvaluation(pool, item, token);
     if ((await intake.workflowContext(token)).intakeId !== item.intakeId) throw Error("Fresh evaluation intake differs");
-    await initializeResponsesUsageLedger(workspace.ledgerDirectory, plan.provider.rates);
+    const reviewerGrant = await commercial?.bindReviewer(pool);
+    await initializeResponsesUsageLedger(workspace.ledgerDirectory, commercial?.primary ?? plan.provider.rates);
     const bytes = await privateWorkflowBytes(join(workspace.ledgerDirectory, "onboarding-usage.json"), root);
     if (digest(bytes) !== grant.ledger.startingLedger) throw Error("Fresh evaluation ledger differs");
     await createPrivate(workspace.grantFile, JSON.stringify(grant) + "\n");
-    return { intakeId: item.intakeId, scope: item.scope, ledger: grant.ledger.startingLedger, sources: grant.approvedSources.length };
+    if (commercial) await createPrivate(join(root, "activation.json"), JSON.stringify({
+      activation: commercial.fingerprint, grant: fingerprint(grant),
+    }) + "\n");
+    return { intakeId: item.intakeId, scope: item.scope, ledger: grant.ledger.startingLedger, sources: grant.approvedSources.length,
+      ...(commercial && { reviewerGrant, expiresAt: new Date(grant.expiresAt).toISOString() }) };
   } };
 }
 
 export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv = process.env) {
   const [operation, scenario, approval, value, ...extra] = args;
   const readOnly = ["inspect", "home", "site"].includes(operation);
-  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "recover", "queue-image", "decide-image"].includes(operation);
+  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "recover", "queue-image", "decide-image", "review-quality"].includes(operation);
   if ((scenario !== "c0" && scenario !== "c2") || !approval || extra.length ||
       !(readOnly || editing || operation === "activate" || operation === "work") || (editing ? !value : Boolean(value))) {
     throw Error("Evaluation command refused");
@@ -210,6 +229,18 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
     if (input.version !== prior.version) throw Error("Evaluation view is stale");
     const actor = { id: "local-evaluation-operator", role: "operator" as const, simulated: false,
       authority: "private evaluation workspace " + approval };
+    if (operation === "review-quality") {
+      if (!instance.reviewer) throw Error("Scoped commercial reviewer required");
+      process.stdin.setEncoding("utf8");
+      let token = "";
+      for await (const chunk of process.stdin) {
+        token += chunk;
+        if (token.length > 66) throw Error("Operator authentication refused");
+      }
+      const reviewer = await instance.reviewer(token.trimEnd());
+      const reviewed = await workflow.recordQualityReview(context, prior.version, reviewer, input.decision);
+      return { next: reviewed?.next, version: reviewed?.version };
+    }
     const result = operation === "continue" ? await workflow.confirmReport(context, prior.version, actor, true)
       : operation === "review-home" ? await workflow.reviewHomeConcept(context, prior.version, actor, input.digest, input.reference)
       : operation === "revise-home" ? await workflow.reviseHomeConcept(context, prior.version, actor, input.digest, input.concern)

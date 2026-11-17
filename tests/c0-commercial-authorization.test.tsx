@@ -9,11 +9,39 @@ import type { PoolClient } from "pg";
 import { managedKey, provisionManagedObject } from "../lib/platform/assets/local-storage";
 import { fingerprint } from "../lib/platform/canonical/model";
 import { commercialC0Inputs, readC0CommercialProposal, readC0CommercialSourceAmendment } from "../lib/platform/intake/c0-commercial-authorization";
+import { commercialApproval, commercialBinding } from "../scripts/intake/commercial-evaluation-activation";
 import { confirmSitePlanningReceipt, initializeResponsesUsageLedger, meteredPresenceWorkflow, summarizePresenceWorkflowUsage } from "../lib/platform/intake/intelligent-responses";
 import { focusMioPagesPreview } from "../scripts/customer-previews/miopages-focus";
 import { bindSiteDraft } from "../lib/platform/wordpress-delivery/site-draft";
 import { readSignedDraftBrand, resolveSignedDraftBrand } from "../lib/platform/wordpress-delivery/draft-brand";
 import { nativeDraftEnvelope, readNativeDraftEnvelope } from "../lib/platform/wordpress-delivery/native-draft-envelope";
+
+test("commercial activation preserves the existing reviewer, expiry and exact authorization", () => {
+  const artifact = "a".repeat(64);
+  const expiresAt = Date.parse("2026-11-19T16:03:51.397Z");
+  const startsAt = expiresAt - 36 * 3_600_000;
+  const activation = {
+    manifestSha256: commercialApproval,
+    sourceAmendmentSha256: "169178bb9a8f4a148f0cdb6307389df34a6cc0dee460097856fffc2b4ce2f1fe",
+    artifactSha256: artifact,
+    innodbProofSha256: "3f9787b162032ff3a4f13cfb5d776b77dc485afd9fd49974aecce2a8547c8e83",
+    reviewerAuthorizer: "same-owner-separate-permissions" as const,
+    reviewerId: "1a3febb6-5f06-448c-a9b5-77749af82d07",
+    reviewerVerifier: "b".repeat(64),
+    reviewerExpiresAt: expiresAt,
+    startsAt,
+  };
+  const result = commercialBinding(activation, artifact, startsAt, false);
+  assert.equal(result.expiresAt, expiresAt);
+  assert.equal(result.independentReviewerId, activation.reviewerId);
+  assert.ok(!JSON.stringify(result).includes(activation.reviewerVerifier));
+  assert.throws(() => commercialBinding({ ...activation, reviewerId: randomUUID() }, artifact, startsAt, false));
+  assert.throws(() => commercialBinding({ ...activation, reviewerExpiresAt: expiresAt + 1 }, artifact, startsAt, false));
+  assert.throws(() => commercialBinding(activation, "c".repeat(64), startsAt, false));
+  assert.throws(() => commercialBinding(activation, artifact, startsAt - 1, false));
+  assert.throws(() => commercialBinding(activation, artifact, expiresAt, false));
+  assert.equal(commercialBinding(activation, artifact, expiresAt, true).expiresAt, expiresAt);
+});
 
 const sha = (value: Buffer) => createHash("sha256").update(value).digest("hex");
 async function currentProposal() {
