@@ -20,6 +20,7 @@ test("Core retrieves only pinned public sources and sends source-bound stages th
     await initializeResponsesUsageLedger(directory, rates);
     const context: WorkflowContext = {
       scope: { webPresenceId: "test-presence", managedSiteId: "test-site" }, intakeId: "test-intake", entry: "FREE_REVIEW",
+      evaluation: { scenario: "c0", basis: fingerprint("evaluation fixture") },
       evidence: [{ id: "owner", kind: "owner-confirmed", label: "Offer", reference: "private-owner-pointer",
         date: "2026-11-01", content: "The business offers managed Launch and Ongoing." }], limitations: [], conflicts: [],
     };
@@ -56,6 +57,7 @@ test("Core retrieves only pinned public sources and sends source-bound stages th
         const encoded = JSON.stringify(body);
         assert.match(encoded, /Public evidence/);
         assert.doesNotMatch(encoded, /private-script|private-owner-pointer|test-presence|test-intake/);
+        assert.match(encoded, /"sourceIds":\{"type":"array","items":\{"type":"string","enum":\["owner","research:market"\]\}\}/u);
         if (path.endsWith("/input_tokens")) return { body: { input_tokens: 5000 } };
         assert.equal((body as { store: boolean }).store, false);
         return { body: responseBody, rawBody: Buffer.from(JSON.stringify(responseBody)) };
