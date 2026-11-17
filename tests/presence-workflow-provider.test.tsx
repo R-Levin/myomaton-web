@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fingerprint } from "../lib/platform/canonical/model";
-import { initializeResponsesUsageLedger, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
+import { initializeResponsesUsageLedger, meteredPresenceWorkflow, meteredPresenceWorkflowImage, type ResponsesRates } from "../lib/platform/intake/intelligent-responses";
 import { createResponsesPresenceWorkflow, type PresenceWorkflowGrant } from "../lib/platform/intake/presence-workflow-provider";
 import type { WorkflowContext, WorkflowInput, WorkflowOperation, WorkflowRun } from "../lib/platform/intake/presence-workflow";
 import { ArtifactValidationError, readBlueprint, readDirection, readEditorial, readPage, readReport } from "../lib/platform/intake/presence-workflow-artifacts";
@@ -83,6 +83,11 @@ test("Core retrieves only pinned public sources and sends source-bound stages th
       actor: { id: "owner-test", role: "operator", simulated: false }, reportDigest: fingerprint(report), at: new Date().toISOString(),
     }] });
     await assert.rejects(provider.run(newCorrection, retain), /authorization/i);
+    const unapprovedHome = makeRun("page", { ...base, research, revisionRequest: {
+      source: "home-concept", paths: ["/"], audit: { summary: "Unapproved operator text", concerns: [{ path: "/", concern: "Unapproved operator text" }] },
+      priorPages: [], actor: { id: "test", role: "operator", simulated: false }, at: new Date().toISOString(), ordinal: 1,
+    } });
+    await assert.rejects(provider.run(unapprovedHome, retain), /authorization/i);
     assert.deepEqual(requested, []);
     assert.deepEqual(await provider.run(work, retain), report);
     assert.deepEqual(requested, ["/v1/responses/input_tokens", "/v1/responses"]);
@@ -101,6 +106,42 @@ test("Core retrieves only pinned public sources and sends source-bound stages th
     assert.equal(requested.length, 2);
   } finally {
     await rm(ledgerPath, { force: true });
+    await rmdir(directory);
+  }
+});
+
+test("evaluation budgets distinguish image and text operations before dispatch", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "miopages-evaluation-budget-"));
+  const ledger = join(directory, "onboarding-usage.json");
+  try {
+    const rates: ResponsesRates = { model: "test-model", verifiedOn: "2026-11-16", inputPerMillion: 750_000,
+      cachedPerMillion: 75_000, cacheWritePerMillion: 0, outputPerMillion: 4_500_000, countMicros: 0 };
+    await initializeResponsesUsageLedger(directory, rates);
+    const scope = { id: fingerprint("case"), startingLedger: createHash("sha256").update(await readFile(ledger)).digest("hex"),
+      baselineAttempts: 0, requests: 3, generations: 2, capMicros: 600_000, inputTokens: 10, inputBytes: 1000,
+      breakdown: { text: 1, images: 1, searchCalls: 0 } };
+    const counts = { image: 0, text: 0 };
+    const model = "gpt-image-2.5-sunburst-2026-09-08";
+    const ownerDigest = fingerprint("owner");
+    const recheck = async () => {};
+    const image = (id: string) => meteredPresenceWorkflowImage(directory, rates, scope, { ownerDigest, workDigest: fingerprint(id) },
+      model, async () => { counts.image++; return { model, requestId: null }; }, recheck);
+    const text = meteredPresenceWorkflow(directory, rates, { async send(path) {
+      counts.text++;
+      if (path.endsWith("/input_tokens")) return { body: { input_tokens: 2 } };
+      return { body: { model: rates.model, service_tier: "default", status: "completed",
+        usage: { input_tokens: 2, input_tokens_details: { cached_tokens: 0 }, output_tokens: 2,
+          output_tokens_details: { reasoning_tokens: 0 }, total_tokens: 4 },
+        output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: "{}" }] }] } };
+    } }, scope, 20);
+    await image("first image");
+    await assert.rejects(image("second image"), /image budget/);
+    const request = { model: rates.model, instructions: "fixture", input: "fixture", text: { format: {} } };
+    await text({ ownerDigest, workDigest: fingerprint("first text") }, request);
+    await assert.rejects(text({ ownerDigest, workDigest: fingerprint("second text") }, request), /budget/);
+    assert.deepEqual(counts, { image: 1, text: 2 });
+  } finally {
+    await rm(ledger, { force: true });
     await rmdir(directory);
   }
 });

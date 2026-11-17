@@ -16,9 +16,8 @@ export type PresenceVisualPlacement = {
 
 export function presenceVisualPlacement(context: WorkflowContext, view: PresenceWorkflowView, path: string, sectionIndex: number): PresenceVisualPlacement {
   const decision = view.operatorReview;
-  if (view.contextDigest !== fingerprint(context) || view.next !== "review-complete" || !decision || decision.target !== fingerprint({
-    confirmation: view.confirmation?.target, direction: view.direction, blueprint: view.blueprint, pages: view.pages, editorial: view.editorial,
-  }) || decision.actor.role !== "operator") throw Error("Exact reviewed website required for a visual placement");
+  const concept = context.evaluation && view.next === "home-concept" && path === "/" && sectionIndex === 0 ? view.homeConcept : undefined;
+  if (view.contextDigest !== fingerprint(context) || (!concept && (view.next !== "review-complete" || !decision || decision.target !== view.candidateReviewTarget || decision.actor.role !== "operator"))) throw Error("Exact reviewed website or scoped Home concept required for a visual placement");
   const section = view.pages.find(page => page.path === path)?.sections[sectionIndex];
   if (!Number.isSafeInteger(sectionIndex) || sectionIndex < 0 || section?.visual.status !== "asset-needed") {
     throw Error("Visual placement needs an image and has no outstanding rights review");
@@ -26,7 +25,7 @@ export function presenceVisualPlacement(context: WorkflowContext, view: Presence
   const { purpose, brief, altIntent } = section.visual;
   return {
     owner: uuid(context.scope.webPresenceId), site: uuid(context.scope.managedSiteId), intake: uuid(context.intakeId),
-    path, sectionIndex, sectionDigest: fingerprint(section), candidateDigest: decision.target,
+    path, sectionIndex, sectionDigest: fingerprint(section), candidateDigest: concept?.digest ?? decision!.target,
     purpose, brief, altIntent,
   };
 }

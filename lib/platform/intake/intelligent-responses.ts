@@ -29,6 +29,7 @@ type Receipt = QuestionAttribution & { reservedMicros: number; countDispatched: 
   inputLimit?: number;
   workflowScope?: string;
   webSearchCalls?: number;
+  workflowImage?: true;
   imageRun?: { model: string; requestId?: string; resultDigest: string };
   recoveryAuthorized?: true;
   proposalValidation?: "valid" | "proposal_shape" | "proposal_citations" | "proposal_route" | "proposal_content" | "response_decode";
@@ -340,6 +341,7 @@ export function verifyOutcomeLedger(ledger: Ledger, inputDigest: string, attempt
 export type WorkflowUsageScope = {
   id: string; startingLedger: string; baselineAttempts: number;
   requests: number; generations: number; capMicros: number; inputTokens: number; inputBytes: number;
+  breakdown?: { text: number; images: number; searchCalls: number };
 };
 
 const workflowImageModel = "gpt-image-2.5-sunburst-2026-09-08";
@@ -378,11 +380,12 @@ export async function meteredPresenceWorkflowImage<T extends { requestId: string
     const generations = recent.filter(item => item.generationDispatched).length;
     const requests = recent.filter(item => item.countDispatched).length + generations;
     const spend = recent.reduce((sum, item) => sum + workflowDebit(item), 0);
-    if (generations >= workflow.generations || requests + 1 > workflow.requests ||
+    const images = recent.filter(item => item.workflowImage).length;
+    if ((workflow.breakdown && images >= workflow.breakdown.images) || generations >= workflow.generations || requests + 1 > workflow.requests ||
         spend + imageEnvelopeMicros > workflow.capMicros ||
         ledger.attempts.some(item => item.workDigest === attribution.workDigest)) throw Error("Workflow image budget or duplicate refused");
     await recheck();
-    const receipt: Receipt = { ...attribution, reservedMicros: imageEnvelopeMicros, workflowScope: workflow.id,
+    const receipt: Receipt = { ...attribution, reservedMicros: imageEnvelopeMicros, workflowScope: workflow.id, workflowImage: true,
       countDispatched: false, generationDispatched: true, status: "pending" };
     ledger.attempts.push(receipt);
     async function checkpoint() {
@@ -449,9 +452,14 @@ function searchCalls(body: Record<string, unknown>) {
 export function meteredPresenceWorkflow(directory: string, rates: Rates, transport: ResponsesTransport,
   scope: WorkflowUsageScope, outputLimit: number, retainedReservation?: string, researchCalls?: number) {
   const fields = [scope.baselineAttempts, scope.requests, scope.generations, scope.capMicros, scope.inputTokens, scope.inputBytes, outputLimit];
+  const mix = scope.breakdown;
+  if (mix && ([mix.text, mix.images, mix.searchCalls].some(value => !Number.isSafeInteger(value) || value < 0) ||
+      mix.text < 1 || mix.text + mix.images !== scope.generations || mix.searchCalls !== (researchCalls ?? 0))) {
+    throw Error("Workflow request breakdown refused");
+  }
   if (![scope.id, scope.startingLedger, ...(retainedReservation ? [retainedReservation] : [])].every(value => /^[a-f0-9]{64}$/u.test(value)) ||
       fields.some(value => !Number.isSafeInteger(value) || value < 0) ||
-      scope.requests < 2 || scope.generations < 1 || scope.generations * 2 > scope.requests ||
+      scope.requests < 2 || scope.generations < 1 || (mix ? mix.text * 2 + mix.images : scope.generations * 2) > scope.requests ||
       scope.capMicros < 1 || scope.inputTokens < 1 || scope.inputBytes < 1 || outputLimit < 16) throw Error("Workflow budget refused");
   if (researchCalls !== undefined && (rates.model !== "gpt-5.4-mini-2026-03-17" ||
       !Number.isSafeInteger(researchCalls) || researchCalls < 1 || researchCalls > 10)) throw Error("Research tool budget refused");
@@ -508,7 +516,11 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
         const runGenerations = recent.filter(item => item.generationDispatched).length;
         const runRequests = recent.filter(item => item.countDispatched).length + runGenerations;
         const runSpent = recent.reduce((sum, item) => sum + workflowDebit(item), 0);
-        if (runRequests + operations > workflow.requests || runGenerations >= workflow.generations ||
+        const images = recent.filter(item => item.workflowImage).length;
+        const spentSearchCalls = recent.reduce((sum, item) => sum + (item.webSearchCalls ?? 0), 0);
+        if ((workflow.breakdown && (runGenerations - images >= workflow.breakdown.text ||
+              spentSearchCalls + toolLimit > workflow.breakdown.searchCalls)) ||
+            runRequests + operations > workflow.requests || runGenerations >= workflow.generations ||
             runSpent + reservation > workflow.capMicros) throw Error("Workflow budget exhausted");
       } else if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) {
         throw Error("Development budget exhausted");

@@ -1,7 +1,9 @@
 import { lstat, readFile, realpath } from "node:fs/promises";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import type { Pool } from "pg";
 import { fingerprint } from "../canonical/model";
+import { requireEvaluationContext } from "./presence-evaluation";
+import type { WorkflowContext } from "./presence-workflow";
 import { IntakeError, normalizeAnswers } from "./model";
 import { adaptiveOnboardingVersion, type PreparedUnderstanding } from "./adaptive";
 import { c0DisclosureManifest, addC0WorkflowKnowledge } from "./c0-workflow-knowledge";
@@ -74,24 +76,66 @@ export async function openProtectedPresenceWorkspace(requireEvidence = true) {
   return { workspace, pool, intake, token: input.draftToken };
 }
 
-export function composePresenceCase(pool: Pool, intake: IntakeService, token: string, workspace: Workspace, capability:
-  { kind: "review" } | { kind: "worker"; apiKey: string } |
-  { kind: "offline-test"; transport: ResponsesTransport; fetchPage: typeof fetch; readGrant: () => Promise<PresenceWorkflowGrant>; rates: ResponsesRates; imageProvider?: ImageProvider }) {
-  if (capability.kind === "offline-test" && process.env.NODE_ENV === "production") throw Error("Fixture transport refused");
-  const readGrant = capability.kind === "offline-test" ? capability.readGrant : () => privateWorkflowFile<PresenceWorkflowGrant>(workspace.grantFile, workspace.root);
+type PresenceCapability = { kind: "review" } | { kind: "worker"; apiKey: string } |
+  { kind: "offline-test"; transport: ResponsesTransport; fetchPage: typeof fetch; readGrant: () => Promise<PresenceWorkflowGrant>; rates: ResponsesRates; imageProvider?: ImageProvider };
+
+export function composePresenceCase(pool: Pool, intake: IntakeService, token: string, workspace: Workspace, capability: PresenceCapability) {
   async function context() {
     if (fingerprint(intake.selection) !== fingerprint(protectedOwnerScope) && capability.kind !== "offline-test") {
       throw Error("Protected workflow site refused");
     }
     return addC0WorkflowKnowledge(await intake.workflowContext(token), workspace.referenceDirectory, capability.kind !== "offline-test");
   }
+  return composeBoundPresenceCase(pool, context, workspace, capability, "protected", (current, grant) => {
+    const manifest = c0DisclosureManifest(current);
+    return grant.contextDigest === manifest.contextDigest &&
+      grant.approvedSources.every(digest => manifest.approvedSourceCandidates.some(source => source.digest === digest));
+  });
+}
+
+export function composeIsolatedPresenceEvaluation(pool: Pool, intake: IntakeService, token: string, bound: WorkflowContext,
+  workspace: Workspace, capability: PresenceCapability) {
+  const binding = requireEvaluationContext(bound);
+  if (process.env.NODE_ENV === "production") throw Error("Evaluation runner is isolated from production");
+  const expected = structuredClone(bound);
+  async function context() {
+    const { rows: [database] } = await pool.query("SELECT current_database() AS name, host(inet_server_addr()) AS host");
+    if (!/^migration_rehearsal_[a-f0-9]{32}$/u.test(database?.name ?? "") || database.host !== "127.0.0.1") {
+      throw Error("Isolated evaluation requires the disposable loopback database");
+    }
+    const owned = await intake.workflowContext(token);
+    if (owned.intakeId !== expected.intakeId || fingerprint(owned.scope) !== fingerprint(expected.scope) || owned.entry !== expected.entry) {
+      throw Error("Evaluation intake ownership changed");
+    }
+    return structuredClone(expected);
+  }
+  const evaluation = composeBoundPresenceCase(pool, context, workspace, capability, "disposable", (current, grant) =>
+    grant.siteComposition === "managed-v1" && grant.ledger.baselineAttempts === 0 && Boolean(grant.ledger.breakdown) &&
+    grant.contextDigest === fingerprint(current) &&
+    fingerprint([...grant.approvedSources].sort()) === fingerprint(current.evidence.map(fingerprint).sort()));
+  return { context, async open() {
+    if (basename(workspace.root) !== binding.intake || workspace.grantFile !== join(workspace.root, "grant.json") ||
+        workspace.ledgerDirectory !== join(workspace.root, "usage") ||
+        (workspace.visualDirectory && workspace.visualDirectory !== join(workspace.root, "media"))) {
+      throw Error("Case-specific private evaluation workspace required");
+    }
+    if (capability.kind !== "offline-test") {
+      await verifyDirectory(workspace.root);
+      await verifyDirectory(workspace.ledgerDirectory);
+    }
+    return evaluation.open();
+  } };
+}
+
+function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowContext>, workspace: Workspace,
+  capability: PresenceCapability, boundary: "disposable" | "protected", permitted: (current: WorkflowContext, grant: PresenceWorkflowGrant) => boolean) {
+  if (capability.kind === "offline-test" && process.env.NODE_ENV === "production") throw Error("Fixture transport refused");
+  const readGrant = capability.kind === "offline-test" ? capability.readGrant : () => privateWorkflowFile<PresenceWorkflowGrant>(workspace.grantFile, workspace.root);
   return {
     context,
     async open() {
       const [grant, current] = await Promise.all([readGrant(), context()]);
-      const manifest = c0DisclosureManifest(current);
-      if (grant.contextDigest !== manifest.contextDigest ||
-          grant.approvedSources.some(digest => !manifest.approvedSourceCandidates.some(source => source.digest === digest))) throw Error("Protected workflow source binding refused");
+      if (!permitted(current, grant)) throw Error("Workflow source binding refused");
       const rates = capability.kind === "offline-test" ? capability.rates : (await privateWorkflowFile<{ rateCard: ResponsesRates }>(
         join(workspace.ledgerDirectory, "onboarding-usage.json"), workspace.root)).rateCard;
       if (rates.model !== "gpt-5.4-mini-2026-03-17" || rates.inputPerMillion !== 750_000 || rates.cachedPerMillion !== 75_000 ||
@@ -150,7 +194,7 @@ export function composePresenceCase(pool: Pool, intake: IntakeService, token: st
         };
       }
       const scoped = { ...operations, visuals };
-      return new PresenceWorkflow(pool, capability.kind === "review" ? { ...scoped, run: noOutbound } : scoped, {}, Date.now, "protected");
+      return new PresenceWorkflow(pool, capability.kind === "review" ? { ...scoped, run: noOutbound } : scoped, {}, Date.now, boundary);
     },
   };
 }
@@ -162,7 +206,7 @@ export async function workPresenceCase(workflow: PresenceWorkflow, current: Awai
       previous = await workflow.recover(current, previous.version);
     } else if (!previous.failure && ["research", "report", "direction", "blueprint", "page", "editorial"].includes(previous.next)) {
       previous = await workflow.advance(current, previous.version);
-    } else if (previous.next === "review-complete" && previous.visuals?.some(visual => ["queued", "running", "unverified"].includes(visual.state))) {
+    } else if (["review-complete", "home-concept"].includes(previous.next) && previous.visuals?.some(visual => ["queued", "running", "unverified"].includes(visual.state))) {
       return workflow.advanceVisual(current, previous.version);
     } else return previous;
   }

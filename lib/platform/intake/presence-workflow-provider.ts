@@ -13,6 +13,7 @@ export type PresenceWorkflowGrant = {
   contextDigest: string;
   approvedSources: readonly string[];
   approvedCorrections: readonly string[];
+  approvedHomeFeedback?: readonly string[];
   researchSources: readonly PublicResearchSource[];
   researchResponseBytes: number;
   discovery?: ResearchDiscovery;
@@ -53,10 +54,14 @@ function workScope(run: WorkflowRun, grant: PresenceWorkflowGrant) {
 function approvedProjection(run: WorkflowRun, grant: PresenceWorkflowGrant) {
   const { evidence, research, corrections, report, direction, blueprint, entry, limitations, conflicts, pages, revisionRequest } = run.input;
   const selected = evidence.filter(source => grant.approvedSources.includes(fingerprint(source)));
+  const fictional = run.context.evaluation?.scenario === "c2" && selected.length > 0 && selected.every(source =>
+    source.kind !== "owner-confirmed" && source.reference.startsWith("Fictional C2 fixture: "));
   if (fingerprint(run.context) !== grant.contextDigest || fingerprint(run.input) !== run.work.inputDigest ||
       fingerprint(evidence) !== fingerprint(run.context.evidence) ||
-      !selected.some(source => source.kind === "owner-confirmed") || selected.length !== grant.approvedSources.length ||
-      corrections.some(correction => !grant.approvedCorrections.includes(fingerprint(correction)))) {
+      (!fictional && !selected.some(source => source.kind === "owner-confirmed")) || selected.length !== grant.approvedSources.length ||
+      corrections.some(correction => !grant.approvedCorrections.includes(fingerprint(correction))) ||
+      (revisionRequest?.source === "home-concept" && revisionRequest.audit.concerns.some(item =>
+        !grant.approvedHomeFeedback?.includes(fingerprint(item.concern))))) {
     throw new WorkflowBlocked("Exact evidence authorization required");
   }
   const omitReference = ({ id, kind, label, date, content }: WorkflowRun["input"]["evidence"][number]) => ({ id, kind, label, date, content });
