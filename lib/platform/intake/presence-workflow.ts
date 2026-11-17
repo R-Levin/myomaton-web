@@ -6,6 +6,7 @@ import type { EntryIntent } from "./model";
 import { IntakeError } from "./model";
 import type { EvaluationBinding } from "./presence-evaluation";
 import { composeHomeConcept, homeConceptDigest } from "./presence-home-concept";
+import { applyEditorialPatch } from "./presence-editorial-patch";
 import { editorialDecision, editorialFindings, withEditorialHistory, type EditorialDecision, type EditorialFinding } from "./presence-editorial-decisions";
 import { presenceVisualPlacement, type PresenceVisual, type PresenceVisualOperations } from "./presence-workflow-visual";
 import {
@@ -38,7 +39,7 @@ type Work = {
 type Failure = "operation-blocked" | "output-invalid" | "outcome-unknown";
 type Decision = { actor: Actor; at: string; target: string; decision: "confirmed" | "development-continuation" | "reviewed" };
 type Correction = { finding: WorkflowReport["findings"][number]; text: string; reportDigest: string; actor: Actor; at: string };
-type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: WorkflowPage[]; actor: Actor; at: string; ordinal: number; source?: "home-concept" };
+type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: WorkflowPage[]; actor: Actor; at: string; ordinal: number; source?: "home-concept"; batch?: "pending" | "applied" };
 type State = {
   version: number;
   contextDigest: string;
@@ -167,6 +168,7 @@ function nextTask(state: State): Task | null {
   const drafted = new Set(state.pages.map(page => page.path));
   if (!drafted.has("/") && state.blueprint.pages.some(page => page.path === "/")) return { operation: "page", path: "/" };
   if (state.evaluation && !state.homeReview) return null;
+  if (state.evaluation && state.revisionRequest?.batch === "pending") return { operation: "page" };
   const missing = state.blueprint.pages.find(page => !drafted.has(page.path));
   if (missing) return { operation: "page", path: missing.path };
   if (!state.editorial) return { operation: "editorial" };
@@ -315,6 +317,12 @@ export class PresenceWorkflow {
         case "direction": next = { ...state, direction: readDirection(output, ids, provider) }; break;
         case "blueprint": next = { ...state, blueprint: readBlueprint(output, ids, provider) }; break;
         case "page": {
+          if (state.evaluation && state.revisionRequest?.batch === "pending" && !work.path) {
+            const revisionRequest = state.revisionRequest;
+            next = { ...state, revisionRequest: { ...revisionRequest, batch: "applied" },
+              pages: applyEditorialPatch(output, state.pages, revisionRequest.paths, paths, ids, this.destinations) };
+            break;
+          }
           const destinations = state.evaluation ? Object.fromEntries(Object.entries(this.destinations).filter(([, destination]) =>
             destination !== work.path && paths.includes(destination))) : this.destinations;
           const page = readPage(output, work.path!, paths, ids, destinations, provider, Boolean(state.evaluation));
@@ -393,12 +401,13 @@ export class PresenceWorkflow {
     const ordinal = (state.revisionRequest?.ordinal ?? 0) + 1;
     if (ordinal > (this.operations.maxEditorialRevisions ?? 1)) throw new IntakeError("workflow_not_ready", 409);
     const at = new Date(this.clock()).toISOString();
+    const batch = Boolean(state.evaluation) && state.mode === "provider" && paths.length > 1;
     const revisionRequest = { paths, audit: { summary: state.editorial.summary, concerns }, priorPages: state.pages.filter(page => paths.includes(page.path)),
-      actor, at, ordinal };
+      actor, at, ordinal, ...(batch && { batch: "pending" as const }) };
     const queued = assigned.map(({ decision }) => ({ ...decision, status: "queued" as const, actor, at, basedOnVersion: version }));
     return this.view(context, await this.store.append(context, version, { ...state, revisionRequest, editorial: null,
       editorialFindings: savedEditorialFindings(state), editorialDecisions: [...state.editorialDecisions ?? [], ...queued],
-      pages: state.pages.filter(page => !paths.includes(page.path)) }));
+      pages: batch ? state.pages : state.pages.filter(page => !paths.includes(page.path)) }));
   }
 
   async confirmReport(context: WorkflowContext, version: number, actor: Actor, developmentContinuation = false) {

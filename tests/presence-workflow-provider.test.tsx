@@ -10,6 +10,7 @@ import { createResponsesPresenceWorkflow, type PresenceWorkflowGrant } from "../
 import type { WorkflowContext, WorkflowInput, WorkflowOperation, WorkflowRun } from "../lib/platform/intake/presence-workflow";
 import { ArtifactValidationError, readBlueprint, readDirection, readEditorial, readPage, readReport } from "../lib/platform/intake/presence-workflow-artifacts";
 import { validateResearchSources } from "../lib/platform/intake/presence-workflow-research";
+import { applyEditorialPatch } from "../lib/platform/intake/presence-editorial-patch";
 
 test("Core retrieves only pinned public sources and sends source-bound stages through the existing usage and recovery rules", async () => {
   const directory = await mkdtemp(join(tmpdir(), "miopages-workflow-provider-"));
@@ -215,6 +216,32 @@ test("evaluation recovery keeps valid Intro links contextual without changing co
   assert.deepEqual(mismatch.actions, [{ label: action.label, kind: action.kind, destination: null }]);
   assert.throws(() => readPage({ ...page, actions: [{ ...action, sectionIndex: 8 }] }, "/login", paths,
     ["owner"], { "request-review": "/free-review" }, true, true), /Action placement/);
+});
+
+test("a scoped editorial patch improves actual copy and moves an existing preview Action without widening evidence or routes", () => {
+  const paths = ["/", "/free-review"], allowed = ["owner", "quoted"];
+  const visual = { status: "asset-needed", purpose: "Show one useful decision", brief: "Opening illustration", altIntent: "Example" };
+  const raw = { path: "/", composition: "managed-v1", heading: "Old opening", searchTitle: "Home", searchDescription: "Useful starting point",
+    sections: [{ role: "hero", heading: "Old heading", body: "Old text", sourceIds: ["owner"], visual },
+      { role: "cta", heading: "Choices", body: "Three options", sourceIds: ["owner"], visual }],
+    actions: [{ label: "Review", kind: "request-review", destination: "/free-review", sectionIndex: 1 }],
+    internalLinks: ["/free-review", "/unknown"] };
+  const destinations = { "request-review": "/free-review" };
+  const before = readPage(raw, "/", paths, allowed, destinations, true, true);
+  const section = { index: 0, heading: "Find what needs work", body: "Get a focused review.", sourceIds: ["quoted"], visual: null };
+  const change = { path: "/", heading: null, sections: [section], removeInternalLinks: ["/free-review"],
+    actions: [{ index: 0, label: "Start the Free Review", sectionIndex: 0, remove: false }] };
+  const [after] = applyEditorialPatch({ changes: [change] }, [before], ["/"], paths, allowed, destinations);
+  assert.equal(after.sections[0].body, section.body);
+  assert.deepEqual(after.sections[0].sourceIds, ["quoted"]);
+  assert.deepEqual(after.sections[1], before.sections[1]);
+  assert.deepEqual(after.actions, [{ label: "Start the Free Review", kind: "request-review", destination: "/free-review", sectionIndex: 0 }]);
+  assert.deepEqual(after.unresolvedLinks, ["/unknown"]);
+  assert.throws(() => applyEditorialPatch({ changes: [change] }, [before], ["/free-review"], paths, allowed, destinations), /outside/);
+  const foreign = { ...change, sections: [{ ...section, sourceIds: ["foreign"] }] };
+  assert.throws(() => applyEditorialPatch({ changes: [foreign] }, [before], ["/"], paths, allowed, destinations), /Unknown artifact reference/);
+  assert.throws(() => applyEditorialPatch({ changes: [{ ...change, removeInternalLinks: ["/foreign"] }] },
+    [before], ["/"], paths, allowed, destinations), /link change refused/);
 });
 
 test("provider artifact settlement retains editorial suggestions as advice and refuses foreign citations", () => {
