@@ -101,6 +101,7 @@ if (core) {
   for (const [source, executable] of [
     ["scripts/intake/protected-presence-worker.ts", "protected-presence-worker.cjs"],
     ["scripts/wordpress-private-operator.ts", "wordpress-private-operator.cjs"],
+    ["scripts/intake/run-presence-evaluation.ts", "presence-evaluation-worker.cjs"],
   ]) {
     const relative = path.join(".rehearsal", executable);
     const outfile = path.join(staging, relative);
@@ -109,7 +110,9 @@ if (core) {
     protectedCommands.push(relative);
     hashes[relative] = createHash("sha256").update(await readFile(outfile)).digest("hex");
   }
+  await copyEntry("lib/platform/db/migrations");
   for (const file of ["lib/platform/intake/presence-workflow.sql", "lib/platform/intake/protected-presence-workflow-policy.sql",
+    "docs/presence-evaluation-activation.json",
     "docs/miopages-c0-business-brief.md", "docs/c0-discovery-question-recovery-audit.md", "docs/miopages-c0-product-model.md"]) {
     await mkdir(path.dirname(path.join(staging, file)), { recursive: true });
     await copyEntry(file);
@@ -125,7 +128,7 @@ try {
     const result = spawnSync(process.execPath, [command, "INVALID"], { cwd: staging, input: "",
       encoding: "utf8", timeout: 10_000, env: { PATH: process.env.PATH, HOME: process.env.HOME, NODE_ENV: "production" } });
     assert.equal(result.status, 1, "Packaged protected entry must fail safely without configuration");
-    assert.match(result.stderr, index === 0 ? /"status":"BLOCKED"/u : /Protected command refused/u);
+    assert.match(result.stderr, index === 1 ? /Protected command refused/u : /"status":"BLOCKED"/u);
     assert.equal(result.stdout, "");
   }
 }

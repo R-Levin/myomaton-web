@@ -21,6 +21,9 @@ on:
       - 'scripts/intake/c0-site-journey-client.tsx'
       - 'scripts/intake/presence-workflow-panel.tsx'
       - 'scripts/intake/protected-presence-worker.ts'
+      - 'scripts/intake/*presence-evaluation*.ts'
+      - 'docs/presence-evaluation-activation.json'
+      - 'tests/integration/presence-evaluation*.test.ts'
       - 'tests/presence-workflow-provider.test.tsx'
       - 'tests/presence-workflow-review.test.tsx'
       - 'scripts/wordpress-routing-smoke.mjs'
@@ -64,6 +67,20 @@ jobs:
         run: npx tsx --test tests/proposal-preview-compatibility.test.tsx tests/wordpress-private-build-config.test.tsx
       - name: Verify metered planning and private recovery on Linux
         run: npx tsx --test tests/site-planning.test.tsx tests/site-planning-recovery.test.tsx tests/presence-workflow-provider.test.tsx tests/presence-workflow-review.test.tsx
+      - name: Verify isolated evaluation worker on Linux PostgreSQL
+        run: |
+          for candidate in /usr/lib/postgresql/17/bin /usr/lib/postgresql/18/bin; do
+            if test -x "$candidate/initdb"; then export PG_BIN_DIR="$candidate"; break; fi
+          done
+          if test -z "${PG_BIN_DIR:-}"; then
+            sudo install -d -m 0755 /usr/share/postgresql-common/pgdg
+            curl --fail --silent --show-error --location https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc >/dev/null
+            echo 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main' | sudo tee /etc/apt/sources.list.d/miopages-pgdg.list >/dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends postgresql-17
+            export PG_BIN_DIR=/usr/lib/postgresql/17/bin
+          fi
+          node --import tsx --test --test-concurrency=1 tests/integration/presence-evaluation-linux.test.ts tests/integration/presence-evaluation.test.ts
       - name: Verify portable artifact dependency boundary
         run: node --test tests/wordpress-artifact-links.test.mjs
       - name: Verify raw routing boundary and sanitized diagnostics

@@ -72,11 +72,13 @@ function validateRates(rates: Rates) {
       integer(rates.outputPerMillion) > 25_000_000 || integer(rates.countMicros) > capMicros) throw Error("Rate card outside development limits");
 }
 
-export async function initializeResponsesUsageLedger(directory: string, rates: Rates) {
+export function emptyResponsesUsageLedger(rates: Rates): Ledger {
   validateRates(rates);
-  await durableWrite(join(directory, "onboarding-usage.json"), {
-    ratesDigest: fingerprint(rates), rateCard: rates, adapterVersion: version, model: rates.model, tier: "default", attempts: [],
-  });
+  return { ratesDigest: fingerprint(rates), rateCard: rates, adapterVersion: version, model: rates.model, tier: "default", attempts: [] };
+}
+
+export async function initializeResponsesUsageLedger(directory: string, rates: Rates) {
+  await durableWrite(join(directory, "onboarding-usage.json"), emptyResponsesUsageLedger(rates));
 }
 export const initializeOfflineUsageLedger = initializeResponsesUsageLedger;
 

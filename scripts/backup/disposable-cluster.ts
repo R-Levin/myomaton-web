@@ -9,9 +9,11 @@ import { Pool } from "pg";
 import { native } from "./core";
 
 // No installed service, shared port, shared database or repository binary changes.
-export async function disposableCluster(bin: string) {
+export async function disposableCluster(bin: string, databaseId: string = randomUUID()) {
+  const database = "migration_rehearsal_" + databaseId.replaceAll("-", "");
+  assert.match(database, /^migration_rehearsal_[a-f0-9]{32}$/u);
   const root = await mkdtemp(path.join(tmpdir(), "miopages-managed-cluster-")), data = path.join(root, "data");
-  const password = randomBytes(32).toString("hex"), file = path.join(root, "password.tmp"), database = "migration_rehearsal_" + randomUUID().replaceAll("-", "");
+  const password = randomBytes(32).toString("hex"), file = path.join(root, "password.tmp");
   const reservation = createServer(); reservation.listen(0, "127.0.0.1"); await once(reservation, "listening"); const port = (reservation.address() as { port: number }).port;
   await new Promise<void>(resolve => reservation.close(() => resolve())); assert.notEqual(port, 5432);
   const base = new URL(`postgresql://postgres:${password}@127.0.0.1:${port}/postgres`); let started = false;

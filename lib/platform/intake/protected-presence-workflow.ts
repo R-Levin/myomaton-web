@@ -34,7 +34,7 @@ export async function privateWorkflowFile<T>(file: string, root: string): Promis
   return JSON.parse((await privateWorkflowBytes(file, root)).toString("utf8")) as T;
 }
 
-async function verifyDirectory(path: string) {
+export async function verifyDirectory(path: string) {
   const status = await lstat(path);
   if (!status.isDirectory() || status.uid !== process.getuid?.() || (status.mode & 0o777) !== 0o700 ||
       await realpath(path) !== path) throw Error("Protected workflow directory refused");
@@ -53,7 +53,7 @@ export async function protectedWorkflowWorkspace(requireEvidence = true): Promis
 type ProtectedInput = { webPresenceId: string; managedSiteId: string; draftToken: string; answers: unknown;
   provenance: Record<string, IntakeEvidence>; prepared: PreparedUnderstanding; step: number };
 
-export async function openProtectedPresenceWorkspace(requireEvidence = true) {
+export async function openProtectedPresenceWorkspace(requireEvidence = true, connection?: { url: string; ca: string }) {
   const workspace = await protectedWorkflowWorkspace(requireEvidence);
   const input = await privateWorkflowFile<ProtectedInput>(join(workspace.root, "core-input.json"), workspace.root);
   const selection = { webPresenceId: input.webPresenceId, managedSiteId: input.managedSiteId };
@@ -62,9 +62,9 @@ export async function openProtectedPresenceWorkspace(requireEvidence = true) {
   const answers = normalizeAnswers(input.answers, adaptiveOnboardingVersion);
   if (fingerprint(answers) !== fingerprint(input.answers) ||
       Object.keys(answers).some(key => input.provenance[key]?.confirmation !== "unconfirmed")) throw Error("Protected C0 intake evidence refused");
-  const ca = process.env.MIOPAGES_WP_DATABASE_CA;
+  const ca = connection?.ca ?? process.env.MIOPAGES_WP_DATABASE_CA;
   if (!ca) throw Error("Pinned CA required");
-  const pool = protectedPool(process.env.MIOPAGES_PROTECTED_CORE_DB_URL ?? "", protectedWorkflowRole, ca);
+  const pool = protectedPool(connection?.url ?? process.env.MIOPAGES_PROTECTED_CORE_DB_URL ?? "", protectedWorkflowRole, ca);
   const intake = new IntakeService(pool, selection, { database: "postgres", answers, provenance: input.provenance, prepared: input.prepared, step: input.step,
     async protectedScope(db) {
       await protectedConnection(db, protectedWorkflowRole, "postgres");
@@ -194,7 +194,8 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
         };
       }
       const scoped = { ...operations, visuals };
-      return new PresenceWorkflow(pool, capability.kind === "review" ? { ...scoped, run: noOutbound } : scoped, {}, Date.now, boundary);
+      return new PresenceWorkflow(pool, capability.kind === "review" ? { ...scoped, run: noOutbound } : scoped,
+        boundary === "disposable" ? grant.previewActionDestinations ?? {} : {}, Date.now, boundary);
     },
   };
 }

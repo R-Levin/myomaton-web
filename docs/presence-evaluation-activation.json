@@ -1,0 +1,232 @@
+{
+  "schema": "miopages.presence-evaluation/1",
+  "boundary": {
+    "execution": "existing protected Core Linux account",
+    "database": "private loopback disposable PostgreSQL",
+    "coreOrigin": "https://wp-acceptance.miopages.com",
+    "providerOrigin": "https://api.openai.com",
+    "protectedWordPress": false,
+    "publication": false,
+    "retentionDays": 30,
+    "privatePreview": "Authenticated disposable loopback WordPress on the existing workstation; private SSH transfer of only reviewed generated render packets and verified image bytes",
+    "protectedSourceCustody": "Existing protected Core Linux account only; no original evidence, credentials or raw provider responses exported"
+  },
+  "approval": {
+    "expiresAt": "2026-11-20T01:30:00.000Z",
+    "capMicros": 7500000,
+    "c0First": true,
+    "automaticRetries": 0,
+    "deliberateRetriesPerCase": 2,
+    "maxEditorialRevisionsPerCase": 3
+  },
+  "original": {
+    "scope": {
+      "webPresenceId": "819d007a-595d-4374-a2f0-96b900d46559",
+      "managedSiteId": "1d92a248-416f-4e22-baaf-d2f1fca70352"
+    },
+    "intakeId": "91733e9a-70d5-4799-92c7-d045422f0e5b",
+    "revision": 41,
+    "eventDigest": "ff90effffa6fd26d903a04e299b17cbfcdf1ba5c005e508db193e1e786f09106",
+    "contextDigest": "3eb8ab4ce60605d9094d741c0cee663b0fcc90d3d670398031650dd4573302f2",
+    "approvedProjectionDigest": "a16c550dd064124e2c604166ade93e70fe3ee8ed7fbce940e0af66c44fc93648",
+    "sources": [
+      "d92b1890389f973c135095740f1ce84971ccbb0b14b32b218e793433c09bf237",
+      "62c4a46dc0f3dd6546564cb3f6340315ad569f1b97c8024f6f574399b911df02",
+      "8ae7d236106b0d72579bbbb7580f918ea21aac72a3ba91854751cc59d84dd32e",
+      "3548b06255141d7e7c28fe5044a6ecede98aa78e4f9b074d43bcdc5f0bc8dda4",
+      "5ea9e9ecd431e2cdd5dda372d353bbe65482a2abd4e57872a65ace5a2f3d74f1",
+      "7a73a38c9a2216338421822f3633dc4ac1e8ba74a4c964b33f59ffc80700dd12",
+      "65b52745d20adb02396aa5f2ed8b2a20151dcc490eecbc83081060cc86406284",
+      "b790d9e06afe8c116d79a00f3b849b961b541c23a1af3a3a45b21f84f14f6c1c",
+      "4ce10942cf4620c7be9cb384ce8eac21d4b9447b4415c2dca3a1c8345d1010db",
+      "abe53dacf6dad0f28ed47eb5d108387b260877a259046850557ff94624b12990",
+      "67a45b9b0358b8d727beb32828ecfcf9f9e856c57dd2f8eaf2468ba507a00e10",
+      "743c941aafb993cbdffeb54dc8885bc445d0f057d41b73510b141d2fc2186819",
+      "b5b3115d3ee67b43da9bb830363d26abc09be2f1a061b2373c10954ec5c8ee4a",
+      "d4e8c20bb2acf44e2c47eee6addb7c119e73b54828265d3257fcf36afbbe6066",
+      "b18fe5e33b79b58af70d6fc9d5c677ab3be5ae86599d3e6b55ee2a28ab1f9689",
+      "1776301e240ff90efd2d0a8fc1a915fc2955643f26458875146b5303358a99ab",
+      "3dd0070a40778fba5c85c0e49ceedf9ecd2d627865f26b446abc12d01a1e8982",
+      "5a8deb458fb1ad4112978fc10ed41f7b461c6b1c31fe7f47d65a543132d7be0b",
+      "e73c1c72d585b2e45697670e75d7c617d0098ad1bf8261978d953a31d4d12b87",
+      "a97d55b0480ed74dbeedcc5b57057090d6f1d0fe0262824d23a67c7646a8edbb"
+    ],
+    "ledgerDigest": "ada3dfcc8c734ba4782dfdcdfe2aeb12d21043ca75c3d861534af0d6d3131236",
+    "attempts": 29
+  },
+  "provider": {
+    "rates": {
+      "model": "gpt-5.4-mini-2026-03-17",
+      "verifiedOn": "2026-11-17",
+      "inputPerMillion": 750000,
+      "cachedPerMillion": 75000,
+      "cacheWritePerMillion": 0,
+      "outputPerMillion": 4500000,
+      "countMicros": 0
+    },
+    "imageModel": "gpt-image-2.5-sunburst-2026-09-08",
+    "serviceTier": "default",
+    "store": false,
+    "perImageReservationMicros": 500000,
+    "researchInputReservationTokens": 400000,
+    "perSearchCallMicros": 10000,
+    "inputTokens": 64000,
+    "inputBytes": 320000,
+    "outputTokens": 10000,
+    "researchResponseBytes": 450000,
+    "siteComposition": "managed-v1"
+  },
+  "cases": {
+    "c0": {
+      "organizationId": "271e3714-576b-5aa8-9e7e-baa7e0e58645",
+      "intakeId": "b170f66e-6657-559a-9dd2-aa0f587516f7",
+      "scope": {
+        "webPresenceId": "54fdcac3-7ba2-5edc-a213-f501dcfc921c",
+        "managedSiteId": "87910af3-d02b-578d-99dc-2428a8105309"
+      },
+      "entry": "DIRECT_START",
+      "budget": {
+        "requests": 52,
+        "text": 24,
+        "images": 4,
+        "searchCalls": 4,
+        "capMicros": 4750000
+      },
+      "research": {
+        "roots": [
+          {
+            "id": "research:miopages",
+            "url": "https://miopages.com/",
+            "label": "C0 existing public site"
+          },
+          {
+            "id": "research:standard",
+            "url": "https://sitecare360.com/",
+            "label": "Managed website comparable"
+          },
+          {
+            "id": "research:refresh",
+            "url": "https://siteupdater.com/",
+            "label": "Existing site refresh comparable"
+          },
+          {
+            "id": "research:international",
+            "url": "https://www.sitecommanderstudio.com/websites",
+            "label": "Non-US managed design comparable"
+          },
+          {
+            "id": "research:search",
+            "url": "https://developers.google.com/search/docs/appearance/ai-features",
+            "label": "Google Search guidance"
+          },
+          {
+            "id": "research:accessibility",
+            "url": "https://www.w3.org/WAI/tutorials/forms/",
+            "label": "W3C accessible forms"
+          }
+        ],
+        "market": {
+          "publicQuery": "small business managed website services, buying considerations, existing website transitions and ongoing care",
+          "maxToolCalls": 4,
+          "maxSources": 12,
+          "minimumNewOrigins": 3
+        }
+      },
+      "images": [
+        {
+          "id": "launch-and-care",
+          "label": "Launch and continuing care",
+          "prompt": "A warm, editorial, abstract still life of a newly arranged workspace and a small plant with new growth. Use muted teal, warm cream and soft daylight, with clear forms and generous negative space. Convey the idea of getting a website started and giving it continuing care without depicting an actual client, a real website or a service outcome."
+        },
+        {
+          "id": "adoption-and-handoff",
+          "label": "Existing website transition",
+          "prompt": "An editorial illustration of two overlapping sheets and a small set of orderly stationery on a quiet desk, suggesting an intentional handoff and continuity. Muted slate and cream with restrained teal accents. Keep the composition spacious and readable as a wide crop. No brands, writing or representational screens."
+        },
+        {
+          "id": "visibility-and-next-step",
+          "label": "Visibility and visitor next step",
+          "prompt": "A minimal editorial illustration of a soft beam of daylight revealing an open path through geometric paper shapes. Use warm cream, muted slate and teal. Convey discoverability and a clear next step with an understated composition, without implying metrics, traffic or commercial results."
+        },
+        {
+          "id": "launch-and-care-refinement",
+          "label": "Refine the Home concept",
+          "prompt": "Create one original wide editorial illustration in muted teal and warm cream showing a workspace methodically arranged in three stages, from understanding an existing website to setting it up and keeping it useful. Use simple shapes and daylight for a clear mobile crop. No readable text, logos, real clients, real screens or represented outcomes."
+        }
+      ],
+      "earlyFeedback": [
+        "Clarify the first visitor choice and the difference between Free Review and Direct Start.",
+        "Remove unsupported claims and keep internal review notes out of visitor copy.",
+        "Strengthen the first-screen hierarchy and give the Hero graphic a clear communication purpose."
+      ],
+      "previewDestinations": {
+        "request-review": "/free-review",
+        "start-onboarding": "/direct-start"
+      }
+    },
+    "c2": {
+      "organizationId": "ef757a56-4918-51de-9a9e-aaff9bcc0ee4",
+      "intakeId": "48bc90b8-5b2d-5e48-8a80-7baeba902a8f",
+      "scope": {
+        "webPresenceId": "7965d11e-353d-5268-b057-9e2ca4052d5d",
+        "managedSiteId": "4d6024f6-bfdd-5064-9d92-44abe86b259c"
+      },
+      "entry": "DIRECT_START",
+      "budget": {
+        "requests": 32,
+        "text": 15,
+        "images": 2,
+        "searchCalls": 3,
+        "capMicros": 2750000
+      },
+      "research": {
+        "roots": [
+          {
+            "id": "research:isa",
+            "url": "https://www.treesaregood.org/Tree-Owner-Resources/Managing-Hazards-and-Risk",
+            "label": "International Society of Arboriculture tree hazards guidance"
+          },
+          {
+            "id": "research:psu",
+            "url": "https://extension.psu.edu/helping-trees-recover-after-storms",
+            "label": "Penn State Extension storm guidance"
+          }
+        ],
+        "market": {
+          "publicQuery": "residential tree care in Pennsylvania, routine assessment, storm-damage safety and customer decision factors",
+          "maxToolCalls": 3,
+          "maxSources": 8,
+          "minimumNewOrigins": 2
+        }
+      },
+      "fictionalEvidence": [
+        {
+          "id": "fictional-c2-old-site",
+          "kind": "website-observation",
+          "label": "Unverified claims described by the fictional tree-service website",
+          "reference": "Fictional C2 fixture: docs/fictional-customer-2-tree-service-onboarding-scenario.md",
+          "date": null,
+          "content": "The scenario describes an outdated website advertising preventive and emergency tree service to homeowners and small businesses in Bucks and Montgomery Counties, Pennsylvania. It lists yard clearing as secondary and firewood and winter plowing as seasonal. It describes emergency contacts by phone and routine inquiries by phone, text or form. It reports free estimates, more than ten years in business and available bonding and insurance proof, all unverified. There is no actual site URL, business name, public contact, coverage boundary, hours, response guarantee, certification, testimonial permission, Free Review answers or delivered assessment."
+        }
+      ],
+      "images": [
+        {
+          "id": "routine-tree-care",
+          "label": "Routine assessment illustration",
+          "prompt": "Draw an original wide editorial illustration of a mature tree beside a generic dwelling and open yard, using restrained natural colors and clear forms. Convey the context for a routine assessment. No people, logos, lettering, identifiable property, hazards or claimed completed work."
+        },
+        {
+          "id": "storm-separation",
+          "label": "Separate storm safety illustration",
+          "prompt": "Draw a wide, original editorial illustration showing a generic storm-affected tree in the distance, viewed clearly from an unobstructed open area well away from it. Use calm restrained natural colors; do not show people working, electrical equipment, an identifiable property, or a purported service outcome. No text or logo."
+        }
+      ],
+      "earlyFeedback": [
+        "Clarify the difference between urgent safety information and a planned estimate.",
+        "Remove unsupported coverage, certification, availability and response claims.",
+        "Strengthen the first-screen hierarchy and give the Hero graphic a clear communication purpose."
+      ],
+      "previewDestinations": {}
+    }
+  }
+}
