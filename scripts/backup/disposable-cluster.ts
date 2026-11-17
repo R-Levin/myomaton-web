@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, writeFile, unlink, rm, realpath } from "node:fs/promises";
+import { mkdtemp, writeFile, unlink, rm, realpath, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { randomBytes, randomUUID } from "node:crypto";
@@ -24,7 +24,18 @@ export async function disposableCluster(bin: string, databaseId: string = random
   try {
     await writeFile(file, password + "\n", { mode: 0o600, flag: "wx" });
     await native(bin, "initdb", ["--pgdata=" + data, "--username=postgres", "--encoding=UTF8", "--locale=C", "--auth=scram-sha-256", "--pwfile=" + file]); await unlink(file);
-    await native(bin, "pg_ctl", ["--pgdata=" + data, "--log=" + path.join(root, "server.log"), "--options=" + `-h 127.0.0.1 -p ${port}`, "--wait", "start"]); started = true;
+    const log = path.join(root, "server.log");
+    const sockets = process.platform === "win32" ? "" : " -c unix_socket_directories=";
+    try {
+      await native(bin, "pg_ctl", ["--pgdata=" + data, "--log=" + log, "--options=" + `-h 127.0.0.1 -p ${port}${sockets}`, "--wait", "start"]);
+      started = true;
+    } catch {
+      const diagnostic = await readFile(log, "utf8").catch(() => "");
+      const reason = /Unix-domain socket|\.s\.PGSQL/u.test(diagnostic) ? "socket setup" :
+        /Address already in use/iu.test(diagnostic) ? "loopback port conflict" :
+        /shared librar|symbol lookup/iu.test(diagnostic) ? "native library mismatch" : "controller startup";
+      throw Error("Disposable PostgreSQL refused: " + reason);
+    }
     const admin = new Pool({ connectionString: base.toString() }); try { await admin.query(`CREATE DATABASE "${database}" TEMPLATE template0`); } finally { await admin.end(); }
     base.pathname = "/" + database;
     return { root, bin, url: base.toString(), stop };
