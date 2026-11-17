@@ -123,7 +123,8 @@ export function readBlueprint(value: unknown, ids: readonly string[], normalizeP
 type PageAction = { label: string; kind: typeof actionKinds[number]; destination: string | null; sectionIndex?: number; unresolvedDestination?: string };
 
 export function readPage(value: unknown, exactPath: string, paths: readonly string[], ids: readonly string[],
-  destinations: Partial<Record<Exclude<typeof actionKinds[number], "navigate">, string>>, normalizeProviderReferences = false) {
+  destinations: Partial<Record<Exclude<typeof actionKinds[number], "navigate">, string>>, normalizeProviderReferences = false,
+  evaluationPlacement = false) {
   const page = object(value, ["path", "heading", "searchTitle", "searchDescription", "sections", "actions", "internalLinks", "composition"]);
   const composition = page.composition === undefined ? undefined : choice(page.composition, ["managed-v1"] as const);
   if (page.path !== exactPath) throw new ArtifactValidationError("page-binding", "Page does not match the blueprint");
@@ -142,9 +143,13 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
   const actions = list<PageAction>(page.actions, value => {
     const action = object(value, composition ? ["label", "kind", "destination", "sectionIndex"] : ["label", "kind", "destination"]);
     const index = action.sectionIndex;
-    if (composition && index !== null && (typeof index !== "number" || !Number.isSafeInteger(index) ||
-      !sections[index] || !["hero", "cta"].includes(sections[index].role ?? ""))) throw Error("Action placement does not match a Hero or CTA");
-    const placement = typeof index === "number" ? { sectionIndex: index } : {};
+    const validIndex = typeof index === "number" && Number.isSafeInteger(index) && Boolean(sections[index]);
+    // An already authorized link in a real Intro stays contextual. Recovery
+    // must not promote it to a different section or invent a destination.
+    const contextual = evaluationPlacement && normalizeProviderReferences && validIndex && sections[index].role === "intro";
+    if (composition && index !== null && (!validIndex ||
+      !contextual && !["hero", "cta"].includes(sections[index].role ?? ""))) throw Error("Action placement does not match a Hero or CTA");
+    const placement = typeof index === "number" && !contextual ? { sectionIndex: index } : {};
     const kind = choice(action.kind, actionKinds);
     const destination = action.destination === null ? null : text(action.destination, 500);
     if (kind === "navigate" && !otherPaths.includes(destination ?? "")) {

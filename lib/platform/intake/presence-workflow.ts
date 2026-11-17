@@ -317,7 +317,7 @@ export class PresenceWorkflow {
         case "page": {
           const destinations = state.evaluation ? Object.fromEntries(Object.entries(this.destinations).filter(([, destination]) =>
             destination !== work.path && paths.includes(destination))) : this.destinations;
-          const page = readPage(output, work.path!, paths, ids, destinations, provider);
+          const page = readPage(output, work.path!, paths, ids, destinations, provider, Boolean(state.evaluation));
           if (state.evaluation && page.composition !== "managed-v1") throw Error("Evaluation Page needs the composed format");
           // Keep the exact sitemap order when selected pages are redrafted.
           const drafts = new Map([...state.pages, page].map(draft => [draft.path, draft]));

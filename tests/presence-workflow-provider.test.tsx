@@ -199,6 +199,24 @@ test("provider Page recovery quarantines unverified actions and preserves unreso
     /Invalid Page path/);
 });
 
+test("evaluation recovery keeps valid Intro links contextual without changing copy, targets or existing validation", () => {
+  const visual = { purpose: "Fixture", brief: "Fixture", altIntent: "Fixture", status: "text-only" };
+  const sections = [{ heading: "Account access", body: "Review instructions.", role: "hero", sourceIds: ["owner"], visual },
+    { heading: "Other routes", body: "Choose the relevant destination.", role: "intro", sourceIds: ["owner"], visual }];
+  const action = { label: "Request a Free Review", kind: "request-review", destination: "/free-review", sectionIndex: 1 };
+  const page = { path: "/login", heading: "Client access", searchTitle: "Client access", searchDescription: "Find the right route.",
+    sections, actions: [action], internalLinks: [], composition: "managed-v1" };
+  const paths = ["/login", "/free-review"];
+  assert.throws(() => readPage(page, "/login", paths, ["owner"], { "request-review": "/free-review" }, true), /Action placement/);
+  const accepted = readPage(page, "/login", paths, ["owner"], { "request-review": "/free-review" }, true, true);
+  assert.deepEqual(accepted.sections, sections);
+  assert.deepEqual(accepted.actions, [{ label: action.label, kind: action.kind, destination: action.destination }]);
+  const mismatch = readPage(page, "/login", paths, ["owner"], {}, true, true);
+  assert.deepEqual(mismatch.actions, [{ label: action.label, kind: action.kind, destination: null }]);
+  assert.throws(() => readPage({ ...page, actions: [{ ...action, sectionIndex: 8 }] }, "/login", paths,
+    ["owner"], { "request-review": "/free-review" }, true, true), /Action placement/);
+});
+
 test("provider artifact settlement retains editorial suggestions as advice and refuses foreign citations", () => {
   const draft = {
     summary: "Check the full candidate.",
