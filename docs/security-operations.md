@@ -92,6 +92,26 @@ is a bounded presentation capability flag, not security authorization. Future
 automation needs operation-scoped permissions and approval; protected business
 facts cannot be autonomously invented or silently changed.
 
+## Stage-appropriate access and approval — owner correction, November 17, 2026
+
+**Purpose.** Apply controls in proportion to the information and action at risk. Do not transplant production release-role ceremonies onto local/disposable creative evaluation. This policy clarifies authority rather than granting new hosted access, external-provider use, protected writes, credential changes or publication. [Owner-critical P0-18](owner-critical-conversations.md#p0-18--proportionate-access-and-review-stages-for-c0-now-and-commercial-operations-later-november-17-2026) and [Issue #12](https://github.com/R-Levin/myomaton-web/issues/12) record the current direction.
+
+| Level / work | Access required now | Review/approval meaning |
+| --- | --- | --- |
+| **0. Local disposable composition and visual review** (no protected source/credential, no public delivery) | Ordinary authorized development access and isolated runtime; loopback/private viewer, no unrelated tenant state | Codex/AI/tool-assisted editorial and browser critique, then owner feedback on viewable result. **No separate human reviewer, authorizer grant, signed release or customer approval needed just to show a local preview.** Local output is not a production approval. |
+| **1. Scoped protected information and third-party AI generation** | Explicit eligible source data, destination/provider, retention/privacy boundaries, effective authorization, shared spending ceiling and metering; protect secrets and tenant boundaries | C0's already approved bounded evaluation controls apply. Owner does not reapprove each routine API request; a scope/budget mismatch is a meaningful stop. Public research without protected data still needs bounded, reliable execution rather than arbitrary call-count rituals. |
+| **2. Authenticated private preview of protected material** | Restrict actual draft/asset viewing to eligible identities, verify site protections and access logs where needed | Viewing, critique and business feedback are distinct from approving production publication. For C0, the founder is the **only human** and may review directly. An AI/Codex assessment is quality evidence, **not a fictitious second human sign-off**. |
+| **3. Changes to protected hosted Core, customer records or WordPress drafts** | Specific approved operation, exact target/revision, credential/signer scopes as implemented, preservation of previous state, reversible change and readback | Keep existing signed grants and protected delivery/rollback safeguards. Technical roles/actions may be recorded distinctly **without requiring different human individuals for founder-operated C0**. Do not bypass an existing technical guard merely because a local preview could proceed without it; change a guard only through approved, tested work. |
+| **4. Public release, live lead/customer flows, payments/domains, customer knowledge promotion, credentials and high-impact operations** | Exact release/customer authority, tenant boundary, privacy/operational checks, recovery and audit evidence; separate privileged credentials as appropriate | Customer-specific approval and public activation are distinct. When multiple actual customers/operators exist, least privilege and separation of duties must be meaningful. The founder's multiple C0 hats do not confer customer consent or authority to publish for others. |
+
+**Roles are actions, not assumed headcount.** For the current single-human C0 test, the founder may perform both reviewer and authorizer actions under correctly scoped *distinct permissions* where actual protected-site code requires them. This is not independent human review; independent critique can be provided by different analysis methods/agents and honest QA evidence, with founder acceptance remaining explicit. A database constraint on different grant IDs is not a requirement for different humans. Existing application checks that demand distinct actor IDs are **implementation specifics to reconcile**, not grounds to invent a human reviewer.
+
+**Immediate product priority:** Recover the genuine AI-assisted C0 candidate and show a meaningful **local, disposable WordPress preview** using approved branding, copy authority, distinct Free Review/Direct Start and useful research. Do not stall on role-provisioning or hosted staging when loopback preview suffices. Keep current already-approved aggregate spending/provider/data boundaries, and do not alter protected WordPress revision 6 or C0 revision 41 in order to satisfy a local visual milestone.
+
+**Later productization:** Define Customer, Operator, reviewer, site publisher, system migration and provider/credential administrator scopes at the points those operations become real; test tenant isolation, audit trails, actor attribution, revocation and privileges before production exposure. Do not build a second permissions framework; evolve existing Core auth, WordPress authority and service architecture.
+
+---
+
 ## Management access and tenant isolation
 
 Before production customer or operator management surfaces/APIs are exposed,
