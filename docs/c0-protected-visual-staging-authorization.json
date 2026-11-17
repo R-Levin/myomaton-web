@@ -1,0 +1,94 @@
+{
+  "schema": "miopages.c0-protected-visual-staging-scope/1",
+  "status": "proposed",
+  "authorization": "One reversible authenticated visual evaluation on the existing protected WordPress installation",
+  "destination": {
+    "origin": "https://miopages.org",
+    "installationId": "d84ebc69-46d5-4c64-adc6-ac7b87468f89",
+    "gate": "existing protection and authenticated draft review",
+    "requireIndependentSignedSiteAndPageChecks": true
+  },
+  "candidate": {
+    "evaluationCase": "b170f66e-6657-559a-9dd2-aa0f587516f7",
+    "evaluationVersion": 68,
+    "coreRenderDigest": "eeb7ffc530aacacad717e021c5f648b6f2137b76d5d0b7283b25e251ae39e494",
+    "evaluatedVisualDigest": "f174acef98e4c220ee467a8f0976e2c9c1e98ba5952c3fa4088f3927b62f895c",
+    "renderFileSha256": "44c3740ea44773390cd6a7b71313a17c483923ccff0d234dbf81e9ed42ea1e25",
+    "paths": [
+      "/",
+      "/free-review",
+      "/direct-start",
+      "/services",
+      "/who-its-for",
+      "/what-we-handle",
+      "/what-we-dont-handle",
+      "/how-it-works",
+      "/proof",
+      "/questions",
+      "/insights",
+      "/contact",
+      "/login"
+    ],
+    "sections": 53,
+    "actions": 35,
+    "images": [
+      {
+        "path": "/",
+        "sectionId": "7eaf867a-7543-5a8a-80a4-da0fdf3de9af",
+        "sha256": "06d9f23b9ce3f46334636289aa1d5c78588fe0554e48a65072876ab49139e5d4",
+        "binding": "Explicitly rebind the earlier approved Home illustration to the evaluated final Home Hero before issuance"
+      },
+      {
+        "path": "/questions",
+        "sectionId": "cd7ffc61-001f-506d-8365-91541ca238d0",
+        "sha256": "1e3b99a589778a5fad15b5b68801aff04cecaed27a8a70912028236aac9c1731",
+        "binding": "Retain the reviewed service-process section placement"
+      }
+    ]
+  },
+  "renderer": {
+    "delivery": {
+      "previousVersion": "0.0.10",
+      "version": "0.0.12",
+      "sha256": "a988c26004b261beec943565b30e61e214cd0ea30cd3221a5bbabeaa4de22ddd",
+      "verifiedLinuxRun": 44103155344
+    },
+    "theme": {
+      "name": "miopages-managed-site",
+      "version": "0.1.0",
+      "files": 7,
+      "sha256": "4d2b030a79f585cea2294678c537e6cc4952d9250cb064f053610ab65315e3e3",
+      "existingStyleSha256": "ad620b0a72a568189f4f546b46219d7c69969897e184f2f147f7367ae414c389",
+      "evaluatedStyleSha256": "63ca01aa82d2f2872ac327caf6b09faba123299bc7d0a1b77dde91eabb8b1df1"
+    }
+  },
+  "baseline": {
+    "originalC0RevisionToPreserve": 41,
+    "originalC0EventDigest": "ff90effffa6fd26d903a04e299b17cbfcdf1ba5c005e508db193e1e786f09106",
+    "verifySignedDeliveryBaselineBeforeWrite": true,
+    "drafts": [
+      {
+        "path": "/",
+        "wordPressId": 13,
+        "sha256": "960fea54ac23eb52c15eb9aedec4e84023903c845160942ebc96256b58999940"
+      },
+      {
+        "path": "/service",
+        "wordPressId": 14,
+        "sha256": "90c4917bfe9fa5fd7d478df98a972c6cfd26050e47d54a0c735ef369d9cbc39e"
+      }
+    ],
+    "neverReplaceOriginalCoreCase": true
+  },
+  "limits": {
+    "protectedOffWebrootDraftMediaOnly": true,
+    "transport": "Exact reviewed copy and two verified prepared PNGs only, mapped into the existing signed protected delivery scope",
+    "retainAndTestRollback": true,
+    "publication": false,
+    "liveIntake": false,
+    "providerSpendMicros": 0,
+    "c2": false,
+    "preserveExistingProtectedContentUntilRollbackIsVerified": true,
+    "holdCandidateForOwnerReviewUnderExistingProtection": true
+  }
+}
