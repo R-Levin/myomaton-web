@@ -43,7 +43,9 @@ export function applyEditorialPatch(value: unknown, current: readonly WorkflowPa
     if (!previous || patched.has(previous.path)) throw Error("Editorial page is outside the exact review");
     const sectionEdits = uniqueEdits(edit.sections, ["index", "heading", "body", "sourceIds", "visual"], previous.sections.length);
     const actionEdits = uniqueEdits(edit.actions, ["index", "label", "sectionIndex", "remove"], previous.actions.length);
-    if (!Array.isArray(edit.removeInternalLinks) || edit.removeInternalLinks.some(link => !previous.internalLinks.includes(link))) {
+    // Removing an exact site route already absent from this Page is a no-op.
+    // Unknown routes still fail closed and no new link can be introduced.
+    if (!Array.isArray(edit.removeInternalLinks) || edit.removeInternalLinks.some(link => !paths.includes(link))) {
       throw Error("Editorial link change refused");
     }
     const removedLinks = new Set(edit.removeInternalLinks);

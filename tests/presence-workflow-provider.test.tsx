@@ -229,7 +229,7 @@ test("a scoped editorial patch improves actual copy and moves an existing previe
   const destinations = { "request-review": "/free-review" };
   const before = readPage(raw, "/", paths, allowed, destinations, true, true);
   const section = { index: 0, heading: "Find what needs work", body: "Get a focused review.", sourceIds: ["quoted"], visual: null };
-  const change = { path: "/", heading: null, sections: [section], removeInternalLinks: ["/free-review"],
+  const change = { path: "/", heading: null, sections: [section], removeInternalLinks: ["/free-review", "/"],
     actions: [{ index: 0, label: "Start the Free Review", sectionIndex: 0, remove: false }] };
   const [after] = applyEditorialPatch({ changes: [change] }, [before], ["/"], paths, allowed, destinations);
   assert.equal(after.sections[0].body, section.body);
