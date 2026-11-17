@@ -3,6 +3,7 @@ import { fingerprint, object, text, uuid } from "../canonical/model";
 import { hash } from "../content-editing/proposal";
 import { canonicalPagePath } from "../managed-sites/paths";
 import { validatePages, type ReviewedProjection, type Site } from "./authority";
+import { readSignedDraftBrand } from "./draft-brand";
 import { readNativeDraftMedia, type NativeDraftMedia } from "./native-draft-media";
 
 // Page review remains the source of content authority. This composition
@@ -44,9 +45,11 @@ export function nativeDraftBaseline(value: unknown) {
   return pages;
 }
 
-export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[], input: unknown) {
+export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[], input: unknown, exactBrand?: ReturnType<typeof readSignedDraftBrand>) {
   const scope = { organizationId: uuid(site.organizationId), webPresenceId: uuid(site.webPresenceId), managedSiteId: uuid(site.managedSiteId) };
-  const selection = object(input, ["siteProposalId", "installationId", "revision", "previousDigest", "rollback", "baselinePages", "navigation", "actions"]);
+  const selection = object(input, ["siteProposalId", "installationId", "revision", "previousDigest", "rollback", "baselinePages", "navigation", "actions", "brandDigest"]);
+  if (selection.brandDigest !== exactBrand?.digest) throw Error("Exact canonical draft brand required");
+  const brand = exactBrand && readSignedDraftBrand(exactBrand, scope);
   if (typeof selection.revision !== "number" || !Number.isSafeInteger(selection.revision) || selection.revision < 1) throw Error("Invalid draft revision");
   const revision = selection.revision;
   const previousDigest = revision === 1 && selection.previousDigest === null ? null : hash(selection.previousDigest);
@@ -106,6 +109,6 @@ export function bindSiteDraft(site: Site, reviewed: readonly ReviewedDraftPage[]
   const rollback = selection.rollback === undefined ? undefined : nativeDraftRollback(selection.rollback, revision);
   if (rollback?.digest === previousDigest) throw Error("Materialized rollback digest must differ from signed predecessor");
   const candidate = { scope, siteProposalId: uuid(selection.siteProposalId), installationId: uuid(selection.installationId), revision,
-    previousDigest, ...(rollback && { rollback }), ...(baselinePages && { baselinePages }), ...(media.length && { media }), sourceDigest, approvals, pages, navigation: [...selection.navigation] as string[], actions };
+    previousDigest, ...(brand && { brand }), ...(rollback && { rollback }), ...(baselinePages && { baselinePages }), ...(media.length && { media }), sourceDigest, approvals, pages, navigation: [...selection.navigation] as string[], actions };
   return { candidate, digest: fingerprint(candidate) };
 }

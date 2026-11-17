@@ -1,6 +1,6 @@
 import { fingerprint, object, text } from "../canonical/model";
 import type { WorkflowRun } from "./presence-workflow";
-import type { PresenceEvidence } from "./presence-workflow-artifacts";
+import type { PresenceEvidence, WorkflowPage } from "./presence-workflow-artifacts";
 
 const uses = ["business-fact", "staffed-offer", "editorial", "analysis", "excluded"] as const;
 type EvidenceUse = typeof uses[number];
@@ -52,7 +52,7 @@ export function marketingCitationIds(run: WorkflowRun, authority: MarketingAutho
 
 export function marketingProjection(run: WorkflowRun, authority: MarketingAuthority) {
   const { operation, path } = run.work;
-  const { entry, evidence, research, corrections, report, direction, blueprint, pages, revisionRequest } = run.input;
+  const { entry, evidence, research, corrections, report, direction, blueprint, pages, revisionRequest, replan } = run.input;
   const sources = marketingSources(authority, evidence);
   const expose = ({ id, kind, label, date, content }: PresenceEvidence) => ({ id, kind, label, date, content });
   const design = { digest: authority.brandDigest, brief: authority.brandBrief };
@@ -69,7 +69,8 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
   const readable = new Set([...approved, ...analysis, ...(research ?? [])].map(source => source.id));
   const approvedCorrections = corrections.filter(({ finding }) => finding.sourceIds.every(id => readable.has(id)))
     .map(({ text, finding }) => ({ text, finding, status: "correction-to-review" }));
-  const base = { entry, approved, analysis, research: research?.map(expose), corrections: approvedCorrections, design };
+  const base = { entry, approved, analysis, research: research?.map(expose), corrections: approvedCorrections, design,
+    ...(replan && { independentReviewCriteriaToCorrect: replan.concerns }) };
   switch (operation) {
     case "research":
     case "report": return base;
@@ -107,13 +108,26 @@ export const qualityCriteria = [
   "internal-content-exclusion", "brand-and-design", "media-in-context", "site-architecture-and-search",
   "desktop-mobile-and-accessibility", "proof-permission-and-data",
 ] as const;
-type Criterion = typeof qualityCriteria[number];
+export type QualityCriterion = typeof qualityCriteria[number];
+
+export const commercialRevisionGuidance: Readonly<Record<QualityCriterion, string>> = {
+  "offer-and-value": "Rebuild the opening to name the managed offer, its buyer, the concrete outcome and a substantiated reason to choose it.",
+  "buyer-fit-and-objections": "Address a material audience objection with supported evidence and help that buyer decide whether the offer fits.",
+  "commercial-copy": "Rewrite the sections around a real buyer decision and concrete benefit. Remove generic service language.",
+  "supported-service-and-actions": "Explain the supported staffed offer, put the two relevant entry choices where visitors can see them, and use exact authorized routes.",
+  "internal-content-exclusion": "Remove internal process, development, diagnostic and unconfirmed information throughout the public copy.",
+  "brand-and-design": "Rework the visual hierarchy and semantic section choices around the approved brand and what visitors need first.",
+  "media-in-context": "Specify an image with a distinct communication job and a mobile-readable placement, or remove the filler placement.",
+  "site-architecture-and-search": "Give the page one distinct buyer purpose, remove repetition, and support it with clear contextual navigation.",
+  "desktop-mobile-and-accessibility": "Prioritize concise content, clear headings, visible entry choices and accessible descriptions on narrow and wide screens.",
+  "proof-permission-and-data": "Build relevant proof around grounded contribution and rights. Remove unsupported results, promises, customer details and unusable destinations.",
+};
 
 export type QualityReview = {
   target: string;
   desktopEvidence: string;
   mobileEvidence: string;
-  findings: readonly { criterion: Criterion; status: "pass" | "revise"; observation: string }[];
+  findings: readonly { criterion: QualityCriterion; status: "pass" | "revise"; observation: string }[];
 };
 
 export function readQualityReview(input: unknown, expected: string): QualityReview {
@@ -130,6 +144,32 @@ export function readQualityReview(input: unknown, expected: string): QualityRevi
   });
   if (new Set(findings.map(finding => finding.criterion)).size !== qualityCriteria.length) throw Error("Duplicate independent quality finding");
   return { target: expected, desktopEvidence: review.desktopEvidence, mobileEvidence: review.mobileEvidence, findings };
+}
+
+export function verifyCommercialJourneys(pages: readonly WorkflowPage[], navigation: readonly string[],
+  required: Partial<Record<"request-review" | "start-onboarding", string>>) {
+  const home = pages.find(page => page.path === "/");
+  if (!home) throw Error("Commercial Home unavailable");
+  for (const [kind, destination] of Object.entries(required)) {
+    if (!home.actions.some(action => action.kind === kind && action.destination === destination &&
+        action.sectionIndex !== undefined && home.sections[action.sectionIndex]?.role === "hero") ||
+        !pages.some(page => page.path === destination)) throw Error("Home must present each authorized visitor journey");
+  }
+  const reached = new Set(["/", ...navigation]);
+  const queue = [...reached];
+  const byPath = new Map(pages.map(page => [page.path, page]));
+  for (const path of queue) {
+    const page = byPath.get(path);
+    if (!page) throw Error("Commercial navigation target missing");
+    for (const route of [...page.internalLinks, ...page.actions.flatMap(action =>
+      action.destination && action.kind !== "existing-account" && (action.kind === "navigate" || page.composition) ? [action.destination] : [])]) {
+      if (!reached.has(route) && byPath.has(route)) {
+        reached.add(route);
+        queue.push(route);
+      }
+    }
+  }
+  if (pages.some(page => !reached.has(page.path))) throw Error("Commercial site contains unreachable pages");
 }
 
 export function qualityPass(review: QualityReview, expected: string) {

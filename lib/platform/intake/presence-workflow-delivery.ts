@@ -64,5 +64,5 @@ export function workflowEvaluationPreviewInput(context: WorkflowContext, view: P
       type: "page" as const, from: page.path, destination, ...location }));
   });
   return { scope: context.scope, candidateDigest: review.target, pages, navigation: view.blueprint.navigation,
-    actions, ...(baseline.length && { baselinePages: baseline }) };
+    actions, ...(view.brandDigest && { brandDigest: view.brandDigest }), ...(baseline.length && { baselinePages: baseline }) };
 }

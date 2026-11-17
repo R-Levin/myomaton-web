@@ -37,7 +37,8 @@ async function main() {
       selected = { workflow: await run.open(), context: await run.context() };
     }
     const service = protectedOperatorServices(pool, db => protectedConnection(db, operatorRole), process.env.MIOPAGES_WP_CORE_ORIGIN ?? "",
-      selected && { root: custody!.workspace.visualDirectory!, resolve: selected.workflow.privateVisualResolver(selected.context) });
+      selected && { root: custody!.workspace.visualDirectory!, resolve: selected.workflow.privateVisualResolver(selected.context),
+        brandDigest: (await selected.workflow.review(selected.context))?.brandDigest });
     const context = await service.operator.authenticate(command.token);
     const proposals = service.proposals(context);
     let result: unknown;

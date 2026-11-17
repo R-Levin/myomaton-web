@@ -163,11 +163,11 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
         }) });
         const recheck = async () => {
           const latest = await readGrant();
-          if (latest.revoked || Date.now() >= latest.expiresAt || fingerprint(latest) !== fingerprint(grant) ||
+          if (latest.revoked || Date.now() < (latest.startsAt ?? 0) || Date.now() >= latest.expiresAt || fingerprint(latest) !== fingerprint(grant) ||
               fingerprint(await context()) !== grant.contextDigest) throw new WorkflowBlocked("Image authorization unavailable");
         };
         visuals = {
-          requestable: !grant.revoked && Date.now() < grant.expiresAt,
+          requestable: !grant.revoked && Date.now() >= (grant.startsAt ?? 0) && Date.now() < grant.expiresAt,
           briefs: choices.map(({ id, label, request }) => ({ id, label, requestDigest: fingerprint(request) })),
           ...(provider && { execute: async (visual, retain) => {
             const request = choices.find(brief => brief.id === visual.briefId)?.request;
@@ -236,6 +236,7 @@ export async function reviewWorkflowChange(workflow: PresenceWorkflow,
     case "workflow-retry": return workflow.retryRejectedOutput(current, version, actor);
     case "workflow-editorial-decision": return workflow.decideEditorialFinding(current, version, actor, details?.editorial);
     case "workflow-revise": return workflow.requestEditorialRevision(current, version, actor);
+    case "workflow-commercial-replan": return workflow.requestCommercialReplan(current, version, actor);
     case "workflow-review": return workflow.reviewCandidate(current, version, actor);
     case "workflow-quality-review": return workflow.recordQualityReview(current, version, actor, details?.quality);
     case "workflow-visual-queue": {

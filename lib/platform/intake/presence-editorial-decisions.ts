@@ -1,4 +1,5 @@
 import { fingerprint, object, text } from "../canonical/model";
+import type { QualityCriterion } from "./presence-marketing-authority";
 import { IntakeError } from "./model";
 import type { PresenceEvidence, WorkflowEditorial, WorkflowPage } from "./presence-workflow-artifacts";
 import type { WorkflowActor } from "./presence-workflow";
@@ -7,6 +8,7 @@ export type EditorialFinding = {
   id: string;
   reviewRevision: number;
   suggestedTarget: string;
+  commercialCriterion?: QualityCriterion;
   concern: string;
 };
 type AssignedPage = { path: string; baseline: string };

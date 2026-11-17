@@ -7,7 +7,9 @@ function miopages_draft_brand(): ?array {
         $post->post_status !== 'draft' || !current_user_can('edit_post', $post->ID)) return null;
     if (array_key_exists($post->ID, $cache)) return $cache[$post->ID];
     $cache[$post->ID] = null;
-    $binding = get_post_meta($post->ID, '_miopages_draft_brand', true);
+    $signed = apply_filters('miopages_signed_draft_brand', null, $post);
+    $binding = $signed['projection'] ?? (defined('MIOPAGES_NATIVE_DRAFT_IDENTITY')
+        ? null : get_post_meta($post->ID, '_miopages_draft_brand', true));
     if (!is_array($binding) || ($binding['version'] ?? null) !== 1 ||
         ($binding['design']['grammar'] ?? null) !== 'service-led' ||
         !in_array($binding['design']['version'] ?? null, [1, 2, 3], true)) return null;
@@ -38,12 +40,16 @@ function miopages_draft_brand(): ?array {
     $attachment = $binding['logoAttachment'] ?? null;
     $alt = $logo['alt'] ?? null;
     $digest = $logo['sha256'] ?? null;
-    if (!is_int($attachment) || get_post_mime_type($attachment) !== 'image/png' ||
-        !is_string($alt) || trim($alt) === '' || !is_string($digest) || !preg_match('/^[a-f0-9]{64}$/D', $digest)) return null;
-    $file = get_attached_file($attachment, true);
-    if (!$file || !is_file($file) || !is_readable($file)) return null;
-    $bytes = file_get_contents($file);
-    if (!is_string($bytes) || !hash_equals($digest, hash('sha256', $bytes))) return null;
+    if ($signed !== null) {
+        $bytes = $signed['bytes'];
+    } else {
+        if (!is_int($attachment) || get_post_mime_type($attachment) !== 'image/png') return null;
+        $file = get_attached_file($attachment, true);
+        if (!$file || !is_file($file) || !is_readable($file)) return null;
+        $bytes = file_get_contents($file);
+    }
+    if (!is_string($alt) || trim($alt) === '' || !is_string($digest) ||
+        !is_string($bytes) || !hash_equals($digest, hash('sha256', $bytes))) return null;
     $size = getimagesizefromstring($bytes);
     if ($size === false || $size['mime'] !== 'image/png') return null;
     return $cache[$post->ID] = ['palette' => $palette, 'typography' => $typography,

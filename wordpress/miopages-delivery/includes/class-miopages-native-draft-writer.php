@@ -29,7 +29,7 @@ final class MioPages_Native_Draft_Writer
                 throw new RuntimeException('Native draft proposal scope changed.');
             }
             if ($current !== null && $current['digest'] === $digest && $state['highWaterRevision'] === $candidate['revision']) {
-                self::verifyDrafts($current);
+                self::verifyDrafts($current, $candidate['scope']);
                 return $state;
             }
             $restoredFrom = $state['restoredFrom'] ?? null;
@@ -56,7 +56,7 @@ final class MioPages_Native_Draft_Writer
             $baseline = $candidate['baselinePages'] ?? null;
             $priorPosts = $current['posts'] ?? [];
             if ($current !== null) {
-                self::verifyDrafts($current);
+                self::verifyDrafts($current, $candidate['scope']);
                 if ($baseline === null) {
                     $currentIds = $current['logicalPageIds'] ?? null;
                     $currentPaths = array_keys($current['posts']);
@@ -84,7 +84,7 @@ final class MioPages_Native_Draft_Writer
                 }
                 foreach ($archive as $knownPath => $saved) {
                     if ($knownPath === $path && $saved['logicalId'] === $logicalId) {
-                        self::verifyDrafts(['posts' => [$saved['post']]]);
+                        self::verifyDrafts(['posts' => [$saved['post']]], $candidate['scope']);
                         $priorPosts[$path] = $saved['post'];
                         unset($archive[$path]);
                     } elseif ($knownPath === $path || $saved['logicalId'] === $logicalId || rtrim($knownPath, '/') === rtrim($path, '/')) {
@@ -109,10 +109,11 @@ final class MioPages_Native_Draft_Writer
             unset($post);
             $next = ['siteProposalId' => $candidate['siteProposalId'], 'revision' => $candidate['revision'],
                 'digest' => $digest, 'posts' => $posts, 'logicalPageIds' => $logicalIds];
+            if (isset($candidate['brand'])) $next['brand'] = $candidate['brand'];
             if ($attachments !== []) {
                 $next['attachments'] = $attachments;
             }
-            self::verifyDrafts($next);
+            self::verifyDrafts($next, $candidate['scope']);
             // The signed predecessor of a forward revision after a restore is
             // the high-water authorization, not the currently materialized content.
             // A v2 authorization explicitly binds the actual materialized baseline.
@@ -142,7 +143,7 @@ final class MioPages_Native_Draft_Writer
             $rollback = $candidate['rollback'] ?? ['digest' => $candidate['previousDigest'], 'revision' => $candidate['revision'] - 1];
             if (($state['restoredFrom'] ?? null) === $digest && $current['digest'] === $rollback['digest']
                 && $current['revision'] === $rollback['revision'] && $state['highWaterRevision'] === $candidate['revision']) {
-                self::verifyDrafts($current);
+                self::verifyDrafts($current, $candidate['scope']);
                 return $state;
             }
             if ($current['digest'] !== $digest || $current['revision'] !== $candidate['revision']
@@ -150,7 +151,7 @@ final class MioPages_Native_Draft_Writer
                 || $previous['revision'] !== $rollback['revision'] || $state['highWaterRevision'] !== $candidate['revision']) {
                 throw new RuntimeException('Native draft restoration predecessor mismatch.');
             }
-            self::verifyDrafts($current);
+            self::verifyDrafts($current, $candidate['scope']);
             $archive = $state['archive'] ?? [];
             $baseline = $candidate['baselinePages'] ?? null;
             if ($baseline !== null) {
@@ -176,7 +177,7 @@ final class MioPages_Native_Draft_Writer
                     $archive[$path] = ['logicalId' => $current['logicalPageIds'][$path], 'post' => $post];
                 }
             }
-            self::verifyDrafts($previous);
+            self::verifyDrafts($previous, $candidate['scope']);
             return ['current' => $previous, 'previous' => null, 'restoredFrom' => $digest,
                 'highWaterRevision' => $state['highWaterRevision'], ...($archive === [] ? [] : ['archive' => $archive])];
         });
@@ -254,9 +255,12 @@ final class MioPages_Native_Draft_Writer
         return $result;
     }
 
-    private static function verifyDrafts(array $revision): void
+    private static function verifyDrafts(array $revision, array $scope): void
     {
         global $wpdb;
+        if (isset($revision['brand'])) {
+            MioPages_Native_Draft_Brand::bytes($revision['brand'], $scope);
+        }
         foreach ($revision['attachments'] ?? [] as $attachment) {
             MioPages_Native_Draft_Media::verifyAttachment($attachment);
         }

@@ -7,6 +7,7 @@ if (!defined('ABSPATH')) {
 }
 
 require_once __DIR__ . '/class-miopages-native-draft-media.php';
+require_once __DIR__ . '/class-miopages-native-draft-brand.php';
 
 final class MioPages_Native_Draft_Envelope
 {
@@ -20,7 +21,7 @@ final class MioPages_Native_Draft_Envelope
         $envelope = json_decode($wire, true, 48, JSON_THROW_ON_ERROR);
         if (!is_array($envelope) || count($envelope) !== 6
             || ($envelope['schema'] ?? null) !== 'miopages.wordpress.native-draft-envelope'
-            || !in_array($envelope['version'] ?? null, [1, 2, 3, 4], true) || !is_string($identity['keyId'] ?? null)
+            || !in_array($envelope['version'] ?? null, [1, 2, 3, 4, 5], true) || !is_string($identity['keyId'] ?? null)
             || ($envelope['keyId'] ?? null) !== $identity['keyId']) {
             throw new InvalidArgumentException('Native draft envelope refused.');
         }
@@ -47,14 +48,18 @@ final class MioPages_Native_Draft_Envelope
         }
         $candidate = $payload['candidate'];
         $rollback = $candidate['rollback'] ?? null;
-        if (array_key_exists('baselinePages', $candidate) !== ($payload['version'] === 4)) {
+        if (array_key_exists('brand', $candidate) !== ($payload['version'] === 5)
+            || (array_key_exists('brand', $candidate) && !is_array($candidate['brand']))) {
+            throw new InvalidArgumentException('Native draft brand version refused.');
+        }
+        if ($payload['version'] < 5 && array_key_exists('baselinePages', $candidate) !== ($payload['version'] === 4)) {
             throw new InvalidArgumentException('Native draft Page membership version refused.');
         }
-        if ($payload['version'] === 4) {
+        if (array_key_exists('baselinePages', $candidate)) {
             self::baseline($candidate);
         }
         $media = array_key_exists('media', $candidate);
-        if ($payload['version'] !== 4 && $media !== ($payload['version'] === 3)) {
+        if ($payload['version'] < 4 && $media !== ($payload['version'] === 3)) {
             throw new InvalidArgumentException('Native draft media version refused.');
         }
         if ($media) {
@@ -76,6 +81,9 @@ final class MioPages_Native_Draft_Envelope
             if (!is_string($identity[$field] ?? null) || $actual !== $identity[$field]) {
                 throw new InvalidArgumentException('Native draft target refused.');
             }
+        }
+        if (isset($candidate['brand'])) {
+            MioPages_Native_Draft_Brand::bytes($candidate['brand'], $candidate['scope']);
         }
         return $payload;
     }

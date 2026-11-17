@@ -14,7 +14,7 @@ import {
   type WorkflowBlueprint, type WorkflowDirection, type WorkflowEditorial, type WorkflowPage, type WorkflowReport,
 } from "./presence-workflow-artifacts";
 
-import { qualityPass, readQualityReview, type MarketingAuthority, type QualityReview } from "./presence-marketing-authority";
+import { commercialRevisionGuidance, qualityPass, readQualityReview, verifyCommercialJourneys, type MarketingAuthority, type QualityReview } from "./presence-marketing-authority";
 import type { ResolvePrivateVisuals } from "../content-editing/proposal-media";
 
 export type WorkflowContext = {
@@ -60,6 +60,7 @@ type State = {
   editorialFindings?: EditorialFinding[];
   editorialDecisions?: EditorialDecision[];
   revisionRequest?: RevisionRequest | null;
+  replan?: { ordinal: number; concerns: QualityReview["findings"][number]["criterion"][] };
   operatorReview: Decision | null;
   qualityReviews?: { actor: Actor; at: string; review: QualityReview }[];
   work: Work | null;
@@ -69,7 +70,7 @@ type State = {
   visuals?: PresenceVisual[];
 };
 type Task = Pick<Work, "operation" | "path">;
-export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest"> &
+export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest" | "replan"> &
   Pick<WorkflowContext, "entry" | "evidence" | "limitations" | "conflicts">;
 export type WorkflowRun = { context: WorkflowContext; input: WorkflowInput; work: Work };
 export interface PresenceWorkflowOperations {
@@ -77,6 +78,7 @@ export interface PresenceWorkflowOperations {
   readonly maxRetries?: number;
   readonly marketingAuthority?: MarketingAuthority;
   readonly maxEditorialRevisions?: number;
+  readonly maxCommercialReplans?: number;
   readonly visuals?: PresenceVisualOperations;
   preflight?(run: WorkflowRun): Promise<void>;
   run(run: WorkflowRun, retain: (bytes: Buffer) => Promise<void>): Promise<unknown>;
@@ -180,8 +182,8 @@ function nextTask(state: State): Task | null {
 }
 function runInput(context: WorkflowContext, state: State): WorkflowInput {
   const { entry, evidence, limitations, conflicts } = context;
-  const { report, research, direction, blueprint, pages, corrections, revisionRequest } = state;
-  return { entry, evidence, limitations, conflicts, report, research, direction, blueprint, pages, corrections, ...(revisionRequest && { revisionRequest }) };
+  const { report, research, direction, blueprint, pages, corrections, revisionRequest, replan } = state;
+  return { entry, evidence, limitations, conflicts, report, research, direction, blueprint, pages, corrections, ...(revisionRequest && { revisionRequest }), ...(replan && { replan }) };
 }
 function readResearch(value: unknown, ids: readonly string[]): PresenceEvidence[] {
   if (!Array.isArray(value) || !value.length) throw Error("Research record is incomplete");
@@ -247,6 +249,7 @@ export class PresenceWorkflow {
       ...(concept && { homeConcept: { digest: concept } }), ...(state.homeReview && { homeReview: state.homeReview }),
       ...(operatorReview && { candidateReviewTarget: candidateReviewTarget(state) }),
       ...(deliveryQuality && { deliveryQuality }),
+      ...(current && authority && { brandDigest: authority.brandDigest }),
       ...((state.marketingAuthorityDigest && !authority) && { deliveryQuality: { target: null, passed: false, history: state.qualityReviews ?? [] } }),
       failure, ...(failure === "output-invalid" && state.artifactIssue && { artifactIssue: state.artifactIssue }),
       next, pendingOperation: state.work?.operation ?? null, recoverable: current && Boolean(state.work && (state.failure || state.work.until <= this.clock())),
@@ -416,15 +419,16 @@ export class PresenceWorkflow {
     if (!state.editorial || state.work || state.operatorReview) throw new IntakeError("workflow_not_ready", 409);
     const { assigned } = editorialProgress(state);
     const concerns = [...state.editorial.concerns, ...assigned.flatMap(({ finding, decision }) =>
-      decision.pages.map(page => ({ path: page.path, concern: finding.concern })))];
+      decision.pages.map(page => ({ path: page.path,
+        concern: finding.commercialCriterion ? commercialRevisionGuidance[finding.commercialCriterion] : finding.concern })))];
     if (!concerns.length) throw new IntakeError("workflow_not_ready", 409);
     const paths = [...new Set(concerns.map(item => item.path))];
     const ordinal = (state.revisionRequest?.ordinal ?? 0) + 1;
     if (ordinal > (this.operations.maxEditorialRevisions ?? 1)) throw new IntakeError("workflow_not_ready", 409);
     const at = new Date(this.clock()).toISOString();
-    const batch = Boolean(state.evaluation) && state.mode === "provider" && paths.length > 1;
+    const batch = !this.operations.marketingAuthority && Boolean(state.evaluation) && state.mode === "provider" && paths.length > 1;
     const revisionRequest = { paths, audit: { summary: state.editorial.summary, concerns }, priorPages: state.pages.filter(page => paths.includes(page.path)),
-      actor, at, ordinal, ...(this.operations.marketingAuthority && assigned.length > 0 && { source: "operator-editorial" as const }),
+      actor, at, ordinal, ...(this.operations.marketingAuthority && assigned.some(item => !item.finding.commercialCriterion) && { source: "operator-editorial" as const }),
       ...(batch && { batch: "pending" as const }) };
     const queued = assigned.map(({ decision }) => ({ ...decision, status: "queued" as const, actor, at, basedOnVersion: version }));
     return this.view(context, await this.store.append(context, version, { ...state, revisionRequest, editorial: null,
@@ -617,12 +621,41 @@ export class PresenceWorkflow {
     try { review = readQualityReview(input, target); }
     catch { throw new IntakeError("invalid_request"); }
     const qualityReviews = [...state.qualityReviews ?? [], { actor, at: new Date(this.clock()).toISOString(), review }];
-    const unresolved = review.findings.filter(finding => finding.status === "revise").map(finding =>
-      ({ suggestedTarget: finding.criterion, concern: finding.observation }));
-    if (!unresolved.length) return this.view(context, await this.store.append(context, version, { ...state, qualityReviews }));
+    const unresolved = review.findings.filter(finding => finding.status === "revise");
+    if (!unresolved.length) {
+      try {
+        const { "request-review": review, "start-onboarding": start } = this.destinations;
+        verifyCommercialJourneys(state.pages, state.blueprint?.navigation ?? [], {
+          ...(review && { "request-review": review }), ...(start && { "start-onboarding": start }),
+        });
+      } catch { throw new IntakeError("workflow_not_ready", 409); }
+      return this.view(context, await this.store.append(context, version, { ...state, qualityReviews }));
+    }
     // Reuse assignment and exact revision review. A critic cannot silently choose Pages or approve new copy.
     return this.view(context, await this.store.append(context, version, { ...state, qualityReviews, operatorReview: null,
-      editorialFindings: [...savedEditorialFindings(state), ...editorialFindings({ summary: "", concerns: [], unassigned: unresolved }, version + 1)] }));
+      editorialFindings: [...savedEditorialFindings(state), ...unresolved.map(({ criterion, observation }) => ({
+        id: fingerprint({ review, criterion, version }), reviewRevision: version + 1, suggestedTarget: criterion,
+        commercialCriterion: criterion, concern: observation,
+      }))] }));
+  }
+
+  async requestCommercialReplan(context: WorkflowContext, version: number, actor: Actor) {
+    const state = await this.current(context, version);
+    if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || (!actor.simulated && !actor.authority)) {
+      throw new IntakeError("unavailable", 403);
+    }
+    const last = state.qualityReviews?.at(-1);
+    const concerns = last?.review.findings.filter(item => item.status === "revise").map(item => item.criterion) ?? [];
+    const ordinal = (state.replan?.ordinal ?? 0) + 1;
+    if (!this.operations.marketingAuthority || !concerns.length || !state.editorial || !state.blueprint || state.operatorReview ||
+        state.work || state.failure || ordinal > (this.operations.maxCommercialReplans ?? 0)) {
+      throw new IntakeError("workflow_not_ready", 409);
+    }
+    // Prior pages, findings and visuals remain in the append-only event history.
+    // Only closed criterion codes cross the provider boundary on this replan.
+    return this.view(context, await this.store.append(context, version, { ...state, replan: { ordinal, concerns },
+      direction: null, blueprint: null, pages: [], editorial: null, editorialFindings: [], editorialDecisions: [],
+      revisionRequest: null, homeReview: null, visuals: [] }));
   }
 
   async reviewCandidate(context: WorkflowContext, version: number, actor: Actor) {

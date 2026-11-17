@@ -1,7 +1,7 @@
 import type { Pool, PoolClient } from "pg";
 import type { KeyObject } from "node:crypto";
 import { projectContent } from "../canonical/projections";
-import { fingerprint, uuid } from "../canonical/model";
+import { fingerprint, object, uuid } from "../canonical/model";
 import { readProposalState } from "../content-editing/proposal-postgres";
 import { resolvePage, siteBase } from "../content-editing/proposal-context";
 import { resolveProposalCandidate, type ResolvePrivateVisuals } from "../content-editing/proposal-media";
@@ -9,12 +9,14 @@ import { hash, pageProposal } from "../content-editing/proposal";
 import { proposalPreview } from "../content-editing/proposal-preview";
 import { validatePages, type ReviewedProjection, type Site } from "./authority";
 import { customerMandate, type ProtectedOperator } from "./operator";
+import { assetRoot } from "../assets/local-storage";
+import { resolveSignedDraftBrand } from "./draft-brand";
 import { bindSiteDraft } from "./site-draft";
 import { nativeDraftEnvelope, readNativeDraftEnvelope } from "./native-draft-envelope";
 import { prepareNativeDraftMedia } from "./native-draft-media";
 import type { NativeDraftReceiptExpectation, NativeDraftReceiptJournal } from "./native-draft-receipt";
 
-type WorkflowMedia = { root: string; resolve: ResolvePrivateVisuals };
+type WorkflowMedia = { root: string; resolve: ResolvePrivateVisuals; brandDigest?: string };
 
 type RecoveryEvidence = { journal: NativeDraftReceiptJournal; secret: Buffer; credentialId: string };
 
@@ -77,7 +79,7 @@ async function approvedProjection(db: PoolClient, site: Site, proposalId: string
   const copies = root ? await Promise.all(media.map(item => prepareNativeDraftMedia(root, scope.webPresenceId, revision.page.pageId, item))) : [];
   return { pages, projectionDigest: fingerprint(pages), sourceDigest: revision.binding.baseFingerprint,
     approvalId, previewDigest: approved.approval.previewDigest, revision: revision.binding.revision,
-    approver: identity.operator_id as string, copies, ...(copies.length && { media: copies.map(copy => copy.descriptor) }) };
+    approver: identity.operator_id as string, workflow: Boolean(revision.page.workflowReview), copies, ...(copies.length && { media: copies.map(copy => copy.descriptor) }) };
 }
 
 export async function reviewedPrivateSource(db: PoolClient, site: Site): Promise<ReviewedProjection | null> {
@@ -88,7 +90,7 @@ export async function reviewedPrivateSource(db: PoolClient, site: Site): Promise
   const reviewer = (await db.query(`SELECT operator_id FROM wordpress_operator_grants WHERE id=$1 AND web_presence_id=$2
     AND managed_site_id=$3 AND permission='review-private-stage' AND revoked_at IS NULL`,
   [record.reviewer_grant_id, site.webPresenceId, site.managedSiteId])).rows[0];
-  const { approver, copies, media, ...projection } = await approvedProjection(db, site, record.proposal_id, record.approval_digest);
+  const { approver, copies, media, workflow, ...projection } = await approvedProjection(db, site, record.proposal_id, record.approval_digest);
   if (copies.length || media) return null;
   if (!reviewer || reviewer.operator_id === approver || record.projection_digest !== projection.projectionDigest) return null;
   return { ...site, ...projection, releaseId: record.id, releaseDigest: fingerprint(record), version: 1, publishable: true };
@@ -160,6 +162,7 @@ export class PrivateReleaseReview {
         ...(draft.baselinePages && { baselinePaths: draft.baselinePages.map(page => page.path),
           requestedPaths: draft.pages.map(page => page.path),
           ...(!restore && !draft.rollback && { appliedBaseline: hash(draft.previousDigest) }) }),
+        ...(!restore && { brandDigest: draft.brand?.digest }),
         ...(!restore && draft.media && { media: draft.media, pageIds: draft.pages.map(page => page.id) }) };
       await db.query("COMMIT");
       return { expected, credentialId: uuid(installation.credential_id), signed,
@@ -216,7 +219,14 @@ export class PrivateReleaseReview {
         if (projection.approver === reviewer.operatorId) throw Error("Independent projection reviewer required");
         members.push({ ...site, ...projection, proposalId });
       }
-      const result = bindSiteDraft(site, members, draft);
+      const selection = object(draft, ["siteProposalId", "installationId", "revision", "previousDigest", "rollback", "baselinePages", "navigation", "actions", "brandDigest"]);
+      if (members.some(member => member.workflow) && this.workflowMedia?.brandDigest !== undefined &&
+          (selection.brandDigest !== this.workflowMedia.brandDigest || members.some(member => !member.workflow))) {
+        throw Error("Exact independently reviewed workflow brand required");
+      }
+      const brand = selection.brandDigest === undefined ? undefined
+        : await resolveSignedDraftBrand(db, site, hash(selection.brandDigest), this.disposableMediaRoot ?? assetRoot());
+      const result = bindSiteDraft(site, members, draft, brand);
       const { rows: [installation] } = await db.query(`SELECT k.key_id,k.public_key,k.credential_id FROM wordpress_installations i
         JOIN wordpress_installation_keys k ON k.installation_id=i.id AND k.generation=i.generation
         WHERE i.id=$1 AND i.organization_id=$2 AND i.web_presence_id=$3 AND i.managed_site_id=$4 AND i.status='active'`,

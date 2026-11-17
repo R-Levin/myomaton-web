@@ -8,7 +8,7 @@ import { PrivateReleaseReview } from "./private-source";
 import { WordPressDelivery } from "./service";
 
 export function protectedOperatorServices(pool: Pool, boundary: (db: PoolClient) => Promise<void>, origin: string,
-  privateVisuals?: { root: string; resolve: ResolvePrivateVisuals }) {
+  privateVisuals?: { root: string; resolve: ResolvePrivateVisuals; brandDigest?: string }) {
   const operator = new ProtectedOperator(pool, boundary);
   return {
     operator,

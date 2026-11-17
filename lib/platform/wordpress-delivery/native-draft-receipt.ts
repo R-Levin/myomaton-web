@@ -14,6 +14,7 @@ export type NativeDraftReceiptExpectation = {
   revision: number;
   paths: readonly string[];
   media?: readonly NativeDraftMedia[];
+  brandDigest?: string;
   pageIds?: readonly string[];
   baselinePaths?: readonly string[];
   appliedBaseline?: string;
@@ -36,13 +37,19 @@ function verifyReceipt(value: unknown, secret: Buffer, expected: NativeDraftRece
   const bytes = Buffer.from(wire.receiptBase64, "base64");
   if (bytes.toString("base64") !== wire.receiptBase64) throw Error("Native draft receipt encoding refused");
   const body = object(JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)),
-    ["schema", "version", "installationId", "siteProposalId", "operation", "requestedDigest", "appliedDigest", "revision", "posts", "attachments"]);
-  if (body.version !== 1 && body.version !== 2) throw Error("Native draft receipt version refused");
+    ["schema", "version", "installationId", "siteProposalId", "operation", "requestedDigest", "appliedDigest", "revision", "posts", "attachments", "brandDigest"]);
+  if (body.version !== 1 && body.version !== 2 && body.version !== 3) throw Error("Native draft receipt version refused");
   const mac = createHmac("sha256", secret).update(`MioPages-WP-Native-Draft-Receipt-v${body.version}\n`).update(bytes).digest();
   if (!timingSafeEqual(mac, Buffer.from(hash(wire.mac), "hex"))) throw Error("Native draft receipt authentication refused");
   const installationId = uuid(body.installationId), siteProposalId = uuid(body.siteProposalId);
   const requestedDigest = hash(body.requestedDigest), appliedDigest = hash(body.appliedDigest);
-  if (body.schema !== "miopages.wordpress.native-draft-receipt" || Object.hasOwn(body, "attachments") !== (body.version === 2) ||
+  const brandDigest = body.version === 3 ? hash(body.brandDigest) : undefined;
+  if ((!historicalMedia || expected.brandDigest !== undefined) && brandDigest !== expected.brandDigest) {
+    throw Error("Native draft receipt brand differs from authorization");
+  }
+  if (body.schema !== "miopages.wordpress.native-draft-receipt" ||
+      (body.version !== 3 && Object.hasOwn(body, "attachments") !== (body.version === 2)) ||
+      Object.hasOwn(body, "brandDigest") !== (body.version === 3) ||
       installationId !== expected.installationId || siteProposalId !== expected.siteProposalId ||
       body.operation !== expected.operation || requestedDigest !== expected.requestedDigest || appliedDigest !== expected.appliedDigest ||
       (expected.operation === "apply" ? requestedDigest !== appliedDigest : requestedDigest === appliedDigest) ||
@@ -57,7 +64,7 @@ function verifyReceipt(value: unknown, secret: Buffer, expected: NativeDraftRece
     return { path: expected.paths[index], id: post.id, contentSha256: hash(post.contentSha256) };
   });
   if (new Set(posts.map(post => post.id)).size !== posts.length) throw Error("Duplicate native draft receipt post");
-  if (body.version === 2 && (!Array.isArray(body.attachments) || !body.attachments.length)) {
+  if (Object.hasOwn(body, "attachments") && (!Array.isArray(body.attachments) || !body.attachments.length)) {
     throw Error("Native draft attachment count refused");
   }
   const attachments = (body.attachments as unknown[] | undefined)?.map(value => {
@@ -80,7 +87,7 @@ function verifyReceipt(value: unknown, secret: Buffer, expected: NativeDraftRece
     throw Error("Native draft receipt media differs from authorization");
   }
   return { installationId, siteProposalId, operation: expected.operation, requestedDigest, appliedDigest, revision: body.revision, posts,
-    ...(attachments && { attachments }) };
+    ...(attachments && { attachments }), ...(brandDigest && { brandDigest }) };
 }
 
 /** Development receipts live in the existing protected Core account. */
@@ -116,7 +123,7 @@ export class NativeDraftReceiptJournal {
     const restored = verifyReceipt(await this.read(expected.installationId, expected.requestedDigest, "restore"), secret, {
       ...expected, operation: "restore",
     }, true);
-    if (fingerprint(prior.posts) !== fingerprint(restored.posts) ||
+    if (prior.brandDigest !== restored.brandDigest || fingerprint(prior.posts) !== fingerprint(restored.posts) ||
         fingerprint(prior.attachments ?? []) !== fingerprint(restored.attachments ?? [])) throw Error("Materialized baseline differs from prior readback");
     return restored;
   }
@@ -142,9 +149,9 @@ export class NativeDraftReceiptJournal {
       }, true);
       verifyReceipt(await this.read(expected.installationId, expected.requestedDigest, "apply"), secret, {
         ...expected, operation: "apply", appliedDigest: expected.requestedDigest, revision: expected.requestedRevision ?? expected.revision + 1,
-        media: undefined, pageIds: undefined, paths: expected.requestedPaths ?? expected.paths,
+        media: undefined, pageIds: undefined, brandDigest: undefined, paths: expected.requestedPaths ?? expected.paths,
       }, true);
-      if (fingerprint(previous.posts) !== fingerprint(verified.posts) ||
+      if (previous.brandDigest !== verified.brandDigest || fingerprint(previous.posts) !== fingerprint(verified.posts) ||
           fingerprint(previous.attachments ?? []) !== fingerprint(verified.attachments ?? [])) throw Error("Restored draft differs from previous readback");
     }
     const file = await this.file(expected.installationId, expected.requestedDigest, expected.operation);

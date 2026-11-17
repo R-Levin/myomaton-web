@@ -107,7 +107,7 @@ test("isolated evaluations keep the original intake intact and pause at an exact
     const actor = { id: "local-evaluation", authority: "test-only", role: "operator", simulated: true } as const;
     const measurement = new FirstPartyMeasurement(setup.pool);
     for (const context of [bound.c0, bound.c2]) {
-      const scoped = context === bound.c0 ? { ...operations, marketingAuthority: {
+      const scoped = context === bound.c0 ? { ...operations, maxCommercialReplans: 1, marketingAuthority: {
         contextDigest: fingerprint(context), sources: [{ digest: fingerprint(owner), use: "staffed-offer" as const }],
         brandDigest: fingerprint("local brand fixture"), brandBrief: "Local fixture", qualityReviewerId: "independent",
       } } : operations;
@@ -174,6 +174,14 @@ test("isolated evaluations keep the original intake intact and pause at an exact
         assert.equal(rejected.deliveryQuality?.history.length, 2);
         assert.equal(rejected.editorialFindings?.[0].concern, "The opening offer is too vague to guide a buyer.");
         assert.throws(() => workflowDeliveryInput(context, rejected, null, []), /quality review/);
+        const replanned = (await workflow.requestCommercialReplan(context, rejected.version, actor))!;
+        assert.equal(replanned.next, "direction");
+        assert.deepEqual(replanned.research, rejected.research);
+        assert.deepEqual(replanned.report, rejected.report);
+        assert.equal(replanned.blueprint, null);
+        assert.deepEqual(replanned.pages, []);
+        assert.deepEqual(replanned.deliveryQuality?.history, rejected.deliveryQuality?.history);
+        await assert.rejects(workflow.requestCommercialReplan(context, replanned.version, actor), { code: "workflow_not_ready" });
       }
       const source: MeasurementSource = { id: randomUUID(), selection: context.scope, environment: "synthetic",
         activatedAt: new Date(Date.now() - 60_000).toISOString(), coverage: ["action-selected", "contact-accepted"],

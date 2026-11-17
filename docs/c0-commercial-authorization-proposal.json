@@ -1,0 +1,291 @@
+{
+  "schema": "miopages.c0-commercial-authorization-proposal/1",
+  "status": "proposed-no-authority",
+  "boundary": {
+    "execution": "Existing protected Core Linux account. New off-webroot directory and dedicated loopback disposable PostgreSQL; existing roles and access only.",
+    "original": "Read and verify retained C0 revision 41, former evaluation and ledger. Do not alter them.",
+    "privateWordPress": "Stage and visibly review on disposable loopback WordPress. Keep the protected hosted WordPress installation and its revision 6, receipts and rollback unchanged.",
+    "publication": false,
+    "retentionDays": 30,
+    "providerOrigin": "https://api.openai.com",
+    "store": false,
+    "serviceTier": "default",
+    "noAutomaticRetry": true
+  },
+  "approval": {
+    "capMicros": 8000000,
+    "maximumHours": 72,
+    "conditions": [
+      "Record explicit owner approval of this exact manifest SHA-256, an independent named reviewer, the exact Linux artifact SHA-256, and UTC start and expiry before any dispatch.",
+      "Verify source fingerprints, brand and AssetUsage projection, actual provider rate card, delivery rollback, independent reviewer authority and empty isolated ledger at activation. Stop on mismatch, ambiguous provider debit or guard failure.",
+      "Export only scoped drafts, approved imagery and redacted receipts for the disposable preview. Keep raw provider responses, original source evidence, access keys and full private receipts protected."
+    ]
+  },
+  "original": {
+    "revision": 41,
+    "contextDigest": "3eb8ab4ce60605d9094d741c0cee663b0fcc90d3d670398031650dd4573302f2",
+    "eventDigest": "ff90effffa6fd26d903a04e299b17cbfcdf1ba5c005e508db193e1e786f09106",
+    "ledgerDigest": "ada3dfcc8c734ba4782dfdcdfe2aeb12d21043ca75c3d861534af0d6d3131236",
+    "wordpressRetainRevision": 6,
+    "wordpressRetainRestoreTarget": 3
+  },
+  "destination": {
+    "organizationId": "43710276-c556-5671-86eb-b9f4f6a80082",
+    "intakeId": "233d76a5-a683-5c0e-90fb-3c7cbe853dd1",
+    "scope": {
+      "webPresenceId": "afe397d0-7f33-54cd-91a2-9ef4d4238caf",
+      "managedSiteId": "7a492cd8-07ea-5fcb-b9e6-1e525b19bbea"
+    },
+    "entry": "DIRECT_START"
+  },
+  "assets": {
+    "designReference": "scripts/customer-previews/miopages-focus.ts",
+    "logoPath": "brand/miopages/MioPagesDV.png",
+    "logoSha256": "09b1d3c6e189ce74538d75be63386116be0dee464d6b70d86577430963d91b5e",
+    "assetId": "8bb6956d-6255-579c-a75e-df1cff624b56",
+    "usageId": "21708fe4-b193-5c4d-ab39-7f30e62b97a2",
+    "alt": "MioPages",
+    "editorialReference": "scripts/customer-previews/miopages-editorial-r3.json",
+    "editorialSha256": "0163b59c7e5d3bc866439bd266679c50d09c7011a4e43ea224138cd43510281d"
+  },
+  "evidence": {
+    "deniedOriginalOutbound": "All original protected source text, corrections, internal material, intake answers, research and prior generated copy stay out of provider payloads. Compare the independent result against them locally.",
+    "originalExclusions": [
+      "intake:proof",
+      "intake:workExcluded",
+      "intake:workIncluded",
+      "intake:reviewHandoff",
+      "intake:sourceCorrection"
+    ],
+    "prepared": [
+      {
+        "id": "c0-approved-market",
+        "kind": "owner-confirmed",
+        "use": "business-fact",
+        "reference": "docs/miopages-c0-product-model.md#initial-customer-hypothesis",
+        "content": "MioPages is moving to one managed Web Presence service. Local service businesses and trades are included alongside professional and technical firms. The existing customer sign-in is separate from acquisition. Do not offer retired legacy services."
+      },
+      {
+        "id": "c0-approved-service",
+        "kind": "service-direction",
+        "use": "staffed-offer",
+        "reference": "docs/miopages-c0-business-brief.md#launch-and-ongoing-offer",
+        "content": "The managed offer helps customers make their business clearer online and give interested visitors a next step. Launch organizes business knowledge, offerings, pages, navigation and a supported contact route. Ongoing keeps the site current and uses observations to recommend useful changes, subject to review. An operator can provide supported work. Offer the Free Web Presence Review as a useful diagnostic, including when MioPages is not a fit, and present Direct Start as a distinct option. Do not promise a price, turnaround, outcomes, migration or integration beyond confirmed scope."
+      }
+    ],
+    "brandBrief": "Use the approved MioPages wordmark, warm neutrals and purple, restrained contrast, readable Sans at 18 px, and service-led v3 with motion off. Lead with what a buyer can gain, use direct mobile actions, and design diagrams or examples around a specific decision."
+  },
+  "research": {
+    "roots": [
+      {
+        "id": "research:miopages",
+        "url": "https://miopages.com/",
+        "label": "C0 existing public site"
+      },
+      {
+        "id": "research:search",
+        "url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "label": "Google Search guidance"
+      },
+      {
+        "id": "research:accessibility",
+        "url": "https://www.w3.org/WAI/tutorials/forms/",
+        "label": "W3C accessible forms"
+      }
+    ],
+    "scopes": {
+      "publicQuery": "Managed Web Presence for small service businesses across the United States",
+      "maxToolCalls": 10,
+      "maxSources": 16,
+      "minimumNewOrigins": 6,
+      "questions": {
+        "buying-needs": "What small service businesses need from a managed presence when buying a new website",
+        "alternatives": "How managed web services differ from self service builders specialized studios and agencies",
+        "objections": "Customer concerns about website handoffs ownership ongoing costs and time commitment",
+        "search-and-content": "Search intent for improving an existing small business website or starting a new site",
+        "launch-and-ongoing": "Comparative approaches for linking website launch with purposeful ongoing service and measurement"
+      }
+    },
+    "responseBytes": 450000
+  },
+  "image": {
+    "model": "gpt-image-2.5-sunburst-2026-09-08",
+    "reserveEachMicros": 500000,
+    "maximum": 4,
+    "briefs": [
+      {
+        "id": "journey-diagram",
+        "label": "Business knowledge through ongoing improvement",
+        "prompt": "A clean wide editorial vector-like diagram with three visually distinct connected stages: organizing the knowledge of a service business, publishing a clear page with a visible visitor choice, and making a small improvement based on an observation. Deep purple, cream and restrained sand. Clear at mobile size. No text, logos, customer photos, analytics values or represented outcomes."
+      },
+      {
+        "id": "illustrative-review",
+        "label": "What a Free Review gives a buyer",
+        "prompt": "A clearly fictional visual artifact showing a short website-review report with three prioritized findings and a next-step panel. Use symbolic shapes instead of text or numerical values. Editorial composition using warm neutrals, deep purple and sand accents. Do not show any real business, case study, logo or screenshot."
+      },
+      {
+        "id": "migration-map",
+        "label": "Keep or change an existing site",
+        "prompt": "A small editorial comparison diagram illustrating an existing service-business page splitting into two distinct decisions: preserve useful information and improve an unclear visitor route. Purple on warm cream, simple shapes, no words, live customer screens, logos or promised outcomes."
+      },
+      {
+        "id": "refined-journey-diagram",
+        "label": "Mobile-first revision of the service illustration",
+        "prompt": "A mobile-readable variant of a three-phase managed website service diagram: business knowledge, a page with a visitor action, and one reviewed improvement. Large distinct shapes, one clear reading direction, deep purple and warm neutral ground with a sand accent. No text, logo, real metrics or customers."
+      }
+    ]
+  },
+  "budget": {
+    "capMicros": 8000000,
+    "text": 60,
+    "images": 4,
+    "searchCalls": 10,
+    "requests": 124,
+    "stages": {
+      "research": {
+        "rates": {
+          "model": "gpt-5.4-mini-2026-03-17",
+          "verifiedOn": "2026-11-17",
+          "inputPerMillion": 750000,
+          "cachedPerMillion": 75000,
+          "cacheWritePerMillion": 0,
+          "outputPerMillion": 4500000,
+          "countMicros": 0
+        },
+        "requestInputTokens": 200000,
+        "requestOutputTokens": 5000,
+        "cumulativeInputTokens": 200000,
+        "cumulativeOutputTokens": 5000,
+        "capMicros": 450000
+      },
+      "report": {
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-17",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "cacheWritePerMillion": 0,
+          "outputPerMillion": 15000000,
+          "countMicros": 0
+        },
+        "requestInputTokens": 96000,
+        "requestOutputTokens": 14000,
+        "cumulativeInputTokens": 192000,
+        "cumulativeOutputTokens": 32000,
+        "capMicros": 850000
+      },
+      "direction": {
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-17",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "cacheWritePerMillion": 0,
+          "outputPerMillion": 15000000,
+          "countMicros": 0
+        },
+        "requestInputTokens": 96000,
+        "requestOutputTokens": 14000,
+        "cumulativeInputTokens": 240000,
+        "cumulativeOutputTokens": 42000,
+        "capMicros": 850000
+      },
+      "blueprint": {
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-17",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "cacheWritePerMillion": 0,
+          "outputPerMillion": 15000000,
+          "countMicros": 0
+        },
+        "requestInputTokens": 64000,
+        "requestOutputTokens": 12000,
+        "cumulativeInputTokens": 192000,
+        "cumulativeOutputTokens": 36000,
+        "capMicros": 700000
+      },
+      "page": {
+        "rates": {
+          "model": "gpt-5.4-mini-2026-03-17",
+          "verifiedOn": "2026-11-17",
+          "inputPerMillion": 750000,
+          "cachedPerMillion": 75000,
+          "cacheWritePerMillion": 0,
+          "outputPerMillion": 4500000,
+          "countMicros": 0
+        },
+        "requestInputTokens": 48000,
+        "requestOutputTokens": 6000,
+        "cumulativeInputTokens": 850000,
+        "cumulativeOutputTokens": 150000,
+        "capMicros": 1200000
+      },
+      "revision": {
+        "rates": {
+          "model": "gpt-5.4-mini-2026-03-17",
+          "verifiedOn": "2026-11-17",
+          "inputPerMillion": 750000,
+          "cachedPerMillion": 75000,
+          "cacheWritePerMillion": 0,
+          "outputPerMillion": 4500000,
+          "countMicros": 0
+        },
+        "requestInputTokens": 64000,
+        "requestOutputTokens": 8000,
+        "cumulativeInputTokens": 900000,
+        "cumulativeOutputTokens": 160000,
+        "capMicros": 1100000
+      },
+      "editorial": {
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-17",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "cacheWritePerMillion": 0,
+          "outputPerMillion": 15000000,
+          "countMicros": 0
+        },
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 16000,
+        "cumulativeInputTokens": 275000,
+        "cumulativeOutputTokens": 48000,
+        "capMicros": 850000
+      }
+    }
+  },
+  "cycle": {
+    "operatorPageRevisionRounds": 3,
+    "wholeSiteReplans": 1,
+    "deliberateRetries": 2,
+    "previewDestinations": {
+      "request-review": "/free-review",
+      "start-onboarding": "/direct-start"
+    },
+    "independentAcceptance": [
+      {
+        "deficiency": "Vague value and positioning",
+        "required": "Research-backed choice of primary audience, comparison with DIY and agency routes, concrete buyer outcome from Launch through Ongoing, grounded in the staffed offer within the Home opening."
+      },
+      {
+        "deficiency": "Buried entry choices",
+        "required": "Distinct Free Review and Direct Start in the Home Hero. Independent reviewer must see both on a representative mobile viewport and complete both private journeys through safe preview targets."
+      },
+      {
+        "deficiency": "Unreachable or purposeless pages",
+        "required": "Replan page membership where required, give every retained page a buyer job and link it into the rendered navigation or contextual journey. Inventory and test every reachable route without capping pages."
+      },
+      {
+        "deficiency": "Weak proof and internal copy",
+        "required": "Use only verified experience and permissions. Withhold customer results, experimental status, diagnostic language, internal constraints, pricing and unverified claims. Refuse material leakage and anchor proof to its customer-facing purpose."
+      },
+      {
+        "deficiency": "Generic imagery",
+        "required": "Require a useful and recognizable C0 service explanation or illustrative Review artifact, exact canonical wordmark, and editorially verified desktop and mobile placements. Reject generic filler, misleading proof and weak crops before spending on a revision or accepting."
+      }
+    ],
+    "review": "Independent reviewer exercises the two journeys, validates sources and contrast, reads the whole rendered site across desktop and mobile and either refuses it or signs the exact candidate and media. Replan direction and IA or fully rewrite affected pages in scope. Revise and rerender before founder review. Stop if any item persists or budget or authorization fails."
+  }
+}

@@ -324,7 +324,7 @@ export async function hostedCoreRequest(request: Request) {
           const scope = await app.presenceCase();
           await reviewWorkflowChange(await scope.open(), await scope.context(), value.operation, version,
             { id: actor.operatorId, role: "operator", simulated: false,
-              ...((value.operation.startsWith("workflow-visual-") || value.operation === "workflow-editorial-decision" || value.operation === "workflow-quality-review") &&
+              ...((value.operation.startsWith("workflow-visual-") || value.operation === "workflow-editorial-decision" || value.operation === "workflow-quality-review" || value.operation === "workflow-commercial-replan") &&
                 { authority: actor.authorityReference }) },
             { finding: value.finding, correction: value.correction, visual: value.visual, editorial: value.editorial, quality: value.quality });
           return await view(app.intake.resume(app.draftToken));

@@ -150,3 +150,32 @@ test("an independent original authorizer can reissue an exact restore from authe
     assert.equal(restore.candidate.previousDigest, first.digest);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test("a branded restore reconciles against the exact original brand even with unchanged posts", async () => {
+  const root = await mkdtemp(path.join(await realpath(tmpdir()), "miopages-brand-receipt-"));
+  try {
+    const journal = new NativeDraftReceiptJournal(root);
+    const key = randomBytes(32);
+    const first = "1".repeat(64), second = "2".repeat(64), originalBrand = "3".repeat(64), newBrand = "4".repeat(64);
+    const base: NativeDraftReceiptExpectation = { installationId: randomUUID(), siteProposalId: randomUUID(),
+      operation: "apply", requestedDigest: first, appliedDigest: first, revision: 1, paths: ["/"], brandDigest: originalBrand };
+    const next = { ...base, requestedDigest: second, appliedDigest: second, revision: 2, brandDigest: newBrand };
+    const restore = { ...base, requestedDigest: second, operation: "restore" as const, brandDigest: undefined };
+    const receipt = (expected: NativeDraftReceiptExpectation, brandDigest?: string) => {
+      const result = { operation: expected.operation, installationId: expected.installationId, requestedDigest: expected.requestedDigest,
+        applied: { siteProposalId: expected.siteProposalId, digest: expected.appliedDigest, revision: expected.revision,
+          posts: { "/": { ID: 22, post_status: "draft", post_content: "Home" } },
+          ...(brandDigest && { brand: { digest: brandDigest } }) } };
+      const php = spawnSync("php", ["wordpress/miopages-delivery/tests/native-draft-receipt.php"], { encoding: "utf8",
+        input: JSON.stringify({ result, key: key.toString("hex") }) });
+      assert.equal(php.status, 0, php.stderr);
+      return JSON.parse(php.stdout);
+    };
+    await assert.rejects(journal.record(base, key, receipt(base)), /brand differs from authorization/);
+    await journal.record(base, key, receipt(base, originalBrand));
+    await journal.record(next, key, receipt(next, newBrand));
+    await assert.rejects(journal.record(restore, key, receipt(restore)), /differs from previous/);
+    await assert.rejects(journal.record(restore, key, receipt(restore, newBrand)), /differs from previous/);
+    assert.equal((await journal.record(restore, key, receipt(restore, originalBrand))).brandDigest, originalBrand);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});

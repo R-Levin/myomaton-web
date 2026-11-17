@@ -19,13 +19,15 @@ final class MioPages_Native_Draft_Receipt
                 'contentSha256' => hash('sha256', $post['post_content'])];
         }
         $attachments = array_values($applied['attachments'] ?? []);
-        $version = count($attachments) > 0 ? 2 : 1;
+        $brand = $applied['brand']['digest'] ?? null;
+        $version = $brand !== null ? 3 : (count($attachments) > 0 ? 2 : 1);
         $body = json_encode([
             'schema' => 'miopages.wordpress.native-draft-receipt', 'version' => $version,
             'installationId' => $result['installationId'], 'siteProposalId' => $applied['siteProposalId'],
             'operation' => $result['operation'], 'requestedDigest' => $result['requestedDigest'],
             'appliedDigest' => $applied['digest'], 'revision' => $applied['revision'], 'posts' => $posts,
-            ...($version === 2 ? ['attachments' => $attachments] : []),
+            ...($attachments !== [] ? ['attachments' => $attachments] : []),
+            ...($brand !== null ? ['brandDigest' => $brand] : []),
         ], JSON_THROW_ON_ERROR);
         return ['receiptBase64' => base64_encode($body),
             'mac' => hash_hmac('sha256', "MioPages-WP-Native-Draft-Receipt-v" . $version . "\n" . $body, $secret)];
