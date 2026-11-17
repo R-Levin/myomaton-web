@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash, createPrivateKey, createPublicKey, randomBytes, randomUUID } from "node:crypto";
 import { lstat, readFile, realpath, writeFile } from "node:fs/promises";
 import { basename, join } from "node:path";
+import { assertC0ProposalGuard } from "./db/c0-proposal-guard-check";
 import { managedKey, provisionManagedObject, readManagedObject } from "../lib/platform/assets/local-storage";
 import { validateStoredMedia } from "../lib/platform/assets/media-validation";
 import { fingerprint } from "../lib/platform/canonical/model";
@@ -35,7 +36,7 @@ const mandate = { kind: "accepted-authority", subjectId: "synthetic-native-draft
   authorityReference: "Owner approved non-public C0 visual staging only " + manifestSha };
 const sha = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 
-function stableId(value: unknown) {
+export function stableId(value: unknown) {
   const s = fingerprint([manifestSha, value]);
   return s.slice(0, 8) + "-" + s.slice(8, 12) + "-5" + s.slice(13, 16) + "-8" + s.slice(17, 20) + "-" + s.slice(20, 32);
 }
@@ -58,12 +59,12 @@ type EvaluatedPage = { id: string; path: string; title: string; composition: "ma
   sections: { id: string; type: "hero" | "intro" | "cta"; content: { heading: string; text: string } }[] };
 type EvaluatedImage = { sectionId: string; file: string; digest: string; alt: string; width: number; height: number };
 
-async function exactPacket(root: string) {
-  const manifest = await file(join(root, "manifest.json"));
+export async function exactPacket(root: string, read: (path: string) => Promise<Buffer> = file) {
+  const manifest = await read(join(root, "manifest.json"));
   assert.equal(sha(manifest), manifestSha);
   const approved = JSON.parse(manifest.toString());
   assert.equal(approved.destination.installationId, installationId);
-  const bytes = await file(join(root, "site-6801.json"));
+  const bytes = await read(join(root, "site-6801.json"));
   assert.equal(sha(bytes), approved.candidate.renderFileSha256);
   const packet = JSON.parse(bytes.toString());
   const exactPages: EvaluatedPage[] = packet.candidate.pages;
@@ -102,7 +103,7 @@ async function exactPacket(root: string) {
   assert.equal(media.size, 2);
   const mediaBytes = new Map<string, Buffer>();
   for (const image of images) {
-    const master = await file(join(root, image.file));
+    const master = await read(join(root, image.file));
     assert.equal(sha(master), image.digest);
     await validateStoredMedia(master, "image/png", image);
     mediaBytes.set(image.digest, master);
@@ -179,6 +180,16 @@ async function main() {
   };
 
   try {
+    if (["preflight", "authorize", "issue"].includes(operation)) {
+      stage = "database-proposal-guard";
+      const db = await operator.connect();
+      try {
+        await verifyProtectedSession(db, operatorRole, "postgres");
+        await db.query("BEGIN READ ONLY");
+        try { await assertC0ProposalGuard(db); }
+        finally { await db.query("ROLLBACK"); }
+      } finally { db.release(); }
+    }
     if (operation === "preflight") {
       stage = "read-only-projection";
       const db = await operator.connect();
@@ -309,7 +320,9 @@ async function main() {
   } finally { secret.fill(0); await operator.end(); }
 }
 
-void main().catch((error: { code?: string }) => {
-  console.error(JSON.stringify({ status: "BLOCKED", stage, grantState, code: error.code && /^[0-9A-Z_]{3,50}$/u.test(error.code) ? error.code : "VERIFICATION" }));
-  process.exitCode = 1;
-});
+if (process.argv[1] && /^wordpress-stage-c0-visual\.(?:cjs|ts)$/u.test(basename(process.argv[1]))) {
+  void main().catch((error: { code?: string }) => {
+    console.error(JSON.stringify({ status: "BLOCKED", stage, grantState, code: error.code && /^[0-9A-Z_]{3,50}$/u.test(error.code) ? error.code : "VERIFICATION" }));
+    process.exitCode = 1;
+  });
+}
