@@ -1,0 +1,40 @@
+{
+  "schema": "miopages.c0-commercial-source-amendment/1",
+  "status": "proposed-no-authority",
+  "baseManifestSha256": "79ab938feb2e2a33447d8328c4666988a51726a87a15d1009d3fd89503a8f924",
+  "replace": "evidence.prepared",
+  "prepared": [
+    {
+      "id": "c0-approved-market",
+      "kind": "owner-confirmed",
+      "use": "business-fact",
+      "reference": "docs/miopages-c0-product-model.md#initial-customer-hypothesis",
+      "content": "MioPages is one managed Web Presence service for small businesses and organizations in the United States. Established expertise-led businesses with an outdated, fragmented or neglected presence are an initial fit. Local service businesses and trades are included alongside professional and technical firms. A new venture can start with its business and visitor goals. Help the right people find the business, understand and trust its offer, and take a useful next step."
+    },
+    {
+      "id": "c0-approved-service",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/miopages-c0-product-model.md#launch-and-ongoing-customer-deliverable-summary",
+      "content": "Give visitors two distinct choices. Free Web Presence Review offers an initial diagnosis, useful priorities and an honest view of fit. Direct Start is for a buyer who intends to proceed into supported onboarding. Standard Launch turns confirmed business knowledge into clear content, professionally designed pages, reachable navigation and contact paths. Preserve useful content and URL continuity when migration is supported. Ongoing keeps information current and uses first-party observations to recommend and review useful changes. Customers confirm important business facts and approve material changes. People can deliver supported work with guided automation."
+    },
+    {
+      "id": "c0-current-legacy-boundary",
+      "kind": "owner-confirmed",
+      "use": "business-fact",
+      "reference": "docs/miopages-c0-product-model.md#founder-led-transition-to-the-managed-service",
+      "content": "Standalone hosting and email, legacy website and support packages, and QR-code or self-managed websites are retired as offerings. Coordinate existing domains, email and compatible services when appropriate within the managed scope. Keep the existing customer sign-in separate from acquisition, without activating an account link in this evaluation. These current decisions take precedence over historical R3 editorial language and observations from the former offer."
+    },
+    {
+      "id": "c0-current-scope-and-trust",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/miopages-c0-business-brief.md#launch-and-ongoing-offer",
+      "content": "Most normal variation belongs in Standard Launch and the one Ongoing service. Expanded Launch is reserved for materially more supported complexity, such as substantial migration or a materially larger catalog. Preserve the customer's ownership of information, assets and external accounts where practical. Keep provisional prices and terms, unsupported integrations, unsubstantiated proof, unverified readiness, permission-restricted customer names and guaranteed results outside the candidate. Any example must be unmistakably illustrative."
+    }
+  ],
+  "conditions": [
+    "Keep the seven exact R3 records as editorial reference. Current approved offer and trust boundaries govern conflicting language.",
+    "Original protected records and all previous generated candidates remain outside provider transmission. No changes to the five public research purposes, visual prompts, request or cost ceilings, preview destinations, reviewer independence, 72-hour window or publication boundary."
+  ]
+}
