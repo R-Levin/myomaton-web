@@ -8,7 +8,7 @@ import test from "node:test";
 import type { PoolClient } from "pg";
 import { managedKey, provisionManagedObject } from "../lib/platform/assets/local-storage";
 import { fingerprint } from "../lib/platform/canonical/model";
-import { commercialC0Inputs, readC0CommercialProposal } from "../lib/platform/intake/c0-commercial-authorization";
+import { commercialC0Inputs, readC0CommercialProposal, readC0CommercialSourceAmendment } from "../lib/platform/intake/c0-commercial-authorization";
 import { confirmSitePlanningReceipt, initializeResponsesUsageLedger, meteredPresenceWorkflow, summarizePresenceWorkflowUsage } from "../lib/platform/intake/intelligent-responses";
 import { focusMioPagesPreview } from "../scripts/customer-previews/miopages-focus";
 import { bindSiteDraft } from "../lib/platform/wordpress-delivery/site-draft";
@@ -31,6 +31,23 @@ test("the exact C0 proposal pins known design bytes and isolated identities, and
   const changed = Buffer.from(JSON.stringify({ ...proposal, status: "approved" }));
   assert.throws(() => readC0CommercialProposal(changed, sha(changed)), /Exact C0/);
   await assert.rejects(commercialC0Inputs({ ...proposal, assets: { ...proposal.assets, logoSha256: "0".repeat(64) } }), /bytes differ/);
+});
+
+test("the exact approved amendment changes only the prepared C0 source records", async () => {
+  const base = await readFile("docs/c0-commercial-authorization-proposal.json");
+  const amendment = await readFile("docs/c0-commercial-source-amendment.json");
+  const baseSha = sha(base), amendmentSha = sha(amendment);
+  const original = readC0CommercialProposal(base, baseSha);
+  const prepared = readC0CommercialSourceAmendment(amendment, amendmentSha, baseSha);
+  assert.equal(original.evidence.prepared.length, 2);
+  assert.deepEqual(prepared.map(item => item.id),
+    ["c0-approved-market", "c0-approved-service", "c0-current-legacy-boundary", "c0-current-scope-and-trust"]);
+  assert.match(prepared[2].content, /Standalone hosting and email.*retired/u);
+  assert.match(prepared[2].content, /take precedence over historical R3/u);
+  assert.match(prepared[1].content, /first-party observations/u);
+  assert.throws(() => readC0CommercialSourceAmendment(amendment, amendmentSha, "9".repeat(64)), /amendment required/);
+  const substitute = Buffer.from(JSON.stringify({ ...JSON.parse(amendment.toString()), replace: "budget.capMicros" }));
+  assert.throws(() => readC0CommercialSourceAmendment(substitute, sha(substitute), baseSha), /amendment required/);
 });
 
 test("two pinned model cards share one ledger, respect stage headroom, and recover only the exact stage receipt", async () => {

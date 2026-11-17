@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import proposal from "../../../docs/c0-commercial-authorization-proposal.json";
 import previous from "../../../docs/presence-evaluation-activation.json";
+import sourceAmendment from "../../../docs/c0-commercial-source-amendment.json";
 import { focusMioPagesPreview } from "../../../scripts/customer-previews/miopages-focus";
 import { fingerprint, uuid } from "../canonical/model";
 import { draftBrand } from "../wordpress-delivery/draft-brand";
@@ -16,12 +17,23 @@ import { validatePresenceImageGrant } from "./presence-workflow-visual";
 
 const sha = (value: Buffer | string) => createHash("sha256").update(value).digest("hex");
 const shaPattern = /^[a-f0-9]{64}$/u;
+const approvedSourceAmendmentSha256 = "169178bb9a8f4a148f0cdb6307389df34a6cc0dee460097856fffc2b4ce2f1fe";
 
 export function readC0CommercialProposal(bytes: Buffer, expectedSha256: string) {
   if (sha(bytes) !== expectedSha256 || fingerprint(JSON.parse(bytes.toString("utf8"))) !== fingerprint(proposal)) {
     throw Error("Exact C0 commercial authorization proposal required");
   }
   return structuredClone(proposal);
+}
+
+export function readC0CommercialSourceAmendment(bytes: Buffer, expectedSha256: string, baseManifestSha256: string) {
+  if (expectedSha256 !== approvedSourceAmendmentSha256 || sha(bytes) !== expectedSha256 ||
+      baseManifestSha256 !== sourceAmendment.baseManifestSha256 ||
+      sourceAmendment.replace !== "evidence.prepared" ||
+      fingerprint(JSON.parse(bytes.toString("utf8"))) !== fingerprint(sourceAmendment)) {
+    throw Error("Exact approved C0 source amendment required");
+  }
+  return structuredClone(sourceAmendment.prepared);
 }
 
 export async function commercialC0Inputs(plan: typeof proposal) {
@@ -67,10 +79,12 @@ export async function commercialC0Inputs(plan: typeof proposal) {
  * must verify the owner decision, reviewer identity and artifact before installing
  * its output. The proposal carries no executable enrollment or provider grants. */
 export async function prepareCommercialC0(plan: typeof proposal, verifiedOriginal: WorkflowContext, binding: {
-  manifestSha256: string; artifactSha256: string; independentReviewerId: string; startsAt: number; expiresAt: number;
+  manifestSha256: string; sourceAmendmentSha256: string; artifactSha256: string; independentReviewerId: string; startsAt: number; expiresAt: number;
 }) {
   const exact = readC0CommercialProposal(await readFile("docs/c0-commercial-authorization-proposal.json"), binding.manifestSha256);
   if (fingerprint(exact) !== fingerprint(plan)) throw Error("Compiled proposal differs from approved bytes");
+  const preparedSources = readC0CommercialSourceAmendment(await readFile("docs/c0-commercial-source-amendment.json"),
+    binding.sourceAmendmentSha256, binding.manifestSha256);
   const { destination, evidence, cycle, research } = plan;
   if (fingerprint(verifiedOriginal.scope) !== fingerprint(previous.cases.c0.scope) ||
       verifiedOriginal.intakeId !== previous.cases.c0.intakeId ||
@@ -85,7 +99,7 @@ export async function prepareCommercialC0(plan: typeof proposal, verifiedOrigina
       binding.expiresAt <= binding.startsAt || binding.expiresAt - binding.startsAt > plan.approval.maximumHours * 3_600_000) {
     throw Error("Exact artifact, reviewer and approval window required");
   }
-  const prepared = evidence.prepared.map(item => ({ evidence: { id: item.id, kind: item.kind as PresenceEvidence["kind"],
+  const prepared = preparedSources.map(item => ({ evidence: { id: item.id, kind: item.kind as PresenceEvidence["kind"],
     label: item.id, date: null, reference: item.reference, content: item.content } satisfies PresenceEvidence,
     use: item.use as MarketingAuthority["sources"][number]["use"] }));
   const excluded = evidence.originalExclusions.map(id => {
