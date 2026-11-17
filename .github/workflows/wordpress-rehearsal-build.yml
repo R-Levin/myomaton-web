@@ -24,6 +24,8 @@ on:
       - 'scripts/intake/*presence-evaluation*.ts'
       - 'docs/presence-evaluation-activation.json'
       - 'tests/integration/presence-evaluation*.test.ts'
+      - 'scripts/backup/disposable-cluster.ts'
+      - 'scripts/db/bootstrap.ts'
       - 'tests/presence-workflow-provider.test.tsx'
       - 'tests/presence-workflow-review.test.tsx'
       - 'scripts/wordpress-routing-smoke.mjs'
