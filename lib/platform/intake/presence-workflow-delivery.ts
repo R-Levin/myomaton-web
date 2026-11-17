@@ -13,6 +13,13 @@ function logicalId(value: unknown) {
  * independent approval before the site authorization can issue. */
 export function workflowDeliveryInput(context: WorkflowContext, view: PresenceWorkflowView,
   prior: unknown, canonical: readonly { id: string; slug: string }[]) {
+  if (view.deliveryQuality?.passed === false) throw Error("Independent product-quality review required before delivery");
+  return workflowEvaluationPreviewInput(context, view, prior, canonical);
+}
+
+/** Permits a private evaluation render before its product-quality verdict. */
+export function workflowEvaluationPreviewInput(context: WorkflowContext, view: PresenceWorkflowView,
+  prior: unknown, canonical: readonly { id: string; slug: string }[]) {
   const review = view.operatorReview;
   if (view.contextDigest !== fingerprint(context) || view.next !== "review-complete" || !review || !view.blueprint ||
       view.visuals?.some(visual => ["queued", "running", "review", "unverified"].includes(visual.state))) {

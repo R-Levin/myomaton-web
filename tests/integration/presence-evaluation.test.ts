@@ -6,10 +6,12 @@ import { join } from "node:path";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { createC0Onboarding } from "../../scripts/intake/c0-onboarding";
 import { workflowFixture } from "../../scripts/intake/presence-workflow-fixture";
-import { PresenceWorkflow, type WorkflowContext } from "../../lib/platform/intake/presence-workflow";
+import { PresenceWorkflow, type PresenceWorkflowOperations, type WorkflowContext } from "../../lib/platform/intake/presence-workflow";
 import { bindPresenceEvaluations } from "../../lib/platform/intake/presence-evaluation";
 import { composeHomeConcept } from "../../lib/platform/intake/presence-home-concept";
 import { composeIsolatedPresenceEvaluation, workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
+import { qualityCriteria, type QualityReview } from "../../lib/platform/intake/presence-marketing-authority";
+import { workflowDeliveryInput, workflowEvaluationPreviewInput } from "../../lib/platform/intake/presence-workflow-delivery";
 import { IntakeService } from "../../lib/platform/intake/service";
 import { FirstPartyMeasurement, type MeasurementSource } from "../../lib/platform/measurement/first-party";
 import type { PresenceEvidence } from "../../lib/platform/intake/presence-workflow-artifacts";
@@ -73,7 +75,7 @@ test("isolated evaluations keep the original intake intact and pause at an exact
       async fetchPage() { throw Error("No research request during this check"); },
     });
     assert.equal(await (await readOnly.open()).review(bound.c0), null);
-    const workflow = new PresenceWorkflow(setup.pool, {
+    const operations: PresenceWorkflowOperations = {
       ...workflowFixture,
       async run(run, retain) {
         const tree = run.context.evaluation?.scenario === "c2";
@@ -101,10 +103,15 @@ test("isolated evaluations keep the original intake intact and pause at an exact
         async recover(_visual, bytes) { return JSON.parse(bytes.toString("utf8")); },
         async read() { return Buffer.from("Local fixture only"); },
       },
-    });
+    };
     const actor = { id: "local-evaluation", authority: "test-only", role: "operator", simulated: true } as const;
     const measurement = new FirstPartyMeasurement(setup.pool);
     for (const context of [bound.c0, bound.c2]) {
+      const scoped = context === bound.c0 ? { ...operations, marketingAuthority: {
+        contextDigest: fingerprint(context), sources: [{ digest: fingerprint(owner), use: "staffed-offer" as const }],
+        brandDigest: fingerprint("local brand fixture"), brandBrief: "Local fixture", qualityReviewerId: "independent",
+      } } : operations;
+      const workflow = new PresenceWorkflow(setup.pool, scoped);
       await workflow.start(context);
       const report = (await workPresenceCase(workflow, context))!;
       await workflow.confirmReport(context, report.version, actor, true);
@@ -141,6 +148,33 @@ test("isolated evaluations keep the original intake intact and pause at an exact
       assert.equal(resumed.homeReview?.digest, concept.digest);
       const complete = (await workPresenceCase(workflow, context))!;
       assert.equal(complete.pages.length, 2);
+      if (context === bound.c0) {
+        const reviewed = (await workflow.reviewCandidate(context, complete.version, actor))!;
+        assert.ok(reviewed.deliveryQuality?.target);
+        assert.equal(reviewed.deliveryQuality.passed, false);
+        assert.throws(() => workflowDeliveryInput(context, reviewed, null, []), /quality review/);
+        assert.equal(workflowEvaluationPreviewInput(context, reviewed, null, []).pages.length, 2);
+        const reviewer = { ...actor, id: "independent" };
+        const receipt: QualityReview = { target: reviewed.deliveryQuality.target, desktopEvidence: fingerprint("desktop fixture"),
+          mobileEvidence: fingerprint("mobile fixture"), findings: qualityCriteria.map(criterion =>
+            ({ criterion, status: "pass", observation: "Independently inspected fixture criteria." })) };
+        await assert.rejects(workflow.recordQualityReview(context, reviewed.version, actor, receipt), { code: "unavailable" });
+        await assert.rejects(workflow.recordQualityReview(context, reviewed.version, reviewer, { ...receipt, target: fingerprint("another candidate") }),
+          { code: "invalid_request" });
+        const accepted = (await workflow.recordQualityReview(context, reviewed.version, reviewer, receipt))!;
+        assert.equal(workflowDeliveryInput(context, accepted, null, []).pages.length, 2);
+        const wrongAuthority = await new PresenceWorkflow(setup.pool, operations).review(context);
+        assert.equal(wrongAuthority?.deliveryQuality?.passed, false);
+        assert.throws(() => workflowDeliveryInput(context, wrongAuthority!, null, []), /quality review/);
+        const negative: QualityReview = { ...receipt, findings: receipt.findings.map(finding => finding.criterion === "commercial-copy"
+          ? { ...finding, status: "revise", observation: "The opening offer is too vague to guide a buyer." } : finding) };
+        const rejected = (await workflow.recordQualityReview(context, accepted.version, reviewer, negative))!;
+        assert.equal(rejected.next, "editorial-review");
+        assert.equal(rejected.operatorReview, null);
+        assert.equal(rejected.deliveryQuality?.history.length, 2);
+        assert.equal(rejected.editorialFindings?.[0].concern, "The opening offer is too vague to guide a buyer.");
+        assert.throws(() => workflowDeliveryInput(context, rejected, null, []), /quality review/);
+      }
       const source: MeasurementSource = { id: randomUUID(), selection: context.scope, environment: "synthetic",
         activatedAt: new Date(Date.now() - 60_000).toISOString(), coverage: ["action-selected", "contact-accepted"],
         revision: fingerprint(complete.pages), routes: { "/": ["request-review"] } };
@@ -157,7 +191,7 @@ test("isolated evaluations keep the original intake intact and pause at an exact
       const separate = await measurement.snapshot({ ...source, selection: wrongSite.scope }, source.activatedAt, new Date().toISOString());
       assert.equal(separate.counts["action-selected"], 0);
     }
-    assert.equal(await workflow.review(origin), null);
+    assert.equal(await new PresenceWorkflow(setup.pool, operations).review(origin), null);
     assert.deepEqual(await original.service.workflowContext("aa".repeat(32)), original.context);
   } finally { await setup.stop(); }
 });

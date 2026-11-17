@@ -14,6 +14,7 @@ import {
   type WorkflowBlueprint, type WorkflowDirection, type WorkflowEditorial, type WorkflowPage, type WorkflowReport,
 } from "./presence-workflow-artifacts";
 
+import { qualityPass, readQualityReview, type MarketingAuthority, type QualityReview } from "./presence-marketing-authority";
 import type { ResolvePrivateVisuals } from "../content-editing/proposal-media";
 
 export type WorkflowContext = {
@@ -39,11 +40,12 @@ type Work = {
 type Failure = "operation-blocked" | "output-invalid" | "outcome-unknown";
 type Decision = { actor: Actor; at: string; target: string; decision: "confirmed" | "development-continuation" | "reviewed" };
 type Correction = { finding: WorkflowReport["findings"][number]; text: string; reportDigest: string; actor: Actor; at: string };
-type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: WorkflowPage[]; actor: Actor; at: string; ordinal: number; source?: "home-concept"; batch?: "pending" | "applied" };
+type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: WorkflowPage[]; actor: Actor; at: string; ordinal: number; source?: "home-concept" | "operator-editorial"; batch?: "pending" | "applied" };
 type State = {
   version: number;
   contextDigest: string;
   sourceSnapshot: Pick<WorkflowContext, "evidence" | "limitations" | "conflicts" | "entry">;
+  marketingAuthorityDigest?: string;
   evaluation?: EvaluationBinding;
   homeReview?: { digest: string; reference: string; actor: Actor; at: string } | null;
   mode: "fixture" | "provider";
@@ -59,6 +61,7 @@ type State = {
   editorialDecisions?: EditorialDecision[];
   revisionRequest?: RevisionRequest | null;
   operatorReview: Decision | null;
+  qualityReviews?: { actor: Actor; at: string; review: QualityReview }[];
   work: Work | null;
   failure: Failure | null;
   artifactIssue?: ArtifactIssue | null;
@@ -72,6 +75,7 @@ export type WorkflowRun = { context: WorkflowContext; input: WorkflowInput; work
 export interface PresenceWorkflowOperations {
   readonly mode: State["mode"];
   readonly maxRetries?: number;
+  readonly marketingAuthority?: MarketingAuthority;
   readonly maxEditorialRevisions?: number;
   readonly visuals?: PresenceVisualOperations;
   preflight?(run: WorkflowRun): Promise<void>;
@@ -214,7 +218,9 @@ export class PresenceWorkflow {
 
   private view(context: WorkflowContext, state: State | null) {
     if (!state) return null;
-    const current = state.contextDigest === fingerprint(context);
+    const authority = this.operations.marketingAuthority;
+    const current = state.contextDigest === fingerprint(context) &&
+      state.marketingAuthorityDigest === (authority && fingerprint(authority));
     const editorial = editorialProgress(state);
     const concept = current && state.evaluation && !state.homeReview ? homeConceptDigest(context, state) : undefined;
     const canQueueEditorialRevision = current && Boolean(state.editorial) && !state.work && !state.operatorReview &&
@@ -224,11 +230,24 @@ export class PresenceWorkflow {
       nextTask(state)?.operation ?? (concept ? "home-concept" : !state.confirmation ? "customer-review" :
         state.editorial && (state.editorial.concerns.length || editorial.open) ? "editorial-review" :
           !state.operatorReview ? "operator-review" : "review-complete");
+    const reviewedVisuals = (state.visuals ?? []).filter(visual => visual.placement.candidateDigest === state.operatorReview?.target);
+    const qualityTarget = current && authority && state.operatorReview && !reviewedVisuals.some(visual =>
+      !["approved", "rejected", "revoked"].includes(visual.state))
+      ? fingerprint({ candidate: state.operatorReview.target, context: state.contextDigest, authority, visuals: reviewedVisuals }) : undefined;
+    const lastQualityReview = state.qualityReviews?.at(-1);
+    const deliveryQuality = authority ? {
+      target: qualityTarget ?? null,
+      passed: Boolean(qualityTarget && lastQualityReview && qualityPass(lastQualityReview.review, lastQualityReview.review.target) &&
+        lastQualityReview.review.target === qualityTarget && lastQualityReview.actor.id === authority.qualityReviewerId),
+      history: state.qualityReviews ?? [],
+    } : undefined;
     const { research, report, confirmation, corrections, direction, blueprint, pages, operatorReview, version, mode, failure } = state;
     return { version, mode, contextDigest: state.contextDigest, research, report, confirmation, corrections, direction, blueprint, pages, editorial: state.editorial, operatorReview,
       ...(editorial.findings.length > 0 && { editorialFindings: editorial.findings }), canQueueEditorialRevision,
       ...(concept && { homeConcept: { digest: concept } }), ...(state.homeReview && { homeReview: state.homeReview }),
       ...(operatorReview && { candidateReviewTarget: candidateReviewTarget(state) }),
+      ...(deliveryQuality && { deliveryQuality }),
+      ...((state.marketingAuthorityDigest && !authority) && { deliveryQuality: { target: null, passed: false, history: state.qualityReviews ?? [] } }),
       failure, ...(failure === "output-invalid" && state.artifactIssue && { artifactIssue: state.artifactIssue }),
       next, pendingOperation: state.work?.operation ?? null, recoverable: current && Boolean(state.work && (state.failure || state.work.until <= this.clock())),
       sources: state.sourceSnapshot.evidence, limitations: state.sourceSnapshot.limitations,
@@ -247,6 +266,7 @@ export class PresenceWorkflow {
       contextDigest: fingerprint(context), sourceSnapshot: { evidence: context.evidence, limitations: context.limitations,
         conflicts: context.conflicts, entry: context.entry }, mode: this.operations.mode, research: null, report: null, corrections: [],
       ...(context.evaluation && { evaluation: context.evaluation }),
+      ...(this.operations.marketingAuthority && { marketingAuthorityDigest: fingerprint(this.operations.marketingAuthority) }),
       confirmation: null, direction: null, blueprint: null, pages: [], editorial: null, operatorReview: null,
       work: null, failure: null,
     });
@@ -255,7 +275,8 @@ export class PresenceWorkflow {
 
   private async current(context: WorkflowContext, version: number) {
     const state = await this.store.read(context);
-    if (!state || state.version !== version || state.contextDigest !== fingerprint(context) || state.mode !== this.operations.mode) {
+    if (!state || state.version !== version || state.contextDigest !== fingerprint(context) || state.mode !== this.operations.mode ||
+        state.marketingAuthorityDigest !== (this.operations.marketingAuthority && fingerprint(this.operations.marketingAuthority))) {
       throw new IntakeError("draft_changed", 409);
     }
     return state;
@@ -403,7 +424,8 @@ export class PresenceWorkflow {
     const at = new Date(this.clock()).toISOString();
     const batch = Boolean(state.evaluation) && state.mode === "provider" && paths.length > 1;
     const revisionRequest = { paths, audit: { summary: state.editorial.summary, concerns }, priorPages: state.pages.filter(page => paths.includes(page.path)),
-      actor, at, ordinal, ...(batch && { batch: "pending" as const }) };
+      actor, at, ordinal, ...(this.operations.marketingAuthority && assigned.length > 0 && { source: "operator-editorial" as const }),
+      ...(batch && { batch: "pending" as const }) };
     const queued = assigned.map(({ decision }) => ({ ...decision, status: "queued" as const, actor, at, basedOnVersion: version }));
     return this.view(context, await this.store.append(context, version, { ...state, revisionRequest, editorial: null,
       editorialFindings: savedEditorialFindings(state), editorialDecisions: [...state.editorialDecisions ?? [], ...queued],
@@ -527,7 +549,7 @@ export class PresenceWorkflow {
     const view = await this.review(context);
     if (fingerprint(scope) !== fingerprint(context.scope) || page.workflowReview?.intakeId !== context.intakeId ||
         view?.next !== "review-complete" || !view.operatorReview || view.operatorReview.target !== page.workflowReview?.candidateDigest ||
-        !this.operations.visuals) throw Error("Current protected visual review required");
+        view.deliveryQuality?.passed === false || !this.operations.visuals) throw Error("Current protected visual review required");
     const reviewedPage = view.pages.find(item => item.path === page.slug);
     if (!reviewedPage || reviewedPage.composition !== page.composition ||
         (page.composition && page.navigationLabel !== view.blueprint?.pages.find(item => item.path === page.slug)?.label) ||
@@ -579,6 +601,28 @@ export class PresenceWorkflow {
       throw new IntakeError("unavailable", 404);
     }
     return this.operations.visuals.read(visual);
+  }
+
+  async recordQualityReview(context: WorkflowContext, version: number, actor: Actor, input: unknown) {
+    const state = await this.current(context, version);
+    const authority = this.operations.marketingAuthority;
+    if (!authority || actor.role !== "operator" || actor.id !== authority.qualityReviewerId ||
+        actor.simulated !== (state.mode === "fixture") || !actor.authority ||
+        actor.id === state.operatorReview?.actor.id || actor.id === state.confirmation?.actor.id) {
+      throw new IntakeError("unavailable", 403);
+    }
+    const target = this.view(context, state)?.deliveryQuality?.target;
+    if (!target || state.work || state.failure) throw new IntakeError("workflow_not_ready", 409);
+    let review: QualityReview;
+    try { review = readQualityReview(input, target); }
+    catch { throw new IntakeError("invalid_request"); }
+    const qualityReviews = [...state.qualityReviews ?? [], { actor, at: new Date(this.clock()).toISOString(), review }];
+    const unresolved = review.findings.filter(finding => finding.status === "revise").map(finding =>
+      ({ suggestedTarget: finding.criterion, concern: finding.observation }));
+    if (!unresolved.length) return this.view(context, await this.store.append(context, version, { ...state, qualityReviews }));
+    // Reuse assignment and exact revision review. A critic cannot silently choose Pages or approve new copy.
+    return this.view(context, await this.store.append(context, version, { ...state, qualityReviews, operatorReview: null,
+      editorialFindings: [...savedEditorialFindings(state), ...editorialFindings({ summary: "", concerns: [], unassigned: unresolved }, version + 1)] }));
   }
 
   async reviewCandidate(context: WorkflowContext, version: number, actor: Actor) {

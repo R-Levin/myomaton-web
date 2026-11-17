@@ -219,7 +219,15 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run, c
         {workflow.next === "editorial-review" && workflow.canQueueEditorialRevision && (!hosted || canTriage) &&
           <button type="button" disabled={busy} onClick={() => void submit("revise")}>Queue the flagged pages for revision</button>}
         {workflow.next === "operator-review" && (!hosted || canTriage) && <button type="button" disabled={busy} onClick={() => void submit("review")}>{hosted ? "Record Operator site review" : "Record simulated Operator review"}</button>}
-        {workflow.operatorReview && <p>Operator review saved. WordPress preparation requires separate authorization.</p>}
+        {workflow.operatorReview && !workflow.deliveryQuality && <p>Operator review saved. WordPress preparation requires separate authorization.</p>}
+        {workflow.deliveryQuality && <section aria-label="Independent product review">
+          <h4>Independent product review</h4>
+          <p>{workflow.deliveryQuality.passed ? "Passed for this exact candidate. WordPress preparation still requires authorization."
+            : workflow.deliveryQuality.target ? "A separate desktop and mobile quality review is required before delivery."
+              : "Delivery is on hold while the candidate or its media is in review."}</p>
+          {workflow.deliveryQuality.history.at(-1)?.review.findings.some(finding => finding.status === "revise") &&
+            <p>The last independent review requested revisions. Its findings remain in editorial review.</p>}
+        </section>}
       </section>}
       {workflow.report && <details className={styles.sourceArchive}><summary>Source history and open conflicts</summary>
         {(workflow.limitations.length > 0 || workflow.conflicts.length > 0) && <ul>

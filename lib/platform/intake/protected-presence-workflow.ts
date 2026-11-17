@@ -222,7 +222,7 @@ export async function recoverRetainedPresenceOutput(workflow: PresenceWorkflow,
 }
 
 export async function reviewWorkflowChange(workflow: PresenceWorkflow,
-  current: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>>, operation: unknown, version: number, actor: WorkflowActor, details?: { finding?: unknown; correction?: unknown; visual?: unknown; editorial?: unknown }) {
+  current: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>>, operation: unknown, version: number, actor: WorkflowActor, details?: { finding?: unknown; correction?: unknown; visual?: unknown; editorial?: unknown; quality?: unknown }) {
   // Existing protected Operator can continue a development report. This grants
   // no authority to confirm business facts as a customer or publish anything.
   switch (operation) {
@@ -237,6 +237,7 @@ export async function reviewWorkflowChange(workflow: PresenceWorkflow,
     case "workflow-editorial-decision": return workflow.decideEditorialFinding(current, version, actor, details?.editorial);
     case "workflow-revise": return workflow.requestEditorialRevision(current, version, actor);
     case "workflow-review": return workflow.reviewCandidate(current, version, actor);
+    case "workflow-quality-review": return workflow.recordQualityReview(current, version, actor, details?.quality);
     case "workflow-visual-queue": {
       const input = details?.visual as { path?: unknown; index?: unknown; briefId?: unknown } | undefined;
       if (typeof input?.path !== "string" || typeof input.index !== "number") throw new IntakeError("invalid_request");

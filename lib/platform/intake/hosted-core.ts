@@ -315,7 +315,7 @@ export async function hostedCoreRequest(request: Request) {
       const context = await authenticate(credential, active?.owner);
       if (!context) { refusal = reply({ error: "sign_in_required" }, 401); return null; }
       let actor;
-      try { actor = await app.operators.authorize(context, value.operation === "workflow-visual-decide" ? "review-private-stage" : "prepare-site-proposal", app.selection); }
+      try { actor = await app.operators.authorize(context, ["workflow-visual-decide", "workflow-quality-review"].includes(String(value.operation)) ? "review-private-stage" : "prepare-site-proposal", app.selection); }
       catch { refusal = reply({ error: "authorization_required" }, 403); return null; }
       try {
         const view = async (result: ReturnType<IntakeService["resume"]>) => includeOperations(await result, context);
@@ -324,9 +324,9 @@ export async function hostedCoreRequest(request: Request) {
           const scope = await app.presenceCase();
           await reviewWorkflowChange(await scope.open(), await scope.context(), value.operation, version,
             { id: actor.operatorId, role: "operator", simulated: false,
-              ...((value.operation.startsWith("workflow-visual-") || value.operation === "workflow-editorial-decision") &&
+              ...((value.operation.startsWith("workflow-visual-") || value.operation === "workflow-editorial-decision" || value.operation === "workflow-quality-review") &&
                 { authority: actor.authorityReference }) },
-            { finding: value.finding, correction: value.correction, visual: value.visual, editorial: value.editorial });
+            { finding: value.finding, correction: value.correction, visual: value.visual, editorial: value.editorial, quality: value.quality });
           return await view(app.intake.resume(app.draftToken));
         }
         if (typeof value.operation === "string" && value.operation.startsWith("site-plan-")) {

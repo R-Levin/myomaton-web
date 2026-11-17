@@ -5,7 +5,7 @@ import { Pool } from "pg";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { validatePages } from "../../lib/platform/wordpress-delivery/authority";
 import { composeHomeConcept } from "../../lib/platform/intake/presence-home-concept";
-import { workflowDeliveryInput } from "../../lib/platform/intake/presence-workflow-delivery";
+import { workflowEvaluationPreviewInput } from "../../lib/platform/intake/presence-workflow-delivery";
 import { bindFictionalEvaluation, bindOriginalEvaluation, evaluationGrant, readEvaluationManifest,
   type EvaluationManifest, type EvaluationScenario } from "../../lib/platform/intake/presence-evaluation-activation";
 import { initializeResponsesUsageLedger } from "../../lib/platform/intake/intelligent-responses";
@@ -181,7 +181,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       if (home) {
         packet = { ...home, ...(home.image && { image: { ...home.image, file: await publishImage(home.image.id, home.image.digest) } }) };
       } else {
-        const input = workflowDeliveryInput(context, prior, null, []);
+        const input = workflowEvaluationPreviewInput(context, prior, null, []);
         const editorial = (copy: { kind: string; text?: string } | undefined) => {
           if (copy?.kind !== "editorial" || typeof copy.text !== "string") throw Error("Expected reviewed editorial copy");
           return copy.text;

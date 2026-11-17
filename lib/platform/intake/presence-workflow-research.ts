@@ -15,14 +15,36 @@ function safeResearchUrl(url: URL) {
     !/\.(?:localhost|local|internal|test)$/u.test(host) && /^\/[a-z0-9_./-]*$/iu.test(url.pathname);
 }
 
-export type MarketSearch = { publicQuery: string; maxToolCalls: number; maxSources: number; minimumNewOrigins: number };
+const researchIntents = ["buying-needs", "alternatives", "objections", "search-and-content", "launch-and-ongoing"] as const;
+type ResearchIntent = typeof researchIntents[number];
+
+export type MarketSearch = {
+  publicQuery: string; maxToolCalls: number; maxSources: number; minimumNewOrigins: number;
+  questions?: Readonly<Record<ResearchIntent, string>>;
+};
+
+const publicQuestion = /^[a-z][a-z ,'-]{19,359}[a-z]$/iu;
+
+export function marketResearchInput(scope: MarketSearch) {
+  if (!scope.questions) return scope.publicQuery;
+  return JSON.stringify({ market: scope.publicQuery,
+    questions: researchIntents.map(intent => ({ intent, question: scope.questions![intent] })) });
+}
 
 export function validateMarketSearch(value: MarketSearch) {
-  if (!/^[a-z][a-z ,'-]{19,359}[a-z]$/iu.test(value.publicQuery) ||
+  if (!publicQuestion.test(value.publicQuery) ||
       !Number.isSafeInteger(value.maxToolCalls) || value.maxToolCalls < 1 || value.maxToolCalls > 10 ||
       !Number.isSafeInteger(value.maxSources) || value.maxSources < 1 || value.maxSources > 16 ||
       !Number.isSafeInteger(value.minimumNewOrigins) || value.minimumNewOrigins < 1 || value.minimumNewOrigins > value.maxSources) {
     throw Error("Market search scope refused");
+  }
+  if (value.questions) {
+    const questions = Object.values(value.questions);
+    if (value.maxToolCalls < researchIntents.length || questions.length !== researchIntents.length ||
+        new Set(questions.map(question => question.toLowerCase())).size !== researchIntents.length ||
+        researchIntents.some(intent => typeof value.questions![intent] !== "string" || !publicQuestion.test(value.questions![intent]))) {
+      throw Error("Independent public research questions required");
+    }
   }
 }
 
@@ -30,6 +52,10 @@ export function marketSources(response: unknown, seeds: readonly PublicResearchS
   validateMarketSearch(scope);
   const body = response as { output?: { type: string; status: string; action?: { sources?: { type: string; url: string }[] } }[] };
   if (!Array.isArray(body?.output)) throw Error("Market search response refused");
+  if (scope.questions && body.output.filter(item => item.type === "web_search_call" && item.status === "completed" &&
+      item.action?.sources?.some(source => source.type === "url")).length < researchIntents.length) {
+    throw Error("Market research returned too few completed search passes");
+  }
   const known = new Set(seeds.map(source => new URL(source.url).hostname.replace(/^www\./u, "")));
   const discovered: PublicResearchSource[] = [];
   for (const output of body.output) {

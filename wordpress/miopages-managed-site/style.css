@@ -29,3 +29,45 @@ main .wp-block-post-content > .miopages-composed { max-width: 72rem; }
 .miopages-draft-with-image img { display: block; width: 100%; height: auto; border-radius: .8rem; }
 .miopages-composed :focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 @media (max-width: 680px) { .miopages-draft-with-image { grid-template-columns: minmax(0, 1fr); } }
+
+body.miopages-branded-draft {
+  background: var(--wp--preset--color--surface);
+  color: var(--wp--preset--color--ink);
+  font-family: var(--miopages-body-font);
+  font-size: var(--miopages-body-size);
+  line-height: var(--miopages-body-leading);
+}
+.miopages-branded-draft h1, .miopages-branded-draft h2 { font-family: var(--miopages-heading-font); }
+.miopages-branded-draft .miopages-draft-section h1 { font-size: clamp(2rem, 5vw, var(--miopages-title-size)); }
+.miopages-draft-wordmark { display: inline-block; line-height: 0; }
+.miopages-draft-wordmark img { display: block; width: clamp(9rem, 18vw, 13rem); height: auto; }
+.miopages-branded-draft .miopages-draft-hero {
+  background: var(--wp--preset--color--brand);
+  color: var(--wp--preset--color--on-brand);
+  border-radius: .4rem;
+}
+.miopages-branded-draft .miopages-draft-hero h1,
+.miopages-branded-draft .miopages-draft-cta h2 { color: inherit; }
+.miopages-branded-draft .miopages-draft-hero .wp-block-button__link {
+  background: var(--miopages-accent-surface);
+  color: var(--miopages-accent-ink);
+}
+.miopages-branded-draft .miopages-draft-hero .wp-block-button + .wp-block-button .wp-block-button__link {
+  color: var(--wp--preset--color--on-brand);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+.miopages-branded-draft .miopages-draft-intro { border-color: var(--miopages-border); }
+.miopages-branded-draft .miopages-draft-cta {
+  background: var(--wp--preset--color--support);
+  color: var(--miopages-tonal-ink);
+  border-radius: .4rem;
+}
+.miopages-branded-draft .miopages-draft-cta .wp-block-button__link {
+  background: var(--wp--preset--color--brand);
+  color: var(--wp--preset--color--on-brand);
+}
+.miopages-motion-off *, .miopages-motion-off *::before, .miopages-motion-off *::after {
+  animation: none !important;
+  transition: none !important;
+}
