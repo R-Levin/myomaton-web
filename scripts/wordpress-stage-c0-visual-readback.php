@@ -1,15 +1,18 @@
 <?php
 /** Verify the exact approved C0 native readback in the existing private installation. */
-declare(strict_types=1);
+// wp eval-file evaluates this script after loading its command prelude.
+$root = getcwd();
 
 function check(bool $ok): void {
     if (!$ok) {
-        fwrite(STDERR, "BLOCKED: exact C0 staged readback differs.\n");
+        $line = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['line'] ?? 0;
+        fwrite(STDERR, "BLOCKED: exact C0 staged readback differs at check line {$line}.\n");
         exit(1);
     }
 }
 
-check(defined('WP_CLI') && WP_CLI && home_url() === 'https://miopages.org'
+check($root === '/home/sites/36a/9/9fe7ae6df4/miopages-private/native-draft-d84ebc69-46d5-4c64-adc6-ac7b87468f89/stage-36f5dbff'
+    && defined('WP_CLI') && WP_CLI && home_url() === 'https://miopages.org'
     && current_user_can('edit_pages'));
 $installation = 'd84ebc69-46d5-4c64-adc6-ac7b87468f89';
 check(MIOPAGES_NATIVE_DRAFT_IDENTITY['installationId'] === $installation);
@@ -20,7 +23,7 @@ if (is_string($state)) {
     $state = json_decode($state, true, 48, JSON_THROW_ON_ERROR);
 }
 check(is_array($state) && $state['highWaterRevision'] === 6);
-$before = json_decode(file_get_contents(__DIR__ . '/baseline-site.json'), true, 48, JSON_THROW_ON_ERROR)['state'];
+$before = json_decode(file_get_contents($root . '/baseline-site.json'), true, 48, JSON_THROW_ON_ERROR)['state'];
 if (is_string($before)) {
     $before = json_decode($before, true, 48, JSON_THROW_ON_ERROR);
 }
@@ -41,7 +44,7 @@ if ($operation === 'verify-restored') {
     exit;
 }
 
-$wire = json_decode(file_get_contents(__DIR__ . '/apply.json'), true, 48, JSON_THROW_ON_ERROR);
+$wire = json_decode(file_get_contents($root . '/apply.json'), true, 48, JSON_THROW_ON_ERROR);
 $issued = json_decode(base64_decode($wire['envelope']['payloadBase64'], true), true, 48, JSON_THROW_ON_ERROR)['issuedAt'];
 // Historical verification for readback only. The write command checks current time.
 $envelope = MioPages_Native_Draft_Envelope::verify(wp_json_encode($wire['envelope']), MIOPAGES_NATIVE_DRAFT_IDENTITY, $issued);
@@ -52,7 +55,7 @@ check(($state['archive']['/service']['post'] ?? null) === $baselines['/service']
 $verifyPost($baselines['/service']);
 
 if ($operation === 'verify-rollback') {
-    $restore = MioPages_Native_Draft_Envelope::verify(file_get_contents(__DIR__ . '/rollback-check.json'), MIOPAGES_NATIVE_DRAFT_IDENTITY);
+    $restore = MioPages_Native_Draft_Envelope::verify(file_get_contents($root . '/rollback-check.json'), MIOPAGES_NATIVE_DRAFT_IDENTITY);
     check($restore['operation'] === 'restore' && $restore['digest'] === $envelope['digest'] && $restore['candidate'] === $candidate);
     check($candidate['rollback']['revision'] === 3 && $candidate['rollback']['digest'] === $before['current']['digest']);
     echo wp_json_encode(['status' => 'PASS', 'restorableRevision' => 3, 'verifiedCurrentRevision' => 6]), PHP_EOL;
@@ -69,7 +72,8 @@ foreach ($expected as $path => $post) {
         && $post['post_title'] === $actual['post_title']);
     $verifyPost($actual);
     $html = do_blocks(get_post($actual['ID'])->post_content);
-    check(str_contains($html, 'class="miopages-draft-nav"') && substr_count($html, '<h1>') === 1 && !str_contains($html, '<form'));
+    check(str_contains($html, 'class="miopages-draft-nav"') && preg_match_all('/<h1(?=[\s>])/i', $html) === 1
+        && !str_contains($html, '<form'));
     $paths[] = ['path' => $path, 'id' => $actual['ID']];
 }
 foreach ($current['attachments'] as $item) {

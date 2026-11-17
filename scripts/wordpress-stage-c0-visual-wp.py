@@ -52,7 +52,7 @@ def invoke(*args, data=None):
 
 
 def wp(*args, data=None, scoped=False):
-    options = ["--require=" + str(ROOT / "cli-config.php"), "--user=1"] if scoped else []
+    options = ["--require=" + str(guarded(RUN / "wordpress-stage-c0-visual-media.php", 0o600)), "--user=1"] if scoped else []
     return invoke(PHP, "/usr/local/bin/wp", "--path=" + str(DOC), *options, *args, data=data)
 
 
