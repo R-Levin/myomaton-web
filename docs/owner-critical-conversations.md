@@ -459,6 +459,16 @@ Technical success (retained 12 Pages, 63 Sections, ten source-bound editorial fi
 
 ---
 
+## P0-24 — Explicit owner approval of exact P0-22 C0 generation run, not site or production approval (November 18, 2026)
+
+**Direct owner authorization in this chat:** ChatGPT reviewed Codex's P0-22 implementation checkpoint `924fd146601c25ebc77a9ba2ccd9a80409aa6f88`, exact new peer sources, pinned source pack, run cap, expiry and the conservative old ledger. ChatGPT recommended approval and explicitly asked the owner to approve the exact P0-22 proposal. **Owner replied: “Yes.”** The record is [Issue #12 #6983036002](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6983036002) and the mandatory [development-control P0-24 entry](development-control.md#p0-24--owner-approved-exact-p0-22-local-generation-scope-activation-pending-november-18-2026).
+
+**Precisely approved:** One genuine local isolated Core C0 generation and review using [proposal SHA-256 `f8e48f864853802cfda73907a3fdce66b266b87e202bad9dc010fdc77435dd03`](https://github.com/R-Levin/myomaton-web/blob/924fd146601c25ebc77a9ba2ccd9a80409aa6f88/docs/c0-generation-p0-22-run-proposal.json) and [source pack SHA-256 `175bfeb870f4a375bb27bd6c299e7aaefe11d39731b9d5e94f806488bab6782a`](https://github.com/R-Levin/myomaton-web/blob/924fd146601c25ebc77a9ba2ccd9a80409aa6f88/docs/c0-generation-p0-22-sources.json). Additional cost maximum **$5.95**, with aggregate original $8 unchanged, conservative carried ledger debit **$1.952189** including unresolved $0.45 hold. Two new public read-only peer sites **b12.io** and **sitecare.com**, approved sanitized business/peer data only; exact stage budgets and limits (29 text calls, up to 2 images, 4 searches, 60 provider requests, zero automatic retries), up to **72 hours from verified activation**, not chat reply. Protected/hosted writes, publication, merge, extra source/data permission and acceptance of future marketing output **NOT approved**. Independent functional review/authority and credential procedure still apply.
+
+**Current verified status:** Approval was recorded in Git but **provider activation, live generation, new preview and local WordPress result have not been observed or executed by ChatGPT**; GitHub comment is not Codex dispatch. Do not change pinned JSON status/bytes (would break bound hashes); Codex checks actual local custody/ledger and activates exact approved operation. User and ChatGPT discuss results in this chat; only substantive product outcomes, remaining uncertainties or genuine material scope decisions come to the founder. Keep the P0-23 connected operating-cycle beacons in parallel without holding the website preview hostage. The owner’s previous F/D− rejections are not acceptance of this new candidate.
+
+---
+
 ## Forward-maintenance template: add a new owner-marked critical conversation
 
 For every future explicitly important owner conversation, append a chronological, referenced entry; update `docs/development-control.md` only when the navigation/priority policy changes. Preserve prior entries and mark supersession instead of erasure.
