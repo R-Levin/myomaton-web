@@ -7,7 +7,7 @@ import test from "node:test";
 import { p022CandidateInputs, p022ProposedMeter, readP022SourcePack } from "../lib/platform/intake/c0-p022-source-pack";
 import { fingerprint } from "../lib/platform/canonical/model";
 import { strategyBasis } from "../lib/platform/intake/presence-decision-brief";
-import { createResponsesPresenceWorkflow, type PresenceWorkflowGrant } from "../lib/platform/intake/presence-workflow-provider";
+import { bindBlueprintDecisionSchema, bindEvaluationHomeActions, createResponsesPresenceWorkflow, type PresenceWorkflowGrant } from "../lib/platform/intake/presence-workflow-provider";
 import { marketingProjection, repeatsPeerObservation, unsupportedCommercialCopy, type MarketingAuthority } from "../lib/platform/intake/presence-marketing-authority";
 import { readBlueprint, readPage } from "../lib/platform/intake/presence-workflow-artifacts";
 import { readSemanticBlock } from "../lib/platform/intake/presence-semantic-block";
@@ -26,6 +26,49 @@ const block = { version: 1, name: "how-control-moves", purpose: "Explain respons
   layout: "grid", listStyle: "steps", groups: [{ heading: "You confirm",
     body: "Tell us what your business does.", items: ["Share what already works", "Confirm important details"] },
   { heading: "We handle the next step", body: "Structure and maintain the web presence.", items: [] }] };
+
+test("Core binds only explicit Home preview intents to exact declared and authorized routes", () => {
+  const output = { path: "/", actions: [
+    { kind: "request-review", label: "Free Review", sectionIndex: 0, destination: null },
+    { kind: "start-onboarding", label: "Direct Start", sectionIndex: 0, destination: null },
+    { kind: "existing-account", label: "Account", sectionIndex: 0, destination: null },
+  ] };
+  const paths = ["/", "/free-review", "/direct-start"];
+  const destinations = { "request-review": "/free-review", "start-onboarding": "/direct-start" };
+  assert.deepEqual((bindEvaluationHomeActions(output, paths, destinations) as typeof output).actions.map(action => action.destination),
+    ["/free-review", "/direct-start", null]);
+  assert.deepEqual(bindEvaluationHomeActions(output, paths.slice(0, 2), destinations), output);
+  assert.deepEqual(bindEvaluationHomeActions({ ...output, path: "/other" }, paths, destinations), { ...output, path: "/other" });
+  const tainted = { ...output, actions: [{ ...output.actions[0], destination: "/unapproved" }, output.actions[1]] };
+  assert.equal((bindEvaluationHomeActions(tainted, paths, destinations) as typeof tainted).actions[0].destination, "/unapproved");
+  assert.equal(readSemanticBlock({ ...block, name: "Service fit and scope" }, true).name, "service-fit-and-scope");
+  assert.throws(() => readSemanticBlock({ ...block, name: "<script>" }, true));
+});
+
+test("constrains Blueprint report references separately from approved source IDs", async () => {
+  const { context, authority } = p022CandidateInputs(await readFile(packFile), scope);
+  const run = inputs(authority, context);
+  const fields = bindBlueprintDecisionSchema(run, authority).properties.pages.items.properties.decisionBrief.properties;
+  assert.deepEqual((fields.findingIds.items as { enum?: string[] }).enum, ["important-finding"]);
+  assert.ok((fields.claimIds.items as { enum?: string[] }).enum?.includes("c0-launch"));
+  assert.ok(!(fields.claimIds.items as { enum?: string[] }).enum?.includes("peer-wordpress-builder"));
+  assert.deepEqual((fields.directionSteps.items as { enum?: number[] }).enum, [0]);
+});
+
+test("P0-22 accepts both exact rendered public peers and rejects replaced evidence", async () => {
+  const pack = await readFile(packFile);
+  const peers = [
+    { id: "peer-b12-rendered", publisher: "B12", url: "https://www.b12.io/" },
+    { id: "peer-sitecare-rendered", publisher: "SiteCare", url: "https://sitecare.com/" },
+  ].map(peer => ({ ...peer, date: "2026-11-18", desktopSha256: "a".repeat(64), mobileSha256: "b".repeat(64),
+    observation: "Local structured desktop and mobile observations, no source pixels or copied prose." }));
+  const result = p022CandidateInputs(pack, scope, [], peers);
+  assert.deepEqual(result.authority.strategy?.peerIds.slice(-2), peers.map(peer => peer.id));
+  assert.ok(result.authority.sources.slice(-2).every(row => row.use === "analysis"));
+  assert.throws(() => p022CandidateInputs(pack, scope, [], [peers[0], { ...peers[1], url: "https://sitecare.com/sign-in/" }]));
+  assert.throws(() => p022CandidateInputs(pack, scope, [], [peers[0]]));
+  assert.throws(() => p022CandidateInputs(pack, scope, [], [peers[0], { ...peers[1], mobileSha256: peers[1].desktopSha256 }]));
+});
 
 function inputs(authority: MarketingAuthority, context: WorkflowRun["context"], testCase = 1, revision = false): WorkflowRun {
   const direction = { positioning: "Private strategy narrative", approach: "Original supported decisions", sourceIds: [claims[0], peerIds[0]],

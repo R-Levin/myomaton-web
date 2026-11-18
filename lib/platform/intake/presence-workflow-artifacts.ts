@@ -11,8 +11,8 @@ const sectionRoles = ["hero", "intro", "cta"] as const;
 const visualStates = ["text-only", "asset-needed", "rights-review"] as const;
 const string = { type: "string" };
 const nullableString = { type: ["string", "null"] };
-const array = (items: unknown) => ({ type: "array", items });
-const shape = (properties: Record<string, unknown>) => ({
+const array = <T>(items: T) => ({ type: "array", items });
+const shape = <T extends Record<string, unknown>>(properties: T) => ({
   type: "object", properties, required: Object.keys(properties), additionalProperties: false,
 });
 const options = (values: readonly string[]) => ({ type: "string", enum: values });
@@ -144,7 +144,7 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
     const visual = object(section.visual, ["purpose", "brief", "altIntent", "status"]);
     return { heading: copy(section.heading), body: copy(section.body), sourceIds: citedSources(section.sourceIds, ids, normalizeProviderReferences),
       ...(role && { role }),
-      ...(section.block != null && { block: readSemanticBlock(section.block) }),
+      ...(section.block != null && { block: readSemanticBlock(section.block, normalizeProviderReferences && semanticBlocks) }),
       visual: { purpose: copy(visual.purpose), brief: copy(visual.brief), altIntent: copy(visual.altIntent), status: choice(visual.status, visualStates) } };
   });
   if (composition && (sections[0].role !== "hero" || sections.slice(1).some(section => section.role === "hero"))) {

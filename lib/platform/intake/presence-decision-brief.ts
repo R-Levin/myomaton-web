@@ -10,7 +10,7 @@ const hash = /^[a-f0-9]{64}$/u;
 const uses = ["terminology", "composition", "journey"] as const;
 const string = { type: "string" };
 const strings = { type: "array", items: string };
-const shape = (properties: object) => ({ type: "object", additionalProperties: false, properties, required: Object.keys(properties) });
+const shape = <T extends Record<string, unknown>>(properties: T) => ({ type: "object", additionalProperties: false, properties, required: Object.keys(properties) });
 export const decisionBriefSchema = shape({
   decision: string, findingIds: strings, directionSteps: { type: "array", items: { type: "integer" } },
   claimIds: strings, influences: { type: "array", items: shape({ sourceIds: strings, use: { type: "string", enum: uses }, implication: string }) },

@@ -9,6 +9,7 @@ import { privateWorkflowFile, verifyDirectory } from "../../lib/platform/intake/
 import type { ReportReservation } from "../../lib/platform/intake/intelligent-responses";
 import type { WorkflowContext } from "../../lib/platform/intake/presence-workflow";
 import { ProtectedOperator } from "../../lib/platform/wordpress-delivery/operator";
+import { verifiedP022Runtime } from "./p022-evaluation-activation";
 
 export const commercialApproval = "79ab938feb2e2a33447d8328c4666988a51726a87a15d1009d3fd89503a8f924";
 const sourceAmendment = "169178bb9a8f4a148f0cdb6307389df34a6cc0dee460097856fffc2b4ce2f1fe";
@@ -44,7 +45,7 @@ export function commercialBinding(activation: Activation, artifact: string, now:
     independentReviewerId: uuid(activation.reviewerId), startsAt, expiresAt };
 }
 
-export async function openCommercialActivation(parent: string, allowExpiredReview: boolean) {
+export async function openCommercialActivation(parent: string, allowExpiredReview: boolean, p022 = false) {
   const root = join(parent, directory);
   await verifyDirectory(root);
   const [activation, entry, planBytes] = await Promise.all([
@@ -54,7 +55,7 @@ export async function openCommercialActivation(parent: string, allowExpiredRevie
   ]);
   const original = join(root, "worker.cjs");
   const artifact = createHash("sha256").update(await readFile(original)).digest("hex");
-  if (entry !== original) {
+  if (!p022 && entry !== original) {
     if (entry !== join(root, "worker-p018.cjs")) throw Error("Protected commercial executable required");
     const continuation = await privateWorkflowFile<{ original: string; worker: string }>(join(root, "p018-executable.json"), root);
     if (continuation.original !== artifact || continuation.worker !== createHash("sha256").update(await readFile(entry)).digest("hex")) {
@@ -62,6 +63,7 @@ export async function openCommercialActivation(parent: string, allowExpiredRevie
     }
   }
   const binding = commercialBinding(activation, artifact, Date.now(), allowExpiredReview);
+  const upgraded = p022 ? await verifiedP022Runtime(parent, binding.independentReviewerId, activation.reviewerExpiresAt, allowExpiredReview) : null;
   const reportHold = await privateWorkflowFile<ReportReservation>(join(root, "p018-report-hold.json"), root).catch((error: NodeJS.ErrnoException) => {
     if (error.code === "ENOENT") return undefined;
     throw error;
@@ -71,7 +73,8 @@ export async function openCommercialActivation(parent: string, allowExpiredRevie
   }
   const plan = readC0CommercialProposal(planBytes, binding.manifestSha256);
   const { primary } = await commercialC0Inputs(plan);
-  const scope = plan.destination.scope;
+  const scope = upgraded?.item.scope ?? plan.destination.scope;
+  const intakeId = upgraded?.item.intakeId ?? plan.destination.intakeId;
 
   async function verifyGrant(pool: Pool) {
     const { rows } = await pool.query(`SELECT c.id,c.expires_at,c.token_sha256,g.id AS grant_id,g.permission
@@ -85,10 +88,11 @@ export async function openCommercialActivation(parent: string, allowExpiredRevie
   }
 
   return {
-    item: { ...plan.destination, entry: "DIRECT_START" as const },
-    reportHold,
-    primary,
-    compile: (original: WorkflowContext) => prepareCommercialC0(plan, original, binding),
+    item: upgraded?.item ?? { ...plan.destination, entry: "DIRECT_START" as const },
+    reportHold: upgraded ? undefined : reportHold,
+    primary: upgraded?.primary ?? primary,
+    previousLedger: upgraded?.previousLedger,
+    compile: upgraded?.compile ?? ((original: WorkflowContext) => prepareCommercialC0(plan, original, binding)),
     async bindReviewer(pool: Pool) {
       const db = await pool.connect();
       try {
@@ -107,13 +111,13 @@ export async function openCommercialActivation(parent: string, allowExpiredRevie
       } finally { db.release(); }
       return verifyGrant(pool);
     },
-    fingerprint: fingerprint(binding),
+    fingerprint: upgraded?.fingerprint ?? fingerprint(binding),
     verifyGrant,
     async reviewer(pool: Pool, token: unknown) {
       const grantId = await verifyGrant(pool);
       const operator = new ProtectedOperator(pool, async db => {
         const { rows: [identity] } = await db.query("SELECT current_database() AS name,host(inet_server_addr()) AS host");
-        if (identity.name !== "migration_rehearsal_" + plan.destination.intakeId.replaceAll("-", "") ||
+        if (identity.name !== "migration_rehearsal_" + intakeId.replaceAll("-", "") ||
             identity.host !== "127.0.0.1") throw Error("Isolated review connection required");
       });
       const actor = await operator.authorize(await operator.authenticate(token), "review-private-stage", scope);

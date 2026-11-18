@@ -10,9 +10,13 @@ export const semanticBlockSchema = record({
   groups: { type: "array", items: record({ heading: string, body: string, items: { type: "array", items: string } }) },
 });
 
-export function readSemanticBlock(value: unknown) {
+export function readSemanticBlock(value: unknown, normalizeProviderName = false) {
   const block = object(value, ["version", "name", "purpose", "layout", "listStyle", "groups"]);
-  const name = text(block.name, 65);
+  const supplied = text(block.name, 65);
+  // Canonicalize a readable provider label without dropping punctuation or
+  // accepting any new executable or markup-shaped input.
+  const name = normalizeProviderName && /^[A-Za-z0-9]+(?:[ -][A-Za-z0-9]+)*$/u.test(supplied)
+    ? supplied.toLowerCase().replaceAll(" ", "-") : supplied;
   if (block.version !== 1 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(name) ||
       !Array.isArray(block.groups) || !block.groups.length || Buffer.byteLength(JSON.stringify(block), "utf8") > 32_000) {
     throw Error("Semantic block contract refused");

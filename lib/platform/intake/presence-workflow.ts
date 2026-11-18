@@ -273,7 +273,7 @@ export class PresenceWorkflow {
     }
     const state = await this.store.append(context, 0, {
       contextDigest: fingerprint(context), sourceSnapshot: { evidence: context.evidence, limitations: context.limitations,
-        conflicts: context.conflicts, entry: context.entry }, mode: this.operations.mode, research: null, report: null, corrections: [],
+        conflicts: context.conflicts, entry: context.entry }, mode: this.operations.mode, research: this.operations.marketingAuthority?.strategy && context.evaluation ? [] : null, report: null, corrections: [],
       ...(context.evaluation && { evaluation: context.evaluation }),
       ...(this.operations.marketingAuthority && { marketingAuthorityDigest: fingerprint(this.operations.marketingAuthority) }),
       confirmation: null, direction: null, blueprint: null, pages: [], editorial: null, operatorReview: null,

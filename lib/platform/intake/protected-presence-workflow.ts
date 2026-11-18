@@ -3,7 +3,7 @@ import { basename, join } from "node:path";
 import type { Pool } from "pg";
 import { fingerprint } from "../canonical/model";
 import { requireEvaluationContext } from "./presence-evaluation";
-import type { WorkflowContext } from "./presence-workflow";
+import type { WorkflowContext, WorkflowRun } from "./presence-workflow";
 import { IntakeError, normalizeAnswers } from "./model";
 import { adaptiveOnboardingVersion, type PreparedUnderstanding } from "./adaptive";
 import { c0DisclosureManifest, addC0WorkflowKnowledge } from "./c0-workflow-knowledge";
@@ -76,7 +76,7 @@ export async function openProtectedPresenceWorkspace(requireEvidence = true, con
   return { workspace, pool, intake, token: input.draftToken };
 }
 
-type PresenceCapability = { kind: "review" } | { kind: "research-replay" } | { kind: "worker"; apiKey: string; resumeMarketResearch?: boolean; reportHold?: ReportReservation } |
+type PresenceCapability = { kind: "review" } | { kind: "blueprint-recovery"; repair: (output: unknown, run: WorkflowRun, bytes: Buffer) => unknown } | { kind: "research-replay" } | { kind: "worker"; apiKey: string; resumeMarketResearch?: boolean; reportHold?: ReportReservation } |
   { kind: "offline-test"; transport: ResponsesTransport; fetchPage: typeof fetch; readGrant: () => Promise<PresenceWorkflowGrant>; rates: ResponsesRates; imageProvider?: ImageProvider };
 
 export function composePresenceCase(pool: Pool, intake: IntakeService, token: string, workspace: Workspace, capability: PresenceCapability) {
@@ -153,6 +153,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
       const operations = createResponsesPresenceWorkflow({ grant, readGrant, readContext: context, ledgerDirectory: workspace.ledgerDirectory, rates, transport, fetchPage, reportHold,
         resumeMarketResearch: isolatedCommercialWorker || (boundary === "disposable" && capability.kind === "research-replay"),
         marketResearchReplayOnly: capability.kind === "research-replay",
+        recoverBlueprint: boundary === "disposable" && capability.kind === "blueprint-recovery" ? capability.repair : undefined,
         fetchMarketPages: sources => mayFetch
           ? pinnedResearchFetch(url => researchUrlAllowed(url, sources), grant.researchResponseBytes) : fetchPage,
       });

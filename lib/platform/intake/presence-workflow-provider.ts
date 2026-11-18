@@ -66,6 +66,40 @@ function bindCitations(schema: object, references: readonly string[]) {
   return bound;
 }
 
+export function bindBlueprintDecisionSchema(run: WorkflowRun, authority: MarketingAuthority) {
+  const { report, direction } = run.input;
+  if (!report?.findings.length || !direction?.visitorDecisions.length) throw Error("Retained report and Direction required");
+  const approvedEvidence = run.input.evidence.filter(item => authority.sources.some(source =>
+    ["business-fact", "staffed-offer"].includes(source.use) && source.digest === fingerprint(item)));
+  if (!approvedEvidence.length) throw Error("Approved business evidence required");
+  const schema = structuredClone(strategyBlueprintSchema);
+  const fields = schema.properties.pages.items.properties.decisionBrief.properties;
+  const decisionFields = {
+    ...fields,
+    findingIds: { type: "array", description: "Use IDs from report.findings.", items: { type: "string", enum: report.findings.map(item => item.id) } },
+    claimIds: { type: "array", description: "Use only approved business claim IDs.", items: { type: "string", enum: approvedEvidence.map(item => item.id) } },
+    directionSteps: { type: "array", description: "Use zero-based indices into direction.visitorDecisions.",
+      items: { type: "integer", enum: direction.visitorDecisions.map((_, index) => index) } },
+  };
+  schema.properties.pages.items.properties.decisionBrief.properties = decisionFields;
+  Object.assign(fields.influences, { description: "Each Page requires at least one composition influence citing an observed peer. Keep other uses separate." });
+  Object.assign(fields.avoid, { description: "Describe specific risks or content to avoid in plain language, not by ID." });
+  return schema;
+}
+
+export function bindEvaluationHomeActions(output: unknown, paths: readonly string[], destinations: PresenceWorkflowGrant["previewActionDestinations"]) {
+  if (!output || typeof output !== "object" || (output as { path?: unknown }).path !== "/") return output;
+  const home = output as { actions?: { kind: string; destination: unknown; sectionIndex: unknown }[] };
+  const both = [destinations?.["request-review"], destinations?.["start-onboarding"]];
+  if (both.some(path => !path || path === "/" || !paths.includes(path)) || both[0] === both[1] || !Array.isArray(home.actions)) return output;
+  const actions = home.actions.map(action => {
+    if (!action || !["request-review", "start-onboarding"].includes(action.kind) || action.sectionIndex !== 0 ||
+        action.destination !== null || home.actions!.filter(other => other?.kind === action.kind).length !== 1) return action;
+    return { ...action, destination: destinations![action.kind as "request-review" | "start-onboarding"] };
+  });
+  return { ...home, actions };
+}
+
 function workScope(run: WorkflowRun, grant: PresenceWorkflowGrant) {
   return { ownerDigest: fingerprint(run.context.scope), workDigest: fingerprint({
     grant: grant.ledger.id, context: fingerprint(run.context), input: run.work.inputDigest,
@@ -129,6 +163,7 @@ export function createResponsesPresenceWorkflow(config: {
   resumeMarketResearch?: boolean;
   marketResearchReplayOnly?: boolean;
   reportHold?: ReportReservation;
+  recoverBlueprint?: (output: unknown, run: WorkflowRun, bytes: Buffer) => unknown;
   clock?: () => number;
 }): PresenceWorkflowOperations {
   const { readGrant, readContext, ledgerDirectory, rates, transport, fetchPage, clock = Date.now } = config;
@@ -194,6 +229,10 @@ export function createResponsesPresenceWorkflow(config: {
     return [...new Set(sources.map(source => source.id))];
   }
   function verifyCitations(output: unknown, run: WorkflowRun) {
+    if (run.context.evaluation && run.work.operation === "page" && run.work.path === "/" &&
+        grant.marketingAuthority?.strategy?.entryJourneys && !grant.marketingAuthority.strategy.change) {
+      output = bindEvaluationHomeActions(output, run.input.blueprint?.pages.map(page => page.path) ?? [], grant.previewActionDestinations);
+    }
     const ids = new Set(citationIds(run));
     function allowed(value: unknown): boolean {
       if (!value || typeof value !== "object") return true;
@@ -320,7 +359,8 @@ export function createResponsesPresenceWorkflow(config: {
       const pageSchema = grant.marketingAuthority?.strategy ? strategyPageSchema : schemas.page;
       const artifact = batch ? editorialPatchSchema(batch.paths) : exactPage !== undefined
         ? { ...pageSchema, properties: { ...pageSchema.properties, path: { type: "string", enum: [exactPage] } } }
-        : operation === "blueprint" && grant.marketingAuthority?.strategy ? strategyBlueprintSchema : schemas[operation];
+        : operation === "blueprint" && grant.marketingAuthority?.strategy
+          ? bindBlueprintDecisionSchema(run, grant.marketingAuthority) : schemas[operation];
       const schema = run.context.evaluation || grant.marketingAuthority ? bindCitations(artifact, citationIds(run)) : artifact;
       const editing = "Make targeted editorial patches for the supplied review concerns. Preserve useful verified copy. Use exact Page paths and zero-based indexes of existing sections and Actions. Supply only changed Pages and fields. Null means keep existing text or visual choice. A null Action sectionIndex makes an existing link contextual. Remove repetitive, misleading or unsupported choices; preserve distinct Free Review and Direct Start paths where present. Only change visitor copy that matters, prefer shorter clear copy near the first screen, and keep unsupported capabilities and evidence out. Changed section body text must have sourceIds from the supplied case. Keep existing destinations and allow for honest private previews.";
       const preview = grant.previewActionDestinations && Object.keys(grant.previewActionDestinations).length && ["blueprint", "page"].includes(operation)
@@ -334,7 +374,7 @@ export function createResponsesPresenceWorkflow(config: {
         : " Describe intended service as proposed where delivery is not yet supported by evidence. Documented Operator work may support delivery without automation.")
         : instructions[operation];
       const strategy = grant.marketingAuthority?.strategy && (operation === "blueprint" || operation === "page")
-        ? " Put the actual report findings and Direction to work in the specific Page job. Use verified claims for public promises and market observations solely for original buyer language, architecture, and design. Give each Page an actionable brief that cites both, separates facts from inferences, names what to leave out and uses a peer visual observation to decide something specific. Historic copy and layout are optional precedent. For a Page, propose an originally named semantic block where it helps a visitor compare, follow steps or understand relationships. Compose it from grouped headings, explanatory text and lists with a responsive grid or reading-order stack. Use null when a standard section is sufficient. Supply no raw markup, external styling or script and keep all Actions in the approved Action list. For an existing-site change, honor the exact base revision and the specified Page scope." : "";
+        ? " Put the actual report findings and Direction to work in the specific Page job. Use verified claims for public promises and market observations solely for original buyer language, architecture, and design. Give each Page an actionable brief that cites both, separates facts from inferences, names what to leave out and uses a peer visual observation to decide something specific. Historic copy and layout are optional precedent. For a Page, propose an originally named semantic block where it helps a visitor compare, follow steps or understand relationships. Compose it from grouped headings, explanatory text and lists with a responsive grid or reading-order stack. Use a lowercase, hyphen-separated machine name for each semantic block. Use null when a standard section is sufficient. Supply no raw markup, external styling or script and keep all Actions in the approved Action list. For an existing-site change, honor the exact base revision and the specified Page scope." : "";
       const output = await budget(workScope(run, grant), {
         model, input: JSON.stringify(input),
         instructions: (batch ? editing : [stageInstructions, guidance].filter(Boolean).join(" ") + preview) +
@@ -359,7 +399,9 @@ export function createResponsesPresenceWorkflow(config: {
       const response = JSON.parse(bytes.toString("utf8"));
       if (response.model !== model || response.status !== "completed") throw Error("Retained response not completed");
       if (run.work.operation === "research") return collectMarketEvidence(response, run);
-      return verifyCitations(responseProposal(response), run);
+      const proposal = responseProposal(response);
+      return verifyCitations(run.work.operation === "blueprint" && config.recoverBlueprint
+        ? config.recoverBlueprint(proposal, run, bytes) : proposal, run);
     },
   };
 }
