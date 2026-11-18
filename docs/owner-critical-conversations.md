@@ -479,6 +479,14 @@ Technical success (retained 12 Pages, 63 Sections, ten source-bound editorial fi
 
 ---
 
+## P0-27 — Never again substitute technical compliance or minimized spending for the owner's required product outcome (November 18, 2026)
+
+**Founder's emphatic direct order:** After **15–20 repetitions** of this very discussion in two days, ChatGPT is explicitly commanded **never again to replace a required product outcome with technical compliance or an artificially cheap imitation**. Do not attenuate the owner's exact strategy, comprehensive outside research, original strategic language/design, visually rich site, new useful components, stock/image sourcing or full connected service into narrow, easy-to-test mechanism proofs. Do not make coding, green tests or resource thrift into what is presented as commercial product progress. Stop changing owner priorities. The authorized budget is to support genuine research, reasoning and creative iteration, **not a challenge to stay under 10%**; avoid waste, but do not starve work to save pennies. Continue to honor exact scope, provider rights, genuine protected-data/security/publication gates. This is **not** a command to spend to the cap or an implicit new paid grant.
+
+**Accountability:** ChatGPT owns the repeated narrowing from conversation → assignment → API/schema → renderer → review. The user was unambiguous. Formal source/claim and test mechanisms are necessary **but not sufficient**; demand actual substantial evidence of new peer-influenced original language and visible design, coherent multi-page image strategy, and relevant customer/Operator outcomes before declaring anything complete. Preserve the improved C0 preview and full beacon-connected service; don't substitute another manifesto or a user approval request for diagnosis/correction. **The next decision must embody this instruction.** [Source-linked Issue #12 P0-27](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6986029697) also links P0-25/P0-26. Record as owner direction, not implemented software, future acceptance, or new authority.
+
+---
+
 ## Forward-maintenance template: add a new owner-marked critical conversation
 
 For every future explicitly important owner conversation, append a chronological, referenced entry; update `docs/development-control.md` only when the navigation/priority policy changes. Preserve prior entries and mark supersession instead of erasure.
