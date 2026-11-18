@@ -24,6 +24,7 @@ import type { OriginalMaterial } from "./presence-source-material";
 import { researchMaterialCustody } from "./presence-research-material";
 import { capturePublicPeer } from "./presence-peer-browser";
 import { chromium } from "playwright-core";
+import type {PublicPeerCapture} from "./presence-public-capture-bridge";
 
 export const protectedWorkflowRole = "miopages_core_development";
 type Workspace = { root: string; grantFile: string; ledgerDirectory: string; referenceDirectory?: string; visualDirectory?: string };
@@ -80,7 +81,7 @@ export async function openProtectedPresenceWorkspace(requireEvidence = true, con
   return { workspace, pool, intake, token: input.draftToken };
 }
 
-type PresenceCapability = { kind: "review" } | { kind: "blueprint-recovery"; repair: (output: unknown, run: WorkflowRun, bytes: Buffer) => unknown } | { kind: "research-replay" } | { kind: "worker"; apiKey: string; resumeMarketResearch?: boolean; reportHold?: ReportReservation } |
+type PresenceCapability = { kind: "review" } | { kind: "blueprint-recovery"; repair: (output: unknown, run: WorkflowRun, bytes: Buffer) => unknown } | { kind: "research-replay" } | { kind: "worker"; apiKey: string; resumeMarketResearch?: boolean; reportHold?: ReportReservation; peerCapture?: PublicPeerCapture } |
   { kind: "offline-test"; transport: ResponsesTransport; fetchPage: typeof fetch; readGrant: () => Promise<PresenceWorkflowGrant>; rates: ResponsesRates; imageProvider?: ImageProvider };
 
 export function composePresenceCase(pool: Pool, intake: IntakeService, token: string, workspace: Workspace, capability: PresenceCapability) {
@@ -160,7 +161,8 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
         if (latestGrant.revoked || fingerprint(latestGrant) !== fingerprint(grant) || latestGrant.contextDigest !== fingerprint(latestContext) ||
             Date.now() < (latestGrant.startsAt ?? 0) || Date.now() >= latestGrant.expiresAt) throw Error("Research material authority unavailable");
       };
-      const renderPeer = originals?.publicResearch?.screenshots && (capability.kind === "worker" || capability.kind === "research-replay")
+      const delegatedCapture = boundary === "disposable" && capability.kind === "worker" ? capability.peerCapture : undefined;
+      const renderPeer = delegatedCapture ? delegatedCapture.capture : originals?.publicResearch?.screenshots && (capability.kind === "worker" || capability.kind === "research-replay")
         ? async (source: { id: string; url: string; label: string }, html: Buffer) => {
           if (!process.env.MIOPAGES_RESEARCH_CHROMIUM) throw Error("Configured Core research browser is unavailable");
           const browser = await chromium.launch({ executablePath: process.env.MIOPAGES_RESEARCH_CHROMIUM, headless: true,
@@ -178,6 +180,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
         marketResearchReplayOnly: capability.kind === "research-replay",
         researchOriginals,
         async verifyResearchAccess() {
+          if (delegatedCapture) return delegatedCapture.verify();
           if (capability.kind !== "worker" || !process.env.MIOPAGES_RESEARCH_CHROMIUM) throw new WorkflowBlocked("Configured research browser required");
           await access(process.env.MIOPAGES_RESEARCH_CHROMIUM);
           const browser = await chromium.launch({ executablePath: process.env.MIOPAGES_RESEARCH_CHROMIUM, headless: true,

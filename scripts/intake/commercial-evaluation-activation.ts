@@ -10,6 +10,7 @@ import type { ReportReservation } from "../../lib/platform/intake/intelligent-re
 import type { WorkflowContext } from "../../lib/platform/intake/presence-workflow";
 import { ProtectedOperator } from "../../lib/platform/wordpress-delivery/operator";
 import { verifiedP022Runtime } from "./p022-evaluation-activation";
+import {verifiedOriginalEvidenceRuntime} from "./original-evidence-activation";
 
 export const commercialApproval = "79ab938feb2e2a33447d8328c4666988a51726a87a15d1009d3fd89503a8f924";
 const sourceAmendment = "169178bb9a8f4a148f0cdb6307389df34a6cc0dee460097856fffc2b4ce2f1fe";
@@ -45,7 +46,7 @@ export function commercialBinding(activation: Activation, artifact: string, now:
     independentReviewerId: uuid(activation.reviewerId), startsAt, expiresAt };
 }
 
-export async function openCommercialActivation(parent: string, allowExpiredReview: boolean, p022 = false) {
+export async function openCommercialActivation(parent: string, allowExpiredReview: boolean, p022 = false, originalEvidence = false) {
   const root = join(parent, directory);
   await verifyDirectory(root);
   const [activation, entry, planBytes] = await Promise.all([
@@ -55,7 +56,7 @@ export async function openCommercialActivation(parent: string, allowExpiredRevie
   ]);
   const original = join(root, "worker.cjs");
   const artifact = createHash("sha256").update(await readFile(original)).digest("hex");
-  if (!p022 && entry !== original) {
+  if (!p022 && !originalEvidence && entry !== original) {
     if (entry !== join(root, "worker-p018.cjs")) throw Error("Protected commercial executable required");
     const continuation = await privateWorkflowFile<{ original: string; worker: string }>(join(root, "p018-executable.json"), root);
     if (continuation.original !== artifact || continuation.worker !== createHash("sha256").update(await readFile(entry)).digest("hex")) {
@@ -63,7 +64,8 @@ export async function openCommercialActivation(parent: string, allowExpiredRevie
     }
   }
   const binding = commercialBinding(activation, artifact, Date.now(), allowExpiredReview);
-  const upgraded = p022 ? await verifiedP022Runtime(parent, binding.independentReviewerId, activation.reviewerExpiresAt, allowExpiredReview) : null;
+  const upgraded = originalEvidence ? await verifiedOriginalEvidenceRuntime(parent,binding.independentReviewerId,activation.reviewerExpiresAt,allowExpiredReview)
+    : p022 ? await verifiedP022Runtime(parent, binding.independentReviewerId, activation.reviewerExpiresAt, allowExpiredReview) : null;
   const reportHold = await privateWorkflowFile<ReportReservation>(join(root, "p018-report-hold.json"), root).catch((error: NodeJS.ErrnoException) => {
     if (error.code === "ENOENT") return undefined;
     throw error;

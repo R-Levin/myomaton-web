@@ -47,7 +47,7 @@ export function readDecisionBrief(value: unknown) {
 export type DecisionBrief = ReturnType<typeof readDecisionBrief>;
 
 export function checkStrategyScope(scope: StrategyScope) {
-  if (scope.version !== 1 || ids(scope.peerIds).length < 2 || (scope.discoveredPeers !== undefined && scope.discoveredPeers !== true) ||
+  if (scope.version !== 1 || (scope.discoveredPeers ? !Array.isArray(scope.peerIds) || new Set(scope.peerIds).size !== scope.peerIds.length : ids(scope.peerIds).length < 2) || (scope.discoveredPeers !== undefined && scope.discoveredPeers !== true) ||
       (scope.copyPolicy && scope.copyPolicy !== "unpriced-no-testimony")) {
     throw Error("Independent peer evidence and valid copy policy required");
   }

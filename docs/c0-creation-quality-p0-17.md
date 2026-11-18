@@ -362,3 +362,81 @@ editing have not been verified. Do not claim that editor round-trip is complete.
 Core's structured candidate remains the editing authority. Verify that remaining
 WordPress editor behavior before advertising manual Gutenberg customization or
 promoting component version 2 to protected delivery.
+
+## Original-evidence run — approved activation, November 18, 2026
+
+The owner approved proposal `db5eea3ef55b24a4f0c9229b14968f6be4bcc49e1cc902f186961ec985ae2a75`
+directly in Codex; [the durable approval record](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6989946707)
+preserves the $12 additional / $14.811609 cumulative accounted ceiling, exact
+data/stock scope and 72-hour maximum. No protected Core/WordPress deployment,
+shared canonical write, publication or merge is authorized.
+
+**Runtime verified.** Fresh isolated C0 case
+`4d437190-9ce3-460b-81af-edd92279271a`, Web Presence
+`b94984b1-0bed-4a26-a54f-bb7ff7164147`, Managed Site
+`caf2b932-25af-4965-aa18-df599a664c2f`. It reuses the old private PostgreSQL
+cluster on loopback 36339, with a separate case database and the complete old
+54-entry ledger as an unchanged prefix. Activation began **2026-11-18 20:23:10.766
+UTC**; the existing review-only credential shortens the effective expiry to
+**2026-11-19 16:03:51.397 UTC**. Its identity and expiry are preserved. No new
+shared-database grant or credential was installed.
+
+Cloud has `user.max_user_namespaces=0`, no Chrome sandbox helper, and unprivileged
+bubblewrap cannot create a namespace. No host setting was changed and no
+unsandboxed browser was used. Core instead uses the already available **sandboxed
+Windows renderer for public material only**, connected by encrypted SSH stdio.
+This is a placement adaptation within the authorized public research/local
+evaluation, not a new environment or relaxed guard. The Windows preflight
+independently reports renderer Lockdown/untrusted integrity. The fixed-operation
+channel accepts only sandbox preflight and public-HTML capture, with exact source
+and byte digests and both viewports. Public-only HTTPS/DNS pinning, CSP, blocked
+forms/XHR/WebSockets/workers, fresh profiles and mobile reading order remain.
+Private C0 context, database access and OpenAI credentials remain on Cloud.
+The Linux-local browser path still requires its own sandbox if used later.
+
+**Independent input inspection.** All nine original files and 16 scoped evidence
+records read back with exact hashes and mode 0600. The old prescriptive peer notes
+are absent from the new context; real discovered peers will supply those
+observations. Core assembled a **2,404,910-byte** research request with five real
+image inputs; SHA-256
+`e10b427921727bc90bb638d44825218654b77e8d077d34c4cf36fb0e0a674583`.
+The ten original answers remain unconfirmed. A diagnostic initially tested escaped
+JSON bytes incorrectly and printed false for that boolean; parsed descriptor
+readback confirmed the correct state and the diagnostic was corrected. Original
+evidence is retained.
+
+Pre-dispatch inspection also caught an unused meter binding of 50 generations
+against 99 requests, after reserving one request for exact-model metadata access.
+It was corrected to **49 generations / 99 count-generation requests**, inside
+the approved maxima. No provider generation had been made and no workflow event
+existed. The original grant, binding, executable and diagnostics were retained;
+only the unused binding changed. A correction harness initially addressed the
+protected schema instead of the isolated public schema; that read failed before
+writes and was fixed. No ledger reset or debit change occurred. Final worker
+SHA-256: `3a27a9f09a7616fe93093b5082fe26b5582a2fc29d78001698ebc619c9928a2e`.
+
+**Other verified preparation.** Official pricing still supports the exact pinned
+GPT-5.4 model/rates, and one authenticated metadata GET returned HTTP 200.
+The two owner-initiated Pixabay searches returned eight results each into the
+private 24-hour cache. The key existed only in the hidden-prompt child process;
+no image was downloaded. Existing source rejection IDs still apply. Focused tests
+passed actual sandboxed stdio capture/refusals, full originals/custody, historical
+and new request projections, budget/source hashes and cached stock request limits.
+TypeScript and lint passed. The new local runner does not disclose protected
+remote stderr or model content to the public capture client.
+
+**Cost at activation checkpoint.** One free model-metadata GET, zero OpenAI
+generations/token counts, two Pixabay API searches, zero image downloads, $0 new
+provider spend. Retained accounted debit **$2.811609** and its uncertainties are
+unchanged. Founder attention: one hidden key prompt, duration UNKNOWN.
+
+**RECOVERY / RESUME HERE.** Use the latest linked branch commit, the private
+`miopages-private-acceptance/p0-original-evidence-c0-runtime` executable and
+case above. Preserve P0-22 version 52 / preview 4473, Core 41 and WordPress 6.
+Run the Core public-capture controller for `work`; its exact worker must match
+the activation record. Core owns generation and persistence. Continue the saved
+report for development planning only, not confirmation of business truth, then
+draft, critically review and revise before founder review. Capture real research
+effects and the two appropriate licensed images in actual local WordPress.
+On failure inspect the retained response and ledger before any deliberate retry;
+do not repeat paid stages blindly.

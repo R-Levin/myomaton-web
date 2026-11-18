@@ -20,6 +20,9 @@ import { migrateWithBootstrapCompatibility } from "../db/bootstrap";
 import { commercialApproval, openCommercialActivation } from "./commercial-evaluation-activation";
 import { repairP022Blueprint } from "./p022-evaluation-activation";
 import { p022RunProposalSha256 } from "../../lib/platform/intake/c0-p022-source-pack";
+import {originalEvidenceApproval} from "./original-evidence-activation";
+import {prepareOriginalCustody} from "../../lib/platform/intake/presence-original-custody";
+import {publicCaptureBridge} from "../../lib/platform/intake/presence-public-capture-bridge";
 import { summarizePresenceWorkflowUsage } from "../../lib/platform/intake/intelligent-responses";
 
 const digest = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
@@ -83,7 +86,8 @@ async function seedEvaluation(pool: Pool, item: Pick<EvaluationManifest["cases"]
 export async function openEvaluationWorker(options: Options, allowExpiredReview = false) {
   if (process.platform !== "linux" || process.env.NODE_ENV === "production") throw Error("Linux development worker required");
   const p022 = options.approval === p022RunProposalSha256;
-  const isCommercial = options.approval === commercialApproval || p022;
+  const originals = options.approval === originalEvidenceApproval;
+  const isCommercial = options.approval === commercialApproval || p022 || originals;
   if (isCommercial && options.scenario !== "c0") throw Error("Commercial C0 scope required");
   const parent = join(await realpath(options.home), "miopages-private-acceptance");
   if (parent.includes("/public_html/")) throw Error("Off-webroot evaluation workspace required");
@@ -91,7 +95,7 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
   const manifestBytes = await readFile(manifestFile);
   const plan = readEvaluationManifest(manifestBytes, isCommercial ? retainedManifestSha256 : options.approval,
     isCommercial || allowExpiredReview ? null : Date.now());
-  const commercial = isCommercial ? await openCommercialActivation(parent, allowExpiredReview, p022) : null;
+  const commercial = isCommercial ? await openCommercialActivation(parent, allowExpiredReview, p022, originals) : null;
   const item = commercial?.item ?? plan.cases[options.scenario];
   const name = "migration_rehearsal_" + item.intakeId.replaceAll("-", "");
   const url = new URL(options.databaseUrl);
@@ -110,6 +114,7 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
   } catch (error) { await pool.end(); throw error; }
   const intake = new IntakeService(pool, item.scope);
   const contextFile = join(root, "context.json");
+  let peerCapture:ReturnType<typeof publicCaptureBridge>|undefined;
   async function openCase(apiKey?: string, researchReplay = false, recovery = false) {
     await verifyDirectory(group);
     const [{ context, token }, storedGrant] = await Promise.all([
@@ -126,13 +131,14 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
     const bound = composeIsolatedPresenceEvaluation(pool, intake, token, context, workspace,
       p022 && recovery ? { kind: "blueprint-recovery", repair: repairP022Blueprint } :
         researchReplay && commercial ? { kind: "research-replay" } :
-        apiKey === undefined ? { kind: "review" } : { kind: "worker", apiKey, resumeMarketResearch: Boolean(commercial), reportHold: commercial?.reportHold });
+        apiKey === undefined ? { kind: "review" } : { kind: "worker", apiKey, resumeMarketResearch: Boolean(commercial), reportHold: commercial?.reportHold,
+          ...(originals && apiKey && process.env.MIOPAGES_PUBLIC_RESEARCH_BRIDGE==="1" && {peerCapture:peerCapture??=publicCaptureBridge(process.stdin,process.stdout)}) });
     return { context: await bound.context(), workflow: await bound.open(), root };
   }
   function protectedConfig() {
     return privateWorkflowFile<{ databaseUrl: string; ca: string; aiEnabled: boolean; apiKey: string }>(join(parent, "core-config.json"), parent);
   }
-  return { stop: () => pool.end(), openCase, reviewer: commercial && ((token: unknown) => commercial.reviewer(pool, token)), async providerKey() {
+  return { stop: () => {peerCapture?.close();return pool.end()}, openCase, reviewer: commercial && ((token: unknown) => commercial.reviewer(pool, token)), async providerKey() {
     const config = await protectedConfig();
     if (!config.aiEnabled || !/^sk-[a-zA-Z0-9_-]{20,512}$/u.test(config.apiKey)) throw Error("Approved development provider credential required");
     return config.apiKey;
@@ -163,6 +169,10 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
     const bytes = await privateWorkflowBytes(join(workspace.ledgerDirectory, "onboarding-usage.json"), root);
     if (digest(bytes) !== grant.ledger.startingLedger) throw Error("Fresh evaluation ledger differs");
     await createPrivate(workspace.grantFile, JSON.stringify(grant) + "\n");
+    if (prepared && "originals" in prepared && "readOriginal" in prepared && typeof prepared.readOriginal==="function" && grant.originalMaterials) {
+      const directory=join(root,"originals");await mkdir(directory,{mode:0o700});
+      await prepareOriginalCustody(directory,grant.originalMaterials,fingerprint(context),prepared.readOriginal as (source:import("../../lib/platform/intake/presence-source-material").OriginalMaterial)=>Promise<Buffer>);
+    }
     if (commercial) await createPrivate(join(root, "activation.json"), JSON.stringify({
       activation: commercial.fingerprint, grant: fingerprint(grant),
     }) + "\n");
@@ -173,7 +183,7 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
 
 export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv = process.env) {
   const [operation, scenario, approval, value, ...extra] = args;
-  const localCommercial = approval === commercialApproval || approval === p022RunProposalSha256;
+  const localCommercial = approval === commercialApproval || approval === p022RunProposalSha256 || approval === originalEvidenceApproval;
   const readOnly = ["inspect", "home", "site"].includes(operation) || (["local-site", "local-home"].includes(operation) && localCommercial);
   const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "recover", "queue-image", "decide-image", "review-quality"].includes(operation) ||
     (["continue-local-home", "revise-local-page"].includes(operation) && localCommercial);
