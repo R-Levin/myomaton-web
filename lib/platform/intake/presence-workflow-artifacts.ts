@@ -90,8 +90,9 @@ export function readReport(value: unknown, sources: readonly PresenceEvidence[],
 }
 export function readDirection(value: unknown, ids: readonly string[], normalizeProviderReferences = false) {
   const direction = object(value, ["positioning", "approach", "visitorDecisions", "sourceIds"]);
-  return { positioning: copy(direction.positioning), approach: copy(direction.approach),
-    visitorDecisions: list(direction.visitorDecisions, copy), sourceIds: citedSources(direction.sourceIds, ids, normalizeProviderReferences) };
+  const prose = (input: unknown) => copy(normalizeProviderReferences && typeof input === "string" ? input.replaceAll(" -> ", " → ") : input);
+  return { positioning: prose(direction.positioning), approach: prose(direction.approach),
+    visitorDecisions: list(direction.visitorDecisions, prose), sourceIds: citedSources(direction.sourceIds, ids, normalizeProviderReferences) };
 }
 function citedSources(value: unknown, ids: readonly string[], normalizeProviderReferences: boolean) {
   // Source repetition carries no additional meaning. Validate every ID even when deduplicating.

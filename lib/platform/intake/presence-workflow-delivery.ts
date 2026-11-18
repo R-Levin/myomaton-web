@@ -25,9 +25,27 @@ export function workflowEvaluationPreviewInput(context: WorkflowContext, view: P
       view.visuals?.some(visual => ["queued", "running", "review", "unverified"].includes(visual.state))) {
     throw Error("Complete exact workflow and visual review required");
   }
+  return projectWorkflowPreview(context, { ...view, blueprint: view.blueprint }, review.target, prior, canonical);
+}
+
+/** Disposable render input for editorial inspection. No signed projection or review event is issued. */
+export function workflowLocalDraftInput(context: WorkflowContext, view: PresenceWorkflowView) {
+  const blueprint = view.blueprint;
+  if (!context.evaluation || view.contextDigest !== fingerprint(context) || !blueprint || !view.editorial || view.failure ||
+      !["editorial-review", "operator-review", "review-complete"].includes(view.next) ||
+      view.pages.length !== blueprint.pages.length || blueprint.pages.some(entry => !view.pages.some(page => page.path === entry.path)) ||
+      view.visuals?.some(visual => ["queued", "running", "unverified"].includes(visual.state))) {
+    throw Error("Complete isolated editorial draft required");
+  }
+  const target = fingerprint({ draft: view.pages, outline: blueprint, editorial: view.editorial, scope: context.scope });
+  return projectWorkflowPreview(context, { ...view, blueprint }, target, null, [], "Unapproved isolated draft " + target);
+}
+
+function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflowView & { blueprint: NonNullable<PresenceWorkflowView["blueprint"]> }, target: string,
+  prior: unknown, canonical: readonly { id: string; slug: string }[], rationale = "Protected evidence-linked website review " + target) {
   const baseline = prior === null ? [] : nativeDraftBaseline(prior);
   const editorial = (copy: string) => ({ kind: "editorial" as const, text: copy,
-    rationale: "Protected evidence-linked website review " + review.target });
+    rationale });
   const pages = view.pages.map(page => {
     const owned = canonical.find(row => row.slug === page.path);
     const existing = baseline.find(row => row.path === page.path);
@@ -35,7 +53,7 @@ export function workflowEvaluationPreviewInput(context: WorkflowContext, view: P
     const pageId = existing?.id ?? owned?.id ?? logicalId({ site: context.scope.managedSiteId, path: page.path });
     return pageProposal({ operation: owned ? "replace-page" : "create-page", pageId, slug: page.path,
       title: editorial(page.heading), purpose: view.blueprint!.pages.find(entry => entry.path === page.path)!.purpose,
-      workflowReview: { intakeId: context.intakeId, candidateDigest: review.target },
+      workflowReview: { intakeId: context.intakeId, candidateDigest: target },
       ...(page.composition && { composition: page.composition, navigationLabel: view.blueprint!.pages.find(entry => entry.path === page.path)!.label }),
       sections: page.sections.map((section, index) => {
         const approved = view.visuals?.find(item => item.placement.path === page.path &&
@@ -63,6 +81,6 @@ export function workflowEvaluationPreviewInput(context: WorkflowContext, view: P
     return [...navigation].map(([destination, location]) => ({ id: logicalId({ site: context.scope.managedSiteId, from: page.path, destination }),
       type: "page" as const, from: page.path, destination, ...location }));
   });
-  return { scope: context.scope, candidateDigest: review.target, pages, navigation: view.blueprint.navigation,
+  return { scope: context.scope, candidateDigest: target, pages, navigation: view.blueprint.navigation,
     actions, ...(view.brandDigest && { brandDigest: view.brandDigest }), ...(baseline.length && { baselinePages: baseline }) };
 }

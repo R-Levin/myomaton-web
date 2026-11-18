@@ -387,7 +387,33 @@ export type WorkflowUsageScope = {
 const workflowImageModel = "gpt-image-2.5-sunburst-2026-09-08";
 const imageEnvelopeMicros = 500_000;
 
-const workflowDebit = (receipt: Receipt) => integer(receipt.webSearchCalls ? receipt.reservedMicros : receipt.estimatedMicros);
+export type ReportReservation = { receiptDigest: string; originalWorkDigest: string; replacementWorkDigest: string };
+const replacementReport = { inputTokens: 60_000, outputTokens: 10_000, capMicros: 300_000 };
+
+function holdsReport(receipt: Receipt, hold: ReportReservation | undefined) {
+  return Boolean(hold && receipt.workDigest === hold.originalWorkDigest && receipt.workflowStage === "report" &&
+    receipt.status === "pending" && receipt.countDispatched && receipt.countRequestId && receipt.generationDispatched &&
+    !receipt.generationRequestId && !receipt.responseId && !receipt.usage && receipt.estimatedMicros === undefined &&
+    receipt.reservedMicros === 450_000 && fingerprint(receipt) === hold.receiptDigest);
+}
+
+const workflowDebit = (receipt: Receipt, hold?: ReportReservation) => integer(
+  receipt.webSearchCalls || holdsReport(receipt, hold) ? receipt.reservedMicros : receipt.estimatedMicros);
+
+export async function confirmReportReservation(directory: string, scope: WorkflowUsageScope, ownerDigest: string, hold: ReportReservation) {
+  const path = join(directory, "onboarding-usage.json");
+  const file = await lstat(path);
+  if (!file.isFile() || await realpath(path) !== path ||
+      (process.platform !== "win32" && (file.uid !== process.getuid?.() || (file.mode & 0o777) !== 0o600))) {
+    throw Error("Private report ledger refused");
+  }
+  const ledger = JSON.parse(await readFile(path, "utf8")) as Ledger;
+  const attempts = recentWorkflow(ledger, scope, ownerDigest);
+  verifiedSpend(ledger, undefined, hold);
+  if (attempts.at(-1)?.workDigest !== hold.originalWorkDigest || attempts.some(row => row.workDigest === hold.replacementWorkDigest)) {
+    throw Error("Replacement report was already prepared or attempted");
+  }
+}
 
 function recentWorkflow(ledger: Ledger, workflow: WorkflowUsageScope, ownerDigest: string) {
   const baseline = JSON.stringify({ ...ledger, attempts: ledger.attempts.slice(0, workflow.baselineAttempts) }) + "\n";
@@ -441,7 +467,7 @@ export async function summarizePresenceWorkflowUsage(directory: string, scope: W
 // remains charged against this run until independently reconciled.
 export async function meteredPresenceWorkflowImage<T extends { requestId: string | null; model: string }>(
   directory: string, rates: Rates, workflow: WorkflowUsageScope, attribution: QuestionAttribution,
-  model: string, dispatch: () => Promise<T>, recheck: () => Promise<void>, retainedReservation?: string,
+  model: string, dispatch: () => Promise<T>, recheck: () => Promise<void>, retainedReservation?: string, reportHold?: ReportReservation,
 ) {
   if (model !== workflowImageModel || ![attribution.ownerDigest, attribution.workDigest].every(value => /^[a-f0-9]{64}$/u.test(value))) {
     throw Error("Workflow image scope refused");
@@ -454,11 +480,11 @@ export async function meteredPresenceWorkflowImage<T extends { requestId: string
         ledger.model !== rates.model || ledger.tier !== "default" || ledger.adapterVersion !== version || !Array.isArray(ledger.attempts)) {
       throw Error("Usage ledger binding mismatch");
     }
-    verifiedSpend(ledger, retainedReservation);
+    verifiedSpend(ledger, retainedReservation, reportHold);
     const recent = recentWorkflow(ledger, workflow, attribution.ownerDigest);
     const generations = recent.filter(item => item.generationDispatched).length;
     const requests = recent.filter(item => item.countDispatched).length + generations;
-    const spend = recent.reduce((sum, item) => sum + workflowDebit(item), 0);
+    const spend = recent.reduce((sum, item) => sum + workflowDebit(item, reportHold), 0);
     const images = recent.filter(item => item.workflowImage).length;
     if ((workflow.breakdown && images >= workflow.breakdown.images) || generations >= workflow.generations || requests + 1 > workflow.requests ||
         spend + imageEnvelopeMicros > workflow.capMicros ||
@@ -500,9 +526,13 @@ export async function confirmPresenceWorkflowImage(directory: string, scope: Wor
       (scope.stages && receipt.workflowModel !== model) || receipt.imageRun?.model !== model || receipt.imageRun.resultDigest !== fingerprint(result)) throw Error("Exact image usage receipt required");
 }
 
-function verifiedSpend(ledger: Ledger, retainedReservation?: string) {
-  let retained = false;
+function verifiedSpend(ledger: Ledger, retainedReservation?: string, reportHold?: ReportReservation) {
+  let retained = false, reservedReport = false;
   const spent = ledger.attempts.reduce((total, receipt) => {
+    if (!reservedReport && holdsReport(receipt, reportHold)) {
+      reservedReport = true;
+      return total + receipt.reservedMicros;
+    }
     if (!retained && retainedReservation && receipt.status === "uncertain" && receipt.countDispatched === true &&
         receipt.generationDispatched === true && fingerprint(receipt) === retainedReservation) {
       retained = true;
@@ -512,7 +542,7 @@ function verifiedSpend(ledger: Ledger, retainedReservation?: string) {
         integer(receipt.estimatedMicros) > integer(receipt.reservedMicros)) throw Error("Unreconciled development usage");
     return total + receipt.estimatedMicros;
   }, 0);
-  if (retainedReservation && !retained) throw Error("Prior reservation evidence mismatch");
+  if ((retainedReservation && !retained) || (reportHold && !reservedReport)) throw Error("Prior reservation evidence mismatch");
   return spent;
 }
 
@@ -531,7 +561,7 @@ function searchCalls(body: Record<string, unknown>) {
 
 export function meteredPresenceWorkflow(directory: string, rates: Rates, transport: ResponsesTransport,
   scope: WorkflowUsageScope, outputLimit: number, retainedReservation?: string, researchCalls?: number, stageName?: WorkflowMeterStage,
-  researchPass?: { inputTokens: number; outputTokens: number }) {
+  researchPass?: { inputTokens: number; outputTokens: number }, reportHold?: ReportReservation) {
   const fields = [scope.baselineAttempts, scope.requests, scope.generations, scope.capMicros, scope.inputTokens, scope.inputBytes, outputLimit];
   const mix = scope.breakdown;
   if (mix && ([mix.text, mix.images, mix.searchCalls].some(value => !Number.isSafeInteger(value) || value < 0) ||
@@ -554,18 +584,20 @@ export function meteredPresenceWorkflow(directory: string, rates: Rates, transpo
     throw Error("Exact bounded research pass required");
   }
   return meteredResponsesDispatch(directory, rates, transport, 0, 0, 0, outputLimit, retainedReservation, undefined, undefined,
-    structuredClone(scope), researchPass ? 1 : researchCalls, stageName, researchPass && structuredClone(researchPass));
+    structuredClone(scope), researchPass ? 1 : researchCalls, stageName, researchPass && structuredClone(researchPass),
+    reportHold && structuredClone(reportHold));
 }
 
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
   requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string, comparisonInput?: string,
   outcome?: { inputDigest: string; attempt: number; c0ReadbackDigest?: string }, workflow?: WorkflowUsageScope,
-  researchCalls?: number, stageName?: WorkflowMeterStage, researchPass?: { inputTokens: number; outputTokens: number }) {
+  researchCalls?: number, stageName?: WorkflowMeterStage, researchPass?: { inputTokens: number; outputTokens: number }, reportHold?: ReportReservation) {
   const rootRates = structuredClone(configuredRates);
   const stageBudget = stageName ? workflow?.stages?.[stageName] : undefined;
   const rates = stageBudget?.rates ?? rootRates;
   validateRates(rates);
-  outputLimit = researchPass?.outputTokens ?? stageBudget?.requestOutputTokens ?? outputLimit;
+  const isReplacementReport = stageName === "report" && reportHold !== undefined;
+  outputLimit = isReplacementReport ? replacementReport.outputTokens : researchPass?.outputTokens ?? stageBudget?.requestOutputTokens ?? outputLimit;
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
   const inputRate = Math.max(rates.inputPerMillion, rates.cachedPerMillion, rates.cacheWritePerMillion);
   return async ({ ownerDigest, workDigest }: QuestionAttribution, request: ResponsesRequest, recheck?: () => Promise<unknown>,
@@ -577,7 +609,10 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
     if (toolLimit === undefined || (toolLimit > 0 && (!retain || !recheck))) throw Error("Research authorization required");
     const search = toolLimit > 0;
     if (researchPass && !search) throw Error("Research tool required");
-    const inputLimit = researchPass?.inputTokens ?? stageBudget?.requestInputTokens ?? (search ? researchInputLimit : workflow?.inputTokens ?? maxInput);
+    const inputLimit = isReplacementReport ? replacementReport.inputTokens
+      : researchPass?.inputTokens ?? stageBudget?.requestInputTokens ?? (search ? researchInputLimit : workflow?.inputTokens ?? maxInput);
+    if (isReplacementReport && (search || workDigest !== reportHold.replacementWorkDigest || !stageBudget ||
+        inputLimit > stageBudget.requestInputTokens || outputLimit > stageBudget.requestOutputTokens)) throw Error("Exact replacement report required");
     const requestCost = search ? 0 : rates.countMicros;
     const operations = search ? 1 : 2;
     let stage: PlanningFailure = "usage_gate";
@@ -588,7 +623,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       const ledger: Ledger = JSON.parse(bytes);
       if (ledger.ratesDigest !== fingerprint(rootRates) || fingerprint(ledger.rateCard) !== ledger.ratesDigest || ledger.model !== rootRates.model || ledger.tier !== "default" ||
           ledger.adapterVersion !== version || !Array.isArray(ledger.attempts)) throw Error("Usage ledger binding mismatch");
-      const spent = verifiedSpend(ledger, retainedReservation);
+      const spent = verifiedSpend(ledger, retainedReservation, reportHold);
       const generations = ledger.attempts.filter(item => item.generationDispatched).length;
       const requests = ledger.attempts.filter(item => item.countDispatched).length + generations;
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");
@@ -606,17 +641,19 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       if (outcome) verifyOutcomeLedger(ledger, outcome.inputDigest, outcome.attempt, outcomeCompactComparison, outcome.c0ReadbackDigest);
       const reservation = requestCost + toolLimit * researchToolMicros + Math.ceil((inputLimit * inputRate + outputLimit * rates.outputPerMillion) / 1_000_000);
       if ((comparisonInput !== undefined || outcome) && reservation !== freshCompactComparison.envelopeMicros) throw Error("Fresh comparison request envelope refused");
+      if (isReplacementReport && reservation > replacementReport.capMicros) throw Error("Replacement report cap refused");
       if (workflow) {
         const recent = recentWorkflow(ledger, workflow, ownerDigest);
         const runGenerations = recent.filter(item => item.generationDispatched).length;
         const runRequests = recent.filter(item => item.countDispatched).length + runGenerations;
-        const runSpent = recent.reduce((sum, item) => sum + workflowDebit(item), 0);
+        if (reportHold && !recent.some(item => holdsReport(item, reportHold))) throw Error("Report reservation scope refused");
+        const runSpent = recent.reduce((sum, item) => sum + workflowDebit(item, reportHold), 0);
         if (stageBudget) {
           const prior = recent.filter(item => item.workflowStage === stageName);
           if (prior.some(item => item.workflowModel !== rates.model || item.stageRatesDigest !== fingerprint(rates))) throw Error("Stage rate history differs");
-          if (prior.reduce((n, item) => n + (item.usage?.input ?? 0), inputLimit) > stageBudget.cumulativeInputTokens ||
-              prior.reduce((n, item) => n + (item.usage?.output ?? 0), outputLimit) > stageBudget.cumulativeOutputTokens ||
-              prior.reduce((n, item) => n + workflowDebit(item), reservation) > stageBudget.capMicros) {
+          if (prior.reduce((n, item) => n + (holdsReport(item, reportHold) ? integer(item.inputLimit) : item.usage?.input ?? 0), inputLimit) > stageBudget.cumulativeInputTokens ||
+              prior.reduce((n, item) => n + (holdsReport(item, reportHold) ? integer(item.outputLimit) : item.usage?.output ?? 0), outputLimit) > stageBudget.cumulativeOutputTokens ||
+              prior.reduce((n, item) => n + workflowDebit(item, reportHold), reservation) > stageBudget.capMicros) {
             throw Error("Workflow stage budget exhausted");
           }
         }

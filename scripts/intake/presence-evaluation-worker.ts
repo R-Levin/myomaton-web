@@ -5,7 +5,7 @@ import { Pool } from "pg";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { validatePages } from "../../lib/platform/wordpress-delivery/authority";
 import { composeHomeConcept } from "../../lib/platform/intake/presence-home-concept";
-import { workflowEvaluationPreviewInput } from "../../lib/platform/intake/presence-workflow-delivery";
+import { workflowEvaluationPreviewInput, workflowLocalDraftInput } from "../../lib/platform/intake/presence-workflow-delivery";
 import { bindFictionalEvaluation, bindOriginalEvaluation, evaluationGrant, readEvaluationManifest,
   type EvaluationManifest, type EvaluationScenario } from "../../lib/platform/intake/presence-evaluation-activation";
 import { initializeResponsesUsageLedger } from "../../lib/platform/intake/intelligent-responses";
@@ -121,7 +121,7 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
     if (fingerprint(storedGrant) !== fingerprint(compiled) || !/^[0-9a-f]{64}$/u.test(token)) throw Error("Local evaluation grant or token differs");
     const bound = composeIsolatedPresenceEvaluation(pool, intake, token, context, workspace,
       researchReplay && commercial ? { kind: "research-replay" } :
-        apiKey === undefined ? { kind: "review" } : { kind: "worker", apiKey, resumeMarketResearch: Boolean(commercial) });
+        apiKey === undefined ? { kind: "review" } : { kind: "worker", apiKey, resumeMarketResearch: Boolean(commercial), reportHold: commercial?.reportHold });
     return { context: await bound.context(), workflow: await bound.open(), root };
   }
   function protectedConfig() {
@@ -164,12 +164,14 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
 
 export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv = process.env) {
   const [operation, scenario, approval, value, ...extra] = args;
-  const readOnly = ["inspect", "home", "site"].includes(operation);
-  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "recover", "queue-image", "decide-image", "review-quality"].includes(operation);
+  const readOnly = ["inspect", "home", "site"].includes(operation) || (["local-site", "local-home"].includes(operation) && approval === commercialApproval);
+  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "recover", "queue-image", "decide-image", "review-quality"].includes(operation) ||
+    (["continue-local-home", "revise-local-page"].includes(operation) && approval === commercialApproval);
+  const replaceReport = operation === "replace-report" && approval === commercialApproval;
   const researchReplay = operation === "replay-research";
   const completeResearch = (operation === "complete-research" || researchReplay) && approval === commercialApproval;
   if ((scenario !== "c0" && scenario !== "c2") || !approval || extra.length ||
-      !(readOnly || editing || operation === "activate" || operation === "work" || completeResearch) || (editing ? !value : Boolean(value))) {
+      !(readOnly || editing || operation === "activate" || operation === "work" || completeResearch || replaceReport) || (editing ? !value : Boolean(value))) {
     throw Error("Evaluation command refused");
   }
   const instance = await openEvaluationWorker({ scenario, approval, databaseUrl: env.MIOPAGES_EVALUATION_DATABASE_URL ?? "",
@@ -177,12 +179,17 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   try {
     if (operation === "activate") return await instance.activate();
     const { workflow, context, root } = await instance.openCase(
-      operation === "work" || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay);
+      operation === "work" || replaceReport || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay);
     const prior = await workflow.review(context);
     if (completeResearch) {
       if (!prior) throw Error("Retained research required");
       const completed = await workflow.completeMarketResearch(context, prior.version);
       return { next: completed?.next, version: completed?.version, ...(completed?.failure && { failure: completed.failure }) };
+    }
+    if (replaceReport) {
+      if (!prior) throw Error("Retained report claim required");
+      const result = await workflow.replaceTimedOutReport(context, prior.version);
+      return { next: result?.next, version: result?.version, ...(result?.failure && { failure: result.failure, artifact: result.artifactIssue }) };
     }
     if (operation === "work") {
       if (!prior) await workflow.start(context);
@@ -196,20 +203,31 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       return { next: prior.next, version: prior.version, file: path };
     }
     if (!prior) throw Error("Evaluation workflow is not started");
-    if (operation === "home" || operation === "site") {
-      const home = operation === "home" ? composeHomeConcept(context, prior) : null;
+    if (["home", "site", "local-site", "local-home"].includes(operation)) {
+      const localDraft = operation.startsWith("local-");
+      const packetType = operation === "local-home" ? "home" : operation === "local-site" ? "site" : operation;
+      const home = packetType === "home" ? composeHomeConcept(context, prior) : null;
       const publishImage = async (id: string, preparedDigest: string) => {
-        const bytes = await workflow.visualImage(context, id);
+        const bytes = await (localDraft ? workflow.localDraftImage(context, prior.version, id) : workflow.visualImage(context, id));
         if (digest(bytes) !== preparedDigest) throw Error("Preview image bytes differ");
-        const file = `${operation}-${prior.version}-${id}.png`;
+        const file = `${packetType}-${prior.version}-${id}.png`;
         await createPrivate(join(root, file), bytes);
         return file;
       };
+      const pendingHome = localDraft ? prior.visuals?.find(item => item.state === "review" && item.briefId === "journey-diagram" &&
+        item.result && item.placement.path === "/" && item.placement.sectionIndex === 0) : undefined;
+      const pendingImage = async (sectionId: string) => {
+        if (!pendingHome?.result) return [];
+        const { width, height, masterDigest } = pendingHome.result;
+        return [{ sectionId, width, height, digest: masterDigest, alt: "Illustration of the stages of a managed Web Presence",
+          file: await publishImage(pendingHome.id, masterDigest), status: "pending-local-review" }];
+      };
       let packet: object;
       if (home) {
-        packet = { ...home, ...(home.image && { image: { ...home.image, file: await publishImage(home.image.id, home.image.digest) } }) };
+        packet = { ...home, ...(home.image && { image: { ...home.image, file: await publishImage(home.image.id, home.image.digest) } }),
+          ...(localDraft && { localDraftOnly: true, ...(pendingHome && { images: await pendingImage(home.candidate.pages[0].sections[0].id) }) }) };
       } else {
-        const input = workflowEvaluationPreviewInput(context, prior, null, []);
+        const input = operation === "local-site" ? workflowLocalDraftInput(context, prior) : workflowEvaluationPreviewInput(context, prior, null, []);
         const editorial = (copy: { kind: string; text?: string } | undefined) => {
           if (copy?.kind !== "editorial" || typeof copy.text !== "string") throw Error("Expected reviewed editorial copy");
           return copy.text;
@@ -227,10 +245,12 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
           const { width, height, masterDigest } = visual.result;
           return { sectionId: section.id, width, height, digest: masterDigest, alt: use.altText, file: await publishImage(visual.id, masterDigest) };
         }] : [])).map(prepare => prepare()));
+        if (pendingHome) images.push(...await pendingImage(pages.find(page => page.path === "/")!.sections[0].id));
         const candidate = { pages, navigation: input.navigation, actions: input.actions };
-        packet = { candidate, images, digest: fingerprint({ candidate, images, review: input.candidateDigest }) };
+        packet = { candidate, images, ...(localDraft && { localDraftOnly: true }),
+          digest: fingerprint({ candidate, images, review: input.candidateDigest }) };
       }
-      const path = join(root, `${operation}-${prior.version}.json`);
+      const path = join(root, `${packetType}-${prior.version}.json`);
       await createPrivate(path, JSON.stringify(packet, null, 2) + "\n");
       return { file: path, version: prior.version };
     }
@@ -251,10 +271,12 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       return { next: reviewed?.next, version: reviewed?.version };
     }
     const result = operation === "continue" ? await workflow.confirmReport(context, prior.version, actor, true)
-      : operation === "review-home" ? await workflow.reviewHomeConcept(context, prior.version, actor, input.digest, input.reference)
+      : operation === "review-home" || operation === "continue-local-home" ?
+        await workflow.reviewHomeConcept(context, prior.version, actor, input.digest, input.reference, operation === "continue-local-home")
       : operation === "revise-home" ? await workflow.reviseHomeConcept(context, prior.version, actor, input.digest, input.concern)
       : operation === "review-site" ? await workflow.reviewCandidate(context, prior.version, actor)
-      : operation === "revise-site" ? await workflow.requestEditorialRevision(context, prior.version, actor)
+      : operation === "revise-site" || operation === "revise-local-page" ?
+        await workflow.requestEditorialRevision(context, prior.version, actor, operation === "revise-local-page" ? input.path ?? "" : undefined)
       : operation === "decide-editorial" ? await workflow.decideEditorialFinding(context, prior.version, actor, input.decision)
       : operation === "recover" ? await workflow.recover(context, prior.version)
       : operation === "retry" ? await workflow.retryRejectedOutput(context, prior.version, actor)

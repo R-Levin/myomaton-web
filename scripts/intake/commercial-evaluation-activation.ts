@@ -6,6 +6,7 @@ import proposal from "../../docs/c0-commercial-authorization-proposal.json";
 import { fingerprint, uuid } from "../../lib/platform/canonical/model";
 import { commercialC0Inputs, prepareCommercialC0, readC0CommercialProposal } from "../../lib/platform/intake/c0-commercial-authorization";
 import { privateWorkflowFile, verifyDirectory } from "../../lib/platform/intake/protected-presence-workflow";
+import type { ReportReservation } from "../../lib/platform/intake/intelligent-responses";
 import type { WorkflowContext } from "../../lib/platform/intake/presence-workflow";
 import { ProtectedOperator } from "../../lib/platform/wordpress-delivery/operator";
 
@@ -61,6 +62,13 @@ export async function openCommercialActivation(parent: string, allowExpiredRevie
     }
   }
   const binding = commercialBinding(activation, artifact, Date.now(), allowExpiredReview);
+  const reportHold = await privateWorkflowFile<ReportReservation>(join(root, "p018-report-hold.json"), root).catch((error: NodeJS.ErrnoException) => {
+    if (error.code === "ENOENT") return undefined;
+    throw error;
+  });
+  if (reportHold && ![reportHold.receiptDigest, reportHold.originalWorkDigest, reportHold.replacementWorkDigest].every(value => sha256.test(value))) {
+    throw Error("Exact report hold refused");
+  }
   const plan = readC0CommercialProposal(planBytes, binding.manifestSha256);
   const { primary } = await commercialC0Inputs(plan);
   const scope = plan.destination.scope;
@@ -78,6 +86,7 @@ export async function openCommercialActivation(parent: string, allowExpiredRevie
 
   return {
     item: { ...plan.destination, entry: "DIRECT_START" as const },
+    reportHold,
     primary,
     compile: (original: WorkflowContext) => prepareCommercialC0(plan, original, binding),
     async bindReviewer(pool: Pool) {

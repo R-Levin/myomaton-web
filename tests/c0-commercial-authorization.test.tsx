@@ -10,13 +10,13 @@ import { managedKey, provisionManagedObject } from "../lib/platform/assets/local
 import { fingerprint } from "../lib/platform/canonical/model";
 import { commercialC0Inputs, readC0CommercialProposal, readC0CommercialSourceAmendment } from "../lib/platform/intake/c0-commercial-authorization";
 import { commercialApproval, commercialBinding } from "../scripts/intake/commercial-evaluation-activation";
-import { confirmSitePlanningReceipt, initializeResponsesUsageLedger, meteredPresenceWorkflow, summarizePresenceWorkflowUsage } from "../lib/platform/intake/intelligent-responses";
+import { confirmReportReservation, confirmSitePlanningReceipt, initializeResponsesUsageLedger, meteredPresenceWorkflow, summarizePresenceWorkflowUsage } from "../lib/platform/intake/intelligent-responses";
 import { focusMioPagesPreview } from "../scripts/customer-previews/miopages-focus";
 import { createResponsesPresenceWorkflow } from "../lib/platform/intake/presence-workflow-provider";
 import { responsesHttps } from "../lib/platform/intake/responses-https";
 import { marketResearchQuestions } from "../lib/platform/intake/presence-workflow-research";
 import type { WorkflowRun } from "../lib/platform/intake/presence-workflow";
-import type { PresenceEvidence } from "../lib/platform/intake/presence-workflow-artifacts";
+import { readDirection, type PresenceEvidence } from "../lib/platform/intake/presence-workflow-artifacts";
 import { bindSiteDraft } from "../lib/platform/wordpress-delivery/site-draft";
 import { readSignedDraftBrand, resolveSignedDraftBrand } from "../lib/platform/wordpress-delivery/draft-brand";
 import { nativeDraftEnvelope, readNativeDraftEnvelope } from "../lib/platform/wordpress-delivery/native-draft-envelope";
@@ -191,6 +191,63 @@ test("research continuation retains the batched receipt and separately meters fi
     assert.equal(usage.total.uncertain, 0);
     assert.ok(usage.total.heldMicros <= proposal.budget.stages.research.capMicros);
   } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test("one report replacement carries the exact pending debit through text and future meters", async () => {
+  const directory = await mkdtemp(join(await realpath(tmpdir()), "miopages-report-hold-"));
+  try {
+    const { primary, reviewLedger } = await commercialC0Inputs(await currentProposal());
+    await initializeResponsesUsageLedger(directory, primary);
+    const report = reviewLedger.stages!.report.rates;
+    const owner = fingerprint("owner");
+    const original = fingerprint("original");
+    const replacement = fingerprint("replacement");
+    const attrib = (workDigest: string) => ({ ownerDigest: owner, workDigest });
+    const request = (model: string) => ({ model, input: "approved fixture", instructions: "test", text: { format: {} } });
+    let sent = 0;
+    const transport = { async send(path: string, value: object) {
+      sent++;
+      if (path.endsWith("input_tokens")) return { body: { input_tokens: 20 }, requestId: "fixture_count" };
+      if (sent === 2) throw Error("no receipt");
+      const { model, max_output_tokens } = value as { model: string; max_output_tokens: number };
+      if (model === report.model) assert.equal(max_output_tokens, 10_000);
+      const body = { id: "receipt_" + sent, model, status: "completed", service_tier: "default",
+        usage: { input_tokens: 20, output_tokens: 10, total_tokens: 30,
+          input_tokens_details: { cached_tokens: 0 }, output_tokens_details: { reasoning_tokens: 0 } },
+        output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: "{}" }] }] };
+      return { body, rawBody: Buffer.from(JSON.stringify(body)) };
+    } };
+    const run = (name: "report" | "page", hold?: { receiptDigest: string; originalWorkDigest: string; replacementWorkDigest: string }) =>
+      meteredPresenceWorkflow(directory, primary, transport, reviewLedger, 16_000, undefined, undefined, name, undefined, hold);
+    await assert.rejects(run("report")(attrib(original), request(report.model), async () => {}, async () => {}));
+    const ledgerPath = join(directory, "onboarding-usage.json");
+    const prior = JSON.parse(await readFile(ledgerPath, "utf8")).attempts[0];
+    assert.equal(prior.reservedMicros, 450_000);
+    assert.equal(prior.status, "pending");
+    const hold = { receiptDigest: fingerprint(prior), originalWorkDigest: original, replacementWorkDigest: replacement };
+    await confirmReportReservation(directory, reviewLedger, owner, hold);
+    await assert.rejects(run("report")(attrib(replacement), request(report.model)));
+    await assert.rejects(run("report", { ...hold, receiptDigest: fingerprint("other receipt") })(attrib(replacement), request(report.model)));
+    await assert.rejects(run("report", hold)(attrib(fingerprint("wrong request")), request(report.model)));
+    assert.equal(sent, 2);
+    await run("report", hold)(attrib(replacement), request(report.model), async () => {}, async () => {});
+    await assert.rejects(run("report", hold)(attrib(replacement), request(report.model)));
+    await run("page", hold)(attrib(fingerprint("next stage")), request(primary.model), async () => {}, async () => {});
+    assert.equal(sent, 6);
+    const attempts = JSON.parse(await readFile(ledgerPath, "utf8")).attempts;
+    assert.deepEqual(attempts[0], prior);
+    assert.equal(attempts[1].reservedMicros, 300_000);
+    const usage = await summarizePresenceWorkflowUsage(directory, reviewLedger, owner);
+    assert.equal(usage.total.heldMicros, 450_260);
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test("a retained provider direction can recover a plain-text workflow arrow without accepting markup", () => {
+  const direction = { positioning: "Managed Web Presence", approach: "Review -> Priorities -> Next step",
+    visitorDecisions: ["Review first", "Start onboarding"], sourceIds: ["source"] };
+  assert.equal(readDirection(direction, ["source"], true).approach, "Review → Priorities → Next step");
+  assert.throws(() => readDirection(direction, ["source"]));
+  assert.throws(() => readDirection({ ...direction, approach: "<b>Review</b> -> Priorities" }, ["source"], true));
 });
 
 test("an isolated commercial transport accepts its bounded deadline and refuses use after authorization expires", async () => {

@@ -15,7 +15,7 @@ import { createResponsesPresenceWorkflow, type PresenceWorkflowGrant } from "./p
 import { researchUrlAllowed } from "./presence-workflow-research";
 import { pinnedResearchFetch } from "./presence-workflow-egress";
 import { responsesHttps } from "./responses-https";
-import { confirmPresenceWorkflowImage, meteredPresenceWorkflowImage, type ResponsesRates, type ResponsesTransport } from "./intelligent-responses";
+import { confirmPresenceWorkflowImage, meteredPresenceWorkflowImage, type ReportReservation, type ResponsesRates, type ResponsesTransport } from "./intelligent-responses";
 import { acquirePresenceVisual, presenceVisualRequest, readPresenceVisual, validatePresenceImageGrant, type PresenceVisual,
   type PresenceVisualOperations, type PresenceVisualResult } from "./presence-workflow-visual";
 import { openAIImageProvider } from "../acquisition/openai";
@@ -76,7 +76,7 @@ export async function openProtectedPresenceWorkspace(requireEvidence = true, con
   return { workspace, pool, intake, token: input.draftToken };
 }
 
-type PresenceCapability = { kind: "review" } | { kind: "research-replay" } | { kind: "worker"; apiKey: string; resumeMarketResearch?: boolean } |
+type PresenceCapability = { kind: "review" } | { kind: "research-replay" } | { kind: "worker"; apiKey: string; resumeMarketResearch?: boolean; reportHold?: ReportReservation } |
   { kind: "offline-test"; transport: ResponsesTransport; fetchPage: typeof fetch; readGrant: () => Promise<PresenceWorkflowGrant>; rates: ResponsesRates; imageProvider?: ImageProvider };
 
 export function composePresenceCase(pool: Pool, intake: IntakeService, token: string, workspace: Workspace, capability: PresenceCapability) {
@@ -148,7 +148,8 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
       const mayFetch = capability.kind === "worker" || (boundary === "disposable" && capability.kind === "research-replay");
       const fetchPage = mayFetch ? pinnedResearchFetch(url => researchUrlAllowed(url, grant.researchSources, grant.discovery), grant.researchResponseBytes)
         : capability.kind === "offline-test" ? capability.fetchPage : noOutbound;
-      const operations = createResponsesPresenceWorkflow({ grant, readGrant, readContext: context, ledgerDirectory: workspace.ledgerDirectory, rates, transport, fetchPage,
+      const reportHold = isolatedCommercialWorker ? capability.reportHold : undefined;
+      const operations = createResponsesPresenceWorkflow({ grant, readGrant, readContext: context, ledgerDirectory: workspace.ledgerDirectory, rates, transport, fetchPage, reportHold,
         resumeMarketResearch: isolatedCommercialWorker || (boundary === "disposable" && capability.kind === "research-replay"),
         marketResearchReplayOnly: capability.kind === "research-replay",
         fetchMarketPages: sources => mayFetch
@@ -184,7 +185,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
                 const result = await acquirePresenceVisual(provider, visual.placement, request, directory, visual.id, recheck);
                 await retain(result);
                 return result;
-              }, recheck, grant.retainedReservation);
+              }, recheck, grant.retainedReservation, reportHold);
           } }),
           recover: async (visual, bytes) => {
             const result = JSON.parse(bytes.toString("utf8")) as PresenceVisualResult;

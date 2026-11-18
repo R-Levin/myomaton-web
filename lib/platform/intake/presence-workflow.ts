@@ -83,6 +83,7 @@ export interface PresenceWorkflowOperations {
   preflight?(run: WorkflowRun): Promise<void>;
   run(run: WorkflowRun, retain: (bytes: Buffer) => Promise<void>): Promise<unknown>;
   recover(run: WorkflowRun, bytes: Buffer): Promise<unknown>;
+  verifyReportReplacement?(run: WorkflowRun): Promise<void>;
   completeMarketResearch?(run: WorkflowRun, original: Buffer, custody: {
     read(attempt: string): Promise<Buffer | null>;
     retain(attempt: string, bytes: Buffer): Promise<void>;
@@ -214,7 +215,7 @@ export class PresenceWorkflow {
   private store: WorkflowStore;
 
   constructor(pool: Pool, private operations: PresenceWorkflowOperations,
-    private destinations: Parameters<typeof readPage>[4] = {}, private clock = Date.now, boundary: "disposable" | "protected" = "disposable") {
+    private destinations: Parameters<typeof readPage>[4] = {}, private clock = Date.now, private boundary: "disposable" | "protected" = "disposable") {
     this.store = new WorkflowStore(pool, boundary);
   }
 
@@ -322,6 +323,21 @@ export class PresenceWorkflow {
       output = await this.operations.recover({ context, input, work }, bytes);
     } catch { return this.fail(context, state, "outcome-unknown"); }
     return this.settle(context, state, output);
+  }
+
+  async replaceTimedOutReport(context: WorkflowContext, version: number) {
+    const state = await this.current(context, version);
+    const work = state.work;
+    if (!state.evaluation || !this.operations.verifyReportReplacement || state.failure !== "outcome-unknown" ||
+        work?.operation !== "report" || state.report || await this.store.output(context, work)) {
+      throw new IntakeError("workflow_not_ready", 409);
+    }
+    const input = runInput(context, state);
+    if (fingerprint(input) !== work.inputDigest) throw new IntakeError("draft_changed", 409);
+    await this.operations.verifyReportReplacement({ context, input, work });
+    const next = await this.store.append(context, version, { ...state, failure: null, work: null,
+      retry: { count: (state.retry?.count ?? 0) + 1, previous: work.attempt } });
+    return this.advance(context, next.version);
   }
 
   async completeMarketResearch(context: WorkflowContext, version: number) {
@@ -434,14 +450,17 @@ export class PresenceWorkflow {
     }));
   }
 
-  async requestEditorialRevision(context: WorkflowContext, version: number, actor: Actor) {
+  async requestEditorialRevision(context: WorkflowContext, version: number, actor: Actor, evaluationPath?: string) {
     const state = await this.current(context, version);
     if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture")) throw new IntakeError("unavailable", 403);
-    if (!state.editorial || state.work || state.operatorReview) throw new IntakeError("workflow_not_ready", 409);
+    if (!state.editorial || state.work || state.operatorReview ||
+        (evaluationPath !== undefined && (this.boundary !== "disposable" || !context.evaluation ||
+          !state.pages.some(page => page.path === evaluationPath)))) throw new IntakeError("workflow_not_ready", 409);
     const { assigned } = editorialProgress(state);
     const concerns = [...state.editorial.concerns, ...assigned.flatMap(({ finding, decision }) =>
       decision.pages.map(page => ({ path: page.path,
-        concern: finding.commercialCriterion ? commercialRevisionGuidance[finding.commercialCriterion] : finding.concern })))];
+        concern: finding.commercialCriterion ? commercialRevisionGuidance[finding.commercialCriterion] : finding.concern })))].filter(
+      concern => evaluationPath === undefined || concern.path === evaluationPath);
     if (!concerns.length) throw new IntakeError("workflow_not_ready", 409);
     const paths = [...new Set(concerns.map(item => item.path))];
     const ordinal = (state.revisionRequest?.ordinal ?? 0) + 1;
@@ -451,7 +470,8 @@ export class PresenceWorkflow {
     const revisionRequest = { paths, audit: { summary: state.editorial.summary, concerns }, priorPages: state.pages.filter(page => paths.includes(page.path)),
       actor, at, ordinal, ...(this.operations.marketingAuthority && assigned.some(item => !item.finding.commercialCriterion) && { source: "operator-editorial" as const }),
       ...(batch && { batch: "pending" as const }) };
-    const queued = assigned.map(({ decision }) => ({ ...decision, status: "queued" as const, actor, at, basedOnVersion: version }));
+    const queued = assigned.filter(({ decision }) => evaluationPath === undefined || decision.pages.every(page => page.path === evaluationPath))
+      .map(({ decision }) => ({ ...decision, status: "queued" as const, actor, at, basedOnVersion: version }));
     return this.view(context, await this.store.append(context, version, { ...state, revisionRequest, editorial: null,
       editorialFindings: savedEditorialFindings(state), editorialDecisions: [...state.editorialDecisions ?? [], ...queued],
       pages: batch ? state.pages : state.pages.filter(page => !paths.includes(page.path)) }));
@@ -483,11 +503,12 @@ export class PresenceWorkflow {
       pages: state.pages.filter(page => page.path !== "/") }));
   }
 
-  async reviewHomeConcept(context: WorkflowContext, version: number, actor: Actor, digest: unknown, reference: unknown) {
+  async reviewHomeConcept(context: WorkflowContext, version: number, actor: Actor, digest: unknown, reference: unknown, localDraft = false) {
     const state = await this.current(context, version);
     this.visualActor(actor, state);
     const view = this.view(context, state)!;
-    if (view.next !== "home-concept" || state.work || view.visuals?.some(visual => ["queued", "running", "review", "unverified"].includes(visual.state))) {
+    if ((localDraft && (this.boundary !== "disposable" || !context.evaluation)) || view.next !== "home-concept" || state.work || view.visuals?.some(visual =>
+      ["queued", "running", "unverified"].includes(visual.state) || (!localDraft && visual.state === "review"))) {
       throw new IntakeError("workflow_not_ready", 409);
     }
     const concept = composeHomeConcept(context, view);
@@ -626,6 +647,17 @@ export class PresenceWorkflow {
       throw new IntakeError("unavailable", 404);
     }
     return this.operations.visuals.read(visual);
+  }
+
+  async localDraftImage(context: WorkflowContext, version: number, id: string) {
+    const state = await this.current(context, version);
+    const image = state.visuals?.find(entry => entry.id === id && ["review", "approved"].includes(entry.state));
+    const section = state.pages.find(page => page.path === image?.placement.path)?.sections[image?.placement.sectionIndex ?? -1];
+    if (this.boundary !== "disposable" || !context.evaluation || !image?.result || !section ||
+        fingerprint(section) !== image.placement.sectionDigest || !this.operations.visuals) {
+      throw new IntakeError("unavailable", 404);
+    }
+    return this.operations.visuals.read(image);
   }
 
   async recordQualityReview(context: WorkflowContext, version: number, actor: Actor, input: unknown) {
