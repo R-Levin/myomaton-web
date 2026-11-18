@@ -51,8 +51,15 @@ export async function openCommercialActivation(parent: string, allowExpiredRevie
     realpath(process.argv[1] ?? ""),
     readFile("docs/c0-commercial-authorization-proposal.json"),
   ]);
-  if (entry !== join(root, "worker.cjs")) throw Error("Protected commercial executable required");
-  const artifact = createHash("sha256").update(await readFile(entry)).digest("hex");
+  const original = join(root, "worker.cjs");
+  const artifact = createHash("sha256").update(await readFile(original)).digest("hex");
+  if (entry !== original) {
+    if (entry !== join(root, "worker-p018.cjs")) throw Error("Protected commercial executable required");
+    const continuation = await privateWorkflowFile<{ original: string; worker: string }>(join(root, "p018-executable.json"), root);
+    if (continuation.original !== artifact || continuation.worker !== createHash("sha256").update(await readFile(entry)).digest("hex")) {
+      throw Error("Exact approved continuation artifact required");
+    }
+  }
   const binding = commercialBinding(activation, artifact, Date.now(), allowExpiredReview);
   const plan = readC0CommercialProposal(planBytes, binding.manifestSha256);
   const { primary } = await commercialC0Inputs(plan);

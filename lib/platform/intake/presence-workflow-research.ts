@@ -48,6 +48,13 @@ export function validateMarketSearch(value: MarketSearch) {
   }
 }
 
+export function marketResearchQuestions(scope: MarketSearch) {
+  validateMarketSearch(scope);
+  const questions = scope.questions;
+  if (!questions) throw Error("Approved research intents required");
+  return researchIntents.map(intent => ({ intent, question: questions[intent] }));
+}
+
 export function marketSources(response: unknown, seeds: readonly PublicResearchSource[], scope: MarketSearch) {
   validateMarketSearch(scope);
   const body = response as { output?: { type: string; status: string; action?: { sources?: { type: string; url: string }[] } }[] };
@@ -56,9 +63,15 @@ export function marketSources(response: unknown, seeds: readonly PublicResearchS
       item.action?.sources?.some(source => source.type === "url")).length < researchIntents.length) {
     throw Error("Market research returned too few completed search passes");
   }
+  return marketSourceCandidates(body.output, seeds, scope.maxSources, scope.minimumNewOrigins);
+}
+
+type MarketOutput = { type: string; status: string; action?: { sources?: { type: string; url: string }[] } };
+
+export function marketSourceCandidates(outputItems: MarketOutput[], seeds: readonly PublicResearchSource[], maximum: number, minimum: number) {
   const known = new Set(seeds.map(source => new URL(source.url).hostname.replace(/^www\./u, "")));
   const discovered: PublicResearchSource[] = [];
-  for (const output of body.output) {
+  for (const output of outputItems) {
     if (output.type !== "web_search_call" || output.status !== "completed" || !Array.isArray(output.action?.sources)) continue;
     for (const source of output.action.sources) {
       if (source?.type !== "url" || typeof source.url !== "string" || source.url.length > 500) continue;
@@ -69,10 +82,10 @@ export function marketSources(response: unknown, seeds: readonly PublicResearchS
       known.add(host);
       discovered.push({ id: "research:market-" + createHash("sha256").update(source.url).digest("hex").slice(0, 24),
         url: source.url, label: host, discoveredFrom: "OpenAI Web Search" });
-      if (discovered.length === scope.maxSources) return discovered;
+      if (discovered.length === maximum) return discovered;
     }
   }
-  if (discovered.length < scope.minimumNewOrigins) throw Error("Market search returned too few independently fetchable origins");
+  if (discovered.length < minimum) throw Error("Market search returned too few independently fetchable origins");
   return discovered;
 }
 

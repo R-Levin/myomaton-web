@@ -530,7 +530,8 @@ function searchCalls(body: Record<string, unknown>) {
 }
 
 export function meteredPresenceWorkflow(directory: string, rates: Rates, transport: ResponsesTransport,
-  scope: WorkflowUsageScope, outputLimit: number, retainedReservation?: string, researchCalls?: number, stageName?: WorkflowMeterStage) {
+  scope: WorkflowUsageScope, outputLimit: number, retainedReservation?: string, researchCalls?: number, stageName?: WorkflowMeterStage,
+  researchPass?: { inputTokens: number; outputTokens: number }) {
   const fields = [scope.baselineAttempts, scope.requests, scope.generations, scope.capMicros, scope.inputTokens, scope.inputBytes, outputLimit];
   const mix = scope.breakdown;
   if (mix && ([mix.text, mix.images, mix.searchCalls].some(value => !Number.isSafeInteger(value) || value < 0) ||
@@ -547,19 +548,24 @@ export function meteredPresenceWorkflow(directory: string, rates: Rates, transpo
   }
   if (researchCalls !== undefined && (rates.model !== "gpt-5.4-mini-2026-03-17" ||
       !Number.isSafeInteger(researchCalls) || researchCalls < 1 || researchCalls > 10)) throw Error("Research tool budget refused");
+  if (researchPass && (stageName !== "research" || researchCalls === undefined || !scope.stages?.research ||
+      !Number.isSafeInteger(researchPass.inputTokens) || researchPass.inputTokens < 1 || researchPass.inputTokens > scope.stages.research.requestInputTokens ||
+      !Number.isSafeInteger(researchPass.outputTokens) || researchPass.outputTokens < 16 || researchPass.outputTokens > scope.stages.research.requestOutputTokens)) {
+    throw Error("Exact bounded research pass required");
+  }
   return meteredResponsesDispatch(directory, rates, transport, 0, 0, 0, outputLimit, retainedReservation, undefined, undefined,
-    structuredClone(scope), researchCalls, stageName);
+    structuredClone(scope), researchPass ? 1 : researchCalls, stageName, researchPass && structuredClone(researchPass));
 }
 
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
   requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string, comparisonInput?: string,
   outcome?: { inputDigest: string; attempt: number; c0ReadbackDigest?: string }, workflow?: WorkflowUsageScope,
-  researchCalls?: number, stageName?: WorkflowMeterStage) {
+  researchCalls?: number, stageName?: WorkflowMeterStage, researchPass?: { inputTokens: number; outputTokens: number }) {
   const rootRates = structuredClone(configuredRates);
   const stageBudget = stageName ? workflow?.stages?.[stageName] : undefined;
   const rates = stageBudget?.rates ?? rootRates;
   validateRates(rates);
-  outputLimit = stageBudget?.requestOutputTokens ?? outputLimit;
+  outputLimit = researchPass?.outputTokens ?? stageBudget?.requestOutputTokens ?? outputLimit;
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
   const inputRate = Math.max(rates.inputPerMillion, rates.cachedPerMillion, rates.cacheWritePerMillion);
   return async ({ ownerDigest, workDigest }: QuestionAttribution, request: ResponsesRequest, recheck?: () => Promise<unknown>,
@@ -570,7 +576,8 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
     const toolLimit = request.text ? 0 : researchCalls;
     if (toolLimit === undefined || (toolLimit > 0 && (!retain || !recheck))) throw Error("Research authorization required");
     const search = toolLimit > 0;
-    const inputLimit = stageBudget?.requestInputTokens ?? (search ? researchInputLimit : workflow?.inputTokens ?? maxInput);
+    if (researchPass && !search) throw Error("Research tool required");
+    const inputLimit = researchPass?.inputTokens ?? stageBudget?.requestInputTokens ?? (search ? researchInputLimit : workflow?.inputTokens ?? maxInput);
     const requestCost = search ? 0 : rates.countMicros;
     const operations = search ? 1 : 2;
     let stage: PlanningFailure = "usage_gate";

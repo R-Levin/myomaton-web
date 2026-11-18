@@ -76,7 +76,7 @@ export async function openProtectedPresenceWorkspace(requireEvidence = true, con
   return { workspace, pool, intake, token: input.draftToken };
 }
 
-type PresenceCapability = { kind: "review" } | { kind: "worker"; apiKey: string } |
+type PresenceCapability = { kind: "review" } | { kind: "research-replay" } | { kind: "worker"; apiKey: string; resumeMarketResearch?: boolean } |
   { kind: "offline-test"; transport: ResponsesTransport; fetchPage: typeof fetch; readGrant: () => Promise<PresenceWorkflowGrant>; rates: ResponsesRates; imageProvider?: ImageProvider };
 
 export function composePresenceCase(pool: Pool, intake: IntakeService, token: string, workspace: Workspace, capability: PresenceCapability) {
@@ -141,12 +141,17 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
       if (rates.model !== "gpt-5.4-mini-2026-03-17" || rates.inputPerMillion !== 750_000 || rates.cachedPerMillion !== 75_000 ||
           rates.outputPerMillion !== 4_500_000 || rates.cacheWritePerMillion !== 0 || rates.countMicros !== 0) throw Error("Pinned workflow rates refused");
       async function noOutbound(): Promise<never> { throw new WorkflowBlocked("The worker owns provider dispatch"); }
-      const transport = capability.kind === "worker" ? responsesHttps(capability.apiKey, grant.expiresAt, grant.ledger.inputBytes + 48_000)
+      const isolatedCommercialWorker = boundary === "disposable" && capability.kind === "worker" && capability.resumeMarketResearch === true;
+      const transport = capability.kind === "worker" ? responsesHttps(capability.apiKey, grant.expiresAt, grant.ledger.inputBytes + 48_000,
+        isolatedCommercialWorker ? 150_000 : undefined)
         : capability.kind === "offline-test" ? capability.transport : { send: noOutbound };
-      const fetchPage = capability.kind === "worker" ? pinnedResearchFetch(url => researchUrlAllowed(url, grant.researchSources, grant.discovery), grant.researchResponseBytes)
+      const mayFetch = capability.kind === "worker" || (boundary === "disposable" && capability.kind === "research-replay");
+      const fetchPage = mayFetch ? pinnedResearchFetch(url => researchUrlAllowed(url, grant.researchSources, grant.discovery), grant.researchResponseBytes)
         : capability.kind === "offline-test" ? capability.fetchPage : noOutbound;
       const operations = createResponsesPresenceWorkflow({ grant, readGrant, readContext: context, ledgerDirectory: workspace.ledgerDirectory, rates, transport, fetchPage,
-        fetchMarketPages: sources => capability.kind === "worker"
+        resumeMarketResearch: isolatedCommercialWorker || (boundary === "disposable" && capability.kind === "research-replay"),
+        marketResearchReplayOnly: capability.kind === "research-replay",
+        fetchMarketPages: sources => mayFetch
           ? pinnedResearchFetch(url => researchUrlAllowed(url, sources), grant.researchResponseBytes) : fetchPage,
       });
       let visuals: PresenceVisualOperations | undefined;

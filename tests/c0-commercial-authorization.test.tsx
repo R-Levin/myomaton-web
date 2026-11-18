@@ -12,6 +12,11 @@ import { commercialC0Inputs, readC0CommercialProposal, readC0CommercialSourceAme
 import { commercialApproval, commercialBinding } from "../scripts/intake/commercial-evaluation-activation";
 import { confirmSitePlanningReceipt, initializeResponsesUsageLedger, meteredPresenceWorkflow, summarizePresenceWorkflowUsage } from "../lib/platform/intake/intelligent-responses";
 import { focusMioPagesPreview } from "../scripts/customer-previews/miopages-focus";
+import { createResponsesPresenceWorkflow } from "../lib/platform/intake/presence-workflow-provider";
+import { responsesHttps } from "../lib/platform/intake/responses-https";
+import { marketResearchQuestions } from "../lib/platform/intake/presence-workflow-research";
+import type { WorkflowRun } from "../lib/platform/intake/presence-workflow";
+import type { PresenceEvidence } from "../lib/platform/intake/presence-workflow-artifacts";
 import { bindSiteDraft } from "../lib/platform/wordpress-delivery/site-draft";
 import { readSignedDraftBrand, resolveSignedDraftBrand } from "../lib/platform/wordpress-delivery/draft-brand";
 import { nativeDraftEnvelope, readNativeDraftEnvelope } from "../lib/platform/wordpress-delivery/native-draft-envelope";
@@ -123,6 +128,77 @@ test("two pinned model cards share one ledger, respect stage headroom, and recov
     assert.deepEqual(ledger.attempts.map((receipt: { workflowStage: string; estimatedMicros: number }) =>
       [receipt.workflowStage, receipt.estimatedMicros]), [["report", 200], ["page", 60]]);
   } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test("research continuation retains the batched receipt and separately meters five resumable authorized questions", async () => {
+  const directory = await mkdtemp(join(await realpath(tmpdir()), "miopages-research-recovery-"));
+  try {
+    const proposal = await currentProposal();
+    const { primary, reviewLedger, brand } = await commercialC0Inputs(proposal);
+    await initializeResponsesUsageLedger(directory, primary);
+    const marketSearch = proposal.research.scopes;
+    const evidence: PresenceEvidence[] = [{ id: "owner-fact", kind: "owner-confirmed", label: "Approved", reference: "fixture", date: null, content: "Synthetic approved business fact." }];
+    const context = { intakeId: proposal.destination.intakeId, scope: proposal.destination.scope, entry: "DIRECT_START" as const, limitations: [], conflicts: [], evidence };
+    const input = { ...context, research: null, report: null, direction: null, blueprint: null, pages: [], corrections: [] };
+    const run: WorkflowRun = { context, input, work: { operation: "research", attempt: randomUUID(), until: Date.now() + 60_000, inputDigest: fingerprint(input) } };
+    const grant = {
+      contextDigest: fingerprint(context),
+      marketingAuthority: { contextDigest: fingerprint(context), brandDigest: brand.digest, brandBrief: "Synthetic test style",
+        qualityReviewerId: randomUUID(), sources: [{ digest: fingerprint(evidence[0]), use: "business-fact" as const }] },
+      approvedCorrections: [], approvedSources: evidence.map(fingerprint), researchSources: proposal.research.roots, marketSearch,
+      researchResponseBytes: proposal.research.responseBytes, ledger: reviewLedger, maxOutputTokens: 16_000, expiresAt: Date.now() + 3600_000,
+    };
+    const seen: string[] = [];
+    let initial: Buffer | undefined;
+    const custody = new Map<string, Buffer>();
+    let fetched = 0;
+    const read: typeof fetch = async target => {
+      const response = new Response("<html><title>Public market reference</title><main>" +
+        "Evidence from a research publisher on customer buying questions. ".repeat(8) + "</main></html>", { headers: { "Content-Type": "text/html" } });
+      Object.defineProperty(response, "url", { value: String(target) });
+      fetched++;
+      return response;
+    };
+    const enabled = createResponsesPresenceWorkflow({ grant, readGrant: async () => grant, readContext: async () => context,
+      ledgerDirectory: directory, rates: primary, resumeMarketResearch: true, fetchPage: read, fetchMarketPages: () => read,
+      transport: { async send(path, body) {
+        assert.equal(path, "/v1/responses");
+        const request = body as { max_tool_calls: number; max_output_tokens: number; input: string };
+        const index = seen.length;
+        assert.equal(request.max_tool_calls, index ? 1 : 10);
+        assert.equal(request.max_output_tokens, index ? 750 : 5000);
+        seen.push(request.input);
+        const reply = { id: "response_" + index, model: primary.model, status: "completed", service_tier: "default",
+          usage: { input_tokens: 8848, output_tokens: index ? 170 : 765, total_tokens: index ? 9018 : 9613,
+            input_tokens_details: { cached_tokens: 0 }, output_tokens_details: { reasoning_tokens: 0 } },
+          output: [{ type: "web_search_call", status: "completed", action: { sources: [
+            { type: "url", url: `https://publisher${index}.example.com/research` },
+            { type: "url", url: "https://sector.example.org/analysis" },
+          ] } }] };
+        return { body: reply, rawBody: Buffer.from(JSON.stringify(reply)) };
+      } } });
+    await assert.rejects(enabled.run(run, async bytes => { initial = bytes; }), /too few completed search passes/);
+    assert.ok(initial);
+    const store = { read: async (id: string) => custody.get(id) ?? null, retain: async (id: string, bytes: Buffer) => { custody.set(id, bytes); } };
+    const results = await enabled.completeMarketResearch!(run, initial, store);
+    assert.ok(Array.isArray(results) && results.length >= marketSearch.minimumNewOrigins);
+    assert.ok(fetched >= marketSearch.minimumNewOrigins);
+    assert.deepEqual(seen.slice(1), marketResearchQuestions(marketSearch).map(item => item.question));
+    assert.deepEqual(await enabled.completeMarketResearch!(run, initial, store), results);
+    assert.equal(seen.length, 6);
+    const usage = await summarizePresenceWorkflowUsage(directory, reviewLedger, fingerprint(context.scope));
+    assert.equal(usage.total.requests, 6);
+    assert.equal(usage.total.uncertain, 0);
+    assert.ok(usage.total.heldMicros <= proposal.budget.stages.research.capMicros);
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test("an isolated commercial transport accepts its bounded deadline and refuses use after authorization expires", async () => {
+  const syntheticCredential = "sk-" + "f".repeat(35);
+  const expired = Date.now() - 1;
+  assert.throws(() => responsesHttps(syntheticCredential, expired, 18_000, 150_001), /unavailable/);
+  const adapter = responsesHttps(syntheticCredential, expired, 18_000, 150_000);
+  await assert.rejects(adapter.send("/v1/responses", {}), /dispatch refused/);
 });
 
 test("canonical owned logo resolves from managed bytes and survives a signed v5 envelope accepted by PHP", async () => {

@@ -106,7 +106,7 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
   } catch (error) { await pool.end(); throw error; }
   const intake = new IntakeService(pool, item.scope);
   const contextFile = join(root, "context.json");
-  async function openCase(apiKey?: string) {
+  async function openCase(apiKey?: string, researchReplay = false) {
     await verifyDirectory(group);
     const [{ context, token }, storedGrant] = await Promise.all([
       privateWorkflowFile<{ context: WorkflowContext; token: string }>(contextFile, root),
@@ -120,7 +120,8 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
     const compiled = commercial ? storedGrant : evaluationGrant(plan, options.approval, options.scenario, context);
     if (fingerprint(storedGrant) !== fingerprint(compiled) || !/^[0-9a-f]{64}$/u.test(token)) throw Error("Local evaluation grant or token differs");
     const bound = composeIsolatedPresenceEvaluation(pool, intake, token, context, workspace,
-      apiKey === undefined ? { kind: "review" } : { kind: "worker", apiKey });
+      researchReplay && commercial ? { kind: "research-replay" } :
+        apiKey === undefined ? { kind: "review" } : { kind: "worker", apiKey, resumeMarketResearch: Boolean(commercial) });
     return { context: await bound.context(), workflow: await bound.open(), root };
   }
   function protectedConfig() {
@@ -165,16 +166,24 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const [operation, scenario, approval, value, ...extra] = args;
   const readOnly = ["inspect", "home", "site"].includes(operation);
   const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "recover", "queue-image", "decide-image", "review-quality"].includes(operation);
+  const researchReplay = operation === "replay-research";
+  const completeResearch = (operation === "complete-research" || researchReplay) && approval === commercialApproval;
   if ((scenario !== "c0" && scenario !== "c2") || !approval || extra.length ||
-      !(readOnly || editing || operation === "activate" || operation === "work") || (editing ? !value : Boolean(value))) {
+      !(readOnly || editing || operation === "activate" || operation === "work" || completeResearch) || (editing ? !value : Boolean(value))) {
     throw Error("Evaluation command refused");
   }
   const instance = await openEvaluationWorker({ scenario, approval, databaseUrl: env.MIOPAGES_EVALUATION_DATABASE_URL ?? "",
     home: env.HOME ?? "" }, readOnly);
   try {
     if (operation === "activate") return await instance.activate();
-    const { workflow, context, root } = await instance.openCase(operation === "work" ? await instance.providerKey() : undefined);
+    const { workflow, context, root } = await instance.openCase(
+      operation === "work" || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay);
     const prior = await workflow.review(context);
+    if (completeResearch) {
+      if (!prior) throw Error("Retained research required");
+      const completed = await workflow.completeMarketResearch(context, prior.version);
+      return { next: completed?.next, version: completed?.version, ...(completed?.failure && { failure: completed.failure }) };
+    }
     if (operation === "work") {
       if (!prior) await workflow.start(context);
       const result = await workPresenceCase(workflow, context);

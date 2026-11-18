@@ -83,6 +83,10 @@ export interface PresenceWorkflowOperations {
   preflight?(run: WorkflowRun): Promise<void>;
   run(run: WorkflowRun, retain: (bytes: Buffer) => Promise<void>): Promise<unknown>;
   recover(run: WorkflowRun, bytes: Buffer): Promise<unknown>;
+  completeMarketResearch?(run: WorkflowRun, original: Buffer, custody: {
+    read(attempt: string): Promise<Buffer | null>;
+    retain(attempt: string, bytes: Buffer): Promise<void>;
+  }): Promise<unknown>;
 }
 
 export class WorkflowBlocked extends Error {}
@@ -317,6 +321,23 @@ export class PresenceWorkflow {
       if (!bytes) return this.fail(context, state, state.failure ?? "outcome-unknown");
       output = await this.operations.recover({ context, input, work }, bytes);
     } catch { return this.fail(context, state, "outcome-unknown"); }
+    return this.settle(context, state, output);
+  }
+
+  async completeMarketResearch(context: WorkflowContext, version: number) {
+    const state = await this.current(context, version);
+    const work = state.work;
+    if (!this.operations.completeMarketResearch || !state.failure || work?.operation !== "research" || !state.evaluation) {
+      throw new IntakeError("workflow_not_ready", 409);
+    }
+    const input = runInput(context, state);
+    if (fingerprint(input) !== work.inputDigest) throw new IntakeError("draft_changed", 409);
+    const original = await this.store.output(context, work);
+    if (!original) throw new IntakeError("workflow_not_ready", 409);
+    const output = await this.operations.completeMarketResearch({ context, input, work }, original, {
+      read: attempt => this.store.output(context, { attempt }),
+      retain: (attempt, bytes) => this.store.retain(context, { attempt }, bytes),
+    });
     return this.settle(context, state, output);
   }
 
