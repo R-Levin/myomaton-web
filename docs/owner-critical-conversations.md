@@ -449,6 +449,16 @@ Technical success (retained 12 Pages, 63 Sections, ten source-bound editorial fi
 
 ---
 
+## P0-23 — Prevent failures structurally; keep one complete beaconed operating cycle; technical tests are implementation (November 18, 2026)
+
+**Exact founder correction:** “We must keep things in balance. Your language passively asserts what not to deliver, but those outcomes must be eliminated on a systemic level. Please keep in mind the overall plan to put at least beacon/placeholder elements in position so that the entire system can be tested for operation as we add capability. Ideally, testing on the technical level should be understood to be part of implementing new/enhanced functionality and not part of the product we are trying to build.”
+
+**Binding product/engineering implication:** Stop relying on ChatGPT prohibitions and review checklists as a surrogate for product architecture. Implement source/authority/knowledge-coverage enforcement, actual intelligence-to-Page/Revision contract, safe generative component implementation and source→decision→render trace **at their real interfaces**. Preserve working code, approved brand/identity, no internal/customer claims leakage and access/rollback gates. Keep a **single linked end-to-end local development cycle**, with replaceable, explicitly synthetic **beacons at unfinished interfaces**: optional Review OR Direct Start → research/AI business understanding → assessment/Direction → actual original WP site → synthetic inquiry → synthetic first-party measurement/snapshot → suggested improvement → Operator review → privately staged revision → remeasurement. Reuse existing components; don't build a parallel demo or pretend beacons are live customer outcomes. Advance interviewing, creation, portals, leads/measurement and Ongoing in **parallel**. Do not let one website/technical-proof blockage dominate the whole product. Technical tests are built into each Codex engineering increment, **not separate user-facing product milestones or owner approvals**. The owner reviews working commercial functionality and makes consequential decisions, not trivial test gates.
+
+**Full existing task correction:** [Issue #12 P0-23](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6982137262); [C0 P0-22 brief — P0-23 correction](c0-generation-p0-22.md#p0-23-correction--systemic-product-behavior-and-continuously-connected-operating-cycle); [shared Creation/Ongoing — P0-23](shared-intelligence-creation-ongoing-architecture.md#p0-23--real-connected-operating-cycle-with-explicit-interface-beacons-not-a-collection-of-proofs). These **refine, not supersede** P0-19/20/21/22; preserve all earlier gains, protected Core 41/WP6+rollback, source/cost boundary and C0/C2/Myomaton separation. This is a captured owner decision/documentation, **not implemented source code or a Codex dispatch**.
+
+---
+
 ## Forward-maintenance template: add a new owner-marked critical conversation
 
 For every future explicitly important owner conversation, append a chronological, referenced entry; update `docs/development-control.md` only when the navigation/priority policy changes. Preserve prior entries and mark supersession instead of erasure.
