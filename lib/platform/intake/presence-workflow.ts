@@ -473,17 +473,18 @@ export class PresenceWorkflow {
     }));
   }
 
-  async requestEditorialRevision(context: WorkflowContext, version: number, actor: Actor, evaluationPath?: string) {
+  async requestEditorialRevision(context: WorkflowContext, version: number, actor: Actor, evaluationPath?: string | readonly string[]) {
     const state = await this.current(context, version);
     if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture")) throw new IntakeError("unavailable", 403);
+    const selected=evaluationPath===undefined?undefined:typeof evaluationPath==="string"?[evaluationPath]:[...evaluationPath];
     if (!state.editorial || state.work || state.operatorReview ||
-        (evaluationPath !== undefined && (this.boundary !== "disposable" || !context.evaluation ||
-          !state.pages.some(page => page.path === evaluationPath)))) throw new IntakeError("workflow_not_ready", 409);
+        (selected !== undefined && (this.boundary !== "disposable" || !context.evaluation || !selected.length || new Set(selected).size!==selected.length ||
+          selected.some(path=>!state.pages.some(page=>page.path===path))))) throw new IntakeError("workflow_not_ready", 409);
     const { assigned } = editorialProgress(state);
     const concerns = [...state.editorial.concerns, ...assigned.flatMap(({ finding, decision }) =>
       decision.pages.map(page => ({ path: page.path,
         concern: finding.commercialCriterion ? commercialRevisionGuidance[finding.commercialCriterion] : finding.concern })))].filter(
-      concern => evaluationPath === undefined || concern.path === evaluationPath);
+      concern => selected === undefined || selected.includes(concern.path));
     if (!concerns.length) throw new IntakeError("workflow_not_ready", 409);
     const paths = [...new Set(concerns.map(item => item.path))];
     const ordinal = (state.revisionRequest?.ordinal ?? 0) + 1;
@@ -493,7 +494,7 @@ export class PresenceWorkflow {
     const revisionRequest = { paths, audit: { summary: state.editorial.summary, concerns }, priorPages: state.pages.filter(page => paths.includes(page.path)),
       actor, at, ordinal, ...(this.operations.marketingAuthority && assigned.some(item => !item.finding.commercialCriterion) && { source: "operator-editorial" as const }),
       ...(batch && { batch: "pending" as const }) };
-    const queued = assigned.filter(({ decision }) => evaluationPath === undefined || decision.pages.every(page => page.path === evaluationPath))
+    const queued = assigned.filter(({ decision }) => selected === undefined || decision.pages.every(page => selected.includes(page.path)))
       .map(({ decision }) => ({ ...decision, status: "queued" as const, actor, at, basedOnVersion: version }));
     return this.view(context, await this.store.append(context, version, { ...state, revisionRequest, editorial: null,
       editorialFindings: savedEditorialFindings(state), editorialDecisions: [...state.editorialDecisions ?? [], ...queued],

@@ -2,6 +2,7 @@ import {createHash} from "node:crypto";
 import {readFile,lstat,realpath} from "node:fs/promises";
 import {join} from "node:path";
 import plan from "../../docs/c0-original-evidence-run-proposal.json";
+import stageAmendment from "../../docs/c0-original-evidence-stage-amendment.json";
 import oldSources from "../../docs/c0-generation-p0-22-sources.json";
 import {fingerprint} from "../../lib/platform/canonical/model";
 import {privateWorkflowFile,privateWorkflowBytes,verifyDirectory} from "../../lib/platform/intake/protected-presence-workflow";
@@ -11,6 +12,17 @@ import type {OriginalMaterial} from "../../lib/platform/intake/presence-source-m
 import {validateWorkflowStagePlan,type WorkflowStagePlan} from "../../lib/platform/intake/intelligent-responses";
 import {focusMioPagesPreview} from "../customer-previews/miopages-focus";
 import {draftBrand} from "../../lib/platform/wordpress-delivery/draft-brand";
+export const originalEvidenceStageAmendmentSha="fafb190ea3853b1b944a3923f0bf9fab2f9cf377c1f928321d7ac382ea892914";
+export function originalEvidenceStageGrant(grant:PresenceWorkflowGrant){
+ if(grant.ledger.capMicros!==12000000||fingerprint(grant.ledger.stages)!==fingerprint(plan.provider.stages))throw Error("Original stage grant differs");
+ const next=structuredClone(grant);
+ for(const [stage,cap] of Object.entries(stageAmendment.newStageCapsMicros))next.ledger.stages![stage as "page"|"revision"|"editorial"].capMicros=cap;
+ validateWorkflowStagePlan(next.ledger.stages!,next.ledger,10);return next;
+}
+export function originalEvidenceRuntimeFingerprint(activation:Record<string,unknown>,expiresAt:number,originals:readonly OriginalMaterial[],reviewerId:string,brand:string){
+ const {artifact,...scopeActivation}=activation;void artifact;
+ return fingerprint({activation:scopeActivation,expiresAt,originals,reviewerId,brand});
+}
 export const originalEvidenceApproval="db5eea3ef55b24a4f0c9229b14968f6be4bcc49e1cc902f186961ec985ae2a75";
 export const originalEvidenceCandidate={
  organizationId:"0b669145-979a-461c-9a14-e62c6276e6d4",intakeId:"4d437190-9ce3-460b-81af-edd92279271a",
@@ -19,7 +31,7 @@ export const originalEvidenceCandidate={
 const hash=(b:Buffer)=>createHash("sha256").update(b).digest("hex");
 export async function verifiedOriginalEvidenceRuntime(parent:string,reviewerId:string,reviewerExpiry:number,allowExpired:boolean){
  const root=join(parent,"p0-original-evidence-c0-runtime");await verifyDirectory(root);
- const activation=await privateWorkflowFile<{proposal:string;artifact:string;startsAt:number;approvalRecord:number;capture:"existing-windows-core-stdio"}>(join(root,"activation.json"),root);
+ const activation=await privateWorkflowFile<{proposal:string;artifact:string;startsAt:number;approvalRecord:number;capture:"existing-windows-core-stdio";stageAmendment?:{sha256:string;approvalRecord:number}}>(join(root,"activation.json"),root);
  const current=await realpath(process.argv[1]??"");
  const bytes=await readFile("docs/c0-original-evidence-run-proposal.json");
  if(hash(bytes)!==originalEvidenceApproval||activation.proposal!==originalEvidenceApproval||activation.approvalRecord!==6989946707||
@@ -27,6 +39,10 @@ export async function verifiedOriginalEvidenceRuntime(parent:string,reviewerId:s
   !Number.isSafeInteger(activation.startsAt)||activation.startsAt>Date.now())throw Error("Approved original-evidence activation differs");
  const expiresAt=Math.min(activation.startsAt+72*3600_000,reviewerExpiry);
  if(expiresAt<=activation.startsAt||!allowExpired&&expiresAt<=Date.now())throw Error("Original-evidence window unavailable");
+ if(activation.stageAmendment){
+  const amendmentBytes=await readFile("docs/c0-original-evidence-stage-amendment.json");
+  if(hash(amendmentBytes)!==originalEvidenceStageAmendmentSha||activation.stageAmendment.sha256!==originalEvidenceStageAmendmentSha||activation.stageAmendment.approvalRecord!==stageAmendment.approvalRecord||expiresAt!==Date.parse(stageAmendment.expiresAt))throw Error("Exact stage amendment differs");
+ }
  const prior=join(parent,"presence-evaluation",plan.preserve.priorEvaluation);
  const previousLedger=await privateWorkflowBytes(join(prior,"usage","onboarding-usage.json"),prior);
  const priorGrant=await privateWorkflowFile<PresenceWorkflowGrant>(join(prior,"grant.json"),prior);
@@ -48,10 +64,10 @@ export async function verifiedOriginalEvidenceRuntime(parent:string,reviewerId:s
  const brand=draftBrand({scope:originalEvidenceCandidate.scope,visualDirection:focusMioPagesPreview.siteConfiguration.visualDirection,
   design:focusMioPagesPreview.designConfiguration,logo:{assetId:"cd7d9a9f-76a1-4615-957a-0ebaa8e6427d",usageId:"bf7fbc72-50ef-461f-974b-f4dbcc7a62df",
    sha256:originals.find(s=>s.id==="c0-original-wordmark")!.sha256,alt:"MioPages"}});
- const {artifact:verifiedArtifact,...scopeActivation}=activation;void verifiedArtifact;
+
  return {
   item:originalEvidenceCandidate,primary:JSON.parse(previousLedger.toString()).rateCard,previousLedger,readOriginal,
-  fingerprint:fingerprint({activation:scopeActivation,expiresAt,originals,reviewerId,brand:brand.digest}),
+  fingerprint:originalEvidenceRuntimeFingerprint(activation,expiresAt,originals,reviewerId,brand.digest),
   async compile(_original:WorkflowContext){
    void _original;
    const sourceRecords=oldSources.sources.map(s=>({evidence:{id:s.id,kind:s.kind as WorkflowContext["evidence"][number]["kind"],
@@ -84,7 +100,7 @@ export async function verifiedOriginalEvidenceRuntime(parent:string,reviewerId:s
      maxToolCalls:10,maxSources:10,minimumNewOrigins:3},
     previewActionDestinations:{"request-review":"/free-review","start-onboarding":"/direct-start"},
     maxOutputTokens:24000,maxRetries:0,maxEditorialRevisions:3,maxCommercialReplans:1,startsAt:activation.startsAt,expiresAt,ledger};
-   return {context,grant,brand,originals,readOriginal};
+   return {context,grant:activation.stageAmendment?originalEvidenceStageGrant(grant):grant,brand,originals,readOriginal};
   }
  };
 }

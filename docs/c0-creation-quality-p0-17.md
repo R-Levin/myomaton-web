@@ -677,3 +677,35 @@ prior-content digest:
 `94d4688734dbb8e257090fad5866f2b96141568ca4690bb1b20d33745cd3c472`.
 Recovery restored the new candidate for inspection, rather than leaving it rolled
 back. This content-preservation proof is not a signed Core release approval.
+
+## Approved final correction budget — November 18, 2026
+
+The owner approved the pending three-stage reallocation in the direct Codex reply,
+recorded in [Issue #12](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6994592207).
+The exact amendment is [c0-original-evidence-stage-amendment.json](c0-original-evidence-stage-amendment.json),
+SHA-256 `fafb190ea3853b1b944a3923f0bf9fab2f9cf377c1f928321d7ac382ea892914`.
+Only Page/revision/editorial caps become $2.10/$4.70/$1.60. Original proposal,
+$12/$14.811609 totals, model/rates, sources, identities, expiry, counters and
+maximum revision rounds remain unchanged. The earlier pending entry is historical.
+
+The fixed-operation amendment retains the three original configuration files and
+checks exact version64, original grant/source binding, unchanged usage ledger and
+actual stage spending before installation. It cannot dispatch a provider or write
+the database. Normal worker compilation independently verifies the amended binding.
+A focused private revision can select several existing Pages in one existing
+round; foreign/duplicate selections, Customer actors and protected-boundary use
+are refused. Unselected Pages remain exact. No new approval workflow is created.
+
+Nineteen focused offline tests and both Linux amendment/selection tests passed.
+The editorial contract now distinguishes an inactive development control from a
+confirmed staffed business offer. Preview readiness belongs in the review, not
+apologetic visitor copy; unsupported proof/prices/contacts remain prohibited.
+Target Service, Free Review, Direct Start and Ownership/trust for the last focused
+round, preserving Home and its exact reviewed photos. Whole-site critique and
+actual desktop/mobile WordPress review follow. No additional cash authorization
+or protected WordPress operation is implied.
+
+**RECOVERY / RESUME HERE:** amendment is approved; verify its actual installation
+and latest case state before dispatch. Preserve version64, prior grant/bindings,
+all responses and ledger, 4473, protected Core41/WordPress6. Continue to the real
+revised website result; this engineering/authority checkpoint is not acceptance.

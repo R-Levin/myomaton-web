@@ -287,7 +287,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       await createPrivate(path, JSON.stringify(packet, null, 2) + "\n");
       return { file: path, version: prior.version };
     }
-    const input = JSON.parse(value) as { version: number; digest?: string; reference?: string; concern?: string; path?: string; index?: number; brief?: string; decision?: unknown };
+    const input = JSON.parse(value) as { version: number; digest?: string; reference?: string; concern?: string; path?: string; paths?: string[]; index?: number; brief?: string; decision?: unknown };
     if (input.version !== prior.version) throw Error("Evaluation view is stale");
     const actor = { id: "local-evaluation-operator", role: "operator" as const, simulated: false,
       authority: "private evaluation workspace " + approval };
@@ -309,7 +309,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       : operation === "revise-home" ? await workflow.reviseHomeConcept(context, prior.version, actor, input.digest, input.concern)
       : operation === "review-site" ? await workflow.reviewCandidate(context, prior.version, actor)
       : operation === "revise-site" || operation === "revise-local-page" ?
-        await workflow.requestEditorialRevision(context, prior.version, actor, operation === "revise-local-page" ? input.path ?? "" : undefined)
+        await workflow.requestEditorialRevision(context, prior.version, actor, operation === "revise-local-page" ? input.paths ?? input.path ?? "" : undefined)
       : operation === "decide-editorial" ? await workflow.decideEditorialFinding(context, prior.version, actor, input.decision)
       : operation === "recover" ? await workflow.recover(context, prior.version)
       : operation === "resume-undispatched" ? await workflow.resumeUndispatchedRequest(context,prior.version,actor)

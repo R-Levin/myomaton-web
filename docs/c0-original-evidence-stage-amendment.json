@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "baseProposal": "db5eea3ef55b24a4f0c9229b14968f6be4bcc49e1cc902f186961ec985ae2a75",
+  "approvalRecord": 6994592207,
+  "caseId": "4d437190-9ce3-460b-81af-edd92279271a",
+  "baselineVersion": 64,
+  "baselineLedger": "e3f338ae15cc2978512c4bdd3971db539406c77b68abca040de813306b603c5e",
+  "newStageCapsMicros": {
+    "page": 2100000,
+    "revision": 4700000,
+    "editorial": 1600000
+  },
+  "additionalCapMicros": 12000000,
+  "cumulativeCapMicros": 14811609,
+  "expiresAt": "2026-11-19T16:03:51.397Z",
+  "scope": "Only the three approved stage ceilings change. Preserve sources, model, rates, custody, prior usage, identities, requests, generations, rounds, expiry and all publication/protected-installation gates."
+}

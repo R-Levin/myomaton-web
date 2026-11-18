@@ -7,8 +7,9 @@ import {openCommercialActivation} from "./commercial-evaluation-activation";
 import {createHash} from "node:crypto";
 import {join} from "node:path";
 import {realpath as resolveRealPath} from "node:fs/promises";
+import {applyOriginalEvidenceStages} from "./original-evidence-stage-amendment";
 const [operation,value]=process.argv.slice(2);
-const allowed=["rebind-executable","rebind-unused","activate","work","recover","inspect","continue","continue-local-home","revise-local-page","review-site","revise-site","decide-editorial","retry","resume-undispatched","local-site","local-home"];
+const allowed=["amend-stage-budgets","rebind-executable","rebind-unused","activate","work","recover","inspect","continue","continue-local-home","revise-local-page","review-site","revise-site","decide-editorial","retry","resume-undispatched","local-site","local-home"];
 async function main(){
  if(!allowed.includes(operation))throw Error("Operation refused");
  const home=await resolveRealPath(process.env.HOME??"");
@@ -16,6 +17,10 @@ async function main(){
  if(!/^[a-f0-9]{64}$/.test(password))throw Error("Dedicated database credential unavailable");
  const url=new URL("postgresql://postgres@127.0.0.1:36339/migration_rehearsal_"+originalEvidenceCandidate.intakeId.replaceAll("-",""));
  url.password=password;process.env.MIOPAGES_EVALUATION_DATABASE_URL=url.href;
+ if(operation==="amend-stage-budgets"){
+  const result=await applyOriginalEvidenceStages(home,url.href);
+  console.log(JSON.stringify({miopagesRunResult:1,status:"PASS",operation,result}));return;
+ }
  if(operation==="rebind-unused"||operation==="rebind-executable"){
   const parent=join(home,"miopages-private-acceptance"),root=join(parent,"presence-evaluation",originalEvidenceCandidate.intakeId);
   const db=new Pool({connectionString:url.href});
