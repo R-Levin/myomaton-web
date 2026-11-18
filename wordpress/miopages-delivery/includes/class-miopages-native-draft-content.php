@@ -147,6 +147,14 @@ final class MioPages_Native_Draft_Content
                 $related[] = self::link($postIds[$action['destination']], $action['label']);
             }
         }
+        $componentImages = [];
+        foreach ($page['sections'] as $index => $section) {
+            if (isset($attachments[$section['id']])) $componentImages['section-' . $index] = $attachments[$section['id']];
+        }
+        $componentActions = [];
+        foreach (array_values(array_filter($actions, static fn($action) => $action['from'] === $path)) as $index => $action) {
+            $componentActions['action-' . $index] = $action;
+        }
         foreach ($page['sections'] as $index => $section) {
             $type = $section['type'];
             if (!in_array($type, ['hero', 'intro', 'cta'], true) || (($index === 0) !== ($type === 'hero'))) {
@@ -157,6 +165,23 @@ final class MioPages_Native_Draft_Content
             $attrs = $type === 'hero' ? ' {"level":1}' : '';
             $content = '<!-- wp:heading' . $attrs . ' --><' . $tag . ' class="wp-block-heading">'
                 . esc_html($section['content']['heading']) . '</' . $tag . '><!-- /wp:heading -->';
+            if (($section['block']['version'] ?? null) === 2 && ($section['block']['mode'] ?? null) === 'section') {
+                $levels = [];
+                $collect = static function (array $node) use (&$collect, &$levels): void {
+                    if (($node['kind'] ?? null) === 'heading') $levels[] = ['level'=>$node['level']??null,'text'=>$node['text']??null];
+                    foreach ($node['children']??[] as $child) $collect($child);
+                };
+                $collect($section['block']['root']);
+                $matched = array_filter($levels, static fn($heading) => $heading['level'] === ($type === 'hero' ? 1 : 2)
+                    && $heading['text'] === $section['content']['heading']);
+                $h1 = count(array_filter($levels, static fn($heading) => $heading['level'] === 1));
+                if ($matched === [] || $h1 !== ($type === 'hero' ? 1 : 0)) throw new InvalidArgumentException('Authored Section heading differs.');
+                $authored = self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3, $componentImages, $componentActions, $postIds);
+                $class = 'miopages-draft-section miopages-draft-' . $type . ' miopages-authored-section';
+                $blocks[] = '<!-- wp:group {"tagName":"section","className":"' . $class . '"} -->'
+                    . '<section class="wp-block-group ' . $class . '">' . $authored . '</section><!-- /wp:group -->';
+                continue;
+            }
             $content .= self::paragraph(nl2br(esc_html($section['content']['text']), false));
             if (!empty($placedActions[$id])) {
                 $buttons = [];
@@ -167,7 +192,7 @@ final class MioPages_Native_Draft_Content
                 }
                 $content .= '<!-- wp:buttons --><div class="wp-block-buttons">' . implode('', $buttons) . '</div><!-- /wp:buttons -->';
             }
-            if (array_key_exists('block', $section)) $content .= self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3);
+            if (array_key_exists('block', $section)) $content .= self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3, $componentImages, $componentActions, $postIds);
             $media = $attachments[$id] ?? null;
             $style = $type === 'cta' && empty($placedActions[$id]) ? 'intro' : $type;
             $class = 'miopages-draft-section miopages-draft-' . $style . ($media ? ' miopages-draft-with-image' : '');
@@ -193,9 +218,13 @@ final class MioPages_Native_Draft_Content
         return esc_html($text);
     }
 
-    private static function semanticBlock(mixed $value, int $headingLevel): string
+    private static function semanticBlock(mixed $value, int $headingLevel, array $images = [], array $actions = [], array $postIds = []): string
     {
         if (!is_array($value)) throw new InvalidArgumentException('Semantic draft specification required.');
+        if (($value['version'] ?? null) === 2) {
+            require_once __DIR__ . '/class-miopages-native-component.php';
+            return MioPages_Native_Component::render($value, $images, $actions, $postIds);
+        }
         $keys = array_keys($value);
         sort($keys);
         if ($keys !== ['groups', 'layout', 'listStyle', 'name', 'purpose', 'version'] || $value['version'] !== 1

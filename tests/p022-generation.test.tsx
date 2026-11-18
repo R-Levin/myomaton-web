@@ -96,7 +96,9 @@ function inputs(authority: MarketingAuthority, context: WorkflowRun["context"], 
   return { context, input, work: { operation: "page", path: "/", inputDigest: fingerprint(input), attempt: "offline-fixture", until: 0 } };
 }
 
-test("actual outbound Page and revision requests receive verified findings, Direction and peer observations without raw private content", async () => {
+for (const originals of [false, true]) test(originals
+  ? "new source grants carry complete report, Direction, original and revision context into actual Page requests"
+  : "historical Page and revision requests retain their exact condensed privacy projection", async () => {
   const pack = await readFile(packFile);
   const { context, authority } = p022CandidateInputs(pack, scope, [{ id: "private", kind: "customer-unconfirmed", label: "Excluded",
     reference: "custody-pointer", date: null, content: protectedText }]);
@@ -107,7 +109,12 @@ test("actual outbound Page and revision requests receive verified findings, Dire
     const rates: ResponsesRates = { model: "fixture-model", verifiedOn: "2026-11-18", inputPerMillion: 750_000,
       outputPerMillion: 4_500_000, cachedPerMillion: 75_000, cacheWritePerMillion: 0, countMicros: 0 };
     await initializeResponsesUsageLedger(directory, rates);
+    const originalBytes = Buffer.from("An entire newly authorized source, not an excerpt. ".repeat(500));
+    const original = { id: "fixture-entire-source", sha256: createHash("sha256").update(originalBytes).digest("hex"), bytes: originalBytes.length,
+      mime: "text/plain" as const, reference: "Offline original fixture", author: "Test owner", date: "2026-11-18",
+      status: "unconfirmed" as const, purpose: "business-context" as const, operations: ["page" as const] };
     const grant: PresenceWorkflowGrant = {
+      ...(originals && { originalMaterials: { version: 1 as const, contextDigest: fingerprint(context), records: [original], requestBytes: 150_000 } }),
       contextDigest: fingerprint(context), approvedSources: context.evidence.map(fingerprint), approvedCorrections: [],
       marketingAuthority: authority, siteComposition: "managed-v1", expiresAt: Date.now() + 60_000,
       researchSources: [{ id: "research:pinned", label: "Public research", url: "https://example.org/" }],
@@ -115,16 +122,32 @@ test("actual outbound Page and revision requests receive verified findings, Dire
       previewActionDestinations: { "request-review": "/free-review", "start-onboarding": "/direct-start" },
       ledger: { id: fingerprint("P0-22 offline"), baselineAttempts: 0,
         startingLedger: createHash("sha256").update(await readFile(join(directory, "onboarding-usage.json"))).digest("hex"),
-        requests: 4, generations: 2, capMicros: 150_000, inputBytes: 60_000, inputTokens: 10000 },
+        requests: 4, generations: 2, capMicros: 150_000, inputBytes: 150_000, inputTokens: 10000 },
     };
     const recorded: string[] = [];
     const provider = createResponsesPresenceWorkflow({
       grant, readContext: async () => context, readGrant: async () => grant, rates, ledgerDirectory: directory,
       fetchPage: async () => { throw Error("No network in the verification pass"); },
+      ...(originals && { readOriginalMaterials: async () => [{ source: original, bytes: originalBytes }],
+        retainRequest: async (_run: WorkflowRun, bytes: Buffer) => { assert.ok(bytes.includes(originalBytes)); } }),
       transport: { async send(path, req) {
         const actual = req as { input: string; instructions: string; text: { format: { schema: object } }; store?: boolean };
-        const input = JSON.parse(actual.input);
-        assert.doesNotMatch(actual.input, /Internal paperwork|Untransmittable narrative|custody-pointer|Private strategy narrative/u);
+        const actualInput = actual.input as unknown;
+        let input;
+        if (originals) {
+          const content = (actualInput as { content: { type: string; text?: string }[] }[])[0].content;
+          assert.ok(content.some(row => row.type === "input_text" && row.text === originalBytes.toString()));
+          const packet = JSON.parse(content[0].text!).task;
+          assert.equal(packet.report.summary, priorReport);
+          assert.equal(packet.direction.positioning, "Private strategy narrative");
+          assert.ok(Object.hasOwn(packet, "revisions"));
+          if (packet.revisions) assert.match(packet.revisions.audit.concerns[0].concern, /Direct Start/);
+          input = packet.task;
+          assert.ok(!JSON.stringify(actualInput).includes(protectedText));
+        } else {
+          input = JSON.parse(actual.input);
+          assert.doesNotMatch(actual.input, /Internal paperwork|Untransmittable narrative|custody-pointer|Private strategy narrative/u);
+        }
         assert.equal(input.approved.length, claims.length);
         assert.equal(input.decisionBrief.findings[0].id, "important-finding");
         assert.equal(input.decisionBrief.sourceTrace[0].use, "market-influence");
@@ -157,8 +180,8 @@ test("actual outbound Page and revision requests receive verified findings, Dire
     const paths = ["/", "/free-review", "/direct-start", "/migration", "/responsibility"];
     const draftOne = readPage(first, "/", paths, claims, grant.previewActionDestinations!, true, true, true);
     const draftTwo = readPage(second, "/", paths, claims, grant.previewActionDestinations!, true, true, true);
-    assert.equal(draftOne.sections[0].block?.layout, "grid");
-    assert.equal(draftTwo.sections[0].block?.layout, "stack");
+    assert.equal(draftOne.sections[0].block?.version === 1 && draftOne.sections[0].block.layout, "grid");
+    assert.equal(draftTwo.sections[0].block?.version === 1 && draftTwo.sections[0].block.layout, "stack");
     assert.equal(draftOne.actions[2].destination, "/responsibility");
     assert.equal(draftTwo.actions[2].destination, "/migration");
     const stale = inputs(authority, context);

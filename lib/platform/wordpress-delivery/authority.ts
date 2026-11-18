@@ -2,6 +2,7 @@ import type { PoolClient } from "pg";
 import { fingerprint, uuid } from "../canonical/model";
 import { releaseBase } from "../content-editing/release";
 import { releaseHistory } from "../content-editing/releases";
+import { assertNativeSection } from "../intake/presence-native-component";
 import { readSemanticBlock, type SemanticBlock } from "../intake/presence-semantic-block";
 
 export type Site = { organizationId: string; webPresenceId: string; managedSiteId: string };
@@ -50,7 +51,8 @@ export function validatePages(pages: Page[], nativeDraft = false, localSemanticB
     for (const { id: sectionId, type, content, block, ...extra } of page.sections) {
       if (block !== undefined) {
         if (!composed || !localSemanticBlocks) throw Error("Projection semantic block requires the local draft renderer");
-        readSemanticBlock(block);
+        const component = readSemanticBlock(block);
+        if (component.version === 2) assertNativeSection(component, content.heading, type);
       }
       if (Object.keys(extra).length || !id(sectionId) || sectionIds.has(sectionId)
         || !["hero", "intro", "relationship", "collection", "cta"].includes(type)

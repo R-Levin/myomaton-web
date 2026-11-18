@@ -6,6 +6,10 @@ import type { PresenceEvidence } from "./presence-workflow-artifacts";
 
 export type PublicResearchSource = { id: string; url: string; label: string; discoveredFrom?: string };
 export type ResearchDiscovery = { prefixes: Readonly<Record<string, readonly string[]>>; terms: readonly string[]; maxDiscovered: number; excerptCharacters?: number };
+export type ResearchOriginalCustody = {
+  retain(source: PublicResearchSource, bytes: Buffer): Promise<void>;
+  render?: (source: PublicResearchSource, bytes: Buffer) => Promise<void>;
+};
 type Link = { url: string; title: string; from: string; score: number };
 
 function safeResearchUrl(url: URL) {
@@ -140,7 +144,7 @@ async function download(response: Response, byteLimit: number) {
 // Uses an exact, server-side URL list. Customer URLs, response links and redirects
 // cannot expand the research scope. The production composition must also restrict egress.
 export async function retrievePublicResearch(sources: readonly PublicResearchSource[], byteLimit: number,
-  recheck: () => Promise<void>, fetchPage: typeof fetch = fetch, clock = Date.now, discovery?: ResearchDiscovery): Promise<PresenceEvidence[]> {
+  recheck: () => Promise<void>, fetchPage: typeof fetch = fetch, clock = Date.now, discovery?: ResearchDiscovery, originals?: ResearchOriginalCustody): Promise<PresenceEvidence[]> {
   validateResearchSources(sources);
   if (discovery) validateDiscovery(sources, discovery);
   if (!Number.isSafeInteger(byteLimit) || byteLimit < 1 || byteLimit > 2_000_000) throw Error("Research response envelope refused");
@@ -154,6 +158,7 @@ export async function retrievePublicResearch(sources: readonly PublicResearchSou
       throw Error("Approved research content unavailable");
     }
     const bytes = await download(response, byteLimit);
+    if (originals) await originals.retain(source, bytes);
     const dom = new JSDOM(bytes);
     try {
       const document = dom.window.document;
@@ -168,15 +173,17 @@ export async function retrievePublicResearch(sources: readonly PublicResearchSou
           if (score > (links.get(target.href)?.score ?? 0)) links.set(target.href, { url: target.href, title, from: source.url, score });
         }
       }
-      document.querySelectorAll("script,style,nav,iframe,template,noscript,footer,[hidden]").forEach(element => element.remove());
-      const main = document.querySelector("main,article") ?? document.body;
+      document.querySelectorAll(originals ? "script,style,iframe,template,noscript,[hidden]"
+        : "script,style,nav,iframe,template,noscript,footer,[hidden]").forEach(element => element.remove());
+      const main = originals ? document.body : document.querySelector("main,article") ?? document.body;
       const visible = text((main.textContent ?? "").replace(/\s+/gu, " ").replace(/[<>]/gu, " "), Infinity);
       const limit = discovery?.excerptCharacters ?? 6_000;
-      const content = visible.length <= limit ? visible : visible.slice(0, limit).trimEnd() + " [public excerpt]";
+      const content = originals || visible.length <= limit ? visible : visible.slice(0, limit).trimEnd() + " [public excerpt]";
       const rawDigest = createHash("sha256").update(bytes).digest("hex");
       results.push({ id: source.id, kind: "public-research", label: source.label, reference: source.url,
         date: new Date(clock()).toISOString().slice(0, 10), content, rawDigest, ...(discoveredFrom && { discoveredFrom }) });
     } finally { dom.window.close(); }
+    if (originals?.render) await originals.render(source, bytes);
   }
   for (const source of sources) await readSource(source, true, source.discoveredFrom);
   if (discovery) {

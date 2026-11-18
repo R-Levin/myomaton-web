@@ -2,6 +2,7 @@ import { lstat, open, readFile, realpath, rename, unlink } from "node:fs/promise
 import { join } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 import { fingerprint } from "../canonical/model";
+import type { ResponsesInput } from "./presence-source-material";
 import type { QuestionAttribution, QuestionContext, QuestionProvider } from "./intelligent-model";
 import { presencePlanSchema } from "./presence-plan";
 import { atPlanningStage, isInvalidPlanningResponse, PlanningFailureError, type PlanningFailure } from "./planning-diagnostics";
@@ -557,7 +558,7 @@ function verifiedSpend(ledger: Ledger, retainedReservation?: string, reportHold?
 
 const researchInputLimit = 400_000; // Documented context window of the pinned model.
 const researchToolMicros = 10_000; // Default-tier Web Search per-call fee, plus token usage.
-type ResponsesRequest = { model: string; input: string; instructions: string; text?: { format: object } };
+export type ResponsesRequest = { model: string; input: ResponsesInput; instructions: string; text?: { format: object } };
 
 function searchCalls(body: Record<string, unknown>) {
   if (!Array.isArray(body.output)) throw Error("Research tool usage unavailable");
@@ -675,7 +676,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       } else if (requests + 2 > requestLimit || generations >= generationLimit || spent + reservation > spendLimit) {
         throw Error("Development budget exhausted");
       }
-      if (Buffer.byteLength(request.input) > (workflow?.inputBytes ?? 12_000)) throw Error("Input envelope exceeded");
+      if (Buffer.byteLength(typeof request.input === "string" ? request.input : JSON.stringify(request.input)) > (workflow?.inputBytes ?? 12_000)) throw Error("Input envelope exceeded");
       const receipt: Receipt = { ownerDigest, workDigest, reservedMicros: reservation,
         ...(outputLimit !== maxOutput && { outputLimit }), ...(workflow && { inputLimit, workflowScope: workflow.id }),
         ...(stageName && { workflowStage: stageName, workflowModel: request.model, stageRatesDigest: fingerprint(rates) }),

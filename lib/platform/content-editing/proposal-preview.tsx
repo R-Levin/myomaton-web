@@ -31,7 +31,7 @@ export function proposalPreview(revision: Revision, image?: SectionImage, privat
       <h2>Provisional private image</h2><p>{placement.evidence.reference}</p>
       <p>{placement.sectionId} · {placement.configuration.image.altText} · {placement.preparedDigest}</p>
     </aside>)}
-    {media?.evidence.source === "permissioned-stock" && <aside><h2>Synthetic stock evidence</h2>
+    {media?.evidence.source === "permissioned-stock" && <aside><h2>{media.evidence.stock.provider === "pixabay" ? "Reviewed Pixabay evidence" : "Synthetic stock evidence"}</h2>
       <p>{media.evidence.stock.provider} · {media.evidence.stock.sourceId} · {media.evidence.stock.creator ?? "Creator unspecified"}</p>
       <p>{media.evidence.stock.sourceUrl}</p>
       <p>{media.evidence.stock.representation.id} · {media.evidence.stock.integration.reference} · Permission expires {media.evidence.stock.license.expiresAt}</p>

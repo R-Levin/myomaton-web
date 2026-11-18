@@ -2,6 +2,7 @@ import { choice, object, text } from "../canonical/model";
 import { canonicalPagePath } from "../managed-sites/paths";
 import { decisionBriefSchema, readDecisionBrief } from "./presence-decision-brief";
 import { readSemanticBlock, semanticBlockSchema } from "./presence-semantic-block";
+import { assertNativeSection, nativeComponentSchema } from "./presence-native-component";
 
 export const evidenceKinds = ["owner-confirmed", "earlier-review-answer", "earlier-review-assessment", "website-observation", "customer-unconfirmed", "historical-discovery", "service-direction", "public-research"] as const;
 export type PresenceEvidence = { id: string; kind: typeof evidenceKinds[number]; label: string; reference: string; date: string | null; content: string; rawDigest?: string; discoveredFrom?: string };
@@ -50,6 +51,14 @@ export const strategyPageSchema = shape({ ...composedPage.properties,
   sections: array(shape({ heading: string, body: string, ...cited, role: options(sectionRoles),
     visual: shape({ purpose: string, brief: string, altIntent: string, status: options(visualStates) }),
     block: { anyOf: [semanticBlockSchema, { type: "null" }] } })) });
+export const creativePageSchema = {
+  ...strategyPageSchema, $defs: nativeComponentSchema.$defs,
+  properties: { ...strategyPageSchema.properties,
+    sections: array(shape({ ...strategyPageSchema.properties.sections.items.properties,
+      block: { anyOf: [semanticBlockSchema,
+        { type: nativeComponentSchema.type, properties: nativeComponentSchema.properties,
+          required: nativeComponentSchema.required, additionalProperties: false }, { type: "null" }] } })) },
+};
 export const strategyBlueprintSchema = shape({ ...artifactSchemas.blueprint.properties,
   pages: array(shape({ path: string, label: string, purpose: string, ...cited, decisionBrief: decisionBriefSchema })) });
 
@@ -142,9 +151,11 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
     const section = object(value, composition ? ["heading", "body", "sourceIds", "visual", "role", ...(semanticBlocks ? ["block"] : [])] : ["heading", "body", "sourceIds", "visual"]);
     const role = composition ? choice(section.role, sectionRoles) : undefined;
     const visual = object(section.visual, ["purpose", "brief", "altIntent", "status"]);
+    const block = section.block == null ? undefined : readSemanticBlock(section.block, normalizeProviderReferences && semanticBlocks);
+    if (block?.version === 2) assertNativeSection(block, copy(section.heading), role ?? "intro");
     return { heading: copy(section.heading), body: copy(section.body), sourceIds: citedSources(section.sourceIds, ids, normalizeProviderReferences),
       ...(role && { role }),
-      ...(section.block != null && { block: readSemanticBlock(section.block, normalizeProviderReferences && semanticBlocks) }),
+      ...(block && { block }),
       visual: { purpose: copy(visual.purpose), brief: copy(visual.brief), altIntent: copy(visual.altIntent), status: choice(visual.status, visualStates) } };
   });
   if (composition && (sections[0].role !== "hero" || sections.slice(1).some(section => section.role === "hero"))) {

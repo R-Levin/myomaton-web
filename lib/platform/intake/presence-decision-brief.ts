@@ -4,7 +4,7 @@ import type { WorkflowRun } from "./presence-workflow";
 import type { PresenceEvidence } from "./presence-workflow-artifacts";
 
 export type StrategyScope = { version: 1; peerIds: readonly string[]; copyPolicy?: "unpriced-no-testimony";
-  entryJourneys?: { reviewClaimId: string; directClaimId: string }; change?:
+  entryJourneys?: { reviewClaimId: string; directClaimId: string }; discoveredPeers?: true; change?:
   { baseline: string; paths: readonly string[]; reason: string; observationIds: readonly string[] } };
 const hash = /^[a-f0-9]{64}$/u;
 const uses = ["terminology", "composition", "journey"] as const;
@@ -47,7 +47,8 @@ export function readDecisionBrief(value: unknown) {
 export type DecisionBrief = ReturnType<typeof readDecisionBrief>;
 
 export function checkStrategyScope(scope: StrategyScope) {
-  if (scope.version !== 1 || ids(scope.peerIds).length < 2 || (scope.copyPolicy && scope.copyPolicy !== "unpriced-no-testimony")) {
+  if (scope.version !== 1 || ids(scope.peerIds).length < 2 || (scope.discoveredPeers !== undefined && scope.discoveredPeers !== true) ||
+      (scope.copyPolicy && scope.copyPolicy !== "unpriced-no-testimony")) {
     throw Error("Independent peer evidence and valid copy policy required");
   }
   if (scope.entryJourneys) ids([scope.entryJourneys.reviewClaimId, scope.entryJourneys.directClaimId]);
@@ -74,7 +75,8 @@ export function compilePageDecision(run: WorkflowRun, brief: DecisionBrief, path
       (scope.change && !scope.change.paths.includes(path))) throw Error("Unbound Page decision");
   const claimIds = new Set(claims.map(item => item.id));
   const observationIds = new Set(observations.map(item => item.id));
-  const peerIds = new Set(scope.peerIds);
+  const peerIds = new Set([...scope.peerIds, ...(scope.discoveredPeers
+    ? observations.filter(source => source.kind === "public-research" && source.date && source.rawDigest).map(source => source.id) : [])]);
   if (brief.claimIds.some(item => !claimIds.has(item)) ||
       (scope.change && scope.change.observationIds.some(id => !observationIds.has(id)))) throw Error("Page claim authority refused");
   const findings = brief.findingIds.map(id => {
@@ -99,7 +101,7 @@ export function compilePageDecision(run: WorkflowRun, brief: DecisionBrief, path
     sourceTrace: brief.influences.flatMap(item => item.sourceIds).filter((id, i, sourceIds) => sourceIds.indexOf(id) === i)
       .map(id => {
         const source = observations.find(item => item.id === id)!;
-        return { id, observed: peerIds.has(id) ? text(source.content, 2_000, true) : null,
+        return { id, observed: peerIds.has(id) ? text(source.content, scope.discoveredPeers ? Infinity : 2_000, true) : null,
           use: "market-influence" as const, observedAt: source.date, digest: fingerprint(source) };
       }),
     ...(scope.change && { change: { ...scope.change, paths: [path] } }),

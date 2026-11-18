@@ -15,7 +15,7 @@ import { SiteReleaseService } from "../../lib/platform/content-editing/releases"
 import { siteReleaseFixture } from "../../scripts/site-releases/disposable";
 import { enableDisposableSuppliedMedia } from "../../scripts/acquisition/supplied-disposable";
 
-test("synthetic permissioned stock raster uses the existing acquisition and release path", async t => {
+for (const providerCase of ["synthetic", "pixabay"] as const) test(providerCase + " stock-shaped offline raster uses the existing acquisition and release path", async t => {
   const url = process.env.ASSET_TEST_DATABASE_URL;
   assert.ok(url);
   const db = new URL(url);
@@ -49,7 +49,12 @@ test("synthetic permissioned stock raster uses the existing acquisition and rele
     const receive = grants["receive-supplied-media"], review = grants["review-supplied-media"], revoke = grants["revoke-supplied-media"];
     // Project-created fixture output, independent of all real stock providers.
     const bytes = await sharp({ create: { width: 120, height: 90, channels: 3, background: "#264653" } }).withMetadata().png().toBuffer();
-    const selection: StockSelection = {
+    const selection: StockSelection = providerCase === "pixabay" ? {
+      provider: "pixabay", sourceId: "99999999", sourceUrl: "https://pixabay.com/photos/offline-fixture-99999999/",
+      creator: "Offline Pixabay-shaped fixture; not provider media", representation: { id: "webformat", sourceDigest: createHash("sha256").update(bytes).digest("hex") },
+      license: { reference: "https://pixabay.com/service/license-summary/", use: "isolated-private-site-evaluation", copy: "allowed", expiresAt: new Date(Date.now() + 600_000).toISOString() },
+      integration: { reference: "https://pixabay.com/api/docs/", delivery: "managed-copy", attribution: "optional" },
+    } : {
       provider: "synthetic-stock-library", sourceId: "project-raster-1", sourceUrl: "https://stock.fixture.invalid/photos/project-raster-1",
       creator: "MioPages synthetic fixture", representation: { id: "project-png-120x90", sourceDigest: createHash("sha256").update(bytes).digest("hex") },
       license: { reference: "synthetic-project-permission/1", use: "disposable-intro-image", copy: "allowed", expiresAt: new Date(Date.now() + 600_000).toISOString() },
@@ -124,8 +129,8 @@ test("synthetic permissioned stock raster uses the existing acquisition and rele
       assert.ok(revision?.candidate.media?.evidence.source === "permissioned-stock");
       assert.deepEqual(revision.candidate.media.evidence.stock, selection);
       const preview = await proposals.preview(fixture.operator, revision.binding, randomUUID());
-      assert.match(preview.html, /Synthetic stock evidence/);
-      assert.match(preview.html, /synthetic-stock-library/);
+      assert.match(preview.html, providerCase === "synthetic" ? /Synthetic stock evidence/ : /Reviewed Pixabay evidence/);
+      assert.ok(preview.html.includes(selection.provider));
       assert.match(preview.html, /provider-license/);
       assert.match(preview.html, /data:image\/png;base64,/);
       const consent = await proposals.approve(fixture.approver, { binding: revision.binding, previewDigest: preview.digest,

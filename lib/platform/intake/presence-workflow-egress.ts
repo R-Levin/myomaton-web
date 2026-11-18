@@ -17,11 +17,11 @@ export function publicResearchAddress(address: string) {
 
 // DNS is resolved once per request. The chosen global IPv4 is passed to the
 // actual TLS connection without a second lookup; TLS still verifies the host.
-export function pinnedResearchFetch(allowed: (url: URL) => boolean, byteLimit: number): typeof fetch {
+export function pinnedResearchFetch(allowed: (url: URL) => boolean, byteLimit: number, assets = false): typeof fetch {
   return async (input, init) => {
     const url = typeof input === "string" || input instanceof URL ? new URL(input) : null;
     if (!url || !allowed(url) || url.protocol !== "https:" || url.port || url.username || url.password ||
-        url.search || url.hash || init?.redirect !== "error") throw Error("Research egress refused");
+        (!assets && url.search) || url.hash || init?.redirect !== "error" || (init.method && init.method !== "GET")) throw Error("Research egress refused");
     const candidates = await lookup(url.hostname, { family: 4, all: true });
     if (!candidates.length || candidates.some(item => !publicResearchAddress(item.address))) throw Error("Research DNS refused");
     const signal = init.signal ?? AbortSignal.timeout(15_000);
@@ -29,14 +29,14 @@ export function pinnedResearchFetch(allowed: (url: URL) => boolean, byteLimit: n
     return new Promise<Response>((resolve, reject) => {
       const fail = () => reject(Error("Research HTTPS operation unverified"));
       const req = request({
-        protocol: "https:", hostname: url.hostname, servername: url.hostname, path: url.pathname, port: 443,
+        protocol: "https:", hostname: url.hostname, servername: url.hostname, path: url.pathname + url.search, port: 443,
         family: 4, lookup: (_host, _opts, done) => done(null, address, 4),
         rejectUnauthorized: true, agent: false, signal, method: "GET", headers: {
-          "Accept": "text/html", "Accept-Encoding": "identity", "User-Agent": "MioPages research reference fetch",
+          "Accept": assets ? "*/*" : "text/html", "Accept-Encoding": "identity", "User-Agent": "MioPages research reference fetch",
         },
       }, res => {
         const type = res.headers["content-type"];
-        if (res.statusCode !== 200 || !type?.startsWith("text/html") || (res.headers["content-encoding"] && res.headers["content-encoding"] !== "identity")) {
+        if (res.statusCode !== 200 || !(assets ? type && /^(?:text\/(?:css|javascript)|application\/(?:javascript|font-woff|vnd\.ms-fontobject)|image\/(?:png|jpeg|webp|gif|svg\+xml|avif)|font\/(?:woff2?|ttf|otf))(?:;|$)/iu.test(type) : type?.startsWith("text/html")) || (res.headers["content-encoding"] && res.headers["content-encoding"] !== "identity")) {
           res.destroy(); fail(); return;
         }
         const chunks: Buffer[] = [];
@@ -48,7 +48,7 @@ export function pinnedResearchFetch(allowed: (url: URL) => boolean, byteLimit: n
         res.on("error", fail);
         res.on("aborted", fail);
         res.on("end", () => {
-          const response = new Response(new Uint8Array(Buffer.concat(chunks)), { status: 200, headers: { "content-type": type } });
+          const response = new Response(new Uint8Array(Buffer.concat(chunks)), { status: 200, headers: { "content-type": type! } });
           Object.defineProperty(response, "url", { value: url.href });
           resolve(response);
         });

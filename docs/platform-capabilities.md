@@ -9,6 +9,42 @@ Commercial/payment terms require separate validation; Review auto-delivery and a
 operator network remain future hypotheses. See P11–P14 and P26 in the
 [architecture register](deferred-architecture.md).
 
+## Current functional map — November 18, 2026
+
+This reconciles the complete approved service with current development evidence.
+It refines dated statuses below without replacing the architecture register or
+declaring Commercial V1 complete. The November 13 local handoff assessment remains
+historical. C0 is development evidence, not a different product. There are no
+customers yet using the new service.
+
+| Service stage | Functioning evidence to preserve | Connection still needed for ordinary service |
+| --- | --- | --- |
+| Free Review / Direct Start | Shared versioned intake, progress/submissions and Review synthesis; distinct generated journey pages at [4473](http://127.0.0.1:4473/). | Public intake, reliable private Review delivery and commercial handoff. Current candidate links do not submit requests. |
+| Research / adaptive interview | Real API-generated C0, C2 and startup reasoning; answer-dependent assessment and isolated persistence. Complete original text and actual visual input now have an opt-in request path. | Integrate useful questioning and source reuse into ordinary onboarding. New-path research quality is unproven. |
+| Living business understanding | Retained answers/provenance, report review/corrections, canonical Knowledge/Offering writers and immutable revisions. | Seamless Customer/Operator My Business correction/confirmation and independent versioned proposal storage. Generated findings and the ten retained answers do not become confirmed facts automatically. |
+| Assessment / Presence Direction | Genuine hosted report/Direction and source-bound strategy plans. | Consistently useful intelligence, explained consequences and normal customer confirmation; generation success is not acceptance. |
+| Complete site creation | Five genuinely generated/revised C0 Pages, brand/illustration and actual native local WordPress. New nested blocks and private-stock compatibility pass offline tests. | Stronger external intelligence, visual variety, substantive writing, purposeful media and repeatable quality. Preserve v3 and both rejected candidates. No new commercial candidate is claimed from fixtures. |
+| Review / private delivery | Exact Page/site governance, signed HTTPS pull, scoped principals, stable WordPress IDs, application receipts, monotonic revisions and rollback; protected revision 6 retained. | Carry a good candidate through resumable Customer/Operator review. Local visual critique is not signed approval. New component version 2 remains local-only. |
+| Account / Launch / operations | Hosted protected owner login; customer binding, activation, roles/permissions and readiness foundations. Legacy HostShop remains separate. | Ordinary customer account/recovery, payment/commercial reconciliation, Launch readiness and delivery operations. No complete automated signup/billing or public launch is claimed. |
+| Contact / leads / outcomes | Canonical Contact acceptance; a restricted hosted synthetic inquiry with revision lineage and improvement recommendation. | Genuine submissions, abuse/privacy/retention, notification/delivery, customer-confirmed qualification and outcomes. Synthetic inquiries are not leads. |
+| First-party measurement / reporting | Durable local scoped page/Action events, deduplication, accepted-Contact reconciliation and Performance Snapshot/recommendation fixtures. | Installation-bound collection, coverage/consent/internal/bot treatment and useful real reports. No claimed traffic/conversion/revenue. Google integrations remain optional enrichment. |
+| Ongoing improvement / growth | Recommendation → Operator change → signed private revision/receipt/restore exercised with synthetic inputs; shared generation supports revisions. | Actual observation and confirmed outcomes driving prioritization, Articles, approval, delivery and remeasurement. Ongoing remains core scope, not maintenance-only or optional future work. |
+
+**Current coordinated increment.** Repair source intake, visual research, original
+composition and media in the existing Creation/Ongoing engine, then evaluate their
+effect in one genuine C0 cycle. Each Action retains its destination and operational
+readiness. Reuse the inquiry/measurement loop while showing missing notifications,
+collection and outcomes. After a useful site, connect real consented Action/Contact
+evidence to the same revision workflow.
+
+The [service model](web-presence-service-model.md), [progressive onboarding](progressive-onboarding-and-launch-readiness.md),
+[knowledge transfer](paid-onboarding-knowledge-transfer-contract.md), [measurement](measurement-and-analytics.md),
+[content growth](content-growth-loop.md), [operations](service-operations-model.md)
+and [active gates](deferred-architecture.md) retain the full requirements.
+Publication, consequential customer decisions, protected writes, spending and
+merges retain their existing authority. A fresh hosted-health audit was not
+performed in this local increment; cited hosted results are retained evidence.
+
 ## Purpose
 
 This document defines the intended capability envelope of the managed Web Presence

@@ -176,6 +176,47 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
   padding-block: .35rem;
 }
 .miopages-draft-creative .miopages-draft-related { border-block-start: 1px solid var(--miopages-border); }
+/* Versioned component trees keep their authored hierarchy and mobile order. */
+.miopages-native-component .miopages-node { min-width: 0; grid-column: span var(--mp-span, 1); }
+.miopages-native-component .miopages-node > :first-child { margin-block-start: 0; }
+.miopages-native-component .miopages-node > :last-child { margin-block-end: 0; }
+.miopages-native-component .miopages-node-flow { display: block; }
+.miopages-native-component .miopages-node-row { display: flex; flex-wrap: wrap; }
+.miopages-native-component .miopages-node-columns { display: grid; grid-template-columns: var(--mp-columns); }
+.miopages-native-component .miopages-node-gap-none { gap: 0; }
+.miopages-native-component .miopages-node-gap-small { gap: .65rem; }
+.miopages-native-component .miopages-node-gap-medium { gap: clamp(1rem, 2vw, 2rem); }
+.miopages-native-component .miopages-node-gap-large { gap: clamp(1.5rem, 4vw, 4rem); }
+.miopages-native-component .miopages-node-inset-none { padding: 0; }
+.miopages-native-component .miopages-node-inset-small { padding: .75rem; }
+.miopages-native-component .miopages-node-inset-medium { padding: clamp(1rem, 2.5vw, 2rem); }
+.miopages-native-component .miopages-node-inset-large { padding: clamp(1.5rem, 4vw, 4rem); }
+.miopages-native-component .miopages-node-surface-light { background: var(--wp--preset--color--surface); color: var(--wp--preset--color--ink); }
+.miopages-native-component .miopages-node-surface-brand { background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand); }
+.miopages-native-component .miopages-node-surface-tonal { background: var(--wp--preset--color--support); color: var(--miopages-tonal-ink); }
+.miopages-native-component .miopages-node-surface-strong { background: var(--miopages-accent-surface); color: var(--miopages-accent-ink); }
+.miopages-native-component .miopages-node-align-start { align-items: start; }
+.miopages-native-component .miopages-node-align-center { align-items: center; }
+.miopages-native-component .miopages-node-align-end { align-items: end; }
+.miopages-native-component .miopages-node-align-stretch { align-items: stretch; }
+.miopages-native-component .miopages-node-border { border: 1px solid var(--miopages-border); }
+.miopages-native-component .miopages-node-rounded { border-radius: .75rem; }
+.miopages-native-component :is(h2,h3,h4,h5,h6) { color: inherit; }
+.miopages-native-component details summary { cursor: pointer; font-weight: 650; padding-block: .65rem; }
+.miopages-native-component .miopages-node-measure-narrow { max-width: 28ch; }
+.miopages-native-component .miopages-node-measure-reading { max-width: 61ch; }
+.miopages-native-component .miopages-node-measure-wide { max-width: 82ch; }
+.miopages-native-component .miopages-node-type-small { font-size: .875rem; line-height: 1.5; }
+.miopages-native-component .miopages-node-type-body { font-size: 1rem; line-height: 1.55; }
+.miopages-native-component .miopages-node-type-lead { font-size: clamp(1.1rem, 2vw, 1.55rem); line-height: 1.4; }
+.miopages-native-component .miopages-node-type-display { font-size: clamp(2rem, 4.5vw, 4.8rem); line-height: 1.06; letter-spacing: -.035em; }
+.miopages-branded-draft .miopages-draft-creative .miopages-authored-section { padding: 0; background: transparent; border: 0; color: inherit; }
+.miopages-native-component figure { margin: 0; }
+.miopages-native-component img { display: block; max-width: 100%; height: auto; }
+@media (max-width: 680px) {
+  .miopages-native-component .miopages-node-columns { grid-template-columns: minmax(0, 1fr); }
+  .miopages-native-component .miopages-node { grid-column: auto; }
+}
 @media (min-width: 900px) {
   .miopages-draft-creative .miopages-draft-with-image { grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); }
 }

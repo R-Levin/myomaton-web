@@ -20,12 +20,16 @@ type SearchEntry = {
   results: Promise<readonly (StockSearchHit & { digest: string })[]>;
 };
 
+export interface StockSearchCache {
+  readOrCreate(query: string, acquire: () => Promise<readonly StockSearchHit[]>): Promise<{ expiresAt: number; results: readonly StockSearchHit[] }>;
+}
+
 // The private Operator action supplies one human-entered search. No scheduler,
 // automatic selection, media download or eligibility grant is attached here.
 export class StockDiscovery {
   private readonly cache = new Map<string, SearchEntry>();
 
-  constructor(private readonly provider: StockSearchProvider, private readonly authority: SuppliedMediaAuthority) {}
+  constructor(private readonly provider: StockSearchProvider, private readonly authority: SuppliedMediaAuthority, private readonly persistentCache?: StockSearchCache) {}
 
   private async authorize(context: unknown, target: SuppliedPlacement, phrase: string) {
     const placement = placementInput(target);
@@ -41,9 +45,14 @@ export class StockDiscovery {
     let entry = this.cache.get(query);
     if (!entry) {
       if (this.cache.size >= 64) throw Error("Stock search cache is at capacity");
-      const next: SearchEntry = { expiresAt: Infinity, placements: new Set(), results: this.provider.search(query).then(hits => {
+      const next: SearchEntry = { expiresAt: Infinity, placements: new Set(), results: Promise.resolve().then(async () => {
+        const saved = this.persistentCache
+          ? await this.persistentCache.readOrCreate(query, () => this.provider.search(query))
+          : { results: await this.provider.search(query), expiresAt: Date.now() + cacheDuration };
+        next.expiresAt = saved.expiresAt;
+        return saved.results;
+      }).then(hits => {
         const results = hits.map(hit => ({ ...hit, digest: fingerprint(hit) }));
-        next.expiresAt = Date.now() + cacheDuration;
         return results;
       }).catch(error => {
         this.cache.delete(query);

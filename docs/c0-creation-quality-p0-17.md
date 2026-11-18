@@ -204,3 +204,161 @@ Core generated a 12-finding report and Presence Direction. The Blueprint respons
 **Verification and connected cycle:** TypeScript, focused lint, 19 targeted provider/permission/measurement/Operator tests, native PHP content, signed brand/membership, stable revision restore and the consolidated PHP gate passed. The broader scoped PostgreSQL/PHP signed-cycle regression initially caught an existing shape mismatch: an unsigned optional brand digest was present as an undefined property in unbranded receipt decisions. Omitting that field when brand is absent restored the receipt path; rerun passed the restricted-role end-to-end cycle and both measurement tests. It preserves the labeled synthetic Contact/measurement and improvement fixture. The new C0 preview consumes genuine generated content; it does not produce real inquiry data, live measurement or verified outcome lift. Protected Core revision 41, WordPress revision 6 and the existing rollback were outside the write scope.
 
 **RECOVERY / RESUME HERE.** Continue from isolated evaluation `e3e29501-95b9-4df3-baaa-868bb1ee27a0`, durable version 52, candidate digest `2b5aaff89b7f9454e054a3306810537a07dac88bffb209a2a568fce1ef07298b`. Exact export SHA-256 `bc96552d6f6e394a8fd2066aae1accab1ab7609ff0a0d0f3a412ec6a8e86fbc4`; final Linux worker `970b59aff142f5d6d06ea1772630c747dde9e646e829c3e0ab61252b632e5561`. The private evaluation database was stopped cleanly with its data, outputs and ledger retained. Open the local preview above; if needed relaunch `runtime-content/p022-wp-validation/Start-C0-Preview.cmd` in the primary checkout. Review these actual drafts and carry a selected narrow improvement forward through the shared Creation/Ongoing contract when authorized. Preserve the current draft, original response receipts and prior failed candidates.
+
+## Original-evidence and service-scope correction — November 18, 2026
+
+**Owner direction.** Execute the reusable Core correction while keeping the
+complete managed growth-service scope visible. The owner did not authorize an
+additional live run merely by authorizing local engineering. Direct owner/Git
+coordination is sufficient; no separate chat reconstruction is required.
+[Whole-service status](platform-capabilities.md#current-functional-map--november-18-2026)
+now distinguishes current functionality, historical proof, fixtures, rejected
+acceptance and missing operational connections.
+
+**Verified root causes.** Page/revision requests still used a reduced
+marketing/decision projection, not the original report, Direction and underlying
+material. Real screenshot images had no request transport. Research normally
+stripped navigation/footer and truncated at 6,000 characters. Strategy-mode
+evaluation startup could mark research complete without performing new research.
+The local semantic component contract allowed grid/stack groups but not a complete
+original Section. Permissioned-stock intake admitted only synthetic providers.
+These findings explain constraints in the creation system; they do not prove
+that correcting interfaces will automatically produce excellent work.
+
+**Implemented local correction.** An explicit new source grant binds each full
+original by digest, bytes, author/reference/date, authority status and permitted
+operations. No summary is substituted for those originals. Protected request
+custody precedes provider dispatch, alongside the existing exact-response custody.
+Page and revision requests now carry the complete retained report, Direction,
+blueprint, observed research and revision concerns when that grant is present.
+Historical grants retain their old disclosure boundary. Claims still require the
+existing approved claim IDs; external observations and unconfirmed answers do not
+become customer facts.
+
+Core can perform its own bounded discovery and capture real desktop/mobile peer
+screenshots in a clean browser context with DNS-pinned public-only HTTPS resources.
+Full raw HTML is retained. Complete readable observed text and actual screenshot
+bytes reach synthesis/writing; repeating CSS/scripts in every text request is
+unnecessary. Derived screenshots bind to the retained HTML digest. Browser launch
+is checked before paid dispatch; Linux requires the Chromium sandbox. Original
+capture uses a single ordered index writer. Sources remain untrusted and
+auth/account/form/XHR navigation is refused. Exact input envelopes cause an
+explicit refusal, never silent truncation.
+
+The version-2 component tree supports unequal columns, nesting, heading hierarchy,
+paragraphs/lists, reviewed image/Action references, details, spacing, surface,
+text measure and typographic emphasis. It can replace a whole local Section or
+supplement an existing one. Gutenberg blocks preserve the tree and source reading
+order on mobile. No arbitrary script, selector, CSS, foreign URL or unbound image
+is accepted. The protected signed validator still rejects this evaluation-only
+contract; no Delivery/theme upgrade or protected application occurred.
+
+Pixabay now has a reusable protected HTTPS transport, durable 24-hour search cache,
+immutable dispatch attempts/no blind retry, exact selected download and safe
+JPEG/WebP → prepared PNG provenance. The existing candidate/rights/Asset/AssetUsage,
+preview/approval, release, rollback and revocation path accepts the explicitly
+private Pixabay policy. Rejected IDs 384740, 6389104 and 7642551 are refused.
+The legacy one-search launcher uses the same transport. No new image has been
+searched, downloaded, selected or approved in this increment.
+
+**Verification.** Complete-original and screenshot request tests, altered/missing/
+foreign-source refusal, old/new Page and revision disclosure regression,
+request/response recovery without a repeat call, actual clean-context pixel
+capture, exact native WordPress parse/serialize/render and desktop/mobile order,
+cached restart/no duplicate dispatch, private stock rights/conflict/stale-state/
+tamper/release/rollback/revocation all passed with offline provider fixtures.
+Disposable PostgreSQL 18 testing uses unchanged canonical migrations and the
+existing intake seed: 14 tests passed. The first attempts omitted that seed and
+failed before intake; correcting the runner restored both unchanged supplied
+media and the new stock path. The WordPress proof initially lacked the existing
+SQLite CLI extensions; using the established flags passed, with saved Posts
+unchanged. TypeScript/lint, consolidated PHP and the complete Node suite are
+recorded in the final Git handoff. Linux Node 22.23.2 accepted the streamed
+Node-22 worker syntax; that read-only check installed nothing.
+
+**Honest remaining work.** No new AI-derived commercial or visual result exists.
+The current local website stays at [4473](http://127.0.0.1:4473/). Windows Chrome
+verified the capture/component mechanisms with synthetic content. The evaluation
+Cloud account has no browser executable in PATH; a verified user-local browser,
+dependencies and actual sandbox/custody execution are activation prerequisites.
+This is included in the one proposed operation, not an additional hosting project.
+Runtime case/artifact/start/expiry bindings and the selected two real images
+remain to be established during authorized execution. The new components remain
+local-only. Generic public Contact, notifications, real first-party collection,
+confirmed lead outcomes and recurring content operations remain incomplete as
+shown in the functional map.
+
+**One consolidated decision.** Review [the exact run proposal](c0-original-evidence-run-proposal.json).
+It requests full transmission of the pinned business brief/product model/R3,
+wordmark and four accepted-v3 comparison images, plus **only** the existing
+ten-answer/provenance projection (8,307 bytes, all unconfirmed), complete permitted
+public observations and real screenshot pixels. Reuse the existing isolated
+Core worker/cluster, retain the current case and ledger prefix, and use the
+existing disposable local WordPress. It proposes GPT-5.4 for the complete
+intellectual/creative cycle, **$12 additional** maximum and **$14.811609**
+cumulative accounted ceiling including all old reservations, 72 hours, up to
+50 text generations/100 provider requests/10 search tool calls, no automatic
+retries, substantive revision/critique and two exact human-initiated Pixabay
+queries with up to two reviewed private image downloads. The ceiling is a
+development quality allowance, not a per-customer price or spending target.
+Rates and vision support were checked against official
+[GPT-5.4](https://developers.openai.com/api/docs/models/gpt-5.4),
+[mini](https://developers.openai.com/api/docs/models/gpt-5.4-mini),
+[vision](https://developers.openai.com/api/docs/guides/images-vision) and
+[tool pricing](https://developers.openai.com/api/docs/pricing).
+[Pixabay API](https://pixabay.com/api/docs/) requires human requests, 24-hour
+caching and local image copies for ongoing use. The current
+[license](https://pixabay.com/service/terms/) permits integrated commercial
+use without mandatory image-by-image website credits, subject to prohibited use
+and third-party rights. This proposal preserves source/creator/license custody
+and Operator-visible credits. No broad AI search automation or stock library is
+enabled.
+
+**Cost line.** This correction: 0 paid provider requests/generations, $0 new API
+spend. Prior P0-22 increment remains $0.359420 text usage estimate plus $0.500000
+image reservation. Its cumulative ledger debit remains $2.811609, including the
+original $0.45 uncertainty and historical image reservations; these are not
+new charges or an independently reconciled invoice. Other new cash cost $0;
+owner time UNKNOWN. No active authorization for expanded transmission/spend is
+inferred from unused historical headroom.
+
+**RECOVERY / RESUME HERE.** Start on the development branch at the commit linked
+from Issue #12. Preserve case e3e29501-95b9-4df3-baaa-868bb1ee27a0/version 52,
+the 54-entry ledger SHA
+bfae3dd16adcec2e5ea06f12b9ce4305b3e4ced5d4a62ab897633720406d426b,
+the five-page preview and both failed comparisons. The one next decision is the
+expanded-source/run proposal. After approval, bind and verify that exact proposal,
+originals, executable, isolated C0 identity, ledger prefix, browser and effective
+window, then let Core research, generate and substantively revise. Verify the
+actual WordPress desktop/mobile candidate and two purposeful reviewed images
+before requesting founder judgment. Do not reuse the historical source grant,
+rebuild the prior candidate, reset ledgers, write protected WordPress, or ask the
+owner to repeat retained business information. Capture intellectual gains and
+gaps, not just successful tests.
+
+**Final verification receipt.** Complete Node application suite: **468 passed,
+0 failed/skipped**, including the actual existing disposable WordPress rendering
+test. An additional focused whole-Section regression also verifies one exact H1,
+replacement of the fixed shell, and wrong-title refusal (the focused native suite
+has four passing tests). PostgreSQL: **14 passed**, including both historical
+synthetic and Pixabay-shaped offline rights/release/withdrawal paths. TypeScript,
+changed-file ESLint and the consolidated PHP gate passed. The final Node-22 bundle
+SHA-256 is **bf8018b6d22731a9ac1a75197feb8b1b5680b2c603ba06644197e813680f26b4**;
+Linux Node 22.23.2 read-only syntax verification passed. This is not Linux browser
+or end-to-end runtime acceptance. The preserved five-page export hash still
+matches, and all **10** desktop/mobile title, opening, heading and navigation
+observations match version 52 without overflow.
+
+The exact pending proposal SHA-256 is
+**db5eea3ef55b24a4f0c9229b14968f6be4bcc49e1cc902f186961ec985ae2a75**.
+There have been no new provider calls, protected writes, credential changes,
+publication or merge. All required real-output/commercial acceptance remains
+pending the one expanded-run decision.
+
+**Editor limitation.** Native core-block class names, parse/serialize and actual
+frontend rendering are verified. The separate Gutenberg JavaScript editor's
+validation and preservation of all custom presentation properties through manual
+editing have not been verified. Do not claim that editor round-trip is complete.
+Core's structured candidate remains the editing authority. Verify that remaining
+WordPress editor behavior before advertising manual Gutenberg customization or
+promoting component version 2 to protected delivery.

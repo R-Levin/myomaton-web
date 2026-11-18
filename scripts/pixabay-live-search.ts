@@ -1,4 +1,4 @@
-import { get, type RequestOptions } from "node:https";
+import { readPixabayResponse, sendPixabayHttps, type PixabaySend } from "../lib/platform/acquisition/pixabay-https";
 import { lstat, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fingerprint } from "../lib/platform/canonical/model";
@@ -6,7 +6,6 @@ import { pixabaySearch } from "../lib/platform/acquisition/pixabay";
 import { StockDiscovery } from "../lib/platform/acquisition/stock-discovery";
 import reviewed from "./customer-updates/miopages-focus-reviewed.json";
 
-const bodyLimit = 128 * 1024;
 const technicalTrial = {
   id: "first-search-574c573", query: "workshop workbench",
   target: { webPresenceId: "4bcd9832-8149-4a97-9552-553b8ad26e4a", managedSiteId: "4bcd9832-8149-4a97-9552-553b8ad26e4b",
@@ -17,48 +16,9 @@ export const c0Trial = {
   target: { webPresenceId: reviewed.target.webPresenceId, managedSiteId: reviewed.target.managedSiteId,
     pageId: "f4155bb3-e2a0-4db1-b88f-9ec55de5af0d", sectionId: "c18776da-f19a-481a-a239-6644eda51f94" },
 };
-type Reply = { status: number; contentType?: string; body: AsyncIterable<Uint8Array> };
-type Send = (options: RequestOptions) => Promise<Reply>;
-
-const isJson = (value?: string) => /^application\/json(?:\s*;|$)/i.test(value ?? "");
-
-function sendHttps(options: RequestOptions): Promise<Reply> {
-  return new Promise((resolve, reject) => {
-    const request = get(options, response => {
-      const status = response.statusCode ?? 0;
-      const contentType = response.headers["content-type"];
-      if (status !== 200 || !isJson(contentType)) response.destroy();
-      resolve({ status, contentType, body: response });
-    });
-    request.on("error", reject);
-  });
-}
-
-async function searchResponse(key: string, params: URLSearchParams, send: Send) {
-  const authenticated = new URLSearchParams(params);
-  authenticated.set("key", key);
-  // Pixabay requires a query parameter. The request path is transient and is
-  // never returned, logged or passed to a browser.
-  const reply = await send({ protocol: "https:", hostname: "pixabay.com", port: 443, method: "GET",
-    path: "/api/?" + authenticated.toString(), agent: false, rejectUnauthorized: true,
-    headers: { accept: "application/json", "accept-encoding": "identity", "user-agent": "MioPages/1 local operator trial" },
-    signal: AbortSignal.timeout(12_000) });
-  if (reply.status !== 200) return { status: reply.status, body: null };
-  if (!isJson(reply.contentType)) throw Error("unexpected_content_type");
-  const chunks: Buffer[] = [];
-  let size = 0;
-  for await (const chunk of reply.body) {
-    size += chunk.byteLength;
-    if (size > bodyLimit) throw Error("response_too_large");
-    chunks.push(Buffer.from(chunk));
-  }
-  const raw = Buffer.concat(chunks).toString("utf8");
-  if (raw.includes(key)) throw Error("credential_reflected");
-  let body: unknown;
-  try { body = JSON.parse(raw); } catch { throw Error("invalid_json"); }
-  if (JSON.stringify(body).includes(key)) throw Error("credential_reflected");
-  return { status: 200, body };
-}
+type Send = PixabaySend;
+const sendHttps = sendPixabayHttps;
+const searchResponse = readPixabayResponse;
 
 type Discovery = Awaited<ReturnType<StockDiscovery["search"]>>;
 const escaped = (value: string) => value.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);

@@ -14,7 +14,7 @@ import { appendEvent, candidateSubject, recordCandidateDecision, transaction, ty
 import { suppliedDecision, originalAsset, suppliedPolicy, suppliedSubjectMatches, type SuppliedDecision,
   type SuppliedLineage, type SuppliedPlacement, type SuppliedProvenance, type SuppliedReceipt, type SuppliedSource } from "./supplied-evidence";
 import { readUploadPng, requireCurrentUploadAgreement, uploadAgreement, uploadRequest, type CustomerUploadAuthority } from "./customer-upload";
-import { eligibleStock, stockPolicy, type StockSelection } from "./stock";
+import { eligibleStock, stockPolicyFor, type StockSelection } from "./stock";
 
 type Operation = "receive-supplied-media" | "review-supplied-media" | "revoke-supplied-media";
 export interface SuppliedMediaAuthority {
@@ -129,9 +129,9 @@ export class SuppliedMediaIntake {
       if (stock && stock.representation.sourceDigest !== sourceDigest) throw Error("Selected stock representation bytes changed");
       const sourceKind = stock ? "permissioned-stock" : "customer-supplied";
       const provider = stock?.provider ?? "operator-assisted";
-      const policy = stock ? stockPolicy : suppliedPolicy;
+      const policy = stock ? stockPolicyFor(stock) : suppliedPolicy;
       const provenance: SuppliedProvenance = { ...receipt, sourceDigest,
-        originalAssetDigest: original && fingerprint(original), transformation: original ? "reuse-prepared/1" : "managed-raster-prepare/1",
+        originalAssetDigest: original && fingerprint(original), transformation: original ? "reuse-prepared/1" : stock?.provider === "pixabay" ? "managed-raster-png/1" : "managed-raster-prepare/1",
         placement, role: "image" };
       const prior = (await db.query(`SELECT c.* FROM external_work w JOIN media_candidates c ON c.work_id=w.id AND c.web_presence_id=w.web_presence_id
         WHERE w.web_presence_id=$1 AND w.identity=$2 AND w.capability='supplied-raster'`, [owner, identity])).rows[0] as Candidate | undefined;
@@ -144,7 +144,7 @@ export class SuppliedMediaIntake {
         return prior;
       }
       const { digest: contextDigest } = await placementContext(db, placement);
-      const prepared = original ? { bytes, mimeType: "image/png", width: original.width, height: original.height } : await prepareRaster(bytes);
+      const prepared = original ? { bytes, mimeType: "image/png", width: original.width, height: original.height } : await prepareRaster(bytes, stock?.provider === "pixabay" ? "png" : undefined);
       if (prepared.mimeType !== "image/png" || prepared.bytes.length > 1024 * 1024) throw Error("Disposable intake requires a bounded PNG");
       await validateStoredMedia(prepared.bytes, prepared.mimeType, prepared);
       const key = managedKey(prepared.bytes);

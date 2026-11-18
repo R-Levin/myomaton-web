@@ -1,4 +1,4 @@
-import { lstat, readFile, realpath } from "node:fs/promises";
+import { access, lstat, open, readFile, realpath } from "node:fs/promises";
 import { basename, join } from "node:path";
 import type { Pool } from "pg";
 import { fingerprint } from "../canonical/model";
@@ -20,6 +20,10 @@ import { acquirePresenceVisual, presenceVisualRequest, readPresenceVisual, valid
   type PresenceVisualOperations, type PresenceVisualResult } from "./presence-workflow-visual";
 import { openAIImageProvider } from "../acquisition/openai";
 import type { ImageProvider } from "../acquisition/contracts";
+import type { OriginalMaterial } from "./presence-source-material";
+import { researchMaterialCustody } from "./presence-research-material";
+import { capturePublicPeer } from "./presence-peer-browser";
+import { chromium } from "playwright-core";
 
 export const protectedWorkflowRole = "miopages_core_development";
 type Workspace = { root: string; grantFile: string; ledgerDirectory: string; referenceDirectory?: string; visualDirectory?: string };
@@ -150,9 +154,69 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
       const fetchPage = mayFetch ? pinnedResearchFetch(url => researchUrlAllowed(url, grant.researchSources, grant.discovery), grant.researchResponseBytes)
         : capability.kind === "offline-test" ? capability.fetchPage : noOutbound;
       const reportHold = isolatedCommercialWorker ? capability.reportHold : undefined;
+      const originals = grant.originalMaterials;
+      const recheckResearch = async () => {
+        const [latestGrant, latestContext] = await Promise.all([readGrant(), context()]);
+        if (latestGrant.revoked || fingerprint(latestGrant) !== fingerprint(grant) || latestGrant.contextDigest !== fingerprint(latestContext) ||
+            Date.now() < (latestGrant.startsAt ?? 0) || Date.now() >= latestGrant.expiresAt) throw Error("Research material authority unavailable");
+      };
+      const renderPeer = originals?.publicResearch?.screenshots && (capability.kind === "worker" || capability.kind === "research-replay")
+        ? async (source: { id: string; url: string; label: string }, html: Buffer) => {
+          if (!process.env.MIOPAGES_RESEARCH_CHROMIUM) throw Error("Configured Core research browser is unavailable");
+          const browser = await chromium.launch({ executablePath: process.env.MIOPAGES_RESEARCH_CHROMIUM, headless: true,
+            chromiumSandbox: process.platform === "linux", args: ["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"] });
+          try {
+            const resources = pinnedResearchFetch(url => url.protocol === "https:" && !url.username && !url.password &&
+              !url.port && !url.hash && url.href.length <= 2000, grant.researchResponseBytes, true);
+            return await capturePublicPeer(browser, source, html, resources, recheckResearch, originals.publicResearch!.maximumBytes);
+          } finally { await browser.close(); }
+        } : undefined;
+      const researchOriginals = originals?.publicResearch && (capability.kind === "worker" || capability.kind === "research-replay")
+        ? researchMaterialCustody(join(workspace.root, "originals"), originals, recheckResearch, renderPeer) : undefined;
       const operations = createResponsesPresenceWorkflow({ grant, readGrant, readContext: context, ledgerDirectory: workspace.ledgerDirectory, rates, transport, fetchPage, reportHold,
         resumeMarketResearch: isolatedCommercialWorker || (boundary === "disposable" && capability.kind === "research-replay"),
         marketResearchReplayOnly: capability.kind === "research-replay",
+        researchOriginals,
+        async verifyResearchAccess() {
+          if (capability.kind !== "worker" || !process.env.MIOPAGES_RESEARCH_CHROMIUM) throw new WorkflowBlocked("Configured research browser required");
+          await access(process.env.MIOPAGES_RESEARCH_CHROMIUM);
+          const browser = await chromium.launch({ executablePath: process.env.MIOPAGES_RESEARCH_CHROMIUM, headless: true,
+            chromiumSandbox: process.platform === "linux", args: ["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"] });
+          await browser.close();
+        },
+        ...(grant.originalMaterials && {
+          async readOriginalMaterials() {
+            const root = join(workspace.root, "originals");
+            await verifyDirectory(root);
+            const manifest = await privateWorkflowFile<OriginalMaterial[]>(join(root, "index.json"), root);
+            if (!Array.isArray(manifest)) throw Error("Original source index refused");
+            return Promise.all(manifest.map(async source => {
+              if (!/^[a-f0-9]{64}$/u.test(source.sha256) || !Number.isSafeInteger(source.bytes) ||
+                  source.bytes < 1 || source.bytes > grant.originalMaterials!.requestBytes) throw Error("Original source envelope refused");
+              const path = join(root, source.sha256 + ".source");
+              const meta = await lstat(path);
+              if (!meta.isFile() || meta.uid !== process.getuid?.() || (meta.mode & 0o777) !== 0o600 ||
+                  meta.size !== source.bytes || await realpath(path) !== path) throw Error("Original source custody refused");
+              return { source, bytes: await readFile(path) };
+            }));
+          },
+          async retainRequest(run: WorkflowRun, bytes: Buffer) {
+            const root = join(workspace.root, "originals");
+            await verifyDirectory(root);
+            if (!/^[a-f0-9-]{36}$/u.test(run.work.attempt)) throw Error("Request custody identity refused");
+            const path = join(root, run.work.attempt + ".request.json");
+            let output;
+            try { output = await open(path, "wx", 0o600); }
+            catch (error) {
+              if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+              const meta = await lstat(path);
+              if (!meta.isFile() || meta.uid !== process.getuid?.() || (meta.mode & 0o777) !== 0o600 ||
+                  await realpath(path) !== path || !(await readFile(path)).equals(bytes)) throw Error("Retained request differs");
+              return;
+            }
+            try { await output.writeFile(bytes); await output.sync(); } finally { await output.close(); }
+          },
+        }),
         recoverBlueprint: boundary === "disposable" && capability.kind === "blueprint-recovery" ? capability.repair : undefined,
         fetchMarketPages: sources => mayFetch
           ? pinnedResearchFetch(url => researchUrlAllowed(url, sources), grant.researchResponseBytes) : fetchPage,

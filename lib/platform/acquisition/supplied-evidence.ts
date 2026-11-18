@@ -4,7 +4,7 @@ import { record } from "../presentation/content";
 import { candidateSubject, type Candidate } from "./service";
 import type { Scope } from "../content-editing/authority";
 import { requireCurrentUploadAgreement, type UploadAgreement, type VerifyUploadAgreement } from "./customer-upload";
-import { eligibleStock, stockPolicy, type StockSelection } from "./stock";
+import { eligibleStock, stockPolicyFor, type StockSelection } from "./stock";
 
 export const suppliedPolicy = "disposable-supplied-raster/1";
 
@@ -23,7 +23,7 @@ export type SuppliedReceipt = { source: SuppliedSource; receivedBy: { operatorId
 export type SuppliedProvenance = SuppliedReceipt & {
   sourceDigest: string;
   originalAssetDigest: string | null;
-  transformation: "managed-raster-prepare/1" | "reuse-prepared/1";
+  transformation: "managed-raster-prepare/1" | "managed-raster-png/1" | "reuse-prepared/1";
   placement: SuppliedPlacement;
   role: "image";
 };
@@ -47,9 +47,10 @@ export type SuppliedEvidence = {
 } & ({ source: "customer-supplied"; agreement?: UploadAgreement } | { source: "permissioned-stock"; stock: StockSelection });
 
 export function suppliedSubjectMatches(candidate: Candidate) {
-  const stock = record(record(candidate.provenance).source).kind === "permissioned-stock";
+  const source = record(record(candidate.provenance).source);
+  const stock = source.kind === "permissioned-stock";
   return candidate.source_kind === (stock ? "permissioned-stock" : "customer-supplied")
-    && candidate.policy_version === (stock ? stockPolicy : suppliedPolicy)
+    && candidate.policy_version === (stock ? stockPolicyFor({ provider: String(record(source.selection).provider) }) : suppliedPolicy)
     && candidate.quarantine_key === "objects/" + candidate.bytes_digest
     && candidate.subject_digest === candidateSubject(candidate)
     && candidate.provenance_digest === fingerprint(candidate.provenance)

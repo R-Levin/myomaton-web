@@ -29,16 +29,17 @@ export function rejectMultipageContainers(input: Buffer) {
   }
 }
 
-export async function prepareRaster(input: Buffer) {
+export async function prepareRaster(input: Buffer, outputFormat?: "png") {
   rejectMultipageContainers(input);
   const decoder = sharp(input, { limitInputPixels: MAX_IMAGE_PIXELS, failOn: "warning", animated: true });
   const metadata = await decoder.metadata();
   if (!metadata.format || !["jpeg", "png", "webp"].includes(metadata.format)) throw new Error("Unsupported raster format.");
   if ((metadata.pages ?? 1) !== 1) throw new Error("Animated/multipage images are unsupported.");
   const oriented = decoder.rotate(); // Sharp strips metadata unless explicitly retained.
-  const output = metadata.format === "jpeg" ? oriented.jpeg({ quality: 90 })
-    : metadata.format === "png" ? oriented.png() : oriented.webp({ quality: 90 });
+  const format = outputFormat ?? metadata.format;
+  const output = format === "jpeg" ? oriented.jpeg({ quality: 90 })
+    : format === "png" ? oriented.png() : oriented.webp({ quality: 90 });
   const { data, info } = await output.toBuffer({ resolveWithObject: true });
   if (!imageDimensions(info.width, info.height)) throw new Error("Invalid image dimensions.");
-  return { bytes: data, type: "image" as const, mimeType: `image/${metadata.format}`, width: info.width, height: info.height };
+  return { bytes: data, type: "image" as const, mimeType: `image/${format}`, width: info.width, height: info.height };
 }

@@ -4,7 +4,7 @@ import type { ResponsesTransport } from "./intelligent-responses";
 /** The same two HTTPS operations as the live onboarding proof. */
 export function responsesHttps(key: string, expiresAt: number, requestBytes = 18_000, timeoutMs = 45_000): ResponsesTransport {
   if (!/^sk-[a-zA-Z0-9_-]{20,512}$/.test(key) || !Number.isSafeInteger(expiresAt) ||
-      !Number.isSafeInteger(requestBytes) || requestBytes < 1 || requestBytes > 1_000_000 ||
+      !Number.isSafeInteger(requestBytes) || requestBytes < 1 || requestBytes > 48_000_000 ||
       !Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 150_000) throw Error("Responses credentials unavailable");
   return {
     async send(path, body) {
