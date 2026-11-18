@@ -7,6 +7,7 @@ import { marketSourceCandidates, marketSources, marketResearchInput, marketResea
 import { WorkflowBlocked, type PresenceWorkflowOperations, type WorkflowContext, type WorkflowRun } from "./presence-workflow";
 import { editorialPatchSchema } from "./presence-editorial-patch";
 
+import {confirmUndispatchedPlanningRequest} from "./intelligent-responses";
 import { exposesInternalCopy, marketingCitationIds, marketingProjection, repeatsPeerObservation, unsupportedCommercialCopy, validateMarketingAuthority, validateStrategyBlueprint, type MarketingAuthority } from "./presence-marketing-authority";
 import type { PresenceImageGrant } from "./presence-workflow-visual";
 import { originalMaterialInput, validateOriginalGrant, type OriginalMaterialGrant, type OriginalMaterialReader } from "./presence-source-material";
@@ -169,6 +170,7 @@ export function createResponsesPresenceWorkflow(config: {
   reportHold?: ReportReservation;
   recoverBlueprint?: (output: unknown, run: WorkflowRun, bytes: Buffer) => unknown;
   readOriginalMaterials?: OriginalMaterialReader;
+  readAvailableMedia?: (run:WorkflowRun)=>Promise<unknown>;
   researchOriginals?: ResearchOriginalCustody;
   verifyResearchAccess?: () => Promise<void>;
   retainRequest?: (run: WorkflowRun, bytes: Buffer) => Promise<void>;
@@ -204,7 +206,8 @@ export function createResponsesPresenceWorkflow(config: {
     const stage = grant.ledger.stages?.[name];
     return { stage: stage && { name, rates: stage.rates }, model: stage?.rates.model ?? rates.model,
       budget: legacyBudget ?? meteredPresenceWorkflow(ledgerDirectory, rates, transport, grant.ledger, grant.maxOutputTokens,
-        grant.retainedReservation, name === "research" ? grant.marketSearch?.maxToolCalls : undefined, name, undefined, reportHold) };
+        grant.retainedReservation, name === "research" ? grant.marketSearch?.maxToolCalls : undefined, name, undefined, reportHold,
+          grant.originalMaterials && name==="editorial" ? Math.min(12_000,stage?.requestOutputTokens??grant.maxOutputTokens) : undefined) };
   };
 
   async function collectMarketEvidence(response: unknown, run: WorkflowRun) {
@@ -366,9 +369,14 @@ export function createResponsesPresenceWorkflow(config: {
       let input: unknown = await authorize(run);
       const operation = run.work.operation;
       if (grant.originalMaterials) {
-        input = { task: input, report: run.input.report, direction: run.input.direction,
+        const authority=grant.marketingAuthority;
+        const evidence=run.input.evidence.filter(source=>!authority||authority.sources.some(row=>row.digest===fingerprint(source)&&row.use!=="excluded"))
+          .map(source=>{const {id,kind,label,date,content}=source;return {id,kind,label,date,content,use:authority?.sources.find(row=>row.digest===fingerprint(source))?.use??"case-evidence"}});
+        input = { task: input, evidence, ...(config.readAvailableMedia&&{availableMedia:await config.readAvailableMedia(run)}),report: run.input.report, direction: run.input.direction,
           research: run.input.research, blueprint: run.input.blueprint,
-          revisions: run.input.revisionRequest ?? null,
+          revisions: run.input.revisionRequest ? operation==="editorial"
+            ? { ...run.input.revisionRequest, priorPages: undefined, priorDraftReferences:run.input.revisionRequest.priorPages.map(page=>({path:page.path,digest:fingerprint(page),retainedInWorkflowHistory:true})) }
+            : run.input.revisionRequest : null,
           sourceUse: "Full originals are attached with their authority. Reconcile historical and current evidence explicitly. Use unconfirmed statements for questions and uncertainty, not factual promises. Derive the creative approach yourself. A prior brief is a proposal to reconsider." };
       }
       const { model, budget } = meter(run);
@@ -427,7 +435,7 @@ export function createResponsesPresenceWorkflow(config: {
         ? await originalMaterialInput(run, grant.originalMaterials, input, config.readOriginalMaterials!)
         : JSON.stringify(input);
       const creative = grant.nativeComponents === 2
-        ? " Conceive the site as a coherent original design. Describe the intended typography, hierarchy, image relationships, responsive behavior and visitor decisions in Direction. Compose new native components when useful using version 2 recursive nodes, asymmetric columns, grouped surfaces, typographic hierarchy, comparisons, sequences and accessible details. Use mode section to author the entire Section composition, or supplement to add a supporting component. A section-mode Hero must contain exactly one level-1 heading matching its Section heading; supporting sections must contain a matching level-2 heading and no level-1 heading. Section-mode replaces the usual heading/body/image layout, so put all intended visitor content and image/Action references into the tree. This allows genuinely different Hero and supporting compositions rather than variations on an automatic text-plus-image shell. Native image and Action references bind only to section-N (zero-based Section index within this Page) and action-N (zero-based active internal Page Actions for this Page in original order; exclude null destinations). Put explicit image nodes in an authored section that needs a placed image and explicit action nodes for its intended choices. An image reference is a placement request, not evidence that media has already been acquired. Keep mobile visual and DOM reading order identical (mobileOrder 0). Create an arrangement that fits the actual information and visitor need. Existing section roles describe semantic jobs, not a fixed layout. If a necessary idea cannot be expressed, state the specific limitation in the visual brief for Operator engineering rather than disguising a generic fallback. Preserve established brand identity; use source visuals to reason, never to reproduce distinctive designs. Treat self-contained reader answers as useful content when no article inventory exists. Critique the complete strategy and rendered design and make substantive changes where evidence warrants them."
+        ? " Conceive the site as a coherent original design. Describe the intended typography, hierarchy, image relationships, responsive behavior and visitor decisions in Direction. Compose new native components when useful using version 2 recursive nodes, asymmetric columns, grouped surfaces, typographic hierarchy, comparisons, sequences and accessible details. Use mode section to author the entire Section composition, or supplement to add a supporting component. A section-mode Hero must contain exactly one level-1 heading matching its Section heading; supporting sections must contain a matching level-2 heading and no level-1 heading. Section-mode replaces the usual heading/body/image layout, so put all intended visitor content and image/Action references into the tree. This allows genuinely different Hero and supporting compositions rather than variations on an automatic text-plus-image shell. Native image and Action references bind only to section-N (zero-based Section index within this Page) and action-N (zero-based index in this Page\'s complete Action list, including null destinations; a null destination stays disabled and never shifts another Action into its slot). Put explicit image nodes in an authored section that needs a placed image and explicit action nodes for its intended choices. An image reference is a placement request, not evidence that media has already been acquired. When availableMedia is supplied, this private cycle requires both selected photographs to become purposeful supporting Intro placements in the real website. On a Home revision, compose suitable distinct supporting contexts for the two images; if a different page is materially better, state that exact placement need in the brief instead of treating acquisition as completed. Use the actual selected source IDs in the visual brief, propose useful supporting Intro placements and contextual altIntent, and treat contextual permission review as pending. Stock illustrates a business situation, never a customer, testimonial or endorsement. Keep the conceptual service-led Hero; use original native blocks for abstract relationships instead of requesting additional unavailable illustrations. Never invent acquired assets or fill the site with placeholder images. Keep mobile visual and DOM reading order identical (mobileOrder 0). Create an arrangement that fits the actual information and visitor need. Existing section roles describe semantic jobs, not a fixed layout. If a necessary idea cannot be expressed, state the specific limitation in the visual brief for Operator engineering rather than disguising a generic fallback. Preserve established brand identity; use source visuals to reason, never to reproduce distinctive designs. Treat self-contained reader answers as useful content when no article inventory exists. Critique the complete strategy and rendered design and make substantive changes where evidence warrants them."
         : "";
       const request = {
         model, input: providerInput,
@@ -445,6 +453,12 @@ export function createResponsesPresenceWorkflow(config: {
       if (grant.originalMaterials) await config.retainRequest!(run, Buffer.from(JSON.stringify(request)));
       const output = await budget(workScope(run, grant), request, () => authorize(run), retain);
       return verifyCitations(output, run);
+    },
+    async verifyUndispatchedRequest(run:WorkflowRun) {
+      if(!grant.originalMaterials||!run.context.evaluation)throw Error("Isolated original-evidence scope required");
+      await authorize(run);
+      const {ownerDigest,workDigest}=workScope(run,grant);
+      await confirmUndispatchedPlanningRequest(ledgerDirectory,grant.ledger,ownerDigest,workDigest);
     },
     async recover(run, bytes) {
       await authorize(run, false);

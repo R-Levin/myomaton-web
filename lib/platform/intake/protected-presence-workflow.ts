@@ -26,6 +26,8 @@ import { capturePublicPeer } from "./presence-peer-browser";
 import { chromium } from "playwright-core";
 import type {PublicPeerCapture} from "./presence-public-capture-bridge";
 import {retainedResearchFetch} from "./presence-research-cache";
+import {eligibleStock} from "../acquisition/stock";
+import {createHash} from "node:crypto";
 
 export const protectedWorkflowRole = "miopages_core_development";
 type Workspace = { root: string; grantFile: string; ledgerDirectory: string; referenceDirectory?: string; visualDirectory?: string };
@@ -190,6 +192,21 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
           await browser.close();
         },
         ...(grant.originalMaterials && {
+          ...(boundary==="disposable"&&current.evaluation&&{async readAvailableMedia(run:WorkflowRun){
+            const file=join(workspace.root,"media/stock-selection.json");
+            let supplied:{contextDigest:string;entries:{hit:{sourceId:string;sourceUrl:string;creator:string|null;representation:{url:string}};selection:unknown;sourceSha256:string;preparedSha256:string}[]};
+            try{supplied=await privateWorkflowFile(file,workspace.root)}catch(error){if((error as NodeJS.ErrnoException).code==="ENOENT")return [];throw error}
+            if(supplied.contextDigest!==fingerprint(run.context)||supplied.entries.length!==2||new Set(supplied.entries.map(item=>item.hit.sourceId)).size!==2)throw Error("Selected stock scope differs");
+            const stock=run.context.evidence.find(source=>source.id==="stock-discovery");
+            if(!stock||stock.kind!=="public-research")throw Error("Approved stock evidence missing");
+            for(const item of supplied.entries){
+              const selected=eligibleStock(item.selection);
+              if(selected.sourceId!==item.hit.sourceId||selected.sourceUrl!==item.hit.sourceUrl||selected.representation.sourceDigest!==item.sourceSha256||!stock.content.includes(JSON.stringify(item.hit.sourceId))||!stock.content.includes(item.hit.representation.url))throw Error("Selected stock evidence differs");
+              const bytes=await privateWorkflowBytes(join(workspace.root,"media",item.sourceSha256+".original"),workspace.root);
+              if(createHash("sha256").update(bytes).digest("hex")!==item.sourceSha256)throw Error("Selected stock custody differs");
+            }
+            return {state:"downloaded-awaiting-contextual-permission-review",entries:supplied.entries};
+          }}),
           async readOriginalMaterials() {
             const root = join(workspace.root, "originals");
             await verifyDirectory(root);

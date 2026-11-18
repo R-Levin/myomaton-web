@@ -185,7 +185,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const [operation, scenario, approval, value, ...extra] = args;
   const localCommercial = approval === commercialApproval || approval === p022RunProposalSha256 || approval === originalEvidenceApproval;
   const readOnly = ["inspect", "home", "site"].includes(operation) || (["local-site", "local-home"].includes(operation) && localCommercial);
-  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "recover", "queue-image", "decide-image", "review-quality"].includes(operation) ||
+  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "resume-undispatched", "recover", "queue-image", "decide-image", "review-quality"].includes(operation) ||
     (["continue-local-home", "revise-local-page"].includes(operation) && localCommercial);
   const replaceReport = operation === "replace-report" && approval === commercialApproval;
   const researchReplay = operation === "replay-research";
@@ -270,6 +270,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
         }] : [])).map(prepare => prepare()));
         if (pendingHome) images.push(...await pendingImage(pages.find(page => page.path === "/")!.sections[0].id));
         const candidate = { pages, navigation: input.navigation, actions: input.actions };
+        const unresolvedActions=operation==="local-site"&&"unresolvedActions" in input?input.unresolvedActions:undefined;
         const decisionTrace = localDraft && prior.blueprint?.strategyBasis ? {
           basis: prior.blueprint.strategyBasis,
           pages: prior.blueprint.pages.map(page => ({ path: page.path, findingIds: page.decisionBrief?.findingIds,
@@ -279,7 +280,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
               sourceIds: section.sourceIds, ...(section.block && { semanticBlock: section.block.name }),
             })) })),
         } : undefined;
-        packet = { candidate, images, ...(localDraft && { localDraftOnly: true }), ...(decisionTrace && { decisionTrace }),
+        packet = { candidate, images, ...(unresolvedActions&&{unresolvedActions}), ...(localDraft && { localDraftOnly: true }), ...(decisionTrace && { decisionTrace }),
           digest: fingerprint({ candidate, images, review: input.candidateDigest, ...(decisionTrace && { decisionTrace }) }) };
       }
       const path = join(root, `${packetType}-${prior.version}.json`);
@@ -311,6 +312,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
         await workflow.requestEditorialRevision(context, prior.version, actor, operation === "revise-local-page" ? input.path ?? "" : undefined)
       : operation === "decide-editorial" ? await workflow.decideEditorialFinding(context, prior.version, actor, input.decision)
       : operation === "recover" ? await workflow.recover(context, prior.version)
+      : operation === "resume-undispatched" ? await workflow.resumeUndispatchedRequest(context,prior.version,actor)
       : operation === "retry" ? await workflow.retryRejectedOutput(context, prior.version, actor)
       : operation === "queue-image" ? await workflow.queueVisual(context, prior.version, actor, input.path ?? "", input.index ?? -1, input.brief)
       : await workflow.decideVisual(context, prior.version, actor, input.decision);

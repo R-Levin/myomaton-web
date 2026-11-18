@@ -42,3 +42,13 @@ add_filter('render_block_core/site-title', static function (string $html): strin
         '" alt="' . esc_attr($brand['alt']) . '" width="' . (int)$brand['size'][0] .
         '" height="' . (int)$brand['size'][1] . '"></span>';
 });
+
+/* A composed native Page supplies its own reviewed H1. Do not leave a second,
+   CSS-hidden title in the accessibility tree. Ordinary theme Pages retain theirs. */
+add_filter('render_block_core/post-title', static function (string $html): string {
+    $post = get_post();
+    if ($post && $post->post_type === 'page'
+        && str_contains($post->post_content, 'class="wp-block-group miopages-composed ')
+        && str_contains($post->post_content, 'miopages-native-component')) return '';
+    return $html;
+});

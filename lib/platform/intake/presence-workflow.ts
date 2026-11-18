@@ -86,6 +86,7 @@ export interface PresenceWorkflowOperations {
   run(run: WorkflowRun, retain: (bytes: Buffer) => Promise<void>): Promise<unknown>;
   recover(run: WorkflowRun, bytes: Buffer): Promise<unknown>;
   verifyReportReplacement?(run: WorkflowRun): Promise<void>;
+  verifyUndispatchedRequest?(run:WorkflowRun):Promise<void>;
   completeMarketResearch?(run: WorkflowRun, original: Buffer, custody: {
     read(attempt: string): Promise<Buffer | null>;
     retain(attempt: string, bytes: Buffer): Promise<void>;
@@ -431,6 +432,18 @@ export class PresenceWorkflow {
       ...(state.evaluation && { homeReview: null }),
       ...(state.retry && { retry: { ...state.retry, previous: "" } }),
     }));
+  }
+
+  async resumeUndispatchedRequest(context:WorkflowContext,version:number,actor:Actor) {
+    const state=await this.current(context,version),work=state.work;
+    if(this.boundary!=="disposable"||!context.evaluation||state.mode!=="provider"||!state.failure||!work||
+      actor.role!=="operator"||actor.simulated||!actor.authority||!this.operations.verifyUndispatchedRequest||
+      await this.store.output(context,work))throw new IntakeError("workflow_not_ready",409);
+    const input=runInput(context,state);
+    if(fingerprint(input)!==work.inputDigest)throw new IntakeError("draft_changed",409);
+    await this.operations.verifyUndispatchedRequest({context,input,work});
+    return this.view(context,await this.store.append(context,version,{...state,work:null,failure:null,
+      retry:{previous:work.attempt,count:state.retry?.count??0}}));
   }
 
   async retryRejectedOutput(context: WorkflowContext, version: number, actor: Actor) {

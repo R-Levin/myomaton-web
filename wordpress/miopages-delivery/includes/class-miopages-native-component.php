@@ -146,7 +146,7 @@ final class MioPages_Native_Component
         }
         $action = $actions[$reference] ?? null;
         if ($localPending && PHP_SAPI === 'cli' && ($action['pendingLocal'] ?? false) === true) {
-            return '<!-- wp:paragraph --><p class="miopages-pending-action"><span aria-disabled="true">' . $copy . ' — destination not yet drafted</span></p><!-- /wp:paragraph -->';
+            return '<!-- wp:paragraph --><p class="miopages-pending-action"><span aria-disabled="true">' . $copy . ' — preview only; submissions disabled</span></p><!-- /wp:paragraph -->';
         }
         if (!$action || !isset($postIds[$action['destination']])) throw new InvalidArgumentException('Native component Action is unbound.');
         return '<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button ' . $block . ' --><div' . $attrs

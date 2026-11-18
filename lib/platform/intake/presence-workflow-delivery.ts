@@ -39,11 +39,11 @@ export function workflowLocalDraftInput(context: WorkflowContext, view: Presence
     throw Error("Complete isolated editorial draft required");
   }
   const target = fingerprint({ draft: view.pages, outline: blueprint, editorial: view.editorial, scope: context.scope });
-  return projectWorkflowPreview(context, { ...view, blueprint }, target, null, [], "Unapproved isolated draft " + target);
+  return projectWorkflowPreview(context, { ...view, blueprint }, target, null, [], "Unapproved isolated draft " + target, true);
 }
 
 function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflowView & { blueprint: NonNullable<PresenceWorkflowView["blueprint"]> }, target: string,
-  prior: unknown, canonical: readonly { id: string; slug: string }[], rationale = "Protected evidence-linked website review " + target) {
+  prior: unknown, canonical: readonly { id: string; slug: string }[], rationale = "Protected evidence-linked website review " + target, authoredActions = false) {
   const baseline = prior === null ? [] : nativeDraftBaseline(prior);
   const editorial = (copy: string) => ({ kind: "editorial" as const, text: copy,
     rationale });
@@ -68,6 +68,15 @@ function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflow
   if (!view.blueprint.navigation.includes("/")) throw Error("Private navigation requires Home");
   const actions = view.pages.flatMap(page => {
     const nativePage = pages.find(item => item.slug === page.path)!;
+    if(authoredActions){
+      const original=page.actions.map((action,index)=>({...action,sourceIndex:index})).filter(action=>action.destination&&action.destination!==page.path&&view.blueprint!.pages.some(target=>target.path===action.destination)&&(action.kind==="navigate"||page.composition&&action.kind!=="existing-account"));
+      const chosen=original.map(action=>({id:logicalId({site:context.scope.managedSiteId,from:page.path,index:action.sourceIndex}),type:"page" as const,from:page.path,destination:action.destination!,label:action.label,componentReference:"action-"+action.sourceIndex,...(action.sectionIndex!==undefined&&{sectionId:nativePage.sections[action.sectionIndex].id})}));
+      for(const destination of page.internalLinks){
+        const target=view.blueprint!.pages.find(entry=>entry.path===destination);
+        if(target&&!chosen.some(action=>action.destination===destination))chosen.push({id:logicalId({site:context.scope.managedSiteId,from:page.path,related:destination}),type:"page",from:page.path,destination,label:target.label,componentReference:"related-"+logicalId({site:context.scope.managedSiteId,from:page.path,destination})});
+      }
+      return chosen;
+    }
     const navigation = new Map<string, { label: string; sectionId?: string }>();
     for (const action of page.actions) if (action.destination && action.destination !== page.path &&
       view.blueprint!.pages.some(target => target.path === action.destination) &&
@@ -83,5 +92,5 @@ function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflow
       type: "page" as const, from: page.path, destination, ...location }));
   });
   return { scope: context.scope, candidateDigest: target, pages, navigation: view.blueprint.navigation,
-    actions, ...(view.brandDigest && { brandDigest: view.brandDigest }), ...(baseline.length && { baselinePages: baseline }) };
+    actions, ...(authoredActions&&{unresolvedActions:view.pages.flatMap(page=>page.actions.flatMap((action,index)=>!action.destination?[{from:page.path,reference:"action-"+index,label:action.label}]:[]))}), ...(view.brandDigest && { brandDigest: view.brandDigest }), ...(baseline.length && { baselinePages: baseline }) };
 }

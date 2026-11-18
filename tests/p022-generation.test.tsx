@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import {resolveSourceReferences} from "../lib/platform/intake/presence-source-material";
 import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -137,7 +138,7 @@ for (const originals of [false, true]) test(originals
         if (originals) {
           const content = (actualInput as { content: { type: string; text?: string }[] }[])[0].content;
           assert.ok(content.some(row => row.type === "input_text" && row.text === originalBytes.toString()));
-          const packet = JSON.parse(content[0].text!).task;
+          const packet = resolveSourceReferences(JSON.parse(content[0].text!).task,new Map([[original.id,originalBytes.toString()]])) as {report:{summary:string};direction:{positioning:string};revisions?:{audit:{concerns:{concern:string}[]}};task:ReturnType<typeof JSON.parse>};
           assert.equal(packet.report.summary, priorReport);
           assert.equal(packet.direction.positioning, "Private strategy narrative");
           assert.ok(Object.hasOwn(packet, "revisions"));

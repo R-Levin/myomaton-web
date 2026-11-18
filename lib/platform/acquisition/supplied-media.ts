@@ -63,7 +63,21 @@ const overlaps = (a: string, b: string) => {
 // Trusted composition root. The upload request adapter has no installed route.
 // Customer and Operator grants come from separate authority adapters.
 export class SuppliedMediaIntake {
-  constructor(private pool: Pool, private authority: SuppliedMediaAuthority, private quarantine: string, private managed: string, private customerUpload?: CustomerUploadAuthority) {}
+  constructor(private pool: Pool, private authority: SuppliedMediaAuthority, private quarantine: string, private managed: string, private customerUpload?: CustomerUploadAuthority,
+    private privatePlacement?: (db: PoolClient, placement: SuppliedPlacement) => Promise<Awaited<ReturnType<typeof placementContext>>>) {}
+
+  // Only a trusted disposable composition root can supply a draft context.
+  // The same boundary, authority and stale-subject checks still run on every operation.
+  private async placement(db: PoolClient, target: SuppliedPlacement) {
+    const current = await (this.privatePlacement ? this.privatePlacement(db, target) : placementContext(db, target));
+    hash(current.digest);
+    if (current.page.id !== target.pageId || current.page.managed_site_id !== target.managedSiteId
+      || current.section.id !== target.sectionId || current.section.page_id !== target.pageId
+      || current.section.type !== "intro" || current.page.status !== "active" || current.section.status !== "active") {
+      throw Error("Owned current private Intro placement required");
+    }
+    return current;
+  }
 
   private get agreementVerifier() {
     return this.customerUpload?.verifyCurrent.bind(this.customerUpload);
@@ -143,7 +157,7 @@ export class SuppliedMediaIntake {
         }
         return prior;
       }
-      const { digest: contextDigest } = await placementContext(db, placement);
+      const { digest: contextDigest } = await this.placement(db, placement);
       const prepared = original ? { bytes, mimeType: "image/png", width: original.width, height: original.height } : await prepareRaster(bytes, stock?.provider === "pixabay" ? "png" : undefined);
       if (prepared.mimeType !== "image/png" || prepared.bytes.length > 1024 * 1024) throw Error("Disposable intake requires a bounded PNG");
       await validateStoredMedia(prepared.bytes, prepared.mimeType, prepared);
@@ -174,7 +188,7 @@ export class SuppliedMediaIntake {
       await this.boundary(db);
       const { candidate } = await ownedCandidate(db, placement, candidateId, false);
       if (!suppliedSubjectMatches(candidate) || candidate.state !== "proposed") throw Error("Supplied-media candidate is not reviewable");
-      const { digest, page, section } = await placementContext(db, placement);
+      const { digest, page, section } = await this.placement(db, placement);
       if (digest !== candidate.context_digest) throw Error("Stale supplied-media placement");
       return { candidate, page, section, bytes: await readManagedObject(this.quarantine, placement.webPresenceId, candidate.quarantine_key) };
     });
@@ -222,7 +236,7 @@ export class SuppliedMediaIntake {
         if (!["proposed", "ingested"].includes(candidate.state)) throw Error("Candidate is not revocable");
       } else {
         if (candidate.work_status !== "awaiting-review" || candidate.state !== "proposed") throw Error("Candidate is not reviewable");
-        if ((await placementContext(db, placement)).digest !== candidate.context_digest) throw Error("Stale supplied-media placement");
+        if ((await this.placement(db, placement)).digest !== candidate.context_digest) throw Error("Stale supplied-media placement");
         if (provenance.source.existingAssetId &&
           fingerprint(await originalAsset(db, placement.webPresenceId, provenance.source.existingAssetId)) !== provenance.originalAssetDigest) {
           throw Error("Supplied-media source Asset changed");

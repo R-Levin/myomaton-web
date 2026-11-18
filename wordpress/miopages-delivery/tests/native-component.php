@@ -10,7 +10,7 @@ try {
     $value = json_decode(stream_get_contents(STDIN), true, 512, JSON_THROW_ON_ERROR);
     if (isset($value['candidate'])) {
         require dirname(__DIR__) . '/includes/class-miopages-native-draft-content.php';
-        echo MioPages_Native_Draft_Content::posts($value['candidate'], $value['postIds'], [], true)['/']['post_content'];
+        echo MioPages_Native_Draft_Content::posts($value['candidate'], $value['postIds'], [], $value['localSemanticBlocks'] ?? true, $value['pendingActions'] ?? [])['/']['post_content'];
     } else echo MioPages_Native_Component::render($value, [], [], []);
 } catch (Throwable $error) {
     fwrite(STDERR, "Native component refused.\n");

@@ -470,3 +470,23 @@ zero retries. Dispatch validates the recorded authority; provenance binds the
 escalation event digest. Rejection or provider failure retains reservations and
 requires another human escalation. No automatic fourth iteration is available.
 The version-3 brief supports Hero copy through restrained clarity and continuity.
+
+### Isolated pre-approval workflow placement — November 18, 2026
+
+The original-evidence C0 evaluation uses the same permissioned-stock intake,
+rights decision, canonical Asset/AssetUsage and prepared immutable bytes.
+It cannot truthfully satisfy the older media fixture's commercial activation
+binding, because the site is an unapproved development candidate. Do not create
+customer consent or activate an account to work around that mismatch.
+
+The trusted composition root may supply a current private placement reader only
+inside the existing disposable/loopback boundary. It must verify owned exact
+Page/Intro, database/schema, source workflow version and content, and re-read
+them for receipt, inspection and decision. The default inactive/activation-backed
+reader and all authority, rights, stale-state and byte safeguards remain.
+No request field or environment flag selects this adapter. Its usages remain
+private and acquired media is still excluded from the legacy public query.
+The actual two-photo result is recorded in
+[c0 creation continuity](c0-creation-quality-p0-17.md#original-evidence-eight-page-wordpress-and-stock-checkpoint--november-18-2026).
+Production customer authority, master storage and WordPress synchronization policy
+are not settled by this evaluation bridge.

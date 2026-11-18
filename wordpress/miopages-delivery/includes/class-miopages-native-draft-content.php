@@ -35,6 +35,7 @@ final class MioPages_Native_Draft_Content
             }
         }
         foreach ($actions as $action) {
+            if (!$localSemanticBlocks && isset($action['componentReference'])) throw new InvalidArgumentException('Local component Action reference refused.');
             if ($action['type'] !== 'page'
                 || !isset($postIds[$action['from']], $postIds[$action['destination']])) {
                 throw new InvalidArgumentException('Native draft Action is unsupported.');
@@ -160,7 +161,15 @@ final class MioPages_Native_Draft_Content
             }
         }
         foreach (array_values(array_filter($actions, static fn($action) => $action['from'] === $path)) as $index => $action) {
-            $componentActions['action-' . $index] = $action;
+            $reference = $localComposition && isset($action['componentReference']) ? $action['componentReference'] : 'action-' . $index;
+            if (!is_string($reference) || !preg_match('/^(action-[0-9]+|related-[a-f0-9-]+)$/D',$reference)) throw new InvalidArgumentException('Local Action reference refused.');
+            $componentActions[$reference] = $action;
+        }
+        if ($localComposition && PHP_SAPI === 'cli') foreach($pendingActions as $pending) {
+            if (is_array($pending) && ($pending['from']??null)===$path && preg_match('/^action-[0-9]+$/D',$pending['reference']??'')) {
+                if(isset($componentActions[$pending['reference']])) throw new InvalidArgumentException('Local pending Action conflicts with active binding.');
+                $componentActions[$pending['reference']]=['pendingLocal'=>true];
+            }
         }
         foreach ($page['sections'] as $index => $section) {
             $type = $section['type'];

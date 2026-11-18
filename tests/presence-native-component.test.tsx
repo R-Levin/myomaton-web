@@ -124,3 +124,46 @@ test("a whole authored Section replaces the fixed shell while preserving the exa
   assert.ok(!php.stdout.includes("Fixed shell must not be emitted"));
   assert.match(php.stdout,/miopages-authored-section/);
 });
+
+test("an unresolved Action slot cannot shift later Direct Start and Review bindings",()=>{
+ const hero=readNativeComponent({...component,mode:"section",root:node("group",{children:[
+  node("heading",{text:"Choose a route",level:1}),
+  node("action",{text:"Unavailable",reference:"action-0"}),
+  node("action",{text:"Direct Start",reference:"action-1"}),
+  node("action",{text:"Free Review",reference:"action-2"}),
+ ]})});
+ const page=(path:string)=>({path,title:path,composition:"managed-v1",navigationLabel:path,sections:[] as unknown[]});
+ const candidate={pages:[{...page("/"),sections:[{id:"hero",type:"hero",content:{heading:"Choose a route",text:"Fixture"},block:hero}]},page("/direct"),page("/review")],
+  navigation:["/"],actions:[
+   {type:"page",from:"/",destination:"/direct",label:"Direct Start",componentReference:"action-1"},
+   {type:"page",from:"/",destination:"/review",label:"Free Review",componentReference:"action-2"},
+  ]};
+ const run=(change:object={})=>spawnSync(process.platform==="win32"?"C:/php/php.exe":"php",["wordpress/miopages-delivery/tests/native-component.php"],
+  {input:JSON.stringify({candidate,postIds:{"/":100,"/direct":101,"/review":102},pendingActions:[{from:"/",reference:"action-0",label:"Unavailable"}],...change}),encoding:"utf8"});
+ const result=run();assert.equal(result.status,0,result.stderr);
+ assert.match(result.stdout,/<a[^>]*page_id=101[^>]*>Direct Start<\/a>/);
+ assert.match(result.stdout,/<a[^>]*page_id=102[^>]*>Free Review<\/a>/);
+ assert.match(result.stdout,/Unavailable — preview only; submissions disabled/);
+ assert.equal(run({pendingActions:[]}).status,1,"Unknown Action still refuses");
+ assert.equal(run({localSemanticBlocks:false}).status,1,"Private references stay unavailable to signed delivery");
+ assert.equal(run({pendingActions:[{from:"/",reference:"action-1",label:"Conflict"}]}).status,1);
+});
+
+test("nested comparisons keep readable columns inside an aligned native flow",async()=>{
+ const card=()=>node("group",{layout:{...node("group").layout,inset:"medium",surface:"light",border:true},children:[
+  node("heading",{level:3,text:"A meaningful visitor choice"}),
+  node("paragraph",{text:"A complete explanation must remain readable within this card. It must not collapse to the padding width when the surrounding flow aligns its children at the start."}),
+ ]});
+ const value={...component,root:node("group",{children:[node("group",{layout:{...node("group").layout,arrangement:"columns",columns:[1,1],gap:"medium"},children:[card(),card()]})]})};
+ const php=spawnSync(process.platform==="win32"?"C:/php/php.exe":"php",["wordpress/miopages-delivery/tests/native-component.php"],{input:JSON.stringify(value),encoding:"utf8"});
+ assert.equal(php.status,0,php.stderr);
+ const css=await readFile("wordpress/miopages-managed-site/style.css","utf8");
+ const browser=await chromium.launch({executablePath:process.platform==="win32"?"C:/Program Files/Google/Chrome/Application/chrome.exe":undefined,headless:true});
+ try{for(const width of [1440,390]){
+  const page=await browser.newPage({viewport:{width,height:1000}});
+  await page.setContent('<style>body{margin:0;padding:24px}*{box-sizing:border-box}</style><style>'+css+'</style>'+php.stdout);
+  const widths=await page.locator(".miopages-native-component p").evaluateAll(nodes=>nodes.map(node=>({width:node.getBoundingClientRect().width,overflow:(node as HTMLElement).scrollWidth>(node as HTMLElement).clientWidth+1})));
+  assert.equal(widths.length,2);for(const item of widths){assert.ok(item.width>200,JSON.stringify({width,item}));assert.equal(item.overflow,false)}
+  await page.close();
+ }}finally{await browser.close()}
+});

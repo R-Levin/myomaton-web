@@ -93,13 +93,14 @@ test("two pinned model cards share one ledger, respect stage headroom, and recov
     const report = scope.stages.report.rates;
     let calls = 0;
     const sent: string[] = [];
+    let expectedPageLimit=6000;
     let retained: Buffer | undefined;
     const transport = { async send(path: string, body: object) {
       const request = body as { model: string; max_output_tokens?: number };
       calls++;
       sent.push(request.model);
       if (path.endsWith("input_tokens")) return { body: { input_tokens: 20 } };
-      assert.equal(request.max_output_tokens, request.model === report.model ? 14_000 : 6_000);
+      assert.equal(request.max_output_tokens, request.model === report.model ? 14_000 : expectedPageLimit);
       const reply = { id: "response_" + calls, model: request.model, service_tier: "default", status: "completed",
         usage: { input_tokens: 20, output_tokens: 10, total_tokens: 30,
           input_tokens_details: { cached_tokens: 0 }, output_tokens_details: { reasoning_tokens: 0 } },
@@ -110,7 +111,7 @@ test("two pinned model cards share one ledger, respect stage headroom, and recov
     const work = (stage: string) => ({ ownerDigest: author, workDigest: sha(Buffer.from(stage)) });
     const recheck = async () => {};
     const request = (model: string) => ({ model, input: "synthetic", instructions: "test only", text: { format: {} } });
-    const prepare = (stage: "report" | "page") => meteredPresenceWorkflow(directory, primary, transport, scope, 1000, undefined, undefined, stage);
+    const prepare = (stage: "report" | "page",limit?:number) => meteredPresenceWorkflow(directory, primary, transport, scope, 1000, undefined, undefined, stage,undefined,undefined,limit);
     await prepare("report")(work("report"), request(report.model), recheck, async bytes => { retained = bytes; });
     assert.ok(retained);
     await confirmSitePlanningReceipt(directory, author, work("report").workDigest, retained, { name: "report", rates: report });
@@ -127,6 +128,12 @@ test("two pinned model cards share one ledger, respect stage headroom, and recov
     assert.equal(usage.images.requests, 0);
     assert.deepEqual(ledger.attempts.map((receipt: { workflowStage: string; estimatedMicros: number }) =>
       [receipt.workflowStage, receipt.estimatedMicros]), [["report", 200], ["page", 60]]);
+    assert.throws(()=>prepare("page",scope.stages.page.requestOutputTokens+1),/allowance exceeds/);
+    expectedPageLimit=2000;
+    await prepare("page",2000)(work("bounded page"),request(primary.model),recheck);
+    const bounded=JSON.parse(await readFile(join(directory,"onboarding-usage.json"),"utf8")).attempts.at(-1);
+    assert.equal(bounded.outputLimit,2000);
+    assert.equal(calls,6);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
 

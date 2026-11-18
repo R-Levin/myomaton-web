@@ -571,7 +571,7 @@ function searchCalls(body: Record<string, unknown>) {
 
 export function meteredPresenceWorkflow(directory: string, rates: Rates, transport: ResponsesTransport,
   scope: WorkflowUsageScope, outputLimit: number, retainedReservation?: string, researchCalls?: number, stageName?: WorkflowMeterStage,
-  researchPass?: { inputTokens: number; outputTokens: number }, reportHold?: ReportReservation) {
+  researchPass?: { inputTokens: number; outputTokens: number }, reportHold?: ReportReservation, perRequestOutputLimit?:number) {
   const fields = [scope.baselineAttempts, scope.requests, scope.generations, scope.capMicros, scope.inputTokens, scope.inputBytes, outputLimit];
   const mix = scope.breakdown;
   if (mix && ([mix.text, mix.images, mix.searchCalls].some(value => !Number.isSafeInteger(value) || value < 0) ||
@@ -595,19 +595,23 @@ export function meteredPresenceWorkflow(directory: string, rates: Rates, transpo
   }
   return meteredResponsesDispatch(directory, rates, transport, 0, 0, 0, outputLimit, retainedReservation, undefined, undefined,
     structuredClone(scope), researchPass ? 1 : researchCalls, stageName, researchPass && structuredClone(researchPass),
-    reportHold && structuredClone(reportHold));
+    reportHold && structuredClone(reportHold),perRequestOutputLimit);
 }
 
 function meteredResponsesDispatch(directory: string, configuredRates: Rates, transport: ResponsesTransport,
   requestLimit: number, generationLimit: number, spendLimit: number, outputLimit = maxOutput, retainedReservation?: string, comparisonInput?: string,
   outcome?: { inputDigest: string; attempt: number; c0ReadbackDigest?: string }, workflow?: WorkflowUsageScope,
-  researchCalls?: number, stageName?: WorkflowMeterStage, researchPass?: { inputTokens: number; outputTokens: number }, reportHold?: ReportReservation) {
+  researchCalls?: number, stageName?: WorkflowMeterStage, researchPass?: { inputTokens: number; outputTokens: number }, reportHold?: ReportReservation, perRequestOutputLimit?:number) {
   const rootRates = structuredClone(configuredRates);
   const stageBudget = stageName ? workflow?.stages?.[stageName] : undefined;
   const rates = stageBudget?.rates ?? rootRates;
   validateRates(rates);
   const isReplacementReport = stageName === "report" && reportHold !== undefined;
   outputLimit = isReplacementReport ? replacementReport.outputTokens : researchPass?.outputTokens ?? stageBudget?.requestOutputTokens ?? outputLimit;
+  if(perRequestOutputLimit!==undefined){
+    if(!Number.isSafeInteger(perRequestOutputLimit)||perRequestOutputLimit<16||perRequestOutputLimit>outputLimit)throw Error("Request output allowance exceeds stage authority");
+    outputLimit=perRequestOutputLimit;
+  }
   const path = join(directory, "onboarding-usage.json"), lockPath = path + ".lock";
   const inputRate = Math.max(rates.inputPerMillion, rates.cachedPerMillion, rates.cacheWritePerMillion);
   return async ({ ownerDigest, workDigest }: QuestionAttribution, request: ResponsesRequest, recheck?: () => Promise<unknown>,
@@ -835,4 +839,18 @@ function interviewRequest(model: string, context: QuestionContext, projected: un
   ) + " Core links the current answer automatically. Do not put an answer ID in sourceIds. Keep the rationale and evidence needed under 180 characters each.";
   request.instructions += planningInstruction;
   return { request, initial, sourceIds };
+}
+
+/** A manual resume may requeue an unsent generation, never an uncertain charge.
+ * The original rejected/count receipt remains in the append-only usage history. */
+export async function confirmUndispatchedPlanningRequest(directory:string,scope:WorkflowUsageScope,ownerDigest:string,workDigest:string) {
+  const path=join(directory,"onboarding-usage.json"),info=await lstat(path);
+  if(!info.isFile()||await realpath(path)!==path||process.platform!=="win32"&&(info.uid!==process.getuid?.()||(info.mode&0o777)!==0o600))throw Error("Private usage receipt refused");
+  const ledger=JSON.parse(await readFile(path,"utf8")) as Ledger;
+  const rows=recentWorkflow(ledger,scope,ownerDigest).filter(row=>row.workDigest===workDigest);
+  const receipt=rows[0];
+  if(rows.length!==1||receipt.status!=="rejected"||receipt.generationDispatched||!receipt.countDispatched||
+    !receipt.countRequestId||receipt.generationRequestId||receipt.responseId||receipt.usage||receipt.estimatedMicros!==0) {
+    throw Error("Unsent zero-cost generation is not independently established");
+  }
 }

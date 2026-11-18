@@ -236,3 +236,32 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
 .miopages-native-component .wp-block-group.miopages-node-flow > * { margin-block: 0; }
 .miopages-native-component .miopages-pending-media,
 .miopages-native-component .miopages-pending-action { padding: .75rem; border: 1px dashed currentColor; font-size: .875rem; }
+
+/* A native Action has one visible button, even when its authored node carries
+   surface/inset tokens. Context defaults keep it legible on a brand surface. */
+.miopages-native-component { --mp-action-bg: var(--wp--preset--color--brand); --mp-action-ink: var(--wp--preset--color--on-brand); }
+.miopages-native-component .miopages-node-surface-brand { --mp-action-bg: var(--wp--preset--color--on-brand); --mp-action-ink: var(--wp--preset--color--brand); }
+.miopages-native-component :is(.miopages-node-surface-light,.miopages-node-surface-tonal) { --mp-action-bg: var(--wp--preset--color--brand); --mp-action-ink: var(--wp--preset--color--on-brand); }
+.miopages-native-component .wp-block-button.miopages-node { background: transparent; color: inherit; border: 0; padding: 0; border-radius: 0; }
+.miopages-native-component .wp-block-button__link { background: var(--mp-action-bg); color: var(--mp-action-ink); border: 1px solid currentColor; }
+.miopages-native-component .wp-block-button.miopages-node-surface-brand > a { background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand); }
+.miopages-native-component .wp-block-button.miopages-node-surface-light > a { background: var(--wp--preset--color--surface); color: var(--wp--preset--color--ink); }
+.miopages-authored-section.miopages-draft-hero .miopages-node-columns { align-items: center; }
+.miopages-authored-section.miopages-draft-hero .miopages-native-component .wp-block-list {
+  list-style: none; padding-inline-start: 0; display: grid; gap: .8rem;
+}
+.miopages-authored-section.miopages-draft-hero .miopages-native-component .wp-block-list > li {
+  padding-block: .65rem; border-block-end: 1px solid currentColor;
+}
+
+/* Nested comparisons respond to their actual column, not only the viewport. */
+.miopages-native-component,
+.miopages-native-component .miopages-node-columns > .wp-block-group.miopages-node { container-type: inline-size; }
+@container (max-width: 38rem) {
+  .miopages-native-component .miopages-node-columns { grid-template-columns: minmax(0, 1fr); }
+  .miopages-native-component .miopages-node { grid-column: auto; }
+}
+
+/* Authored columns inside an align-start flow still fill the available measure.
+   Otherwise inline-size containment can shrink a comparison to its padding. */
+.miopages-native-component .miopages-node-columns { inline-size: 100%; }

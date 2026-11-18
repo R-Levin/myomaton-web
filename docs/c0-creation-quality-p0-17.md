@@ -525,3 +525,155 @@ at desktop/mobile and request substantive generated corrections before founder
 review. Preserve pending operational links, original 4473, protected Core 41 /
 WordPress 6, sources and every receipt. This remains execution toward a useful
 website, not a completed or accepted product.
+
+## Original-evidence eight-page WordPress and stock checkpoint — November 18, 2026
+
+**Genuine result; commercial review still open.** Core/API saved version 64:
+the sourced 18-finding report, Presence Direction, eight-page architecture,
+eight complete Pages, a substantive revision round, a targeted Home revision
+with two exact stock placements, and three whole-site editorial reviews.
+The existing disposable WordPress now renders this candidate at
+[http://127.0.0.1:4474/](http://127.0.0.1:4474/). This is a real WordPress draft
+site with native content and the original wordmark, not synthetic HTML.
+It is available for inspection; it has **not passed final commercial acceptance**.
+
+Home 119, Service 122, Why managed 123, Fit 124, Free Review 125, Direct Start 126,
+Ownership/trust 127 and Articles 128 retain stable local identities. Home exposes
+both entry choices; supporting pages have distinct declared routes. The automated
+browser traversal found Articles orphaned. An explicit local Operator navigation
+decision adds its existing Core label/route as a related Home link. No business
+copy or destination was invented. The Core blueprint and all original packets
+remain unchanged. Local projected packet:
+`1b7b92fe4ab5d253af5ab04d8985bff110cc9ef9c9babc0ec021a9a21891fb1c`.
+
+**Two genuine media placements.** Pixabay 593371 / StartupStockPhotos and
+5467838 / Tumisu were inspected and processed through safe ingestion,
+permissioned-stock candidate review, canonical Asset creation and exact
+Section AssetUsage. Home uses the laptop photograph to illustrate business focus
+and the boutique photograph for everyday business activity. Both have descriptive
+alt text and retain creator/source/license, original/prepared digests, exact Core
+visual brief and review history. Neither depicts a claimed customer or endorsement;
+public-use approval remains false. Private stock packet digest:
+`8082c6949f5d026383e4fd3b67ea1bd23f66cd710e10ae22942d8a02cedb8bce`.
+
+The existing supplied-media context assumes an inactive commercially bound customer.
+The evaluation is an unapproved active development graph with no activation binding.
+No customer confirmation or activation was fabricated. A trusted, disposable-only
+placement reader checks exact database/schema, current Core event, owned Page/Intro,
+scope and content on receipt, inspection and decision. Existing authority, source,
+rights, stale-state, immutable-byte and loopback/disposable guards still run.
+The original context remains the default. A derived private schema holds the two
+Assets/usages; the public case graph was independently fingerprinted unchanged.
+This is a bounded private-workflow bridge, not production customer media authority.
+
+Optional unacquired illustrations are omitted only from an explicitly recorded
+local presentation derivative. Original briefs/nodes remain retained; no placeholder
+is presented as an acquired image. Core's existing native explanation remains.
+Submission controls stay visibly inactive and no form or external destination is
+activated. This preview does not authorize signed delivery of version-2 native
+components; their protected validator still refuses them.
+
+**Reusable corrections.** Full-original requests now intern repeated complete
+values and native defaults inside the same request. Reconstruction and hashes are
+checked before dispatch; no business source, answer, status or text is summarized.
+Complete readable public research and real captured pixels are supplied; raw HTML
+remains in private custody. Editorial input includes every current Page, while
+earlier generated ASTs stay in immutable history instead of being duplicated
+wholesale. A manual unsent-resume operation proves a unique, rejected, zero-cost
+count receipt with no generation or response before appending a new attempt.
+Uncertain financial outcomes cannot use it. Original receipts are retained.
+A per-request output allowance can be reduced, never exceed stage authority.
+
+A serious Action projection bug filtered null slots before indexing, which could
+bind Direct Start to Review. Private projection now preserves original indexes,
+keeps unresolved Actions distinct and refuses unknown/conflicting references.
+Historical protected projection is unchanged. Actual WordPress exposed hidden
+duplicate title markup, nested-column readability and doubled button surfaces.
+Native-theme corrections preserve ordinary Pages and the prior comparison.
+
+**Verification.** The consolidated 51-test suite passed with no skips, including
+actual sandboxed public capture and real WordPress responsive component rendering.
+Thirteen PostgreSQL stock/supplied-media tests passed, covering scope, conflicts,
+stale state, byte tampering, rejection, release, rollback and withdrawal.
+Their first attempt against this differently identified evaluation database failed
+in legacy intake ownership before media code. The correct unchanged pilot fixture
+was seeded in a disposable database on the existing PG17 cluster; both suites passed
+and that temporary database was removed. This failure was not treated as passing.
+TypeScript and changed-file lint passed. Later theme changes are separately checked
+in the actual browser and native-component suite.
+
+All eight Pages render at desktop/mobile; both images load and there is no
+document overflow. Browser traversal reaches all eight from Home, verifies both
+entry links lead to different pages, opens native details, rejects POST and an
+unmapped protected Page ID, and makes no external requests. Local rollback restores
+the prior eight-page content byte for byte and recovers the current candidate,
+preserving IDs/slugs/brand and WordPress revision history. Evidence is private under
+the existing `runtime-content/original-evidence-local` and
+`runtime-content/p022-wp-validation` directories.
+
+Read-only checks confirm protected Core revision 41 / event
+`ff90effffa6fd26d903a04e299b17cbfcdf1ba5c005e508db193e1e786f09106`
+and protected WordPress revision 6 / digest
+`42c7060518c24ddb08b6104e4560a5ed701028dc9d74867bacf85dd1f12c5ddb`
+remain exact, including its 13 drafts and two images. The prior version-52 export
+and all ten 4473 desktop/mobile observations match. No protected deployment,
+publication, credential change or merge occurred.
+
+**Independent product finding.** The complete original sources reach Core and
+the site is materially navigable and image-equipped. It still underperforms the
+accepted v3 precedent in concise persuasion and visual economy: overlong pages,
+repeated offer/CTA descriptions, overly generic opening language, and internal
+readiness/proof-policy statements in visitor copy. The eight-page architecture is
+a proposal, not owner-approved necessity. The narrow native layout fixes and two
+photographs do not establish excellent commercial output. Codex has not replaced
+these deficiencies with handwritten marketing. Genuine inquiry submission,
+notification/outcomes and measured Ongoing performance remain missing connections,
+as recorded in the complete service map; preview/browser activity is not performance.
+
+**Cost, current snapshot.** 24 completed generations / 49 count-generation requests,
+two paid search calls: new usage-priced estimate **$7.198313**; conservative new debit
+**$7.491010**; cumulative accounted **$10.302619**, including the prior $2.811609
+and uncertainties. No new uncertain receipt and no paid response repeated.
+This is not an independently reconciled invoice charge. Other cash $0;
+owner prompt time UNKNOWN; elapsed founder-time cost must not be invented.
+Original $12 additional / $14.811609 cumulative ceilings and effective expiry
+November 19 16:03:51.397 UTC remain unchanged.
+
+**One pending decision.** The original manifest also pins stage ceilings.
+Revision has used $3.116815 of $3.60; editorial $0.931141 of $1.20; Page drafting
+$2.068061 of $3.60. Aggregate headroom does not silently expand them.
+Requested reallocation: Page $2.10, revision $4.70, editorial $1.60; other stages,
+$12 aggregate, sources/model, request/round limits and expiry unchanged.
+This funds one focused final commercial correction/review round. It is pending
+owner authorization, not active authority; no further dispatch was made for it.
+
+**RECOVERY / RESUME HERE.** Use branch `codex/first-operational-cycle-2026-11-12`.
+Read actual case 4d437190-9ce3-460b-81af-edd92279271a and its append-only ledger.
+There is no in-flight operation: version 64, editorial review, all eight Pages
+retained. Linux worker SHA:
+`b0c388cd885246766f988a8b7f06ae13c3132775b5c2980ddc62b3923daa08c9`;
+all previous executables/activation records are retained and grant/start unchanged.
+Do not rerun stock intake: two candidates are already ingested in
+`canonical_test_09e8823a84c943e4bdb7405aecd71360_intake`.
+Private stock attempt/checkpoint/resume and exact lineage are retained.
+Inspect the current WordPress comparison. Apply any subsequently approved stage
+amendment exactly before further model dispatch; preserve the original manifest,
+ledger, packet and published recovery record. Complete substantive Core-generated
+copy correction and desktop/mobile review; do not request acceptance of this
+engineering checkpoint. Keep 4473, Core 41, WordPress 6 and the broader Commercial V1
+growth-service roadmap intact.
+
+Final readback confirms ledger SHA-256
+`e3f338ae15cc2978512c4bdd3971db539406c77b68abca040de813306b603c5e`
+and byte-identical prior ledger/prefix. Actual final browser checks cover 16
+Page/viewport observations with no compressed-text flags, missing images,
+extra main headings or document overflow. Visual inspection caught a temporary
+container-query width collapse that a document-overflow check alone missed;
+the width correction and a separate desktop/mobile readability regression pass.
+The six final native-renderer tests passed without skips. Final local rollback
+current-content digest:
+`d602e12f22302990cafc0cd2b6ac39cd41bb579a40abb19bc43fe02a3e90c2e7`;
+prior-content digest:
+`94d4688734dbb8e257090fad5866f2b96141568ca4690bb1b20d33745cd3c472`.
+Recovery restored the new candidate for inspection, rather than leaving it rolled
+back. This content-preservation proof is not a signed Core release approval.
