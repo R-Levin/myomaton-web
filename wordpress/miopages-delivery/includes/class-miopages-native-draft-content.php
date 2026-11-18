@@ -81,7 +81,7 @@ final class MioPages_Native_Draft_Content
                 $posts[$path] = [
                     'ID' => $postIds[$path], 'post_type' => 'page', 'post_status' => 'draft',
                     'post_title' => $page['title'],
-                    'post_content' => self::composed($page, $postIds, $navigation, $labels, $actions, $attachments),
+                    'post_content' => self::composed($page, $postIds, $navigation, $labels, $actions, $attachments, $localSemanticBlocks),
                 ];
                 continue;
             }
@@ -125,7 +125,7 @@ final class MioPages_Native_Draft_Content
         return $posts;
     }
 
-    private static function composed(array $page, array $postIds, array $navigation, array $titles, array $actions, array $attachments): string
+    private static function composed(array $page, array $postIds, array $navigation, array $titles, array $actions, array $attachments, bool $localComposition): string
     {
         $path = $page['path'];
         $links = [];
@@ -180,7 +180,8 @@ final class MioPages_Native_Draft_Content
             $blocks[] = '<!-- wp:html --><nav class="miopages-draft-related" aria-label="Related pages">'
                 . implode('', $related) . '</nav><!-- /wp:html -->';
         }
-        return '<!-- wp:group {"className":"miopages-composed"} --><div class="wp-block-group miopages-composed">'
+        $siteClass = 'miopages-composed' . ($localComposition && PHP_SAPI === 'cli' ? ' miopages-draft-creative' : '');
+        return '<!-- wp:group {"className":"' . $siteClass . '"} --><div class="wp-block-group ' . $siteClass . '">'
             . implode("\n", $blocks) . '</div><!-- /wp:group -->';
     }
 

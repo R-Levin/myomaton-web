@@ -162,7 +162,7 @@ export class PrivateReleaseReview {
         ...(draft.baselinePages && { baselinePaths: draft.baselinePages.map(page => page.path),
           requestedPaths: draft.pages.map(page => page.path),
           ...(!restore && !draft.rollback && { appliedBaseline: hash(draft.previousDigest) }) }),
-        ...(!restore && { brandDigest: draft.brand?.digest }),
+        ...(!restore && draft.brand && { brandDigest: draft.brand.digest }),
         ...(!restore && draft.media && { media: draft.media, pageIds: draft.pages.map(page => page.id) }) };
       await db.query("COMMIT");
       return { expected, credentialId: uuid(installation.credential_id), signed,

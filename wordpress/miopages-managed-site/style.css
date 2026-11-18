@@ -83,3 +83,106 @@ body.miopages-branded-draft {
   animation: none !important;
   transition: none !important;
 }
+
+/* The creative layout is emitted only by the disposable native draft projector. */
+body.miopages-branded-draft:has(.miopages-draft-creative) :is(header, footer) > .wp-block-group {
+  background: transparent !important;
+  border-block: 1px solid var(--miopages-border);
+}
+body.miopages-branded-draft:has(.miopages-draft-creative) main.wp-block-group {
+  margin-block-start: 0;
+  padding-top: .75rem !important;
+}
+body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordmark img {
+  width: clamp(8rem, 15vw, 11rem);
+}
+.miopages-branded-draft .miopages-draft-creative .miopages-draft-nav {
+  border-block-end: 1px solid var(--miopages-border);
+  padding-block: .6rem .9rem;
+  gap: .55rem 1.5rem;
+}
+.miopages-draft-creative .miopages-draft-nav a {
+  color: var(--wp--preset--color--brand);
+  text-underline-offset: .25em;
+}
+.miopages-draft-creative .miopages-draft-nav [aria-current="page"] {
+  color: var(--wp--preset--color--brand);
+}
+.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero {
+  color: var(--wp--preset--color--ink);
+  background: transparent;
+  margin-block: 0;
+  border-block-end: 1px solid var(--miopages-border);
+  border-radius: 0;
+  padding: clamp(1.5rem, 3.5vw, 3rem) 0;
+}
+.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero h1 {
+  color: var(--wp--preset--color--brand);
+  font-size: clamp(2rem, 5vw, 4.25rem);
+  max-width: 17ch;
+  line-height: 1.04;
+  margin-block: 0 1rem;
+  text-wrap: pretty;
+}
+.miopages-draft-creative .miopages-draft-hero .miopages-draft-copy > p {
+  text-wrap: pretty;
+  max-width: 48ch;
+}
+.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero:not(.miopages-draft-with-image) h1 { max-width: 25ch; }
+.miopages-draft-creative .miopages-draft-hero:not(.miopages-draft-with-image) .miopages-draft-copy > p { max-width: 61ch; }
+.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero figure {
+  padding: clamp(.5rem, 1.2vw, 1rem);
+  background: var(--wp--preset--color--support);
+  border-radius: .6rem;
+  border: 1px solid var(--miopages-border);
+}
+.miopages-branded-draft .miopages-draft-creative .wp-block-button__link,
+.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero .wp-block-button__link {
+  border-radius: .4rem;
+  padding: .7rem 1.1rem;
+  font-weight: 650;
+  font-size: .95rem;
+  background: var(--wp--preset--color--brand);
+  color: var(--wp--preset--color--on-brand);
+}
+.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero .wp-block-button + .wp-block-button .wp-block-button__link {
+  background: transparent;
+  color: var(--wp--preset--color--brand);
+}
+.miopages-draft-creative .miopages-draft-intro {
+  padding-inline: 0;
+}
+.miopages-draft-creative .miopages-draft-intro h2 {
+  font-size: clamp(1.4rem, 2.8vw, 2.45rem);
+  letter-spacing: -.025em;
+  text-wrap: balance;
+}
+.miopages-draft-creative .miopages-semantic-group {
+  background: var(--wp--preset--color--support);
+  color: var(--miopages-tonal-ink);
+  border-block-start: 3px solid var(--wp--preset--color--brand);
+  padding: clamp(.85rem, 2vw, 1.4rem);
+  border-radius: 0 0 .45rem .45rem;
+}
+.miopages-draft-creative .miopages-semantic-stack {
+  max-width: 66ch;
+  gap: 1rem;
+}
+.miopages-draft-creative .miopages-semantic-stack > .miopages-semantic-group {
+  background: transparent;
+  border-block-start: 0;
+  border-inline-start: 3px solid var(--miopages-border);
+  border-radius: 0;
+  padding-block: .35rem;
+}
+.miopages-draft-creative .miopages-draft-related { border-block-start: 1px solid var(--miopages-border); }
+@media (min-width: 900px) {
+  .miopages-draft-creative .miopages-draft-with-image { grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); }
+}
+@media (max-width: 680px) {
+  .miopages-branded-draft .miopages-draft-creative .miopages-draft-nav {
+    gap: .55rem 1rem;
+    font-size: .875rem;
+  }
+  .miopages-branded-draft .miopages-draft-creative .miopages-draft-hero { gap: 1.2rem; }
+}
