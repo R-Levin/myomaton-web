@@ -1,5 +1,7 @@
 # Content growth and continuous optimization
 
+> **Shared AI engine / distinct workflows (November 18, 2026 owner direction):** [Shared Core intelligence for Creation and Ongoing](shared-intelligence-creation-ongoing-architecture.md) is a companion implementation blueprint, not a replacement for this content-growth owner contract. It reuses Core's source-backed research, knowledge, original content and component design, approved WordPress proposal/preview/release and measurement interfaces, while Ongoing alone selects evidence-driven **scoped changes, Articles, maintain/watch or no action** from actual customer signals and evaluates them afterward. See [Issue #12 P0-21](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6981341710). Nothing in the companion authorizes production publication or creates a second queue.
+
 ## Purpose and scope
 
 The Web Presence platform should not stop at publishing a website. Its long-term
