@@ -1,6 +1,7 @@
 import { fingerprint, object, text } from "../canonical/model";
 import type { WorkflowRun } from "./presence-workflow";
-import type { PresenceEvidence, WorkflowPage } from "./presence-workflow-artifacts";
+import { readBlueprint, type PresenceEvidence, type WorkflowPage } from "./presence-workflow-artifacts";
+import { checkStrategyScope, compilePageDecision, strategyBasis, type StrategyScope } from "./presence-decision-brief";
 
 const uses = ["business-fact", "staffed-offer", "editorial", "analysis", "excluded"] as const;
 type EvidenceUse = typeof uses[number];
@@ -12,12 +13,14 @@ export type MarketingAuthority = {
   brandDigest: string;
   brandBrief: string;
   qualityReviewerId: string;
+  strategy?: StrategyScope;
 };
 
 const publicUses: ReadonlySet<EvidenceUse> = new Set(["business-fact", "staffed-offer", "editorial"]);
 const sha256 = /^[a-f0-9]{64}$/u;
 
 export function validateMarketingAuthority(authority: MarketingAuthority, contextDigest: string, sources: readonly string[]) {
+  if (authority.strategy) checkStrategyScope(authority.strategy);
   const declared = authority.sources.map(source => source.digest);
   if (authority.contextDigest !== contextDigest || !sha256.test(authority.brandDigest) ||
       !authority.brandBrief.trim() || !authority.qualityReviewerId.trim() ||
@@ -44,8 +47,10 @@ export function marketingSources(authority: MarketingAuthority, evidence: readon
 export function marketingCitationIds(run: WorkflowRun, authority: MarketingAuthority) {
   const sources = marketingSources(authority, run.input.evidence);
   const writesCopy = run.work.operation === "page";
+  if (writesCopy && authority.strategy) return strategyDecision(run, authority,
+    run.input.blueprint?.pages.find(page => page.path === run.work.path)).claimIds;
   return [
-    ...sources.filter(({ use }) => writesCopy ? publicUses.has(use) : use !== "excluded").map(({ source }) => source.id),
+    ...sources.filter(({ use }) => writesCopy ? publicUses.has(use) && !(authority.strategy && use === "editorial") : use !== "excluded").map(({ source }) => source.id),
     ...(writesCopy ? [] : (run.input.research ?? []).map(source => source.id)),
   ];
 }
@@ -56,13 +61,20 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
   const sources = marketingSources(authority, evidence);
   const expose = ({ id, kind, label, date, content }: PresenceEvidence) => ({ id, kind, label, date, content });
   const design = { digest: authority.brandDigest, brief: authority.brandBrief };
-  const approved = sources.filter(({ use }) => publicUses.has(use)).map(({ source, use }) => ({ ...expose(source), use }));
+  const claims = sources.filter(({ use }) => use === "business-fact" || use === "staffed-offer");
+  const approved = (authority.strategy ? claims : sources.filter(({ use }) => publicUses.has(use)))
+    .map(({ source, use }) => ({ ...expose(source), use }));
   const analysis = sources.filter(({ use }) => use === "analysis").map(({ source }) => expose(source));
   if (operation === "page") {
     const prior = revisionRequest?.priorPages.find(page => page.path === path);
     const needBatch = !path && revisionRequest?.batch === "pending";
-    // Carry forward information architecture, not free-form report, raw research, private notes or derived strategy prose.
-    return { entry, approved, design, pagePath: path, pagePlan: blueprint?.pages.map(({ path, label, purpose }) => ({ path, label, purpose })),
+    if (authority.strategy && blueprint?.strategyBasis !== strategyBasis(run.context, run.input)) {
+      throw Error("Page brief is stale for the current report, Direction or market evidence");
+    }
+    const scoped = authority.strategy && strategyDecision(run, authority, blueprint?.pages.find(item => item.path === path));
+    // The case-bound strategy compiler intentionally omits raw narrative reports and raw peer pages.
+    return { entry, approved: scoped ? approved.filter(item => scoped.claimIds.includes(item.id)) : approved,
+      design, pagePath: path, ...(scoped && { decisionBrief: scoped }), pagePlan: blueprint?.pages.map(({ path, label, purpose }) => ({ path, label, purpose })),
       ...(needBatch ? { pages: revisionRequest.priorPages, concerns: revisionRequest.audit.concerns } :
         prior ? { previous: prior, concerns: revisionRequest?.audit.concerns.filter(item => item.path === path) } : {}) };
   }
@@ -70,6 +82,7 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
   const approvedCorrections = corrections.filter(({ finding }) => finding.sourceIds.every(id => readable.has(id)))
     .map(({ text, finding }) => ({ text, finding, status: "correction-to-review" }));
   const base = { entry, approved, analysis, research: research?.map(expose), corrections: approvedCorrections, design,
+    ...(authority.strategy && { strategy: authority.strategy }),
     ...(replan && { independentReviewCriteriaToCorrect: replan.concerns }) };
   switch (operation) {
     case "research":
@@ -80,19 +93,53 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
   }
 }
 
+function strategyDecision(run: WorkflowRun, authority: MarketingAuthority, page: ReturnType<typeof readBlueprint>["pages"][number] | undefined) {
+  if (!authority.strategy || !page?.decisionBrief) throw Error("Provenance-linked Page brief required");
+  const sources = marketingSources(authority, run.input.evidence);
+  const claims = sources.filter(item => item.use === "business-fact" || item.use === "staffed-offer").map(item => item.source);
+  const analysis = sources.filter(item => item.use === "analysis").map(item => item.source);
+  for (const id of authority.strategy.peerIds) {
+    const source = analysis.find(item => item.id === id);
+    if (source?.kind !== "public-research" || !source.date || !source.rawDigest || !sha256.test(source.rawDigest)) {
+      throw Error("Reviewed peer observation missing");
+    }
+  }
+  const brief = compilePageDecision(run, page.decisionBrief, page.path, authority.strategy, claims,
+    [...analysis, ...run.input.research ?? []], authority.contextDigest);
+  if (exposesInternalCopy(brief, run.input.evidence, authority, true)) throw Error("Excluded content in Page decision");
+  return brief;
+}
+
+export function validateStrategyBlueprint(output: unknown, run: WorkflowRun, authority: MarketingAuthority,
+  destinations?: Partial<Record<"request-review" | "start-onboarding", string>>) {
+  const parsed = readBlueprint(output, marketingCitationIds(run, authority), true, true);
+  for (const page of parsed.pages) strategyDecision(run, authority, page);
+  const journeys = authority.strategy?.entryJourneys;
+  if (journeys && !authority.strategy?.change) {
+    const review = destinations?.["request-review"];
+    const direct = destinations?.["start-onboarding"];
+    const claims = (path: string | undefined) => parsed.pages.find(page => page.path === path)?.decisionBrief?.claimIds;
+    if (!review || !direct || review === direct || review === "/" || direct === "/" ||
+        !claims(review)?.includes(journeys.reviewClaimId) || !claims(direct)?.includes(journeys.directClaimId) ||
+        ![journeys.reviewClaimId, journeys.directClaimId].every(id => claims("/")?.includes(id))) {
+      throw Error("Distinct supported buyer routes required");
+    }
+  }
+}
+
 function normalized(value: string) {
   return value.toLowerCase().match(/[\p{L}\p{N}]+/gu)?.join(" ") ?? "";
 }
 
 /** Exact internal excerpts are deterministic failures. Independent review still judges paraphrase,
  * sales effectiveness, claim support and suitability of approved material. */
-export function exposesInternalCopy(output: unknown, evidence: readonly PresenceEvidence[], authority: MarketingAuthority) {
+export function exposesInternalCopy(output: unknown, evidence: readonly PresenceEvidence[], authority: MarketingAuthority, allText = false) {
   const forbidden = marketingSources(authority, evidence).filter(({ use }) => use === "excluded")
     .flatMap(({ source }) => source.content.split(/[.!?\r\n]+/u).map(normalized))
     .filter(phrase => phrase.split(" ").length >= 6);
   function search(value: unknown, field = ""): boolean {
     if (typeof value === "string") {
-      if (!["title", "heading", "body", "searchTitle", "searchDescription", "label", "purpose"].includes(field)) return false;
+      if (!allText && !["title", "heading", "body", "searchTitle", "searchDescription", "label", "purpose", "items"].includes(field)) return false;
       const searchText = " " + normalized(value) + " ";
       return forbidden.some(phrase => searchText.includes(" " + phrase + " "));
     }
@@ -101,6 +148,35 @@ export function exposesInternalCopy(output: unknown, evidence: readonly Presence
     return Object.entries(value).some(([key, item]) => search(item, key));
   }
   return search(output);
+}
+
+// These are deterministic refusals for an unpriced development offer. Claims
+// still need source review, including wording this check cannot recognize.
+function anyVisitorCopy(output: unknown, check: (copy: string) => boolean) {
+  const fields = new Set(["heading", "title", "body", "searchTitle", "searchDescription", "label", "items"]);
+  function walk(value: unknown, field = ""): boolean {
+    if (typeof value === "string") return fields.has(field) && check(value);
+    if (!value || typeof value !== "object") return false;
+    if (Array.isArray(value)) return value.some(item => walk(item, field));
+    return Object.entries(value).some(([key, child]) => walk(child, key));
+  }
+  return walk(output);
+}
+
+export function unsupportedCommercialCopy(output: unknown) {
+  const explicitClaim = /(?:[$€£]\s*\d|\b\d[\d,.]*\s*(?:USD|dollars)\b|\b(?:guaranteed|guarantee)\b[^.!?]{0,30}\b(?:rankings|sales|profits|revenue|leads|traffic|results)\b|\b\d(?:\.\d+)?\s*(?:\/\s*5|stars)\b|\b(?:customers?|clients?)\s+(?:say|said|reported)\b)/iu;
+  return anyVisitorCopy(output, copy => explicitClaim.test(copy));
+}
+
+export function repeatsPeerObservation(output: unknown, peers: readonly PresenceEvidence[]) {
+  const phraseSize = 12;
+  function phrases(copy: string) {
+    const words = normalized(copy).split(" ");
+    return words.slice(0, Math.max(0, words.length - phraseSize + 1))
+      .map((_, index) => words.slice(index, index + phraseSize).join(" "));
+  }
+  const sourcePhrases = new Set(peers.flatMap(peer => phrases(peer.content)));
+  return anyVisitorCopy(output, copy => phrases(copy).some(phrase => sourcePhrases.has(phrase)));
 }
 
 export const qualityCriteria = [

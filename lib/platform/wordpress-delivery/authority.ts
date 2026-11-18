@@ -2,10 +2,11 @@ import type { PoolClient } from "pg";
 import { fingerprint, uuid } from "../canonical/model";
 import { releaseBase } from "../content-editing/release";
 import { releaseHistory } from "../content-editing/releases";
+import { readSemanticBlock, type SemanticBlock } from "../intake/presence-semantic-block";
 
 export type Site = { organizationId: string; webPresenceId: string; managedSiteId: string };
 type Page = { id: string; path: string; title: string; composition?: "managed-v1"; navigationLabel?: string; sections: {
-  id: string; type: string; content: { heading: string; text: string };
+  id: string; type: string; content: { heading: string; text: string }; block?: SemanticBlock;
 }[] };
 export type ReviewedProjection = Site & {
   version: 1;
@@ -31,7 +32,7 @@ const exact = (value: object, keys: string) => Object.keys(value).sort().join(",
 const text = (value: string, limit: number) =>
   typeof value === "string" && Buffer.byteLength(value) <= limit && !/[<>\x00]/.test(value);
 
-export function validatePages(pages: Page[], nativeDraft = false) {
+export function validatePages(pages: Page[], nativeDraft = false, localSemanticBlocks = false) {
   const paths = new Set<string>(), pageIds = new Set<string>(), sectionIds = new Set<string>();
   if (!Array.isArray(pages) || pages.length < 1 || (!nativeDraft && pages.length > 16)) throw Error("Projection pages refused");
   for (const page of pages) {
@@ -46,7 +47,11 @@ export function validatePages(pages: Page[], nativeDraft = false) {
       page.sections.some(section => !["hero", "intro", "cta"].includes(section.type)))) throw Error("Composed Page sections refused");
     paths.add(page.path);
     pageIds.add(page.id);
-    for (const { id: sectionId, type, content, ...extra } of page.sections) {
+    for (const { id: sectionId, type, content, block, ...extra } of page.sections) {
+      if (block !== undefined) {
+        if (!composed || !localSemanticBlocks) throw Error("Projection semantic block requires the local draft renderer");
+        readSemanticBlock(block);
+      }
       if (Object.keys(extra).length || !id(sectionId) || sectionIds.has(sectionId)
         || !["hero", "intro", "relationship", "collection", "cta"].includes(type)
         || !exact(content, "heading,text") || !text(content.heading, 300) || !content.heading.trim()

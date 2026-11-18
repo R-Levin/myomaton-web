@@ -88,7 +88,7 @@ export function composePresenceCase(pool: Pool, intake: IntakeService, token: st
   }
   return composeBoundPresenceCase(pool, context, workspace, capability, "protected", (current, grant) => {
     const manifest = c0DisclosureManifest(current);
-    return grant.contextDigest === manifest.contextDigest &&
+    return !grant.ledger.carryForward && grant.contextDigest === manifest.contextDigest &&
       grant.approvedSources.every(digest => manifest.approvedSourceCandidates.some(source => source.digest === digest));
   });
 }
@@ -110,7 +110,8 @@ export function composeIsolatedPresenceEvaluation(pool: Pool, intake: IntakeServ
     return structuredClone(expected);
   }
   const evaluation = composeBoundPresenceCase(pool, context, workspace, capability, "disposable", (current, grant) =>
-    grant.siteComposition === "managed-v1" && grant.ledger.baselineAttempts === 0 && Boolean(grant.ledger.breakdown) &&
+    grant.siteComposition === "managed-v1" && (grant.ledger.baselineAttempts === 0 ||
+      Boolean(grant.marketingAuthority?.strategy && grant.ledger.carryForward)) && Boolean(grant.ledger.breakdown) &&
     grant.contextDigest === fingerprint(current) &&
     fingerprint([...grant.approvedSources].sort()) === fingerprint(current.evidence.map(fingerprint).sort()));
   return { context, async open() {

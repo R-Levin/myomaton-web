@@ -233,9 +233,12 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
           return copy.text;
         };
         const pages = input.pages.map(page => ({ id: page.pageId, path: page.slug, title: editorial(page.title),
-          composition: page.composition, navigationLabel: page.navigationLabel, sections: page.sections.map(section =>
-            ({ id: section.id, type: section.type, content: { heading: editorial(section.heading), text: editorial(section.text) } })) }));
-        validatePages(pages, true);
+          composition: page.composition, navigationLabel: page.navigationLabel, sections: page.sections.map((section, index) => {
+            const block = prior.pages.find(candidate => candidate.path === page.slug)?.sections[index].block;
+            return { id: section.id, type: section.type, content: { heading: editorial(section.heading), text: editorial(section.text) },
+              ...(localDraft && block && { block }) };
+          }) }));
+        validatePages(pages, true, localDraft);
         const images = await Promise.all(input.pages.flatMap(page => page.sections.flatMap(section => section.image ? [async () => {
           const use = section.image!;
           const visual = prior.visuals?.find(item => item.association?.usageId === use.usageId && item.state === "approved");
@@ -247,8 +250,17 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
         }] : [])).map(prepare => prepare()));
         if (pendingHome) images.push(...await pendingImage(pages.find(page => page.path === "/")!.sections[0].id));
         const candidate = { pages, navigation: input.navigation, actions: input.actions };
-        packet = { candidate, images, ...(localDraft && { localDraftOnly: true }),
-          digest: fingerprint({ candidate, images, review: input.candidateDigest }) };
+        const decisionTrace = localDraft && prior.blueprint?.strategyBasis ? {
+          basis: prior.blueprint.strategyBasis,
+          pages: prior.blueprint.pages.map(page => ({ path: page.path, findingIds: page.decisionBrief?.findingIds,
+            directionSteps: page.decisionBrief?.directionSteps, claimIds: page.decisionBrief?.claimIds,
+            influences: page.decisionBrief?.influences.map(({ sourceIds, use }) => ({ sourceIds, use })),
+            sections: prior.pages.find(item => item.path === page.path)?.sections.map(section => ({
+              sourceIds: section.sourceIds, ...(section.block && { semanticBlock: section.block.name }),
+            })) })),
+        } : undefined;
+        packet = { candidate, images, ...(localDraft && { localDraftOnly: true }), ...(decisionTrace && { decisionTrace }),
+          digest: fingerprint({ candidate, images, review: input.candidateDigest, ...(decisionTrace && { decisionTrace }) }) };
       }
       const path = join(root, `${packetType}-${prior.version}.json`);
       await createPrivate(path, JSON.stringify(packet, null, 2) + "\n");

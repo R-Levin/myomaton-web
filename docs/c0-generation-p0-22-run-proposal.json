@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "status": "proposal-no-activation-authority",
+  "purpose": "One isolated C0 Creation round in disposable local WordPress",
+  "sourcePackSha256": "175bfeb870f4a375bb27bd6c299e7aaefe11d39731b9d5e94f806488bab6782a",
+  "preservedLedger": {
+    "sha256": "ab3ca989c30b4521ae0def7f0e6b5d622b491ec9bdf63122f6938862259c736d",
+    "attempts": 32,
+    "debitMicros": 1952189,
+    "reportHold": {
+      "receiptDigest": "108e59b2a74b69c683f653902d63d118c79bf301c58a0b43c69a7fdeef6da78c",
+      "originalWorkDigest": "0c43bc4bbe2a2fef238b876672f34df2c063fb708351574bfc1a1400cb2691a2",
+      "replacementWorkDigest": "b9d98c97b2a693584087b6d9a5ac08b15a2a51fc4a22069718c6a5d04dcecfa0"
+    }
+  },
+  "additionalPublicPeerPages": [
+    "https://www.b12.io/",
+    "https://sitecare.com/"
+  ],
+  "externalScope": "Read-only desktop/mobile captures of these exact public pages, no account visits or submissions. Verify publisher and relevance. Include only parsed, attributed public observations in the P0-22 case. Original peer pixels, text and protected C0 input are excluded from provider requests.",
+  "boundaries": {
+    "totalCapMicros": 8000000,
+    "additionalCapMicros": 5950000,
+    "maximumHoursFromActivation": 72,
+    "textGenerations": 29,
+    "images": 2,
+    "searchCalls": 4,
+    "providerRequests": 60,
+    "automaticRetries": 0,
+    "store": false,
+    "rawSourceDisclosure": false,
+    "protectedWrite": false,
+    "deadlineSeconds": 150
+  },
+  "stageBudgets": {
+    "research": {
+      "model": "mini",
+      "perRequestInput": 96000,
+      "perRequestOutput": 12000,
+      "totalInput": 200000,
+      "totalOutput": 24000,
+      "micros": 350000
+    },
+    "report": {
+      "model": "full",
+      "perRequestInput": 56000,
+      "perRequestOutput": 20000,
+      "totalInput": 80000,
+      "totalOutput": 24000,
+      "micros": 440000
+    },
+    "direction": {
+      "model": "full",
+      "perRequestInput": 60000,
+      "perRequestOutput": 20000,
+      "totalInput": 90000,
+      "totalOutput": 26000,
+      "micros": 450000
+    },
+    "blueprint": {
+      "model": "full",
+      "perRequestInput": 64000,
+      "perRequestOutput": 20000,
+      "totalInput": 100000,
+      "totalOutput": 30000,
+      "micros": 460000
+    },
+    "page": {
+      "model": "mini",
+      "perRequestInput": 64000,
+      "perRequestOutput": 12000,
+      "totalInput": 900000,
+      "totalOutput": 160000,
+      "micros": 1300000
+    },
+    "revision": {
+      "model": "mini",
+      "perRequestInput": 64000,
+      "perRequestOutput": 12000,
+      "totalInput": 900000,
+      "totalOutput": 160000,
+      "micros": 1100000
+    },
+    "editorial": {
+      "model": "full",
+      "perRequestInput": 60000,
+      "perRequestOutput": 18000,
+      "totalInput": 180000,
+      "totalOutput": 54000,
+      "micros": 850000
+    }
+  },
+  "image": "Existing pinned GPT Image 2.5 Sunburst, $0.50 reservation each for up to two originally authored, purpose-specific C0 illustrations subject to protected review. No peer images or raw screenshots in the prompt.",
+  "activation": "Bind the exact approved transmitted projection, observed peer digest(s), canonical color/wordmark, worker artifact and UTC expiry before provider access. The retained ledger is a verified prefix; do not change any prior row or open a separate spend account. Preserve earlier candidates and production WordPress state."
+}

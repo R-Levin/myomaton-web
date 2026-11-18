@@ -28,8 +28,8 @@ export function composeHomeConcept(context: WorkflowContext, view: PresenceWorkf
   const pages = [{ id, path: "/", title: home.heading, composition: "managed-v1" as const,
     navigationLabel: view.blueprint!.pages.find(page => page.path === "/")!.label,
     sections: home.sections.map((section, index) => ({ id: scopedId({ pageId: id, section: index }),
-      type: section.role!, content: { heading: section.heading, text: section.body } })) }];
-  validatePages(pages, true);
+      type: section.role!, content: { heading: section.heading, text: section.body }, ...(section.block && { block: section.block }) })) }];
+  validatePages(pages, true, true);
   const image = view.visuals?.find(visual => visual.placement.candidateDigest === target && visual.placement.sectionIndex === 0 && visual.state === "approved");
   const candidate = { pages, navigation: ["/"], actions: [] };
   return { candidate, pendingActions: home.actions.map(action => action.label),

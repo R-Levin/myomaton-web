@@ -382,6 +382,7 @@ export type WorkflowUsageScope = {
   requests: number; generations: number; capMicros: number; inputTokens: number; inputBytes: number;
   breakdown?: { text: number; images: number; searchCalls: number };
   stages?: WorkflowStagePlan;
+  carryForward?: { totalCapMicros: number; debitMicros: number; reportHold: ReportReservation };
 };
 
 const workflowImageModel = "gpt-image-2.5-sunburst-2026-09-08";
@@ -421,6 +422,14 @@ function recentWorkflow(ledger: Ledger, workflow: WorkflowUsageScope, ownerDiges
   if (ledger.attempts.length < workflow.baselineAttempts ||
       createHash("sha256").update(baseline).digest("hex") !== workflow.startingLedger ||
       recent.some(item => item.workflowScope !== workflow.id || item.ownerDigest !== ownerDigest)) throw Error("Workflow ledger baseline refused");
+  const carried = workflow.carryForward;
+  if (carried) {
+    const prior = ledger.attempts.slice(0, workflow.baselineAttempts);
+    const matching = prior.filter(row => holdsReport(row, carried.reportHold));
+    if (matching.length !== 1 || !Number.isSafeInteger(carried.debitMicros) || !Number.isSafeInteger(carried.totalCapMicros) ||
+        prior.reduce((sum, item) => sum + workflowDebit(item, carried.reportHold), 0) !== carried.debitMicros ||
+        carried.debitMicros + workflow.capMicros > carried.totalCapMicros) throw Error("Carried-forward workflow envelope refused");
+  }
   return recent;
 }
 
@@ -480,7 +489,7 @@ export async function meteredPresenceWorkflowImage<T extends { requestId: string
         ledger.model !== rates.model || ledger.tier !== "default" || ledger.adapterVersion !== version || !Array.isArray(ledger.attempts)) {
       throw Error("Usage ledger binding mismatch");
     }
-    verifiedSpend(ledger, retainedReservation, reportHold);
+    verifiedSpend(ledger, retainedReservation, reportHold ?? workflow.carryForward?.reportHold);
     const recent = recentWorkflow(ledger, workflow, attribution.ownerDigest);
     const generations = recent.filter(item => item.generationDispatched).length;
     const requests = recent.filter(item => item.countDispatched).length + generations;
@@ -623,7 +632,7 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       const ledger: Ledger = JSON.parse(bytes);
       if (ledger.ratesDigest !== fingerprint(rootRates) || fingerprint(ledger.rateCard) !== ledger.ratesDigest || ledger.model !== rootRates.model || ledger.tier !== "default" ||
           ledger.adapterVersion !== version || !Array.isArray(ledger.attempts)) throw Error("Usage ledger binding mismatch");
-      const spent = verifiedSpend(ledger, retainedReservation, reportHold);
+      const spent = verifiedSpend(ledger, retainedReservation, reportHold ?? workflow?.carryForward?.reportHold);
       const generations = ledger.attempts.filter(item => item.generationDispatched).length;
       const requests = ledger.attempts.filter(item => item.countDispatched).length + generations;
       if (ledger.attempts.some(item => item.workDigest === workDigest)) throw Error("Development work already dispatched");

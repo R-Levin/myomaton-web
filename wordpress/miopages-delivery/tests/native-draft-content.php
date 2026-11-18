@@ -60,4 +60,22 @@ refuses(fn() => MioPages_Native_Draft_Content::posts($foreign, $ids));
 $unsupported = $candidate;
 $unsupported['actions'][0]['type'] = 'contact';
 refuses(fn() => MioPages_Native_Draft_Content::posts($unsupported, $ids));
+
+$local = $candidate;
+$local['pages'][0]['composition'] = 'managed-v1';
+$local['pages'][0]['navigationLabel'] = 'Home';
+$local['pages'][0]['sections'][0]['id'] = 'hero';
+$local['pages'][0]['sections'][0]['type'] = 'hero';
+$local['pages'][0]['sections'][0]['block'] = ['version' => 1, 'name' => 'responsibility-handoff', 'purpose' => 'Clarify who handles the work',
+    'layout' => 'grid', 'listStyle' => 'steps', 'groups' => [
+        ['heading' => 'You confirm the details', 'body' => 'Bring what you know about your business.', 'items' => ['Confirm important facts']],
+        ['heading' => 'We organize the next steps', 'body' => 'Give visitors a clear path forward.', 'items' => []],
+    ]];
+refuses(fn() => MioPages_Native_Draft_Content::posts($local, $ids));
+$preview = MioPages_Native_Draft_Content::posts($local, $ids, [], true);
+check(str_contains($preview['/']['post_content'], 'miopages-semantic-grid'), 'The local composition is rendered, not flattened.');
+check(str_contains($preview['/']['post_content'], '<ol class="wp-block-list">'), 'Ordered content is accessible.');
+check(str_contains($preview['/']['post_content'], '<h2 class="wp-block-heading">You confirm the details</h2>'), 'The Hero subgroup maintains heading hierarchy.');
+$local['pages'][0]['sections'][0]['block']['groups'][0]['body'] = '<script>unsafe()</script>';
+refuses(fn() => MioPages_Native_Draft_Content::posts($local, $ids, [], true));
 echo "Native draft content projection passed.\n";

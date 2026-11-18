@@ -239,6 +239,17 @@ test("one report replacement carries the exact pending debit through text and fu
     assert.equal(attempts[1].reservedMicros, 300_000);
     const usage = await summarizePresenceWorkflowUsage(directory, reviewLedger, owner);
     assert.equal(usage.total.heldMicros, 450_260);
+    const prefixBytes = await readFile(ledgerPath);
+    const following = { ...reviewLedger, id: fingerprint("new candidate"), baselineAttempts: attempts.length, startingLedger: sha(prefixBytes),
+      carryForward: { debitMicros: 450_260, totalCapMicros: reviewLedger.capMicros + 450_260, reportHold: hold } };
+    const requested = request(primary.model);
+    const start = (next: typeof following) => meteredPresenceWorkflow(directory, primary, transport, next, 16_000, undefined, undefined, "page");
+    await assert.rejects(start({ ...following, carryForward: { ...following.carryForward, totalCapMicros: reviewLedger.capMicros } })(
+      attrib(fingerprint("excess budget")), requested));
+    await start(following)(attrib(fingerprint("new candidate page")), requested);
+    assert.equal(sent, 8);
+    const carried = JSON.parse(await readFile(ledgerPath, "utf8")).attempts;
+    assert.deepEqual(carried.slice(0, attempts.length), attempts);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
 

@@ -13,7 +13,7 @@ final class MioPages_Native_Draft_Content
      * and IDs allocated by its materializer. The caller must authenticate the
      * candidate and verify the target posts before using these inputs.
      */
-    public static function posts(array $candidate, array $postIds, array $attachments = []): array
+    public static function posts(array $candidate, array $postIds, array $attachments = [], bool $localSemanticBlocks = false): array
     {
         $pages = $candidate['pages'];
         $navigation = $candidate['navigation'];
@@ -69,6 +69,11 @@ final class MioPages_Native_Draft_Content
         $posts = [];
         foreach ($pages as $page) {
             $path = $page['path'];
+            foreach ($page['sections'] as $section) {
+                if (array_key_exists('block', $section) && (!$localSemanticBlocks || PHP_SAPI !== 'cli' || ($page['composition'] ?? null) !== 'managed-v1')) {
+                    throw new InvalidArgumentException('Semantic draft blocks are local-only.');
+                }
+            }
             if (array_key_exists('composition', $page)) {
                 if ($page['composition'] !== 'managed-v1') {
                     throw new InvalidArgumentException('Unknown managed composition.');
@@ -162,6 +167,7 @@ final class MioPages_Native_Draft_Content
                 }
                 $content .= '<!-- wp:buttons --><div class="wp-block-buttons">' . implode('', $buttons) . '</div><!-- /wp:buttons -->';
             }
+            if (array_key_exists('block', $section)) $content .= self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3);
             $media = $attachments[$id] ?? null;
             $style = $type === 'cta' && empty($placedActions[$id]) ? 'intro' : $type;
             $class = 'miopages-draft-section miopages-draft-' . $style . ($media ? ' miopages-draft-with-image' : '');
@@ -176,6 +182,55 @@ final class MioPages_Native_Draft_Content
         }
         return '<!-- wp:group {"className":"miopages-composed"} --><div class="wp-block-group miopages-composed">'
             . implode("\n", $blocks) . '</div><!-- /wp:group -->';
+    }
+
+    private static function semanticText(mixed $text, int $bytes): string
+    {
+        if (!is_string($text) || trim($text) === '' || strlen($text) > $bytes || preg_match('/[<>\x00-\x08\x0b\x0c\x0e-\x1f]/', $text)) {
+            throw new InvalidArgumentException('Semantic draft text refused.');
+        }
+        return esc_html($text);
+    }
+
+    private static function semanticBlock(mixed $value, int $headingLevel): string
+    {
+        if (!is_array($value)) throw new InvalidArgumentException('Semantic draft specification required.');
+        $keys = array_keys($value);
+        sort($keys);
+        if ($keys !== ['groups', 'layout', 'listStyle', 'name', 'purpose', 'version'] || $value['version'] !== 1
+            || !is_string($value['name']) || strlen($value['name']) > 65 || !preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $value['name'])
+            || !in_array($value['layout'], ['stack', 'grid'], true) || !in_array($value['listStyle'], ['bullets', 'steps'], true)
+            || !is_array($value['groups']) || !array_is_list($value['groups']) || $value['groups'] === []
+            || strlen(json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) > 32000) {
+            throw new InvalidArgumentException('Semantic draft specification refused.');
+        }
+        self::semanticText($value['purpose'], 1440);
+        $class = 'miopages-semantic miopages-semantic-' . $value['layout'];
+        $content = '<!-- wp:group {"className":"' . $class . '"} --><div class="wp-block-group ' . $class . '">';
+        $heading = 'h' . $headingLevel;
+        foreach ($value['groups'] as $group) {
+            if (!is_array($group)) throw new InvalidArgumentException('Semantic draft group refused.');
+            $keys = array_keys($group);
+            sort($keys);
+            if ($keys !== ['body', 'heading', 'items'] || !is_array($group['items']) || !array_is_list($group['items'])) {
+                throw new InvalidArgumentException('Semantic draft group refused.');
+            }
+            $content .= '<!-- wp:group {"className":"miopages-semantic-group"} --><div class="wp-block-group miopages-semantic-group">'
+                . '<!-- wp:heading {"level":' . $headingLevel . '} --><' . $heading . ' class="wp-block-heading">'
+                . self::semanticText($group['heading'], 960) . '</' . $heading . '><!-- /wp:heading -->'
+                . self::paragraph(nl2br(self::semanticText($group['body'], 6000), false));
+            if ($group['items'] !== []) {
+                $ordered = $value['listStyle'] === 'steps';
+                $tag = $ordered ? 'ol' : 'ul';
+                $content .= '<!-- wp:list' . ($ordered ? ' {"ordered":true}' : '') . ' --><' . $tag . ' class="wp-block-list">';
+                foreach ($group['items'] as $item) {
+                    $content .= '<!-- wp:list-item --><li>' . self::semanticText($item, 1440) . '</li><!-- /wp:list-item -->';
+                }
+                $content .= '</' . $tag . '><!-- /wp:list -->';
+            }
+            $content .= '</div><!-- /wp:group -->';
+        }
+        return $content . '</div><!-- /wp:group -->';
     }
 
     private static function image(array $attachment): string

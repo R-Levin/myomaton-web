@@ -21,6 +21,7 @@ export function workflowDeliveryInput(context: WorkflowContext, view: PresenceWo
 export function workflowEvaluationPreviewInput(context: WorkflowContext, view: PresenceWorkflowView,
   prior: unknown, canonical: readonly { id: string; slug: string }[]) {
   const review = view.operatorReview;
+  if (view.pages.some(page => page.sections.some(section => section.block))) throw Error("Local semantic blocks require a supported release renderer");
   if (view.contextDigest !== fingerprint(context) || view.next !== "review-complete" || !review || !view.blueprint ||
       view.visuals?.some(visual => ["queued", "running", "review", "unverified"].includes(visual.state))) {
     throw Error("Complete exact workflow and visual review required");

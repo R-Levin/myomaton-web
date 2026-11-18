@@ -67,6 +67,18 @@ body.miopages-branded-draft {
   background: var(--wp--preset--color--brand);
   color: var(--wp--preset--color--on-brand);
 }
+.miopages-semantic {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  margin-block: 1.25rem 0;
+}
+@media (min-width: 760px) {
+  .miopages-semantic-grid { grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); }
+}
+.miopages-semantic > .miopages-semantic-group { margin-block: 0; border-block-start: 2px solid currentColor; padding-block-start: .9rem; }
+.miopages-semantic-group :is(h2, h3) { margin-block: 0 .5rem; }
+.miopages-semantic-group p, .miopages-semantic-group ol, .miopages-semantic-group ul { margin-block: .5rem 0; }
 .miopages-motion-off *, .miopages-motion-off *::before, .miopages-motion-off *::after {
   animation: none !important;
   transition: none !important;

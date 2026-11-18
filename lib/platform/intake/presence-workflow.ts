@@ -6,6 +6,7 @@ import type { EntryIntent } from "./model";
 import { IntakeError } from "./model";
 import type { EvaluationBinding } from "./presence-evaluation";
 import { composeHomeConcept, homeConceptDigest } from "./presence-home-concept";
+import { strategyBasis } from "./presence-decision-brief";
 import { applyEditorialPatch } from "./presence-editorial-patch";
 import { editorialDecision, editorialFindings, withEditorialHistory, type EditorialDecision, type EditorialFinding } from "./presence-editorial-decisions";
 import { presenceVisualPlacement, type PresenceVisual, type PresenceVisualOperations } from "./presence-workflow-visual";
@@ -376,7 +377,13 @@ export class PresenceWorkflow {
         case "research": next = { ...state, research: readResearch(output, ids) }; break;
         case "report": next = { ...state, report: readReport(output, sources, provider) }; break;
         case "direction": next = { ...state, direction: readDirection(output, ids, provider) }; break;
-        case "blueprint": next = { ...state, blueprint: readBlueprint(output, ids, provider) }; break;
+        case "blueprint": {
+          const blueprint = readBlueprint(output, ids, provider, Boolean(this.operations.marketingAuthority?.strategy));
+          next = { ...state, blueprint: { ...blueprint, ...(this.operations.marketingAuthority?.strategy && {
+            strategyBasis: strategyBasis(context, state),
+          }) } };
+          break;
+        }
         case "page": {
           if (state.evaluation && state.revisionRequest?.batch === "pending" && !work.path) {
             const revisionRequest = state.revisionRequest;
@@ -386,7 +393,8 @@ export class PresenceWorkflow {
           }
           const destinations = state.evaluation ? Object.fromEntries(Object.entries(this.destinations).filter(([, destination]) =>
             destination !== work.path && paths.includes(destination))) : this.destinations;
-          const page = readPage(output, work.path!, paths, ids, destinations, provider, Boolean(state.evaluation));
+          const page = readPage(output, work.path!, paths, ids, destinations, provider, Boolean(state.evaluation),
+            Boolean(this.operations.marketingAuthority?.strategy && this.boundary === "disposable"));
           if (state.evaluation && page.composition !== "managed-v1") throw Error("Evaluation Page needs the composed format");
           // Keep the exact sitemap order when selected pages are redrafted.
           const drafts = new Map([...state.pages, page].map(draft => [draft.path, draft]));

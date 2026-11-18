@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "status": "pending-provider-transmission-approval",
+  "ownerSpecCommit": "a3010b501d9a83c7ae3108ac445a454183e5ca9d",
+  "originalCandidateSha256": "6fd32e46267079460ef315148d8fd2f2e504382de286a4c03202d16654403021",
+  "priorLedgerSha256": "ab3ca989c30b4521ae0def7f0e6b5d622b491ec9bdf63122f6938862259c736d",
+  "brandLogoSha256": "09b1d3c6e189ce74538d75be63386116be0dee464d6b70d86577430963d91b5e",
+  "sources": [
+    {
+      "id": "c0-service-scope",
+      "kind": "owner-confirmed",
+      "use": "business-fact",
+      "reference": "docs/c0-commercial-source-amendment.json",
+      "content": "MioPages is a real, founder-led business offering one managed Web Presence service for small businesses and organizations in the United States. Web Presence includes explaining the business clearly, showing why it is worth trusting, giving an interested person a useful next step and keeping the presence useful over time. It is not a self-managed builder, a standalone hosting or email product, or bespoke website development."
+    },
+    {
+      "id": "c0-fit",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/miopages-c0-business-brief.md#business-customer-and-geography",
+      "content": "Initial best fit is established expertise-led small businesses with existing customers and an outdated, fragmented or neglected web presence, including trades, local services and professional or technical firms. They have limited appetite for website administration and may find some agency engagements too opaque or complex for their needs. A venture with clear business and visitor goals can also be a good fit. Industry and team size are planning signals, never eligibility tests."
+    },
+    {
+      "id": "c0-launch",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/miopages-c0-product-model.md#standard-launch-intended-customer-deliverables",
+      "content": "Standard Launch uses supported discovery and business-knowledge capture to organize audiences, offerings, proof and visitor choices. The staffed service can shape professional pages, navigation and contact paths within agreed scope. Review what already exists; preserve useful content and URL continuity where a supported migration is possible. Coordinate domain, hosting, email and compatible external services where necessary. Establish what can be observed at launch and get approval before going live. Do not imply automatic migration, universal integration or availability of unverified measurement."
+    },
+    {
+      "id": "c0-responsibility",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/miopages-c0-business-brief.md#self-service-and-smallest-useful-intake",
+      "content": "The customer supplies business truth, goals, useful assets and necessary access, confirms important facts and approves material decisions. MioPages synthesizes and proposes direction, structure, content and supported implementation. Customers need no sitemap, wireframes or page-builder instruction. Inference remains a proposal until confirmed. Explain the trade-off: less routine web administration, with meaningful approval retained rather than arbitrary implementation control."
+    },
+    {
+      "id": "c0-ongoing",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/miopages-c0-product-model.md#ongoing-intended-continuing-value",
+      "content": "Ongoing continues with the same business knowledge approved at launch. Maintain the presence, update verified business information, observe useful first-party interactions, explain what is known or uncertain, and propose prioritized content or contact-path improvements for review. Maintenance supports the work but is not the entire value. Do not guarantee outcomes, analytics coverage, publishing cadence, or access to GA4, Search Console or Google Business Profile."
+    },
+    {
+      "id": "c0-expanded",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/miopages-c0-product-model.md#expanded-launch-and-initial-non-promises",
+      "content": "Most normal variation fits Standard Launch and one managed Ongoing service. Expanded Launch addresses materially larger supported migrations, catalog or location complexity, redirect continuity or approvals, after scope is agreed. Expansion does not buy bespoke development, arbitrary integration, full CRM replacement, broad social management or pixel-by-pixel direction. No public price, delivery-time, terms or commercial guarantees are confirmed by this pack."
+    },
+    {
+      "id": "c0-review",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/c0-generation-p0-22.md#codex-execution-brief--one-connected-c0-output-no-parallel-demo",
+      "content": "Free Web Presence Review is useful without a purchase. Independently assess how a qualified prospect is represented online, surface a small number of practical priorities and give an honest fit indication. A grounded Home preview is normally prepared for Operator discretion, not a promised giveaway or an automatic prospect deliverable. Do not imply a live form, turnaround promise or free full consulting engagement."
+    },
+    {
+      "id": "c0-direct",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/c0-generation-p0-22.md#codex-execution-brief--one-connected-c0-output-no-parallel-demo",
+      "content": "Direct Start is the distinct route into progressive supported onboarding for someone ready to proceed. It does not require a Free Review. Begin with business identity, offering, audience, area and desired visitor action, use relevant existing evidence, ask important missing questions, confirm facts and agree supported scope before work advances. Local draft journeys are preview-only."
+    },
+    {
+      "id": "c0-trust",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/miopages-c0-business-brief.md#proof-and-trust",
+      "content": "Use verified contributions and permission-cleared examples only. Historical experience cannot be claimed as a result of the new service. Prefer clear descriptions of responsibilities and approval to unsupported testimonials, case studies or statistics. Do not imply multiple staff, fabricate an address or contact route, or use unverified case-study names or results."
+    },
+    {
+      "id": "c0-ownership",
+      "kind": "service-direction",
+      "use": "staffed-offer",
+      "reference": "docs/miopages-c0-business-brief.md#commercial-hypothesis-and-first-cohort",
+      "content": "Preserve the customer's practical ownership and control of its business information and accounts, with authorized access to coordinate supported work. Position retention around value rather than lock-in. Exact exit/export details, cancellation terms and public commitments require verification. Preserve distinct service entry and existing legacy customer access; do not fabricate a sign-in route or market retired services."
+    },
+    {
+      "id": "c0-brand-authority",
+      "kind": "service-direction",
+      "use": "analysis",
+      "reference": "docs/c0-generation-p0-22.md#verified-prior-state-and-reference-hierarchy",
+      "content": "Use the approved MioPages wordmark and purple with warm neutrals. The original site and the accepted service-led v3 design are quality precedent. They do not prescribe a page order, layout, section count, old R3 wording or design choice. Seek a fresh commercial composition that serves buyer decisions."
+    }
+  ],
+  "peers": [
+    {
+      "id": "peer-wordpress-builder",
+      "publisher": "WordPress.com",
+      "date": "2026-11-18",
+      "url": "https://wordpress.com/small-business-website/",
+      "desktopSha256": "591eb8bd587bbd8eb1d2d7a65a423a944adedb518caf7f47527782b0f9e406e0",
+      "mobileSha256": "197832186b6e62c1a806ddd979f213e78bf6177a83cbf813c69a26e0ff3e3c89",
+      "observation": "Website-builder alternative. It names the buyer and concrete activities early. On desktop, a large benefit headline and a depicted customer deliverable share the first screen, with two visibly different actions. At 390px the menu compacts and the actions stay ahead of the image. For MioPages, show a real service deliverable and keep both entry choices discoverable; differentiate by who understands, writes and improves the presence. Do not copy the split-hero presentation, photos, speed claim or platform offer."
+    },
+    {
+      "id": "peer-scanmyseo",
+      "publisher": "ScanMySEO",
+      "date": "2026-11-18",
+      "url": "https://www.scanmyseo.com/articles/content-quality/search-intent-mismatch-on-owner-managed-websites",
+      "desktopSha256": "64a914aac0697b439eb270c9902b3db39b15b189311d246fb95e4aea0aabfdf3",
+      "mobileSha256": "c0b9671fff065d5c5c698b8abc1b474b11f40ce19bf6e26d6354207e72ff1f27",
+      "observation": "SEO tool publisher, not direct managed-service evidence. Its article frames reader intent around the job a page must do, names the writer and dates, and separates the reading path from its software entry. On mobile the large boxed introduction and floating controls crowd the screen. For MioPages use independently useful buyer questions, support proof with explicit context and leave mobile choices inline and unobstructed; avoid branded overlays and the long single-panel introduction."
+    },
+    {
+      "id": "peer-amplify",
+      "publisher": "Amplify SEO",
+      "date": "2026-11-18",
+      "url": "https://amplify.ke/blog/search-intent-page-type",
+      "desktopSha256": "9a0c5ced80c6d17ddcff30e17b71fd77edf707e508ce8a8554a8a29b57c5450d",
+      "mobileSha256": "00eca890e29a8de51304d584767718bde0f81cadd0607e2fa62f7fbf69c50133",
+      "observation": "Kenya-based SEO agency; useful presentation contrast rather than evidence of U.S. managed-site availability or performance. A desktop article pairs the educational journey with a side offer that spells out evaluation deliverables. The mobile first screen removes that side rail so the reading column stays clean. For MioPages, explain the Free Review result separately from implementation, use an original evidence or deliverables panel and place the route visibly in mobile reading order. No copying of scoring, chart, claims or layout."
+    }
+  ],
+  "transmissionExclusions": [
+    "Private raw reports or journals",
+    "Original competitor text, screenshots or assets",
+    "Unconfirmed C0 claims, prices and performance",
+    "Other tenants and synthetic telemetry",
+    "R3 full pages, component layout and headlines as controlling prompt material"
+  ]
+}
