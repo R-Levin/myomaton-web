@@ -4,6 +4,39 @@
 
 **Primary milestone:** Deliver a genuinely researched, contemporary, original, cohesive, commercially credible **C0 WordPress website** that the founder can open locally and critique. The service remains a unified **AI-assisted managed Web Presence** offering that understands businesses, designs their presence, handles Launch, converts visitors appropriately, measures, improves, and continues through Ongoing. **This round must exercise Core's real AI capabilities**; neither Codex-authored polished mock copy nor a manual replacement WordPress site is product proof.
 
+## P0-23 correction — systemic product behavior and continuously connected operating cycle
+
+**Owner correction, November 18:** Negative instructions such as “do not deliver another D−” are not an engineering control. **Eliminate repeatable failure mechanisms at the actual shared interface** and show their behavior in the product. Automated unit/integration/browser tests belong **inside the engineering task that introduces or changes a capability**; tests are not product features, user-facing milestones or a substitute for a working experience. Distinguish product acceptance (the service actually accomplishes its customer/operator job) from verification receipts. Do not inflate process with separate testing projects or founder signoffs on routine fixes.
+
+**Systemic correction rather than prohibitions:**
+- **Knowledge coverage contract:** Persist the full-enough, approved-source business projection with explicit source/status/negative decisions, coverage inventory and version. A new Page/Article or recommendation cannot proceed as substantively grounded if required buyer/offer facts were silently compressed away. When facts are missing, propose a meaningful follow-up or clearly mark uncertainty rather than inventing claims. A deterministic comparison verifies important owner-confirmed decisions survive the projection.
+- **Intelligence-to-creative dependency:** Every substantive AI-created Page, Section, Asset, Action and revision must receive typed relevant findings/Direction, visual/market decision context and claim eligibility from the *same* bound business context. Validate lineage and material influence at the producer→consumer seam, not just citations in a report; ensure two different evidence inputs can lead to different structure/copy. Preserve both safe egress classification and ability to make nonclaim inferences. Fail the specific generation attempt or downgrade it transparently rather than quietly generating generic copy.
+- **Expressive component contract:** The AI can specify a new business-justified semantic component; the existing generic Core→canonical WordPress pipeline must either safely realize that component at reviewed quality or return a clearly surfaced **unsupported-component** decision requiring development. **Never silently flatten it to generic Intro/CTA** while claiming the design was delivered. Preserve existing compatible components and published revision/rollback paths; no unreviewed executable model code on hosted sites.
+- **Independent outcome assessment:** A quality evaluation sees the actual generated, rendered product and provenance, not merely counts, scores or self-congratulating model prose. It produces explicit, actionable observations against the chosen buyer goal, originality, contemporary context, conversion, brand and graphic communication; revise within existing authorized scope. When evidence is insufficient, disclose it. Automated checks support this judgment but cannot supply founder acceptance.
+
+**Keep a permanently connected, growing end-to-end product slice operating NOW.** Reuse real code and authority boundaries and install a small, replaceable, intentionally marked **beacon/fixture at the intended interface of each incomplete component**. No parallel demo app or forked flow. Minimum linked loop:
+
+```text
+Free Review OR Direct Start (distinct, progressive/resumable)
+→ real AI-assisted customer knowledge, missing-knowledge follow-up and assessment
+→ Presence Direction / Conversion Architecture / creative plan
+→ genuine Core-generated original local WordPress Pages/Sections/Assets candidate
+→ labeled synthetic visitor inquiry at existing Contact boundary (unless real authorized)
+→ scoped first-party synthetic observation, Performance Snapshot and coverage status
+→ evidence-based recommended improvement with rationale
+→ Operator review and scoped approval boundary
+→ targeted, private WordPress staged revision with rollback/readback
+→ same-semantics synthetic remeasurement, result/uncertainty and next opportunity
+```
+
+Use implemented real segments directly. At any unfinished segment, the beacon must clearly expose **what it stands in for, its fixture provenance, which interface it exercises, the required real replacement and how to tell the difference**. Keep the end-to-end path traversable through supported local boundaries while development of interview intelligence, generative design, leads, measurement, portals and Ongoing **advances in parallel**. No simulation of production submission, real lead qualification, actual customer outcomes, live traffic or deployed change. Beacons are **engineering scaffolding inside the eventual architecture**, not a second marketing demo or proof that an absent production capability exists. Existing C0 synthetic Contact/first-party/WordPress cycle fixtures should be reused, not rebuilt.
+
+**Implementation and release cadence:** Codex builds, observes, tests, critiques, fixes and reruns within approved local scope **as one capability increment**. Record technical tests in a development receipt once per increment, not as a founder decision. Demonstrate an owner-relevant **working experience**: what Core learned, what strategy changed, what the rendered site says/looks like, what inquiry or measurement signal was synthetic/real, what improvement was suggested, what revised privately, and what remains unsupported. Track errors/blockers in the same continuity record. Do not let one proof, permission or component monopolize progress; preserve successful implementations, exact case boundaries and production/protected gates.
+
+**Two simultaneous milestone tracks, not two projects:** (1) a genuinely credible owner-visible C0 site from the corrected intelligence/creative pipeline; and (2) a continuously runnable complete local operating cycle with increasingly **real components replacing interface beacons**. Neither is met by link coverage, a passing test suite or a prettier isolated screenshot. Owner controls consequential approval, release and evaluation of actual product value, **not repeated technical testing ceremonies**. This P0-23 correction refines P0-22; it does not authorize new paid provider scope, protected writes, unsafe code execution, publication or merge.
+
+---
+
 ## Verified prior state and reference hierarchy
 
 - **Development branch:** `codex/first-operational-cycle-2026-11-12` HEAD **`f3795a547e9e435d13307ca3075dca8e7fafb487`** when checked November 18; `main` had advanced to **`555473976da82db95c97733a026d1254027ddaf5`** with documentation and diverged (419 commits ahead / 35 behind). Two old documentation PRs were open (#5, #11); their status does not establish current local worktrees. **Codex must verify actual local branch/HEAD/worktrees/concurrent changes before edits. Do not merge blindly.**
