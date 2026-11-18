@@ -469,6 +469,16 @@ Technical success (retained 12 Pages, 63 Sections, ten source-bound editorial fi
 
 ---
 
+## P0-25 — New C0 website much better, but external research influence and imagery still not demonstrated (November 18, 2026)
+
+**Owner's first assessment of genuine P0-22 preview** `http://127.0.0.1:4473/?page_id=98&preview=true`: significantly better, **near usable** and worthy of review, but owner sees **no discernible originality/difference attributable to external peer research in the site's language or design**, and no images apparent in the inspected experience. Owner disappointed the result feels like what should have existed a week earlier, while expressing hope. **Do not mislabel this as full acceptance, an outright D/F rejection, or approval to rewrite.** Owner demands audit: external research undertaken, its actual application, real cost and missing visual presence. ChatGPT should evaluate product causes, not respond with test counts or claims that citations mechanically reached Page prompts.
+
+**Independently verified remote checkpoint** `2b84b7024752ffa44e2fe1fda3e0f149715ce13c`: new P0-22 had **two newly inspected peer sites** (B12 and SiteCare), reused three earlier peer notes, **zero new web-search API calls**, a 12-finding genuine Core report, 21 text generations, and one original 1536×1024 journey diagram reportedly placed only on Home. New text metered **$0.359420**; new image **$0.50 reserved** with final billed charge unverified; **$0.859420** new conservative and **$2.811609** cumulative conservative ledger debit including old unresolved **$0.45**. Full evidence in [generation receipt](https://github.com/R-Levin/myomaton-web/blob/2b84b7024752ffa44e2fe1fda3e0f149715ce13c/docs/c0-creation-quality-p0-17.md#p0-22--five-page-c0-wordpress-preview-revisions-and-cost) and [Issue #12 P0-25 source-level audit](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6985448383).
+
+**Critical distinction:** Core now receives source-labeled decisions, but external visual evidence was **condensed into human/Codex-written textual observations** before provider use, not supplied as actual screenshot/image context. The observation notes largely reinforce already approved business ideas (owner control, Launch/Ongoing, two journeys), so fresh innovation was not demonstrated. Current named semantic block grammar permits grid/stack + groups and lists—useful progress but not genuinely unconstrained visual composition. The private draft/source→render record remains inaccessible in Git, and the user's apparent lack of images must be reconciled with the one Home-only illustration receipt, not dismissed. **Preserve the improved candidate, audit per-page private sources/prompts/output and image placement before spending more or deciding targeted improvement.** This is an important product observation and bounded analysis proposal, not Codex dispatch or new provider authority. Full P0-19/20/21/22/23 service plan remains in force; continue connected-cycle beacons.
+
+---
+
 ## Forward-maintenance template: add a new owner-marked critical conversation
 
 For every future explicitly important owner conversation, append a chronological, referenced entry; update `docs/development-control.md` only when the navigation/priority policy changes. Preserve prior entries and mark supersession instead of erasure.
