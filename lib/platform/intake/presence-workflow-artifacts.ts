@@ -5,7 +5,7 @@ import { readSemanticBlock, semanticBlockSchema } from "./presence-semantic-bloc
 import { assertNativeSection, nativeComponentSchema } from "./presence-native-component";
 
 export const evidenceKinds = ["owner-confirmed", "earlier-review-answer", "earlier-review-assessment", "website-observation", "customer-unconfirmed", "historical-discovery", "service-direction", "public-research"] as const;
-export type PresenceEvidence = { id: string; kind: typeof evidenceKinds[number]; label: string; reference: string; date: string | null; content: string; rawDigest?: string; discoveredFrom?: string };
+export type PresenceEvidence = { id: string; kind: typeof evidenceKinds[number]; label: string; reference: string; date: string | null; content: string; rawDigest?: string; discoveredFrom?: string; captureStatus?: "incomplete" };
 const findingStates = ["established", "proposed", "unresolved"] as const;
 const actionKinds = ["navigate", "request-review", "start-onboarding", "request-contact", "existing-account"] as const;
 const sectionRoles = ["hero", "intro", "cta"] as const;

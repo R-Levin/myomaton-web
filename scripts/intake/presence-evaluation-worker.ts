@@ -199,7 +199,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   try {
     if (operation === "activate") return await instance.activate();
     const { workflow, context, root } = await instance.openCase(
-      operation === "work" || replaceReport || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay, operation === "recover");
+      operation === "work" || (operation==="recover" && approval===originalEvidenceApproval) || replaceReport || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay, operation === "recover");
     const prior = await workflow.review(context);
     if (completeResearch) {
       if (!prior) throw Error("Retained research required");

@@ -12,6 +12,7 @@ import type { PresenceImageGrant } from "./presence-workflow-visual";
 import { originalMaterialInput, validateOriginalGrant, type OriginalMaterialGrant, type OriginalMaterialReader } from "./presence-source-material";
 
 type ModelStage = keyof typeof artifactSchemas;
+const fatalResearchFailure=(error:unknown)=>error instanceof Error && /custody|integrity|authority|authorization|changed within/i.test(error.message) && !/custody envelope exceeded/i.test(error.message);
 export type PresenceWorkflowGrant = {
   contextDigest: string;
   approvedSources: readonly string[];
@@ -222,11 +223,19 @@ export function createResponsesPresenceWorkflow(config: {
       await check();
       const resultsBatch = await Promise.allSettled(sources.slice(index, index + batchSize)
         .map(source => retrievePublicResearch([source], grant.researchResponseBytes, check, read, clock, undefined, config.researchOriginals)));
+      for(const result of resultsBatch)if(result.status==="rejected"&&fatalResearchFailure(result.reason))throw result.reason;
       results.push(...resultsBatch.flatMap(result => result.status === "fulfilled" ? result.value : []));
     }
     await check();
     if (results.length < scope.minimumNewOrigins) throw Error("Market research evidence coverage unverified");
-    const seeds = await retrievePublicResearch(grant.researchSources, grant.researchResponseBytes, check, fetchPage, clock, undefined, config.researchOriginals);
+    const seeds=[];
+    for(const source of grant.researchSources){
+      try{seeds.push(...await retrievePublicResearch([source],grant.researchResponseBytes,check,fetchPage,clock,undefined,config.researchOriginals))}
+      catch(error){
+        if(!config.researchOriginals||fatalResearchFailure(error))throw error;
+        // Unavailable seeds are not evidence. Independent coverage remains mandatory.
+      }
+    }
     return [...seeds, ...results];
   }
 

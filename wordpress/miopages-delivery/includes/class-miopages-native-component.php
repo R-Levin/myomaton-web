@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit;
 
 final class MioPages_Native_Component
 {
-    public static function render(array $value, array $images, array $actions, array $postIds): string
+    public static function render(array $value, array $images, array $actions, array $postIds, bool $localPending = false): string
     {
         self::keys($value, ['version','name','purpose','mode','root']);
         if ($value['version'] !== 2 || !in_array($value['mode'], ['supplement','section'], true) || !is_string($value['name']) || strlen($value['name']) > 65
@@ -18,7 +18,7 @@ final class MioPages_Native_Component
         }
         $class = 'miopages-native-component miopages-component-' . $value['name'];
         return '<!-- wp:group ' . self::json(['className'=>$class,'metadata'=>['name'=>$value['name']]]) . ' -->'
-            . '<div class="wp-block-group ' . $class . '">' . self::node($value['root'], $images, $actions, $postIds, 0)
+            . '<div class="wp-block-group ' . $class . '">' . self::node($value['root'], $images, $actions, $postIds, 0, false, $localPending)
             . '</div><!-- /wp:group -->';
     }
 
@@ -51,7 +51,7 @@ final class MioPages_Native_Component
         return json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
-    private static function node(mixed $node, array $images, array $actions, array $postIds, int $depth, bool $insideDetails = false): string
+    private static function node(mixed $node, array $images, array $actions, array $postIds, int $depth, bool $insideDetails = false, bool $localPending = false): string
     {
         if ($depth > 24) throw new InvalidArgumentException('Native component nesting refused.');
         self::keys($node, ['kind','text','level','items','ordered','reference','layout','children']);
@@ -92,7 +92,9 @@ final class MioPages_Native_Component
         }
         $hasText = in_array($kind, ['heading','paragraph','action','details'], true);
         $copy = $hasText ? self::copy($node['text']) : '';
-        if ((!$hasText && $node['text'] !== null)
+        // Image text is retained planning intent, never approved alt text or visitor copy.
+        if (in_array($kind, ['image','list'], true) && $node['text'] !== null) self::copy($node['text']);
+        if ((!$hasText && !in_array($kind, ['image','list'], true) && $node['text'] !== null)
             || ($kind === 'heading' ? !is_int($node['level']) || $node['level'] < 1 || $node['level'] > 6 : $node['level'] !== null)
             || (in_array($kind, ['image','action'], true) ? !is_string($node['reference'])
                 || !preg_match('/^[a-zA-Z0-9][a-zA-Z0-9:_-]*$/D', $node['reference']) : $node['reference'] !== null)) {
@@ -112,7 +114,7 @@ final class MioPages_Native_Component
         $attrs = ' class="' . $class . '" style="' . esc_attr($style) . '"';
         $block = self::json(['className'=>$class]);
         $children = '';
-        foreach ($node['children'] as $child) $children .= self::node($child, $images, $actions, $postIds, $depth + 1, $insideDetails || $kind === 'details');
+        foreach ($node['children'] as $child) $children .= self::node($child, $images, $actions, $postIds, $depth + 1, $insideDetails || $kind === 'details', $localPending);
         if ($kind === 'group') return '<!-- wp:group ' . $block . ' --><div' . $attrs . '>' . $children . '</div><!-- /wp:group -->';
         if ($kind === 'heading') {
             $tag = 'h' . $node['level'];
@@ -124,7 +126,8 @@ final class MioPages_Native_Component
             $tag = $node['ordered'] ? 'ol' : 'ul';
             $items = '';
             foreach ($node['items'] as $item) $items .= '<!-- wp:list-item --><li>' . self::copy($item) . '</li><!-- /wp:list-item -->';
-            return '<!-- wp:list ' . self::json(['ordered'=>$node['ordered'],'className'=>$class]) . ' --><' . $tag . $attrs . '>' . $items
+            return ($node['text'] !== null ? '<!-- wp:paragraph --><p>' . self::copy($node['text']) . '</p><!-- /wp:paragraph -->' : '')
+                . '<!-- wp:list ' . self::json(['ordered'=>$node['ordered'],'className'=>$class]) . ' --><' . $tag . $attrs . '>' . $items
                 . '</' . $tag . '><!-- /wp:list -->';
         }
         if ($kind === 'details') return '<!-- wp:details ' . $block . ' --><details' . $attrs . '><summary>' . $copy . '</summary>'
@@ -133,12 +136,18 @@ final class MioPages_Native_Component
         $reference = $node['reference'];
         if ($kind === 'image') {
             $image = $images[$reference] ?? null;
+            if ($localPending && PHP_SAPI === 'cli' && ($image['pendingLocal'] ?? false) === true) {
+                return '<!-- wp:paragraph --><p class="miopages-pending-media" role="note">Image placement awaiting asset review.</p><!-- /wp:paragraph -->';
+            }
             if (!$image || !is_int($image['id']) || $image['id'] < 1) throw new InvalidArgumentException('Native component media is unbound.');
             return '<!-- wp:image ' . self::json(['id'=>$image['id'],'className'=>$class]) . ' --><figure' . $attrs . '><img src="'
                  . esc_url(MioPages_Native_Draft_Media::url($image['id'])) . '" class="wp-image-' . $image['id'] . '" alt="' . esc_attr($image['media']['alt'])
                 . '" width="' . (int)$image['media']['width'] . '" height="' . (int)$image['media']['height'] . '" /></figure><!-- /wp:image -->';
         }
         $action = $actions[$reference] ?? null;
+        if ($localPending && PHP_SAPI === 'cli' && ($action['pendingLocal'] ?? false) === true) {
+            return '<!-- wp:paragraph --><p class="miopages-pending-action"><span aria-disabled="true">' . $copy . ' — destination not yet drafted</span></p><!-- /wp:paragraph -->';
+        }
         if (!$action || !isset($postIds[$action['destination']])) throw new InvalidArgumentException('Native component Action is unbound.');
         return '<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button ' . $block . ' --><div' . $attrs
             . '><a class="wp-block-button__link wp-element-button" href="'

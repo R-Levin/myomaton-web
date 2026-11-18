@@ -440,3 +440,88 @@ draft, critically review and revise before founder review. Capture real research
 effects and the two appropriate licensed images in actual local WordPress.
 On failure inspect the retained response and ledger before any deliberate retry;
 do not repeat paid stages blindly.
+
+## Original-evidence retained generation and local review — November 18, 2026
+
+**Execution status, not acceptance.** The real Core/API cycle has saved an
+18-finding report, substantive Presence Direction and an eight-Page plan.
+Home and Service have been recovered and the remaining Pages are being generated
+in the same isolated case. The exact original sources and ten unconfirmed answers
+remain bound; protected Core 41, WordPress 6 and the earlier 4473 preview are
+unchanged. No C2 case or fabricated customer proof has been substituted.
+
+Research retained full text from eight sources and five complete desktop/mobile
+capture pairs. The approved 20 MB research-custody envelope prevented three full
+pairs. Recovery now replays the retained HTML byte for byte, skips complete pairs
+and records incomplete visual capture explicitly. Custody/integrity failures
+still refuse. Verified DOM text may support an original information-composition
+proposal; it is not evidence of inspecting missing pixels. Real captured peers
+and their limitations remain in the API input. No research generation was repeated.
+
+Retained responses exposed three renderer-contract mismatches: readable component
+names, image-node planning intent, and list captions. Provider-only names normalize
+as the existing version-1 reader already does. Image intent is retained separately
+from approved alt/visitor copy, and list captions render as native paragraphs.
+Executable fields, markup, foreign references and unsigned protected version-2
+delivery remain refused. Recovery revalidates the original response/receipt rather
+than paying for replacement content. Current Linux worker SHA-256:
+**5260aab31d60bb20a0993c824b60034cb3cbd524cd641a1aa42924fdace575c0**.
+Every prior binary and activation record is retained. Executable integrity remains
+checked at open; ordinary code correction no longer changes the semantic case,
+source, grant, start/expiry or spending binding.
+
+Home has actually rendered in the existing disposable WordPress installation,
+using a distinct Page map and loopback comparison origin 4474. The old Page map,
+export and all ten desktop/mobile observations at 4473 still match. Early rendering
+accurately labels pending media/destinations; it is **not ready for founder review**.
+Actual inspection found generic/repetitive copy, missing media, and inherited Hero
+styles hiding an authored title and squeezing wide layouts. Component-specific
+presentation corrections preserve the prior site; substantive AI revision and
+whole-site visual review remain necessary. No customer/site/publication approval
+was recorded by development continuation.
+
+Both approved cached searches remain unchanged: 16 results, no retained API key.
+Two selected IDs are 5467838 (Tumisu, boutique owner) and 593371
+(StartupStockPhotos, laptop worker). Only those two representations were requested.
+The latter failed validation; a HEAD diagnostic returned 200, and one explicit
+diagnostic acquisition retained its bytes before validation. This exposed the
+actual discrepancy: API height 426, received JPEG 427, width 640 unchanged.
+Recovery validated those exact retained bytes with observed dimensions and recorded
+both original and corrected metadata; no further image request was made.
+The first failure's precise exception was not retained and remains unknown.
+Both private PNG candidates are now available for contextual/rights review and
+the existing Asset/AssetUsage path, **not yet placed or approved**. No extra search,
+third selected image, generation or public hotlink occurred. Official license/API
+conditions were checked; persons/brands still require contextual inspection and
+these images must never imply customer proof or endorsement.
+
+**Verified engineering evidence.** Seventeen focused tests passed without skips,
+including actual sandboxed public capture, native WordPress desktop/mobile
+rendering, retained originals and capture-limit security refusal. TypeScript and
+changed-file lint passed. Subsequent component-label/caption corrections passed
+their focused suites; the final consolidated regression is still due.
+A narrow stock regression additionally checks raw custody precedes dimension refusal.
+The local transfer was initially rejected by automatic approval review for unclear
+scope. The approved manifest expressly requires disposable local WordPress review;
+after verifying the candidate-only schema and owner-only, Git-ignored destination,
+the narrower no-print transfer was approved. No interview, key or credential was
+copied to that preview directory.
+
+**Cost snapshot (before remaining Pages finish).** Seven completed generations /
+13 count-generation requests, two paid search tools; usage-priced estimate
+**$1.864747** new, **$2.157444** new conservative debit, cumulative debit
+**$4.969053**, including the original uncertainties. Later in-flight work is not
+included in this snapshot. No invoice charge is claimed. $12 additional /
+$14.811609 cumulative ceilings and November 19 16:03:51 UTC expiry remain.
+Other cash $0; owner prompt time UNKNOWN. No paid response has been repeated.
+
+**RECOVERY / RESUME HERE.** Verify the latest worker/activation and append-only
+usage ledger in case 4d437190-9ce3-460b-81af-edd92279271a. At the code checkpoint,
+Home/Service and additional Pages are saved and the controlled worker is finishing
+the plan. Read actual state before dispatch; recover retained output on validation
+failure, never call the model blindly. Continue the existing local WordPress
+comparison, finish source-bound stock intake/placements, inspect all real Pages
+at desktop/mobile and request substantive generated corrections before founder
+review. Preserve pending operational links, original 4473, protected Core 41 /
+WordPress 6, sources and every receipt. This remains execution toward a useful
+website, not a completed or accepted product.

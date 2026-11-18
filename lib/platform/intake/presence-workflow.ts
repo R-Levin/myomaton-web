@@ -196,7 +196,7 @@ function readResearch(value: unknown, ids: readonly string[]): PresenceEvidence[
   if (!Array.isArray(value) || !value.length) throw Error("Research record is incomplete");
   const seen = new Set(ids);
   return value.map(item => {
-    const record = object(item, ["id", "kind", "label", "reference", "date", "content", "rawDigest", "discoveredFrom"]);
+    const record = object(item, ["id", "kind", "label", "reference", "date", "content", "rawDigest", "discoveredFrom", "captureStatus"]);
     const id = text(record.id, 160);
     const reference = new URL(text(record.reference, 500));
     const date = text(record.date, 10);
@@ -209,6 +209,7 @@ function readResearch(value: unknown, ids: readonly string[]): PresenceEvidence[
     seen.add(id);
     return { id, kind: "public-research", reference: reference.href, date, label: text(record.label, 250),
       content: text(record.content, Infinity, true), ...(rawDigest && { rawDigest }),
+      ...(record.captureStatus==="incomplete" && {captureStatus:"incomplete" as const}),
       ...(typeof record.discoveredFrom === "string" && { discoveredFrom: text(record.discoveredFrom, 500) }) };
   });
 }

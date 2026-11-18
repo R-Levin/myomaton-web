@@ -183,7 +183,13 @@ export async function retrievePublicResearch(sources: readonly PublicResearchSou
       results.push({ id: source.id, kind: "public-research", label: source.label, reference: source.url,
         date: new Date(clock()).toISOString().slice(0, 10), content, rawDigest, ...(discoveredFrom && { discoveredFrom }) });
     } finally { dom.window.close(); }
-    if (originals?.render) await originals.render(source, bytes);
+    if (originals?.render) {
+      try { await originals.render(source, bytes); }
+      catch (error) {
+        if (!(error instanceof Error) || !/custody envelope exceeded|capture envelope unavailable/.test(error.message)) throw error;
+        results[results.length-1].captureStatus="incomplete";
+      }
+    }
   }
   for (const source of sources) await readSource(source, true, source.discoveredFrom);
   if (discovery) {

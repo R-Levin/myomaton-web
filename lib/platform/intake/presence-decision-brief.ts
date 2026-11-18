@@ -93,6 +93,9 @@ export function compilePageDecision(run: WorkflowRun, brief: DecisionBrief, path
     }
     return { index, decision: text(directionDecision, 1_000), digest: fingerprint(directionDecision), sources: direction.sourceIds };
   });
+  // Verified DOM text can support a proposed information composition. Missing
+  // viewport captures stay explicitly incomplete; they are not invented pixels
+  // or a completed visual-quality review.
   const visualBasis = brief.influences.some(item => item.use === "composition" && item.sourceIds.some(id => peerIds.has(id)));
   if (!visualBasis || brief.influences.some(item => item.sourceIds.some(id => !observationIds.has(id)))) {
     throw Error("Page needs source-backed peer composition and market influence");

@@ -30,6 +30,14 @@ export const component = {
 
 test("original component structure survives Core validation and native WordPress projection without flattening", () => {
   const parsed = readNativeComponent(component);
+  assert.equal(readNativeComponent({...component,name:"Readable Component Name"},true).name,"readable-component-name");
+  assert.throws(()=>readNativeComponent({...component,name:"Readable Component Name"}));
+  assert.throws(()=>readNativeComponent({...component,name:"Unsafe <component>"},true));
+  const labelledList={...component,root:node("list",{text:"Choices explained",items:["First","Second"]})};
+  assert.equal(readNativeComponent(labelledList).root.text,"Choices explained");
+  const labelled=spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php",["wordpress/miopages-delivery/tests/native-component.php"],{input:JSON.stringify(labelledList),encoding:"utf8"});
+  assert.equal(labelled.status,0,labelled.stderr);
+  assert.match(labelled.stdout,/Choices explained/);
   assert.deepEqual(parsed.root.layout.columns, [2, 1]);
   assert.equal(parsed.root.children[0].children[2].kind, "details");
   const pages = [{ id: "11111111-1111-4111-8111-111111111111", path: "/", title: "Fixture", composition: "managed-v1" as const,
@@ -55,6 +63,9 @@ test("unknown executable fields, foreign resources, reordered mobile content and
   assert.throws(() => readNativeComponent({ ...component, root: node("paragraph", { text: "<iframe>" }) }));
   assert.throws(() => readNativeComponent({ ...component, root: node("image", { reference: "https://foreign.test/image.png" }) }));
   assert.throws(() => readNativeComponent({ ...component, root: { ...component.root, layout: { ...component.root.layout, mobileOrder: 1 } } }));
+  const intent = { ...component, root: node("image", { reference: "section-0", text: "Proposed explanatory illustration; not an acquired Asset." }) };
+  assert.equal(readNativeComponent(intent).root.text, intent.root.text);
+  assert.throws(() => readNativeComponent({ ...intent, root: { ...intent.root, text: "<script>unsafe</script>" } }));
   const foreign = { ...component, root: node("image", { reference: "section-999" }) };
   assert.equal(spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/native-component.php"],
     { input: JSON.stringify(foreign), encoding: "utf8" }).status, 1);

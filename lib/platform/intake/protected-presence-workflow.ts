@@ -25,6 +25,7 @@ import { researchMaterialCustody } from "./presence-research-material";
 import { capturePublicPeer } from "./presence-peer-browser";
 import { chromium } from "playwright-core";
 import type {PublicPeerCapture} from "./presence-public-capture-bridge";
+import {retainedResearchFetch} from "./presence-research-cache";
 
 export const protectedWorkflowRole = "miopages_core_development";
 type Workspace = { root: string; grantFile: string; ledgerDirectory: string; referenceDirectory?: string; visualDirectory?: string };
@@ -152,7 +153,8 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
         isolatedCommercialWorker ? 150_000 : undefined)
         : capability.kind === "offline-test" ? capability.transport : { send: noOutbound };
       const mayFetch = capability.kind === "worker" || (boundary === "disposable" && capability.kind === "research-replay");
-      const fetchPage = mayFetch ? pinnedResearchFetch(url => researchUrlAllowed(url, grant.researchSources, grant.discovery), grant.researchResponseBytes)
+      const retainFetch=(live:typeof fetch)=>grant.originalMaterials?retainedResearchFetch(join(workspace.root,"originals"),live):live;
+      const fetchPage = mayFetch ? retainFetch(pinnedResearchFetch(url => researchUrlAllowed(url, grant.researchSources, grant.discovery), grant.researchResponseBytes))
         : capability.kind === "offline-test" ? capability.fetchPage : noOutbound;
       const reportHold = isolatedCommercialWorker ? capability.reportHold : undefined;
       const originals = grant.originalMaterials;
@@ -222,7 +224,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
         }),
         recoverBlueprint: boundary === "disposable" && capability.kind === "blueprint-recovery" ? capability.repair : undefined,
         fetchMarketPages: sources => mayFetch
-          ? pinnedResearchFetch(url => researchUrlAllowed(url, sources), grant.researchResponseBytes) : fetchPage,
+          ? retainFetch(pinnedResearchFetch(url => researchUrlAllowed(url, sources), grant.researchResponseBytes)) : fetchPage,
       });
       let visuals: PresenceVisualOperations | undefined;
       if (grant.images) {

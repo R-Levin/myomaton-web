@@ -2085,3 +2085,14 @@ The approved Free Review Draft D Revision 3 remains approved **but undelivered**
 - Live secrets/credentials/runtime config stay outside Git. The checked-in operations record must contain only nonsecret context.
 - After review/merge, modify the README to link this as the **mandatory current-status entry point**, and correct any stale 'external provisioning has not begun' summary. Do not silently rewrite historical proofs; mark them historical.
 - Before declaring this handoff reliable, test it from a separate read of GitHub `main`, checking the commit/status/next boundary/Commercial V1 route without local recovery-file access. Until merged and tested, **continuity fix remains incomplete**.
+
+### Original-evidence cycle: retained responses and actual WordPress review
+
+Continue from [the current retained-generation checkpoint](c0-creation-quality-p0-17.md#original-evidence-retained-generation-and-local-review--november-18-2026).
+Actual report, Direction and Pages are saved; generation is in progress.
+The local comparison is development-only and still needs substantive revision,
+two source-bound stock placements and whole-site review. Existing 4473, Core 41
+and WordPress 6 are preserved. Read current case/ledger before dispatch.
+The existing approved cycle and expiry apply; no new approval is needed for
+ordinary in-scope recovery. Do not present this engineering checkpoint as
+founder product acceptance or repeat a completed paid response.

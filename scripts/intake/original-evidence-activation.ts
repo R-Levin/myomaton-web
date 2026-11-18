@@ -48,9 +48,10 @@ export async function verifiedOriginalEvidenceRuntime(parent:string,reviewerId:s
  const brand=draftBrand({scope:originalEvidenceCandidate.scope,visualDirection:focusMioPagesPreview.siteConfiguration.visualDirection,
   design:focusMioPagesPreview.designConfiguration,logo:{assetId:"cd7d9a9f-76a1-4615-957a-0ebaa8e6427d",usageId:"bf7fbc72-50ef-461f-974b-f4dbcc7a62df",
    sha256:originals.find(s=>s.id==="c0-original-wordmark")!.sha256,alt:"MioPages"}});
+ const {artifact:verifiedArtifact,...scopeActivation}=activation;void verifiedArtifact;
  return {
   item:originalEvidenceCandidate,primary:JSON.parse(previousLedger.toString()).rateCard,previousLedger,readOriginal,
-  fingerprint:fingerprint({activation,expiresAt,originals,reviewerId,brand:brand.digest}),
+  fingerprint:fingerprint({activation:scopeActivation,expiresAt,originals,reviewerId,brand:brand.digest}),
   async compile(_original:WorkflowContext){
    void _original;
    const sourceRecords=oldSources.sources.map(s=>({evidence:{id:s.id,kind:s.kind as WorkflowContext["evidence"][number]["kind"],

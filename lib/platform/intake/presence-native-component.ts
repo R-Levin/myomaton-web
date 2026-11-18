@@ -58,9 +58,11 @@ export function assertNativeSection(component: NativeComponent, heading: string,
   }
 }
 
-export function readNativeComponent(value: unknown): NativeComponent {
+export function readNativeComponent(value: unknown, normalizeProviderName = false): NativeComponent {
   const component = object(value, ["version", "name", "purpose", "mode", "root"]);
-  const name = text(component.name, 65);
+  const supplied = text(component.name, 65);
+  const name = normalizeProviderName && /^[A-Za-z0-9]+(?:[ -][A-Za-z0-9]+)*$/u.test(supplied)
+    ? supplied.toLowerCase().replaceAll(" ", "-") : supplied;
   if (component.version !== 2 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(name)) throw Error("Native component identity refused");
   function node(value: unknown, depth: number, insideDetails = false): NativeNode {
     if (depth > 24) throw Error("Native component nesting exceeds renderer safety");
@@ -83,7 +85,7 @@ export function readNativeComponent(value: unknown): NativeComponent {
     const copy = row.text === null ? null : plain(row.text);
     const reference = row.reference === null ? null : text(row.reference, 160);
     if ((kind === "heading" ? !Number.isSafeInteger(row.level) || Number(row.level) < 1 || Number(row.level) > 6 : row.level !== null) ||
-        (["heading", "paragraph", "action", "details"].includes(kind) ? !copy : copy !== null) ||
+        (["heading", "paragraph", "action", "details"].includes(kind) ? !copy : ["image", "list"].includes(kind) ? false : copy !== null) ||
         (["image", "action"].includes(kind) ? !reference || !/^[a-zA-Z0-9][a-zA-Z0-9:_-]*$/u.test(reference) : reference !== null)) {
       throw Error("Native component content or reference refused");
     }

@@ -5,7 +5,8 @@ import { MAX_MANAGED_BYTES } from "../assets/source";
 import { eligibleStock, declinedPixabayIds, type StockSelection } from "./stock";
 import type { StockSearchHit } from "./stock-discovery";
 
-export async function downloadPixabaySelection(hit: StockSearchHit, recheck: () => Promise<void>, read: typeof fetch = fetch) {
+export async function downloadPixabaySelection(hit: StockSearchHit, recheck: () => Promise<void>, read: typeof fetch = fetch,
+  retainSource?: (bytes: Buffer, mime: string) => Promise<void>) {
   const url = new URL(hit.representation.url);
   if (hit.provider !== "pixabay" || declinedPixabayIds.some(id => id === hit.sourceId) ||
       hit.representation.id !== "webformat" || url.protocol !== "https:" || url.username || url.password || url.port || url.search || url.hash ||
@@ -32,6 +33,7 @@ export async function downloadPixabaySelection(hit: StockSearchHit, recheck: () 
     }
   } finally { reader.releaseLock(); }
   const source = Buffer.concat(chunks);
+  await retainSource?.(source, mime!);
   await validateStoredMedia(source, mime!, hit.representation);
   const prepared = await prepareRaster(source, "png");
   if (prepared.width !== hit.representation.width || prepared.height !== hit.representation.height) throw Error("Selected image dimensions differ");

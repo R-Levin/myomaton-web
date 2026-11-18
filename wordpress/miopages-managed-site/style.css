@@ -227,3 +227,12 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
   }
   .miopages-branded-draft .miopages-draft-creative .miopages-draft-hero { gap: 1.2rem; }
 }
+
+/* Authored components own their hierarchy; legacy Hero colors/widths must not
+   conceal a title on a model-selected brand surface. */
+.miopages-branded-draft .miopages-draft-creative .miopages-authored-section .miopages-native-component :is(h1,h2,h3,h4,h5,h6) { color: inherit; }
+.miopages-native-component .wp-block-group.miopages-node-measure-wide { max-width: 100%; }
+.miopages-native-component .wp-block-group.miopages-node-flow { display: flex; flex-direction: column; }
+.miopages-native-component .wp-block-group.miopages-node-flow > * { margin-block: 0; }
+.miopages-native-component .miopages-pending-media,
+.miopages-native-component .miopages-pending-action { padding: .75rem; border: 1px dashed currentColor; font-size: .875rem; }

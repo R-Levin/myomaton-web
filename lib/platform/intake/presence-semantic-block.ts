@@ -12,7 +12,7 @@ export const semanticBlockSchema = record({
 });
 
 export function readSemanticBlock(value: unknown, normalizeProviderName = false) {
-  if (value && typeof value === "object" && (value as { version?: unknown }).version === 2) return readNativeComponent(value);
+  if (value && typeof value === "object" && (value as { version?: unknown }).version === 2) return readNativeComponent(value, normalizeProviderName);
   const block = object(value, ["version", "name", "purpose", "layout", "listStyle", "groups"]);
   const supplied = text(block.name, 65);
   // Canonicalize a readable provider label without dropping punctuation or

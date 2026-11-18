@@ -96,3 +96,14 @@ test("research preserves full observed text and original HTML rather than a deve
   assert.match(result[0].content, /Scope details/);
   assert.doesNotMatch(result[0].content, /public excerpt/);
 });
+
+test("a bounded visual-capture stop preserves complete source text and marks the missing visual evidence", async()=>{
+ const html=Buffer.from("<main>Complete public evidence remains available.</main>");
+ const read=async(url:RequestInfo|URL)=>{const r=new Response(html,{headers:{"content-type":"text/html"}});Object.defineProperty(r,"url",{value:String(url)});return r};
+ const result=await retrievePublicResearch([{id:"research:partial",url:"https://example.org/",label:"Fixture"}],10000,async()=>{},read,Date.now,undefined,
+  {retain:async()=>{},render:async()=>{throw Error("Research capture envelope unavailable")}});
+ assert.equal(result[0].captureStatus,"incomplete");
+ assert.equal(result[0].content,"Complete public evidence remains available.");
+ await assert.rejects(retrievePublicResearch([{id:"research:partial",url:"https://example.org/",label:"Fixture"}],10000,async()=>{},read,Date.now,undefined,
+  {retain:async()=>{},render:async()=>{throw Error("Private research directory refused")}}),/directory refused/);
+});

@@ -13,7 +13,7 @@ final class MioPages_Native_Draft_Content
      * and IDs allocated by its materializer. The caller must authenticate the
      * candidate and verify the target posts before using these inputs.
      */
-    public static function posts(array $candidate, array $postIds, array $attachments = [], bool $localSemanticBlocks = false): array
+    public static function posts(array $candidate, array $postIds, array $attachments = [], bool $localSemanticBlocks = false, array $pendingActions = []): array
     {
         $pages = $candidate['pages'];
         $navigation = $candidate['navigation'];
@@ -81,7 +81,7 @@ final class MioPages_Native_Draft_Content
                 $posts[$path] = [
                     'ID' => $postIds[$path], 'post_type' => 'page', 'post_status' => 'draft',
                     'post_title' => $page['title'],
-                    'post_content' => self::composed($page, $postIds, $navigation, $labels, $actions, $attachments, $localSemanticBlocks),
+                    'post_content' => self::composed($page, $postIds, $navigation, $labels, $actions, $attachments, $localSemanticBlocks, $pendingActions),
                 ];
                 continue;
             }
@@ -125,7 +125,7 @@ final class MioPages_Native_Draft_Content
         return $posts;
     }
 
-    private static function composed(array $page, array $postIds, array $navigation, array $titles, array $actions, array $attachments, bool $localComposition): string
+    private static function composed(array $page, array $postIds, array $navigation, array $titles, array $actions, array $attachments, bool $localComposition, array $pendingActions = []): string
     {
         $path = $page['path'];
         $links = [];
@@ -150,8 +150,15 @@ final class MioPages_Native_Draft_Content
         $componentImages = [];
         foreach ($page['sections'] as $index => $section) {
             if (isset($attachments[$section['id']])) $componentImages['section-' . $index] = $attachments[$section['id']];
+            elseif ($localComposition && PHP_SAPI === 'cli') $componentImages['section-' . $index] = ['pendingLocal'=>true];
         }
         $componentActions = [];
+        if ($localComposition && PHP_SAPI === 'cli' && $actions === []) {
+            foreach ($pendingActions as $index => $label) {
+                if (!is_string($label) || trim($label) === '') throw new InvalidArgumentException('Pending Action label required.');
+                $componentActions['action-' . $index] = ['pendingLocal'=>true];
+            }
+        }
         foreach (array_values(array_filter($actions, static fn($action) => $action['from'] === $path)) as $index => $action) {
             $componentActions['action-' . $index] = $action;
         }
@@ -223,7 +230,7 @@ final class MioPages_Native_Draft_Content
         if (!is_array($value)) throw new InvalidArgumentException('Semantic draft specification required.');
         if (($value['version'] ?? null) === 2) {
             require_once __DIR__ . '/class-miopages-native-component.php';
-            return MioPages_Native_Component::render($value, $images, $actions, $postIds);
+            return MioPages_Native_Component::render($value, $images, $actions, $postIds, true);
         }
         $keys = array_keys($value);
         sort($keys);

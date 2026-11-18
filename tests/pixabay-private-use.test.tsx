@@ -57,3 +57,11 @@ test("a restarted stock discovery reuses the private 24-hour result and reauthor
     assert.equal((await resumed.select({}, target, result.query, hit.sourceId, result.results[0].digest)).state, "requires-rights-review");
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test("download custody retains a mismatched provider raster before validation without making it eligible", async()=>{
+  const bytes=await sharp({create:{width:20,height:13,channels:3,background:"#abc"}}).jpeg().toBuffer();
+  let retained:Buffer|undefined;
+  await assert.rejects(downloadPixabaySelection(hit,async()=>{},async()=>new Response(bytes,{headers:{"content-type":"image/jpeg"}}),
+    async(source,mime)=>{assert.equal(mime,"image/jpeg");retained=source}),/dimensions differ/);
+  assert.deepEqual(retained,bytes);
+});

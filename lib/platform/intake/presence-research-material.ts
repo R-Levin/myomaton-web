@@ -69,6 +69,11 @@ export function researchMaterialCustody(root: string, grant: OriginalMaterialGra
   return {
     retain: (source, bytes) => retain(source, bytes),
     ...(render && { async render(source: PublicResearchSource, html: Buffer) {
+      const records=JSON.parse(await readFile(join(root,"index.json"),"utf8")) as OriginalMaterial[];
+      const rawDigest=createHash("sha256").update(html).digest("hex");
+      const complete=["desktop","mobile"].every(viewport=>records.some(row=>row.id===source.id+"-"+viewport&&row.derivedFromSha256===rawDigest));
+      if(complete)return;
+      if(records.filter(row=>row.researchSourceId).reduce((n,row)=>n+row.bytes,0)>permitted.maximumBytes-1_000_000)throw Error("Research capture envelope unavailable");
       const result = await render(source, html);
       for (const capture of result.captured) await retain(source, capture.bytes, capture.viewport, result.limitations,
         createHash("sha256").update(html).digest("hex"));
