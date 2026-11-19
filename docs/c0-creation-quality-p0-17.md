@@ -2002,3 +2002,138 @@ retained outputs. Original$8/32generations/65requests/November22 15:58:31UTC
 limits and all protected41/6/75/old202posts/4473/root4474/rollback remain.
 Complete Entry, portal, MyBusiness, inquiry/measurement/reporting/Ongoing work
 stays in the roadmap; no claim those beacons are completed by a site preview.
+
+## Owner participation, judgment provenance and current capture hold — November 19, 2026
+
+**Owner feedback (current development conversation).** The owner reports that the
+long-running work offers no clear way to assist, and asks who judges what,
+against which reasons, and where hidden task constraints originate. This is
+feedback on the development process, not new customer knowledge, a new source
+for model transmission, or approval of the current site. The preceding concern
+about elapsed time is retained: too much Home-only iteration delayed the
+complete, owner-inspectable result. After opening the actual54 preview, the
+owner says the content is very good but narrowly focused, the result meager for
+the time and money, and they are unhappy with the progress. Preserve the useful
+writing; this is explicit negative product feedback, not acceptance. Do not
+translate this into a request for another Home-only polish round or imply that
+the owner must supply missing engineering direction. Codex acknowledges that interpreting
+"do not present another deficient candidate" as a reason to exclude the owner
+from unfinished work was too broad. Optional feedback on work in progress is
+different from acceptance, authorization and supervising technical debugging.
+
+**Exact provenance of the quoted compiler finding.** `git log -S` traces
+"Page needs source-backed peer composition and market influence" to
+[924fd14](https://github.com/R-Levin/myomaton-web/commit/924fd146601c25ebc77a9ba2ccd9a80409aa6f88),
+`lib/platform/intake/presence-decision-brief.ts`. Its original
+`compilePageDecision` requires at least one influence whose
+`use === "composition"` and whose source belongs to `scope.peerIds`;
+it also permits only observation IDs in influences. This is an implemented
+per-Page peer-composition condition, not a WordPress requirement, a factual
+provenance necessity, or evidence that copying a peer is appropriate.
+The P0-22 handoff in that same commit describes binding market learning to
+actual decisions. Requiring that binding specifically through peer composition
+on **every** Page is the over-prescriptive implementation choice. Market
+learning can inform terminology, a visitor journey or an overall strategy while
+a Page's original composition comes from authorized business/brand knowledge.
+The Git author is the repository's configured author, not proof identifying
+which human or assistant originated the interpretation. Do not attribute motive
+or claim an owner requirement without its actual source.
+
+The current source-aware compiler already accepts authorized customer-source
+composition while retaining genuine market influence and exact source/context
+validation. The historical-grant path remains exact for compatibility. The
+earlier diagnostic was a true description of the rejecting code; it should have
+been accompanied by the explanation that the code's design assumption was
+being challenged, not presented as a legitimate strategic requirement.
+
+**Who judges, and what the judgment means.** These responsibilities apply the
+existing human/AI charter and continuous decision documentation; no new approval
+framework, identities or permission system is created.
+
+| Participant / mechanism | What it judges | Limits and visibility |
+| --- | --- | --- |
+| Deterministic Core checks and tests | Tenant/scope, source references, bytes, current revision, credentials, permitted actions, budget and storage integrity | A pass proves those checks, not persuasive writing or good design. A new style/source-selection restriction requires a reason and must not masquerade as a security invariant. |
+| Core API AI | Proposed research synthesis, business report, Direction, architecture, copy and commercial/visual criticism | Output and criticism are fallible proposals with provenance. AI criticism is not owner acceptance or verified customer truth. |
+| Codex, delegated development review | Technical correctness and a provisional commercial/desktop/mobile judgment using the actual candidate and existing ten review criteria | State material findings, rationale, tradeoffs and unresolved deficiencies. The founder is the only human; separate role permissions do not establish independent human review. Development judgment must not silently settle the owner's product preferences. |
+| Owner | Business corrections, priorities, voice/design preferences and consequential product acceptance/authority | May comment on unfinished work without accepting it or authorizing publication. Do not require the owner to troubleshoot routine implementation or reconstruct retained facts. |
+
+**Current choices available for challenge, not settled product policy.**
+
+- The five routes (Home, Service, Why MioPages, Free Review and Direct Start)
+  are this case's AI-proposed architecture, not a fixed product template.
+- The current Home emphasizes handing off web work while retaining business
+  judgment. Its comparative explanation and responsibility sections are genuine
+  AI output. Whether that emphasis and voice are compelling remains a product
+  judgment, not an integrity check.
+- Both retained stock photographs are provisional context illustrations, not
+  depicted customer evidence or approved brand imagery.
+- Codex's actual desktop/mobile inspection finds the third editorial Home
+  coherent enough for further evaluation but still long and text-heavy; it is
+  not declared commercially accepted. Supporting Pages remain unfinished.
+- Remaining work should complete the supporting journey and evaluate the whole
+  site, rather than spend more rounds repeatedly polishing Home alone. This is
+  an execution correction inside the same grant, not a new owner-imposed gate.
+
+The owner was given the actual unfinished Home at
+http://127.0.0.1:4474/?page_id=203&preview=true and an optional opportunity to
+comment on message, voice, imagery or a consequential hidden choice. Work is
+not to wait for optional feedback. New feedback stays local review input unless
+its model transmission is covered by actual authorization; it must not be
+silently promoted to business fact or mixed into canonical customer knowledge.
+
+**Actual preserved result.** Home54 is real WordPress draft203 with two exact
+prepared photos/AssetUsage bindings. The new capture index binds the current
+input c543a8ad33dc3480958b192f6b9f68135762647ef787a700ceb68968ef1a77c4,
+packet877779ffd998cacd513baff1b3bf58e980477d7fcb3e2dc2fc3cfd970568f2c4
+and exact native rows. Both1440px/390px views returned200 with no overflow;
+both photos and both wordmarks load. All202 older post rows retain digest
+6ad9ca038ebd73c9150eb1ed404a873c5435c53fb8c2e0c23dac7922192dc514.
+Desktop capture b4376ae476587296653ba968136002ce96d0d6a22e577c787df2fd5d7effb29b;
+mobile7961a6ece952d9e0baf8d787a9cd2e66f8b111a74b5b9f2ca66584072f94cd76.
+Supporting Pages/full-site navigation, final critique and this candidate's final
+rollback demonstration remain incomplete. Protected41/6/75 and old previews
+were not modified.
+
+**Tool-level blocker, not a Core defect or missing technical test.** Automatic
+approval review refused the encrypted upload of these two actual visitor-page
+screenshots and their capture index to the same existing private Cloud case.
+A second review included verified owner-approved manifest
+f560374969b7abdff53fa33917c9b84f7053f5f9b092b0dccf9a505bcc8f9ddd:
+`sources.derivedReasoning` permits rendered pixels, `review.candidateImages`
+permits editorial use, and `execution.dataDestinations` includes private
+capture custody. It still rejected the action, stating that trusted user
+instructions did not explicitly authorize this sensitive payload/destination.
+Neither upload executed. Do not reroute, rename/repackage the payload to evade
+review, substitute an old screenshot, omit the required current capture or
+dispatch an ungrounded critique. A protected empty capture-upload-54-media
+directory was prepared; it contains no uploaded images from these attempts.
+Current captures and full retained review input remain intact in their separate
+approved custody. The next request must name the actual screenshots/metadata,
+local-to-same-Cloud-case transfer and existing authorized AI critique, covering
+the remaining captures of this same candidate rather than each image hash.
+
+**Verified running cost (after54, no new request in this checkpoint):**
+37provider requests/19generations, all19completed, **$3.659578 usage-priced
+estimate**, zero pending/uncertain reservations in this fresh run, $4.340422
+remaining before future reservations. Ledger SHA-256
+ef1ddaa1d06c378169e4355bba7b6a855e12744cda90aa927b0a09ac7e3edba2.
+Tracked-lineage maximum-accounted$15.540681 includes the current subtotal and
+the preserved prior uncertainty; do not add the subtotal again. No additional
+paid media/hosting expenditure. Founder minutes and Codex processing-time cash
+charge UNKNOWN; the owner has explicitly reported avoidable elapsed delay.
+Original$8/32generations/65requests/November22 15:58:31UTC limits remain exact;
+replans2/2 and ordinary editorial rounds3/4 are used.
+
+**RECOVERY / RESUME HERE:** branch codex/first-operational-cycle-2026-11-12,
+fresh case41a83e7e-1765-4517-941a-b2b151bb7c4a, saved54 and current verified
+worker41c5e366d67f3e9c5dfbd452ad4355905c0bc5e7a4bd4ea168ec2fd035bda857
+from code checkpoint9c5a7dd. No provider job pending. Preserve local capture54
+and same-case base/media packets. Resolve the tool's explicit screenshot-transfer
+consent requirement without broadening data/destination scope. Then store the
+exact captures through stock-helper-05/source-aware-rendered-review-v4 with
+full existing dependency path, critique the retained Home once, and record a
+reasoned concept-stage judgment. If viable, continue using the actual base
+Home-concept digest and generate the four supporting Pages. Complete actual
+whole-site rendering/critique, necessary bounded correction and scoped rollback.
+Do not regenerate Home merely to recover captures, reset any counter, silently
+treat owner preferences as settled, or claim completed site/product acceptance.
