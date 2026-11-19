@@ -988,3 +988,68 @@ rollback evidence. Do not prescribe another broad regeneration or additional
 data gathering before correcting the demonstrated information/feedback
 bottlenecks. Keep the full Entry→Creation→Contact→measurement→Ongoing service
 in view; improved generation is one shared capability within that product.
+
+## How the restrictions entered the implementation — November 19, 2026
+
+The owner challenges the origin of the timid approach and the mixing of development
+conversation with customer knowledge. The owner did not request that mixture or
+a reduced creative interpretation of the service. This follow-up records code
+history and engineering accountability, not a new implementation authorization.
+
+**Verified sequence.** Commit e53b53e introduced marketing-use classifications on
+November17 after actual internal/unconfirmed proof language appeared in the
+earlier visitor copy. The legitimate problem was false/public claims and leakage.
+The correction also kept raw research and report/Direction out of Page drafting.
+Commit924fd14 on November18 added the compact P0-22 pack and Page-specific claim
+allowlists. Commit c7e25d2 restored complete original material, but reused that old
+pack and classified every restored original text as analysis. It therefore
+repaired transmission while leaving the downstream copy-authority bottleneck.
+These commits establish what changed. They do not reveal an earlier assistant's
+private reasoning or establish that the configured human Git author personally
+chose those implementation details.
+
+The source pack itself mixes business assertions and processing instructions
+inside the same content field, classified as staffed offer. For example, the
+Review and Ongoing records include both the positive offer and prohibitions
+about live forms, commitments and analytics. The original R3 document also
+contains historical development notes. Labeling them as data does not replace a
+proper separation of factual knowledge, source interpretation and operating
+instructions. Some original documents remain genuinely provisional or historical;
+they must not simply be relabeled owner-confirmed to solve this problem.
+
+**Responsibility.** Privacy, secrets, tenant isolation, factual provenance,
+spending and publication restrictions were real owner requirements. A ten-record
+copy bottleneck, exclusion of the generated site's pixels from its critic,
+limited component expression and an unwired strategic-replan path were assistant
+implementation choices. Approval to execute an exact manifest is not product
+acceptance of every embedded engineering assumption. Codex had responsibility
+to expose and correct that mismatch rather than mechanically preserve it.
+More founder repetition or another strategy-chat intermediary does not repair
+these code paths. The previous outcome statements remain insufficient evidence
+of commercial quality.
+
+**Proposed prevention within existing development practice.**
+
+- Keep business facts, customer assertions, research observations and generated
+  interpretations source-aware and distinct. Keep development instructions and
+  security/runtime policy outside customer knowledge. Only quote technical
+  source material into a business task when it has a specific justified use.
+- Identify the basis for material restrictions in existing code/contracts:
+  explicit owner direction, genuine technical/security necessity, or a
+  provisional implementation choice. Do not silently promote the last category
+  into product policy or ask the owner to approve its removal as if they ordered it.
+- Verify the full requirement through the actual provider input, generated
+  decision and rendered result. Source presence, valid citations and green
+  technical tests cannot stand in for preserved business meaning and quality.
+- Give the critic the actual generated desktop/mobile site and let a weak
+  strategy trigger reconsideration of the strategy, page set and visual concept,
+  under the applicable authority. Record specific changes from critique to output.
+- Use a focused controlled comparison to demonstrate that the correction improves
+  meaningful customer-facing decisions before paying to expand another whole
+  site. Preserve one authoritative editable copy, factual status and existing
+  customer/publication gates. This is a proposed engineering acceptance method,
+  not a new approval bureaucracy, fixed product quota or permission to dispatch.
+
+These measures can make the demonstrated failures observable and correctable;
+they cannot promise that future creative work will never disappoint. The owner
+should judge the actual result. No new spending or protected operation occurred.
