@@ -849,3 +849,142 @@ remain local-only; preserve 4473 and all previous artifacts. Read the complete
 [service map](platform-capabilities.md#current-functional-map--november-18-2026)
 before selecting the next connected increment. Retain protected41/6 and every
 customer/publication boundary. No founder acceptance is claimed.
+
+## Owner review and causal audit — November 18, 2026
+
+**Owner finding.** The owner describes 4474 as the most sophisticated result so
+far, but only modestly beyond the site previously edited with ChatGPT, and asks
+why so much effort produced timid/unoriginal work, what it cost and how to move
+beyond it. This is recognition of implementation progress and a substantive
+commercial-quality challenge, **not product acceptance**. Codex's previous
+technical completion statement does not satisfy the creative objective.
+
+**Read-only investigation.** At clean branch HEAD105dbd2, inspected the actual
+case75/event history, retained dispatched request bodies, source classifications,
+Direction/blueprint, latest rendered DOM and usage receipts. No model request,
+runtime update, site edit, database mutation or approval was made by this audit.
+These are verified pipeline constraints; their individual causal weights require
+a controlled comparison and must not be invented.
+
+1. **Complete originals arrived, but copy authority still bottlenecks them.**
+   The original-evidence compiler imports the old P0-22 source pack. Its ten
+   business-fact/staffed-offer records contain approximately625 whitespace words.
+   All full text originals, including the approved brief/product model, are
+   appended with use=analysis. The claim schema for each Page is limited to
+   that Page's selected claim IDs from the old ten records. This preserves a
+   narrow vocabulary even though much richer source material is in the request.
+   References: scripts/intake/original-evidence-activation.ts, especially its
+   compile/sourceRecords path; presence-marketing-authority.ts marketingCitationIds,
+   marketingProjection and strategyDecision. The solution is source-grounded
+   usable knowledge with explicit factual/inferred status, not broad conversion
+   of unconfirmed answers or research into customer facts.
+
+2. **The condensed promise loses commercial force.** R3/approved materials
+   emphasize online discovery, contact generation and continuous analysis/content
+   improvement. The short claim set emphasizes explanation, trust, practical
+   next steps and administrative relief; its Ongoing paragraph stresses
+   maintaining/updating/observing/proposing with several prohibitions. The
+   resulting Direction largely repeats that framing. No guarantee of growth
+   is justified, but removing growth/visibility/content execution from the
+   positive proposition is not a necessary safety control. This is a coverage
+   loss, not missing founder information.
+
+3. **The AI never reviewed this rendered site.** The final retained editorial
+   request contains16 images: the wordmark, four historical-v3 screenshots and
+   eleven external-source captures. None depict the generated WordPress candidate or the two acquired stock
+   photographs themselves; availableMedia supplies selection/permission metadata.
+   The same is true of the examined Page/revision requests. Codex inspected
+   actual WordPress separately, but there is no render→AI visual critique→revision
+   loop. Text/tree inspection cannot establish the quality of the rendered
+   hierarchy, image treatment, whitespace or buyer experience.
+
+4. **The expressive system is still restricted.** Version2 permits eight node
+   kinds (group, heading, paragraph, list, image, action, separator, details) with
+   tokenized arrangements/surfaces/type scales. This supports original grouping,
+   but not arbitrary purpose-built graphics/components or a new art direction
+   implementation. Theme tokens and instructions preserving the conceptual Hero
+   leave many generated sections as purple/neutral cards, lists and comparisons.
+   Core has no completed path from a justified new visual component need to
+   its implementation/review. Preserving brand does not require repeating
+   that visual vocabulary. See presence-native-component.ts and theme CSS.
+
+5. **Revision edits preserve the weak plan.** State75 has no commercial replan
+   and zero formal quality-review records; the informal Codex/browser reviews
+   remain separate evidence. There are13 revision generations and four completed
+   editorial generations. requestCommercialReplan exists in the shared workflow,
+   but the original-evidence executable exposes neither a commercial-replan
+   operation nor review-quality. Ordinary revisions select existing Page paths;
+   they do not provide a working strategic redesign loop. The three rounds thus
+   mostly refine the initially chosen eight-page architecture. Necessary
+   independent approval must be preserved, but strategic diagnosis should not
+   be trapped behind near-final delivery review.
+
+6. **Research transmission was mistaken for influence quality.** The retained
+   sources are real market material: two service peers, consumer research,
+   maintenance pricing, a small agency, builder pricing/product and marketplace
+   support. The small agency's Squarespace subdomain is not proof it is a
+   template: its retained text describes a named business and actual packages.
+   B12, SiteCare and Wix captures are explicitly incomplete. Blueprint
+   implications such as clear Hero/scannable comparisons frequently reinforce
+   existing ideas; source-ID presence does not prove a new commercial insight.
+   The research pipeline needs consequential findings/challenges, source
+   suitability and a visible decision delta, without copying peer work.
+
+7. **Context volume and format add burden, not proven judgment.** The run uses
+   2,701,751 input tokens and133,494 output tokens, with zero cached tokens
+   reported. Every examined later request repeats16 images; many contain
+   roughly270k–694k characters of text/task data, including lossless reference
+   tables and sparse-node defaults. Direction was849 output tokens and chosen
+   once. Semantic copy plus native-node copy also duplicate/differ, as the
+   rendered disclaimer defect demonstrated. Revisions plus editorial cost
+   $5.626440, approximately64.1% of the $8.776797 usage estimate. These
+   observations establish an inefficient allocation; they do not prove an exact
+   quality penalty from context length. All29 completed generations actually
+   used GPT-5.4-2026-03-05. The top-level ledger retains the older mini model
+   because of its historical prefix; per-attempt model/request/rates prove the
+   current full model. A model upgrade alone is not a demonstrated solution.
+   Creative requests do not explicitly configure reasoning effort and the
+   ledger reports zero reasoning tokens for those stages (research305); that
+   observation does not establish the model's unobserved internal reasoning.
+
+**Cost and time.** The previous final snapshot is independently corroborated:
+latest run usage estimate $8.776797, conservative debit $9.069494; prior carried
+debit $2.811609; tracked lineage total $11.881103 including reserved/unresolved
+items. It is not an independently reconciled invoice or an all-project total.
+The final focused round added $1.578484, already included, not another charge.
+Twenty-nine generations,30 count requests and two search tools; all prior entries
+and the current ledger remain intact. Core events span November18 20:34:23.678
+to23:38:06.779UTC (3h03m43s), with integration/inspection/checkpoint afterward.
+This is elapsed workflow time including waits/debug/recovery, not GPU/CPU time
+or a human timesheet. Codex/ChatGPT subscription usage, complete earlier project
+spend and founder/engineering hours cannot be reconstructed honestly from this
+ledger. No provider spending was incurred by the audit.
+
+**Recommended bounded correction, not a new authorization.** Preserve the
+working intake/storage/governance/delivery/media/rollback. Repair the original
+knowledge→claim/strategy contract, distinguishing verified facts, grounded
+interpretation and unresolved decisions. Give Core a readable task-specific
+brief with exact source access rather than mechanically resending the entire
+history. Before regenerating a whole site, use the retained C0 evidence in a
+controlled Home/concept comparison that demonstrates materially different,
+commercially defensible choices. Carry the strongest direction into actual
+WordPress, send its desktop/mobile pixels and DOM back for genuine critical
+revision, and make justified reusable rendering changes where needed. Allow a
+poor concept to trigger strategic replan within authority rather than burn
+copy-edit rounds. One authoritative editable copy should drive semantic/native
+rendering. This is the same Creation/Ongoing engine, not a second demo or a
+permanent fixed-page/three-concept product rule.
+
+Success is a stronger faithful growth-service proposition, a concrete defensible
+market distinction, useful visitor choices and a convincing original rendered
+composition, with a visible explanation of what research changed. Source
+integrity and green tests remain implementation requirements. This proposal
+does not grant more calls, extend the exhausted revision-round authority,
+change protected state or claim customer acceptance.
+
+**RECOVERY / RESUME HERE:** read this audit before any new C0 run. Preserve the
+viewable4474 candidate and all Core75/41, protectedWP6,4473, source, ledger and
+rollback evidence. Do not prescribe another broad regeneration or additional
+data gathering before correcting the demonstrated information/feedback
+bottlenecks. Keep the full Entry→Creation→Contact→measurement→Ongoing service
+in view; improved generation is one shared capability within that product.
