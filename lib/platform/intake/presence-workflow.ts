@@ -65,6 +65,7 @@ type State = {
   editorialDecisions?: EditorialDecision[];
   revisionRequest?: RevisionRequest | null;
   replan?: { ordinal: number; concerns: QualityReview["findings"][number]["criterion"][];
+    priorRejectedPages?: WorkflowPage[];
     conceptCritique?: { target: string; inputDigest: string; editorial: WorkflowEditorial } };
   operatorReview: Decision | null;
   qualityReviews?: { actor: Actor; at: string; review: QualityReview; phase?: "home-concept" }[];
@@ -818,7 +819,7 @@ export class PresenceWorkflow {
     // Prior pages, findings and visuals remain in the append-only event history.
     // Carry the exact Core-generated critique, never free-form reviewer input.
     // Source status and independent review remain distinct.
-    return this.view(context, await this.store.append(context, version, { ...state, replan: { ordinal, concerns, ...(early && state.conceptEditorial && { conceptCritique: state.conceptEditorial }) },
+    return this.view(context, await this.store.append(context, version, { ...state, replan: { ordinal, concerns, ...(authority.projectionVersion === 2 && { priorRejectedPages: structuredClone(state.pages) }), ...(early && state.conceptEditorial && { conceptCritique: state.conceptEditorial }) },
       direction: null, blueprint: null, pages: [], editorial: null, editorialFindings: [], editorialDecisions: [],
       revisionRequest: null, homeReview: null, visuals: [], ...(state.conceptEditorial && { conceptEditorial: null }) }));
   }

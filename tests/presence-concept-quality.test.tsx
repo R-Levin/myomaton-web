@@ -110,9 +110,10 @@ test("an exact early critique can trigger strategic replan before any supporting
   assert.deepEqual(replanned.report, f.initial.report);
   assert.deepEqual(f.snapshot().confirmation, f.initial.confirmation);
   assert.deepEqual(f.events[0].pages, f.initial.pages, "Original Home survives in immutable event history");
-  const retainedReplan = (f.snapshot() as unknown as { replan: { ordinal: number; conceptCritique: unknown } }).replan;
+  const retainedReplan = (f.snapshot() as unknown as { replan: { ordinal: number; conceptCritique: unknown; priorRejectedPages: unknown } }).replan;
   assert.equal(retainedReplan.ordinal, 1);
   assert.deepEqual(retainedReplan.conceptCritique, critiqued.conceptQuality!.critique, "Retain the specific generated reasoning, not just broad criterion codes");
+  assert.deepEqual(retainedReplan.priorRejectedPages, f.initial.pages, "Keep the actual rejected concept with its critique, without mutating old history");
   assert.equal(f.runs.length, 1, "Replan records an exact queue change; it does not dispatch a model");
   await assert.rejects(f.workflow.requestCommercialReplan(f.context, replanned.version, author), { code: "workflow_not_ready" });
 });

@@ -197,3 +197,30 @@ test("source-aware media expiry and invalid context refuse before any count with
   assert.equal(calls,0);assert.deepEqual(await readFile(file),before);
  }finally{await rm(root,{recursive:true,force:true})}
 });
+
+test("current source-aware creative briefs use business decisions rather than a fixed C0 section sequence",async()=>{
+ const {pageAuthoringBrief}=await import("../lib/platform/intake/presence-workflow-provider");
+ const grant={marketingAuthority:authority,previewActionDestinations:{"request-review":"/review","start-onboarding":"/start"}} as PresenceWorkflowGrant;
+ for(const path of ["/","/service"]){
+  const text=pageAuthoringBrief(path,grant);
+  assert.match(text,/current business knowledge, research, Direction and decisionBrief/);
+  assert.match(text,/compare your new concept against priorRejectedPages/);
+  assert.doesNotMatch(text,/Write the MioPages service Home|Let later sections explain Launch/);
+  assert.match(text,/without inventing facts/);
+ }
+ const historical={...grant,marketingAuthority:{...authority,projectionVersion:undefined,sourceSelections:undefined,processingInstructions:undefined}};
+ assert.match(pageAuthoringBrief("/",historical),/Let later sections explain Launch and ongoing work concretely/);
+ assert.equal(pageAuthoringBrief("/service",historical),". Write only that Page and its own visitor job. Other routes in the plan are link targets or context.");
+});
+
+test("the source-aware replan carries exact rejected visitor content for comparison without promoting it to business knowledge",()=>{
+ const run=makeRun();
+ const rejected={path:"/",heading:"Rejected fixture concept",searchTitle:"Fixture",searchDescription:"Fixture only",
+  sections:[{heading:"Rejected fixture concept",body:"Unhelpful repetition",role:"hero" as const,sourceIds:["service"],visual:{status:"text-only" as const,purpose:"None",brief:"None",altIntent:"None"}}],
+  actions:[],internalLinks:[]};
+ run.work.operation="direction";run.input.replan={ordinal:1,concerns:["commercial-copy"],priorRejectedPages:[rejected]};
+ const projected=marketingProjection(run,authority) as {priorRejectedPages:unknown;businessKnowledge:unknown};
+ assert.deepEqual(projected.priorRejectedPages,[rejected]);
+ assert.ok(!JSON.stringify(projected.businessKnowledge).includes("Unhelpful repetition"));
+ assert.deepEqual(run.input.replan.priorRejectedPages,[rejected]);
+});

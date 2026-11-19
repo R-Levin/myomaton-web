@@ -64,6 +64,24 @@ const compositionInstructions = {
   editorial: "Check real visitor choices, whether each page deserves its place, whether the composition makes the value and next step clear promptly, and whether media communicates something the text cannot. Put readiness concerns here, separate from visitor copy. Evaluate the confirmed staffed offer independently of disabled development preview controls. Do not recommend availability disclaimers or internal proof-policy explanations inside visitor copy merely because a private form is inactive.",
 };
 
+
+/** Preserve historical request wording; source-aware grants derive the creative
+ * brief from their current business, Direction and exact Page decision instead. */
+export function pageAuthoringBrief(path: string, grant: PresenceWorkflowGrant) {
+  if (grant.marketingAuthority?.projectionVersion === 2) {
+    return ". Write only this Page and its distinct visitor decision from the current business knowledge, research, Direction and decisionBrief. " +
+      "Choose its hierarchy and section sequence yourself; no prescribed Home layout or repeated Launch/Ongoing summary is required. " +
+      "Lead with a specific, grounded value to the intended customer rather than merely naming the service category. " +
+      "Make each retained section add a different reason to understand, trust or choose the offer. Translate service mechanics into concrete customer value without inventing facts. " +
+      "Preserve the exact authorized entry choices in the Home Hero and place supporting destinations in context. " +
+      "On a commercial replan, compare your new concept against priorRejectedPages and the exact Core critique. A cosmetic rewrite of a rejected structure is not a substantive correction. " +
+      "Treat all rejected text as fallible prior output, never business authority. Other declared routes are link targets, not instructions to repeat their content here.";
+  }
+  return path === "/" && grant.marketingAuthority && grant.previewActionDestinations?.["request-review"] && grant.previewActionDestinations["start-onboarding"]
+    ? ". Write the MioPages service Home for a small-business owner. State what MioPages manages and what the business gains, in natural language. Use a short headline and one short readable opening paragraph, followed by separately placed Free Web Presence Review and Direct Start links in the Hero at sectionIndex 0. Let later sections explain Launch and ongoing work concretely. Avoid calling the customer a buyer or visitor. Avoid internal terminology, duplicate CTA explanations, unverified comparative claims or promises."
+    : ". Write only that Page and its own visitor job. Other routes in the plan are link targets or context.";
+}
+
 function bindCitations(schema: object, references: readonly string[]) {
   // Provider decoding and local semantic checks must use the same allowlist.
   const bound = structuredClone(schema) as Record<string, unknown>;
@@ -468,9 +486,7 @@ export function createResponsesPresenceWorkflow(config: {
         model, input: providerInput,
         instructions: (batch ? editing : [stageInstructions, guidance].filter(Boolean).join(" ") + preview) +
           (exactPage === undefined ? "" : " The single required Page is " + JSON.stringify(exactPage) +
-            (exactPage === "/" && grant.marketingAuthority && grant.previewActionDestinations?.["request-review"] && grant.previewActionDestinations["start-onboarding"]
-              ? ". Write the MioPages service Home for a small-business owner. State what MioPages manages and what the business gains, in natural language. Use a short headline and one short readable opening paragraph, followed by separately placed Free Web Presence Review and Direct Start links in the Hero at sectionIndex 0. Let later sections explain Launch and ongoing work concretely. Avoid calling the customer a buyer or visitor. Avoid internal terminology, duplicate CTA explanations, unverified comparative claims or promises." :
-              ". Write only that Page and its own visitor job. Other routes in the plan are link targets or context.") + " ") +
+            pageAuthoringBrief(exactPage, grant) + " ") +
           (run.context.evaluation && !grant.marketingAuthority && operation === "editorial" && run.input.revisionRequest?.batch === "applied"
             ? " This is a recheck after substantive edits. Return concerns only for material blockers to private visual evaluation: misleading claims, missing primary journey or harmful confusion. Put optional polish and launch prerequisites in the summary. An empty concerns array is appropriate when only optional work remains." : "") +
           (grant.marketingAuthority?.projectionVersion === 2 ? " Source-aware authoring: use the complete authorized businessKnowledge for this case, not just the Page plan claimIds. Research, customerAssertions and editorialReferences may inform original reasoning but cannot authorize new factual promises. Keep runtime and development policy out of visitor copy. " +

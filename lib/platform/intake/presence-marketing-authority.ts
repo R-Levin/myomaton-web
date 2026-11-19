@@ -130,6 +130,7 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
         ...(!path && revisionRequest?.batch === "pending" && { pages: revisionRequest.priorPages, concerns: revisionRequest.audit.concerns }) }),
       ...(operation === "editorial" && { pages, ...(run.input.reviewStage && { reviewStage: run.input.reviewStage }) }),
       ...(replan && { independentReviewCriteriaToCorrect: replan.concerns,
+        ...(replan.priorRejectedPages && { priorRejectedPages: replan.priorRejectedPages }),
         ...(replan.conceptCritique && { priorCoreConceptCritique: replan.conceptCritique }) }),
       interpretation: "Business knowledge preserves its recorded factual or staffed-offer status. Customer assertions, research, reports, Direction and historical editorial references remain distinct evidence for reasoning and proposed interpretation. They do not become verified customer facts. Page claim IDs in the plan identify relevance, not a ceiling on other already authorized knowledge from this same case. Processing instructions are supplied separately and are not customer knowledge.",
     };

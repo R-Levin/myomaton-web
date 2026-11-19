@@ -1783,3 +1783,55 @@ No founder review of this unfinished concept is requested. ProtectedCore41,
 protectedWordPress6, original75, prior4473/4474 sites, keys, old grants, ledgers,
 rollback and broader Entry/portal/MyBusiness/lead/measurement/Ongoing requirements
 remain intact. No protected application/publication is authorized.
+
+## Replan corrected against actual rejected content — November 19, 2026
+
+The first replan produced Home26 on the same native WordPress Page203, retaining
+Home16 in its snapshot/revision history. The page still repeats much of the
+rejected sequence; actual desktop/mobile inspection and Core's exact image
+critique28 confirm that. Negative authenticated quality review29 is retained.
+No founder acceptance is claimed.
+
+**Further cause, correction and evidence:** the request builder explicitly
+prescribed a MioPages Home opening and later Launch/Ongoing explanation even
+for source-aware replans. Replan retained the critic but cleared the actual prior
+Page, leaving the next model without the rejected composition for comparison.
+Source-aware grants now derive the creative brief from the actual current
+business/Direction/Page decision, retaining exact rejected Pages alongside
+Core's critique as fallible prior output. Historical request wording, actual
+business authority, citations, tenant and action restrictions remain unchanged.
+This grants no new factual claim or live endpoint. These are implementation
+contributors to anchoring, not proof of every cause of mediocre output.
+
+Local TypeScript/focused lint and27 targeted tests passed. The exact code-only
+package SHA256
+`7e5e94bbb375b89d219b13bcf340fdc50dd0700e7f73d647949230cf5e2a7052`
+transferred under the owner's bounded correction-series authorization.
+First Linux harness run:42pass/2fail (missing compiled-worker test environment
+and ESM sharp resolution), with its failure log retained. Supplying the existing
+verified compiled launcher and a link to the existing installed dependencies
+resolved those harness failures: **44pass/0fail/0skip**. No live dependency or
+service was changed. Verified worker
+`2da39eb34bb9c1e4d18576a719f5222462b8b7db297f47e8fe23ab8412a76836`;
+Linux proof
+`302a6ca2471ba70fbd86c851f94b0c501b4e7fa7a6746f8e3bebe13b1c5bff62`.
+Previous worker/activation/proof are retained. Only the isolated worker and its
+artifact/proof hashes changed; original consent, expiry, grant, reviewer and ledger
+remain exact. Replan30 is the **second and last authorized commercial replan**;
+normal editorial corrections retain their separate bounded allowance.
+
+**Cost before replan30:**19requests/10generations, **$1.596308 estimated**,
+$6.403692 remaining before future reservations. Tracked-lineage maximum-accounted
+$13.477411 already includes this run and prior uncertainty. No additional
+infrastructure charge; owner minutes UNKNOWN. Replan30 is running, so inspect
+current usage rather than treat this dated subtotal as a live balance.
+
+**RECOVERY / RESUME HERE:** the existing source-aware controller is executing
+the second replan from30. Check current event/ledger first; do not redispatch
+settled work. Materialize the resulting Home on Page203, preserve26/16 and all
+old202 posts, and evaluate its actual native rendering. The new capture/Cloud
+custody helper remains usable at the exact new version. Complete purposeful
+reviewed stock placements and supporting pages; final whole-site review and
+revision remain required. Core41/protectedWordPress6/old75/4473/root4474 are
+unchanged. No new permission is required for ordinary corrections inside the
+already approved run; do not expand its data, destination, time or spending.
