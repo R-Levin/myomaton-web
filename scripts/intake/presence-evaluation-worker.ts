@@ -185,7 +185,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const [operation, scenario, approval, value, ...extra] = args;
   const localCommercial = approval === commercialApproval || approval === p022RunProposalSha256 || approval === originalEvidenceApproval;
   const readOnly = ["inspect", "home", "site"].includes(operation) || (["local-site", "local-home"].includes(operation) && localCommercial);
-  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "resume-undispatched", "recover", "queue-image", "decide-image", "review-quality"].includes(operation) ||
+  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "resume-undispatched", "recover", "queue-image", "decide-image", "review-quality", "commercial-replan"].includes(operation) ||
     (["continue-local-home", "revise-local-page"].includes(operation) && localCommercial);
   const replaceReport = operation === "replace-report" && approval === commercialApproval;
   const researchReplay = operation === "replay-research";
@@ -307,6 +307,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       : operation === "review-home" || operation === "continue-local-home" ?
         await workflow.reviewHomeConcept(context, prior.version, actor, input.digest, input.reference, operation === "continue-local-home")
       : operation === "revise-home" ? await workflow.reviseHomeConcept(context, prior.version, actor, input.digest, input.concern)
+      : operation === "commercial-replan" ? await workflow.requestCommercialReplan(context, prior.version, actor)
       : operation === "review-site" ? await workflow.reviewCandidate(context, prior.version, actor)
       : operation === "revise-site" || operation === "revise-local-page" ?
         await workflow.requestEditorialRevision(context, prior.version, actor, operation === "revise-local-page" ? input.paths ?? input.path ?? "" : undefined)

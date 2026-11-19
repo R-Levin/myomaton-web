@@ -14,6 +14,10 @@ export type MarketingAuthority = {
   brandBrief: string;
   qualityReviewerId: string;
   strategy?: StrategyScope;
+  // Opt-in for a new pinned grant; historical projections and approvals stay exact.
+  projectionVersion?: 2;
+  sourceSelections?: readonly { digest: string; passages: readonly string[] }[];
+  processingInstructions?: readonly { text: string; basis: "owner-direction" | "security-requirement" | "implementation-choice"; reference: string }[];
 };
 
 const publicUses: ReadonlySet<EvidenceUse> = new Set(["business-fact", "staffed-offer", "editorial"]);
@@ -22,6 +26,23 @@ const sha256 = /^[a-f0-9]{64}$/u;
 export function validateMarketingAuthority(authority: MarketingAuthority, contextDigest: string, sources: readonly string[]) {
   if (authority.strategy) checkStrategyScope(authority.strategy);
   const declared = authority.sources.map(source => source.digest);
+  if (authority.projectionVersion !== undefined && authority.projectionVersion !== 2 ||
+      authority.projectionVersion !== 2 && (authority.sourceSelections !== undefined || authority.processingInstructions !== undefined)) {
+    throw Error("Source-aware authoring version required");
+  }
+  if (authority.projectionVersion === 2) {
+    const selections = authority.sourceSelections;
+    const publicSources = authority.sources.filter(source => publicUses.has(source.use));
+    if (!Array.isArray(selections) || selections.length !== publicSources.length ||
+        new Set(selections.map(row => row.digest)).size !== selections.length ||
+        selections.some(row => !publicSources.some(source => source.digest === row.digest) || !Array.isArray(row.passages) || !row.passages.length ||
+          new Set(row.passages).size !== row.passages.length || row.passages.some((passage: unknown) => typeof passage !== "string" || !passage.trim())) ||
+        authority.processingInstructions !== undefined && (!Array.isArray(authority.processingInstructions) ||
+          authority.processingInstructions.some(rule => !rule.text?.trim() || !rule.reference?.trim() ||
+            !["owner-direction", "security-requirement", "implementation-choice"].includes(rule.basis)))) {
+      throw Error("Exact source passages and separate processing instructions required");
+    }
+  }
   if (authority.contextDigest !== contextDigest || !sha256.test(authority.brandDigest) ||
       !authority.brandBrief.trim() || !authority.qualityReviewerId.trim() ||
       sources.length !== new Set(sources).size || declared.length !== sources.length ||
@@ -40,13 +61,35 @@ export function marketingSources(authority: MarketingAuthority, evidence: readon
         (use === "business-fact" && source.kind !== "owner-confirmed")) {
       throw Error("Unconfirmed or market material cannot authorize visitor claims");
     }
+    if (authority.projectionVersion === 2 && publicUses.has(use)) {
+      const selected = authority.sourceSelections?.filter(row => row.digest === digest);
+      if (selected?.length !== 1 || !selected[0].passages.length || selected[0].passages.some(passage => !source.content.includes(passage))) {
+        throw Error("Business knowledge must retain exact recorded source passages");
+      }
+      return { source: { ...source, content: selected[0].passages.join("\n\n") }, use };
+    }
     return { source, use };
   });
+}
+
+/** A trusted canonical projection can bind whole approved records automatically.
+ * Mixed historical documents still need explicit exact passage selections.
+ * This does not classify sources or upgrade their factual/authority status. */
+export function bindCompleteAuthoringKnowledge(authority: Omit<MarketingAuthority, "projectionVersion" | "sourceSelections">, evidence: readonly PresenceEvidence[]): MarketingAuthority {
+  const sources = marketingSources(authority, evidence);
+  const complete: MarketingAuthority = { ...authority, projectionVersion: 2,
+    sourceSelections: sources.filter(({ use }) => publicUses.has(use)).map(({ source }) => ({
+      digest: fingerprint(source), passages: [source.content],
+    })),
+  };
+  validateMarketingAuthority(complete, authority.contextDigest, evidence.map(fingerprint));
+  return complete;
 }
 
 export function marketingCitationIds(run: WorkflowRun, authority: MarketingAuthority) {
   const sources = marketingSources(authority, run.input.evidence);
   const writesCopy = run.work.operation === "page";
+  if (writesCopy && authority.projectionVersion === 2) return sources.filter(({ use }) => use === "business-fact" || use === "staffed-offer").map(({ source }) => source.id);
   if (writesCopy && authority.strategy) return strategyDecision(run, authority,
     run.input.blueprint?.pages.find(page => page.path === run.work.path)).claimIds;
   return [
@@ -65,6 +108,29 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
   const approved = (authority.strategy ? claims : sources.filter(({ use }) => publicUses.has(use)))
     .map(({ source, use }) => ({ ...expose(source), use }));
   const analysis = sources.filter(({ use }) => use === "analysis").map(({ source }) => expose(source));
+  if (authority.projectionVersion === 2) {
+    validateMarketingAuthority(authority, fingerprint(run.context), run.context.evidence.map(fingerprint));
+    if (fingerprint(run.context.evidence) !== fingerprint(evidence)) throw Error("Source-aware knowledge scope changed");
+    if (authority.strategy && operation === "page" && blueprint?.strategyBasis !== strategyBasis(run.context, run.input)) {
+      throw Error("Page brief is stale for the current report, Direction or market evidence");
+    }
+    const previous = revisionRequest?.priorPages.find(page => page.path === path);
+    const readable = new Set([...sources.filter(({ use }) => use !== "excluded").map(({ source }) => source.id), ...(research ?? []).map(source => source.id)]);
+    return { entry, design,
+      businessKnowledge: claims.map(({ source, use }) => ({ ...expose(source), use })),
+      editorialReferences: sources.filter(({ use }) => use === "editorial").map(({ source }) => expose(source)),
+      contextualEvidence: analysis.filter(source => source.kind !== "customer-unconfirmed"),
+      customerAssertions: analysis.filter(source => source.kind === "customer-unconfirmed"),
+      research: research?.map(expose), report, direction, blueprint,
+      corrections: corrections.filter(({ finding }) => finding.sourceIds.every(id => readable.has(id))).map(({ finding, text }) => ({ finding, text, status: "correction-to-review" })),
+      ...(operation === "page" && { pagePath: path, ...(path && authority.strategy && { decisionBrief: strategyDecision(run, authority, blueprint?.pages.find(page => page.path === path)) }),
+        ...(previous && { previous, concerns: revisionRequest?.audit.concerns.filter(concern => concern.path === path) }),
+        ...(!path && revisionRequest?.batch === "pending" && { pages: revisionRequest.priorPages, concerns: revisionRequest.audit.concerns }) }),
+      ...(operation === "editorial" && { pages }),
+      ...(replan && { independentReviewCriteriaToCorrect: replan.concerns }),
+      interpretation: "Business knowledge preserves its recorded factual or staffed-offer status. Customer assertions, research, reports, Direction and historical editorial references remain distinct evidence for reasoning and proposed interpretation. They do not become verified customer facts. Page claim IDs in the plan identify relevance, not a ceiling on other already authorized knowledge from this same case. Processing instructions are supplied separately and are not customer knowledge.",
+    };
+  }
   if (operation === "page") {
     const prior = revisionRequest?.priorPages.find(page => page.path === path);
     const needBatch = !path && revisionRequest?.batch === "pending";
@@ -134,8 +200,10 @@ function normalized(value: string) {
 /** Exact internal excerpts are deterministic failures. Independent review still judges paraphrase,
  * sales effectiveness, claim support and suitability of approved material. */
 export function exposesInternalCopy(output: unknown, evidence: readonly PresenceEvidence[], authority: MarketingAuthority, allText = false) {
-  const forbidden = marketingSources(authority, evidence).filter(({ use }) => use === "excluded")
-    .flatMap(({ source }) => source.content.split(/[.!?\r\n]+/u).map(normalized))
+  const excluded = marketingSources(authority, evidence).filter(({ use }) => use === "excluded").map(({ source }) => source.content);
+  const policy = authority.projectionVersion === 2 ? (authority.processingInstructions ?? []).map(rule => rule.text) : [];
+  const forbidden = [...excluded, ...policy]
+    .flatMap(content => content.split(/[.!?\r\n]+/u).map(normalized))
     .filter(phrase => phrase.split(" ").length >= 6);
   function search(value: unknown, field = ""): boolean {
     if (typeof value === "string") {

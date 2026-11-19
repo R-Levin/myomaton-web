@@ -1053,3 +1053,77 @@ of commercial quality.
 These measures can make the demonstrated failures observable and correctable;
 they cannot promise that future creative work will never disappoint. The owner
 should judge the actual result. No new spending or protected operation occurred.
+
+## Local remediation started — November 19, 2026
+
+The owner asks Codex to handle remediation rather than requiring joint supervision
+of routine engineering. Codex owns implementation, diagnosis, verification and
+Git continuity. The owner retains consequential business judgment and genuine
+external-data/spending/protected-operation approvals. The reviewed external prompt
+has not become customer knowledge, an application instruction or a new authority.
+
+**Implemented locally, not deployed.** A new explicitly selected authoring
+projection in the existing MarketingAuthority/provider path separates business
+knowledge, historical editorial references, contextual observations and unconfirmed
+customer assertions. Runtime processing instructions are supplied in the provider
+instruction channel with their recorded basis, not in customer facts or citations.
+Page/revision authors can use all already authorized same-case business knowledge;
+the Page plan's claim IDs indicate relevance rather than impose a narrower ceiling.
+Report, Presence Direction and the proposed architecture remain available.
+
+The opt-in preserves the old projection exactly when absent. Original cases,
+grant/source hashes and approval artifacts are not rewritten. No tenant scope,
+factual status or source-use permission is inferred from a projection flag.
+Exact source digests and selected passage checks remain. Whole clean canonical
+records can be bound automatically by the trusted projection, so this is not a
+new manual passage-curation job or an arbitrary knowledge-size limit. Mixed old
+documents still require correct classification/selection; the code cannot
+magically distinguish business truth from development instructions in prose.
+It does not automatically replace or relabel the old C0 ten-record pack.
+
+**Working offline evidence.** The test uses the actual approved C0 brief's
+Standard Launch and Ongoing rows, including content/optimization and conversion
+refinement, in an isolated source fixture. It verifies that knowledge absent from
+a Page's initial claim list reaches the constructed metered authoring request and
+survives normal Page parsing. Processing instructions remain outside business
+knowledge; exact policy leakage is refused. Changed sources, foreign scope, stale
+Direction, unconfirmed promotion and invalid selections refuse. The existing
+historical claim scope and original-material/custody tests remain separate.
+The transport is a provider-shaped offline double, not actual AI reasoning,
+commercially accepted copy or proof of an improved rendered site.
+
+The isolated executable now exposes the shared worker's existing quality-review
+and commercial-replan operations. Replan delegates to the same actor, prior
+negative quality-review and bounded replan checks. A local test verifies refusal
+for a Customer or zero allowance and retains the old event while clearing the
+proposed strategy/page set. **This does not yet solve the late review-entry
+dependency:** early rendered-concept review and its exact candidate binding remain
+the next connection. No current C0 replan or review was recorded.
+
+**Safety and remaining work.** Automatic approval review rejected an attempted
+simplification that would remove passage validation. It was not applied or
+bypassed; the final path retains those guards and derives full-record bindings
+automatically. Ordinary initial test fixture/type failures were corrected
+without relaxing runtime checks, including raw response custody and a valid
+inactive visitor Action. No model call, spending, migration, credential change,
+hosted deployment, protected write or WordPress edit occurred.
+
+**RECOVERY / RESUME HERE:** continue the local remediation on this branch.
+Complete the authentic C0 Knowledge projection/coverage trace, exact current
+desktop/mobile rendered-review binding and early strategic-replan integration.
+Retain the distinction between historical-source use and confirmed facts.
+Then verify the full controlled visitor journey and prepare one fresh bounded
+external-use authorization. This preparatory adapter is not a completed
+creation-quality repair or owner acceptance. Preserve Core75/41, WordPress6,
+4473/4474, all original evidence/grants/usage and the complete connected service.
+
+Final verification for this local checkpoint: **23 focused tests passed, zero
+skips**, including the actual constructed request with and without original
+attachments, complete canonical-record binding, historical compatibility and
+the existing guarded replan. Full TypeScript and focused ESLint passed.
+The isolated worker bundles and passes Node syntax validation locally:
+SHA-256 `f93eb903a393f620daf5bb8dabc69321d31055190a9908d3a9ccc45f7e1c14da`.
+It was not uploaded, run against hosted data or treated as a verified Linux
+production build. The installed Next server/client boundary guidance was checked;
+these remain server-side workflow modules with no new client credential path.
+No paid transport or genuine AI output was used in this verification.

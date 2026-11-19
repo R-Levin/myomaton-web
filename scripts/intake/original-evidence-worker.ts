@@ -9,7 +9,7 @@ import {join} from "node:path";
 import {realpath as resolveRealPath} from "node:fs/promises";
 import {applyOriginalEvidenceStages} from "./original-evidence-stage-amendment";
 const [operation,value]=process.argv.slice(2);
-const allowed=["amend-stage-budgets","rebind-executable","rebind-unused","activate","work","recover","inspect","continue","continue-local-home","revise-local-page","review-site","revise-site","decide-editorial","retry","resume-undispatched","local-site","local-home"];
+const allowed=["amend-stage-budgets","rebind-executable","rebind-unused","activate","work","recover","inspect","continue","continue-local-home","revise-local-page","review-site","revise-site","decide-editorial","review-quality","commercial-replan","retry","resume-undispatched","local-site","local-home"];
 async function main(){
  if(!allowed.includes(operation))throw Error("Operation refused");
  const home=await resolveRealPath(process.env.HOME??"");

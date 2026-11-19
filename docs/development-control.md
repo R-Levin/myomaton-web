@@ -61,6 +61,8 @@ Use: `Task / since / model requests+generations / AI usage-estimate spent (delta
 Codex maintains the actual measured totals, immutable provider receipts and scoped grant accounting in their existing protected custody. The canonical handoff contains only the sanitized, dated *running summary* and exact evidence reference. Carry forward the previous balance before a new model comparison, report each delta, and show the cumulative balance after it. Budget requests should make clear how much **new authorization** is sought versus already-spent or reserved amounts.
 
 
+**Local remediation is now in implementation.** See [the first source/processing separation and guarded-replan correction](c0-creation-quality-p0-17.md#local-remediation-started--november-19-2026). It is opt-in local code with offline evidence, not a deployed fix, AI-quality result or new owner-review request. Codex handles engineering; the owner is not expected to supervise routine repairs.
+
 ## Working delivery targets — November 19, 2026
 
 The owner asks to proceed efficiently and establish key project targets. This
