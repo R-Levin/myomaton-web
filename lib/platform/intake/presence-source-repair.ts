@@ -32,6 +32,18 @@ export function compileSourceRepair(grant:PresenceWorkflowGrant,plan:SourceRepai
  if(fingerprint(before)!==fingerprint(after))throw Error("Source repair changed unrelated authority");
  return next;
 }
+/** The custody index is the provider reader's actual input catalog. Preserve every
+ * existing research record and add required grant originals explicitly. */
+export function sourceRepairIndex(grant:PresenceWorkflowGrant,index:readonly OriginalMaterial[]){
+ if(!grant.originalMaterials||!grant.sourceRepair||grant.sourceRepair.materialsDigest!==fingerprint(grant.originalMaterials.records))throw Error("Repaired source authority required");
+ const ids=new Set<string>();
+ for(const source of index){validateOriginalMaterial(source);if(ids.has(source.id))throw Error("Duplicate custody source");ids.add(source.id)}
+ for(const expected of grant.originalMaterials.records){
+  const old=index.find(source=>source.id===expected.id);
+  if(old&&fingerprint(old)!==fingerprint(expected))throw Error("Original custody identity conflicts with grant");
+ }
+ return [...index,...grant.originalMaterials.records.filter(source=>!ids.has(source.id))];
+}
 export function verifySourceRepairBytes(source:OriginalMaterial,bytes:Buffer){
  if(bytes.length!==source.bytes||createHash("sha256").update(bytes).digest("hex")!==source.sha256)throw Error("Repaired original source bytes differ");
 }

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import {createHash} from "node:crypto";
 import test from "node:test";
 import {fingerprint} from "../lib/platform/canonical/model";
-import {compileSourceRepair,verifySourceRepairBytes,type SourceRepairPlan} from "../lib/platform/intake/presence-source-repair";
+import {compileSourceRepair,sourceRepairIndex,verifySourceRepairBytes,type SourceRepairPlan} from "../lib/platform/intake/presence-source-repair";
 import type {PresenceWorkflowGrant} from "../lib/platform/intake/presence-workflow-provider";
 import type {OriginalMaterial} from "../lib/platform/intake/presence-source-material";
 const fp=fingerprint;
@@ -48,4 +48,16 @@ test("prepared source payloads are exact bytes, not substitutes with similar fil
  const source={...f.plan.additionalMaterials[0],bytes:bytes.length,sha256:createHash("sha256").update(bytes).digest("hex")};
  verifySourceRepairBytes(source,bytes);
  assert.throws(()=>verifySourceRepairBytes(source,Buffer.from("A handoff about that source.")));
+});
+
+test("provider custody index must contain the newly granted actual originals while preserving every research source",()=>{
+ const f=fixture(),next=compileSourceRepair(f.grant,f.plan,f.authorization),old=f.grant.originalMaterials!.records;
+ const research={...old[0],id:"retained-peer",purpose:"market-research" as const,status:"public-observation" as const,researchSourceId:"research:peer"};
+ const index=[...old,research],expected=sourceRepairIndex(next,index);
+ assert.deepEqual(expected,[...index,...f.plan.additionalMaterials]);
+ assert.deepEqual(sourceRepairIndex(next,expected),expected,"Registry correction retries are exact and idempotent");
+ assert.deepEqual(index,[...old,research]);
+ assert.throws(()=>sourceRepairIndex(next,[{...old[0],sha256:fp("different bytes")},research]),/conflicts/);
+ assert.throws(()=>sourceRepairIndex(next,[...index,research]),/Duplicate/);
+ assert.throws(()=>sourceRepairIndex(f.grant,index),/authority/);
 });

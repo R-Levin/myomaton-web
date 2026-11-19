@@ -2325,3 +2325,46 @@ Same$8 total run ceiling,32generation/65request/November22 expiry; consumed19
 generations/$3.659578,2replans/3editorial rounds remain. Ask a genuine resource
 amendment only if the actual plan needs it; never silently replenish counters
 or imply another site has been generated.
+
+### Exact consent accepted; complete source request and reassessment active
+
+The owner explicitly replied **Authorized** to the exact five-source manifest
+and encrypted same-account custody/OpenAI use, including actual same-candidate
+WordPress screenshots/capture metadata. The transfer succeeded; no new numeric
+financial authority or protected-deployment/publication authority is inferred.
+
+The source-only installer independently verified actual case54, complete
+site8/active7/R3seven/29knowledge entries, all source bytes/permissions, unchanged
+other grant fields and ledger. Tested worker647e1174/proofc1bb7fd9 is active with
+prior artifact/proof/activation retained. Core appended source-repair55, next
+report, preserving original54, useful prior report/Direction/blueprint/Home,
+research and consumed allowances. No provider call occurred in these operations.
+
+Pre-dispatch inspection caught a further interface issue: the installer had
+registered five sources in the grant/custody but not the provider's actual
+originals/index.json. A focused regression now requires that index to contain
+all mandatory grant originals without changing any existing research metadata.
+The original index was retained and the five exact descriptors appended under
+its existing lock/atomic-write pattern. An inspection helper initially used
+the256KB configuration reader on full source images; it was corrected to the
+same granted source-envelope/exact-size/hash/ownership checks used by the real
+reader. Configuration limits were not weakened. Failed no-dispatch checks remain;
+no response was bought to diagnose them. Final helperSHA
+b77083a3cfff4d12debc6fa777cf256a7a414f1a67a9431d0082c277008b4077.
+
+**Actual report request inspected before dispatch:**sourceRecovery input
+e215e79afa91e1b801d851deb454dd6f86ffa5af690bf9348d088cf1d038f6ab,
+requestSHA f8728557bded11267b395e88d2b3df1c38f5e5499de8c0222656105064c14721,
+14,371,189bytes,14required originals, all five complete additions verified
+literally in the payload,29knowledge entries/full owned sites,11actual reference
+images, three retained research records and prior useful work. The test transport
+forbade network and ledger stayed ef1ddaa1. Raw request remains private on Cloud.
+
+**RECOVERY / RESUME HERE:**the genuine authorized Core report operation is now
+running from55 using the existing source-aware controller. Inspect actual event
+and usage before any continuation; do not duplicate a pending dispatch or reset
+counters. Prior cost37requests/19generations/$3.659578 is the PRE-dispatch value.
+After report, use development-continuation (not customer confirmation) and
+continue Direction/plan/site. All original8-dollar/32gen/65request/November22
+limits remain. Current source/registry corrections are functional engineering,
+not a claim of a completed or accepted website.

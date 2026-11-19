@@ -212,7 +212,7 @@ function nextTask(state: State): Task | null {
   if (!state.editorial) return { operation: "editorial" };
   return null;
 }
-function runInput(context: WorkflowContext, state: State, reviewStage = state.work?.reviewStage): WorkflowInput {
+export function runInput(context: WorkflowContext, state: State, reviewStage = state.work?.reviewStage): WorkflowInput {
   const { entry, evidence, limitations, conflicts } = context;
   const { report, research, direction, blueprint, pages, corrections, revisionRequest, replan, sourceRecovery } = state;
   return { entry, evidence, limitations, conflicts, report, research, direction, blueprint, pages, corrections, ...(revisionRequest && { revisionRequest }), ...(replan && { replan }), ...(sourceRecovery && { sourceRecovery }), ...(reviewStage && { reviewStage }) };
