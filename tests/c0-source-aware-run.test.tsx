@@ -134,7 +134,8 @@ test("runtime activation requires a matching offline Linux result and refuses an
 test("launcher configuration refusal identifies its stage without echoing unexpected arguments or reading credentials", async () => {
   const { spawnSync } = await import("node:child_process");
   const marker = "DO_NOT_ECHO_UNEXPECTED_PRIVATE_ARGUMENT";
-  const result = spawnSync(process.execPath, ["--import", "tsx", "scripts/intake/source-aware-evaluation-worker.ts", marker],
+  const compiled = process.env.MIOPAGES_TEST_COMPILED_WORKER;
+  const result = spawnSync(process.execPath, compiled ? [compiled, marker] : ["--import", "tsx", "scripts/intake/source-aware-evaluation-worker.ts", marker],
     { encoding: "utf8", env: { ...process.env, HOME: "unavailable-for-this-offline-test" } });
   assert.equal(result.status, 1);
   assert.ok(!result.stderr.includes(marker) && !result.stdout.includes(marker));

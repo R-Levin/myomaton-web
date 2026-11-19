@@ -29,11 +29,19 @@ export async function publicResearchReply(browser:Browser,frame:Record<string,un
  return {miopagesPeerReply:1,id:frame.id,operation:frame.operation,status:"PASS",htmlSha256:digest(html),
   captured:result.captured.map(row=>({...row,bytes:row.bytes.toString("base64"),sha256:digest(row.bytes)})),limitations:result.limitations};
 }
+export function publicResearchCommand(args:readonly string[]){
+ const fresh=args[0]==="--source-aware";
+ const [operation,value,...extra]=fresh?args.slice(1):args;
+ if(extra.length||!["work","recover"].includes(operation)||operation==="work"&&value||
+  operation==="recover"&&(!/^\d+$/.test(value??"")||!Number.isSafeInteger(Number(value))||Number(value)<1))throw Error("Controlled operation required");
+ const folder=fresh?"p0-source-aware-c0-runtime":"p0-original-evidence-c0-runtime/app";
+ const script=fresh?"./worker.cjs":"../worker.cjs";
+ const argument=value?(fresh?" '"+JSON.stringify({version:Number(value)})+"'":" "+value):"";
+ return "cd ~/miopages-private-acceptance/"+folder+" && exec env NODE_ENV=development MIOPAGES_PUBLIC_RESEARCH_BRIDGE=1 NODE_PATH=$HOME/miopages-private-acceptance/p0-original-evidence-c0-runtime/node_modules:$HOME/public_html/node_modules node "+script+" "+operation+argument;
+}
 async function main(){
- const [operation,value]=process.argv.slice(2);
- if(!["work","recover"].includes(operation)||operation==="work"&&value||operation==="recover"&&!/^\d+$/.test(value??""))throw Error("Controlled operation required");
+ const remote=publicResearchCommand(process.argv.slice(2));
  const browser=await chromium.launch({executablePath:"C:/Program Files/Google/Chrome/Application/chrome.exe",headless:true,chromiumSandbox:true,args:["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"]});
- const remote="cd ~/miopages-private-acceptance/p0-original-evidence-c0-runtime/app && exec env NODE_ENV=development MIOPAGES_PUBLIC_RESEARCH_BRIDGE=1 NODE_PATH=$HOME/miopages-private-acceptance/p0-original-evidence-c0-runtime/node_modules:$HOME/public_html/node_modules node ../worker.cjs "+operation+(value?" "+value:"");
  const child=spawn("ssh",["-o","BatchMode=yes","-o","StrictHostKeyChecking=yes","-o","ConnectTimeout=8","-i",
   join(homedir(),".ssh","miopages_20i"),"-p","39304","wp-acceptance.miopages.com@ssh.iad.stackcp.com",remote],{stdio:["pipe","pipe","pipe"]});
  child.stderr.on("data",()=>{}); // Never relay remote errors containing protected context.

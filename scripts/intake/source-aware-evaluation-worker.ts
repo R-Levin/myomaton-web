@@ -21,7 +21,7 @@ async function main() {
   const result = await evaluationCommand([operation, "c0", sourceAwareC0ProposalSha256, ...(value ? [value] : [])],
     { ...process.env, MIOPAGES_EVALUATION_DATABASE_URL: url.href });
   const failed = result && typeof result === "object" && "failure" in result && result.failure;
-  console.log(JSON.stringify({ status: failed ? "BLOCKED" : "PASS", operation, result }));
+  console.log(JSON.stringify({ miopagesRunResult: 1, status: failed ? "BLOCKED" : "PASS", operation, result }));
   if (failed) process.exitCode = 1;
 }
 main().catch((error: Error & { code?: string }) => {
@@ -29,7 +29,7 @@ main().catch((error: Error & { code?: string }) => {
   const rendered = ["Required rendered review is unavailable or not authorized for this operation",
     "Required original source is unavailable", "Rendered review input changed",
     "Rendered review index binding changed", "Complete matching desktop and mobile Page review required"].includes(error.message);
-  console.error(JSON.stringify({ status: "BLOCKED", operation: operations.includes(operation) ? operation : "unrecognized",
+  console.error(JSON.stringify({ miopagesRunResult: 1, status: "BLOCKED", operation: operations.includes(operation) ? operation : "unrecognized",
     stage: known ? error.stage : rendered ? "rendered-review-preflight" : operationStage,
     category: error.code && /^[A-Z0-9_]+$/u.test(error.code) ? error.code : rendered ? "RENDERED_EVIDENCE_NOT_READY" : "FRESH_RUN_VALIDATION_FAILED",
     detail: known || rendered ? error.message : "Stop and retain private activation, source and usage evidence; inspect this stage. No automatic retry." }));

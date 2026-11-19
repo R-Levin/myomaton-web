@@ -1425,3 +1425,79 @@ security, authority, uncertain duplicate spend or exhausted resources. Do not
 substitute manually authored marketing material or an offline fixture for the
 Core-generated result. Preserve the complete Entry, portals/My Business,
 inquiry, measurement/reporting and Ongoing roadmap alongside this correction.
+
+## Source-aware run approved and activated — November 19, 2026
+
+**Authority.** The owner approved the exact preceding $8/72-hour manifest and
+reported $28.41 API credit. [Recorded approval](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7014091163).
+That credit is not a larger spending authorization. Manifest SHA remains
+`f560374969b7abdff53fa33917c9b84f7053f5f9b092b0dccf9a505bcc8f9ddd`.
+The proposal file is immutable; actual authority is in the protected activation.
+The owner may be away: proceed through ordinary scoped corrections, and preserve
+a resumable checkpoint for actual access/security/authority/uncertain-spend stops.
+
+**Verified activation.** Existing acceptance-account SSH works. No extra login,
+password or credential rotation was required. Actual Linux Node22 verification:
+**37 tests, zero failures/skips**, plus the actual compiled launcher refusal.
+Windows independently passed the sandboxed public capture/stdio test and new
+fixed-destination controller checks. Full TypeScript and focused lint pass.
+The first Linux log is retained: it exposed test-loader/dependency resolution
+and a Windows-browser test mistakenly included in the Linux group. The harness
+now exercises the compiled launcher and resolved bundled imports; the real
+Windows browser check runs on Windows. No failed result was reported as passing.
+
+A deterministic worker/controller correction connects the existing public-only
+Windows capture bridge to the new case and preserves its fixed-operation
+allowlist and result framing. It changes no evidence or spending scope.
+Final worker SHA-256:
+`550f37382b01d62c6dd8c87e3bbfaa6a80a14258439fb9abfa7ad4e599c570d0`.
+Actual Linux receipt SHA-256:
+`1706709be9c0981756cf608f9ca9ae2c8479ebc0cf2e0834d92ee093cf5d06d9`.
+
+Protected activation starts **2026-11-19T15:58:31.154Z** and expires
+**2026-11-22T15:58:31.154Z**. One new case database on the existing isolated
+PostgreSQL17 loopback service is initialized. New intake
+`41a83e7e-1765-4517-941a-b2b151bb7c4a`; existing reviewer identity
+`1a3febb6-5f06-448c-a9b5-77749af82d07`; fresh isolated review-only grant
+`f729a63c-3bf6-488b-8646-b0281f93b9f2`.
+Independent token authentication and scope checks pass; prepare, approve,
+native-draft authorization, issuance and foreign-scope review are refused.
+Old identities/credentials/grants are untouched. Private custody remains0700/0600.
+
+**Actual input inspection before paid dispatch.** The request contains22 source
+records, all nine originals, all six source-bound canonical knowledge additions
+and the unconfirmed answer classification. Complete actual provider-format
+request:2,349,820bytes, SHA-256
+`aa63e33830cc3953f08be1a71c2aeea9f1029c303773915c9e2ea4cb75b9a625`.
+No network was permitted in this inspection. Initial helper attempts used the
+metadata reader for large images and refused before dispatch; the helper now
+uses exact declared source size/hash and the existing ownership/mode/symlink
+checks. The generic metadata guard was not relaxed. Both acquired photo
+originals/prepared bytes reverified. The existing local WordPress native-row
+digest still matches `6ad9ca038ebd73c9150eb1ed404a873c5435c53fb8c2e0c23dac7922192dc514`;
+no old Page changed. The old usage/grant and full85-attempt prefix are exact.
+
+**Private recovery paths (acceptance account, off-webroot).** Runtime:
+`~/miopages-private-acceptance/p0-source-aware-c0-runtime`; case:
+`~/miopages-private-acceptance/presence-evaluation/41a83e7e-1765-4517-941a-b2b151bb7c4a`.
+Activation, Linux proof, prior failed logs, input-preflight receipt/request and
+fresh review token remain there; never copy token or full protected input to Git.
+The existing protected OpenAI key is available; actual model authorization is
+checked by the controlled request, without a speculative extra generation.
+
+**Cost at this checkpoint:**0 new provider requests/generations/$0 new spending.
+Previous conservative tracked-lineage debit remains$11.881103; additional cap$8,
+cumulative ceiling$19.881103. No larger balance permission, old-grant renewal,
+protected Core/WP write, public service/listener/DNS change or publication.
+
+**RECOVERY / RESUME HERE:** use the existing Windows public-research controller
+with `--source-aware work` for the fresh case (source entry:
+`scripts/intake/presence-research-controller.ts`). It relays public-only browser
+frames; protected context and model traffic stay on Cloud. Inspect retained
+case state and ledger before any redispatch. Continue genuine research/report,
+then delegated development report continuation, Direction/blueprint/Home.
+Render actual new disposable WordPress drafts, capture exact desktop/mobile,
+critique/replan before expansion and retain meaningful corrections. No founder
+review of a fixture is needed. Stop on uncertain financial outcome and recover
+retained output rather than buying it twice. Protected41/6, original75,4473/4474,
+their content/media/history and the complete service roadmap remain preserved.
