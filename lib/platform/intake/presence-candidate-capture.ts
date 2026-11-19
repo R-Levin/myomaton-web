@@ -14,23 +14,49 @@ export type RenderedCandidateBinding = {
   pages: readonly { path: string; wordpressPageId: number }[];
 };
 
-export function validateRenderedCandidateBinding(run: WorkflowRun, grant: OriginalMaterialGrant, binding: RenderedCandidateBinding) {
+export type RenderedCaptureIntent = {
+  version: 1; contextDigest: string; inputDigest: string; operation: "editorial" | "page";
+  expectedPages: readonly { path: string; title: string; heading: string }[];
+  maximumRecords: number; maximumBytes: number; includeOperatorProjections: boolean;
+};
+
+/** Only proposed visitor headings, routes and bindings cross to the renderer.
+ * Protected source records/answers and the full review input stay on Core. */
+export function renderedCaptureIntent(run: WorkflowRun, grant: OriginalMaterialGrant): RenderedCaptureIntent {
   validateOriginalGrant(grant, fingerprint(run.context));
-  const origin = new URL(binding.origin);
-  const expected = run.work.operation === "editorial" ? run.input.pages.map(page => page.path) :
-    run.work.path ? [run.work.path] : [];
+  const paths = run.work.operation === "editorial" ? run.input.pages.map(page => page.path) : run.work.path ? [run.work.path] : [];
   if (!grant.candidateReview?.operations.some(operation => operation === run.work.operation) ||
-      fingerprint(run.context) !== grant.contextDigest || fingerprint(run.input) !== run.work.inputDigest ||
-      binding.contextDigest !== grant.contextDigest || binding.inputDigest !== run.work.inputDigest ||
+      !["editorial", "page"].includes(run.work.operation) || !paths.length ||
+      fingerprint(run.context) !== grant.contextDigest || fingerprint(run.input) !== run.work.inputDigest) throw Error("Exact Core capture intent required");
+  return { version: 1, contextDigest: grant.contextDigest, inputDigest: run.work.inputDigest, operation: run.work.operation as "editorial" | "page",
+    expectedPages: paths.map(path => { const page = run.input.pages.find(page => page.path === path);
+      if (!page) throw Error("Prepared Page missing from capture intent");
+      return { path, title: page.heading, heading: page.sections.find(section => section.role === "hero")?.heading ?? page.heading }; }),
+    maximumRecords: grant.candidateReview.maximumRecords, maximumBytes: grant.candidateReview.maximumBytes,
+    includeOperatorProjections: grant.candidateReview.includeOperatorProjections === true };
+}
+
+export function validateRenderedCandidateBinding(run: WorkflowRun, grant: OriginalMaterialGrant, binding: RenderedCandidateBinding) {
+  validateRenderedCaptureIntent(renderedCaptureIntent(run, grant), binding);
+}
+
+export function validateRenderedCaptureIntent(intent: RenderedCaptureIntent, binding: RenderedCandidateBinding) {
+  const origin = new URL(binding.origin);
+  const expected = intent.expectedPages.map(page => page.path);
+  if (intent.version !== 1 || !["editorial", "page"].includes(intent.operation) ||
+      ![intent.contextDigest, intent.inputDigest].every(value => /^[a-f0-9]{64}$/u.test(value)) ||
+      !Number.isSafeInteger(intent.maximumRecords) || !Number.isSafeInteger(intent.maximumBytes) || intent.maximumBytes < 1 ||
+      new Set(expected).size !== expected.length || intent.expectedPages.some(page => !page.title.trim() || !page.heading.trim()) ||
+      binding.contextDigest !== intent.contextDigest || binding.inputDigest !== intent.inputDigest ||
       ![binding.representationDigest, binding.nativeReadbackDigest].every(digest => /^[a-f0-9]{64}$/u.test(digest)) || !expected.length ||
       !["core-candidate", "operator-proposed-preview"].includes(binding.variant) ||
-      binding.variant === "operator-proposed-preview" && !grant.candidateReview.includeOperatorProjections ||
+      binding.variant === "operator-proposed-preview" && !intent.includeOperatorProjections ||
       origin.protocol !== "http:" || origin.hostname !== "127.0.0.1" || !origin.port || origin.username || origin.password ||
       origin.origin !== binding.origin || binding.pages.length !== expected.length ||
       new Set(binding.pages.map(page => page.path)).size !== expected.length ||
       new Set(binding.pages.map(page => page.wordpressPageId)).size !== expected.length ||
       binding.pages.some(page => !expected.includes(page.path) || !Number.isSafeInteger(page.wordpressPageId) || page.wordpressPageId < 1) ||
-      expected.length * 2 > grant.candidateReview.maximumRecords) throw Error("Exact disposable WordPress capture binding required");
+      expected.length * 2 > intent.maximumRecords) throw Error("Exact disposable WordPress capture binding required");
 }
 
 /** The trusted renderer must verify native draft readback before returning its
@@ -41,8 +67,17 @@ export function validateRenderedCandidateBinding(run: WorkflowRun, grant: Origin
  * media acquisition, provider request, application write or approval occurs. */
 export async function captureRenderedCandidate(browser: Browser, run: WorkflowRun, grant: OriginalMaterialGrant,
   readBinding: () => Promise<RenderedCandidateBinding>, now = Date.now) {
+  const result = await captureRenderedIntent(browser, renderedCaptureIntent(run, grant), readBinding, now);
+  verifyCandidateReview(run, grant, result.rows);
+  return result;
+}
+
+/** Rendering half of the same capture contract. Core must independently bind
+ * returned pixels to the retained full run via prepareRenderedCandidateCustody. */
+export async function captureRenderedIntent(browser: Browser, intent: RenderedCaptureIntent,
+  readBinding: () => Promise<RenderedCandidateBinding>, now = Date.now) {
   const binding = await readBinding();
-  validateRenderedCandidateBinding(run, grant, binding);
+  validateRenderedCaptureIntent(intent, binding);
   const initial = fingerprint(binding);
   const rows: { source: OriginalMaterial; bytes: Buffer }[] = [];
   const observations: { path: string; viewport: "desktop" | "mobile"; status: number; overflow: boolean; images: number; textDigest: string }[] = [];
@@ -72,18 +107,18 @@ export async function captureRenderedCandidate(browser: Browser, run: WorkflowRu
           images: [...document.images].map(image => image.complete && image.naturalWidth > 0),
           overflow: document.documentElement.scrollWidth > innerWidth,
         }));
-        const expected = run.input.pages.find(page => page.path === entry.path);
+        const expected = intent.expectedPages.find(page => page.path === entry.path);
         if (!expected || observed.heading !== expected.heading.trim() || !observed.text.trim() || observed.images.some(loaded => !loaded)) {
           throw Error("Rendered WordPress content or image differs from prepared scope");
         }
         const bytes = await page.screenshot({ fullPage: true });
         total += bytes.length;
-        if (total > grant.candidateReview!.maximumBytes) throw Error("WordPress capture exceeds its authorized image envelope");
+        if (total > intent.maximumBytes) throw Error("WordPress capture exceeds its authorized image envelope");
         const source: OriginalMaterial = { id: "candidate-" + fingerprint(entry.path).slice(0, 16) + "-" + viewport,
           bytes: bytes.length, sha256: createHash("sha256").update(bytes).digest("hex"), mime: "image/png",
           reference: url, author: "Core disposable WordPress browser capture", date: new Date(now()).toISOString(),
-          status: "unconfirmed", purpose: "candidate-review", operations: [run.work.operation],
-          reviewOf: { contextDigest: grant.contextDigest, inputDigest: run.work.inputDigest,
+          status: "unconfirmed", purpose: "candidate-review", operations: [intent.operation],
+          reviewOf: { contextDigest: intent.contextDigest, inputDigest: intent.inputDigest,
             representationDigest: binding.representationDigest, path: entry.path, viewport,
             representation: "wordpress-native-draft", variant: binding.variant } };
         rows.push({ source, bytes });
@@ -93,6 +128,5 @@ export async function captureRenderedCandidate(browser: Browser, run: WorkflowRu
     } finally { await context.close(); }
   }
   if (fingerprint(await readBinding()) !== initial) throw Error("WordPress capture binding changed");
-  verifyCandidateReview(run, grant, rows);
   return { rows, observations };
 }

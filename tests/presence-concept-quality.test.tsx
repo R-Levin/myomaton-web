@@ -302,3 +302,34 @@ test("whole-site rendering precedes critique without requiring a fabricated edit
   assert.equal(f.runs.length, calls + 1);
   assert.equal(f.runs.at(-1)!.work.inputDigest, run.work.inputDigest);
 });
+
+test("render capture intent carries only visitor headings and hashes while Core retains the full evidence boundary",async()=>{
+ const {renderedCaptureIntent,validateRenderedCaptureIntent}=await import("../lib/platform/intake/presence-candidate-capture");
+ const f=setup(),run=await f.workflow.conceptCritiqueInput(f.context,10,author);
+ const grant={version:1 as const,contextDigest:fingerprint(f.context),records:[{id:"offer",sha256:fingerprint("fixture source"),bytes:10,mime:"text/plain" as const,reference:"Offline source",author:"Fixture",date:"2026-11-19",status:"owner-confirmed" as const,purpose:"business-context" as const,operations:["editorial" as const]}],requestBytes:100000,
+  candidateReview:{operations:["editorial" as const],maximumRecords:2,maximumBytes:50000}};
+ const intent=renderedCaptureIntent(run,grant);
+ assert.deepEqual(intent.expectedPages,[{path:"/",title:run.input.pages[0].heading,heading:run.input.pages[0].sections[0].heading}]);
+ assert.equal(intent.contextDigest,fingerprint(f.context));
+ assert.ok(!JSON.stringify(intent).includes(f.context.evidence[0].content));
+ assert.ok(!("evidence" in intent)&&!("context" in intent)&&!("report" in intent));
+ const binding={contextDigest:intent.contextDigest,inputDigest:intent.inputDigest,representationDigest:fingerprint("fixture packet"),
+  nativeReadbackDigest:fingerprint("actual row fixture"),variant:"core-candidate" as const,origin:"http://127.0.0.1:4474",pages:[{path:"/",wordpressPageId:1}]};
+ validateRenderedCaptureIntent(intent,binding);
+ assert.throws(()=>validateRenderedCaptureIntent(intent,{...binding,pages:[{path:"/foreign",wordpressPageId:1}]}));
+ assert.throws(()=>validateRenderedCaptureIntent({...intent,maximumRecords:1},binding));
+ assert.throws(()=>validateRenderedCaptureIntent(intent,{...binding,origin:"https://example.org"}));
+});
+
+test("native capture preserves distinct Page metadata title and actual Hero H1 instead of rewriting either",async()=>{
+ const {renderedCaptureIntent}=await import("../lib/platform/intake/presence-candidate-capture");
+ const f=setup();f.mutate(s=>{s.pages[0].heading="Different Page metadata title";});
+ const run=await f.workflow.conceptCritiqueInput(f.context,10,author);
+ const source={id:"offer",sha256:fingerprint("fixture source"),bytes:10,mime:"text/plain" as const,reference:"Offline source",author:"Fixture",date:"2026-11-19",status:"owner-confirmed" as const,purpose:"business-context" as const,operations:["editorial" as const]};
+ const intent=renderedCaptureIntent(run,{version:1,contextDigest:fingerprint(f.context),records:[source],requestBytes:100000,
+  candidateReview:{operations:["editorial"],maximumRecords:2,maximumBytes:50000}});
+ assert.equal(intent.expectedPages[0].title,"Different Page metadata title");
+ assert.equal(intent.expectedPages[0].heading,"Fixture managed service");
+ assert.equal(run.input.pages[0].heading,"Different Page metadata title");
+ assert.equal(run.input.pages[0].sections[0].heading,"Fixture managed service");
+});

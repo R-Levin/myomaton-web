@@ -1703,3 +1703,83 @@ or counter reset. Then continue genuine Home generation with the fresh-case
 media permission, and actual local WordPress rendering/capture/critique before
 expanding the site. Preserve original scope/expiry; diagnose actual failures
 rather than buy retained output again. The whole service roadmap remains intact.
+
+## Actual WordPress Home, native visual critique and bounded replan — November 19, 2026
+
+**Bounded corrective code consent is active.** The owner explicitly approved
+package `c50b4983ca5321f99c600f2aa0732a731d2ee4d697ed4ec057f8c39180f77308`
+and subsequent tested, purpose-bound code/test transfers required for this same
+C0 run, to the same existing private acceptance-account runtime only.
+[Recorded owner decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7016129775).
+No broader data export, deployment, infrastructure, spending or publication
+permission was inferred. The corrected worker passed **40 actual Linux tests,
+zero failures/skips**. Worker SHA256
+`70cdf809ae04097d82bf66e1613e7c413e8b8e4a8f1664b0b7ceb5e644325c31`,
+Linux receipt `42951bac4be06ea9d4dbaa1034315578d0981ebb4148a2c4ac5aa3ea4eb3c7b6`.
+Exact ledger-lock/no-dispatch proof resumed event13 without resetting history
+or buying a duplicate output. Genuine Home generation then completed at16.
+
+**A real rendered result, not quality acceptance.** The fresh case's Home is
+WordPress draft203 at http://127.0.0.1:4474/?page_id=203&preview=true, using the
+existing disposable installation/theme. It is separate from the retained old
+root site. All202 pre-existing post rows remain exact (subset SHA256
+`6ad9ca038ebd73c9150eb1ed404a873c5435c53fb8c2e0c23dac7922192dc514`).
+The actual 1440px desktop/390px mobile captures returned200, no horizontal
+overflow, and two loaded wordmark images each. The two downloaded stock
+photographs are **not yet placed**; do not count logos as completed stock media.
+The generated Page metadata title and actual Hero H1 legitimately differ;
+capture now verifies both without rewriting either. A local PHP global
+variable collision initially mislabeled only new draft203; its content stayed
+exact, the initial label record was retained, and the fresh-case label corrected.
+
+**Source custody and reusable capture.** Core retains the complete review input,
+source evidence, answers and report on Cloud. Only approved visitor content,
+Page headings and hash-bound capture intent were transferred to the existing
+local WordPress destination. Actual native Page readback, brand/packet/context
+bindings and immutable screenshots are independently verified before capture,
+during capture and on return to Core. Core then binds those pixels to its full
+retained input. No new report export or arbitrary payload-size reduction.
+Server helper SHA256
+`68e18eaea8d73972b521c01b1be6f4a59959cf7a22b7b2fb4562d0d2481be51c`;
+actual Linux capture tests **10/10**, same10 local regressions pass with
+TypeScript/focused lint. Screenshot custody:2records/474874bytes, descriptor
+`7e3cf374013ae11641bf259a6eb8c5f5d012bca39f25e0b65de3cd7363e4743f`.
+Native readback
+`123912f5dfc19db2161cd1b72bb502292bdc74bc420e47e3581be45c535696a1`.
+
+**Actual commercial verdict and action.** Core's genuine image-informed critique
+completed at18. It finds repetitive generic copy, weak buying trade-offs, late
+customer fit, undistinctive visual composition and unfinished imagery.
+Codex also inspected both actual screens and recorded all10 criteria under the
+existing authenticated, review-only principal. This is delegated technical/
+commercial development review, not independent human governance, owner acceptance,
+customer confirmation or signed publication approval. Negative judgment at19
+triggered the existing bounded commercial replan at20. Core carries its exact
+generated critique into the next Direction/blueprint/Home; no Codex-authored
+marketing replaces it. Preview-disabled labels are a renderer concern and must
+not be fixed by enabling unauthorized submissions or inventing live destinations.
+
+**Running cost:** this fresh run9requests/5generations at Home16: estimated
+$0.746409. The sixth generation (actual Home critique) adds$0.160100, giving
+**11requests/6generations, $0.906509 estimated, $7.093491 remaining** before future
+reservations. Tracked-lineage maximum-accounted **$12.787612**, preserving prior
+uncertainty; this already includes this run, not a separate bill. No extra
+infrastructure expenditure. Founder minutes/compute-time cost UNKNOWN. The next
+replan is running under the same $8 grant/2026-11-22T15:58:31.154Z deadline; take
+the protected ledger's current readback as authoritative over this dated subtotal.
+
+**RECOVERY / RESUME HERE:** use fresh case
+`41a83e7e-1765-4517-941a-b2b151bb7c4a` in the existing
+`p0-source-aware-c0-runtime`, not oldCore75. Event20 queued the first commercial
+replan; inspect current work and usage before any redispatch. The controller
+`presence-research-controller.ts --source-aware work` is executing Direction,
+blueprint and revised Home, then pauses for exact native rendering/critique.
+Preserve draft203/capture16 and all old pages. Reuse the new metadata-only capture
+path with each exact version; do not copy the full review input/report to PC.
+Complete contextual stock Asset/Usage review and purposeful placement, render/
+critique the revised concept, then generate the remaining site, critique the
+actual whole-site desktop/mobile result and correct within the existing allowance.
+No founder review of this unfinished concept is requested. ProtectedCore41,
+protectedWordPress6, original75, prior4473/4474 sites, keys, old grants, ledgers,
+rollback and broader Entry/portal/MyBusiness/lead/measurement/Ongoing requirements
+remain intact. No protected application/publication is authorized.

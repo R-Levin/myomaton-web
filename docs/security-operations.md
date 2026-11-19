@@ -328,3 +328,11 @@ and escalate actual scope changes or uncertainty. Do not make an LLM reinterpret
 the founder's conversation for every routine operation. This is clarification
 of the existing operating direction, not a new authentication framework or
 claim of production readiness.
+
+The next exact-hash correction was also refused, despite identical purpose and
+destination. A direct owner decision then explicitly authorized a **bounded
+series of tested code-only corrections** for this same case, runtime directory,
+budget and expiry. Those corrective transfers and actual Linux tests succeeded;
+record each artifact's checksum/results. This is the observed practical fix for
+the development-tool consent mismatch, not a global bypass or a permission for
+protected report export. Existing raw C0 sources remain on their approved host.
