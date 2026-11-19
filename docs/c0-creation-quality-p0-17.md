@@ -2368,3 +2368,65 @@ After report, use development-continuation (not customer confirmation) and
 continue Direction/plan/site. All original8-dollar/32gen/65request/November22
 limits remain. Current source/registry corrections are functional engineering,
 not a claim of a completed or accepted website.
+
+## Complete sources received; narrow Home rejected and final correction active
+
+The exact five-source consent was executed. Core retained a new report57,
+development-continuation58 (not customer confirmation), Direction60,
+blueprint62 and actual Home64. Five proposed routes are business output, not a
+product limit: Home, Service, Why MioPages, Free Review and Direct Start.
+Only Home has been drafted so far. WordPress203 contains that actual Home64
+and both privately reviewed stock placements; earlier202 posts remain exact.
+
+**Product finding, not acceptance:** the new Home remains narrowly centered on
+administrative relief and upkeep, with excessive repeated cards, a tall Hero
+and weak explanation of the complete managed growth service. Supplying the
+missing site records did not itself solve commercial quality. Actual desktop
+and mobile captures are retained and returned to the same private case under
+the owner's exact consent. Core critique66 retained11 concerns; the authenticated
+delegated review67 records substantive negative judgments. No founder acceptance,
+independent human governance or positive quality result is claimed.
+
+A further request defect was verified in code: marketingProjection copied
+sourceRecovery.previous (superseded AI report/Direction/plan/drafts) into
+repairedSourceContext on every current request. This duplicated the failed
+strategy while attempting fresh reasoning. Its causal contribution is a
+credible anchoring risk, not independently measured proof of the entire failure.
+The correction projects only the exact repair provenance; complete archived
+artifacts stay unchanged in history. CURRENT report/Direction/plan/research and
+all authorized knowledge still reach the model. Instructions explicitly make
+generated interpretations subordinate to source business knowledge and allow
+correction of their omissions without repeating the rejected structure.
+
+Local19focused tests, TypeScript and lint pass. Actual Linux54tests pass,
+0fail/0skip/0provider calls. Code-only correction08 archive
+57cf50077e4deae893d0f9164c452474b6b99391dfec1260f98f0931b4397fd0,
+worker f8c51c32df21d208031f62f195ee3c1e4fd48a1656cbdc3e6bf2624deb833dc7,
+proof d359cf554d05187ebe5af2eb45565c657722d88c4dffdef00b61bdf96f3b9373
+are verified in the existing authorized runtime. Matching prior worker/proof/
+activation retained; grant, ledger and idle66 were independently unchanged at
+activation. No protected Core or WordPress deployment.
+
+The last ordinary editorial round was queued at68 from the exact Core critique;
+Home generation69 is in flight. Do not dispatch it again. Replans2/2 and
+editorial4/4 remain consumed. The local native writer now captures exact
+presentation metadata and raw routing bytes as well as prior content. A bounded
+same-ID rollback/recovery tool is prepared and PHP syntax-checked, NOT yet run.
+It will retain extra new drafts as history rather than delete them.
+
+**Cost at active69:**25generations/49provider requests including the pending
+Home; $5.249326 settled usage estimates, $0.680000 pending reservation,
+$5.929326 maximum accounted, $2.070674 unreserved under the same$8 ceiling.
+Since source recovery, settled increment$1.589748; the earlier$3.659578 is
+already included. Inclusive lineage maximum accounted$17.810429 includes the
+prior$11.881103 baseline and current reservation, not total Codex credit usage
+or an invoice. Founder time/overall Codex costs UNKNOWN. No new paid media.
+
+**RECOVERY / RESUME HERE:**inspect current event and usage before any action.
+If69 is still active, wait; retain/recover completed output, never rebuy it.
+Then prepare current native packet and media, render actual WordPress, capture
+and critique the exact corrected Home, make an honest scoped judgment. Only
+after adequate concept review continue supporting Pages, complete-site
+render/review and exact local rollback/recovery. No silent replenishment of
+rounds, replans, generations, money or expiry. Preserve original41/6/75,
+root4474/older4473, all sources/responses/events and ledger.

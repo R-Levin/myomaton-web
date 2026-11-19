@@ -34,12 +34,13 @@ $validationIds=array_combine(array_column($candidate['pages'],'path'),range(1,co
 MioPages_Native_Draft_Content::posts($candidate,$validationIds,[],true,$packet['unresolvedActions']??$packet['pendingActions']??[]);
 $track=$root.'/source-aware-ids.json';$ids=is_file($track)?json_decode(file_get_contents($track),true,512,JSON_THROW_ON_ERROR):[];
 $existing=$wpdb->get_results("SELECT ID,post_type,post_status,post_name,post_title,post_content FROM {$wpdb->posts} ORDER BY ID",ARRAY_A);
-$owned=array_map('intval',array_values($ids));$before=[];
+$owned=array_map('intval',array_values($ids));$before=[];$beforeMeta=[];
 foreach($ids as $route=>$id){$post=get_post($id,ARRAY_A);if(!$post||$post['post_status']!=='draft'||get_post_meta($id,'_miopages_source_aware_case',true)!==$sourceAwareCase)exit(8);
- $before[$route]=array_intersect_key($post,array_flip(['ID','post_title','post_content','post_excerpt','post_name','post_status','post_type']));}
+ $before[$route]=array_intersect_key($post,array_flip(['ID','post_title','post_content','post_excerpt','post_name','post_status','post_type']));
+ foreach(['_miopages_source_aware_case','_miopages_source_candidate_digest','_miopages_draft_brand'] as $key)$beforeMeta[$route][$key]=get_post_meta($id,$key,true);}
 $snapshot=$root.'/source-aware-before-'.$argv[2];
 if(is_file($snapshot))throw new RuntimeException('Preserve existing materialization evidence; inspect before retry.');
-file_put_contents($snapshot,json_encode(['pages'=>$before,'render'=>is_file($root.'/source-aware-render.json')?json_decode(file_get_contents($root.'/source-aware-render.json'),true):null],JSON_THROW_ON_ERROR));
+file_put_contents($snapshot,json_encode(['pages'=>$before,'metadata'=>$beforeMeta,'renderText'=>is_file($root.'/source-aware-render.json')?file_get_contents($root.'/source-aware-render.json'):null,'render'=>is_file($root.'/source-aware-render.json')?json_decode(file_get_contents($root.'/source-aware-render.json'),true):null],JSON_THROW_ON_ERROR));
 $visible=[];
 foreach($candidate['pages'] as $page){
  $route=$page['path'];if(!is_string($route)||!str_starts_with($route,'/')||str_contains($route,'..'))exit(9);

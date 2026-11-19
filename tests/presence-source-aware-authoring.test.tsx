@@ -244,3 +244,21 @@ test("source-aware reasoning and visible revisions share the exact approved requ
  assert.equal(authoringOutputLimit(small,"revision"),4096);
  assert.equal(authoringOutputLimit({...grant,originalMaterials:undefined},"revision"),undefined);
 });
+
+test("source repair projects provenance without reintroducing superseded AI strategy or losing current reasoning",()=>{
+ const run=makeRun();
+ const old={report:{...run.input.report!,summary:"ARCHIVED_FAILED_REPORT_SENTINEL"},direction:{...run.input.direction!,positioning:"ARCHIVED_FAILED_DIRECTION_SENTINEL"},blueprint:run.input.blueprint,pages:[]};
+ run.input.sourceRecovery={authorization:fingerprint("exact repair"),baseVersion:54,previousStateDigest:fingerprint("retained state"),
+  materialsDigest:fingerprint("complete source pack"),actor:{id:"operator",role:"operator",simulated:false,authority:"disposable evaluation"},at:"2026-11-19T00:00:00Z",priorRevisionOrdinal:3,previous:old};
+ const before=structuredClone(run.input.sourceRecovery);
+ const projected=marketingProjection(run,authority) as {repairedSourceContext:Record<string,unknown>;report:unknown;direction:unknown;blueprint:unknown;businessKnowledge:unknown;customerAssertions:unknown};
+ assert.equal(projected.repairedSourceContext.authorization,run.input.sourceRecovery.authorization);
+ assert.equal(projected.repairedSourceContext.previousStateDigest,run.input.sourceRecovery.previousStateDigest);
+ assert.ok(!JSON.stringify(projected).includes("ARCHIVED_FAILED_"));
+ assert.deepEqual(projected.report,run.input.report);
+ assert.deepEqual(projected.direction,run.input.direction);
+ assert.deepEqual(projected.blueprint,run.input.blueprint);
+ assert.ok(JSON.stringify(projected.businessKnowledge).includes(ongoing));
+ assert.ok(JSON.stringify(projected.customerAssertions).includes("doubled"));
+ assert.deepEqual(run.input.sourceRecovery,before,"Archived responses, prior count and source-repair history remain exact");
+});

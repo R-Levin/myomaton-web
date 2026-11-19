@@ -119,7 +119,11 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
     const previous = revisionRequest?.priorPages.find(page => page.path === path);
     const readable = new Set([...sources.filter(({ use }) => use !== "excluded").map(({ source }) => source.id), ...(research ?? []).map(source => source.id)]);
     return { entry, design,
-      ...(sourceRecovery && { repairedSourceContext: sourceRecovery }),
+      ...(sourceRecovery && { repairedSourceContext: {
+        authorization: sourceRecovery.authorization, baseVersion: sourceRecovery.baseVersion,
+        previousStateDigest: sourceRecovery.previousStateDigest, materialsDigest: sourceRecovery.materialsDigest,
+        interpretation: "Source repair provenance only. Superseded AI artifacts remain in history, not in the current knowledge projection.",
+      } }),
       businessKnowledge: claims.map(({ source, use }) => ({ ...expose(source), use })),
       editorialReferences: sources.filter(({ use }) => use === "editorial").map(({ source }) => expose(source)),
       contextualEvidence: analysis.filter(source => source.kind !== "customer-unconfirmed"),

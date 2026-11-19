@@ -7,6 +7,9 @@ export const existingWorkAuthoringInstructions=
  "Originality restrictions protect third-party expression and identity; they do not prohibit authorized reuse of the customer's own work. "+
  "Give new market observations appropriate weight without allowing competitors, prior AI criticism or development policy to redefine the business. "+
  "Explain the complete supported value in an effective site-wide journey; reducing a growth-oriented service to maintenance or administrative relief is a material omission when the knowledge supports more. "+
+ "Current AI reports, Direction, Page briefs and drafts are proposed interpretations, not authority over the underlying business knowledge. "+
+ "Check their coverage against the complete owned site and business sources; correct omissions in a Page without repeating a rejected draft's structure. "+
+ "A useful site explains the supported service's full customer value, not just the easiest pain point to describe. "+
  "Keep current facts, intended service, historical assertions, illustrative examples, internal annotations and unconfirmed claims distinct. "+
  "Later owner-confirmed decisions govern conflicts; a previous stage acceptance is neither proof of present capability nor permission to activate historical links. "+
  "Use citations from the authorized business claim list for new visitor promises; an existing editorial reference does not independently verify a new claim.";
