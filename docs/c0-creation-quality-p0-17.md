@@ -1612,3 +1612,94 @@ critique before expanding the model-proposed Page set. Keep the protected report
 on Cloud. ProtectedCore41/WordPress6, original75 and local4473/4474/content/media/
 rollback remain unchanged. Full Entry/portal/MyBusiness/inquiry/measurement/
 reporting/Ongoing roadmap remains required.
+
+## Verified blueprint recovery and media preflight correction — November 19, 2026
+
+**Exact code approval accepted.** The owner explicitly approved the code-package
+transfer/scoped execution and requested investigation of its refusal.
+[Recorded clarification](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7015454287).
+Package981f3576 transferred successfully. The actual read-only diagnostic
+confirmed **"Page needs source-backed peer composition and market influence"**
+as the retained blueprint's failing assertion. Corrective Linux execution passed
+**38 tests/zero failures/skips**, worker
+`9e6253d2ed6c030d2baeeb5abb7f10806e50c77bd94ffccc529b021e914112f3`,
+Linux receipt
+`95ed1f13264034b4c73207527d020cd233a2d0e1dfdd271feaae559ee22f6438`.
+Old worker/proof/activation were retained; only artifact/proof bindings changed.
+Scope, ledger, grant/start/expiry and role permissions stayed exact.
+**Blueprint recovered to version11/next Page with zero provider calls.**
+
+**Home failed before dispatch.** The next work attempt reached event13 with the
+misleading generic `outcome-unknown` state. Independent usage/output readback
+showed only the same four completed receipts/responses: **no Home count,
+generation reservation or response exists**. The copied stock selections had
+the old evaluation permission deadline2026-11-19T16:03:51.397Z. This is the
+temporary private-evaluation authorization, not expiry of Pixabay's underlying
+license. Actual selected bytes/context/source references still match.
+
+Under the already approved fresh-case reuse, only the new case's two selection
+records were bound to2026-11-22T15:58:31.154Z. The new case's initial copied
+records and a hash-bound reuse-authorization receipt are retained. The original
+case's selections are byte-identical. No new image acquisition, Asset/Usage,
+public-use approval, operator credential or old-grant extension occurred.
+Pixabay's current [binding terms](https://pixabay.com/service/terms/) and
+[summary](https://pixabay.com/service/license-summary/) were read; third-party
+rights, contextual placement review and publication remain distinct.
+
+**Local reusable correction, not yet hosted.** Source-aware media validation now
+runs before work claim/count/dispatch and emits safe expired-permission versus
+invalid-context diagnostics. A deliberate recovery can also prove an operation
+never started by acquiring the actual ledger lock, verifying the complete
+immutable usage prefix/carry and absence of its dispatch reservation. No fake
+receipt is inserted or uncertain charge classified as unsent. Existing
+pending/uncertain/completed dispatches refuse; protected scopes and historical
+default behavior are unchanged. The existing disposable resume action still
+requires exact current work/context and no retained output.
+
+**Verification:**31 focused local tests/zero failures/skips, TypeScript/lint,
+bundle and Node syntax pass. Tests include ledger lock contention, altered
+prefix, unchanged bytes, actual/uncertain dispatch refusal and media errors
+before any count. Updated worker
+`70cdf809ae04097d82bf66e1613e7c413e8b8e4a8f1664b0b7ceb5e644325c31`.
+Actual Linux verification of this subsequent build remains pending; the38-test
+receipt above applies only to its predecessor.
+
+**Tool cause narrowed.** Automatic review then rejected this different corrective
+code archive because its checksum differs from the exact package approved,
+despite the original run's ordinary-correction language and identical destination.
+No upload/retry/bypass occurred. This shows a per-payload code-egress approval
+interpretation in the development harness. It does not show a leaked credential
+or a MioPages role failure. Internal reviewer reasoning remains inaccessible.
+The [security-operations clarification](security-operations.md#development-tool-review-and-core-runtime-authority--november-19-2026)
+separates this from Core's direct Responses transport and deterministic grants;
+official documentation confirms Responses applications do not automatically
+inherit Codex Auto-review. No global permission setting was changed.
+
+**Exact pending code package:**local
+`runtime-content/source-aware-run-e0fef9d-20261119/correction-02-code.tar`,
+2,385,920bytes/14code-test files, SHA-256
+`c50b4983ca5321f99c600f2aa0732a731d2ee4d697ed4ec057f8c39180f77308`.
+No protected source bytes, model responses or credentials are bundled.
+Same existing acceptance account/private runtime directory as package01.
+Ask one explicit bounded code-egress permission covering this package **and
+subsequent tested code-only corrective builds required for this same run**,
+with checksums/results logged, unchanged destination/manifest/$8 ceiling/original
+expiry. Do not ask for a larger spending allowance, data export, public deployment
+or a permission to bypass review.
+
+**Cost / state:**unchanged$0.531379 estimated, seven requests/four generations;
+$7.468621 remaining before future reservations. Tracked-lineage maximum-accounted
+$12.412482, preserving all prior uncertainty. No paid Home call or financial
+retry occurred. Current event13 and all four prior responses are preserved.
+No new WordPress Page or website preview exists. Protected41/6, original75 and
+local4473/4474/content/media/rollback remain unchanged.
+
+**RECOVERY / RESUME HERE:** once bounded code-egress clarification is granted,
+transfer/check c50b4983, pass actual Linux tests, retain previous artifact/proof
+and bind only the new verified artifact/proof hashes. Invoke the existing
+`resume-undispatched` on exact event13: its new proof must establish no
+reservation/output and no concurrent ledger writer. No SQL history/ledger edit
+or counter reset. Then continue genuine Home generation with the fresh-case
+media permission, and actual local WordPress rendering/capture/critique before
+expanding the site. Preserve original scope/expiry; diagnose actual failures
+rather than buy retained output again. The whole service roadmap remains intact.

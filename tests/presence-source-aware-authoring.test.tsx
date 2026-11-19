@@ -176,3 +176,24 @@ test("source-aware Page decisions can compose from authorized customer knowledge
   Object.assign(base,original);
  }
 });
+
+test("source-aware media expiry and invalid context refuse before any count with safe actionable diagnostics",async()=>{
+ const {WorkflowMediaUnavailable}=await import("../lib/platform/intake/presence-workflow-provider");
+ const root=await mkdtemp(join(tmpdir(),"miopages-media-preflight-"));
+ try{
+  const run=makeRun(),rates:ResponsesRates={model:"offline-media-model",verifiedOn:"2026-11-19",inputPerMillion:750000,cachedPerMillion:75000,outputPerMillion:4500000,cacheWritePerMillion:0,countMicros:0};
+  await initializeResponsesUsageLedger(root,rates);const file=join(root,"onboarding-usage.json"),before=await readFile(file);
+  const grant:PresenceWorkflowGrant={contextDigest:fingerprint(context),approvedSources:sources,approvedCorrections:[],marketingAuthority:authority,
+   researchSources:[{id:"research:fixture",url:"https://example.org/",label:"Offline"}],researchResponseBytes:10000,expiresAt:Date.now()+60000,maxOutputTokens:1000,
+   ledger:{id:fingerprint("offline media grant"),startingLedger:createHash("sha256").update(before).digest("hex"),baselineAttempts:0,requests:2,generations:1,inputTokens:2000,inputBytes:100000,capMicros:20000}};
+  let calls=0,expired=true;
+  const provider=createResponsesPresenceWorkflow({grant,readGrant:async()=>grant,readContext:async()=>context,rates,ledgerDirectory:root,
+   transport:{async send(){calls++;throw Error("No network permitted")}},fetchPage:async()=>{throw Error("No network")},
+   readAvailableMedia:async()=>{throw Error(expired?"Current stock permission required":"PRIVATE_DETAIL_MUST_NOT_ESCAPE")}});
+  await assert.rejects(provider.preflight!(run),(e:unknown)=>e instanceof WorkflowMediaUnavailable&&e.code==="MEDIA_PERMISSION_EXPIRED");
+  await assert.rejects(provider.run(run,async()=>{}),(e:unknown)=>e instanceof WorkflowMediaUnavailable&&e.code==="MEDIA_PERMISSION_EXPIRED");
+  expired=false;
+  await assert.rejects(provider.preflight!(run),(e:unknown)=>e instanceof WorkflowMediaUnavailable&&e.code==="MEDIA_CONTEXT_UNAVAILABLE"&&!e.message.includes("PRIVATE_DETAIL"));
+  assert.equal(calls,0);assert.deepEqual(await readFile(file),before);
+ }finally{await rm(root,{recursive:true,force:true})}
+});

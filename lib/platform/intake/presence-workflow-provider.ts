@@ -12,6 +12,14 @@ import { exposesInternalCopy, marketingCitationIds, marketingProjection, repeats
 import type { PresenceImageGrant } from "./presence-workflow-visual";
 import { originalMaterialInput, validateOriginalGrant, type OriginalMaterialGrant, type OriginalMaterialReader } from "./presence-source-material";
 
+export class WorkflowMediaUnavailable extends WorkflowBlocked {
+  readonly code: "MEDIA_PERMISSION_EXPIRED" | "MEDIA_CONTEXT_UNAVAILABLE";
+  constructor(expired: boolean) {
+    super(expired ? "Private evaluation media permission expired before dispatch" : "Selected media context could not be verified before dispatch");
+    this.code = expired ? "MEDIA_PERMISSION_EXPIRED" : "MEDIA_CONTEXT_UNAVAILABLE";
+  }
+}
+
 type ModelStage = keyof typeof artifactSchemas;
 const fatalResearchFailure=(error:unknown)=>error instanceof Error && /custody|integrity|authority|authorization|changed within/i.test(error.message) && !/custody envelope exceeded/i.test(error.message);
 export type PresenceWorkflowGrant = {
@@ -249,6 +257,11 @@ export function createResponsesPresenceWorkflow(config: {
     return [...seeds, ...results];
   }
 
+  async function availableMedia(run: WorkflowRun) {
+    try { return await config.readAvailableMedia?.(run); }
+    catch(error) { throw new WorkflowMediaUnavailable(error instanceof Error && error.message === "Current stock permission required"); }
+  }
+
   async function authorize(run: WorkflowRun, outbound = true) {
     const [current, latestContext] = await Promise.all([readGrant(), readContext()]);
     if (fingerprint(current) !== binding || (outbound && (current.revoked || clock() < (current.startsAt ?? 0) || clock() >= current.expiresAt)) ||
@@ -367,6 +380,7 @@ export function createResponsesPresenceWorkflow(config: {
     mode: "provider", requiresResearch: Boolean(grant.marketSearch || grant.originalMaterials?.publicResearch), marketingAuthority: grant.marketingAuthority, maxCommercialReplans: grant.maxCommercialReplans, maxRetries: grant.maxRetries, maxEditorialRevisions: grant.maxEditorialRevisions,
     async preflight(run) {
       const projected = await authorize(run);
+      if (grant.marketingAuthority?.projectionVersion === 2 && config.readAvailableMedia) await availableMedia(run);
       if (grant.originalMaterials?.candidateReview?.operations.some(operation => operation === run.work.operation)) {
         await originalMaterialInput(run, grant.originalMaterials, projected, config.readOriginalMaterials!,
           grant.marketingAuthority?.projectionVersion === 2);
@@ -380,12 +394,12 @@ export function createResponsesPresenceWorkflow(config: {
       let input: unknown = await authorize(run);
       const operation = run.work.operation;
       if (grant.marketingAuthority?.projectionVersion === 2) {
-        input = { ...input as object, ...(config.readAvailableMedia && { availableMedia: await config.readAvailableMedia(run) }) };
+        input = { ...input as object, ...(config.readAvailableMedia && { availableMedia: await availableMedia(run) }) };
       } else if (grant.originalMaterials) {
         const authority=grant.marketingAuthority;
         const evidence=run.input.evidence.filter(source=>!authority||authority.sources.some(row=>row.digest===fingerprint(source)&&row.use!=="excluded"))
           .map(source=>{const {id,kind,label,date,content}=source;return {id,kind,label,date,content,use:authority?.sources.find(row=>row.digest===fingerprint(source))?.use??"case-evidence"}});
-        input = { task: input, evidence, ...(config.readAvailableMedia&&{availableMedia:await config.readAvailableMedia(run)}),report: run.input.report, direction: run.input.direction,
+        input = { task: input, evidence, ...(config.readAvailableMedia&&{availableMedia:await availableMedia(run)}),report: run.input.report, direction: run.input.direction,
           research: run.input.research, blueprint: run.input.blueprint,
           revisions: run.input.revisionRequest ? operation==="editorial"
             ? { ...run.input.revisionRequest, priorPages: undefined, priorDraftReferences:run.input.revisionRequest.priorPages.map(page=>({path:page.path,digest:fingerprint(page),retainedInWorkflowHistory:true})) }
@@ -475,7 +489,7 @@ export function createResponsesPresenceWorkflow(config: {
       if(!grant.originalMaterials||!run.context.evaluation)throw Error("Isolated original-evidence scope required");
       await authorize(run);
       const {ownerDigest,workDigest}=workScope(run,grant);
-      await confirmUndispatchedPlanningRequest(ledgerDirectory,grant.ledger,ownerDigest,workDigest);
+      await confirmUndispatchedPlanningRequest(ledgerDirectory,grant.ledger,ownerDigest,workDigest,grant.marketingAuthority?.projectionVersion===2&&grant.marketingAuthority?.earlyConceptReview===true);
     },
     async recover(run, bytes) {
       await authorize(run, false);

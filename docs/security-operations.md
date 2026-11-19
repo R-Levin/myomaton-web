@@ -299,3 +299,32 @@ The [Human/AI charter](platform-service-architecture.md#human-and-ai-operating-c
 owns project-level action authority; the [runbook status](progressive-onboarding-and-launch-readiness.md#operational-runbook-status)
 distinguishes local sufficiency from missing production procedures. Neither policy
 nor adjacent approval authorizes provisioning, live restore, deletion or spend.
+
+## Development-tool review and Core runtime authority — November 19, 2026
+
+A Codex desktop automatic tool reviewer twice refused an approved private code
+upload, treating carried-forward consent as insufficiently explicit and a
+GitHub restatement as untrusted authority. A direct owner clarification naming
+the exact code package, account and directory was accepted. No credential leak
+or failed MioPages authorization check was identified by that refusal. The
+reviewer's internal reasoning is not visible; context/consent classification
+is the supported explanation, not a proven implementation diagnosis.
+
+Keep development-tool consent distinct from product permissions. Attach the
+trusted owner's actual scoped consent to transfer/deployment operations, name
+code versus protected-data payloads and destinations, verify artifacts, and
+retain accepted scope across ordinary corrections. A GitHub comment records a
+decision; it must not independently confer authority. This lesson does not
+disable tool review, approve new destinations or require a human per model call.
+
+Core currently uses a confined Responses HTTPS transport with its own persisted
+grants, tenant/evidence/endpoint/expiry/budget checks. OpenAI documents that
+Responses/Agents SDK applications do not automatically inherit Codex Auto-review.
+[Official workflow boundary guidance](https://developers.openai.com/api/docs/guides/agents/guardrails-approvals),
+[automatic review description](https://developers.openai.com/api/docs/guides/agents-api/sessions/approvals).
+For production, preserve the approved session/workflow-level authority direction:
+enforce verified scope deterministically at side effects, resume durable work,
+and escalate actual scope changes or uncertainty. Do not make an LLM reinterpret
+the founder's conversation for every routine operation. This is clarification
+of the existing operating direction, not a new authentication framework or
+claim of production readiness.

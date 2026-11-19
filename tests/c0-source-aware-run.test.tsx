@@ -186,3 +186,28 @@ test("shared stage accounting permits useful repetition but the same aggregate c
     assert.equal(ledger.attempts.reduce((sum: number, attempt: { estimatedMicros?: number }) => sum + (attempt.estimatedMicros ?? 0), 0), 8000);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test("explicit source-aware recovery proves an absent reservation under lock and refuses actual or uncertain dispatch",async()=>{
+ const {mkdtemp,readFile,writeFile,rm,unlink}=await import("node:fs/promises");
+ const {join}=await import("node:path");const {tmpdir}=await import("node:os");
+ const {initializeResponsesUsageLedger,confirmUndispatchedPlanningRequest}=await import("../lib/platform/intake/intelligent-responses");
+ const root=await mkdtemp(join(tmpdir(),"miopages-never-dispatched-"));
+ try{
+  await initializeResponsesUsageLedger(root,proposal.provider.rates);
+  const file=join(root,"onboarding-usage.json"),before=await readFile(file),owner=fingerprint("offline owner"),work=fingerprint("offline work");
+  const scope={id:fingerprint("offline missing-reservation scope"),startingLedger:hash(before),baselineAttempts:0,requests:4,generations:2,capMicros:10000,inputTokens:1000,inputBytes:10000};
+  await assert.rejects(confirmUndispatchedPlanningRequest(root,scope,owner,work));
+  await confirmUndispatchedPlanningRequest(root,scope,owner,work,true);
+  assert.deepEqual(await readFile(file),before,"No fabricated receipt or ledger reset");
+  await writeFile(file+".lock","held",{flag:"wx",mode:0o600});
+  await assert.rejects(confirmUndispatchedPlanningRequest(root,scope,owner,work,true),{code:"EEXIST"});await unlink(file+".lock");
+  await assert.rejects(confirmUndispatchedPlanningRequest(root,{...scope,startingLedger:"f".repeat(64)},owner,work,true));
+  for(const status of ["pending","uncertain","completed"]){
+   const ledger=JSON.parse(before.toString());
+   ledger.attempts.push({ownerDigest:owner,workDigest:work,workflowScope:scope.id,status,reservedMicros:4000,countDispatched:true,generationDispatched:true});
+   await writeFile(file,JSON.stringify(ledger)+"\n",{mode:0o600});
+   await assert.rejects(confirmUndispatchedPlanningRequest(root,scope,owner,work,true),"Existing generation cannot be classified as unstarted");
+   await assert.rejects(confirmUndispatchedPlanningRequest(root,scope,owner,fingerprint("different work"),true),"An unrelated unsettled receipt blocks absence proof too");
+  }
+ }finally{await rm(root,{recursive:true,force:true})}
+});

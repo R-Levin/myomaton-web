@@ -854,15 +854,25 @@ function interviewRequest(model: string, context: QuestionContext, projected: un
 }
 
 /** A manual resume may requeue an unsent generation, never an uncertain charge.
- * The original rejected/count receipt remains in the append-only usage history. */
-export async function confirmUndispatchedPlanningRequest(directory:string,scope:WorkflowUsageScope,ownerDigest:string,workDigest:string) {
+ * An explicit source-aware caller can also prove that dispatch never started.
+ * Existing receipts and the complete historical prefix remain unchanged. */
+export async function confirmUndispatchedPlanningRequest(directory:string,scope:WorkflowUsageScope,ownerDigest:string,workDigest:string,allowUnstarted=false) {
   const path=join(directory,"onboarding-usage.json"),info=await lstat(path);
   if(!info.isFile()||await realpath(path)!==path||process.platform!=="win32"&&(info.uid!==process.getuid?.()||(info.mode&0o777)!==0o600))throw Error("Private usage receipt refused");
-  const ledger=JSON.parse(await readFile(path,"utf8")) as Ledger;
-  const rows=recentWorkflow(ledger,scope,ownerDigest).filter(row=>row.workDigest===workDigest);
-  const receipt=rows[0];
-  if(rows.length!==1||receipt.status!=="rejected"||receipt.generationDispatched||!receipt.countDispatched||
-    !receipt.countRequestId||receipt.generationRequestId||receipt.responseId||receipt.usage||receipt.estimatedMicros!==0) {
-    throw Error("Unsent zero-cost generation is not independently established");
-  }
+  // Dispatch must durably reserve in this same locked ledger before any count
+  // or generation. Hold that lock while proving the absence of a reservation.
+  const lock=await open(path+".lock","wx",0o600);
+  try {
+    const ledger=JSON.parse(await readFile(path,"utf8")) as Ledger;
+    const rows=recentWorkflow(ledger,scope,ownerDigest).filter(row=>row.workDigest===workDigest);
+    if(allowUnstarted&&rows.length===0) {
+      verifiedSpend(ledger,undefined,scope.carryForward?.reportHold);
+      return;
+    }
+    const receipt=rows[0];
+    if(rows.length!==1||receipt.status!=="rejected"||receipt.generationDispatched||!receipt.countDispatched||
+      !receipt.countRequestId||receipt.generationRequestId||receipt.responseId||receipt.usage||receipt.estimatedMicros!==0) {
+      throw Error("Unsent zero-cost generation is not independently established");
+    }
+  } finally { await lock.close(); await unlink(path+".lock"); }
 }
