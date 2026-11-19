@@ -2275,3 +2275,53 @@ Inspect actual resolved request for the complete corpus before dispatch. Then
 complete a coherent site and actual native desktop/mobile whole-site review;
 do not restart Home-only iteration or claim tests establish commercial quality.
 The earlier screenshot tool rejection is not silently bypassed by this record.
+
+### Linux result and exact data-transfer hold
+
+Code checkpoint a159c7c passed **46 actual Linux tests,0fail/0skip** using
+the existing Node22 dependencies. The first harness run failed launcher-path
+and ESM sharp resolution; failed logs remain. Correcting the harness's compiled
+worker variable and package-local existing-dependency resolution passed the same
+code. Local47 focused tests, TypeScript and lint also pass; the real accepted
+source projection comparisons run locally and are not misrepresented as Linux
+customer-data tests. Linux proofSHA256
+c1bb7fd926d6e1a6b63919b219b6081bd72e0015aa1e1420d3d066c062576cae binds
+worker647e1174907465046ab9824632b1db577ec9edb85263396e084ec2c95b88a017.
+Proof and code stay in the approved private correction-07 directory. Actual
+current worker remains41c5e366 and ledger ef1ddaa1 remain unchanged; no activation,
+source amendment, rewind event or model request has run.
+
+**Actual tool blocker:**the encrypted transfer of the prepared five-source
+archive a2f66430db9bbacd80d3fa6f35359538a059a0d8a59f7441f682397a7671af4f
+was rejected by automatic approval review. The action named the latest direct
+owner instruction to use the full former site and system knowledge, all five
+payloads, exact existing private runtime, unchanged limits and separate data
+handling. The rejection nevertheless states that using the material is authorized
+but this specific sensitive-data payload/destination is not explicitly authorized
+in trusted user instructions. Nothing was transferred. Do not repackage/reroute
+or treat approved code egress as data permission.
+
+**Single remaining consent:**the owner should explicitly name source-recovery
+manifest76bb9ca171c604f30007bf0ee3ce0706b1a6c4b8d5dd18995647b2e248083b53,
+its five prepared C0 originals, local-PC→existing wp-acceptance private runtime/
+same-case source custody→existing OpenAI Responses use, and actual same-candidate
+WordPress screenshots/capture metadata returned to that case for critique.
+This clarification changes no numeric spending ceiling, expiry, protected
+Core/WordPress scope or publication permission. It should cover ordinary same-case
+captures, rather than require consent per screenshot.
+
+**RECOVERY / RESUME HERE:**source data are still only in the prepared ignored
+Windows site-recovery directory; Cloud correction07 code/proof are ready,
+current case54/worker/ledger untouched. Once direct data consent is accepted:
+transfer/exact-check source archive into runtime/source-recovery-inputs0700/0600;
+run tested source-only installer from correction07, independently verify
+grant/binding and unchanged usage; activate exact verified worker/proof with
+original artifacts retained; invoke repair-sources54 with exact manifest once.
+Confirm the append-only sourceRecovery retains prior useful work/consumed
+allowances and returns report, then inspect actual resolved complete inputs
+before API dispatch. Continue Core-generated report/Direction/site using
+retained research, actual native rendering and honest whole-site critique.
+Same$8 total run ceiling,32generation/65request/November22 expiry; consumed19
+generations/$3.659578,2replans/3editorial rounds remain. Ask a genuine resource
+amendment only if the actual plan needs it; never silently replenish counters
+or imply another site has been generated.
