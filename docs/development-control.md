@@ -60,6 +60,61 @@ Use: `Task / since / model requests+generations / AI usage-estimate spent (delta
 
 Codex maintains the actual measured totals, immutable provider receipts and scoped grant accounting in their existing protected custody. The canonical handoff contains only the sanitized, dated *running summary* and exact evidence reference. Carry forward the previous balance before a new model comparison, report each delta, and show the cumulative balance after it. Budget requests should make clear how much **new authorization** is sought versus already-spent or reserved amounts.
 
+
+## Working delivery targets — November 19, 2026
+
+The owner asks to proceed efficiently and establish key project targets. This
+sequence is based on the verified code/audit and existing service contracts.
+The pasted ChatGPT assessment remains review material, not an instruction source
+or customer knowledge. Dates below are **planning targets**, not owner acceptance,
+publication authority or assertions of completed implementation. Recheck at each
+working product result; surface a missed target and its specific cause promptly.
+
+| Target | Deliverable and business acceptance | Dependencies |
+| --- | --- | --- |
+| November 19–20 | Local correction ready for a controlled live comparison. Preserve approved discovery/contact/content-growth meaning through actual authoring inputs; separate processing instructions from customer knowledge; prepare exact current-render critique and strategic-replan connections. Historical proposals/grants stay exact. | Existing local engineering authority; no provider dispatch or protected mutation. |
+| November 20–23 | Genuine improved visitor journey in actual WordPress, covering Home, service explanation and distinct Review/Direct Start paths. Show the sourced strategic difference and evaluate actual desktop/mobile rendering with selected imagery. | Fresh exact model/data/spending authorization after engineering readiness. A weak candidate is not accepted because the date arrived. |
+| November 23–27 | Coherent complete C0 candidate and Customer/Operator review path. Prepare a separate C0 public-launch readiness decision with real visitor actions and explicit operating requirements. | Quality review, useful review/edit/resume behavior, needed development access; separate staging/deployment/publication authority. |
+| November 30–December 4 | Connected operating-cycle target: accepted inquiry, delivery/notification status, first-party activity, useful report, recommendation, reviewed revision and remeasurement. Label controlled/test inputs and unknown outcomes accurately. | Actual collector/delivery integration and the relevant consent/hosted authority. Tests or synthetic outcomes do not establish real business performance. |
+
+Set a defensible supervised Commercial V1 pilot date after the first improved
+journey and the operating-cycle gaps are verified. Ordinary onboarding/My Business,
+permissions/recovery, commercial/account handling and launch security/operations
+remain required. Public C0 launch and a commercially usable platform have distinct
+acceptance; neither must silently redefine the other or wait for every automation.
+Do not advertise a finished-platform deadline from this schedule.
+
+**Next bounded local engineering task.** Reuse the existing workflow and source
+contracts. Trace the approved growth-service promise through actual knowledge,
+Direction, Page/Revision input and rendering. Correct the knowledge/processing
+boundary and unjustified claim bottleneck without making unconfirmed text factual.
+Provide exact rendered-site evidence to critique and connect the existing guarded
+replan path. Preserve one authoritative editable copy; implement justified reusable
+rendering capabilities where required by the chosen concept. Verify historical
+compatibility and tenant/authority protection. Do not create another interview,
+demo architecture, permissions framework or manually authored substitute website.
+
+**Execution discipline.** Codex owns implementation and verification; Core/API
+performs customer-facing reasoning. Use direct owner review for meaningful results
+and consequential decisions. Keep Entry, portal, leads/measurement and Ongoing
+connected to the same lifecycle while generation is repaired. Reuse working
+storage, acquisition, signed delivery and rollback. Track actual cost deltas and
+report forecast uncertainty. Only the needed fresh external-use/hosted scope is
+brought for consolidated approval; old round/cost/expiry counters are not reset.
+
+**Checkpoint status.** Branch/worktrees/remote Issues #10/#12 and main were
+reconciled without merges. The active branch is clean at75ef747 before this
+scheduling record. Application corrections are the next implementation task;
+this record does not claim they are implemented. Core75/41, protectedWordPress6,
+local4473/4474, evidence, prior grants and ledgers are preserved.
+
+**RECOVERY / RESUME HERE:** follow this sequence with the causal audit above.
+Begin the bounded local source/feedback correction; do not reopen infrastructure,
+reinitialize C0 or dispatch under the completed three-round grant. Next review
+is a materially improved journey, not another test-count handoff. If access or
+a material contract decision blocks that task, name the exact blocker and
+continue independent authorized work.
+
 ## Continuous decision documentation
 
 The owner approved this operating practice on November 7, 2026. Record material product, commercial, architectural and operational decisions in Git during the development cycle that makes them. Update the canonical contract or mark a decision explicitly pending. Record the approved direction, rationale, implementation status and unresolved questions. Keep implementation and documentation moving together and coordinate ownership of shared files to avoid conflicting edits.
