@@ -65,10 +65,10 @@ export function strategyBasis(context: WorkflowRun["context"], input: Pick<Workf
   return fingerprint({ context: fingerprint(context), report: input.report, direction: input.direction, research: input.research });
 }
 
-// Raw source bodies and narrative reports stay behind this compiler. Only the
-// originally validated decision and the specific sourced traces reach the writer.
+// Legacy projections expose only the validated decision and sourced traces.
+// Source-aware authoring separately carries its explicitly authorized knowledge.
 export function compilePageDecision(run: WorkflowRun, brief: DecisionBrief, path: string, scope: StrategyScope,
-  claims: readonly PresenceEvidence[], observations: readonly PresenceEvidence[], expectedContext: string) {
+  claims: readonly PresenceEvidence[], observations: readonly PresenceEvidence[], expectedContext: string, sourceAware = false) {
   const { report, direction } = run.input;
   if (!report || !direction || fingerprint(run.context) !== expectedContext ||
       fingerprint(run.context.evidence) !== fingerprint(run.input.evidence) ||
@@ -96,16 +96,20 @@ export function compilePageDecision(run: WorkflowRun, brief: DecisionBrief, path
   // Verified DOM text can support a proposed information composition. Missing
   // viewport captures stay explicitly incomplete; they are not invented pixels
   // or a completed visual-quality review.
-  const visualBasis = brief.influences.some(item => item.use === "composition" && item.sourceIds.some(id => peerIds.has(id)));
-  if (!visualBasis || brief.influences.some(item => item.sourceIds.some(id => !observationIds.has(id)))) {
-    throw Error("Page needs source-backed peer composition and market influence");
+  // A source-aware Page must have a real market influence, but its original
+  // composition may come from authorized customer knowledge/brand rather than
+  // a competitor. Historical grants keep their peer-composition requirement.
+  const researchBasis = brief.influences.some(item => (sourceAware || item.use === "composition") && item.sourceIds.some(id => peerIds.has(id)));
+  if (!researchBasis || brief.influences.some(item => item.sourceIds.some(id => !observationIds.has(id)))) {
+    throw Error(sourceAware ? "Page needs authorized source influence and market evidence" : "Page needs source-backed peer composition and market influence");
   }
   return { ...brief, findings, directions,
     sourceTrace: brief.influences.flatMap(item => item.sourceIds).filter((id, i, sourceIds) => sourceIds.indexOf(id) === i)
       .map(id => {
         const source = observations.find(item => item.id === id)!;
         return { id, observed: peerIds.has(id) ? text(source.content, scope.discoveredPeers ? Infinity : 2_000, true) : null,
-          use: "market-influence" as const, observedAt: source.date, digest: fingerprint(source) };
+          use: sourceAware && !peerIds.has(id) ? "authorized-customer-source-influence" as const : "market-influence" as const,
+          ...(sourceAware && { sourceKind: source.kind }), observedAt: source.date, digest: fingerprint(source) };
       }),
     ...(scope.change && { change: { ...scope.change, paths: [path] } }),
     caseDigest: expectedContext, reportDigest: fingerprint(report), directionDigest: fingerprint(direction) };

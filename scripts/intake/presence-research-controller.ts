@@ -39,9 +39,12 @@ export function publicResearchCommand(args:readonly string[]){
  const argument=value?(fresh?" '"+JSON.stringify({version:Number(value)})+"'":" "+value):"";
  return "cd ~/miopages-private-acceptance/"+folder+" && exec env NODE_ENV=development MIOPAGES_PUBLIC_RESEARCH_BRIDGE=1 NODE_PATH=$HOME/miopages-private-acceptance/p0-original-evidence-c0-runtime/node_modules:$HOME/public_html/node_modules node "+script+" "+operation+argument;
 }
+const controllerState:{stage:string;remoteExit:number|null;resultSeen:boolean}={stage:"configuration",remoteExit:null,resultSeen:false};
 async function main(){
  const remote=publicResearchCommand(process.argv.slice(2));
+ controllerState.stage="browser-start";
  const browser=await chromium.launch({executablePath:"C:/Program Files/Google/Chrome/Application/chrome.exe",headless:true,chromiumSandbox:true,args:["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"]});
+ controllerState.stage="ssh-stream";
  const child=spawn("ssh",["-o","BatchMode=yes","-o","StrictHostKeyChecking=yes","-o","ConnectTimeout=8","-i",
   join(homedir(),".ssh","miopages_20i"),"-p","39304","wp-acceptance.miopages.com@ssh.iad.stackcp.com",remote],{stdio:["pipe","pipe","pipe"]});
  child.stderr.on("data",()=>{}); // Never relay remote errors containing protected context.
@@ -50,15 +53,20 @@ async function main(){
    if(line.length>4_000_000)throw Error("Public capture frame exceeds source envelope");
    let frame;try{frame=JSON.parse(line)}catch{throw Error("Remote channel is not a public capture frame")}
    if(frame.miopagesPeerRequest===1){
+    controllerState.stage="public-capture";
     const reply=await publicResearchReply(browser,frame);
     child.stdin.write(JSON.stringify(reply)+"\n");
-   }else if(frame.miopagesRunResult===1){console.log(JSON.stringify(frame));child.stdin.end()}
+   }else if(frame.miopagesRunResult===1){controllerState.resultSeen=true;controllerState.stage="run-result";console.log(JSON.stringify(frame));child.stdin.end()}
    else throw Error("Unexpected remote output refused");
   }
+  controllerState.stage="ssh-exit";
   const code=await new Promise<number>(resolve=>{if(child.exitCode!==null)resolve(child.exitCode);else child.once("close",code=>resolve(code??1))});
+  controllerState.remoteExit=code;
   if(code)throw Error("Core operation failed");
  }finally{child.kill();await browser.close()}
 }
 if(process.argv[1]?.replaceAll("\\","/").endsWith("/scripts/intake/presence-research-controller.ts")){
- main().catch(()=>{console.error('{"status":"BLOCKED","stage":"public-capture-controller","requirement":"Preserve remote response and ledger; no automatic retry"}');process.exitCode=1});
+ main().catch(error=>{const messages=["Controlled operation required","Public capture frame exceeds source envelope","Remote channel is not a public capture frame","Unexpected remote output refused","Core operation failed","Premature close"];
+ console.error(JSON.stringify({status:"BLOCKED",stage:"public-capture-controller",operationStage:controllerState.stage,remoteExit:controllerState.remoteExit,resultSeen:controllerState.resultSeen,
+ detail:error instanceof Error&&messages.includes(error.message)?error.message:"Inspect the retained operation at this stage; no automatic retry",requirement:"Preserve remote response and ledger; no automatic retry"}));process.exitCode=1});
 }

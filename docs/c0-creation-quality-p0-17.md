@@ -1501,3 +1501,114 @@ critique/replan before expansion and retain meaningful corrections. No founder
 review of a fixture is needed. Stop on uncertain financial outcome and recover
 retained output rather than buying it twice. Protected41/6, original75,4473/4474,
 their content/media/history and the complete service roadmap remain preserved.
+
+## Source-aware live research, retained blueprint and code-upload stop — November 19, 2026
+
+**Actual live outcome.** In fresh case
+`41a83e7e-1765-4517-941a-b2b151bb7c4a`, Core completed genuine research
+(three retrieved sources), a retained15-finding Business Understanding Report,
+Presence Direction and a complete seven-page blueprint response. The blueprint
+response failed semantic validation as `citation`; latest Core event is
+**version10 / output-invalid**. No Home/Page has been generated, no new
+WordPress draft written, and no improved website or founder acceptance is claimed.
+The seven Pages are a model proposal, not an approved architecture.
+
+The first controller returned a generic BLOCKED while report work was still
+pending. Read-only follow-up then proved the report response and normal priced
+receipt completed and were retained. A subsequent no-dispatch invocation returned
+the saved customer-review state. No second report was purchased. The original
+controller interruption's precise cause remains unproven; new safe diagnostics
+distinguish stage, result-seen and SSH exit code without relaying private stderr.
+The later blueprint refusal correctly returned the retained semantic-failure gate.
+
+**Settled current-run usage, not invoice:** seven provider requests /four
+generations, all four receipts completed:
+
+| Stage | Usage estimate USD |
+| --- | ---: |
+| Research |0.099828 |
+| Business report |0.144595 |
+| Direction |0.130413 |
+| Blueprint |0.156543 |
+| Current run total |**0.531379** |
+
+$7.468621 remains under the existing$8 cap before future conservative request
+reservations. Tracked-lineage maximum-accounted is now$12.412482, carrying the
+previous$11.881103 and its retained uncertainty in full. Do not add the earlier
+run subtotals again, call this all-project cost, or infer the live account balance.
+No new uncertain dispatch remains in these four receipts. The grant/credential
+still expires **2026-11-22T15:58:31.154Z**; do not reset its counters or extend it.
+
+**Local incompatibility reproduced; exact hosted diagnosis pending.** Retained
+blueprint metadata uses known same-case claim/research IDs, with market evidence
+for terminology/journey and customer sources for composition. The legacy Page
+decision compiler insists each Page use a *peer* for composition and permits
+only the analysis subset as influences. That conflicts with the new source-aware
+contract allowing original composition from authorized customer knowledge/brand.
+A focused fixture reproduces that incompatibility. The local v2 correction
+requires real market influence, permits only authorized non-excluded same-case
+sources for other influences, retains source kind, and keeps unconfirmed text
+out of claim authority. Historical grants retain their exact old rule.
+Foreign/excluded sources, missing research, changed tenant and unconfirmed
+claim promotion remain refused. No model output was rewritten to pass.
+
+The actual retained blueprint has **not yet passed the corrected compiler**:
+the read-only diagnostic upload was blocked before it could execute. Therefore
+this is a locally demonstrated contract defect/candidate recovery correction,
+not a proven statement that every live Page decision now validates.
+
+**Verified locally:**30 focused tests/zero failures/skips, full TypeScript,
+focused lint, corrective worker bundle and Node syntax pass. Corrected worker:
+`9e6253d2ed6c030d2baeeb5abb7f10806e50c77bd94ffccc529b021e914112f3`.
+Its actual Linux execution remains pending. The earlier37-test Linux receipt
+binds the previous artifact and must not be reused as this build's proof.
+
+**Automatic approval-review blocks, preserved rather than bypassed.**
+The tool rejected transferring the protected derived report to a new local
+review folder, saying that payload/destination lacked explicit permission.
+That copy was not made or retried; the report stays on Cloud and is not required
+locally to continue the approved generation. No substantive Codex/owner review
+of that report's text is claimed. The report continuation was explicitly
+development-only; no generated assertion became customer-confirmed knowledge.
+
+The tool separately rejected uploading a26,207-byte diagnostic code bundle to
+the already approved off-webroot Cloud directory. Exact manifest/owner approval
+evidence was supplied and the **same** transfer requested again. Automatic review
+again rejected it, saying the trusted user message did not explicitly approve
+that exact manifest/artifact/destination/code egress. No diagnostic was uploaded
+or executed and no alternate transfer/inline-execution route was used.
+This is a tool-enforced authorization interpretation, not a newly invented
+MioPages access requirement or a request for fresh credentials.
+
+**Concrete clarification for the owner.** Authorize encrypted upload/execution
+of the code-only correction package below to existing
+`wp-acceptance.miopages.com@ssh.iad.stackcp.com:39304`, exclusively in
+`/home/virtual/vps-bef564/e/e494602172/miopages-private-acceptance/p0-source-aware-c0-runtime`.
+It contains reviewed validation/diagnostic/worker/test code, not protected source
+bytes, provider responses or credentials. Scope is read-only retained-output
+diagnosis, actual Linux verification, then only the tested purpose-bound worker
+replacement/recovery if checks pass, under the unchanged manifest, $8 ceiling,
+original expiry and protections. No larger budget, report export, protected
+Core/WP operation, role expansion, source change or publication is requested.
+
+Local package:
+`runtime-content/source-aware-run-e0fef9d-20261119/correction-01-code.tar`
+(2,283,520bytes,14 files), SHA-256
+`981f3576e983aa5c9c74ded1207dcc491e14413cc2005b3073a9a3b2d42e2127`.
+Diagnostic artifact SHA-256:
+`8d3576a1ab1a9f4ca31900f8d6f4420647fe593db0e82dd2346246ac9c3a080d`.
+The worker hash above is in the package's per-file manifest.
+
+**RECOVERY / RESUME HERE:** no further paid dispatch is running. Preserve current
+version10, all four exact responses, current ledger and previous activation.
+After the code-transfer clarification, inspect the retained blueprint through
+the read-only diagnostic first; verify the actual failing assertion rather than
+assume the local finding is the only issue. Test the corrective artifact on
+Linux, retain old proof/worker, and rebind only artifact/proof hashes with scope,
+start/expiry, grant and ledger exact. Recover the existing blueprint response
+without another call; do not retry generation just to work around validation.
+Only then continue genuine Home generation and actual WordPress desktop/mobile
+critique before expanding the model-proposed Page set. Keep the protected report
+on Cloud. ProtectedCore41/WordPress6, original75 and local4473/4474/content/media/
+rollback remain unchanged. Full Entry/portal/MyBusiness/inquiry/measurement/
+reporting/Ongoing roadmap remains required.

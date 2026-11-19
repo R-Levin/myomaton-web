@@ -152,3 +152,27 @@ test("strategic replanning retains the specific Core-generated concept critique 
  assert.ok(!JSON.stringify(projected.businessKnowledge).includes(critique.editorial.summary));
  assert.deepEqual((run.input.replan as {conceptCritique:unknown}).conceptCritique,critique);
 });
+
+test("source-aware Page decisions can compose from authorized customer knowledge while retaining a real market influence",async()=>{
+ const {compilePageDecision}=await import("../lib/platform/intake/presence-decision-brief");
+ const run=makeRun(),page=run.input.blueprint!.pages[0],base=page.decisionBrief!;
+ base.influences=[
+  {sourceIds:["peer"],use:"terminology",implication:"Clarify the market distinction without copying."},
+  {sourceIds:["complete-approved-brief"],use:"composition",implication:"Organize this customer's own service relationship."},
+ ];
+ const projection=marketingProjection(run,authority) as {decisionBrief:{sourceTrace:{id:string;use:string;sourceKind?:string}[]}};
+ assert.equal(projection.decisionBrief.sourceTrace.find(x=>x.id==="complete-approved-brief")!.use,"authorized-customer-source-influence");
+ assert.equal(projection.decisionBrief.sourceTrace.find(x=>x.id==="complete-approved-brief")!.sourceKind,"service-direction");
+ assert.equal(projection.decisionBrief.sourceTrace.find(x=>x.id==="peer")!.use,"market-influence");
+ assert.throws(()=>compilePageDecision(run,base,page.path,authority.strategy!,context.evidence.slice(0,2),[context.evidence[3]],authority.contextDigest),/Page needs source-backed/,"Historical grants keep their exact peer-composition contract");
+ for(const change of [
+  ()=>{base.influences=base.influences.filter(x=>!x.sourceIds.includes("peer"));},
+  ()=>{base.influences.push({sourceIds:["foreign-source"],use:"journey",implication:"Refused foreign influence"});},
+  ()=>{base.influences.push({sourceIds:["development"],use:"journey",implication:"Refused excluded processing source"});},
+  ()=>{base.claimIds.push("unconfirmed");},
+ ]){
+  const original=structuredClone(base);change();
+  assert.throws(()=>marketingProjection(run,authority));
+  Object.assign(base,original);
+ }
+});

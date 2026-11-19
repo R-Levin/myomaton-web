@@ -173,8 +173,10 @@ function strategyDecision(run: WorkflowRun, authority: MarketingAuthority, page:
       throw Error("Reviewed peer observation missing");
     }
   }
+  const influenceSources = authority.projectionVersion === 2
+    ? sources.filter(item => item.use !== "excluded").map(item => item.source) : analysis;
   const brief = compilePageDecision(run, page.decisionBrief, page.path, authority.strategy, claims,
-    [...analysis, ...run.input.research ?? []], authority.contextDigest);
+    [...influenceSources, ...run.input.research ?? []], authority.contextDigest, authority.projectionVersion === 2);
   if (exposesInternalCopy(brief, run.input.evidence, authority, true)) throw Error("Excluded content in Page decision");
   return brief;
 }
