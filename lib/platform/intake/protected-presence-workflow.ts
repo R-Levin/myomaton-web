@@ -21,6 +21,7 @@ import { acquirePresenceVisual, presenceVisualRequest, readPresenceVisual, valid
 import { openAIImageProvider } from "../acquisition/openai";
 import type { ImageProvider } from "../acquisition/contracts";
 import type { OriginalMaterial } from "./presence-source-material";
+import { readRenderedCandidateCustody } from "./presence-original-custody";
 import { researchMaterialCustody } from "./presence-research-material";
 import { capturePublicPeer } from "./presence-peer-browser";
 import { chromium } from "playwright-core";
@@ -209,12 +210,12 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
             }
             return reviewedStockForWorkflow(pool,workspace.root,run,supplied);
           }}),
-          async readOriginalMaterials() {
+          async readOriginalMaterials(run) {
             const root = join(workspace.root, "originals");
             await verifyDirectory(root);
             const manifest = await privateWorkflowFile<OriginalMaterial[]>(join(root, "index.json"), root);
             if (!Array.isArray(manifest)) throw Error("Original source index refused");
-            return Promise.all(manifest.map(async source => {
+            const originals = await Promise.all(manifest.map(async source => {
               if (!/^[a-f0-9]{64}$/u.test(source.sha256) || !Number.isSafeInteger(source.bytes) ||
                   source.bytes < 1 || source.bytes > grant.originalMaterials!.requestBytes) throw Error("Original source envelope refused");
               const path = join(root, source.sha256 + ".source");
@@ -223,6 +224,8 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
                   meta.size !== source.bytes || await realpath(path) !== path) throw Error("Original source custody refused");
               return { source, bytes: await readFile(path) };
             }));
+            const rendered = await readRenderedCandidateCustody(root, run, grant.originalMaterials!);
+            return [...originals, ...rendered];
           },
           async retainRequest(run: WorkflowRun, bytes: Buffer) {
             const root = join(workspace.root, "originals");

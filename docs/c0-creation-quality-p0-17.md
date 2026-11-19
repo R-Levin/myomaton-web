@@ -1127,3 +1127,89 @@ It was not uploaded, run against hosted data or treated as a verified Linux
 production build. The installed Next server/client boundary guidance was checked;
 these remain server-side workflow modules with no new client credential path.
 No paid transport or genuine AI output was used in this verification.
+
+## C0 authoring coverage and actual rendered feedback — November 19, 2026
+
+**Local implementation.** The source-aware path now has a C0 adapter proposing
+exact canonical passages for Standard Launch, the managed outcome, customer/
+Operator responsibilities, ongoing content work, useful measurement, reporting
+and conversion refinement. It preserves the incoming context and evidence, adds
+document/passage digests, and retains service-direction as intended direction,
+not verified current operations. It creates no case, grant, customer approval or
+visitor copy. It requires a new source-bound grant; existing cases and manifests
+are unchanged. The reusable downstream authoring path remains source-neutral.
+
+The tests exposed a genuine source conflict: the older business brief's Launch
+row includes GA4/Search Console support; the current product model explicitly puts
+Google access outside the ordinary V1 path. The new adapter uses the current
+Launch deliverables and exact first-party measurement sentence, preserving the
+rest of the scope and the original source. It does not revive that older Google
+promise or silently rewrite either document. Whole original records remain in
+their existing custody. This is additional substantive coverage, not a claim
+that all retained C0 knowledge has been reconciled or newly approved.
+
+The existing original-material/provider path accepts **private rendered-candidate
+evidence** under an explicit operation/byte envelope in a future grant. It binds
+the context, exact work input, represented candidate, Page and desktop/mobile
+viewport. Missing, foreign, stale, mixed or duplicate bindings refuse. Both views
+are required for every Page that the operation reviews; this is completeness for
+the actual Page set, not a product Page limit. Derived review pixels stay
+unconfirmed and cannot become business facts. Local Operator-proposed views need
+explicit scope and keep that label. They cannot masquerade as an unchanged Core
+candidate or signed approval.
+
+Derived evidence uses the existing immutable private source custody, with a
+work-input-specific index, exact byte checks, permission/ownership and symlink
+checks. The protected worker reader is connected to it; old grants require no
+review index and keep their original request interpretation. Request retention
+still precedes provider counting/dispatch. No new credential or permission service
+was added. The trusted renderer/preparer must establish what the pixels actually
+depict: a hash binds the supplied representation, not its truth or quality.
+Automated capture/preparation inside the active workflow remains to be connected.
+
+**Actual WordPress evidence, no model dispatch.** Read-only loopback capture of the
+existing version75 local Operator-preview site passed: eight Pages, 16 current
+desktop/mobile images, both real photos loaded, zero horizontal overflow. A second
+read confirmed the retained PNGs exactly match unchanged WordPress rendering.
+All image bytes survived custody, reload and construction of the existing
+provider-format input (6,315,591 bytes; 4,695,516 image bytes). The rendered packet
+remains `f8e36c5ae5f0707e07ca52ea63b8d9153cf4ca7b93d3cf346a20dd0081d12948`.
+The proof is an explicitly reconstructed offline transport input; it is not a
+canonical Core75 event, genuine AI critique or improved commercial site.
+
+Private receipt (Git-ignored, restricted Windows ACL):
+`runtime-content/remediation-render-20261119-verified/receipt.json`,
+SHA-256 `e71f57f777bd1ca08fb686819fecc37738b04f370cee67a6856e27aa6c345f25`.
+The earlier refused capture/fixture attempts remain preserved. Caller path
+normalization and fixture shape were corrected; custody guards were not weakened.
+The source packet and WordPress mapping stayed byte-identical; no Page write
+or hosted action was performed.
+
+**Verification.** 32 focused tests pass, zero skips, plus full TypeScript and focused
+ESLint. These cover actual canonical C0 passages, C2 refusal, unchanged historical
+scope, stale/changed inputs, source/custody conflicts, incomplete screenshots,
+Operator-preview separation, and a normal metered provider-shaped request with
+retained input/output and no-call recovery. Transports are offline doubles.
+The worker bundles and passes Node syntax locally, SHA-256
+`f3ad83bffffa24817a75649377043e471de3c875097d27a5a0860552674b7080`.
+No Linux production execution, hosted deployment or new AI quality is claimed.
+
+**Cost / state.** This local continuation used zero provider calls and $0 additional
+provider spending. Prior totals remain: new-run usage estimate $8.776797,
+conservative debit $9.069494, tracked lineage maximum-accounted $11.881103.
+The ledger, Core75/41, WordPress6, local4473/4474 and earlier evidence remain
+preserved; no obsolete grant counter/expiry was reset. Elapsed development effort
+is not provider processing time; no reliable owner-minute or compute-hour total
+has been measured.
+
+**RECOVERY / RESUME HERE:** finish the early, exact concept-quality-review entry
+and guarded strategic-replan connection, and connect trusted rendering/capture
+preparation to the active workflow. The C0 proposal adapter must be bound in a
+new activation, not inserted into an old grant. Then prepare one fresh bounded
+external-use request for an actual improved Home → Service → distinct Review/
+Direct Start journey, with rendered critique before expanding the whole site.
+No owner action or new external authority is needed for the remaining local
+engineering. No current site acceptance, paid run, protected write, publication
+or complete remediation is implied. Keep the complete service roadmap and the
+recorded working delivery targets; do not turn this plumbing into another
+standalone proof program.
