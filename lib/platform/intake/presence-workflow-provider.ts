@@ -240,6 +240,14 @@ export function createResponsesPresenceWorkflow(config: {
       !Number.isSafeInteger(grant.sourceRepair.baseVersion) || grant.sourceRepair.baseVersion < 1 ||
       ![grant.sourceRepair.authorization,grant.sourceRepair.previousStateDigest,grant.sourceRepair.materialsDigest].every(x=>/^[a-f0-9]{64}$/u.test(x)) ||
       grant.sourceRepair.materialsDigest !== fingerprint(grant.originalMaterials.records))) throw Error("Exact repaired source material authorization required");
+  if (grant.sourceRepair?.contextTransition) {
+    const transition=grant.sourceRepair.contextTransition;
+    if(!transition.addedEvidenceDigests.length||new Set(transition.addedEvidenceDigests).size!==transition.addedEvidenceDigests.length||
+      ![transition.previousContextDigest,transition.previousAuthorityDigest,transition.nextContextDigest,transition.nextAuthorityDigest,...transition.addedEvidenceDigests].every(value=>/^[a-f0-9]{64}$/u.test(value))||
+      transition.nextContextDigest!==grant.contextDigest||transition.nextAuthorityDigest!==fingerprint(grant.marketingAuthority)||
+      transition.addedEvidenceDigests.some(digest=>!grant.approvedSources.includes(digest)||
+        !grant.marketingAuthority?.sources.some(row=>row.digest===digest&&row.use==="analysis"))) throw Error("Exact reasoning source transition required");
+  }
   if (grant.nativeComponents !== undefined && grant.nativeComponents !== 2) throw Error("Native component version refused");
   validateResearchSources(grant.researchSources);
   if (grant.discovery) validateDiscovery(grant.researchSources, grant.discovery);

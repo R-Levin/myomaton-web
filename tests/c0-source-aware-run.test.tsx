@@ -211,3 +211,24 @@ test("explicit source-aware recovery proves an absent reservation under lock and
   }
  }finally{await rm(root,{recursive:true,force:true})}
 });
+
+test("fresh activation binds a granted original missing from the reasoning registry without promoting it to a visitor claim",async()=>{
+ const f=fixture(),target=f.prior.materials.find(row=>row.source.id==="c0-r3-editorial-original")!;
+ const removed=f.prior.context.evidence.find(row=>row.id===target.source.id)!;
+ f.prior.context.evidence=f.prior.context.evidence.filter(row=>row.id!==target.source.id);
+ const previous=f.prior.grant.marketingAuthority!;
+ previous.sources=previous.sources.filter(row=>row.digest!==fingerprint(removed));
+ previous.contextDigest=fingerprint(f.prior.context);
+ f.prior.grant.contextDigest=previous.contextDigest;f.prior.grant.approvedSources=f.prior.context.evidence.map(fingerprint);
+ f.plan.preserve.previousContextDigest=previous.contextDigest;f.plan.sources.previousContextDigest=previous.contextDigest;
+ f.plan.sources.previousEvidenceRecords=f.prior.context.evidence.length;
+ const compiled=compileSourceAwareC0(f.plan,f.activation,f.prior,f.now);
+ const restored=compiled.context.evidence.find(row=>row.id===target.source.id)!;
+ assert.equal(restored.content,target.bytes.toString("utf8"));assert.equal(restored.rawDigest,target.source.sha256);
+ assert.equal(compiled.grant.marketingAuthority!.sources.find(row=>row.digest===fingerprint(restored))!.use,"analysis");
+ const {marketingCitationIds}=await import("../lib/platform/intake/presence-marketing-authority");
+ const run={context:compiled.context,input:{...compiled.context,research:[],corrections:[],report:null,direction:null,blueprint:null,pages:[]},
+  work:{operation:"report",attempt:"offline",inputDigest:"",until:0}} as import("../lib/platform/intake/presence-workflow").WorkflowRun;
+ assert.ok(marketingCitationIds(run,compiled.grant.marketingAuthority!).includes(target.source.id));
+ run.work.operation="page";assert.ok(!marketingCitationIds(run,compiled.grant.marketingAuthority!).includes(target.source.id));
+});

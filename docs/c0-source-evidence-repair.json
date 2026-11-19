@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "contextDigest": "082d9074fc8a10e6345d2cb138bc7ac87496ab057947ff54d3fbb61c77320a0a",
+  "baseVersion": 70,
+  "previousStateDigest": "ea386343f505b635f5d8bdc04c498c4359aade5755f970f52c495e50c4f4718e",
+  "previousGrantDigest": "e310cdd05d1bfefee229abfedc40fa7f52dbbd3a7a15a831f38e00bf8840b957",
+  "previousMaterialsDigest": "18a94a563875d0f7f62b392804ffd454f6a8e633703b2d1e4841f2d5bf59a7ce",
+  "ledgerSha256": "b9d13677964a4c63a9011c8ec61243baba164f156ffeb529ea180b5d98721ef2",
+  "expiresAt": "2026-11-22T15:58:31.154Z",
+  "reasoningMaterialIds": [
+    "c0-complete-owned-site-and-knowledge",
+    "owned-service-model",
+    "owned-content-growth",
+    "owned-conversion-architecture",
+    "owned-design-direction"
+  ],
+  "status": "PROPOSED_NOT_APPLIED",
+  "scope": {
+    "intakeId": "41a83e7e-1765-4517-941a-b2b151bb7c4a",
+    "webPresenceId": "2a08e054-902c-400b-9b96-3c2274bcadc2",
+    "managedSiteId": "2c0d637d-4ded-4597-ac8b-661519aba358"
+  },
+  "operation": "Bind only the five already-authorized originals as analytical evidence and reopen assessment. Preserve all history, public claims, financial/request/retry/expiry limits. No model dispatch, protected Core/WordPress change or publication."
+}

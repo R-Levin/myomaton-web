@@ -45,7 +45,8 @@ type Failure = "operation-blocked" | "output-invalid" | "outcome-unknown";
 type Decision = { actor: Actor; at: string; target: string; decision: "confirmed" | "development-continuation" | "reviewed" };
 type Correction = { finding: WorkflowReport["findings"][number]; text: string; reportDigest: string; actor: Actor; at: string };
 type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: WorkflowPage[]; actor: Actor; at: string; ordinal: number; source?: "home-concept" | "operator-editorial"; batch?: "pending" | "applied" };
-export type SourceRepairAuthorization = { authorization: string; baseVersion: number; previousStateDigest: string; materialsDigest: string };
+export type SourceRepairAuthorization = { authorization: string; baseVersion: number; previousStateDigest: string; materialsDigest: string;
+  contextTransition?: { previousContextDigest: string; previousAuthorityDigest: string; nextContextDigest: string; nextAuthorityDigest: string; addedEvidenceDigests: string[] } };
 type SourceRecovery = SourceRepairAuthorization & { actor: Actor; at: string; priorRevisionOrdinal: number;
   previous: { report: WorkflowReport | null; direction: WorkflowDirection | null; blueprint: WorkflowBlueprint | null; pages: WorkflowPage[] } };
 
@@ -336,25 +337,49 @@ export class PresenceWorkflow {
    * provider usage and consumed editorial/replan allowances. This is not customer
    * confirmation, a public rewrite, or permission to change source scope. */
   async reassessFromRepairedSources(context: WorkflowContext, version: number, actor: Actor, authorization: unknown) {
-    const state = await this.current(context, version);
     const permitted = this.operations.sourceRepair;
-    if (this.boundary !== "disposable" || !state.evaluation || this.operations.marketingAuthority?.projectionVersion !== 2 ||
+    const transition = permitted?.contextTransition;
+    const state = transition ? await this.store.read(context) : await this.current(context, version);
+    const authority = this.operations.marketingAuthority;
+    if (this.boundary !== "disposable" || !state?.evaluation || authority?.projectionVersion !== 2 ||
         actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || !actor.authority || !permitted ||
+        state.mode !== this.operations.mode || state.version !== version ||
         authorization !== permitted.authorization || ![permitted.authorization,permitted.previousStateDigest,permitted.materialsDigest].every(x=>/^[a-f0-9]{64}$/u.test(x))) {
       throw new IntakeError("unavailable", 403);
     }
-    if (state.sourceRecovery) {
-      if (state.sourceRecovery.authorization !== authorization || fingerprint(permitted) !== fingerprint({
-        authorization: state.sourceRecovery.authorization, baseVersion: state.sourceRecovery.baseVersion,
-        previousStateDigest: state.sourceRecovery.previousStateDigest, materialsDigest: state.sourceRecovery.materialsDigest })) throw new IntakeError("draft_changed",409);
+    if (state.sourceRecovery?.authorization === authorization) {
+      const {actor:previousActor,at,priorRevisionOrdinal,previous,...saved}=state.sourceRecovery;
+      void previousActor;void at;void priorRevisionOrdinal;void previous;
+      if (fingerprint(permitted)!==fingerprint(saved)||state.contextDigest!==fingerprint(context)||
+          state.marketingAuthorityDigest!==fingerprint(authority)) throw new IntakeError("draft_changed",409);
       return this.view(context,state);
+    }
+    if (state.sourceRecovery && !transition) throw new IntakeError("draft_changed",409);
+    if (transition) {
+      const hashes=[transition.previousContextDigest,transition.previousAuthorityDigest,transition.nextContextDigest,
+        transition.nextAuthorityDigest,...transition.addedEvidenceDigests];
+      const oldEvidence=state.sourceSnapshot.evidence,added=context.evidence.slice(oldEvidence.length);
+      const priorContext={...context,...state.sourceSnapshot};
+      const priorAuthority={...authority,contextDigest:transition.previousContextDigest,sources:authority.sources.slice(0,oldEvidence.length)};
+      if (!transition.addedEvidenceDigests.length||!hashes.every(x=>/^[a-f0-9]{64}$/u.test(x))||
+          new Set(context.evidence.map(source=>source.id)).size!==context.evidence.length||
+          state.contextDigest!==transition.previousContextDigest||state.marketingAuthorityDigest!==transition.previousAuthorityDigest||
+          fingerprint(context)!==transition.nextContextDigest||fingerprint(authority)!==transition.nextAuthorityDigest||
+          fingerprint(priorContext)!==transition.previousContextDigest||fingerprint(priorAuthority)!==transition.previousAuthorityDigest||
+          fingerprint(context.evidence.slice(0,oldEvidence.length))!==fingerprint(oldEvidence)||
+          fingerprint(added.map(fingerprint))!==fingerprint(transition.addedEvidenceDigests)||
+          added.some(source=>!authority.sources.some(row=>row.digest===fingerprint(source)&&row.use==="analysis"))) {
+        throw new IntakeError("draft_changed",409);
+      }
     }
     if (state.work || state.failure || state.operatorReview || state.version !== permitted.baseVersion ||
         fingerprint(state) !== permitted.previousStateDigest) throw new IntakeError("draft_changed",409);
     const sourceRecovery: SourceRecovery = {...permitted,actor,at:new Date(this.clock()).toISOString(),
-      priorRevisionOrdinal: state.revisionRequest?.ordinal ?? 0,
+      priorRevisionOrdinal: Math.max(state.revisionRequest?.ordinal ?? 0,state.sourceRecovery?.priorRevisionOrdinal ?? 0),
       previous: structuredClone({report:state.report,direction:state.direction,blueprint:state.blueprint,pages:state.pages})};
     return this.view(context,await this.store.append(context,version,{...state,sourceRecovery,
+      ...(transition&&{contextDigest:fingerprint(context),marketingAuthorityDigest:fingerprint(authority),
+        sourceSnapshot:{evidence:context.evidence,entry:context.entry,limitations:context.limitations,conflicts:context.conflicts}}),
       report:null,confirmation:null,direction:null,blueprint:null,pages:[],editorial:null,operatorReview:null,
       editorialFindings:[],editorialDecisions:[],revisionRequest:null,homeReview:null,conceptEditorial:null,visuals:[]}));
   }

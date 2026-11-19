@@ -2593,3 +2593,93 @@ hosted mutation or resetting2replans/4editorial rounds. Preserve70 and the
 original41/6/75/complete-site evidence. Bring one informed resource/activation
 decision only after the complete corrected request-to-settlement path works
 offline. No claim of a repaired website or founder acceptance.
+
+## Source binding repaired through the existing pipeline — November 19
+
+The owner directs Codex to finish the repair, rather than leave a known defect
+for another prompt. Existing local engineering continues; no paid call is
+authorized by this checkpoint. The owner's later instruction to adjust the
+limit refers specifically to the context-file reader, NOT the API budget or
+Codex account limits. The$8 run ceiling and all iteration/request limits stay.
+
+**Implemented:** a shared original-to-evidence binder verifies exact granted
+descriptors, complete UTF-8 bytes, hashes, IDs and status, then registers the
+material as ANALYSIS in the existing WorkflowContext/MarketingAuthority.
+It is used by new-run compilation and the existing source-repair entrypoint.
+It does not promote historical/unconfirmed material, edit public claim
+classifications/selections or create a parallel knowledge/approval store.
+The five actual complete C0 originals now survive report request -> retained
+response -> normal workflow settlement -> reload -> Direction -> blueprint in
+offline integration. Page claim authority continues to refuse these analysis
+IDs. This is transport/contract verification, not an AI quality claim.
+
+**Recovery connected:** explicit v2 source repair binds exact prior/new
+context/authority digests, appends one new event, preserves prior events,
+research and outputs, clears stale derived assessment/Direction/plan and
+confirmation, and retains consumed replan/editorial ordinals. Wrong tenant,
+actor, bytes, source metadata, limits, pending/uncertain work, stale state and
+protected boundary refuse. Exact repeated recovery is idempotent. Version1
+custody-only historical behavior remains unchanged.
+
+Existing source-repair CLI now has inspect/prepare/apply operations.
+Inspection is no-write. Preparation retains exact before/after private files;
+apply uses the same recovery method in an isolated DB transaction, fails closed
+with a retained lock/bundle on uncertainty, and leaves provider dispatch
+unreachable. Existing intake token, roles/permissions, expiry, model/rates,
+ledger, caps, original bytes and old records remain. Media selection can be
+rebound to the same case without carrying prior placement approval forward:
+old review context is archived and new placement requires contextual review.
+The evaluation worker refuses to start while a repair lock is present.
+
+**The reader limit:** full source context would grow from90,607 to258,615bytes,
+exceeding the old256,000byte config-reader limit. Case context now uses the
+already authorized36,000,000byte source envelope. Defaults for ordinary
+configuration are unchanged; ownership,0600mode, containment and no-symlink
+checks remain. Linux tests verify the larger authorized read and refusal of
+insecure/linked files. No new arbitrary product-size limit.
+
+**Verification:** TypeScript/lint and focused Windows checks pass (the
+Linux-specific ownership case is explicitly skipped on Windows).
+Final exact Linux artifact passes65tests,0fail/0skip,0provider calls.
+Initial09Linux run was59pass/1failure because the new test's metadata fixture
+was absent from the harness. Corrected test packaging; identical worker,
+no customer/case correction and no paid retries. A separate read-only probe's
+hand-coded digest ordering disagreed with the canonical algorithm; it made no
+changes. Replaced it with a fixed inspector reusing the actual compiler and
+canonical fingerprint. Do not treat either failed harness attempt as a pass.
+
+Final archive27e6b736dce0cfaaf163fc4628d91abc764c0f2b6e1e83298b4ecbece613ab44;
+worker9e8a7042f7e75112b915339032a306d63f6213a390e41ffc4f3524adee4706be;
+installer1188fe7b0ee46f16813ad8b13b3d127f7a84b97c5896359272e44c3f1071ca18;
+Linux proof15d662d544fbac49470f163063ec180fefa0d500586bafbc8588e565ae2ea635.
+Code/tests are retained in existing private correction09c, not activated.
+
+**Actual retained-case dry run passed** in a read-only transaction:
+22existing evidence records become27, all five additions citable as analysis,
+public claim authority unchanged. Context/grant/ledger unchanged on host,
+zero case writes/provider calls. Exact prepared manifest
+[ c0-source-evidence-repair.json ](c0-source-evidence-repair.json),
+SHA5494e0a789be91cd905f5c7f4eda0f2f96a2b640e81c5b2f12cd1cb753b4d93a,
+pins idle70/eventea386343 and ledgerb9d13677.
+Expected new context7892fd3ecaac5408f85b18df7219e59072d734b0c6559d9156735a16a4592cfa.
+
+**Current boundary:** local pipeline repair and actual-case no-write compilation
+are complete. No new generation or successful commercial website is claimed.
+The same-source correction can be prepared/applied only under applicable
+existing isolated-case corrective authority; no public/other-case changes or
+new data are included. Do not infer new financial/iteration authority.
+
+**Cost unchanged:**25generations/49requests,$5.652224 settled usage estimates,
+0pending,$2.347776 of$8 remaining. Same2replans/4editorial rounds consumed.
+Tracked lineage maximum-accounted$17.533327 includes prior uncertainty;
+Codex allowance/credit costs remain separate and not measured here.
+
+**RECOVERY / RESUME HERE:**use the committed fix and correction09c artifacts.
+Verify current case/ledger before any binding. Do not rerun old v1/source55
+or another paid Home rewrite. Same-case binding uses the exact v2 manifest
+above and the existing source-repair CLI prepare/apply, with no provider key.
+After independently verifying the appended context and unchanged authority/
+ledger, pause at the actual model-resource boundary: a full upstream
+regeneration needs more generation capacity than the7remaining slots; do
+not silently reset32/65/2/4 or increase$8. Preserve original41/6/75 and
+Home70/old previews/evidence. No founder acceptance claim.

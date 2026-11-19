@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import proposal from "../../../docs/c0-source-aware-run-proposal.json";
 import { fingerprint, uuid } from "../canonical/model";
 import { proposeC0AuthoringKnowledge } from "./c0-authoring-knowledge";
+import {bindOriginalReasoningEvidence} from "./presence-source-repair";
 import { validateMarketingAuthority } from "./presence-marketing-authority";
 import { validateOriginalGrant, type OriginalMaterial } from "./presence-source-material";
 import { validateMarketSearch, validateResearchSources } from "./presence-workflow-research";
@@ -116,11 +117,19 @@ export function compileSourceAwareC0(plan: SourceAwareC0Plan, activation: Source
   const retained = prior.context.evidence.find(source => source.id === "c0-retained-ten-answers");
   if (!retained || retained.kind !== "customer-unconfirmed") throw new SourceAwareRunValidation("knowledge", "Retained C0 answers must remain unconfirmed");
   const prepared = proposeC0AuthoringKnowledge(prior.context, oldAuthority, { businessBrief: documents[0], productModel: documents[1] });
-  const context: WorkflowContext = { ...prepared.context, scope: structuredClone(plan.destination.scope), intakeId: plan.destination.intakeId,
+  let context: WorkflowContext = { ...prepared.context, scope: structuredClone(plan.destination.scope), intakeId: plan.destination.intakeId,
     entry: plan.destination.entry as "DIRECT_START", evaluation: { scenario: "c0", basis: sourceAwareC0ProposalSha256 } };
   if (Object.values(context.scope).some(id => Object.values(prior.context.scope).includes(id))) throw new SourceAwareRunValidation("database", "New C0 evaluation must not overwrite an existing tenant");
-  const authority = { ...prepared.authority, contextDigest: fingerprint(context), brandDigest: prior.brandDigest,
+  let authority = { ...prepared.authority, contextDigest: fingerprint(context), brandDigest: prior.brandDigest,
     qualityReviewerId: activation.reviewerId };
+  const analyticalOriginals=prior.materials.filter(({source})=>!context.evidence.some(row=>row.id===source.id)&&
+    ["text/plain","text/markdown"].includes(source.mime)&&
+    ["business-context","brand-reference","editorial-reference"].includes(source.purpose)&&source.status!=="public-observation");
+  if(analyticalOriginals.length){
+    const bound=bindOriginalReasoningEvidence(context,authority,{version:1,contextDigest:fingerprint(context),
+      records:prior.materials.map(row=>row.source),requestBytes:plan.provider.requestBytes},analyticalOriginals);
+    context=bound.context;authority=bound.authority;
+  }
   const stages = plan.provider.stages as WorkflowStagePlan;
   const ledger = { id: fingerprint({ proposal: sourceAwareC0ProposalSha256, case: plan.destination, startsAt: activation.startsAt }),
     startingLedger: plan.preserve.previousLedgerSha256, baselineAttempts: plan.preserve.baselineAttempts,

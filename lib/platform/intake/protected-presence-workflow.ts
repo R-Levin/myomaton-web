@@ -35,14 +35,14 @@ import {createHash} from "node:crypto";
 export const protectedWorkflowRole = "miopages_core_development";
 type Workspace = { root: string; grantFile: string; ledgerDirectory: string; referenceDirectory?: string; visualDirectory?: string };
 
-export async function privateWorkflowBytes(file: string, root: string): Promise<Buffer> {
+export async function privateWorkflowBytes(file: string, root: string, maximum = 256_000): Promise<Buffer> {
   const meta = await lstat(file);
-  if (!meta.isFile() || meta.size > 256_000 || meta.uid !== process.getuid?.() || (meta.mode & 0o777) !== 0o600 ||
+  if (!Number.isSafeInteger(maximum) || maximum < 1 || maximum > 48_000_000 || !meta.isFile() || meta.size > maximum || meta.uid !== process.getuid?.() || (meta.mode & 0o777) !== 0o600 ||
       await realpath(file) !== file || !file.startsWith(root + "/") || file.includes("/public_html/")) throw Error("Protected workflow file refused");
   return readFile(file);
 }
-export async function privateWorkflowFile<T>(file: string, root: string): Promise<T> {
-  return JSON.parse((await privateWorkflowBytes(file, root)).toString("utf8")) as T;
+export async function privateWorkflowFile<T>(file: string, root: string, maximum = 256_000): Promise<T> {
+  return JSON.parse((await privateWorkflowBytes(file, root, maximum)).toString("utf8")) as T;
 }
 
 export async function verifyDirectory(path: string) {

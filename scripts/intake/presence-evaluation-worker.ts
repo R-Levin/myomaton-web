@@ -121,10 +121,11 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
   let peerCapture:ReturnType<typeof publicCaptureBridge>|undefined;
   async function openCase(apiKey?: string, researchReplay = false, recovery = false) {
     await verifyDirectory(group);
-    const [{ context, token }, storedGrant] = await Promise.all([
-      privateWorkflowFile<{ context: WorkflowContext; token: string }>(contextFile, root),
-      privateWorkflowFile<PresenceWorkflowGrant>(workspace.grantFile, root),
-    ]);
+    try { await lstat(join(root,"source-evidence-repair.lock")); throw Error("Source evidence repair is in progress; retain state"); }
+    catch(error) { if((error as NodeJS.ErrnoException).code!=="ENOENT")throw error; }
+    const storedGrant = await privateWorkflowFile<PresenceWorkflowGrant>(workspace.grantFile, root);
+    const {context,token} = await privateWorkflowFile<{context:WorkflowContext;token:string}>(contextFile,root,
+      storedGrant.originalMaterials?.requestBytes ?? 256_000);
     const commercialBinding = commercial ? await privateWorkflowFile<{ activation: string; grant: string }>(join(root, "activation.json"), root) : null;
     if (commercial && (commercialBinding?.activation !== commercial.fingerprint || commercialBinding?.grant !== fingerprint(storedGrant))) {
       throw Error("Stored commercial activation differs");
