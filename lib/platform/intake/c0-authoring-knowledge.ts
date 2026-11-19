@@ -74,7 +74,7 @@ export function proposeC0AuthoringKnowledge(context: WorkflowContext, authority:
       const source = context.evidence.find(source => fingerprint(source) === row.digest)!;
       return { digest: row.digest, passages: [source.content] };
     });
-  const next: MarketingAuthority = { ...authority, projectionVersion: 2, contextDigest: fingerprint(proposed),
+  const next: MarketingAuthority = { ...authority, projectionVersion: 2, earlyConceptReview: true, contextDigest: fingerprint(proposed),
     processingInstructions: [...authority.processingInstructions ?? [], {
       basis: "owner-direction", reference: "docs/miopages-c0-product-model.md · Launch and Ongoing customer deliverable summary / Marketing-preservation note",
       text: "Canonical service-direction records describe the intended offer, not proof that every workflow operates in the development installation. Preserve the substantive service proposition in original visitor copy without inserting development-readiness commentary. Keep unverified prices, performance, availability and customer proof unconfirmed.",

@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import { mkdir, open, readFile, realpath } from "node:fs/promises";
+import { mkdir, open, readFile, realpath, lstat } from "node:fs/promises";
 import { join } from "node:path";
 import { Pool } from "pg";
 import { fingerprint } from "../../lib/platform/canonical/model";
@@ -184,8 +184,8 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
 export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv = process.env) {
   const [operation, scenario, approval, value, ...extra] = args;
   const localCommercial = approval === commercialApproval || approval === p022RunProposalSha256 || approval === originalEvidenceApproval;
-  const readOnly = ["inspect", "home", "site"].includes(operation) || (["local-site", "local-home"].includes(operation) && localCommercial);
-  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "resume-undispatched", "recover", "queue-image", "decide-image", "review-quality", "commercial-replan"].includes(operation) ||
+  const readOnly = ["inspect", "home", "site", "concept-review-input"].includes(operation) || (["local-site", "local-home"].includes(operation) && localCommercial);
+  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "resume-undispatched", "recover", "queue-image", "decide-image", "review-quality", "commercial-replan", "concept-review-input", "critique-home"].includes(operation) ||
     (["continue-local-home", "revise-local-page"].includes(operation) && localCommercial);
   const replaceReport = operation === "replace-report" && approval === commercialApproval;
   const researchReplay = operation === "replay-research";
@@ -199,7 +199,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   try {
     if (operation === "activate") return await instance.activate();
     const { workflow, context, root } = await instance.openCase(
-      operation === "work" || (operation==="recover" && approval===originalEvidenceApproval) || replaceReport || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay, operation === "recover");
+      operation === "work" || operation === "critique-home" || (operation==="recover" && approval===originalEvidenceApproval) || replaceReport || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay, operation === "recover");
     const prior = await workflow.review(context);
     if (completeResearch) {
       if (!prior) throw Error("Retained research required");
@@ -291,6 +291,19 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
     if (input.version !== prior.version) throw Error("Evaluation view is stale");
     const actor = { id: "local-evaluation-operator", role: "operator" as const, simulated: false,
       authority: "private evaluation workspace " + approval };
+    if (operation === "concept-review-input") {
+      const run = await workflow.conceptCritiqueInput(context, prior.version, actor);
+      const file = join(root, "concept-review-input-" + run.work.inputDigest + ".json");
+      const bytes = JSON.stringify(run) + "\n";
+      try { await createPrivate(file, bytes); }
+      catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+        const meta = await lstat(file);
+        if (!meta.isFile() || meta.uid !== process.getuid?.() || (meta.mode & 0o777) !== 0o600 ||
+            await realpath(file) !== file || !(await readFile(file)).equals(Buffer.from(bytes))) throw Error("Concept preparation custody conflict");
+      }
+      return { file, version: prior.version, inputDigest: run.work.inputDigest, target: run.work.reviewStage!.target, providerCalls: 0 };
+    }
     if (operation === "review-quality") {
       if (!instance.reviewer) throw Error("Scoped commercial reviewer required");
       process.stdin.setEncoding("utf8");
@@ -303,7 +316,8 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       const reviewed = await workflow.recordQualityReview(context, prior.version, reviewer, input.decision);
       return { next: reviewed?.next, version: reviewed?.version };
     }
-    const result = operation === "continue" ? await workflow.confirmReport(context, prior.version, actor, true)
+    const result = operation === "critique-home" ? await workflow.critiqueHomeConcept(context, prior.version, actor)
+      : operation === "continue" ? await workflow.confirmReport(context, prior.version, actor, true)
       : operation === "review-home" || operation === "continue-local-home" ?
         await workflow.reviewHomeConcept(context, prior.version, actor, input.digest, input.reference, operation === "continue-local-home")
       : operation === "revise-home" ? await workflow.reviseHomeConcept(context, prior.version, actor, input.digest, input.concern)

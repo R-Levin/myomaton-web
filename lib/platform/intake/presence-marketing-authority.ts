@@ -16,6 +16,7 @@ export type MarketingAuthority = {
   strategy?: StrategyScope;
   // Opt-in for a new pinned grant; historical projections and approvals stay exact.
   projectionVersion?: 2;
+  earlyConceptReview?: true;
   sourceSelections?: readonly { digest: string; passages: readonly string[] }[];
   processingInstructions?: readonly { text: string; basis: "owner-direction" | "security-requirement" | "implementation-choice"; reference: string }[];
 };
@@ -26,6 +27,7 @@ const sha256 = /^[a-f0-9]{64}$/u;
 export function validateMarketingAuthority(authority: MarketingAuthority, contextDigest: string, sources: readonly string[]) {
   if (authority.strategy) checkStrategyScope(authority.strategy);
   const declared = authority.sources.map(source => source.digest);
+  if (authority.earlyConceptReview !== undefined && (authority.earlyConceptReview !== true || authority.projectionVersion !== 2)) throw Error("Source-aware authority required for early concept review");
   if (authority.projectionVersion !== undefined && authority.projectionVersion !== 2 ||
       authority.projectionVersion !== 2 && (authority.sourceSelections !== undefined || authority.processingInstructions !== undefined)) {
     throw Error("Source-aware authoring version required");
@@ -126,7 +128,7 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
       ...(operation === "page" && { pagePath: path, ...(path && authority.strategy && { decisionBrief: strategyDecision(run, authority, blueprint?.pages.find(page => page.path === path)) }),
         ...(previous && { previous, concerns: revisionRequest?.audit.concerns.filter(concern => concern.path === path) }),
         ...(!path && revisionRequest?.batch === "pending" && { pages: revisionRequest.priorPages, concerns: revisionRequest.audit.concerns }) }),
-      ...(operation === "editorial" && { pages }),
+      ...(operation === "editorial" && { pages, ...(run.input.reviewStage && { reviewStage: run.input.reviewStage }) }),
       ...(replan && { independentReviewCriteriaToCorrect: replan.concerns }),
       interpretation: "Business knowledge preserves its recorded factual or staffed-offer status. Customer assertions, research, reports, Direction and historical editorial references remain distinct evidence for reasoning and proposed interpretation. They do not become verified customer facts. Page claim IDs in the plan identify relevance, not a ceiling on other already authorized knowledge from this same case. Processing instructions are supplied separately and are not customer knowledge.",
     };

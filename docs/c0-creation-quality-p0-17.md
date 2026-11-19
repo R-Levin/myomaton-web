@@ -1213,3 +1213,92 @@ engineering. No current site acceptance, paid run, protected write, publication
 or complete remediation is implied. Keep the complete service roadmap and the
 recorded working delivery targets; do not turn this plumbing into another
 standalone proof program.
+
+## Early concept critique and strategic recovery — November 19, 2026
+
+**Implemented locally.** The proposed source-aware authority can opt into early
+concept review. Existing grants keep their previous behavior. The shared Core
+workflow now prepares an exact read-only critique input, runs the existing
+metered editorial operation for the initial Home, retains the response and
+recovers it after interruption. Repeating a completed exact critique is
+idempotent. Its result is stored as concept advice, separately from whole-site
+editorial, customer confirmation and delivery quality.
+
+The current understanding, corrections, research, Direction, blueprint, Home,
+brand/authority and reviewed visual state bind the concept-quality target.
+The existing authorized reviewer records the existing complete quality criteria
+against desktop/mobile evidence. A negative concept judgment can invoke the
+existing bounded strategic replan before supporting Pages are drafted; original
+content/reviews survive in append-only history. A positive judgment permits
+continued drafting but cannot satisfy whole-site review, customer acceptance,
+WordPress authorization or publication. Roles are authenticated permissions, not
+claims of multiple human participants. No new identities or grants were created.
+
+The provider refuses early critique without its explicit feature authorization
+and scoped rendered-image envelope. Processing instructions distinguish the
+rendered Home and proposed architecture from a completed website, and ask the
+critic to challenge strategy rather than assume copy polishing is sufficient.
+The existing worker exposes `concept-review-input` and `critique-home`; the
+preparation command writes only private, integrity-checked, exact-repeat custody
+and cannot dispatch a provider. A future authorized driver must bind this feature
+and the C0 knowledge adapter in a new activation. Old pinned activation/expiry/
+ledger records were not edited to make the new path runnable.
+
+**Trusted capture connection.** The reusable capture adapter reads an existing
+loopback WordPress preview at desktop/mobile sizes, blocks off-origin and
+non-read requests/WebSockets, and checks the renderer's native readback and
+Page mapping before, during and after capture. It requires the exact work input
+and represented candidate; local Operator-proposed variants remain distinct.
+The trusted renderer must verify actual WordPress rows when supplying that
+mapping: a stored export file or hash alone cannot prove current row identity.
+Images feed the existing private source custody/request path. This adds no
+preview site, page builder or alternate approval system.
+
+The adapter passed against the retained local version75 Home: both viewports,
+HTTP200, four loaded images in each view, no horizontal overflow. All inspected
+post identities, statuses, slugs, titles and content remained exact (read-only
+SQLite connection), digest
+`6ad9ca038ebd73c9150eb1ed404a873c5435c53fb8c2e0c23dac7922192dc514`.
+The 1,224,831 image bytes survived custody/reload into an offline 1,639,906-byte
+provider-format input. This used an explicitly reconstructed offline input,
+not a new canonical Core75 event or model critique. Private receipt:
+`runtime-content/remediation-early-concept-20261119/receipt.json`,
+SHA-256 `901e2c8d0278251d309f8fe39507b6fbf8c71d572f6389d70084fb5ad65e8a2d`.
+The old site and protected WordPress6 remain unchanged.
+
+**Verification.** 39 focused tests pass, zero skips, plus full TypeScript and
+focused ESLint. Two actual disposable PostgreSQL integration tests passed: the
+new critique/reload/role-review/replan event history and the existing C0/C2
+Home-to-site cycle. These are controlled fixtures/offline model doubles, not
+genuine AI quality or owner acceptance. Additional focused checks after binding
+the current report/research/corrections also pass. The local worker bundle and
+Node syntax check pass, SHA-256
+`540a3533907a0cd29439a868ae5428e1cc361ee8ee4909d4af8c51b9c828b84b`.
+
+**Linux gate remains explicit.** No WSL/Docker/Podman development runtime was
+available locally. Automatic approval review rejected transferring/executing a
+private bundled test on Cloud because current authority covers local work, not
+that hosted code disclosure/execution. It was not run or retried by another
+route. Include exact isolated Linux verification and worker activation in the
+next consolidated hosted/data/provider authorization, before any model call.
+No Linux runtime result is claimed from the local syntax check.
+
+**Cost / authority.** Zero provider calls and $0 additional provider spending.
+New-run usage estimate $8.776797, conservative debit $9.069494 and tracked-lineage
+maximum-accounted $11.881103 are unchanged. Old rounds remain consumed and the
+recorded expiry is unchanged; there is no new live authorization.
+No protected write, service restart, WordPress edit, credential change, merge or
+publication occurred. The owner may need to add API credit: give advance notice
+with the next consolidated request, and verify availability before dispatch.
+Credit balance, budget authorization and actual quality are different checks.
+
+**RECOVERY / RESUME HERE:** prepare and verify the fresh activation/compiler and
+one consolidated run manifest using the proposed C0 knowledge, current ledger,
+early exact review, trusted WordPress capture and bounded strategic replan.
+Bind the protected data/host destinations and cost envelope explicitly; do not
+reuse the completed grant. Include Linux verification in that authorization,
+rather than asking for a separate minor approval. Then demonstrate substantive
+genuine improvement in the Home → service explanation → distinct Review/Direct
+Start journey before expanding another whole site. No newly improved website
+or complete commercial capability is claimed here. Keep the broader Entry,
+portal, inquiries/measurement/reporting and Ongoing roadmap intact.
