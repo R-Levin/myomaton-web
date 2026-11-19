@@ -2137,3 +2137,74 @@ Home-concept digest and generate the four supporting Pages. Complete actual
 whole-site rendering/critique, necessary bounded correction and scoped rollback.
 Do not regenerate Home merely to recover captures, reset any counter, silently
 treat owner preferences as settled, or claim completed site/product acceptance.
+
+## Paused: verified earlier-site omission and self-confirming checks — November 19, 2026
+
+The owner directs a pause after reporting exhausted purchased credits and asks
+for a bounded investigation of the earlier-site source error. No implementation,
+hosted change or provider request is authorized by this pause assessment.
+Current branch remains codex/first-operational-cycle-2026-11-12; existing54,
+37requests/19generations/$3.659578 usage estimate and all retained state stay exact.
+Codex account credits/total session processing charges are not established by
+that OpenAI ledger and must not be represented as covered by that subtotal.
+
+**Verified chain, not a speculative AI-quality explanation:**
+
+1. The actual human-reviewed seven-page R3 copy is in
+   scripts/customer-previews/miopages-editorial-r3.json. The later accepted
+   complete-site record is scripts/customer-previews/miopages-c0-accepted.json
+   (seven active routes plus one inactive historical route), retained since847c575.
+   Existing c0MarketingEditorial (e53b53e) already projects all seven R3 page
+   records without the two development notes.
+2. P0-22's source pack (924fd14) replaced those records with short summaries and
+   excluded "R3 full pages, component layout and headlines as controlling prompt
+   material." The governing P0-22 assignment asked for a fresh researched design
+   and nonbinding historical design precedent, while retaining approved facts
+   and owner decisions. Avoiding an obligatory old layout did not require
+   withholding the substantive earlier site.
+3. The full-originals change (0a6a63f) named c0-r3-editorial-original but selected
+   docs/miopages-editorial-r3.md: a development handoff describing the copy and
+   linking to its JSON, not the actual seven-page copy. The current source-aware
+   manifest inherited that selection.
+4. Read-only inspection of the retained completed Home54 provider request
+   (SHA256 3d57b658f54654cea9c3ec1592276b6cd076432897a388e768a42ac9eb9501ec)
+   confirms the handoff and its link arrived, the actual JSON was not attached,
+   and none of three fixed R3 copy probes was present. The active authority has
+   one business-fact,15staffed-offer,6analysis and **zero editorial records**.
+   This is not a claim that all business knowledge was absent: the approved
+   canonical content-recommendation/conversion/reporting/knowledge-update
+   passages were found in that same request, and historical screenshots arrived.
+5. Existing tests derive material from the manifest and verify hashes, custody,
+   counts and selected canonical passages. They do not prove that the material
+   labeled R3 original actually contains the owner-reviewed site. Correct hashes
+   for a wrong file can therefore pass. The prior assertion "complete originals
+   arrived" was too broad: all manifested originals arrived, but the selection
+   itself omitted the actual site. This corrects that earlier diagnosis.
+6. Current source-aware instructions additionally discourage treating historical
+   wording as a template. Their effect on output quality is an inference, not
+   a controlled experiment; together with missing actual copy, they encouraged
+   fresh rewriting instead of retaining strong existing work. Codex then spent
+   too long repairing and reviewing Home before the complete journey existed.
+
+Git proves these code/source decisions, not which conversational participant
+originated each interpretation or any motive. The configured Git author must
+not be used to blame the owner. Codex owns the failed verification and the
+decision to continue iterating despite insufficient results.
+
+**Minimum repair, proposed but NOT executed during the pause:** use the actual
+accepted site and seven-page public-copy projection as complete existing-work
+inputs, with their original authority and later corrections; keep third-party
+originality separate from permission to reuse the customer's own work; test
+that a handoff-document substitution fails; inspect the actual resolved request
+against the full service before another paid call; improve the complete retained
+site rather than regenerate from a narrow summary. No new framework or broader
+audit is needed for this defect. Existing source/spending/hosted boundaries
+remain; do not silently expand a pinned grant.
+
+**RECOVERY / RESUME HERE:** implementation and provider activity paused by owner.
+Read this correction before relying on older "full originals" claims. Preserve
+Home54, all older sites and original source files, ledger/counters and protected
+41/6/75. The screenshot upload rejection is separate and unresolved. Report the
+verified failure chain and minimum repair; await owner direction before resuming
+implementation or dispatch. This investigation used read-only Git/file evidence
+and the earlier in-place request checks, with zero new provider requests.
