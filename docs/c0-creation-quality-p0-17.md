@@ -709,3 +709,143 @@ or protected WordPress operation is implied.
 and latest case state before dispatch. Preserve version64, prior grant/bindings,
 all responses and ledger, 4473, protected Core41/WordPress6. Continue to the real
 revised website result; this engineering/authority checkpoint is not acceptance.
+
+## Final focused correction and viewable site — November 18, 2026
+
+**Actual result.** The approved three-stage amendment was installed with its
+original files retained. Core completed four genuine Page revisions (Service,
+Free Review, Direct Start and Ownership/trust) and a whole-site editorial pass.
+The settled case is version **75**, eight Pages, no in-flight operation or
+failure. Home and its two reviewed stock placements remain exact. Original
+version64, source evidence, provider responses and earlier candidates remain.
+
+Open **http://127.0.0.1:4474/** on the development workstation. This is actual
+disposable WordPress 7.1.4, with the MioPages Managed Site theme and native blocks,
+not an HTML mock. All eight routes are reachable, with separate Review and
+Direct Start journeys. Current Page IDs remain Home119, Service122,
+Why-managed123, Fit124, Free-Review125, Direct-Start126, Ownership127, Articles128.
+
+**What Core improved, and what it did not.** The selected Pages are shorter and
+more focused; no handwritten marketing replaced Core's output. The final critic
+retains 14 concerns, including duplication and repeated route-choice furniture.
+It also incorrectly repeats that image permission is pending. Investigation
+found two real system defects: the media reader still returned download status
+after common rights/AssetUsage review, and creative instructions told the model
+to keep review pending. The corrected disposable reader independently rechecks
+current ownership, common rights/withdrawal evidence, exact usage/alt, context,
+unchanged Home and prepared bytes. A changed Home requires new placement review;
+foreign scope/source fails. Public publication stays unapproved. Critic advice
+is now explicitly subordinate to confirmed business evidence; internal readiness
+and proof-policy concerns belong in Operator review.
+
+These reader/prompt corrections have passed offline request tests and real
+Linux permission/byte readback. The isolated worker was updated and normally
+reopened successfully at version75, without another provider call. They have
+**not** been tested in another paid generation or deployed to protected Core.
+Current isolated worker SHA:
+`088ab3e04f3f5e42c8a797407ad93551fc5e2982bcf02fc876e685999f2b7f00`.
+The prior executable and activation are retained; grant/budget/start are exact.
+
+**Explicit local Operator decisions.** Actual screenshots showed remaining
+internal availability commentary and duplicated explanations. A recorded local
+review removed three duplicate/internal Sections, one proof-policy FAQ and
+exact readiness notes. A second rendering check caught different wording inside
+native blocks that the semantic-text edit alone missed; those exact rendered
+notes were removed too. No new marketing sentences were authored, no concern
+was silently marked resolved, and no canonical Core version or approval changed.
+Native and semantic copies can diverge: ordinary Core editing needs one
+consistent authoritative representation or explicit synchronized edits. The
+local review packet and decision journal are a temporary bridge, **not a completed
+persistent Core editing/review flow**. All original text remains in version75.
+
+Current Core-derived projection:
+`80f5a0577c95ecaf189b023e12c47e2aa7b86a2e2b72d445dc9d11df90fd4864`.
+Current local reviewed WordPress packet:
+`f8e36c5ae5f0707e07ca52ea63b8d9153cf4ca7b93d3cf346a20dd0081d12948`.
+Private packet: `runtime-content/original-evidence-local/site-75-rendered-operator-review.json`.
+Do not commit its protected contents or raw provider output.
+
+**Verification.** Twenty-three focused offline/request/authority tests passed;
+one environment-dependent WordPress test was initially skipped. It was then
+run with the real disposable installation: all six native-renderer tests passed,
+zero skips. TypeScript, focused ESLint and diff checks passed. The real Linux
+stock-context check passes current rights/usage/bytes and refuses changed
+context/source; a changed Home returns review-required. The initial cost-prefix
+read used an incorrect old-runtime path and failed without mutation; locating the
+actual prior case then independently verified all 54 original ledger entries
+unchanged. A final extra guard incorrectly assumed Assets have a managed_site_id;
+the actual Linux check refused it. Assets belong to Web Presence; exact Site and
+Section scope is supplied by reviewed placement/lineage. The correction retains
+that scope plus Section AssetUsage type, and the actual Linux check passes.
+No model was dispatched through the incorrect guard. A repeated inspect refused
+EEXIST for its prior readback; that receipt was retained under a separate name
+before a successful new read-only inspection. Such failed checks are preserved
+and are not reported as passing checks.
+
+The current actual browser check covers all eight Pages at 1440px and 390px:
+16 HTTP200 views, one H1 each, no document overflow, compressed-text flags or
+missing images. All eight routes are reachable from Home; native details work;
+the two buyer routes stay distinct; POST and unmapped Page13 refuse; no external
+browser requests or live submission forms. Visual inspection of actual rendered
+desktop/mobile output confirms readable compositions and the genuine images.
+This is a technical/accessibility/layout result, not excellent-commercial-output
+acceptance. Remaining defects include generic opening/third-person buyer language,
+repeated closing choices, verbose comparisons and some internal-sounding trust
+wording. The accepted v3 still has stronger persuasive economy in places.
+The critic's original concerns remain available with the verified media correction.
+
+Local rollback restored the prior version64 content exactly and recovered this
+reviewed version75 with stable IDs/slugs, brand and retained WordPress history.
+Prior content digest:
+`d602e12f22302990cafc0cd2b6ac39cd41bb579a40abb19bc43fe02a3e90c2e7`;
+current content digest:
+`085570d533abd4fa418a73aa3d5e73e5498b580bc74681d0de21dbf2a32ced12`.
+Evidence is retained in the existing disposable WordPress directory as
+`originals-rollback-75-rendered-evidence.json`. Current site is restored for
+inspection, not left rolled back. This is not a signed delivery/customer approval.
+
+Protected Core41/event
+`ff90effffa6fd26d903a04e299b17cbfcdf1ba5c005e508db193e1e786f09106`
+was independently read with verified TLS/read-only checks. Protected WordPress6
+and its 13 drafts/two images retain digest
+`42c7060518c24ddb08b6104e4560a5ed701028dc9d74867bacf85dd1f12c5ddb`.
+Version52/4473 export and all ten retained Page/viewport observations still match.
+No protected deployment, public publication, credential change or merge occurred.
+
+**Cost at November19 00:03UTC (November18 local).** The final four revisions plus
+critic added **$1.578484** usage-priced/accounted cost. Run totals:
+29 completed generations, 30 token-count requests (59 combined), two paid search
+tools; the separately retained one model-metadata GET remains counted in the
+original request envelope. New usage-priced estimate **$8.776797**; conservative
+new debit **$9.069494**; cumulative accounted **$11.881103**, including the prior
+$2.811609 and its retained uncertainties. No new uncertain receipt. Usage-priced
+estimates are not independently reconciled invoice charges. Other cash $0;
+founder attention cost UNKNOWN. Current ledger SHA:
+`16e829c75e9fd4da21dcbe8c45bf6534230076649a8f25f6b50f57e9d7fe5fe1`.
+Page/revision/editorial actuals are $2.068061/$4.399521/$1.226919 under amended
+$2.10/$4.70/$1.60. All three permitted revision rounds have been used;
+aggregate headroom does not authorize a fourth or extend expiry.
+
+**Next integrated product step.** Preserve this candidate for content/design
+iteration. Connect these exact, provenance-bearing Operator edits to durable
+Core proposal review rather than leaving a local export as the normal workflow.
+Then connect the distinct Entry Actions to real consented inquiry acceptance,
+notification/outcome evidence and first-party measurement, using the existing
+Contact/measurement/change foundations. Current disabled submissions, synthetic
+outcomes and fixture reports do not complete those functions. Ongoing remains
+part of the core growth service; this site round does not complete Commercial V1.
+New model scope or protected staging needs its applicable authority. No such
+operation is requested or silently performed by this checkpoint.
+
+**RECOVERY / RESUME HERE.** Use the current pushed commit on
+`codex/first-operational-cycle-2026-11-12`; verify actual case
+`4d437190-9ce3-460b-81af-edd92279271a` at version75, no work/failure, original
+ledger prefix intact. Do not rerun the completed last revision round, reset
+counters, repeat stock intake/download or spend to obtain a favorable critic.
+Inspect 4474 and its exact packet/journal/screenshots, preserved under
+`runtime-content/original-evidence-local` and the existing
+`runtime-content/p022-wp-validation`. Current Page mapping and discovery/router
+remain local-only; preserve 4473 and all previous artifacts. Read the complete
+[service map](platform-capabilities.md#current-functional-map--november-18-2026)
+before selecting the next connected increment. Retain protected41/6 and every
+customer/publication boundary. No founder acceptance is claimed.

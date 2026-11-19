@@ -36,7 +36,7 @@ test("actual metered requests carry complete original text and image bytes, with
       cachedPerMillion: 75_000, outputPerMillion: 4_500_000, cacheWritePerMillion: 0, countMicros: 0 };
     await initializeResponsesUsageLedger(directory, rates);
     const grant: PresenceWorkflowGrant = { contextDigest: fingerprint(context), approvedSources: context.evidence.map(fingerprint),
-      approvedCorrections: [], originalMaterials: materials, researchResponseBytes: 1000,
+      approvedCorrections: [], originalMaterials: materials, nativeComponents: 2, researchResponseBytes: 1000,
       researchSources: [{ id: "research:fixture", url: "https://example.org/", label: "Fixture" }],
       maxOutputTokens: 2000, maxRetries: 0, expiresAt: Date.now() + 60_000,
       ledger: { id: fingerprint("originals-grant"), inputTokens: 12_000, inputBytes: 2_000_000,
@@ -52,7 +52,8 @@ test("actual metered requests carry complete original text and image bytes, with
     let calls = 0;
     const provider = createResponsesPresenceWorkflow({ grant, readGrant: async () => grant, readContext: async () => context,
       rates, ledgerDirectory: directory, fetchPage: async () => { throw Error("No network"); },
-      readOriginalMaterials: async () => rows, retainRequest: async (_run, bytes) => { request = bytes; },
+      readOriginalMaterials: async () => rows, readAvailableMedia: async () => ({
+        state: "private-contextual-rights-and-usage-verified", publicUseApproved: false, entries: [] }), retainRequest: async (_run, bytes) => { request = bytes; },
       transport: { async send(path, body) {
         calls++;
         assert.ok(request, "Request is retained before any provider count or generation");
@@ -62,6 +63,12 @@ test("actual metered requests carry complete original text and image bytes, with
         const png = content.find(row => row.type === "input_image")!;
         assert.deepEqual(Buffer.from(png.image_url!.split(",")[1], "base64"), image);
         assert.match(JSON.stringify(content), /unconfirmed/);
+        assert.match(JSON.stringify(content), /private-contextual-rights-and-usage-verified/);
+        assert.match(JSON.stringify(content), /publicUseApproved.{0,5}false/);
+        const instructions = (body as { instructions: string }).instructions;
+        assert.match(instructions, /public publication remains unapproved/);
+        assert.match(instructions, /Prior editorial findings are fallible advice, not business authority/);
+        assert.match(instructions, /keeping implementation-readiness and proof-policy notes out of visitor copy/);
         if (path.endsWith("input_tokens")) return { body: { input_tokens: 10_000 } };
         assert.equal(supplied.store, false);
         return { body: reply, rawBody: Buffer.from(JSON.stringify(reply)) };

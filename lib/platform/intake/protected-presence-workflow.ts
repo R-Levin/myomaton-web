@@ -26,6 +26,8 @@ import { capturePublicPeer } from "./presence-peer-browser";
 import { chromium } from "playwright-core";
 import type {PublicPeerCapture} from "./presence-public-capture-bridge";
 import {retainedResearchFetch} from "./presence-research-cache";
+import {approvedSuppliedEvidence,type SuppliedPlacement,type SuppliedLineage} from "../acquisition/supplied-evidence";
+import {readManagedObject} from "../assets/local-storage";
 import {eligibleStock} from "../acquisition/stock";
 import {createHash} from "node:crypto";
 
@@ -205,7 +207,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
               const bytes=await privateWorkflowBytes(join(workspace.root,"media",item.sourceSha256+".original"),workspace.root);
               if(createHash("sha256").update(bytes).digest("hex")!==item.sourceSha256)throw Error("Selected stock custody differs");
             }
-            return {state:"downloaded-awaiting-contextual-permission-review",entries:supplied.entries};
+            return reviewedStockForWorkflow(pool,workspace.root,run,supplied);
           }}),
           async readOriginalMaterials() {
             const root = join(workspace.root, "originals");
@@ -341,4 +343,29 @@ export async function reviewWorkflowChange(workflow: PresenceWorkflow,
     case "workflow-visual-decide": return workflow.decideVisual(current, version, actor, details?.visual);
     default: throw new IntakeError("invalid_request");
   }
+}
+
+export async function reviewedStockForWorkflow(pool:Pool,root:string,run:WorkflowRun,supplied:{entries:{hit:{sourceId:string}}[]}) {
+            let reviewed:{contextDigest:string;schema:string;homeDigest:string;records:{target:SuppliedPlacement;assetId:string;lineage:SuppliedLineage;sourceId:string;image:{usageId:string;digest:string;width:number;height:number;alt:string}}[]}|undefined;
+            try{reviewed=await privateWorkflowFile(join(root,"media/reviewed-stock-context.json"),root)}
+            catch(error){if((error as NodeJS.ErrnoException).code!=="ENOENT")throw error}
+            if(!reviewed)return {state:"downloaded-awaiting-contextual-permission-review",entries:supplied.entries};
+            const home=run.input.pages.find(page=>page.path==="/");
+            if(!home||reviewed.homeDigest!==fingerprint(home))return {state:"new-contextual-placement-review-required",entries:supplied.entries};
+            if(reviewed.contextDigest!==fingerprint(run.context)||!/^canonical_test_[a-f0-9]{32}_intake$/.test(reviewed.schema)||reviewed.records.length!==2)throw Error("Private stock review scope differs");
+            const db=await pool.connect();
+            try{await db.query("BEGIN");await db.query("SELECT set_config('search_path',$1,true)",[reviewed.schema]);
+              for(const record of reviewed.records){
+                if(record.target.webPresenceId!==run.context.scope.webPresenceId||record.target.managedSiteId!==run.context.scope.managedSiteId||!supplied.entries.some(entry=>entry.hit.sourceId===record.sourceId))throw Error("Private stock placement differs");
+                const asset=(await db.query("SELECT * FROM assets WHERE id=$1 AND web_presence_id=$2 AND status='active'",[record.assetId,record.target.webPresenceId])).rows[0];
+                const usage=(await db.query("SELECT * FROM asset_usages WHERE id=$1",[record.image.usageId])).rows[0];
+                if(!asset||usage?.asset_id!==asset.id||usage.entity_type!=="section"||usage.entity_id!==record.target.sectionId||usage.web_presence_id!==record.target.webPresenceId||usage.role!=="image")throw Error("Current stock usage differs");
+                await approvedSuppliedEvidence(db,record.target,asset.id,record.lineage,{preparedDigest:record.image.digest,width:record.image.width,height:record.image.height,altText:record.image.alt});
+                const bytes=await readManagedObject(join(root,"media/stock-managed"),record.target.webPresenceId,asset.source_reference);
+                if(createHash("sha256").update(bytes).digest("hex")!==record.image.digest)throw Error("Reviewed stock bytes differ");
+              }
+
+            }finally{try{await db.query("ROLLBACK")}finally{db.release()}}
+            return {state:"private-contextual-rights-and-usage-verified",publicUseApproved:false,entries:supplied.entries,
+              reviewedPlacements:reviewed.records.map(record=>({sourceId:record.sourceId,placement:record.target,preparedDigest:record.image.digest,alt:record.image.alt,lineage:record.lineage}))};
 }
