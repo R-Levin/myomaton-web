@@ -10,6 +10,7 @@ import {prepareRenderedCandidateCustody} from "../../lib/platform/intake/presenc
 import {PresenceWorkflow} from "../../lib/platform/intake/presence-workflow";
 import type {WorkflowRun} from "../../lib/platform/intake/presence-workflow";
 import type {PresenceWorkflowGrant} from "../../lib/platform/intake/presence-workflow-provider";
+import {verifySourceAwareStock} from "./source-aware-stock";
 import type {OriginalMaterial} from "../../lib/platform/intake/presence-source-material";
 const sha=(b:Buffer)=>createHash("sha256").update(b).digest("hex");
 const proposal="f560374969b7abdff53fa33917c9b84f7053f5f9b092b0dccf9a505bcc8f9ddd";
@@ -26,8 +27,8 @@ async function save(file:string,b:Buffer){
  try{await h.writeFile(b);await h.sync()}finally{await h.close()}
 }
 async function main(){
- const [op,stage,v,digest,...extra]=process.argv.slice(2),version=Number(v);
- assert.ok(!extra.length&&["intent","store"].includes(op)&&["home","site"].includes(stage)&&Number.isSafeInteger(version)&&version>0&&/^[a-f0-9]{64}$/.test(digest??""));
+ const [op,stage,v,digest,variant,...extra]=process.argv.slice(2),version=Number(v);
+ assert.ok(!extra.length&&(variant===undefined||variant==="media")&&["intent","store"].includes(op)&&["home","site"].includes(stage)&&Number.isSafeInteger(version)&&version>0&&/^[a-f0-9]{64}$/.test(digest??""));
  assert.ok(process.platform==="linux"&&process.env.NODE_ENV!=="production");
  const parent=join(await realpath(process.env.HOME??""),"miopages-private-acceptance"),root=join(parent,"presence-evaluation",plan.destination.intakeId);
  assert.ok(!root.includes("/public_html/"));
@@ -58,7 +59,7 @@ async function main(){
   }
   else assert.ok(!run.work.reviewStage&&state.pages.length===state.blueprint.pages.length);
   const intent=renderedCaptureIntent(run,g.originalMaterials);
-  const name=stage+"-"+version+".json",packetBytes=await bytes(join(root,name),root,g.originalMaterials.requestBytes),packet=JSON.parse(packetBytes.toString());
+  const name=stage+"-"+version+(variant==="media"?"-media":"")+".json",packetBytes=await bytes(join(root,name),root,g.originalMaterials.requestBytes),packet=JSON.parse(packetBytes.toString());
   for(const expected of intent.expectedPages){
    const page=packet.candidate.pages.find((p:{path:string})=>p.path===expected.path),source=run.input.pages.find(p=>p.path===expected.path)!;
    assert.equal(page?.title,expected.title);assert.equal(page.sections.length,source.sections.length);
@@ -68,6 +69,13 @@ async function main(){
    });
   }
   assert.equal(packet.candidate.pages.length,intent.expectedPages.length);
+  if(variant==="media"){
+   assert.ok(intent.includeOperatorProjections);
+   const base=JSON.parse((await bytes(join(root,stage+"-"+version+".json"),root,g.originalMaterials.requestBytes)).toString());
+   assert.equal(packet.originalPacketDigest,base.digest);assert.equal(fingerprint(packet.candidate),fingerprint(base.candidate));
+   assert.equal(packet.localStockEvidence.sourceVersion,version);
+   await verifySourceAwareStock(db,root,run,packet);
+  }
   const receipt={runManifestSha256:proposal,intakeId:run.context.intakeId,scope:run.context.scope,workflowVersion:version,
    contextDigest:g.contextDigest,inputDigest:digest,packetDigest:packet.digest,packetSha256:sha(packetBytes),brandDigest:g.marketingAuthority!.brandDigest};
   if(op==="intent"){
@@ -77,10 +85,11 @@ async function main(){
    console.log(JSON.stringify({status:"PASS",operation:"private-capture-intent",version,pages:intent.expectedPages.length,packet:name,inputDigest:digest,protectedSourcesExported:false,providerCalls:0}));return;
   }
   operationStage="capture-native-binding";
-  const upload=join(root,"capture-upload-"+version),index=JSON.parse((await bytes(join(upload,"index.json"),root,g.originalMaterials.requestBytes)).toString()) as {
+  const upload=join(root,"capture-upload-"+version+(variant==="media"?"-media":"")),index=JSON.parse((await bytes(join(upload,"index.json"),root,g.originalMaterials.requestBytes)).toString()) as {
    packetSha256:string;packetDigest:string;brandDigest:string;binding:RenderedCandidateBinding;sources:OriginalMaterial[]};
   assert.equal(index.packetSha256,receipt.packetSha256);assert.equal(index.packetDigest,packet.digest);assert.equal(index.brandDigest,receipt.brandDigest);
   validateRenderedCaptureIntent(intent,index.binding);
+  assert.equal(index.binding.variant,variant==="media"?"operator-proposed-preview":"core-candidate");
   const rows=await Promise.all(index.sources.map(async source=>{
    assert.ok(/^[a-f0-9]{64}$/.test(source.sha256));assert.equal(source.reviewOf?.representationDigest,index.binding.representationDigest);
    const mapped=index.binding.pages.find(p=>p.path===source.reviewOf?.path);assert.ok(mapped);

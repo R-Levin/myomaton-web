@@ -570,7 +570,7 @@ function verifiedSpend(ledger: Ledger, retainedReservation?: string, reportHold?
 
 const researchInputLimit = 400_000; // Documented context window of the pinned model.
 const researchToolMicros = 10_000; // Default-tier Web Search per-call fee, plus token usage.
-export type ResponsesRequest = { model: string; input: ResponsesInput; instructions: string; text?: { format: object } };
+export type ResponsesRequest = { model: string; input: ResponsesInput; instructions: string; text?: { format: object }; reasoning?: { effort: "medium" } };
 
 function searchCalls(body: Record<string, unknown>) {
   if (!Array.isArray(body.output)) throw Error("Research tool usage unavailable");

@@ -1878,3 +1878,127 @@ whole-site native review, editorial correction and rollback remain required.
 Do not claim that test success establishes commercial quality. Same $8 ceiling,
 32-generation/65-request maxima and November22 deadline; no protected writes,
 public publication or report export.
+
+## Real private stock placements and reasoning-aware revision — November 19, 2026
+
+**Actual current result:**Core's Home48 is rendered on the same disposable
+WordPress Page203 at http://127.0.0.1:4474/?page_id=203&preview=true, now with both
+real selected photos. Its opening names a customer value rather than only a
+category; responsibility and alternative-choice sections are substantive Core
+output. Desktop1440/mobile390 return200, no overflow and four loaded images
+(two photos/two wordmarks). This is still a concept, not completed-site or owner
+acceptance. Actual critique50 and negative authenticated judgment51 retain
+copy/layout concerns. The third ordinary editorial revision52 is now completed
+as54; its exact native packet and review input are retained. Supporting Pages
+and whole-site critique remain unfinished. Do not substitute this partial Home
+for the promised complete candidate.
+
+**Common media machinery, actual Assets and usage.** The two previously
+downloaded Pixabay representations were revalidated, prepared and contextually
+reviewed through SuppliedMediaIntake, approvedSuppliedEvidence and
+writeProposalUsage. No new image request/download occurred. Immutable prepared
+hashes remain c22786707f190d307a3a2d2fe49a7e1b020f2deb8d1fd29ce451a9e6f2daa8f9
+and15c301b3d156573123c5ca6baed7205d3d7656f7190cd8d7a66bc752b9935d23.
+Records/usages are in private disposable canonical schemas, with exact case,
+Page/Section, source-event, bytes, rights and alt bindings; source public
+canonical state remains exact. They are **not public-use approval, a claim
+that depicted people are customers, a storage-policy decision, or protected
+signed WordPress application**. Home42's exact Intro/CTA private placement was
+permitted only through an explicit trusted disposable adapter; default ordinary
+Intro-only and all Hero policies remain unchanged. Current Home48 uses two
+Intro slots. The existing native WordPress projector/theme delivers the bytes;
+the local image addition is labeled operator-proposed-preview, not a claim of
+automatic canonical media approval.
+
+**Retained recovery:**first image integration regression correctly refused at
+the canonical inactive-foundation guard before its expected Intro guard.
+Recognizing that existing stronger refusal, the focused actual PostgreSQL test
+passes authority, foreign/stale context, default refusal, explicit private CTA
+and unattached-Asset checks. Both real42 photo records then ingested, but an
+over-escaped filename regex in the new helper refused final readback. The
+failure/checkpoint/two AssetUsage records/bytes were preserved. A tested
+filename correction and fixed-operation recovery independently reverified them
+under row locks, wrote the missing packet and created **zero new Assets/provider
+calls**. No automatic re-ingestion. Version48 separately reviews its new exact
+contexts; previous context pointers and every per-version record are retained.
+The readback uses SELECT locks and ROLLBACK, with no record writes; it is not
+described as a SQL read-only transaction.
+
+**Honest regression status:**the two focused integration/filename tests pass
+on Linux. A broader stock/supplied-media attempt has **2pass/3fail**, retained in
+`verification/stock-and-supplied-regressions.tap`. All3 stop in unchanged
+IntakeService.scope during activation-fixture setup, before the changed media
+constructor: those fixtures request the fixed pilot owner, absent from the fresh
+isolated tenant. service.ts/availability.ts/disposable.ts have no changes. This
+is a fixture/dataset incompatibility, not a passing suite, and was not fixed by
+weakening tenant or activation checks. The scoped actual media path passes.
+The final private helper also independently reverified retained48 assets/usage/
+bytes with directory owner/0700/realpath and file0600/symlink safeguards.
+Latest helper archive
+`92c73bd297190e690580b60d023752f3bca2162a17bbe248efb9f0c8240ff0d7`;
+stock helper
+`a95133b3a3947c8e1b8de32c492f847e05b631adc7fc8e5249bef6b8f1f049e6`;
+rendered-review helper
+`8d9c4bfa0aa6a75461611518a6c9b9de03c289206ee009b5aa1f8ac442b1d941`.
+Earlier helper/failure artifacts remain.
+
+**Reasoning experiment, not a claimed universal cause.** Source/prompt corrections
+did not fully remedy timid literal rewriting. The retained run used very little
+reasoning. Official GPT-5.4 guidance states none is default and suggests medium
+for long-context synthesis/strategy; the count endpoint supports the same
+reasoning field. [Exact model](https://developers.openai.com/api/docs/models/gpt-5.4),
+[guidance](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.4),
+[count API](https://developers.openai.com/api/reference/resources/responses/subresources/input_tokens/methods/count).
+Only source-aware calls on the exact approved gpt-5.4-2026-03-05 snapshot now
+request medium. Historical/other-model behavior is unchanged. The old internal
+12k revision compatibility limit is retained for historical grants; this run
+uses its already approved24k revision ceiling. Reasoning shares that output
+envelope and is billed once inside total output; no new model/token/budget/source
+authority. Actual Home48 has11,034output tokens including3,040reasoning tokens.
+It produces a more specific opening and relocates both photos to eligible Intro
+contexts. The paired prompt/revision/input changes mean this is not a controlled
+proof that reasoning alone caused the improvement.
+
+**Verification/activation:**TypeScript/focused lint and offline source/authority/
+usage/capture tests pass. Exact code archive
+`11d2a473f3090324aeea80ad3bfaa491fc2d696afa4487af0e5a723c77dccd76`
+passed **47 Linux tests/0fail/0skip**. Current worker
+`41c5e366d67f3e9c5dfbd452ad4355905c0bc5e7a4bd4ea168ec2fd035bda857`;
+Linux receipt
+`ced8fb01d906245ee24abec4150ec0b0615a14bb2b296b6d77b3f6a29beca77b`.
+Previous worker/proof/activation remain. Only artifact/proof hashes changed,
+not grant, original expiry, reviewer, context, ledger or counters. All transfers
+used the explicitly approved bounded code series and the same private directory.
+
+**Output boundary clarification:**automatic review refused preview preparation
+that printed an untyped result and a later visual-field excerpt, interpreting
+them as possible protected C0 exports. Nothing ran on those refusals. A safer
+explicit allowlist for both worker outputs and fixed aggregate metadata passed:
+status/version/digests/counts only, full run/report/visual briefs remain on Cloud.
+This does not authorize the refused raw/derived report export or disable review.
+Approved visitor/media packets still go only to the existing WordPress directory.
+
+**Cost at critique50:**35requests/18generations, **$3.343858 usage estimate**,
+$4.656142 remaining before subsequent reservations. Inclusive tracked-lineage
+maximum-accounted$15.224961 includes this subtotal and prior uncertainty.
+The next Home revision was deliberately dispatched inside that same grant;
+use its retained receipt for the current settled total. No new paid media or
+infrastructure expenditure. Founder minutes/compute-time charge UNKNOWN.
+No new owner credential/action was required.
+
+**RECOVERY / RESUME HERE:**fresh case41a83e7e-1765-4517-941a-b2b151bb7c4a,
+existing p0-source-aware-c0-runtime. Current saved version54 follows third
+ordinary revision52; inspect live event/ledger before dispatch. Use the
+allowlisted metadata-only preparation for local-home/concept-review-input;
+never copy full review input/report to PC. Base54 packet/input are already
+retained. Verify current unique photo slots; use tested stock-helper-05 for
+new exact private context and its rendered-review-v4 intent/store path with
+media variant. Materialize on stable local203, capture exact native rows,
+critique and judge the concept. Complete remaining generated Pages, useful
+navigation, whole-site native critique, the remaining bounded editorial
+correction and actual rollback before founder review. Strategic replans2/2
+and editorial rounds3/4 are now used; preserve those counters. Do not requeue
+retained outputs. Original$8/32generations/65requests/November22 15:58:31UTC
+limits and all protected41/6/75/old202posts/4473/root4474/rollback remain.
+Complete Entry, portal, MyBusiness, inquiry/measurement/reporting/Ongoing work
+stays in the roadmap; no claim those beacons are completed by a site preview.

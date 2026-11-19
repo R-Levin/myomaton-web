@@ -85,7 +85,7 @@ test("source selections preserve exact passages, factual status, tenant binding 
 for (const includeOriginals of [false,true]) test("actual metered request carries growth knowledge and separate policy "+(includeOriginals?"with original attachments":"without original attachments"),async()=>{
  const root=await mkdtemp(join(tmpdir(),"miopages-source-aware-"));
  try{
- const rates:ResponsesRates={model:"offline-model",verifiedOn:"2026-11-19",inputPerMillion:750000,cachedPerMillion:75000,outputPerMillion:4500000,cacheWritePerMillion:0,countMicros:0};
+ const rates:ResponsesRates={model:includeOriginals?"gpt-5.4-2026-03-05":"offline-model",verifiedOn:"2026-11-19",inputPerMillion:750000,cachedPerMillion:75000,outputPerMillion:4500000,cacheWritePerMillion:0,countMicros:0};
  await initializeResponsesUsageLedger(root,rates);
  const grant:PresenceWorkflowGrant={contextDigest:fingerprint(context),approvedSources:sources,approvedCorrections:[],marketingAuthority:authority,
   researchSources:[{id:"research:offline",url:"https://example.org/",label:"Never fetched"}],researchResponseBytes:10000,expiresAt:Date.now()+60000,maxOutputTokens:1000,
@@ -100,12 +100,13 @@ for (const includeOriginals of [false,true]) test("actual metered request carrie
  const provider=createResponsesPresenceWorkflow({grant,readGrant:async()=>grant,readContext:async()=>context,ledgerDirectory:root,rates,fetchPage:async()=>{throw Error("No external requests")},
   ...(includeOriginals&&{readOriginalMaterials:async()=>[{source:original,bytes:originalBytes}],retainRequest:async()=>{}}),
   transport:{async send(path,body){
-   calls++;const request=body as {input:string|{content:{type:string;text?:string}[]}[];instructions:string;text:{format:{schema:unknown}}};
+   calls++;const request=body as {input:string|{content:{type:string;text?:string}[]}[];instructions:string;text:{format:{schema:unknown}};reasoning?:{effort:string}};
    const projected=typeof request.input==="string"?JSON.parse(request.input):resolveSourceReferences(JSON.parse(request.input[0].content[0].text!).task,new Map([[original.id,originalBytes.toString()]]));
    const knowledge=JSON.stringify(projected);
    assert.ok(knowledge.includes(ongoing)&&knowledge.includes(launch));
    assert.ok(!knowledge.includes(internal)&&!knowledge.includes(processing));
    assert.ok(request.instructions.includes(processing));
+   assert.deepEqual(request.reasoning,includeOriginals?{effort:"medium"}:undefined);
    assert.match(request.instructions,/permitted customer-owned brand assets/);
    assert.match(request.instructions,/third-party expression/);
    if(Array.isArray(request.input))assert.match(JSON.parse(request.input[0].content[0].text!).interpretation,/permitted customer-owned brand assets/);
@@ -114,7 +115,7 @@ for (const includeOriginals of [false,true]) test("actual metered request carrie
    assert.ok(!encoded.includes('"unconfirmed"'));
    if(path.endsWith("/input_tokens"))return {body:{input_tokens:1000}};
    const response={id:"resp_offline_source_aware",model:rates.model,status:"completed",service_tier:"default",
-    usage:{input_tokens:1000,output_tokens:30,total_tokens:1030,input_tokens_details:{cached_tokens:0},output_tokens_details:{reasoning_tokens:0}},
+    usage:{input_tokens:1000,output_tokens:30,total_tokens:1030,input_tokens_details:{cached_tokens:0},output_tokens_details:{reasoning_tokens:includeOriginals?10:0}},
     output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify(page)}]}]};
    return {body:response,rawBody:Buffer.from(JSON.stringify(response))};
   }}});
@@ -124,6 +125,9 @@ for (const includeOriginals of [false,true]) test("actual metered request carrie
  assert.deepEqual(output,page);
  const parsed=readPage(output,"/service",["/service"],marketingCitationIds(makeRun(),authority),{},false,false,true);
  assert.equal(parsed.sections[0].body,ongoing);assert.equal(calls,2);
+ const ledger=JSON.parse(await readFile(join(root,"onboarding-usage.json"),"utf8"));
+ assert.equal(ledger.attempts[0].usage.reasoning,includeOriginals?10:0);
+ assert.equal(ledger.attempts[0].estimatedMicros,885,"Reasoning is already inside the billed output total; do not add it twice");
  }finally{await rm(root,{recursive:true,force:true})}
 });
 
@@ -223,4 +227,18 @@ test("the source-aware replan carries exact rejected visitor content for compari
  assert.deepEqual(projected.priorRejectedPages,[rejected]);
  assert.ok(!JSON.stringify(projected.businessKnowledge).includes("Unhelpful repetition"));
  assert.deepEqual(run.input.replan.priorRejectedPages,[rejected]);
+});
+
+test("source-aware reasoning and visible revisions share the exact approved request allowance without inheriting the legacy 12k limit",async()=>{
+ const {authoringOutputLimit}=await import("../lib/platform/intake/presence-workflow-provider");
+ const stages=(await import("../docs/c0-source-aware-run-proposal.json")).default.provider.stages;
+ const grant={marketingAuthority:authority,originalMaterials:{version:1},maxOutputTokens:24000,ledger:{stages}} as PresenceWorkflowGrant;
+ assert.equal(authoringOutputLimit(grant,"revision"),24000);
+ assert.equal(authoringOutputLimit(grant,"editorial"),8000);
+ const old={...grant,marketingAuthority:{...authority,projectionVersion:undefined}};
+ assert.equal(authoringOutputLimit(old,"revision"),12000);
+ assert.equal(authoringOutputLimit(old,"editorial"),8000);
+ const small={...grant,ledger:{...grant.ledger,stages:{...grant.ledger.stages!,revision:{...grant.ledger.stages!.revision,requestOutputTokens:4096}}}};
+ assert.equal(authoringOutputLimit(small,"revision"),4096);
+ assert.equal(authoringOutputLimit({...grant,originalMaterials:undefined},"revision"),undefined);
 });

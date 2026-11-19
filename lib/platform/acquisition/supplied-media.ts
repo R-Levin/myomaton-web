@@ -64,7 +64,14 @@ const overlaps = (a: string, b: string) => {
 // Customer and Operator grants come from separate authority adapters.
 export class SuppliedMediaIntake {
   constructor(private pool: Pool, private authority: SuppliedMediaAuthority, private quarantine: string, private managed: string, private customerUpload?: CustomerUploadAuthority,
-    private privatePlacement?: (db: PoolClient, placement: SuppliedPlacement) => Promise<Awaited<ReturnType<typeof placementContext>>>) {}
+    private privatePlacement?: (db: PoolClient, placement: SuppliedPlacement) => Promise<Awaited<ReturnType<typeof placementContext>>>,
+    private privateSectionTypes: readonly ("intro" | "cta")[] = ["intro"]) {
+    if (!privateSectionTypes.length || new Set(privateSectionTypes).size !== privateSectionTypes.length ||
+        privateSectionTypes.some(type => !["intro", "cta"].includes(type)) ||
+        (privateSectionTypes.some(type => type !== "intro") && !privatePlacement)) {
+      throw Error("Explicit disposable private placement capability required");
+    }
+  }
 
   // Only a trusted disposable composition root can supply a draft context.
   // The same boundary, authority and stale-subject checks still run on every operation.
@@ -73,7 +80,7 @@ export class SuppliedMediaIntake {
     hash(current.digest);
     if (current.page.id !== target.pageId || current.page.managed_site_id !== target.managedSiteId
       || current.section.id !== target.sectionId || current.section.page_id !== target.pageId
-      || current.section.type !== "intro" || current.page.status !== "active" || current.section.status !== "active") {
+      || !(this.privatePlacement ? this.privateSectionTypes : ["intro"]).includes(current.section.type) || current.page.status !== "active" || current.section.status !== "active") {
       throw Error("Owned current private Intro placement required");
     }
     return current;

@@ -336,3 +336,12 @@ budget and expiry. Those corrective transfers and actual Linux tests succeeded;
 record each artifact's checksum/results. This is the observed practical fix for
 the development-tool consent mismatch, not a global bypass or a permission for
 protected report export. Existing raw C0 sources remain on their approved host.
+
+For private workflow diagnostics, use an explicit scalar metadata allowlist at
+the stdout boundary: fixed operation/status, version, validated digests and
+aggregate counts. Full source/answer/report/review-input narrative remains in
+its approved custody. In this run, such filtering satisfied review after
+untyped output and a visual-field excerpt were refused; no refused action ran.
+A private visitor-content/image packet sent to its separately authorized renderer
+has a different purpose from exporting the retained source or report. Consent
+to code transfers must never silently authorize the latter.

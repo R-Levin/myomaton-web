@@ -82,6 +82,14 @@ export function pageAuthoringBrief(path: string, grant: PresenceWorkflowGrant) {
     : ". Write only that Page and its own visitor job. Other routes in the plan are link targets or context.";
 }
 
+/** The source-aware grant already pins its request ceiling; legacy private
+ * calls retain their former 12k compatibility limit. Reasoning shares output. */
+export function authoringOutputLimit(grant: PresenceWorkflowGrant, name: WorkflowMeterStage) {
+  if (!grant.originalMaterials || !["editorial","revision"].includes(name)) return undefined;
+  const permitted = grant.ledger.stages?.[name]?.requestOutputTokens ?? grant.maxOutputTokens;
+  return grant.marketingAuthority?.projectionVersion === 2 ? permitted : Math.min(12_000, permitted);
+}
+
 function bindCitations(schema: object, references: readonly string[]) {
   // Provider decoding and local semantic checks must use the same allowlist.
   const bound = structuredClone(schema) as Record<string, unknown>;
@@ -240,7 +248,7 @@ export function createResponsesPresenceWorkflow(config: {
     return { stage: stage && { name, rates: stage.rates }, model: stage?.rates.model ?? rates.model,
       budget: legacyBudget ?? meteredPresenceWorkflow(ledgerDirectory, rates, transport, grant.ledger, grant.maxOutputTokens,
         grant.retainedReservation, name === "research" ? grant.marketSearch?.maxToolCalls : undefined, name, undefined, reportHold,
-          grant.originalMaterials && (name==="editorial"||name==="revision") ? Math.min(12_000,stage?.requestOutputTokens??grant.maxOutputTokens) : undefined) };
+          authoringOutputLimit(grant, name)) };
   };
 
   async function collectMarketEvidence(response: unknown, run: WorkflowRun) {
@@ -483,7 +491,7 @@ export function createResponsesPresenceWorkflow(config: {
         ? " Conceive the site as a coherent original design. Describe the intended typography, hierarchy, image relationships, responsive behavior and visitor decisions in Direction. Compose new native components when useful using version 2 recursive nodes, asymmetric columns, grouped surfaces, typographic hierarchy, comparisons, sequences and accessible details. Use mode section to author the entire Section composition, or supplement to add a supporting component. A section-mode Hero must contain exactly one level-1 heading matching its Section heading; supporting sections must contain a matching level-2 heading and no level-1 heading. Section-mode replaces the usual heading/body/image layout, so put all intended visitor content and image/Action references into the tree. This allows genuinely different Hero and supporting compositions rather than variations on an automatic text-plus-image shell. Native image and Action references bind only to section-N (zero-based Section index within this Page) and action-N (zero-based index in this Page\'s complete Action list, including null destinations; a null destination stays disabled and never shifts another Action into its slot). Put explicit image nodes in an authored section that needs a placed image and explicit action nodes for its intended choices. An image reference is a placement request, not evidence that media has already been acquired. When availableMedia is supplied, this private cycle requires both selected photographs to become purposeful supporting Intro placements in the real website. On a Home revision, compose suitable distinct supporting contexts for the two images; if a different page is materially better, state that exact placement need in the brief instead of treating acquisition as completed. Use the actual selected source IDs in the visual brief, propose useful supporting Intro placements and contextual altIntent, and use the actual supplied permission state: selection/download alone means pending; private-contextual-rights-and-usage-verified means that exact private placement has already been reviewed, while public publication remains unapproved. Stock illustrates a business situation, never a customer, testimonial or endorsement. Keep the conceptual service-led Hero; use original native blocks for abstract relationships instead of requesting additional unavailable illustrations. Never invent acquired assets or fill the site with placeholder images. Keep mobile visual and DOM reading order identical (mobileOrder 0). Create an arrangement that fits the actual information and visitor need. Existing section roles describe semantic jobs, not a fixed layout. If a necessary idea cannot be expressed, state the specific limitation in the visual brief for Operator engineering rather than disguising a generic fallback. Preserve established brand identity; use source visuals to reason, never to reproduce distinctive designs. Treat self-contained reader answers as useful content when no article inventory exists. Critique the complete strategy and rendered design and make substantive changes where evidence warrants them."
         : "";
       const request = {
-        model, input: providerInput,
+        model, ...(grant.marketingAuthority?.projectionVersion === 2 && model === "gpt-5.4-2026-03-05" && { reasoning: { effort: "medium" as const } }), input: providerInput,
         instructions: (batch ? editing : [stageInstructions, guidance].filter(Boolean).join(" ") + preview) +
           (exactPage === undefined ? "" : " The single required Page is " + JSON.stringify(exactPage) +
             pageAuthoringBrief(exactPage, grant) + " ") +

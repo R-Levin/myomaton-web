@@ -14,14 +14,14 @@ async function main(){
  const readback=()=>JSON.parse(execFileSync("C:/Python314/python.exe",[script,wp],{encoding:"utf8"}));
  const before=readback();
  const binding:RenderedCandidateBinding={contextDigest:receipt.contextDigest,inputDigest:receipt.inputDigest,representationDigest:fingerprint({packet:packet.digest,brand:render.brandDigest}),
-  nativeReadbackDigest:before.digest,variant:"core-candidate",origin:"http://127.0.0.1:4474",pages:Object.entries(render.pages).map(([path,wordpressPageId])=>({path,wordpressPageId:wordpressPageId as number}))};
+  nativeReadbackDigest:before.digest,variant:name.endsWith("-media.json")?"operator-proposed-preview":"core-candidate",origin:"http://127.0.0.1:4474",pages:Object.entries(render.pages).map(([path,wordpressPageId])=>({path,wordpressPageId:wordpressPageId as number}))};
  const browser=await chromium.launch({executablePath:"C:/Program Files/Google/Chrome/Application/chrome.exe",headless:true,chromiumSandbox:true,
   args:["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"]});
  let result;
  try{result=await captureRenderedIntent(browser,envelope.intent,async()=>{
   assert.deepEqual(await readFile(wp+"/source-aware-render.json"),mapBytes);const current=readback();assert.deepEqual(current,before);return binding;
  })}finally{await browser.close()}
- const target=incoming+"/capture-"+receipt.workflowVersion;await mkdir(target);
+ const target=incoming+"/capture-"+receipt.workflowVersion+(name.endsWith("-media.json")?"-media":"");await mkdir(target);
  for(const row of result.rows)await writeFile(join(target,row.source.sha256+".source"),row.bytes,{flag:"wx"});
  const index={packetSha256:receipt.packetSha256,packetDigest:packet.digest,brandDigest:render.brandDigest,binding,sources:result.rows.map(x=>x.source),observations:result.observations,oldPostsDigest:before.oldPostsDigest};
  await writeFile(join(target,"index.json"),JSON.stringify(index,null,2),{flag:"wx"});
