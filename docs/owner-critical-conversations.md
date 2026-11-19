@@ -568,3 +568,23 @@ are material costs. See [verified diagnosis, local corrections and remaining
 work](c0-creation-quality-p0-17.md#retained-reasoning-inspection-causal-defects-not-another-paid-attempt).
 This records the discussion; it does not expand live source, financial,
 credential, deployment or publication authority.
+
+### November 19 — finish source binding; context limit clarification
+
+The owner directs finishing the known source-binding defect instead of leaving
+it as a pending item requiring repeated prompts. Continue ordinary authorized
+engineering autonomously. Later “Adjust the limit as needed” explicitly refers
+to the enlarged context-file reader; it is NOT an increase in the$8 API cap or
+permission to alter account/billing/approval controls. The fix uses the
+existing36MB authorized source envelope and retains custody checks.
+
+The owner supplies a usage screenshot showing100%five-hour and84%weekly
+capacity. That conflicts with the approval service's earlier usage-limit error.
+The exact cause is unverified; subsequent commands through the same approval
+path worked. Do not claim verified account exhaustion or recommend purchasing
+credits based solely on that service error. Codex allowance and MioPages API
+usage are separate; “no new API calls” does not mean Codex work is free.
+
+See [implemented source repair and actual hosted-write hold](c0-creation-quality-p0-17.md#prepared-binding-retained-exact-hosted-write-held-by-automatic-review).
+These are operating instructions, not customer business knowledge or new
+financial/deployment/publication authority.
