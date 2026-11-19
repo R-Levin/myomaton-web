@@ -2430,3 +2430,65 @@ after adequate concept review continue supporting Pages, complete-site
 render/review and exact local rollback/recovery. No silent replenishment of
 rounds, replans, generations, money or expiry. Preserve original41/6/75,
 root4474/older4473, all sources/responses/events and ledger.
+
+## Final permitted Home retained; diagnosis-only hold
+
+The final ordinary editorial correction completed as **Home70**, not a complete
+site. Actual WordPress203, desktop/mobile captures and both private stock
+placements are retained. The headline and arrangement changed, but Codex's
+visual/content inspection still finds the offer too narrowly reduced to
+administration, maintenance and fit comparisons. No concept-quality pass or
+founder review request is made. Four planned supporting Pages are not generated.
+Do not obscure this failure with the source-custody or technical test successes.
+
+Actual request69 SHA d6412b19364899a276e940377dc27364325e02405d98d04e436c4f60afe61a19
+is14,376,623bytes with12,543instruction characters and374,472text characters.
+Read-only structure inspection independently confirms full owned-site input
+and growth passages,16businessKnowledge records, current report/Direction/
+blueprint, and repairedSourceContext containing only provenance (no previous).
+Thus the archived-strategy duplication correction was actually used, yet did
+not materially fix the result. Remaining causal narrowing is unresolved; do
+not assert that its removal solved the commercial failure or invent a new
+single-cause explanation.
+
+Current Home70 captures are securely retained in the same Cloud case,
+2records/1,146,608bytes, descriptor31b133d914dbccbd6eed33e4dd135f6a8f118c332e2597af22ee0f90029c87ed.
+An initial store refused SCP-created0644files. Exact names, ownership,
+no-symlink and0700parent were verified, then only these three files were
+tightened to0600; unchanged bytes passed full binding. Future capture transfers
+must explicitly apply0600before storage, not rely on remote shell umask.
+
+**Actual local rollback passed.** Prior Home54 content, brand/ownership/candidate
+metadata and exact routing bytes were restored, independently checked, then
+Home70 was recovered with the same203ID/slug.11WordPress revisions retained.
+First attempt refused before writes because wp-config overwrote the generic
+PHP variable case; the helper now uses a distinct sourceAwareCase variable.
+The identity safeguard was preserved. Final Python native readback is unchanged
+38f0145dd7c03bdaef65286f7c1596fbfbd481087b9373a93e8384816af406ad;
+all earlier202posts remain exact6ad9ca038ebd73c9150eb1ed404a873c5435c53fb8c2e0c23dac7922192dc514.
+No protected WordPress or public output was modified.
+
+**Current cost/authority:**25generations/49requests,$5.652224 usage-estimated
+settled,0pending/uncertain in this fresh run,$2.347776 remaining under the
+same$8. Source-recovery increment$1.992646 is already included. Inclusive
+tracked-lineage maximum-accounted$17.533327 includes the prior$11.881103
+baseline and its uncertainty; it is not total Codex credit use or an invoice.
+No new paid media. Replans2/2 and editorial4/4 exhausted;7generation slots
+remain, but they do not replenish those limits. Same November22 15:58:31UTC expiry.
+
+**One actual diagnosis gate.** Automatic approval review rejected exporting even
+a filtered generated report finding for Codex inspection, saying explicit
+consent for that payload/destination was absent. No text was exported and it was
+not bypassed. Owner has now been asked to permit inspection of retained
+generated report57, Direction60, blueprint62 and critique66 through existing
+encrypted SSH in this Codex session, excluding their text from Git/replies.
+This request is diagnosis only, not new calls/spending/counter changes.
+
+**RECOVERY / RESUME HERE:**current70 is idle, zero pending. Do NOT dispatch,
+redo source recovery, pretend quality passed, replenish counters or rerun
+materialization/rollback filenames blindly. After explicit retained-reasoning
+inspection consent, trace exactly where the complete business was reduced
+between report/Direction/plan and Page; challenge the actual findings before
+another provider request. Any genuinely required resource amendment must be
+one informed bounded decision, not another blind Home rewrite. Preserve
+41/6/75, entire earlier site/work, all historical cases, ledgers and previews.
