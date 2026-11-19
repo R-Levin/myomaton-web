@@ -228,6 +228,7 @@ test("the normal metered concept critique requires actual scoped image inputs an
         const value = body as { instructions: string; input: { content: { type: string; text?: string }[] }[] };
         assert.match(value.instructions, /early Home-concept critique/);
         assert.match(value.instructions, /Challenge the underlying positioning/);
+        assert.match(value.instructions, /do not demand public publication rights before a permitted non-public preview/);
         const content = value.input[0].content;
         assert.equal(content.filter(row => row.type === "input_image").length, 2);
         const task = resolveSourceReferences(JSON.parse(content[0].text!).task, new Map([[source.id, original.toString()]])) as { reviewStage: unknown };
@@ -333,4 +334,22 @@ test("native capture preserves distinct Page metadata title and actual Hero H1 i
  assert.equal(intent.expectedPages[0].heading,"Fixture managed service");
  assert.equal(run.input.pages[0].heading,"Different Page metadata title");
  assert.equal(run.input.pages[0].sections[0].heading,"Fixture managed service");
+});
+
+test("an exact negative Home judgment permits a bounded Core-editorial correction without a third strategic replan or new feedback authority",async()=>{
+ const f=setup(),critiqued=(await f.workflow.critiqueHomeConcept(f.context,10,author))!;
+ await assert.rejects(f.workflow.requestEditorialRevision(f.context,critiqued.version,author,["/"]),{code:"workflow_not_ready"});
+ const judged=(await f.workflow.recordQualityReview(f.context,critiqued.version,reviewer,judgment(critiqued.conceptQuality!.target,true)))!;
+ const queued=(await f.workflow.requestEditorialRevision(f.context,judged.version,author,["/"]))!;
+ const state=f.snapshot() as unknown as {revisionRequest:{audit:unknown;priorPages:unknown;ordinal:number;source?:string};pages:unknown[]};
+ assert.equal(queued.next,"page");assert.equal(state.revisionRequest.ordinal,1);
+ assert.deepEqual(state.revisionRequest.audit,critiqued.conceptQuality!.critique!.editorial);
+ assert.deepEqual(state.revisionRequest.priorPages,f.initial.pages);
+ assert.equal(state.revisionRequest.source,undefined,"Core critique is not unapproved free-form Operator feedback");
+ assert.deepEqual(state.pages,[]);assert.equal(f.runs.length,1,"Queueing buys no additional generation");
+ await assert.rejects(f.workflow.requestEditorialRevision(f.context,judged.version,author,["/"]),{code:"draft_changed"});
+ assert.equal(f.events[0].pages.length,1,"Rejected prior content remains in immutable history");
+ const g=setup(),fresh=(await g.workflow.critiqueHomeConcept(g.context,10,author))!;
+ const passed=(await g.workflow.recordQualityReview(g.context,fresh.version,reviewer,judgment(fresh.conceptQuality!.target)))!;
+ await assert.rejects(g.workflow.requestEditorialRevision(g.context,passed.version,author,["/"]),{code:"workflow_not_ready"});
 });

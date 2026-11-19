@@ -555,11 +555,20 @@ export class PresenceWorkflow {
     const state = await this.current(context, version);
     if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture")) throw new IntakeError("unavailable", 403);
     const selected=evaluationPath===undefined?undefined:typeof evaluationPath==="string"?[evaluationPath]:[...evaluationPath];
-    if (!state.editorial || state.work || state.operatorReview ||
+    // Reuse the same bounded editorial revision path for an exact rejected
+    // source-aware Home concept. No free-form Operator feedback becomes evidence.
+    const authority = this.operations.marketingAuthority;
+    const target = conceptQualityTarget(context, state, authority, this.boundary === "disposable");
+    const last = state.qualityReviews?.at(-1);
+    const conceptAudit = authority?.projectionVersion === 2 && target && state.conceptEditorial?.target === target &&
+      last?.phase === "home-concept" && last.review.target === target && last.actor.id === authority.qualityReviewerId &&
+      !qualityPass(last.review, target) ? state.conceptEditorial.editorial : undefined;
+    const audit = state.editorial ?? conceptAudit;
+    if (!audit || state.work || state.operatorReview ||
         (selected !== undefined && (this.boundary !== "disposable" || !context.evaluation || !selected.length || new Set(selected).size!==selected.length ||
           selected.some(path=>!state.pages.some(page=>page.path===path))))) throw new IntakeError("workflow_not_ready", 409);
     const { assigned } = editorialProgress(state);
-    const concerns = [...state.editorial.concerns, ...assigned.flatMap(({ finding, decision }) =>
+    const concerns = [...audit.concerns, ...assigned.flatMap(({ finding, decision }) =>
       decision.pages.map(page => ({ path: page.path,
         concern: finding.commercialCriterion ? commercialRevisionGuidance[finding.commercialCriterion] : finding.concern })))].filter(
       concern => selected === undefined || selected.includes(concern.path));
@@ -569,7 +578,7 @@ export class PresenceWorkflow {
     if (ordinal > (this.operations.maxEditorialRevisions ?? 1)) throw new IntakeError("workflow_not_ready", 409);
     const at = new Date(this.clock()).toISOString();
     const batch = !this.operations.marketingAuthority && Boolean(state.evaluation) && state.mode === "provider" && paths.length > 1;
-    const revisionRequest = { paths, audit: { summary: state.editorial.summary, concerns }, priorPages: state.pages.filter(page => paths.includes(page.path)),
+    const revisionRequest = { paths, audit: { summary: audit.summary, concerns }, priorPages: state.pages.filter(page => paths.includes(page.path)),
       actor, at, ordinal, ...(this.operations.marketingAuthority && assigned.some(item => !item.finding.commercialCriterion) && { source: "operator-editorial" as const }),
       ...(batch && { batch: "pending" as const }) };
     const queued = assigned.filter(({ decision }) => selected === undefined || decision.pages.every(page => selected.includes(page.path)))

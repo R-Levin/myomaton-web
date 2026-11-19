@@ -1835,3 +1835,46 @@ reviewed stock placements and supporting pages; final whole-site review and
 revision remain required. Core41/protectedWordPress6/old75/4473/root4474 are
 unchanged. No new permission is required for ordinary corrections inside the
 already approved run; do not expand its data, destination, time or spending.
+
+## Early Home editorial continuation — November 19, 2026
+
+Second replan produced a five-page blueprint and Home36 on the same WordPress
+Page203. Actual native desktop/mobile captures and Core critique38 show stronger
+early customer-fit cues but an overlong Hero, repeated explanations and unfinished
+photo placements. Negative authenticated review39 is retained; no acceptance.
+
+The early quality path could replan but could not reuse ordinary editorial
+revision: that method required final whole-site editorial. It now accepts the
+exact current Core Home critique **only** for a disposable source-aware case
+with its exact negative authenticated reviewer judgment. Existing four-round
+limit, version/tenant/actor/evidence constraints remain; no third strategic
+replan, new free-form feedback permission or source promotion. A source-aware
+instruction also distinguishes authorized private photo review from unresolved
+public publication rights. Historical grant wording remains unchanged.
+
+Local TypeScript/lint and28 focused regressions passed. Test staging copies
+initially entered TypeScript's broad include glob; retaining them as non-source
+artifact copies resolved that harness issue without changing application types.
+The final exact code archive SHA256
+`de43e75bbe052cdb3ec82519198fc49375396d1f8e320bd4e63f66329d89e45a`
+passed **45 actual Linux tests/zero failures/skips**, worker
+`d5c77ed03175f1c8783824fb294cb7fc39ec52cd2faa3c5ba2825a97a70de1e1`,
+proof `11f3fdfff1f8ab62e0c06dd1b809e72fd57426808d2f404e1802ac0a1e64463d`.
+Old worker/proof/activation remain. No grant, expiry, counter, database policy,
+protected Core or WordPress deployment changed. Editorial correction40 is
+running under the owner's bounded ordinary-correction authorization.
+
+**Cost at critique38:**27requests/14generations, **$2.355632 usage estimate**;
+$5.644368 remains before future reservations. Inclusive tracked-lineage
+maximum-accounted$14.236735 preserves prior uncertainty. Owner time UNKNOWN;
+no additional infrastructure charge.
+
+**RECOVERY / RESUME HERE:** check the current source-aware case event and usage,
+then resume the controller's targeted Home revision from40 as appropriate.
+Preserve36/26/16, all captures/criticisms and old202 local posts. New Home still
+needs actual contextual media placement, exact capture and quality review.
+Generate its supporting pages only after a defensible concept judgment; final
+whole-site native review, editorial correction and rollback remain required.
+Do not claim that test success establishes commercial quality. Same $8 ceiling,
+32-generation/65-request maxima and November22 deadline; no protected writes,
+public publication or report export.
