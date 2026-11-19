@@ -1302,3 +1302,126 @@ genuine improvement in the Home → service explanation → distinct Review/Dire
 Start journey before expanding another whole site. No newly improved website
 or complete commercial capability is claimed here. Keep the broader Entry,
 portal, inquiries/measurement/reporting and Ongoing roadmap intact.
+
+## Fresh source-aware C0 activation and consolidated run proposal — November 19, 2026
+
+**Status: local engineering verified; fresh external/hosted run NOT authorized.**
+The owner offered login assistance. Existing Cloud SSH agent access works; no
+additional login is needed now. This does not grant the new data/spending scope.
+The exact [reviewable proposal](c0-source-aware-run-proposal.json) has SHA-256
+`f560374969b7abdff53fa33917c9b84f7053f5f9b092b0dccf9a505bcc8f9ddd`.
+Its public status remains `PROPOSED_NOT_AUTHORIZED`; future consent, activation
+time, artifact and verification receipts belong in protected activation custody.
+Do not edit an old grant or infer acceptance from successful tests.
+
+**Implemented in the existing engine.** A pure source-aware compiler and protected
+evaluation-worker adapter bind the exact proposal, original C0 source bytes,
+canonical growth-service coverage, new isolated case, current usage prefix and
+existing reviewer identity. The compiler preserves the prior context, ledger and
+pending report reservation. It retains ten owner answers as unconfirmed and
+separates facts, intended service, observations, historical references and
+processing instructions. The pasted ChatGPT assessment is excluded. No fresh
+case, reviewer token, grant, approval or provider call has been created.
+
+Three further causal defects are corrected locally:
+
+- Strategic replanning now carries the complete exact Core-generated concept
+  critique, rather than only broad criterion codes. That critique is fallible
+  advice, separate from customer facts and free-form reviewer input.
+- The source-aware request permits authorized customer-owned branding while
+  forbidding copied/closely paraphrased third-party expression, branding and
+  distinctive design. Historical request interpretation is unchanged.
+- A complete isolated site can render before whole-site editorial review.
+  The worker pauses for actual WordPress capture; exact-input critique resumes
+  through the existing metered operation. Missing required rendered evidence
+  refuses before work claim/count/dispatch. No invented editorial result,
+  customer approval or signed delivery authority is needed to inspect a
+  disposable draft. Protected delivery gates remain intact.
+
+**One financial envelope, attributed by stage.** The proposed run uses the same
+full `gpt-5.4-2026-03-05` snapshot, maximum **$8 additional** and **72 hours after
+verified activation**. Research, report, Direction, planning, Pages, revisions
+and criticism draw from one shared pool; stage usage remains measurable.
+The explicit new spending policy avoids arbitrary stage reallocations and does
+not change old grants' additive allocations. Both run and cumulative limits
+still refuse before dispatch. The plan permits at most 32 text generations,
+65 provider requests, eight paid search-tool calls, three deliberate technical
+retries, four editorial rounds and two strategic replans; zero automatic retries.
+These are the bounded evaluation's resources, not product Page/Section limits.
+
+Official model/pricing pages checked November 19 confirm $2.50/M input,
+$0.25/M cached input and $15/M output, plus $0.01/search call; planned per-request
+input is below the premium long-context threshold.
+[Model](https://developers.openai.com/api/docs/models/gpt-5.4),
+[pricing](https://developers.openai.com/api/docs/pricing).
+The illustrative basis is 1.6M uncached input +160k output +eight searches =
+**$6.48**, leaving $1.52 correction contingency. Actual use may differ; $8 is a
+hard ceiling, not a quality guarantee. Credit balance must be confirmed before
+paid dispatch. The owner may need to add API credit; do not request a key in chat.
+
+**Exact proposed destinations.** Reuse the existing 20i acceptance account,
+existing isolated loopback PostgreSQL service and local disposable WordPress.
+One new case database and a fresh review-only credential are proposed for the
+existing reviewer identity, only in that new database, expiring no later than
+the run. No old credential is rotated/extended. The sole human may act through
+separate permissions; delegated Codex quality inspection is not independent
+human governance or founder acceptance. Reuse only the two acquired photos via
+existing Asset/AssetUsage; no new stock search/download/image generation.
+
+The proposal expressly includes encrypted private worker/test transfer and
+Linux execution in a new off-webroot run directory. That addresses the prior
+automatic-review rejection instead of bypassing it. No Linux result is claimed
+yet. Protected source/model traffic remains in the listed custody/OpenAI
+destinations; local native rendering/capture uses encrypted transfer. Old
+WordPress Pages/root URLs stay intact; only new comparison draft IDs may enter
+the existing local allowlist. No new listener, public runtime, Supabase policy,
+protected Core build, miopages.org change, hostname or publication is included.
+
+**Verification and remaining gates.** The final 40-test focused group passes
+with zero skips, covering exact proposal/source binding, immutable usage carry,
+wrong tenant/source/reviewer/expiry/artifact refusals, retained replan advice,
+request interpretation, native rendering readiness and historical commercial
+metering/recovery. A mocked paid transport proves two same-stage operations can
+use the shared pool and the next is refused before even its count request.
+The two disposable PostgreSQL integration tests also passed during this
+development cycle: durable concept/review/replan history and the existing C0/C2
+cycle. These are offline/provider-shaped fixtures, not actual AI quality.
+Full TypeScript, focused ESLint, proposal-only validation, worker bundle and
+local Node syntax pass. Worker SHA-256:
+`f52c77e5e769ae2354c5e1fa59b07b2f6084e80fa2565b565b56eefd1752153c`.
+The new Linux adapter, fresh reviewer enrollment and paid generation remain
+unexecuted; actual Linux/custody/role/native-media/rollback and input-coverage
+checks must pass before provider dispatch.
+
+At 14:44:16 UTC, read-only Cloud inspection confirmed the retained ledger
+(85 historical attempts) and grant hashes still match the proposal. No protected
+credential values or source text were printed. Prior ledger SHA:
+`16e829c75e9fd4da21dcbe8c45bf6534230076649a8f25f6b50f57e9d7fe5fe1`.
+No hosted mutation, service restart or WordPress edit occurred. This is not a
+fresh independent verification of every protected production record.
+
+**Cost checkpoint.** This continuation: zero owner-provider requests/generations
+and $0 additional provider spending. Prior new-run usage estimate $8.776797 /
+conservative debit $9.069494; tracked-lineage maximum-accounted $11.881103,
+including retained uncertainty, unchanged. Proposed cumulative ceiling is
+$19.881103 after the new $8 authorization. These are accounting estimates,
+not an invoice or all-project/Codex cost. Owner/compute hours remain UNKNOWN.
+Old rounds remain consumed, with their original expiry unchanged.
+
+**RECOVERY / RESUME HERE:** request one exact owner authorization for the linked
+manifest and confirm API credit readiness. After approval, Codex should verify
+the owner record, transfer/check the reviewed private artifact, pass actual
+Linux offline/sandbox/custody checks, then bind a fresh private activation and
+the new isolated case/reviewer without altering old records. Recheck source and
+ledger hashes, original revision75, rates/model/access, intended authoring inputs,
+media and native rollback before any paid call. Use the shared Core workflow for
+research → report → Direction → blueprint → Home; materialize and capture actual
+WordPress desktop/mobile, then critique and use the existing role-scoped quality
+decision/replan before expansion. Render the complete Page set before final
+editorial, capture again, correct substantive weaknesses and conduct full
+commercial/visual inspection before founder review. Retain responses and recover
+deterministic validation failures before considering a paid retry. Stop on
+security, authority, uncertain duplicate spend or exhausted resources. Do not
+substitute manually authored marketing material or an offline fixture for the
+Core-generated result. Preserve the complete Entry, portals/My Business,
+inquiry, measurement/reporting and Ongoing roadmap alongside this correction.

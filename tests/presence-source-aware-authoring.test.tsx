@@ -106,6 +106,9 @@ for (const includeOriginals of [false,true]) test("actual metered request carrie
    assert.ok(knowledge.includes(ongoing)&&knowledge.includes(launch));
    assert.ok(!knowledge.includes(internal)&&!knowledge.includes(processing));
    assert.ok(request.instructions.includes(processing));
+   assert.match(request.instructions,/permitted customer-owned brand assets/);
+   assert.match(request.instructions,/third-party expression/);
+   if(Array.isArray(request.input))assert.match(JSON.parse(request.input[0].content[0].text!).interpretation,/permitted customer-owned brand assets/);
    const encoded=JSON.stringify(request.text.format.schema);
    assert.ok(encoded.includes("complete-approved-brief"));
    assert.ok(!encoded.includes('"unconfirmed"'));
@@ -135,4 +138,17 @@ test("whole canonical records retain exact provenance without a new manual passa
  assert.equal(complete.sources[2].use,"analysis");
  const changed=structuredClone(cleanEvidence);changed[1].content="Changed after binding";
  assert.throws(()=>marketingProjection({...makeRun(),context:{...context,evidence:cleanEvidence},input:{...makeRun().input,evidence:changed}},complete),/source changed/);
+});
+
+test("strategic replanning retains the specific Core-generated concept critique as fallible advice, not new business facts", () => {
+ const run=makeRun();
+ run.work.operation="direction";
+ const critique={target:fingerprint("exact reviewed concept"),inputDigest:fingerprint("exact reviewed input"),
+  editorial:{summary:"The concept reduces a continuing growth service to maintenance.",concerns:[{path:"/",concern:"Explain supported content work and useful conversion as continuing value."}]}};
+ run.input.replan={ordinal:1,concerns:["offer-and-value"],conceptCritique:critique};
+ run.work.inputDigest=fingerprint(run.input);
+ const projected=marketingProjection(run,authority) as {priorCoreConceptCritique:unknown;businessKnowledge:unknown};
+ assert.deepEqual(projected.priorCoreConceptCritique,critique);
+ assert.ok(!JSON.stringify(projected.businessKnowledge).includes(critique.editorial.summary));
+ assert.deepEqual((run.input.replan as {conceptCritique:unknown}).conceptCritique,critique);
 });

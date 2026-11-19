@@ -32,8 +32,9 @@ export function workflowEvaluationPreviewInput(context: WorkflowContext, view: P
 /** Disposable render input for editorial inspection. No signed projection or review event is issued. */
 export function workflowLocalDraftInput(context: WorkflowContext, view: PresenceWorkflowView) {
   const blueprint = view.blueprint;
-  if (!context.evaluation || view.contextDigest !== fingerprint(context) || !blueprint || !view.editorial || view.failure ||
-      !["editorial-review", "operator-review", "review-complete"].includes(view.next) ||
+  const beforeCritique = view.canRenderForEditorial === true && view.next === "editorial";
+  if (!context.evaluation || view.contextDigest !== fingerprint(context) || !blueprint || (!view.editorial && !beforeCritique) || view.failure ||
+      (!beforeCritique && !["editorial-review", "operator-review", "review-complete"].includes(view.next)) ||
       view.pages.length !== blueprint.pages.length || blueprint.pages.some(entry => !view.pages.some(page => page.path === entry.path)) ||
       view.visuals?.some(visual => ["queued", "running", "unverified"].includes(visual.state))) {
     throw Error("Complete isolated editorial draft required");

@@ -64,7 +64,8 @@ type State = {
   editorialFindings?: EditorialFinding[];
   editorialDecisions?: EditorialDecision[];
   revisionRequest?: RevisionRequest | null;
-  replan?: { ordinal: number; concerns: QualityReview["findings"][number]["criterion"][] };
+  replan?: { ordinal: number; concerns: QualityReview["findings"][number]["criterion"][];
+    conceptCritique?: { target: string; inputDigest: string; editorial: WorkflowEditorial } };
   operatorReview: Decision | null;
   qualityReviews?: { actor: Actor; at: string; review: QualityReview; phase?: "home-concept" }[];
   conceptEditorial?: { target: string; inputDigest: string; editorial: WorkflowEditorial } | null;
@@ -250,6 +251,8 @@ export class PresenceWorkflow {
       state.marketingAuthorityDigest === (authority && fingerprint(authority));
     const editorial = editorialProgress(state);
     const concept = current && state.evaluation && !state.homeReview ? homeConceptDigest(context, state) : undefined;
+    const canRenderForEditorial = current && this.boundary === "disposable" && Boolean(authority?.earlyConceptReview) &&
+      !state.work && !state.failure && nextTask(state)?.operation === "editorial";
     const canQueueEditorialRevision = current && Boolean(state.editorial) && !state.work && !state.operatorReview &&
       (state.revisionRequest?.ordinal ?? 0) < (this.operations.maxEditorialRevisions ?? 1) &&
       Boolean(state.editorial?.concerns.length || editorial.assigned.length);
@@ -285,6 +288,7 @@ export class PresenceWorkflow {
       ...(concept && { homeConcept: { digest: concept } }), ...(state.homeReview && { homeReview: state.homeReview }),
       ...(operatorReview && { candidateReviewTarget: candidateReviewTarget(state) }),
       ...(deliveryQuality && { deliveryQuality }), ...(conceptQuality && { conceptQuality }),
+      ...(canRenderForEditorial && { canRenderForEditorial: true as const }),
       ...(current && authority && { brandDigest: authority.brandDigest }),
       ...((state.marketingAuthorityDigest && !authority) && { deliveryQuality: { target: null, passed: false, history: state.qualityReviews ?? [] } }),
       failure, ...(failure === "output-invalid" && state.artifactIssue && { artifactIssue: state.artifactIssue }),
@@ -335,6 +339,19 @@ export class PresenceWorkflow {
     return { context, input: runInput(context, state, task.reviewStage),
       work: { ...task, attempt: "preparation-only", until: 0,
         inputDigest: fingerprint(runInput(context, state, task.reviewStage)) } };
+  }
+
+  async editorialCritiqueInput(context: WorkflowContext, version: number, actor: Actor): Promise<WorkflowRun> {
+    const state = await this.current(context, version);
+    this.visualActor(actor, state);
+    if (!this.view(context, state)?.canRenderForEditorial) throw new IntakeError("workflow_not_ready", 409);
+    const input = runInput(context, state);
+    return { context, input, work: { operation: "editorial", attempt: "preparation-only", until: 0, inputDigest: fingerprint(input) } };
+  }
+
+  async critiqueSite(context: WorkflowContext, version: number, actor: Actor) {
+    await this.editorialCritiqueInput(context, version, actor);
+    return this.advance(context, version);
   }
 
   async critiqueHomeConcept(context: WorkflowContext, version: number, actor: Actor) {
@@ -799,8 +816,9 @@ export class PresenceWorkflow {
       throw new IntakeError("workflow_not_ready", 409);
     }
     // Prior pages, findings and visuals remain in the append-only event history.
-    // Only closed criterion codes cross the provider boundary on this replan.
-    return this.view(context, await this.store.append(context, version, { ...state, replan: { ordinal, concerns },
+    // Carry the exact Core-generated critique, never free-form reviewer input.
+    // Source status and independent review remain distinct.
+    return this.view(context, await this.store.append(context, version, { ...state, replan: { ordinal, concerns, ...(early && state.conceptEditorial && { conceptCritique: state.conceptEditorial }) },
       direction: null, blueprint: null, pages: [], editorial: null, editorialFindings: [], editorialDecisions: [],
       revisionRequest: null, homeReview: null, visuals: [], ...(state.conceptEditorial && { conceptEditorial: null }) }));
   }

@@ -66,7 +66,9 @@ test("real disposable PostgreSQL retains early critique, separated review, repla
     assert.ok(events.rows.every(row => fingerprint(row.payload) === row.digest));
     assert.ok(events.rows.some(row => row.payload.pages?.length === 1 && row.payload.pages[0].path === "/"));
     assert.ok(events.rows.some(row => row.payload.conceptEditorial?.inputDigest === prepared.work.inputDigest));
-    assert.deepEqual(events.rows.at(-1)!.payload.replan, { ordinal: 1, concerns: ["offer-and-value"] });
+    assert.equal(events.rows.at(-1)!.payload.replan.ordinal, 1);
+    assert.deepEqual(events.rows.at(-1)!.payload.replan.concerns, ["offer-and-value"]);
+    assert.deepEqual(events.rows.at(-1)!.payload.replan.conceptCritique, critiqued.conceptQuality!.critique);
     const outputs = await setup.pool.query("SELECT count(*)::int AS n FROM presence_workflow_outputs WHERE intake_id=$1", [context.intakeId]);
     assert.ok(outputs.rows[0].n > 0);
     await assert.rejects(open().requestCommercialReplan(context, replanned.version, operator), { code: "workflow_not_ready" });

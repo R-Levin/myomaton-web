@@ -302,6 +302,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
 export async function workPresenceCase(workflow: PresenceWorkflow, current: Awaited<ReturnType<ReturnType<typeof composePresenceCase>["context"]>>) {
   let previous = await workflow.review(current);
   while (previous) {
+    if (previous.canRenderForEditorial) return previous;
     if (previous.recoverable && !previous.failure) {
       previous = await workflow.recover(current, previous.version);
     } else if (!previous.failure && ["research", "report", "direction", "blueprint", "page", "editorial"].includes(previous.next)) {

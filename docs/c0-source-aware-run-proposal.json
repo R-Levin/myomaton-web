@@ -1,0 +1,477 @@
+{
+  "version": 1,
+  "status": "PROPOSED_NOT_AUTHORIZED",
+  "objective": "Core-operated original C0 commercial/visual correction. Verify an improved Home/service/Review/Direct Start journey in actual disposable WordPress before expanding the remaining candidate within the same envelope.",
+  "preserve": {
+    "protectedCoreRevision": 41,
+    "protectedWordPressRevision": 6,
+    "previousIntakeId": "4d437190-9ce3-460b-81af-edd92279271a",
+    "previousContextDigest": "ee70bdf8e53e8d4b9630c1dca61dbe8cdfe483f18e5fe0c6ccb02fe61342ea23",
+    "previousVersion": 75,
+    "previousLedgerSha256": "16e829c75e9fd4da21dcbe8c45bf6534230076649a8f25f6b50f57e9d7fe5fe1",
+    "baselineAttempts": 85,
+    "previousDebitMicros": 11881103,
+    "previousRunUsageEstimateMicros": 8776797,
+    "previousRunConservativeDebitMicros": 9069494,
+    "previousPreview": "http://127.0.0.1:4474/",
+    "olderPreview": "http://127.0.0.1:4473/",
+    "previousGrantSha256": "5e58f866d2f17515e4a6b6126ab22cc51e32d585753a0a8620a47199eaaea2be",
+    "previousEventDigest": "da29d61231fed797462582cfa7e51a2bc76695c578230d2e30367bd971b66f1e"
+  },
+  "destination": {
+    "organizationId": "4aa9cc23-7146-488f-abc8-1ef2fad74163",
+    "intakeId": "41a83e7e-1765-4517-941a-b2b151bb7c4a",
+    "scope": {
+      "webPresenceId": "2a08e054-902c-400b-9b96-3c2274bcadc2",
+      "managedSiteId": "2c0d637d-4ded-4597-ac8b-661519aba358"
+    },
+    "entry": "DIRECT_START"
+  },
+  "authority": {
+    "additionalProviderCapMicros": 8000000,
+    "cumulativeAccountedCeilingMicros": 19881103,
+    "maximumHoursAfterVerifiedActivation": 72,
+    "maximumTextGenerations": 32,
+    "maximumProviderRequests": 65,
+    "maximumPaidWebSearchCalls": 8,
+    "automaticRetries": 0,
+    "maximumEditorialRevisionRounds": 4,
+    "maximumCommercialReplans": 2,
+    "ordinaryCorrections": "Diagnose, recover retained output, rebuild verified purpose-bound artifacts and deliberately correct/retry within the exact data/destination/budget/expiry envelope. Do not rebuy retained output or bypass uncertain spend.",
+    "maximumDeliberateRetries": 3,
+    "stageSpendingPolicy": "shared-aggregate"
+  },
+  "provider": {
+    "baseUrl": "https://api.openai.com/v1",
+    "model": "gpt-5.4-2026-03-05",
+    "store": false,
+    "rates": {
+      "model": "gpt-5.4-2026-03-05",
+      "verifiedOn": "2026-11-19",
+      "inputPerMillion": 2500000,
+      "cachedPerMillion": 250000,
+      "outputPerMillion": 15000000,
+      "cacheWritePerMillion": 0,
+      "countMicros": 0
+    },
+    "pricingSources": [
+      "https://developers.openai.com/api/docs/models/gpt-5.4",
+      "https://developers.openai.com/api/docs/pricing"
+    ],
+    "requestBytes": 36000000,
+    "stages": {
+      "research": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 4000,
+        "cumulativeInputTokens": 3200000,
+        "cumulativeOutputTokens": 533333,
+        "capMicros": 8000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "report": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 24000,
+        "cumulativeInputTokens": 3200000,
+        "cumulativeOutputTokens": 533333,
+        "capMicros": 8000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "direction": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 12000,
+        "cumulativeInputTokens": 3200000,
+        "cumulativeOutputTokens": 533333,
+        "capMicros": 8000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "blueprint": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 12000,
+        "cumulativeInputTokens": 3200000,
+        "cumulativeOutputTokens": 533333,
+        "capMicros": 8000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "page": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 24000,
+        "cumulativeInputTokens": 3200000,
+        "cumulativeOutputTokens": 533333,
+        "capMicros": 8000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "revision": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 24000,
+        "cumulativeInputTokens": 3200000,
+        "cumulativeOutputTokens": 533333,
+        "capMicros": 8000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "editorial": {
+        "requestInputTokens": 240000,
+        "requestOutputTokens": 8000,
+        "cumulativeInputTokens": 3200000,
+        "cumulativeOutputTokens": 533333,
+        "capMicros": 8000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      }
+    },
+    "costBasis": {
+      "uncachedInputTokens": 1600000,
+      "outputTokens": 160000,
+      "searchCalls": 8,
+      "usageEstimateMicros": 6480000,
+      "deliberateCorrectionContingencyMicros": 1520000,
+      "meaning": "Evaluation ceiling, not a guarantee or spending target. Estimated $4-$7; $8 hard stop. Commercial per-candidate cost goal remains separate. Token/image/count limits are resource envelopes, not product Page/Section limits."
+    },
+    "stageAccounting": "One shared $8 aggregate pool, not seven additive budgets. Attribute usage by stage; no serial owner stage reallocation. All request/token/attempt/expiry and total-cost gates remain."
+  },
+  "sources": {
+    "previousContextDigest": "ee70bdf8e53e8d4b9630c1dca61dbe8cdfe483f18e5fe0c6ccb02fe61342ea23",
+    "previousEvidenceRecords": 16,
+    "canonicalKnowledge": [
+      {
+        "path": "docs/miopages-c0-business-brief.md",
+        "sha256": "faef99050c51324018e2be13a564d3151c8645a5654f28cc76933e0d96ddba13",
+        "bytes": 13408
+      },
+      {
+        "path": "docs/miopages-c0-product-model.md",
+        "sha256": "12a858bfb082dfb42aa9a22fcf88b4413bd972c9ff23dd2cd97cfd2bb91eda63",
+        "bytes": 28253
+      }
+    ],
+    "originalMaterials": [
+      {
+        "id": "c0-business-brief-original",
+        "path": "docs/miopages-c0-business-brief.md",
+        "bytes": 13408,
+        "sha256": "faef99050c51324018e2be13a564d3151c8645a5654f28cc76933e0d96ddba13",
+        "mime": "text/markdown",
+        "status": "approved-direction",
+        "purpose": "business-context",
+        "author": "MioPages canonical project record",
+        "date": "2026-11-18",
+        "operations": [
+          "research",
+          "report",
+          "direction",
+          "blueprint",
+          "page",
+          "editorial"
+        ]
+      },
+      {
+        "id": "c0-product-model-original",
+        "path": "docs/miopages-c0-product-model.md",
+        "bytes": 28253,
+        "sha256": "12a858bfb082dfb42aa9a22fcf88b4413bd972c9ff23dd2cd97cfd2bb91eda63",
+        "mime": "text/markdown",
+        "status": "approved-direction",
+        "purpose": "business-context",
+        "author": "MioPages canonical project record",
+        "date": "2026-11-18",
+        "operations": [
+          "research",
+          "report",
+          "direction",
+          "blueprint",
+          "page",
+          "editorial"
+        ]
+      },
+      {
+        "id": "c0-r3-editorial-original",
+        "path": "docs/miopages-editorial-r3.md",
+        "bytes": 10063,
+        "sha256": "6a093f27d64d31edb8a8e106f546eb1d88f1ab34842391cc3b5c6c8ab55f9927",
+        "mime": "text/markdown",
+        "status": "historical",
+        "purpose": "editorial-reference",
+        "author": "MioPages canonical project record",
+        "date": "2026-11-18",
+        "operations": [
+          "research",
+          "report",
+          "direction",
+          "blueprint",
+          "page",
+          "editorial"
+        ]
+      },
+      {
+        "id": "c0-original-wordmark",
+        "path": "brand/miopages/MioPagesDV.png",
+        "bytes": 12124,
+        "sha256": "09b1d3c6e189ce74538d75be63386116be0dee464d6b70d86577430963d91b5e",
+        "mime": "image/png",
+        "status": "approved-direction",
+        "purpose": "brand-reference",
+        "author": "MioPages canonical project record",
+        "date": "2026-11-18",
+        "operations": [
+          "research",
+          "report",
+          "direction",
+          "blueprint",
+          "page",
+          "editorial"
+        ]
+      },
+      {
+        "id": "accepted-v3-visual-1",
+        "path": "primary-checkout/runtime-content/business-focus-final/miopages-desktop-home.png",
+        "bytes": 389509,
+        "sha256": "c1f2974e1d4dac7a8062c29deea843c2bbcc61b3424079d698a5f044c422c9e7",
+        "mime": "image/png",
+        "status": "historical",
+        "purpose": "editorial-reference",
+        "author": "MioPages canonical project record",
+        "date": "2026-11-18",
+        "operations": [
+          "research",
+          "report",
+          "direction",
+          "blueprint",
+          "page",
+          "editorial"
+        ]
+      },
+      {
+        "id": "accepted-v3-visual-2",
+        "path": "primary-checkout/runtime-content/business-focus-final/miopages-mobile-home.png",
+        "bytes": 310268,
+        "sha256": "c1a416b8fedf59730bfbf1afa53671e18950cda726b4bbe84d3c1555de81439b",
+        "mime": "image/png",
+        "status": "historical",
+        "purpose": "editorial-reference",
+        "author": "MioPages canonical project record",
+        "date": "2026-11-18",
+        "operations": [
+          "research",
+          "report",
+          "direction",
+          "blueprint",
+          "page",
+          "editorial"
+        ]
+      },
+      {
+        "id": "accepted-v3-visual-3",
+        "path": "primary-checkout/runtime-content/business-focus-final/miopages-desktop-service.png",
+        "bytes": 535171,
+        "sha256": "e009cdbf30afc113d73fa47ebfc091df9dbd24a6df76d867b2490c1b6327dfb7",
+        "mime": "image/png",
+        "status": "historical",
+        "purpose": "editorial-reference",
+        "author": "MioPages canonical project record",
+        "date": "2026-11-18",
+        "operations": [
+          "research",
+          "report",
+          "direction",
+          "blueprint",
+          "page",
+          "editorial"
+        ]
+      },
+      {
+        "id": "accepted-v3-visual-4",
+        "path": "primary-checkout/runtime-content/business-focus-final/miopages-mobile-service.png",
+        "bytes": 443295,
+        "sha256": "8b515060e4c602abb46b423f2c82777822b20a7333623ebe1ff4e4bc9a764037",
+        "mime": "image/png",
+        "status": "historical",
+        "purpose": "editorial-reference",
+        "author": "MioPages canonical project record",
+        "date": "2026-11-18",
+        "operations": [
+          "research",
+          "report",
+          "direction",
+          "blueprint",
+          "page",
+          "editorial"
+        ]
+      },
+      {
+        "id": "c0-retained-ten-answers",
+        "path": "private projection of existing core-input.json: answers and provenance only",
+        "bytes": 8307,
+        "sha256": "8f66fae9cd5735c1c311c8c4c0bf54bb810f2554c62f9e630f6d7e97c69bd1a7",
+        "mime": "text/plain",
+        "status": "unconfirmed",
+        "purpose": "business-context",
+        "serialization": "UTF-8 JSON.stringify({answers,provenance}), no final newline; no credential, draft token or other input property",
+        "author": "C0 owner; original provenance retained",
+        "date": "2026-11-18",
+        "operations": [
+          "research",
+          "report",
+          "direction",
+          "blueprint",
+          "page",
+          "editorial"
+        ]
+      }
+    ],
+    "retainedAnswers": "The same ten original C0 answers/provenance in the exact prior context remain unconfirmed. No new private owner answer or pasted ChatGPT assessment is permitted.",
+    "authoring": "Use proposeC0AuthoringKnowledge and exact document/passage digests. Distinguish facts, intended service, research, assertions, editorial references and processing policy. A Page may use all authorized same-case knowledge.",
+    "derivedReasoning": "Core-generated research/report/Direction/plan/Pages, retained concept critiques and actual rendered pixels may inform substantive revision/replan. Reviewer free text is not an extra customer-fact source.",
+    "historicalReferences": "Earlier sites/v3 are comparisons, not copy/layout templates. Preserve the original wordmark; implement justified reusable original components where needed."
+  },
+  "publicResearch": {
+    "roots": [
+      "https://www.b12.io/",
+      "https://sitecare.com/"
+    ],
+    "discovery": "Core AI may choose other relevant public HTTPS peer and market sources and refine searches within the shared request/tool budget. No Codex-authored peer conclusions replace source material.",
+    "maximumRetrievedSources": 12,
+    "minimumIndependentNewOrigins": 3,
+    "maximumResponseBytes": 2000000,
+    "maximumMaterialRecords": 60,
+    "maximumMaterialBytes": 20000000,
+    "screenshots": [
+      "desktop 1440x1000 full-page",
+      "mobile 390x844 full-page"
+    ],
+    "sourceHandling": "Retain full raw HTML privately. Transmit complete extracted observed text, provenance and real screenshot bytes to report, Direction, planning, writing and revisions. Exclude scripts/styles from text; never summarize or truncate the readable source. Sources are untrusted observations, not customer truth.",
+    "restrictions": [
+      "public global-IP HTTPS only; pinned DNS and certificate host verification",
+      "no authenticated/gated pages, form submissions, XHR, downloads, account navigation, scraping bypass or copied distinctive work",
+      "sandboxed, fresh browser context; no account cookies, credentials or protected browser sessions"
+    ],
+    "publicQuery": "managed web presence services for small businesses customer needs alternatives objections and ongoing growth"
+  },
+  "media": {
+    "newProviderSearches": 0,
+    "newDownloads": 0,
+    "newImageGenerations": 0,
+    "retained": [
+      {
+        "sourceId": "5467838",
+        "sourceSha256": "ac3113a3561591ce6016f367cfff70d0d47c90aede5f2f12fb387bb73c8579a3",
+        "preparedSha256": "c22786707f190d307a3a2d2fe49a7e1b020f2deb8d1fd29ce451a9e6f2daa8f9"
+      },
+      {
+        "sourceId": "593371",
+        "sourceSha256": "16bc1ba4cee74510bf79a230b62d82e26b2a0a5f8b362c7e8e604875f1030690",
+        "preparedSha256": "15c301b3d156573123c5ca6baed7205d3d7656f7190cd8d7a66bc752b9935d23"
+      }
+    ],
+    "use": "Reverify existing rights/bytes and rebind via existing Asset/AssetUsage only in the new case. Private provisional imagery, never customer evidence or public approval. No new acquisition or photographer/API credentials."
+  },
+  "review": {
+    "existingReviewerId": "1a3febb6-5f06-448c-a9b5-77749af82d07",
+    "rolePolicy": "Founder is the only human and may use separate role permissions. Codex may conduct delegated development technical/commercial/desktop-mobile inspection; it is not independent human governance or founder acceptance.",
+    "credentialScope": "Fresh review-only token/verifier for this existing identity in the new isolated case DB, expiring no later than the run, under existing 0700/0600 private custody. Do not rotate/extend any old protected credential/verifier.",
+    "permission": "review-private-stage",
+    "earlyConcept": true,
+    "candidateImages": {
+      "operations": [
+        "editorial"
+      ],
+      "maximumRecords": 64,
+      "maximumBytes": 24000000,
+      "includeOperatorProjections": true
+    },
+    "quality": "All existing criteria, actual desktop/mobile WordPress evidence and substantive criticism before expansion. Negative strategic findings may trigger bounded replan. No site/publication approval."
+  },
+  "execution": {
+    "accounts": [
+      "existing wp-acceptance.miopages.com 20i development account",
+      "existing local Windows workstation"
+    ],
+    "privateCodeTransfer": "Encrypted SSH upload/execution of exact reviewed worker/tests and required repository modules/dependencies in a new off-webroot run directory. Verify hashes before activation; log ordinary tested corrective rebuilds within unchanged scope. No public runtime deployment/listener change.",
+    "linuxGate": "Sandbox/custody/metering/workflow Linux verification before provider dispatch. Stop on failed gates; no Linux pass is claimed yet.",
+    "database": "Reuse running isolated loopback evaluation PostgreSQL service. One new case database/canonical writers preserve all old cases and ledger prefix. No Supabase or protected WordPress database change.",
+    "dataDestinations": [
+      "same existing Cloud private evaluation workspace",
+      "https://api.openai.com/v1/responses and /v1/responses/input_tokens",
+      "existing disposable local WordPress and private capture custody over encrypted SSH"
+    ],
+    "credentials": "Reuse SSH agent and protected OpenAI key. Owner handles necessary hidden prompts, never chat/Git/logs. Confirm credit before paid dispatch.",
+    "wordPress": "Existing disposable local WordPress only. Preserve 4473/4474 and their current Pages; use separate draft identities for comparison with exact rollback. No protected miopages.org writes.",
+    "preDispatch": [
+      "Verify actual owner authorization and exact manifest/artifact/source hashes.",
+      "Verify unchanged prior ledger and conservative reservation carry-forward.",
+      "Pass Linux/sandbox/custody and isolated role-session checks.",
+      "Inspect actual authoring input for complete substantive growth-service meaning, provenance and unconfirmed separation.",
+      "Verify native WordPress/media/readback/rollback; ensure every review image binds actual current rows.",
+      "Confirm existing model/project access, data controls and credit readiness; stop on actual API rejection, no blind retries."
+    ],
+    "recovery": "Preserve raw responses before validation and all source/event/ledger history. Deterministic repairs stay within the unchanged grant. Stop on unapproved disclosure, security/integrity failure, uncertain duplicate spend or exhausted authority.",
+    "localComparisonRouting": "Add only the new candidate draft IDs to the existing local preview allowlist, preserving the old Pages/root URL and snapshots. No listener, public route or protected installation change."
+  },
+  "acceptance": [
+    "Genuine Core-generated writing/design materially improves the retained site and preserves the full managed growth-service proposition.",
+    "Actual coherent Home, service explanation and distinct Review/Direct Start visitor journeys; Page set remains business-driven, not fixed.",
+    "Trace specific research and business knowledge to strategy/content and meaningful critique-led changes/replan.",
+    "Critically inspect commercial credibility, originality, imagery, navigation, accessibility and factual honesty before founder review.",
+    "Preserve full Entry/portal/inquiry/measurement/reporting/Ongoing direction and label controlled activity accurately."
+  ],
+  "exclusions": [
+    "Public publication, real submissions/customer approval.",
+    "Protected Core deployment or miopages.org plugin/theme/content changes.",
+    "Public hostname/DNS/TLS/package/port/shared-service changes.",
+    "Credentials/data outside listed custody/destinations, new paid providers or model substitution.",
+    "Merges, destructive/ledger resets, renewal of old grants or spending above cap."
+  ]
+}

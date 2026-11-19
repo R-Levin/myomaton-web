@@ -110,7 +110,9 @@ test("an exact early critique can trigger strategic replan before any supporting
   assert.deepEqual(replanned.report, f.initial.report);
   assert.deepEqual(f.snapshot().confirmation, f.initial.confirmation);
   assert.deepEqual(f.events[0].pages, f.initial.pages, "Original Home survives in immutable event history");
-  assert.equal((f.snapshot() as unknown as { replan: { ordinal: number } }).replan.ordinal, 1);
+  const retainedReplan = (f.snapshot() as unknown as { replan: { ordinal: number; conceptCritique: unknown } }).replan;
+  assert.equal(retainedReplan.ordinal, 1);
+  assert.deepEqual(retainedReplan.conceptCritique, critiqued.conceptQuality!.critique, "Retain the specific generated reasoning, not just broad criterion codes");
   assert.equal(f.runs.length, 1, "Replan records an exact queue change; it does not dispatch a model");
   await assert.rejects(f.workflow.requestCommercialReplan(f.context, replanned.version, author), { code: "workflow_not_ready" });
 });
@@ -235,9 +237,12 @@ test("the normal metered concept critique requires actual scoped image inputs an
           output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(output) }] }] };
         return { body: response, rawBody: Buffer.from(JSON.stringify(response)) };
       } } });
+    await assert.rejects(provider.preflight!(run), /Required rendered review/);
+    assert.equal(calls, 0, "Missing visual evidence refuses in preflight before any work claim or request");
     await assert.rejects(provider.run(run, async () => {}), /Required rendered review/);
     assert.equal(calls, 0, "A missing rendered candidate stops before provider counting or dispatch");
     available = true;
+    await provider.preflight!(run);
     assert.deepEqual(await provider.run(run, async bytes => { retained = bytes; }), output);
     assert.ok(retained);
     assert.deepEqual(await provider.recover(run, retained), output);
@@ -262,4 +267,38 @@ test("the trusted capture adapter refuses non-loopback, stale, foreign or widene
     { ...binding, pages: [...binding.pages, { path: "/service", wordpressPageId: 2 }] },
     { ...binding, variant: "operator-proposed-preview" as const },
   ]) assert.throws(() => validateRenderedCandidateBinding(run, grant, changed));
+});
+
+test("whole-site rendering precedes critique without requiring a fabricated editorial or weakening signed delivery", async () => {
+  const { workflowLocalDraftInput, workflowDeliveryInput } = await import("../lib/platform/intake/presence-workflow-delivery");
+  const { workPresenceCase } = await import("../lib/platform/intake/protected-presence-workflow");
+  const f = setup();
+  const critiqued = (await f.workflow.critiqueHomeConcept(f.context, 10, author))!;
+  const passed = (await f.workflow.recordQualityReview(f.context, critiqued.version, reviewer, judgment(critiqued.conceptQuality!.target)))!;
+  await f.workflow.reviewHomeConcept(f.context, passed.version, author, composeHomeConcept(f.context, passed).digest, "Offline Home render", true);
+  f.mutate(state => {
+    const home = state.pages[0];
+    for (const page of state.blueprint.pages.filter(page => page.path !== "/")) {
+      state.pages.push({ ...structuredClone(home), path: page.path, heading: "Supporting fixture Page",
+        actions: [{ label: "Home", kind: "navigate", destination: "/", sectionIndex: 0 }], internalLinks: ["/"] });
+    }
+  });
+  const ready = (await f.workflow.review(f.context))!;
+  assert.equal(ready.next, "editorial"); assert.equal(ready.editorial, null);
+  assert.equal(ready.canRenderForEditorial, true);
+  const calls = f.runs.length;
+  const paused = (await workPresenceCase(f.workflow, f.context))!;
+  assert.equal(paused.version, ready.version); assert.equal(f.runs.length, calls);
+  const projected = workflowLocalDraftInput(f.context, ready);
+  assert.equal(projected.pages.length, ready.pages.length);
+  assert.equal(projected.scope.webPresenceId, f.context.scope.webPresenceId);
+  assert.throws(() => workflowDeliveryInput(f.context, ready, null, []), /Independent product-quality/);
+  const run = await f.workflow.editorialCritiqueInput(f.context, ready.version, author);
+  assert.equal(run.input.pages.length, ready.pages.length);
+  assert.equal(run.work.operation, "editorial"); assert.equal(run.work.reviewStage, undefined);
+  const reviewed = (await f.workflow.critiqueSite(f.context, ready.version, author))!;
+  assert.ok(reviewed.editorial);
+  assert.equal(reviewed.canRenderForEditorial, undefined);
+  assert.equal(f.runs.length, calls + 1);
+  assert.equal(f.runs.at(-1)!.work.inputDigest, run.work.inputDigest);
 });

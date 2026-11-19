@@ -357,6 +357,7 @@ export type WorkflowStagePlan = Readonly<Record<WorkflowMeterStage, WorkflowStag
 
 export function validateWorkflowStagePlan(plan: WorkflowStagePlan, scope: WorkflowUsageScope, researchCalls = 0) {
   if (Object.keys(plan).length !== workflowMeterStages.length) throw Error("Exact workflow stage plan required");
+  if (scope.stageSpendingPolicy !== undefined && scope.stageSpendingPolicy !== "shared-aggregate") throw Error("Unknown stage spending policy");
   let capped = 0;
   for (const name of workflowMeterStages) {
     const stage = plan[name];
@@ -370,10 +371,10 @@ export function validateWorkflowStagePlan(plan: WorkflowStagePlan, scope: Workfl
     if ([input, output, cumulativeInputTokens, cumulativeOutputTokens, capMicros].some(n => !Number.isSafeInteger(n) || n < 1) ||
         input > cumulativeInputTokens || output > cumulativeOutputTokens || max > capMicros ||
         input > (stage.rates.model === "gpt-5.4-2026-03-05" ? 272_000 : 400_000) ||
-        output > 128_000) throw Error("Stage token or cost ceiling refused");
+        output > 128_000 || capMicros > scope.capMicros) throw Error("Stage token or cost ceiling refused");
     capped += capMicros;
   }
-  if (capped + (scope.breakdown?.images ?? 0) * imageEnvelopeMicros > scope.capMicros) {
+  if (scope.stageSpendingPolicy !== "shared-aggregate" && capped + (scope.breakdown?.images ?? 0) * imageEnvelopeMicros > scope.capMicros) {
     throw Error("Sum of stage ceilings exceeds workflow cap");
   }
 }
@@ -383,6 +384,7 @@ export type WorkflowUsageScope = {
   requests: number; generations: number; capMicros: number; inputTokens: number; inputBytes: number;
   breakdown?: { text: number; images: number; searchCalls: number };
   stages?: WorkflowStagePlan;
+  stageSpendingPolicy?: "shared-aggregate";
   carryForward?: { totalCapMicros: number; debitMicros: number; reportHold: ReportReservation };
 };
 
@@ -432,6 +434,16 @@ function recentWorkflow(ledger: Ledger, workflow: WorkflowUsageScope, ownerDiges
         carried.debitMicros + workflow.capMicros > carried.totalCapMicros) throw Error("Carried-forward workflow envelope refused");
   }
   return recent;
+}
+
+/** Validate an unchanged complete ledger prefix before a new authorized run.
+ * Reuses existing reservation/accounting rules; never creates/resets a ledger. */
+export function verifyWorkflowUsageBaseline(bytes: Buffer, scope: WorkflowUsageScope) {
+  const ledger = JSON.parse(bytes.toString("utf8")) as Ledger;
+  if (ledger.attempts?.length !== scope.baselineAttempts) throw Error("Complete prior usage baseline required");
+  if (recentWorkflow(ledger, scope, "").length) throw Error("Unexpected prior workflow suffix");
+  verifiedSpend(ledger, undefined, scope.carryForward?.reportHold);
+  return { attempts: ledger.attempts.length, debitMicros: scope.carryForward?.debitMicros ?? 0 };
 }
 
 /** Private usage readback without request IDs, source data or provider output. */
