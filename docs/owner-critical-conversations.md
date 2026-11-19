@@ -552,3 +552,19 @@ a protected Core/WordPress change, or an unspecified increase to the numeric
 provider ceiling. Preserve all original evidence and cumulative spending.
 Current source-only continuation is pinned in c0-source-recovery-amendment.json;
 record actual egress/activation and model operation separately from readiness.
+
+### November 19 — causal accountability after repeated generation failure
+
+The owner authorizes diagnosis-only inspection of retained C0 report57,
+Direction60, blueprint62 and critique66 through existing SSH in this Codex
+session; keep their text out of Git/replies. No new model calls/spending.
+During work the owner asks where the failures originate and rejects merely
+naming bugs or citing test counts as an explanation. Record responsibility for
+implementation, circular validation and continued downstream spending; do
+not attribute assistant implementation constraints to owner direction, infer
+malice, or claim a general ChatGPT quality decline without evidence. Continue
+authorized engineering while answering; founder attention and actual money
+are material costs. See [verified diagnosis, local corrections and remaining
+work](c0-creation-quality-p0-17.md#retained-reasoning-inspection-causal-defects-not-another-paid-attempt).
+This records the discussion; it does not expand live source, financial,
+credential, deployment or publication authority.

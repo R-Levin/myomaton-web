@@ -92,13 +92,15 @@ export function authoringOutputLimit(grant: PresenceWorkflowGrant, name: Workflo
   return grant.marketingAuthority?.projectionVersion === 2 ? permitted : Math.min(12_000, permitted);
 }
 
-function bindCitations(schema: object, references: readonly string[]) {
+export function bindCitations(schema: object, references: readonly string[]) {
   // Provider decoding and local semantic checks must use the same allowlist.
   const bound = structuredClone(schema) as Record<string, unknown>;
   function narrow(node: Record<string, unknown>) {
     if (node.properties && typeof node.properties === "object") {
       const props = node.properties as Record<string, Record<string, unknown>>;
-      if (props.sourceIds) props.sourceIds.items = { type: "string", enum: references };
+      // structuredClone preserves aliases. Replace this exact citation property,
+      // rather than mutating an array also used by non-citation fields.
+      if (props.sourceIds) props.sourceIds = { ...props.sourceIds, items: { type: "string", enum: [...references] } };
       for (const child of Object.values(props)) narrow(child);
     }
     if (node.items && typeof node.items === "object") narrow(node.items as Record<string, unknown>);
@@ -123,7 +125,9 @@ export function bindBlueprintDecisionSchema(run: WorkflowRun, authority: Marketi
       items: { type: "integer", enum: direction.visitorDecisions.map((_, index) => index) } },
   };
   schema.properties.pages.items.properties.decisionBrief.properties = decisionFields;
-  Object.assign(fields.influences, { description: "Each Page requires at least one composition influence citing an observed peer. Keep other uses separate." });
+  Object.assign(fields.influences, { description: authority.projectionVersion === 2
+    ? "Each Page requires a real market influence. Its composition may instead draw on authorized customer knowledge; do not require competitor composition. Keep source uses separate."
+    : "Each Page requires at least one composition influence citing an observed peer. Keep other uses separate." });
   Object.assign(fields.avoid, { description: "Describe specific risks or content to avoid in plain language, not by ID." });
   return schema;
 }

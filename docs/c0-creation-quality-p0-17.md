@@ -2492,3 +2492,104 @@ between report/Direction/plan and Page; challenge the actual findings before
 another provider request. Any genuinely required resource amendment must be
 one informed bounded decision, not another blind Home rewrite. Preserve
 41/6/75, entire earlier site/work, all historical cases, ledgers and previews.
+
+## Retained reasoning inspection: causal defects, not another paid attempt
+
+The owner explicitly authorized inspection of retained generated report57,
+Direction60, blueprint62 and critique66 within this Codex session over existing
+encrypted SSH. Only those generated fields were read, in read-only transactions;
+ledger unchanged. Their text is not reproduced here or in founder replies.
+The prior tool-access blocker is resolved for these four records only.
+
+**What the inspection establishes.** The commercial reduction is present in the
+assessment, then concentrated in Direction and Page decision briefs. The site
+is predominantly organized around qualification, responsibility, comparative
+fit and entry-route selection. The broader supported growth-service substance
+is underdeveloped, not entirely absent. The later Home revision still consumes
+that same report/Direction/plan. It cannot be assumed to repair their omissions
+by changing a headline or arrangement. Page count is not the defect, and no
+fixed substitute Page set is prescribed.
+
+**Two concrete contract failures were independently reproduced:**
+
+1. Source attachments are not the reasoning evidence registry. All five
+   restored originals were physically present in actual report56,
+   Direction59 and blueprint61 requests, but none of their IDs was eligible
+   as a citation. Report/Direction allowed25old IDs. The source-only recovery
+   updated originalMaterials/custody while explicitly preserving
+   context.evidence, approvedSources and marketingAuthority. Provider
+   citationIds and workflow settlement both read the latter registry.
+   The files were visible for reasoning, so this does NOT prove all their
+   meaning was inaccessible or ignored. It proves their distinct provenance
+   could not be expressed through the required citation contract. The source
+   restoration was functionally incomplete despite correct delivery checks.
+   Do not repair this by permitting arbitrary citation strings: original
+   materials need existing evidence/status/authority binding for ANALYSIS,
+   while historical/unconfirmed/contextual material remains ineligible to
+   authorize new visitor promises. A test now establishes that attachment
+   IDs alone fail settlement, and analytical registration can remain
+   proposed while excluded from Page claim authority.
+
+2. The actual blueprint wire schema corrupted the meaning of avoid.
+   decisionBriefSchema reuses one array object for influence sourceIds and
+   avoid. structuredClone preserves that alias. bindCitations mutated items
+   in place, unintentionally forcing avoid to contain source IDs. Actual
+   request61 has25source-ID enum options on avoid despite its plain-language
+   description. Retained planning output contains source identifiers there;
+   the local normalizer accepts arbitrary nonempty risk text and did not
+   detect this semantic corruption. The prior shared-array definition was
+   introduced in924fd14, interacting with the existing binder introduced
+   in7422111. This identifies code provenance, not a human motive or owner
+   instruction. No causal percentage is measurable from retained evidence.
+
+A further stale instruction was verified: the wire description still demanded
+peer-derived composition even after the source-aware semantic validator allowed
+customer-owned composition. The source-aware creative prompt also mandates both
+retained stock photographs in supporting Home contexts. That is implementation
+steering, not a demonstrated requirement of the business. Finally, early
+critique mixes real content/design weaknesses with consequences of inactive
+preview controls and not-yet-built supporting Pages. Those concerns need
+separate remediation owners; they must not consume commercial copy rounds
+indiscriminately. None excuses the genuine weak offer explanation.
+
+**Why testing missed this.** Tests verified intended files, valid IDs and
+plausible fixture responses independently. They did not check the whole final
+provider schema for unintended constraints on non-citation fields. Stubbed
+responses were not constrained by the wire schema that governed the actual
+model. Source-repair tests positively asserted an unchanged reasoning registry,
+without testing usability of the added sources through assessment settlement.
+Technical tests were reported as more reassuring than their coverage justified.
+Codex allowed further paid downstream rewrites instead of challenging the
+complete contract earlier; this was a verification/judgment failure.
+
+**Local correction completed, not deployed.** bindCitations now replaces only
+the exact sourceIds property, retaining descriptions/constraints and leaving
+unrelated shared arrays intact. Source-aware wire composition wording now
+agrees with the validated policy, while the historical wording stays exact.
+Four direct contract tests cover serialized blueprint semantics, shared nested
+arrays across grants, both composition policies and evidence/claim separation.
+29focused tests, TypeScript and lint pass. Initial TypeScript errors in the new
+test's inspection of a dynamically assigned description were corrected before
+reporting pass. No provider calls or hosted code/data writes.
+
+**Remaining work, not claimed fixed:** complete original-to-analytical-evidence
+binding through the existing context/authority/settlement contracts; actual
+request/settlement integration tests using the real full owned source;
+stage-appropriate critique; removal of unjustified placement/prompt steering;
+then a governed upstream recovery from the affected assessment. Do not buy
+another Home variation, widen citation IDs without provenance, silently
+promote historical content, alter existing approval digests or reset consumed
+financial/iteration allowances. Current live worker/case/candidate unchanged.
+
+**Cost unchanged:**25generations/49requests,$5.652224 settled estimates,
+0pending,$2.347776 remaining of$8; inclusive lineage maximum-accounted
+$17.533327, not total Codex credit usage or an invoice. No new paid API calls.
+
+**RECOVERY / RESUME HERE:**read this diagnosis before changing the live run.
+The schema/description corrections are local only. Source binding and upstream
+recovery remain incomplete. Existing local engineering authority permits
+verified corrections; inspection consent does not authorize new paid calls,
+hosted mutation or resetting2replans/4editorial rounds. Preserve70 and the
+original41/6/75/complete-site evidence. Bring one informed resource/activation
+decision only after the complete corrected request-to-settlement path works
+offline. No claim of a repaired website or founder acceptance.
