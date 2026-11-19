@@ -2208,3 +2208,70 @@ Home54, all older sites and original source files, ledger/counters and protected
 verified failure chain and minimum repair; await owner direction before resuming
 implementation or dispatch. This investigation used read-only Git/file evidence
 and the earlier in-place request checks, with zero new provider requests.
+
+## Whole-knowledge source recovery in implementation — November 19, 2026
+
+The owner's latest direct instruction resumes the paused task with the entire
+earlier site and retained business knowledge given proper weight, useful new work
+kept, and external evidence synthesized. Do not reduce this to R3 alone or assume
+another fresh start is inherently better. Original state and usage remain exact.
+
+**Concrete source correction.** The prepared original contains the exact accepted
+site (seven active routes, one inactive historical route,37Sections), all29
+Business Knowledge entries and the complete Offering, plus all seven earlier
+R3 public-copy Pages. The two R3 development notes are excluded explicitly.
+Original file hashes, authority, statuses, inactive history, navigation and
+Actions remain in the source projection. No visitor text is manually rewritten.
+The complete service, content-growth, conversion and accepted-design contracts
+supply intent/constraints separately from proof of currently deployed capability.
+The two existing canonical business documents, ten unconfirmed answers,
+research/captures and previous AI output remain; nothing is deleted or silently
+promoted. Unverified historical prices, retired offerings and links do not become
+new public authority.
+
+The exact source-only continuation is
+[c0-source-recovery-amendment.json](c0-source-recovery-amendment.json), SHA256
+76bb9ca171c604f30007bf0ee3ce0706b1a6c4b8d5dd18995647b2e248083b53.
+Five additional originals total159,748bytes. Actual source files remain private;
+the manifest records their descriptors/hashes. The new regression independently
+compares every projected Page/Section and the entire business/Offering record
+with the retained source, then reconstructs a provider-shaped request. Supplying
+the R3 handoff instead of the copy fails. A hash check alone is no longer the
+claimed source-coverage evidence.
+
+**Reassessment, not a history/ledger reset.** Core has an explicitly bound
+disposable source-repair operation. It appends one event reopening the report,
+preserving actual research and prior useful report/Direction/blueprint/Home for
+critical reuse. It retains all original events, source facts/statuses,
+credentials/grants, replan count and consumed editorial ordinal. Retry is
+idempotent; wrong actor/scope, protected boundary, changed baseline, pending work
+and unknown outcomes refuse. Prior commercial criticism is not customer truth.
+Own-work reuse instructions now distinguish authorized customer copy from
+third-party originality requirements. New meaningful writing remains Core/API's
+job, not a Codex-authored replacement.
+
+**Current verification:**47 focused local tests pass; TypeScript and focused lint
+pass after correcting an incomplete test grant's type declaration. No provider
+request ran. Linux code verification and actual source-custody installation are
+next, not claimed passed here. Prepared code archive43549cf5432177329f6ed34016ed3fb5eec6ebb7073c3c8cc43ddba6488b358b;
+worker647e1174907465046ab9824632b1db577ec9edb85263396e084ec2c95b88a017.
+Archive carries code/tests and metadata, no newly prepared source bodies or
+credentials. New sources are a separate explicit same-case transfer.
+
+**Running cost unchanged:**37requests/19generations,$3.659578 usage estimate,
+no pending, $4.340422 before future reservations under the same$8 ceiling.
+Original32generations/65requests,2replans/4editorial rounds and November22
+15:58:31UTC expiry remain; consumed2replans/3editorial rounds are not replenished.
+More credit availability is not a numeric ceiling amendment. Track actual
+remaining capacity and surface a genuine shortfall before exceeding it.
+
+**RECOVERY / RESUME HERE:**same branch and fresh case41a83e7e-1765-4517-941a-b2b151bb7c4a,
+still saved54, no provider job. Verify exact Linux code/tests, source5 payloads
+and source-only grant/binding readback. The owner-directed repair must retain
+the original grant/binding, all source/history and ledger; apply no Supabase,
+protected Core/WordPress or infrastructure change. Reassess from the first
+affected report, retaining genuine existing research rather than buying it again.
+Inspect actual resolved request for the complete corpus before dispatch. Then
+complete a coherent site and actual native desktop/mobile whole-site review;
+do not restart Home-only iteration or claim tests establish commercial quality.
+The earlier screenshot tool rejection is not silently bypassed by this record.

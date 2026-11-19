@@ -45,6 +45,10 @@ type Failure = "operation-blocked" | "output-invalid" | "outcome-unknown";
 type Decision = { actor: Actor; at: string; target: string; decision: "confirmed" | "development-continuation" | "reviewed" };
 type Correction = { finding: WorkflowReport["findings"][number]; text: string; reportDigest: string; actor: Actor; at: string };
 type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: WorkflowPage[]; actor: Actor; at: string; ordinal: number; source?: "home-concept" | "operator-editorial"; batch?: "pending" | "applied" };
+export type SourceRepairAuthorization = { authorization: string; baseVersion: number; previousStateDigest: string; materialsDigest: string };
+type SourceRecovery = SourceRepairAuthorization & { actor: Actor; at: string; priorRevisionOrdinal: number;
+  previous: { report: WorkflowReport | null; direction: WorkflowDirection | null; blueprint: WorkflowBlueprint | null; pages: WorkflowPage[] } };
+
 type State = {
   version: number;
   contextDigest: string;
@@ -70,6 +74,7 @@ type State = {
   operatorReview: Decision | null;
   qualityReviews?: { actor: Actor; at: string; review: QualityReview; phase?: "home-concept" }[];
   conceptEditorial?: { target: string; inputDigest: string; editorial: WorkflowEditorial } | null;
+  sourceRecovery?: SourceRecovery;
   work: Work | null;
   failure: Failure | null;
   artifactIssue?: ArtifactIssue | null;
@@ -78,7 +83,7 @@ type State = {
 };
 type Task = Pick<Work, "operation" | "path">;
 export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest" | "replan"> &
-  Pick<WorkflowContext, "entry" | "evidence" | "limitations" | "conflicts"> & { reviewStage?: ConceptReviewStage };
+  Pick<WorkflowContext, "entry" | "evidence" | "limitations" | "conflicts"> & { reviewStage?: ConceptReviewStage; sourceRecovery?: SourceRecovery };
 export type WorkflowRun = { context: WorkflowContext; input: WorkflowInput; work: Work };
 export interface PresenceWorkflowOperations {
   readonly mode: State["mode"];
@@ -87,6 +92,7 @@ export interface PresenceWorkflowOperations {
   readonly requiresResearch?: boolean;
   readonly maxEditorialRevisions?: number;
   readonly maxCommercialReplans?: number;
+  readonly sourceRepair?: SourceRepairAuthorization;
   readonly visuals?: PresenceVisualOperations;
   preflight?(run: WorkflowRun): Promise<void>;
   run(run: WorkflowRun, retain: (bytes: Buffer) => Promise<void>): Promise<unknown>;
@@ -208,8 +214,8 @@ function nextTask(state: State): Task | null {
 }
 function runInput(context: WorkflowContext, state: State, reviewStage = state.work?.reviewStage): WorkflowInput {
   const { entry, evidence, limitations, conflicts } = context;
-  const { report, research, direction, blueprint, pages, corrections, revisionRequest, replan } = state;
-  return { entry, evidence, limitations, conflicts, report, research, direction, blueprint, pages, corrections, ...(revisionRequest && { revisionRequest }), ...(replan && { replan }), ...(reviewStage && { reviewStage }) };
+  const { report, research, direction, blueprint, pages, corrections, revisionRequest, replan, sourceRecovery } = state;
+  return { entry, evidence, limitations, conflicts, report, research, direction, blueprint, pages, corrections, ...(revisionRequest && { revisionRequest }), ...(replan && { replan }), ...(sourceRecovery && { sourceRecovery }), ...(reviewStage && { reviewStage }) };
 }
 function readResearch(value: unknown, ids: readonly string[]): PresenceEvidence[] {
   if (!Array.isArray(value) || !value.length) throw Error("Research record is incomplete");
@@ -324,6 +330,33 @@ export class PresenceWorkflow {
       throw new IntakeError("draft_changed", 409);
     }
     return state;
+  }
+
+  /** One explicitly authorized disposable source repair, retaining all prior events,
+   * provider usage and consumed editorial/replan allowances. This is not customer
+   * confirmation, a public rewrite, or permission to change source scope. */
+  async reassessFromRepairedSources(context: WorkflowContext, version: number, actor: Actor, authorization: unknown) {
+    const state = await this.current(context, version);
+    const permitted = this.operations.sourceRepair;
+    if (this.boundary !== "disposable" || !state.evaluation || this.operations.marketingAuthority?.projectionVersion !== 2 ||
+        actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || !actor.authority || !permitted ||
+        authorization !== permitted.authorization || ![permitted.authorization,permitted.previousStateDigest,permitted.materialsDigest].every(x=>/^[a-f0-9]{64}$/u.test(x))) {
+      throw new IntakeError("unavailable", 403);
+    }
+    if (state.sourceRecovery) {
+      if (state.sourceRecovery.authorization !== authorization || fingerprint(permitted) !== fingerprint({
+        authorization: state.sourceRecovery.authorization, baseVersion: state.sourceRecovery.baseVersion,
+        previousStateDigest: state.sourceRecovery.previousStateDigest, materialsDigest: state.sourceRecovery.materialsDigest })) throw new IntakeError("draft_changed",409);
+      return this.view(context,state);
+    }
+    if (state.work || state.failure || state.operatorReview || state.version !== permitted.baseVersion ||
+        fingerprint(state) !== permitted.previousStateDigest) throw new IntakeError("draft_changed",409);
+    const sourceRecovery: SourceRecovery = {...permitted,actor,at:new Date(this.clock()).toISOString(),
+      priorRevisionOrdinal: state.revisionRequest?.ordinal ?? 0,
+      previous: structuredClone({report:state.report,direction:state.direction,blueprint:state.blueprint,pages:state.pages})};
+    return this.view(context,await this.store.append(context,version,{...state,sourceRecovery,
+      report:null,confirmation:null,direction:null,blueprint:null,pages:[],editorial:null,operatorReview:null,
+      editorialFindings:[],editorialDecisions:[],revisionRequest:null,homeReview:null,conceptEditorial:null,visuals:[]}));
   }
 
   async advance(context: WorkflowContext, version: number) {
@@ -574,7 +607,7 @@ export class PresenceWorkflow {
       concern => selected === undefined || selected.includes(concern.path));
     if (!concerns.length) throw new IntakeError("workflow_not_ready", 409);
     const paths = [...new Set(concerns.map(item => item.path))];
-    const ordinal = (state.revisionRequest?.ordinal ?? 0) + 1;
+    const ordinal = Math.max(state.revisionRequest?.ordinal ?? 0, state.sourceRecovery?.priorRevisionOrdinal ?? 0) + 1;
     if (ordinal > (this.operations.maxEditorialRevisions ?? 1)) throw new IntakeError("workflow_not_ready", 409);
     const at = new Date(this.clock()).toISOString();
     const batch = !this.operations.marketingAuthority && Boolean(state.evaluation) && state.mode === "provider" && paths.length > 1;
@@ -604,7 +637,7 @@ export class PresenceWorkflow {
       throw new IntakeError("workflow_not_ready", 409);
     }
     if (digest !== composeHomeConcept(context, view).digest) throw new IntakeError("draft_changed", 409);
-    const ordinal = (state.revisionRequest?.ordinal ?? 0) + 1;
+    const ordinal = Math.max(state.revisionRequest?.ordinal ?? 0, state.sourceRecovery?.priorRevisionOrdinal ?? 0) + 1;
     if (ordinal > (this.operations.maxEditorialRevisions ?? 1)) throw new IntakeError("workflow_not_ready", 409);
     const detail = text(concern, 1200);
     const revisionRequest = { paths: ["/"], source: "home-concept" as const,

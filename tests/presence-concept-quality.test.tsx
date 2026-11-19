@@ -11,7 +11,7 @@ import { readPage } from "../lib/platform/intake/presence-workflow-artifacts";
 const author: WorkflowActor = { id: "generating-operator", role: "operator", simulated: false, authority: "offline preparation only" };
 const reviewer: WorkflowActor = { id: "reviewing-operator", role: "operator", simulated: false, authority: "offline scoped review only" };
 
-function setup(options: { enabled?: boolean; limit?: number; uncertain?: boolean; boundary?: "disposable" | "protected" } = {}) {
+function setup(options: { enabled?: boolean; limit?: number; uncertain?: boolean; boundary?: "disposable" | "protected"; repair?: boolean; consumed?: number } = {}) {
   const context: WorkflowContext = { scope: { webPresenceId: randomUUID(), managedSiteId: randomUUID() }, intakeId: randomUUID(),
     entry: "DIRECT_START", evidence: [{ id: "offer", kind: "owner-confirmed", label: "Fixture offer", reference: "Offline fixture", date: null,
       content: "The fixture business provides a managed service." }], limitations: [], conflicts: [],
@@ -36,7 +36,8 @@ function setup(options: { enabled?: boolean; limit?: number; uncertain?: boolean
     blueprint: { pages: paths.map(path => ({ path, label: path === "/" ? "Home" : path.slice(1), purpose: "Fixture decision", sourceIds: ["offer"] })),
       navigation: paths, articles: [] },
     pages: [page], corrections: [], editorial: null, operatorReview: null, work: null as WorkflowRun["work"] | null,
-    failure: null, homeReview: null };
+    failure: null, homeReview: null,
+    ...(options.consumed && {revisionRequest:{paths:["/"],audit:{summary:"Prior retained review",concerns:[{path:"/",concern:"Prior concern"}]},priorPages:[page],actor:author,at:"2026-11-19",ordinal:options.consumed},replan:{ordinal:2,concerns:["commercial-copy" as const]}}) };
   let saved = structuredClone(initial);
   const events = [structuredClone(initial)], outputs = new Map<string, Buffer>(), runs: WorkflowRun[] = [];
   let recoveries = 0;
@@ -44,6 +45,7 @@ function setup(options: { enabled?: boolean; limit?: number; uncertain?: boolean
     concerns: [{ path: "/", concern: "The concept lacks a distinctive grounded reason to choose the service." }] };
   const workflow = new PresenceWorkflow(null as unknown as Pool, { mode: "provider", marketingAuthority: authority, maxRetries: 0,
     maxCommercialReplans: options.limit ?? 1,
+    ...(options.repair && {sourceRepair:{authorization:fingerprint("owner-authorized source repair"),baseVersion:initial.version,previousStateDigest:fingerprint(initial),materialsDigest:fingerprint("exact repaired materials")}}),
     async run(run, retain) {
       runs.push(structuredClone(run));
       await retain(Buffer.from(JSON.stringify(critique)));
@@ -352,4 +354,62 @@ test("an exact negative Home judgment permits a bounded Core-editorial correctio
  const g=setup(),fresh=(await g.workflow.critiqueHomeConcept(g.context,10,author))!;
  const passed=(await g.workflow.recordQualityReview(g.context,fresh.version,reviewer,judgment(fresh.conceptQuality!.target)))!;
  await assert.rejects(g.workflow.requestEditorialRevision(g.context,passed.version,author,["/"]),{code:"workflow_not_ready"});
+});
+
+test("an authorized source repair reopens assessment with prior useful work, research and history retained; retry is idempotent",async()=>{
+ const f=setup({repair:true}),before=f.snapshot(),authority=f.authority,context=structuredClone(f.context),token=fingerprint("owner-authorized source repair");
+ const view=(await f.workflow.reassessFromRepairedSources(f.context,before.version,author,token))!;
+ assert.equal(view.version,before.version+1);
+ assert.equal(view.next,"report");
+ const saved=f.snapshot() as typeof before & {sourceRecovery:{previous:Pick<typeof before,"report"|"direction"|"blueprint"|"pages">;priorRevisionOrdinal:number}};
+ assert.deepEqual(saved.research,before.research);
+ assert.deepEqual(saved.sourceRecovery.previous,{report:before.report,direction:before.direction,blueprint:before.blueprint,pages:before.pages});
+ assert.equal(saved.confirmation,null);
+ assert.deepEqual(f.events[0],before);
+ assert.deepEqual(f.context,context);
+ assert.deepEqual(f.authority,authority);
+ assert.equal(f.runs.length,0,"Source recovery is not a provider dispatch");
+ await f.workflow.reassessFromRepairedSources(f.context,view.version,author,token);
+ assert.equal(f.events.length,2);
+ await assert.rejects(f.workflow.reassessFromRepairedSources(f.context,before.version,author,token),{code:"draft_changed"});
+});
+
+test("source repair refuses missing grant, wrong principal, protected boundary, changed baseline, unknown outcome and another repair",async()=>{
+ const token=fingerprint("owner-authorized source repair");
+ for(const options of [{},{repair:true,boundary:"protected" as const}]){
+  const f=setup(options);
+  await assert.rejects(f.workflow.reassessFromRepairedSources(f.context,f.snapshot().version,author,token),{code:"unavailable"});
+  assert.equal(f.events.length,1);
+ }
+ for(const mutate of [
+  (f:ReturnType<typeof setup>)=>f.mutate(s=>{s.direction!.positioning="Unreviewed concurrent change"}),
+  (f:ReturnType<typeof setup>)=>f.mutate(s=>{s.work={operation:"page",attempt:"pending",until:1,inputDigest:fingerprint("pending")}}),
+  (f:ReturnType<typeof setup>)=>f.mutate(s=>{s.failure="outcome-unknown" as never}),
+ ]){
+  const f=setup({repair:true});mutate(f);
+  await assert.rejects(f.workflow.reassessFromRepairedSources(f.context,f.snapshot().version,author,token));
+  assert.equal(f.events.length,1);
+ }
+ const f=setup({repair:true});
+ for(const actor of [{...author,role:"customer" as const},{...author,simulated:true},{...author,authority:undefined}]){
+  await assert.rejects(f.workflow.reassessFromRepairedSources(f.context,f.snapshot().version,actor,token),{code:"unavailable"});
+ }
+ await assert.rejects(f.workflow.reassessFromRepairedSources(f.context,f.snapshot().version,author,fingerprint("unapproved repair")),{code:"unavailable"});
+});
+
+test("source repair retains consumed replan/editorial allowances and does not turn old work into current claims",async()=>{
+ const f=setup({repair:true,consumed:3}),before=f.snapshot(),auth=fingerprint("owner-authorized source repair");
+ const view=(await f.workflow.reassessFromRepairedSources(f.context,before.version,author,auth))!;
+ const state=f.snapshot() as typeof before & {sourceRecovery:{priorRevisionOrdinal:number}};
+ assert.equal(state.sourceRecovery.priorRevisionOrdinal,3);
+ assert.equal(state.replan?.ordinal,2);
+ assert.equal(state.revisionRequest,null);
+ assert.deepEqual(state.sourceSnapshot,before.sourceSnapshot);
+ assert.equal(state.report,null);
+ assert.equal(state.confirmation,null);
+ const operations=Reflect.get(f.workflow,"operations");
+ assert.equal(operations.maxCommercialReplans,1,"The original configured allowance is not replenished");
+ f.mutate(s=>{Object.assign(s,{report:before.report,confirmation:before.confirmation,direction:before.direction,blueprint:before.blueprint,pages:before.pages})});
+ const restored=(await f.workflow.review(f.context))!;
+ await assert.rejects(f.workflow.reviseHomeConcept(f.context,view.version,author,composeHomeConcept(f.context,restored).digest,"Another correction"),{code:"workflow_not_ready"});
 });

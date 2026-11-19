@@ -535,3 +535,20 @@ and private downloads, an isolated worker/browser update and spending. It is not
 active authority. Preserve Core revision 41, WordPress revision 6, grants/receipts,
 candidate version 52 and all usage evidence. No publication, protected WordPress
 staging, credential change or merge is implied.
+
+## Direct owner recovery instruction — complete existing work and balanced synthesis, November 19
+
+The owner resumes the paused C0 task. Evaluate the entire former site, design,
+wealth of business information and prior discussion against current knowledge;
+give each proper weight, retain useful new work, and synthesize relevant outside
+research/design/best practice. Wind back as far as necessary to deliver the best
+credible site, rather than polish a narrow fragment. Watch for inherited or new
+judgment failures. Ask about genuine unresolved questions; do not require the
+owner to direct every engineering consideration.
+
+This authorizes the local repair and use of those same-customer materials in the
+current task. It is not acceptance of an earlier or new candidate, publication,
+a protected Core/WordPress change, or an unspecified increase to the numeric
+provider ceiling. Preserve all original evidence and cumulative spending.
+Current source-only continuation is pinned in c0-source-recovery-amendment.json;
+record actual egress/activation and model operation separately from readiness.

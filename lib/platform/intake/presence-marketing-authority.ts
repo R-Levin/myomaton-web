@@ -102,7 +102,7 @@ export function marketingCitationIds(run: WorkflowRun, authority: MarketingAutho
 
 export function marketingProjection(run: WorkflowRun, authority: MarketingAuthority) {
   const { operation, path } = run.work;
-  const { entry, evidence, research, corrections, report, direction, blueprint, pages, revisionRequest, replan } = run.input;
+  const { entry, evidence, research, corrections, report, direction, blueprint, pages, revisionRequest, replan, sourceRecovery } = run.input;
   const sources = marketingSources(authority, evidence);
   const expose = ({ id, kind, label, date, content }: PresenceEvidence) => ({ id, kind, label, date, content });
   const design = { digest: authority.brandDigest, brief: authority.brandBrief };
@@ -119,6 +119,7 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
     const previous = revisionRequest?.priorPages.find(page => page.path === path);
     const readable = new Set([...sources.filter(({ use }) => use !== "excluded").map(({ source }) => source.id), ...(research ?? []).map(source => source.id)]);
     return { entry, design,
+      ...(sourceRecovery && { repairedSourceContext: sourceRecovery }),
       businessKnowledge: claims.map(({ source, use }) => ({ ...expose(source), use })),
       editorialReferences: sources.filter(({ use }) => use === "editorial").map(({ source }) => expose(source)),
       contextualEvidence: analysis.filter(source => source.kind !== "customer-unconfirmed"),
@@ -129,7 +130,7 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
         ...(previous && { previous, concerns: revisionRequest?.audit.concerns.filter(concern => concern.path === path) }),
         ...(!path && revisionRequest?.batch === "pending" && { pages: revisionRequest.priorPages, concerns: revisionRequest.audit.concerns }) }),
       ...(operation === "editorial" && { pages, ...(run.input.reviewStage && { reviewStage: run.input.reviewStage }) }),
-      ...(replan && { independentReviewCriteriaToCorrect: replan.concerns,
+      ...(replan && !sourceRecovery && { independentReviewCriteriaToCorrect: replan.concerns,
         ...(replan.priorRejectedPages && { priorRejectedPages: replan.priorRejectedPages }),
         ...(replan.conceptCritique && { priorCoreConceptCritique: replan.conceptCritique }) }),
       interpretation: "Business knowledge preserves its recorded factual or staffed-offer status. Customer assertions, research, reports, Direction and historical editorial references remain distinct evidence for reasoning and proposed interpretation. They do not become verified customer facts. Page claim IDs in the plan identify relevance, not a ceiling on other already authorized knowledge from this same case. Processing instructions are supplied separately and are not customer knowledge.",

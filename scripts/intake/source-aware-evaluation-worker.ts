@@ -7,7 +7,7 @@ import { WorkflowMediaUnavailable } from "../../lib/platform/intake/presence-wor
 
 const [operation, value, ...extra] = process.argv.slice(2);
 const operations = ["activate", "work", "inspect", "continue", "local-home", "local-site", "concept-review-input", "editorial-review-input", "critique-home", "critique-site",
-  "review-quality", "commercial-replan", "continue-local-home", "revise-home", "review-site", "revise-site", "revise-local-page", "decide-editorial", "recover", "retry", "resume-undispatched"];
+  "review-quality", "commercial-replan", "repair-sources", "continue-local-home", "revise-home", "review-site", "revise-site", "revise-local-page", "decide-editorial", "recover", "retry", "resume-undispatched"];
 let operationStage = "argument-validation";
 async function main() {
   if (!operations.includes(operation) || extra.length) throw Error("Fixed fresh-run operation required");

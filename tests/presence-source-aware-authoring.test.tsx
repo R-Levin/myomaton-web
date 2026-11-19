@@ -109,6 +109,8 @@ for (const includeOriginals of [false,true]) test("actual metered request carrie
    assert.deepEqual(request.reasoning,includeOriginals?{effort:"medium"}:undefined);
    assert.match(request.instructions,/permitted customer-owned brand assets/);
    assert.match(request.instructions,/third-party expression/);
+   assert.match(request.instructions,/Retain strong accurate content or wording/);
+   assert.match(request.instructions,/not disposable inspiration/);
    if(Array.isArray(request.input))assert.match(JSON.parse(request.input[0].content[0].text!).interpretation,/permitted customer-owned brand assets/);
    const encoded=JSON.stringify(request.text.format.schema);
    assert.ok(encoded.includes("complete-approved-brief"));

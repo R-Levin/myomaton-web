@@ -49,7 +49,7 @@ async function main(){
   const {rows:[event]}=await db.query("SELECT version,payload,digest FROM presence_workflow_events WHERE intake_id=$1 ORDER BY version DESC LIMIT 1",[plan.destination.intakeId]);
   assert.equal(event.version,version);assert.equal(fingerprint(event.payload),event.digest);
   const state=event.payload;assert.equal(state.contextDigest,g.contextDigest);assert.ok(!state.work&&!state.failure);
-  for(const field of ["pages","report","direction","blueprint","research","corrections","replan","revisionRequest"] as const)
+  for(const field of ["pages","report","direction","blueprint","research","corrections","replan","revisionRequest","sourceRecovery"] as const)
    assert.equal(fingerprint(state[field]??null),fingerprint(run.input[field]??null));
   if(stage==="home"){
    operationStage="current-core-quality-target";

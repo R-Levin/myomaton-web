@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "ownerDirection": "2026-11-19 direct owner continuation: use the full former site/design and system business knowledge with proper weight; retain useful new work, synthesize outside research, rewind as needed. No new spending ceiling inferred.",
+  "contextDigest": "082d9074fc8a10e6345d2cb138bc7ac87496ab057947ff54d3fbb61c77320a0a",
+  "baseVersion": 54,
+  "previousStateDigest": "b17fc53a15373dffce55c637c5c8d0465aa0d74bdd828028ae8b5131925de515",
+  "previousGrantDigest": "24ff644f54b3bcf1d0665a43f28ea70dffc476cd85d0d5059bd188df2329372d",
+  "previousGrantSha256": "228af86143bb2528d6dccbdbabb30af3bee2f0774896549728d2f04cec5d42b9",
+  "previousMaterialsDigest": "4411aa64914bb2f55b3bc7e2ae4d3e7cd4f6ad84a1df7e590284acdfa60ba220",
+  "ledgerSha256": "ef1ddaa1d06c378169e4355bba7b6a855e12744cda90aa927b0a09ac7e3edba2",
+  "expiresAt": "2026-11-22T15:58:31.154Z",
+  "scope": {
+    "intakeId": "41a83e7e-1765-4517-941a-b2b151bb7c4a",
+    "webPresenceId": "2a08e054-902c-400b-9b96-3c2274bcadc2",
+    "managedSiteId": "2c0d637d-4ded-4597-ac8b-661519aba358"
+  },
+  "additionalMaterials": [
+    {
+      "id": "c0-complete-owned-site-and-knowledge",
+      "sha256": "7c5b27689819c9b75896936d1f940e96650f6d6e831784f07453a40bed271146",
+      "bytes": 84539,
+      "mime": "text/plain",
+      "reference": "Exact accepted C0 site/business snapshot and R3 public-copy projection; sourceFiles bind original records",
+      "author": "Owner-reviewed MioPages records; historical stage authority retained",
+      "date": "2026-11-19",
+      "status": "historical",
+      "purpose": "editorial-reference",
+      "operations": [
+        "research",
+        "report",
+        "direction",
+        "blueprint",
+        "page",
+        "editorial"
+      ]
+    },
+    {
+      "id": "owned-service-model",
+      "sha256": "14a0fcb2d0dcfa13012fcd7f48742a7319aac626230f43cdf07bd783baea47b1",
+      "bytes": 18433,
+      "mime": "text/markdown",
+      "reference": "docs/web-presence-service-model.md",
+      "author": "MioPages canonical service/design contract; intent and boundaries, not evidence of deployed operations",
+      "date": "2026-11-19",
+      "status": "approved-direction",
+      "purpose": "business-context",
+      "operations": [
+        "research",
+        "report",
+        "direction",
+        "blueprint",
+        "page",
+        "editorial"
+      ]
+    },
+    {
+      "id": "owned-content-growth",
+      "sha256": "5bc42571f8b99c60e1ca8593ce93540f3ec47bc481ec8b1b1c0961cf52f68114",
+      "bytes": 25338,
+      "mime": "text/markdown",
+      "reference": "docs/content-growth-loop.md",
+      "author": "MioPages canonical service/design contract; intent and boundaries, not evidence of deployed operations",
+      "date": "2026-11-19",
+      "status": "approved-direction",
+      "purpose": "business-context",
+      "operations": [
+        "research",
+        "report",
+        "direction",
+        "blueprint",
+        "page",
+        "editorial"
+      ]
+    },
+    {
+      "id": "owned-conversion-architecture",
+      "sha256": "47569218d0af244be1a7f52848b14bca62b1847bdb2051afd1519d8463d48f1e",
+      "bytes": 20828,
+      "mime": "text/markdown",
+      "reference": "docs/conversion-architecture.md",
+      "author": "MioPages canonical service/design contract; intent and boundaries, not evidence of deployed operations",
+      "date": "2026-11-19",
+      "status": "approved-direction",
+      "purpose": "business-context",
+      "operations": [
+        "research",
+        "report",
+        "direction",
+        "blueprint",
+        "page",
+        "editorial"
+      ]
+    },
+    {
+      "id": "owned-design-direction",
+      "sha256": "91b954b056c5d210b848ac55b801c7e36ec3bac6f8478d8819cc389e07e08c71",
+      "bytes": 10610,
+      "mime": "text/markdown",
+      "reference": "docs/miopages-business-focus.md",
+      "author": "MioPages canonical service/design contract; intent and boundaries, not evidence of deployed operations",
+      "date": "2026-11-19",
+      "status": "approved-direction",
+      "purpose": "brand-reference",
+      "operations": [
+        "research",
+        "report",
+        "direction",
+        "blueprint",
+        "page",
+        "editorial"
+      ]
+    }
+  ],
+  "existingWorkCoverage": {
+    "acceptedPages": 8,
+    "activePages": 7,
+    "retainedHistoricalPages": 1,
+    "acceptedSections": 37,
+    "earlierReviewedPages": 7,
+    "businessKnowledgeEntries": 29,
+    "offeringRetained": true,
+    "contentDigest": "3ba3ab4929f593366c83c9c8d25dfcb31cf313a957b678ee63cebca4e8781814",
+    "excludedDevelopmentNotes": 2
+  },
+  "existingModel": "gpt-5.4-2026-03-05",
+  "limitsPreserved": {
+    "totalRunCapMicros": 8000000,
+    "maximumGenerations": 32,
+    "maximumProviderRequests": 65,
+    "commercialReplans": 2,
+    "editorialRounds": 4,
+    "automaticRetries": 0
+  },
+  "custody": "Same existing wp-acceptance private case and approved OpenAI Responses only. Existing local WordPress visitor rendering/capture; no protected report/source export to a new destination.",
+  "operation": "One append-only source-repair event reopens report, preserving actual research, prior useful report/Direction/blueprint/Home, all events/usage/consumed allowances and protected41/6/75."
+}

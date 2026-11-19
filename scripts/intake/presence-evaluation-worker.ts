@@ -189,7 +189,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const [operation, scenario, approval, value, ...extra] = args;
   const localCommercial = approval === commercialApproval || approval === p022RunProposalSha256 || approval === originalEvidenceApproval || approval === sourceAwareC0ProposalSha256;
   const readOnly = ["inspect", "home", "site", "concept-review-input", "editorial-review-input"].includes(operation) || (["local-site", "local-home"].includes(operation) && localCommercial);
-  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "resume-undispatched", "recover", "queue-image", "decide-image", "review-quality", "commercial-replan", "concept-review-input", "editorial-review-input", "critique-home", "critique-site"].includes(operation) ||
+  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "resume-undispatched", "recover", "queue-image", "decide-image", "review-quality", "commercial-replan", "concept-review-input", "editorial-review-input", "critique-home", "critique-site", "repair-sources"].includes(operation) ||
     (["continue-local-home", "revise-local-page"].includes(operation) && localCommercial);
   const replaceReport = operation === "replace-report" && approval === commercialApproval;
   const researchReplay = operation === "replay-research";
@@ -292,10 +292,14 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       await createPrivate(path, JSON.stringify(packet, null, 2) + "\n");
       return { file: path, version: prior.version };
     }
-    const input = JSON.parse(value) as { version: number; digest?: string; reference?: string; concern?: string; path?: string; paths?: string[]; index?: number; brief?: string; decision?: unknown };
+    const input = JSON.parse(value) as { authorization?: string; version: number; digest?: string; reference?: string; concern?: string; path?: string; paths?: string[]; index?: number; brief?: string; decision?: unknown };
     if (input.version !== prior.version) throw Error("Evaluation view is stale");
     const actor = { id: "local-evaluation-operator", role: "operator" as const, simulated: false,
       authority: "private evaluation workspace " + approval };
+    if (operation === "repair-sources") {
+      const repaired = await workflow.reassessFromRepairedSources(context,prior.version,actor,input.authorization);
+      return {next:repaired?.next,version:repaired?.version,providerCalls:0};
+    }
     if (operation === "concept-review-input" || operation === "editorial-review-input") {
       const run = operation === "concept-review-input" ? await workflow.conceptCritiqueInput(context, prior.version, actor) :
         await workflow.editorialCritiqueInput(context, prior.version, actor);
