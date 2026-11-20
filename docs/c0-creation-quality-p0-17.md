@@ -3235,3 +3235,101 @@ the evening layout improvement. Queued100 is unknown pending existing-key access
 no retry, counter reset or spend. The local review artifact described in the Issue
 handoff compares existing work and proposed direction; it is not a newly generated
 website or owner acceptance. Protected41/6 and every prior candidate/ledger remain.
+
+## Paid-correction recovery and cost reconciliation — November 20
+
+The owner loaded the existing `miopages_20i` key. Existing encrypted SSH access to
+the acceptance account succeeded. No key, password or grant was created/replaced.
+The access dependency in the preceding checkpoint is resolved.
+
+### Actual retained outcome
+
+Read the isolated existing case and usage ledger with a PostgreSQL **READ ONLY**
+transaction, verified exact database/loopback port, custody ownership/0600 modes,
+grant fingerprint, context binding, event fingerprints and unchanged ledger prefix.
+The worker was not invoked, no provider endpoint called and no host file written.
+The existing isolated database password was used only in its host process; no
+OpenAI key, context token, connection string or original private source was exported.
+
+Queued100 completed all three revisions. The current event is106, fingerprint
+`d60864ea449c2d44e5c24e7a5935c6d261d50388070fc42148a62eb0f391a083`.
+Work/failure are null; all six Pages are present. The unchanged grant remains
+`f024b7997144524a4194cf93a6d7e9ca78783db1d0473d73fa16163102d48995`.
+The usage ledger is
+`241777da3d784337b943df824546eb0e1f8c17602f72d5313c067f808a727baa`.
+It and the grant were independently read back unchanged after the transaction.
+
+Retained the three visitor Page DTOs in ignored local custody for comparison;
+did not export full reports, research/original source bodies or credentials.
+Revalidated them through the existing Page/native-component reader against the
+16 exact authorized public claim IDs and exact Action destinations. Canonical
+fingerprints match their saved event records exactly:
+
+| Recovered Page | Canonical fingerprint |
+| --- | --- |
+| Home | `0645f8a6ba1238ef4a04dd54c2b20d127dcb80bc4e916037a4830b94a175c8b7` |
+| Service | `130bee1ac14a5fdc917b1572e40cdd88f54e6cb137f5116cd7945ebdd8479544` |
+| How It Works | `173211c659441bd4df696346e9d2b3190b7483f3d7674c538ab2317906dd55ea` |
+
+The temporary revalidation helper re-encodes absent contextual Action placement
+as explicit null for the provider-wire reader, then asserts the resulting
+canonical DTO equals the stored DTO. No retained copy, destination, permissions
+or application guard changed. Initial helper-only path/wire-shape errors were
+corrected before this result; they were not additional provider failures/calls.
+FAQ, Free Review and Direct Start fingerprints match the pre-revision state99.
+
+### Reconciled usage, with financial limits kept distinct
+
+| Measure | Verified result |
+| --- | --- |
+| Completed generations / requests in this source-aware run | 40 / 79 |
+| Pending or uncertain receipts in this run | 0 |
+| Retained provider token usage | 2,939,475 input; 231,685 output; 4,608 cached input |
+| Estimated run cost | **$10.823604** |
+| Conservative run debit | **$11.183776** |
+| Last three Page revisions | **$1.127671**, three generations / six requests |
+| Existing ceiling / conservative unspent envelope | $13 / $1.816224; no permission to dispatch it implied |
+| New provider requests for this recovery | 0 |
+
+Independently checked receipt token/rate arithmetic and stage attribution. The
+$0.360172 difference remains the earlier completed research reservation treatment,
+not a newly invented charge. No invoice adjustment, ledger repair or reset was made.
+These figures cover **this run**, not the whole project's historical spending,
+the owner's account balance or Codex charges. OpenAI invoice/dashboard billing
+was not independently retrieved; do not call a calculated estimate a billed total.
+
+### Commercial judgment and what remains viewable
+
+Recovered106 has some clearer phrasing and a shorter How It Works, but it does not
+deliver the needed substantive advance. Home and Service are only slightly shorter.
+All three still lack concrete search/blog/growth explanation; treating literal word
+counts as a fix would be wrong. Scope/authority language remains prominent and
+the fuller earlier value story is still underused. Home requests a conceptual
+image but no actual acquired visual was added. It also retains an explicitly
+unresolved/null existing-account destination; no account link was guessed.
+
+**Do not silently replace the local candidate or claim a new visual-quality pass.**
+The recovery retained and checked source material; it did not render106 in
+WordPress or change Pages. Source97 with local theme0.1.2 remains at
+http://127.0.0.1:4474/?page_id=203&preview=true. Independent local native readback
+still matches `2f31bd9ab9b896adfa9fa9b3b7b854d0e0c876e3ecd083318476e5821f2870a9`
+and the older202 posts remain exact. Protected41/6 and all earlier candidates
+were untouched. No publication, customer approval or application deployment.
+
+Updated local report (original report preserved):
+`runtime-content/c0-presentation-20261119/morning-review-recovered-20261120.html`,
+SHA-256 `a346b48d02e181a501ae4cb2ec56ba0ca23ced0694d02f209e86dfb113414714`.
+It includes costs, the existing visual comparison/revision recommendation and
+expandable actual recovered draft text, explicitly not an applied new website.
+Private readbacks, authority/cost proof, three-Page validation and comparison
+receipts remain in that same ignored directory. No model response/customer text
+or credentials were added to Git. No application code changed or new production
+test/build result is claimed for this read-only recovery.
+
+**RECOVERY / RESUME HERE:** paid output is recovered and costs reconciled to the
+retained usage receipts. No need to regenerate or invoke WORK. Discuss the
+whole-site commercial/visual recommendation with the owner; preserve useful106
+phrasing selectively when a bounded revision is actually agreed. New generation
+requires a specific fresh spending scope. The reported$17.58 credit and remaining
+old grant envelope are not consent. Maintain source97's working layout and all
+41/6/75/97/106 evidence; no protected WordPress change or publication.

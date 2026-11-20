@@ -7,7 +7,19 @@ This file is the first-read **navigation and operational handoff** when merged t
 
 At every new or interrupted MioPages session, first read [current main development control](https://github.com/R-Levin/myomaton-web/blob/main/docs/development-control.md), then the full [owner-critical conversation index](https://github.com/R-Levin/myomaton-web/blob/main/docs/owner-critical-conversations.md). Follow the exact linked owner decisions and Issues #12 and #10, then reconcile with the current development branch, working tree and grants. Main maintains the critical-conversation index. This branch maintains its implementation checkpoint. Apply later owner decisions and record important conversations there during the work, with their authority and supersession. Product development remains the overall priority. [Continuity and priority decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6898063682)
 
-**Current recovery — November 20: whole-site comparison complete; no new generation.**
+**Current recovery — November 20: paid correction recovered at106; no new generation.**
+Read [the read-only recovery, reconciled costs and product judgment](c0-creation-quality-p0-17.md#paid-correction-recovery-and-cost-reconciliation--november-20).
+Existing SSH access is restored. Queued100 completed the Home/Service/How revisions at106;
+all three saved, independently revalidated, zero pending/failure, grant/ledger unchanged.
+Run usage:40generations/79requests, $10.823604 estimated/$11.183776 conservative.
+Final three revisions added$1.127671; figures are usage estimates, not an invoice or Codex costs.
+The copy is modestly refined but still lacks the fuller commercial explanation; no images added.
+Current WordPress remains97; no recovered version was applied. No WORK/provider call/hosted write.
+Updated local report: `runtime-content/c0-presentation-20261119/morning-review-recovered-20261120.html`.
+Next: owner discussion of the concrete whole-site direction below, then only specifically needed
+Core revisions under fresh spending authority. Available$17.58 credit is not that authority.
+
+**Earlier November 20 comparison, retained:**
 Read [the comparison, concrete recommendation and recovery boundary](c0-creation-quality-p0-17.md#whole-site-comparison-and-recommended-direction--november-20).
 The owner sees real layout progress but has not accepted content/design or commercial operation.
 The complete earlier R3 copy, 29 Knowledge entries/Offering and accepted v3 visual evidence
