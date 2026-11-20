@@ -18,13 +18,19 @@ export function MyBusinessPanel({ business, corrections = [] }: {
     <h2 id="my-business-heading">My Business</h2>
     <p>These confirmed records describe your business and its offerings. The business report below can contain interpretations and open questions.</p>
     {!business.facts.length && !business.offerings.length && <p>No confirmed records are available in this workspace.</p>}
-    {business.facts.length > 0 && <dl>{business.facts.map(item => <div key={item.id}>
-      <dt>{factLabels[item.kind]}</dt><dd>{item.value}<br /><small>{descriptions(item)}</small>
+    {(Object.keys(factLabels) as (keyof typeof factLabels)[]).map(kind => {
+      const entries = business.facts.filter(item => item.kind === kind);
+      if (!entries.length) return null;
+      const entry = (item: MyBusinessView["facts"][number]) => <div key={item.id}>
+        <p>{item.value}<br /><small>{descriptions(item)}</small></p>
         {item.history.length > 0 && <details><summary>Earlier confirmed wording</summary>
           <ul>{item.history.map(prior => <li key={prior.revision}>Revision {prior.revision} · {prior.confirmedAt.slice(0, 10)} · {prior.value}</li>)}</ul>
         </details>}
-      </dd>
-    </div>)}</dl>}
+      </div>;
+      return <section key={kind}><h3>{factLabels[kind]}</h3>{entry(entries[0])}
+        {entries.length > 1 && <details><summary>{entries.length - 1} more confirmed {entries.length === 2 ? "record" : "records"}</summary>{entries.slice(1).map(entry)}</details>}
+      </section>;
+    })}
     {business.offerings.map(item => <article key={item.id}>
       <h3>{item.name}</h3><p>{item.summary}</p><p><small>{descriptions(item)}</small></p>
       {item.history.length > 0 && <details><summary>Earlier confirmed offering</summary>

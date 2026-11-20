@@ -19,6 +19,7 @@ import { readRetainedC0 } from "./retained-c0";
 import { PresenceWorkflow } from "../../lib/platform/intake/presence-workflow";
 import { workflowFixture } from "./presence-workflow-fixture";
 import { FirstPartyMeasurement, type MeasurementSource } from "../../lib/platform/measurement/first-party";
+import { accountReviewActivity } from "../../lib/platform/measurement/account-review";
 import { fingerprint } from "../../lib/platform/canonical/model";
 
 const host = "127.0.0.1", port = 4320;
@@ -71,6 +72,7 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
     const database = new URL(cluster.url).pathname.slice(1);
     const selection = await scope("C0 onboarding rehearsal");
     let localSnapshot: (() => ReturnType<FirstPartyMeasurement["snapshot"]>) | undefined;
+    let reviewActivity: ReturnType<typeof accountReviewActivity> | undefined;
     if (runWorkflow) {
       await pool.query(await readFile(new URL("../../lib/platform/measurement/first-party.sql", import.meta.url), "utf8"));
       const current = reviewed.after.business_knowledge.find(row => row.web_presence_id === reviewed.target.webPresenceId)!;
@@ -84,6 +86,7 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
       await writeCanonical(pool, { ...creation, domain: "offering", id: randomUUID(), payload: { ...offering, actionIds: [] },
         responsibleIdentity: offering.approval.by, offering: { type: "service", status: "active", key: offer.key, name: offer.name } });
       const measurement = new FirstPartyMeasurement(pool);
+      reviewActivity = accountReviewActivity(measurement, new Date().toISOString());
       const end = Date.now();
       const iso = (offset: number) => new Date(end + offset).toISOString();
       const source: MeasurementSource = { id: randomUUID(), selection, environment: "synthetic", activatedAt: iso(-60_000),
@@ -132,7 +135,7 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
               return send(401, "application/json", '{"error":"local_access_required"}');
             }
             const response = await intakeHttp(request, intake, abuse, true, false, workflow, {
-              snapshot: localSnapshot, ...(workflow && { business: (id: string) => readMyBusiness(pool, id) }),
+              snapshot: localSnapshot, reviewActivity, ...(workflow && { business: (id: string) => readMyBusiness(pool, id) }),
             });
             const body = await response.text();
             res.writeHead(response.status, { ...headers, ...Object.fromEntries(response.headers) }).end(body);

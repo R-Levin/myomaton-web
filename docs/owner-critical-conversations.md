@@ -767,3 +767,16 @@ path and observation/next action; it does not redefine the whole service or make
 an early public-site launch part of Core intelligence acceptance. Existing manual-
 effort tolerance, all-project reuse, delivery independence and approval boundaries
 remain intact. Owner review of the detailed implementation scope is next.
+
+### November 20 — Codex acts next on local account-cycle implementation
+
+After scoping and the next-step explanation, the owner asked whether anything was
+needed from them or Codex should act next. Continue local implementation from the
+agreed scope; do not send the owner back through another routine approval loop.
+The first checkpoint connects retained understanding/current work and internal
+review observations using existing components. Preserve actual authority for
+canonical confirmation, provider data/spending, protected hosted changes and
+WordPress application/publication. The owner need not log in or test another
+fixture rehearsal now. Bring verified progress and one concrete protected-run
+request when the necessary code, policies and inputs are ready. This records no
+new model or hosted-operation grant.

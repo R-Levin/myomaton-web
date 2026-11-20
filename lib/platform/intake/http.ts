@@ -7,11 +7,13 @@ import { newResumeToken } from "./service";
 import type { PresenceWorkflow } from "./presence-workflow";
 import type { PerformanceSnapshot } from "../measurement/first-party";
 import type { MyBusinessView } from "./my-business";
+import { accountWork } from "./account-work";
 
 export const intakeCookie = "miopages_intake";
 
 async function updateLocalWorkflow(workflow: PresenceWorkflow, context: Awaited<ReturnType<IntakeService["workflowContext"]>>, input: Record<string, unknown>) {
   const keys = input.operation === "workflow-start" ? ["operation"] :
+    ["workflow-understanding-correct", "workflow-understanding-withdraw"].includes(String(input.operation)) ? ["operation", "version", "correction"] :
     input.operation === "workflow-correct" ? ["operation", "version", "finding", "correction"] : ["operation", "version"];
   if (Object.keys(input).some(key => !keys.includes(key))) throw new IntakeError("invalid_request");
   if (input.operation === "workflow-start") return workflow.start(context);
@@ -19,6 +21,8 @@ async function updateLocalWorkflow(workflow: PresenceWorkflow, context: Awaited<
   if (typeof version !== "number" || !Number.isSafeInteger(version) || version < 1) throw new IntakeError("invalid_request");
   const customer = { id: "local-customer", role: "customer", simulated: true } as const;
   switch (input.operation) {
+    case "workflow-understanding-correct": return workflow.correctUnderstanding(context, version, input.correction, customer);
+    case "workflow-understanding-withdraw": return workflow.withdrawUnderstandingCorrection(context, version, input.correction, customer);
     case "workflow-next": return workflow.advance(context, version);
     case "workflow-recover": return workflow.recover(context, version);
     case "workflow-correct": {
@@ -51,6 +55,7 @@ export function sessionToken(request: Request, cookieName = intakeCookie) {
 export async function intakeHttp(request: Request, service: IntakeService, abuse: ContactAbuseGuard, enabled: boolean, sharedDevelopment = false,
   workflow?: PresenceWorkflow, workspace?: {
     snapshot?: () => Promise<PerformanceSnapshot>; business?: (webPresenceId: string) => Promise<MyBusinessView>;
+    reviewActivity?: (context: Awaited<ReturnType<IntakeService["workflowContext"]>>, current: NonNullable<Awaited<ReturnType<PresenceWorkflow["review"]>>>, event?: unknown) => Promise<PerformanceSnapshot>;
   }) {
   // Loopback cookies are shared across ports. This disposable workflow must
   // never adopt the resume cookie of an earlier local intake.
@@ -65,7 +70,12 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
   let token = sessionToken(request, cookieName), fresh = false;
   async function withWorkflow(view: Awaited<ReturnType<IntakeService["resume"]>>) {
     if (!workflow || !token) return view;
-    return { ...view, workflowAvailable: true, workflow: await workflow.review(await service.workflowContext(token)),
+    const context = await service.workflowContext(token), current = await workflow.review(context);
+    const activity = current && workspace?.reviewActivity
+      ? await workspace.reviewActivity(context, current).catch(() => null) : undefined;
+    return { ...view, workflowAvailable: true, workflow: current,
+      ...(current && { accountWork: accountWork(context, current) }),
+      ...(activity && { accountActivity: activity }), ...(activity === null && { accountActivityUnavailable: true }),
       portal: { role: "customer", identity: "Customer rehearsal participant", account: "MioPages C0 rehearsal",
         site: "Disposable draft", environment: "local-rehearsal" } satisfies IntakePortalWorkspace,
       ...(workspace?.snapshot && { firstParty: await workspace.snapshot() }),
@@ -82,6 +92,14 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
       try {
         if (!value || typeof value !== "object" || Array.isArray(value)) throw new IntakeError("invalid_request");
         const input = value as Record<string, unknown>;
+        if (input.operation === "review-activity") {
+          if (Object.keys(input).some(key => !["operation", "event"].includes(key)) || input.event === undefined || !workflow || !token || !workspace?.reviewActivity) throw new IntakeError("invalid_request");
+          const context = await service.workflowContext(token), current = await workflow.review(context);
+          if (!current) throw new IntakeError("workflow_not_ready", 409);
+          try { await workspace.reviewActivity(context, current, input.event); }
+          catch { throw new IntakeError("invalid_request"); }
+          return withWorkflow(await service.resume(token));
+        }
         if (typeof input.operation === "string" && input.operation.startsWith("workflow-")) {
           if (!workflow || !token) throw new IntakeError("session_unavailable", 404);
           await updateLocalWorkflow(workflow, await service.workflowContext(token), input);

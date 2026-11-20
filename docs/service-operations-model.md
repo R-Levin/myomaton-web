@@ -89,8 +89,9 @@ understanding → purposeful work → reviewed change → observed result → ne
 
 ### Proposed implementation scope — one connected account cycle
 
-**November 20, 2026; prepared for owner review.** The direction above is agreed;
-this detailed scope is a proposal, not a dispatched implementation/provider grant.
+**November 20, 2026; local implementation started after the scope discussion.**
+The direction above is agreed; [the first local checkpoint](platform-capabilities.md#connected-account-cycle--first-local-implementation-checkpoint)
+implements part of this scope. Provider use and protected execution remain separate.
 One coordinated product increment reuses the [existing components](platform-capabilities.md#service-process-framework-existing-foundations-and-missing-connections),
 without a new workflow framework or a claim to complete Commercial V1.
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "../../components/intake/interview.module.css";
 import { prospectPriorities } from "../../lib/platform/intake/adaptive";
 import { prospectDirection, prospectPlanSeed } from "../../lib/platform/intake/prospect-direction";
@@ -10,13 +10,15 @@ import type { IntakeView } from "../../lib/platform/intake/service";
 import { SitePlanningReviewPanel } from "./site-planning-review-panel";
 import { isPresenceWorkflowWorking, PresenceWorkflowPanel } from "./presence-workflow-panel";
 import type { MyBusinessView } from "../../lib/platform/intake/my-business";
+import type { AccountWorkView } from "../../lib/platform/intake/account-work";
+import { AccountWorkPanel } from "./account-work-panel";
 import { MyBusinessPanel } from "./my-business-panel";
 import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
 import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-party";
 import type { reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
 
 type Operations = Awaited<ReturnType<typeof import("../../lib/platform/contact/protected-inquiry").protectedInquiry>>;
-type JourneyView = IntakeView & { portal?: IntakePortalWorkspace; myBusiness?: MyBusinessView; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
+type JourneyView = IntakeView & { portal?: IntakePortalWorkspace; myBusiness?: MyBusinessView; accountWork?: AccountWorkView; accountWorkUnavailable?: true; accountActivity?: PerformanceSnapshot; accountActivityUnavailable?: true; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
   sitePlanningReview?: ReturnType<typeof reviewedSitePlanning> & { current: boolean } };
 async function request(endpoint: string, operation?: object, signal?: AbortSignal): Promise<JourneyView | null> {
   const response = await fetch(endpoint, {
@@ -25,8 +27,11 @@ async function request(endpoint: string, operation?: object, signal?: AbortSigna
     ...(operation && { body: JSON.stringify(operation) }),
   });
   if (response.status === 401) throw Error("local_access_required");
-  if (response.status === 409) throw Error("This draft changed. Reload before saving a different answer.");
   const data = await response.json().catch(() => null);
+  if (response.status === 409) throw Error(data?.error === "workflow_not_ready"
+    ? "This step is not ready. Review the current work and its next action before continuing."
+    : "This draft changed. Reload before saving a different answer.");
+  if (response.status === 403) throw Error("Your current role cannot perform this action.");
   if (!response.ok) {
     if (operation && "operation" in operation && String(operation.operation).startsWith("site-plan-") &&
         typeof data?.error === "string" && Object.hasOwn(planningMessages, data.error)) {
@@ -51,6 +56,8 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
   const [page, setPage] = useState<"home" | "service">("home");
   const [answer, setAnswer] = useState("");
   const [correcting, setCorrecting] = useState(false);
+  const [activityUnavailable, setActivityUnavailable] = useState(false);
+  const observedReview = useRef("");
   const [improvementPage, setImprovementPage] = useState("");
   const [deliveryInput, setDeliveryInput] = useState<{ packet: unknown; digest: string } | null>(null);
   const [prior, setPrior] = useState<ReturnType<typeof prospectDirection>>(null);
@@ -71,6 +78,25 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
     setMessage(reason instanceof Error ? reason.message : "Core could not confirm the request.");
   }
   useEffect(() => { request(endpoint).then(adopt).catch(failed).finally(() => setBusy(false)); }, [endpoint]);
+
+  const observeReview = useCallback((kind: "page-observed" | "action-selected", action: string | null) => {
+    void request(endpoint, { operation: "review-activity", event: {
+      id: crypto.randomUUID(), kind, action, at: new Date().toISOString(),
+    } }).then(next => {
+      setView(current => current && next && current.accountWork?.intakeId === next.accountWork?.intakeId &&
+        next.version >= current.version && (next.accountWork?.version ?? 0) >= (current.accountWork?.version ?? 0) ? next : current);
+      setActivityUnavailable(false);
+    }).catch(() => setActivityUnavailable(true));
+  }, [endpoint]);
+  const activityRevision = view?.accountActivity?.revision;
+  const accountIntake = view?.accountWork?.intakeId;
+  useEffect(() => {
+    if (!activityRevision || !accountIntake || busy || locked) return;
+    const key = accountIntake + ":" + activityRevision;
+    if (observedReview.current === key) return;
+    observedReview.current = key;
+    observeReview("page-observed", null);
+  }, [activityRevision, accountIntake, busy, locked, observeReview]);
 
   const pollWorkflow = hosted && isPresenceWorkflowWorking(view?.workflow);
   const workflowVersion = view?.workflow?.version;
@@ -138,7 +164,11 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         setError(true);
         return;
       }
-      setMessage(next.interview?.failure && "operation" in operation && operation.operation === "interview-next"
+      setMessage("operation" in operation && operation.operation === "workflow-understanding-correct"
+        ? "Proposed correction saved. The original sources and existing work are retained."
+        : "operation" in operation && operation.operation === "workflow-understanding-withdraw"
+          ? "Correction withdrawn. Its history is retained."
+        : next.interview?.failure && "operation" in operation && operation.operation === "interview-next"
         ? "Core could not save the model response. Your saved answer is still available."
         : "operation" in operation && operation.operation === "workflow-continue"
           ? "Report review saved." : view ? "Saved. Your earlier answers are still available below." : "Your retained answers are ready.");
@@ -190,12 +220,15 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         </dl>
         {workspace.environment === "local-rehearsal" && <p>Local rehearsal with simulated customer and Operator decisions.</p>}
         {view?.workflowAvailable && <nav aria-label="Workspace">
+          {view.accountWork && <><a href="#account-work">Understanding and current work</a>{" "}</>}
           {view.myBusiness && <><a href="#my-business">My Business</a>{" "}</>}
           <a href="#business-report-and-website">Business report and website</a>
           {view.workflow?.blueprint && <>{" "}<a href="#proposed-website">Proposed website</a></>}
           {view.workflow?.editorial && <>{" "}<a href="#editorial-review">Editorial review</a></>}
         </nav>}
       </aside>}
+      {view?.accountWorkUnavailable && <p role="alert">Core could not read the saved account workflow. Earlier intake is still available; no new account or site result is implied.</p>}
+      {message && <p role={error ? "alert" : "status"}>{message}</p>}
       {locked ? <form onSubmit={event => { event.preventDefault(); void unlock(); }}>
         {hosted && <div className={styles.field}><label htmlFor="owner-username">Username</label>
           <input id="owner-username" name="username" value="owner" autoComplete="username" readOnly /></div>}
@@ -208,6 +241,10 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         <p>Continue with the business information you already provided.</p>
         <button disabled={busy || error} onClick={() => void run({ operation: "begin" })}>Resume retained onboarding</button>
       </> : view.workflowAvailable ? <>
+        {view.accountWork && <AccountWorkPanel key={view.accountWork.intakeId} account={view.accountWork} busy={busy} run={run}
+          activity={view.accountActivity} activityUnavailable={activityUnavailable || view.accountActivityUnavailable}
+          observe={view.accountActivity ? () => observeReview("action-selected", "open-current-work") : undefined}
+          canCorrect={!hosted || workspace?.understandingCorrectionsAvailable === true} />}
         {view.myBusiness && <MyBusinessPanel business={view.myBusiness} corrections={view.workflow?.corrections} />}
         <PresenceWorkflowPanel hosted={hosted} workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run}
           canTriage={workspace?.role === "operator" && workspace.editorialDecisionsAvailable === true} />
@@ -280,7 +317,6 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           </fieldset>
           <button disabled={busy || !priority}>Save site priority</button>
         </form>
-        {message && <p role={error ? "alert" : "status"}>{message}</p>}
         {hosted && <SitePlanningReviewPanel state={view.sitePlanning} review={view.sitePlanningReview}
           enabled={view.sitePlanningEnabled} busy={busy} version={view.version} run={operation => void run(operation)}
           delivery={operation => void prepareDelivery(operation)} inquiry={view.operations?.recommendation ? {
@@ -417,7 +453,6 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           })}
         </details>
       </>}
-      {!view && message && <p role={error ? "alert" : "status"}>{message}</p>}
     </main>
   </div>;
 }

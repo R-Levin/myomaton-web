@@ -42,9 +42,9 @@ and delivery/provider independence. See the [service principles](web-presence-se
 critical-path review are complete. The owner agreed the account-cycle direction
 and requested [a bounded implementation scope](service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle).
 It connects understanding, useful AI work, shared review, authorized delivery/
-inbound reconciliation and actual observation/next action. Implementation awaits
-scope review; no new model dispatch, public-site work or hosted write occurred.
-Preserve completed repairs/proofs and the explicit launch distinctions.
+inbound reconciliation and actual observation/next action. Local implementation
+has begun as recorded below; no new model dispatch, public-site work or hosted
+write occurred. Preserve completed repairs/proofs and launch distinctions.
 
 The [service model](web-presence-service-model.md), [progressive onboarding](progressive-onboarding-and-launch-readiness.md),
 [knowledge transfer](paid-onboarding-knowledge-transfer-contract.md), [measurement](measurement-and-analytics.md),
@@ -53,6 +53,71 @@ and [active gates](deferred-architecture.md) retain the full requirements.
 Publication, consequential customer decisions, protected writes, spending and
 merges retain their existing authority. A fresh hosted-health audit was not
 performed in this local increment; cited hosted results are retained evidence.
+
+### Connected account cycle — first local implementation checkpoint
+
+**November 20, 2026.** The owner asked Codex to act on the scoped next step. This
+extends the existing portal, workflow events and measurement ledger; it does not
+create a second account/task/approval system. It is local implementation, not a
+protected rollout or owner product acceptance.
+
+- [Account work projection](../lib/platform/intake/account-work.ts) and
+  [existing portal integration](../scripts/intake/c0-site-journey-client.tsx) show
+  the current case's sources/status, retained work, pending corrections and next
+  action. Confirmed My Business records are grouped for reading, with full entries
+  and version history retained. This connects the currently authorized case view;
+  it does **not** reparent isolated106 or grant cross-case/tenant access.
+- [Existing workflow](../lib/platform/intake/presence-workflow.ts) now appends
+  source/digest-bound proposed corrections without clearing report, Direction,
+  blueprint, Pages or output custody. Exact retry is idempotent; stale, foreign,
+  malformed and conflicting changes are refused. Pending notes identify directly
+  cited findings/Direction/Page plans or sections and require reassessment before
+  further mutation/delivery. Citation impact is a dependency aid, **not** model
+  reasoning or proof that uncited material is unaffected.
+- Notes stay unconfirmed and leave canonical knowledge unchanged. Author-only
+  withdrawal requires a reason and retains history; it is not confirmation or
+  resolution of the underlying business question. Existing report corrections
+  retain their original separate behavior and historical contracts. Normal scoped
+  portal actions can save proposed notes; they cannot use proposal permission to
+  confirm facts. Actual canonical confirmation/reassessment wiring remains next.
+- [Internal review collector](../lib/platform/measurement/account-review.ts) uses
+  the existing authenticated local intake boundary and first-party ledger. It
+  derives account/source/revision/routes server-side, captures real account views
+  and open-work clicks, deduplicates exact events and rejects foreign fields,
+  invalid Actions and Contact events. `development` is distinct from `synthetic`
+  and `live`. No IP, browser identifier or form text is collected. Its counts
+  establish **internal review activity only**; WordPress visitor collection,
+  inquiry acceptance/outcomes and hosted collector policy are not supplied by it.
+- Save/conflict/permission errors now display in the workflow view; previously
+  that branch hid the common status/error message. Failed saves preserve entered
+  text. A workflow read failure is surfaced while older intake remains available;
+  review telemetry failure does not hide retained work.
+
+**Verified:** new real PostgreSQL/HTTP test plus existing workflow integration
+regression pass;26 focused review/source-authority/transport/cycle tests pass
+(28 automated tests total, zero failures/skips/provider dispatches). Fixture
+reasoning is explicitly labeled. Actual headless Edge at 1440px and 390px verifies
+correction save, reload, citation links, withdrawal, internal collection, no
+horizontal overflow and no browser errors. An explicitly injected409 verifies
+visible failure and retained input before a successful save. Zero external browser
+requests/provider calls. Browser receipts/screenshots are private ignored runtime
+evidence; no founder acceptance of a simulated interview/site is requested.
+
+Full `tsc --noEmit` and targeted ESLint pass. Initial typecheck exposed a pre-existing
+type error in an ignored November19 diagnostic helper; `tsconfig.json` now excludes
+ignored runtime-content/runtime-assets from application compilation. Tracked app,
+library, script and test sources remain included; no customer artifact was removed
+or compiler error suppressed. Disposable PostgreSQL/listeners/browser were stopped.
+
+**Remaining:** source-aware canonical confirmation/reassessment, explicit permitted
+original/evaluation case association, genuinely useful live AI work, ordinary
+inquiries/notifications/confirmed outcomes, installation-bound WordPress collection,
+inbound edit reconciliation and account-level applied receipt/readback. Existing
+signed outbound delivery is preserved. Further local engineering is authorized;
+new provider use, protected policies/deployment/application and publication still
+require their applicable concrete authority. Protected41/WordPress6, local97,
+isolated106 and prior ledgers were not touched. This is a first working connection,
+not completion of the six-step service cycle or a new spending grant.
 
 ### Service-process framework: existing foundations and missing connections
 

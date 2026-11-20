@@ -3,7 +3,7 @@ CREATE TABLE first_party_events (
   web_presence_id uuid NOT NULL REFERENCES web_presences(id),
   managed_site_id uuid NOT NULL REFERENCES managed_sites(id),
   source_id uuid NOT NULL,
-  environment text NOT NULL CHECK (environment IN ('synthetic', 'live')),
+  environment text NOT NULL CHECK (environment IN ('synthetic', 'development', 'live')),
   revision text NOT NULL CHECK (revision ~ '^[a-f0-9]{64}$'),
   event_id uuid NOT NULL,
   observed_at timestamptz NOT NULL,

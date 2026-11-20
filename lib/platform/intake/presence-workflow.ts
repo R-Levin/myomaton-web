@@ -17,6 +17,7 @@ import {
 
 import { commercialRevisionGuidance, qualityPass, readQualityReview, verifyCommercialJourneys, type MarketingAuthority, type QualityReview } from "./presence-marketing-authority";
 import type { ResolvePrivateVisuals } from "../content-editing/proposal-media";
+import { pendingUnderstanding, type UnderstandingCorrection } from "./account-work";
 
 export type WorkflowContext = {
   scope: DeploymentSelection;
@@ -62,6 +63,7 @@ type State = {
   report: WorkflowReport | null;
   confirmation: Decision | null;
   corrections: Correction[];
+  understandingCorrections?: UnderstandingCorrection[];
   direction: WorkflowDirection | null;
   blueprint: WorkflowBlueprint | null;
   pages: WorkflowPage[];
@@ -263,15 +265,16 @@ export class PresenceWorkflow {
     const authority = this.operations.marketingAuthority;
     const current = state.contextDigest === fingerprint(context) &&
       state.marketingAuthorityDigest === (authority && fingerprint(authority));
+    const knowledgePending = pendingUnderstanding(state.understandingCorrections).length > 0;
     const editorial = editorialProgress(state);
     const siteFirst = this.operations.reviewSequence === "site-first" && Boolean(context.evaluation);
     const concept = current && state.evaluation && !state.homeReview && !siteFirst ? homeConceptDigest(context, state) : undefined;
-    const canRenderForEditorial = current && this.boundary === "disposable" && Boolean(authority?.earlyConceptReview) &&
+    const canRenderForEditorial = current && !knowledgePending && this.boundary === "disposable" && Boolean(authority?.earlyConceptReview) &&
       !state.work && !state.failure && nextTask(state, siteFirst)?.operation === "editorial";
-    const canQueueEditorialRevision = current && Boolean(state.editorial) && !state.work && !state.operatorReview &&
+    const canQueueEditorialRevision = current && !knowledgePending && Boolean(state.editorial) && !state.work && !state.operatorReview &&
       (state.revisionRequest?.ordinal ?? 0) < (this.operations.maxEditorialRevisions ?? 1) &&
       Boolean(state.editorial?.concerns.length || editorial.assigned.length);
-    const next = !current ? "evidence-changed" : state.failure ? "recover" : state.work ? "in-progress" :
+    const next = !current ? "evidence-changed" : knowledgePending ? "understanding-review" : state.failure ? "recover" : state.work ? "in-progress" :
       nextTask(state, siteFirst)?.operation ?? (concept ? "home-concept" : !state.confirmation ? "customer-review" :
         state.editorial && (state.editorial.concerns.length || editorial.open) ? "editorial-review" :
           !state.operatorReview ? "operator-review" : "review-complete");
@@ -299,6 +302,7 @@ export class PresenceWorkflow {
     } : undefined;
     const { research, report, confirmation, corrections, direction, blueprint, pages, operatorReview, version, mode, failure } = state;
     return { version, mode, contextDigest: state.contextDigest, research, report, confirmation, corrections, direction, blueprint, pages, editorial: state.editorial, operatorReview,
+      ...(state.understandingCorrections && { understandingCorrections: state.understandingCorrections }),
       ...(editorial.findings.length > 0 && { editorialFindings: editorial.findings }), canQueueEditorialRevision,
       ...(concept && { homeConcept: { digest: concept } }), ...(state.homeReview && { homeReview: state.homeReview }),
       ...(operatorReview && { candidateReviewTarget: candidateReviewTarget(state) }),
@@ -331,13 +335,66 @@ export class PresenceWorkflow {
     return this.view(context, state);
   }
 
-  private async current(context: WorkflowContext, version: number) {
+  private async current(context: WorkflowContext, version: number, understandingReview = false) {
     const state = await this.store.read(context);
     if (!state || state.version !== version || state.contextDigest !== fingerprint(context) || state.mode !== this.operations.mode ||
         state.marketingAuthorityDigest !== (this.operations.marketingAuthority && fingerprint(this.operations.marketingAuthority))) {
       throw new IntakeError("draft_changed", 409);
     }
+    if (!understandingReview && pendingUnderstanding(state.understandingCorrections).length) {
+      throw new IntakeError("workflow_not_ready", 409);
+    }
     return state;
+  }
+
+  async correctUnderstanding(context: WorkflowContext, version: number, value: unknown, actor: Actor) {
+    let proposed: Pick<UnderstandingCorrection, "id" | "sourceId" | "sourceDigest" | "text">;
+    try {
+      const input = object(value, ["id", "sourceId", "sourceDigest", "text"]);
+      const id = text(input.id, 36), sourceId = text(input.sourceId, 160);
+      if (!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/u.test(id) ||
+          typeof input.sourceDigest !== "string" || !/^[a-f0-9]{64}$/u.test(input.sourceDigest)) throw Error("Invalid source correction binding");
+      proposed = { id, sourceId, sourceDigest: input.sourceDigest, text: text(input.text, Infinity, true) };
+    } catch { throw new IntakeError("invalid_request"); }
+    if (!Number.isSafeInteger(version) || version < 1) throw new IntakeError("invalid_request");
+    const saved = await this.store.read(context);
+    if (!saved) throw new IntakeError("workflow_not_ready", 409);
+    const state = await this.current(context, saved.version, true);
+    if (!["customer", "operator"].includes(actor.role) || actor.simulated !== (state.mode === "fixture") || !actor.id.trim()) throw new IntakeError("unavailable", 403);
+    const existing = state.understandingCorrections?.find(item => item.id === proposed.id);
+    if (existing) {
+      const { at, withdrawn, ...previous } = existing; void at; void withdrawn;
+      if (fingerprint(previous) !== fingerprint({ ...proposed, actor })) throw new IntakeError("draft_changed", 409);
+      return this.view(context, state);
+    }
+    if (state.version !== version) throw new IntakeError("draft_changed", 409);
+    const source = [...state.sourceSnapshot.evidence, ...state.research ?? []].find(item => item.id === proposed.sourceId);
+    if (!source || fingerprint(source) !== proposed.sourceDigest) throw new IntakeError("draft_changed", 409);
+    if (state.work || state.visuals?.some(visual => visual.state === "running")) throw new IntakeError("workflow_not_ready", 409);
+    return this.view(context, await this.store.append(context, version, { ...state,
+      understandingCorrections: [...state.understandingCorrections ?? [], { ...proposed, actor, at: new Date(this.clock()).toISOString() }],
+    }));
+  }
+
+  async withdrawUnderstandingCorrection(context: WorkflowContext, version: number, value: unknown, actor: Actor) {
+    let input: Record<string, unknown>, reason: string;
+    try { input = object(value, ["id", "reason"]); reason = text(input.reason, Infinity, true); }
+    catch { throw new IntakeError("invalid_request"); }
+    if (!Number.isSafeInteger(version) || version < 1) throw new IntakeError("invalid_request");
+    const saved = await this.store.read(context);
+    if (!saved) throw new IntakeError("workflow_not_ready", 409);
+    const state = await this.current(context, saved.version, true);
+    const item = state.understandingCorrections?.find(item => item.id === input.id);
+    if (!item || fingerprint(item.actor) !== fingerprint(actor)) throw new IntakeError("unavailable", 403);
+    if (item.withdrawn) {
+      if (item.withdrawn.reason !== reason) throw new IntakeError("draft_changed", 409);
+      return this.view(context, state);
+    }
+    if (state.version !== version) throw new IntakeError("draft_changed", 409);
+    return this.view(context, await this.store.append(context, version, { ...state,
+      understandingCorrections: state.understandingCorrections!.map(entry => entry.id !== item.id ? entry
+        : { ...entry, withdrawn: { actor, reason, at: new Date(this.clock()).toISOString() } }),
+    }));
   }
 
   /** One explicitly authorized disposable source repair, retaining all prior events,

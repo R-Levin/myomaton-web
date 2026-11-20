@@ -23,6 +23,7 @@ import { PlanningResponseCustody } from "./planning-response-custody";
 import { compactSitePlanningVersion, prepareSitePlanning, type SitePlanningEvidence } from "./site-planning";
 import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
 import { composePresenceCase, protectedWorkflowWorkspace, reviewWorkflowChange } from "./protected-presence-workflow";
+import { accountWork } from "./account-work";
 
 export const coreCookie = "__Host-miopages_core";
 type Config = {
@@ -244,15 +245,21 @@ export async function hostedCoreRequest(request: Request) {
       const proposal = view.sitePlanning?.proposal;
       // A pending or invalid workflow grant must not interrupt the prior protected owner review.
       const workflowReview = app.presenceCase && await app.presenceCase()
-        .then(async scope => ({ workflowAvailable: true, workflow: await (await scope.open()).review(await scope.context()) }))
-        .catch(() => undefined);
-      const canTriage = workflowReview?.workflow?.editorial &&
+        .then(async scope => {
+          const current = await scope.context(), workflow = await (await scope.open()).review(current);
+          return { workflowAvailable: true, workflow, ...(workflow && { accountWork: accountWork(current, workflow) }) };
+        })
+        .catch(() => ({ accountWorkUnavailable: true as const }));
+      const canProposeKnowledge = workflowReview && "workflow" in workflowReview && workflowReview.workflow &&
+        await app.operators.authorize(context, "prepare-site-proposal", app.selection).then(() => true, () => false);
+      const canTriage = workflowReview && "workflow" in workflowReview && workflowReview.workflow?.editorial &&
         await app.operators.authorize(context, "prepare-site-proposal", app.selection).then(() => true, () => false);
       return {
         ...view,
         portal: { role: "operator", identity: active?.owner ? "MioPages owner" : "Authorized Operator",
           account: "MioPages", site: "C0 development site", environment: "protected-development",
-          ...(canTriage && { editorialDecisionsAvailable: true }) } satisfies IntakePortalWorkspace,
+          ...(canTriage && { editorialDecisionsAvailable: true }),
+          ...(canProposeKnowledge && { understandingCorrectionsAvailable: true }) } satisfies IntakePortalWorkspace,
         interviewEnabled: Boolean(app.interview), operations: await app.inquiry().catch(() => null),
         sitePlanningEnabled: app.sitePlanningEnabled,
         ...workflowReview,

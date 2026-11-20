@@ -5,7 +5,7 @@ import type { DeploymentSelection } from "../managed-sites/deployment";
 const kinds = ["page-observed", "action-selected", "contact-accepted"] as const;
 type Kind = typeof kinds[number];
 export type MeasurementSource = {
-  id: string; selection: DeploymentSelection; environment: "synthetic" | "live"; activatedAt: string;
+  id: string; selection: DeploymentSelection; environment: "synthetic" | "development" | "live"; activatedAt: string;
   coverage: readonly Kind[]; revision: string; routes: Readonly<Record<string, readonly string[]>>;
 };
 
@@ -16,7 +16,8 @@ function timestamp(value: unknown) {
 }
 function scope(source: MeasurementSource) {
   if (!/^[a-f0-9]{64}$/u.test(source.revision)) throw Error("Measurement revision refused");
-  return [uuid(source.selection.webPresenceId), uuid(source.selection.managedSiteId), uuid(source.id), source.environment, source.revision];
+  return [uuid(source.selection.webPresenceId), uuid(source.selection.managedSiteId), uuid(source.id),
+    choice(source.environment, ["synthetic", "development", "live"]), source.revision];
 }
 
 export class FirstPartyMeasurement {

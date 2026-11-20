@@ -327,6 +327,8 @@ export async function reviewWorkflowChange(workflow: PresenceWorkflow,
   // Existing protected Operator can continue a development report. This grants
   // no authority to confirm business facts as a customer or publish anything.
   switch (operation) {
+    case "workflow-understanding-correct": return workflow.correctUnderstanding(current, version, details?.correction, actor);
+    case "workflow-understanding-withdraw": return workflow.withdrawUnderstandingCorrection(current, version, details?.correction, actor);
     case "workflow-start": return workflow.start(current);
     case "workflow-continue": return workflow.confirmReport(current, version, actor, true);
     case "workflow-correct": {

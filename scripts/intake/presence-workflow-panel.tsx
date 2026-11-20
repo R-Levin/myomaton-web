@@ -102,6 +102,7 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run, c
       </div>}
       {workflow.recoverable && <button type="button" disabled={busy} onClick={() => void submit("recover")}>Recover retained result</button>}
       {workflow.next === "evidence-changed" && <p>Onboarding evidence changed. Core needs to reconcile the changes before continuing.</p>}
+      {workflow.next === "understanding-review" && <p role="status">A proposed knowledge correction needs review. This report and website are retained for comparison; no reassessment or new approval has been recorded.</p>}
       {hosted && workflow.confirmation && working && <div role="status" className={styles.workflowStatus}>
         <h3>{workflow.next === "in-progress" ? step ?? "Core is preparing your website" : "Website planning queued"}</h3>
         {workflow.next !== "in-progress" && step && <p><strong>Next step</strong> {step}</p>}
@@ -131,7 +132,7 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run, c
               <h5>{item.heading}</h5>
               <p>{item.body}</p>
               <SourceReferences sources={item.sourceIds.map(id => sources.get(id)).filter(source => source !== undefined)} />
-              {!workflow.failure && workflow.next !== "in-progress" && workflow.next !== "evidence-changed" &&
+              {!workflow.failure && workflow.next !== "in-progress" && workflow.next !== "evidence-changed" && workflow.next !== "understanding-review" &&
                 <button type="button" className={styles.secondary} disabled={busy}
                   onClick={() => { setFinding({ id: item.id, version: workflow.version }); setCorrection(""); }}>Flag a correction</button>}
               {finding?.version === workflow.version && finding.id === item.id && <div className={styles.field}>

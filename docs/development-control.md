@@ -54,16 +54,24 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
-**Current task: bounded implementation scope prepared for review.** The owner
-asked to scope the agreed connected account cycle. The
+**Current task: connected account cycle, first local implementation checkpoint.**
+Following the scope/next-step discussion, the owner asked Codex to act next; local
+engineering is underway. The
 [proposal and business acceptance](service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle)
 connect understanding/corrections, genuine intelligence and editable work, shared
 review, authorized WP delivery/inbound reconciliation and actual observation/next
-action. It reuses existing components and identifies actual account/case,
-confirmation, collector and inbound gaps. No code, model dispatch or hosted change
-is part of this checkpoint. Next: owner scope review, then local implementation if
-approved. Bring one concrete protected-execution request after tested artifacts
-and policies are ready.
+action. [Verified first checkpoint and remaining gaps](platform-capabilities.md#connected-account-cycle--first-local-implementation-checkpoint)
+now cover retained source corrections, citation links, preserved current work,
+safe retry/withdrawal, visible save failures and actual internal review activity.
+This is working local engineering with recorded reasoning fixtures, not new AI
+quality evidence or a deployed service. No owner login/testing is needed now.
+
+Next local work: connect the existing canonical confirmation/reassessment path and
+ordinary inquiry/outcome handling, then installation-bound site observations and
+governed WordPress return/delivery. Do not invent a new approval or workflow system.
+Bring one concrete protected-execution request after tested artifacts, policies and
+permitted model inputs/budget are ready. No new model dispatch, hosted write,
+credential operation, infrastructure change, merge or publication occurred.
 
 **Prior owner clarification:** manual workload is not the launch constraint. The
 [critical-path assessment](platform-capabilities.md#indispensable-system-capabilities--critical-path-assessment)
@@ -72,9 +80,9 @@ completed review. That assessment was sequencing only, not authority to start
 implementation, a model round, measurement activation or site application.
 
 The [first connected account-cycle shape](service-operations-model.md#first-connected-account-cycle--agreed-shape-november-20)
-is agreed and the detailed scope is now prepared. Neither is an execution/provider
-or protected-write authorization. Review the proposed implementation using existing
-components; do not restart C0 or reduce the goal to a website.
+is agreed and local implementation has started. This does not grant external
+provider use or protected writes. Reuse existing components; do not restart C0 or
+reduce the goal to a website.
 
 Owner authorized a bounded **local review and correction of active guidance and
 interruption recovery**, including project-wide reuse, delivery independence,

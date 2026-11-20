@@ -81,6 +81,7 @@ export type IntakePortalWorkspace = {
   site: string;
   environment: "protected-development" | "local-rehearsal";
   editorialDecisionsAvailable?: true;
+  understandingCorrectionsAvailable?: true;
 };
 
 export class IntakeError extends Error {
