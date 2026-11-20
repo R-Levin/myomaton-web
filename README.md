@@ -2,7 +2,16 @@
 
 > **MioPages development — mandatory current-status entry point:** Read [Development control and continuity](docs/development-control.md) from current GitHub `main` at the start of every new development chat. It records the current hosted boundary, evidence status and the return path to Commercial V1. If inaccessible or conflicting, stop before hosted mutation. This is a live checkpoint, not a substitute for verifying Git or provider state.
 
-Website and first reference implementation of the reusable Myomaton web platform.
+MioPages is a managed Web Presence **growth service**. This repository contains
+Core, its Customer/Operator experiences and reusable service capabilities, plus
+delivery integrations and development customers such as MioPages C0 and Myomaton.
+The original Myomaton reference website remains valuable preserved work; neither
+it nor the C0 website-generation test defines the complete product.
+
+Read the active branch's recovery index and existing local
+`runtime-content/chat-recovery.md` as well as current `main` and the latest issue
+handoff. They may describe different checkpoints. The local note includes work
+not yet committed; reconcile it with Git rather than discarding it.
 
 Current stack: Next.js, React, TypeScript, Tailwind CSS.
 
@@ -22,7 +31,8 @@ isolation. C0/C1 same-process proof is implemented; hosted capacity is unproved.
 
 - [Architecture, principles, decisions and Human/AI charter](docs/platform-service-architecture.md)
   own the current 20i Managed Cloud + Supabase prototype direction, assumptions and
-  empty external-resource inventory. Providers remain replaceable candidates.
+  dated external-resource inventory. Verify current state from the active handoff;
+  providers and delivery mechanisms remain separate from the service domain.
 - [Service model](docs/web-presence-service-model.md) and
   [capabilities](docs/platform-capabilities.md) own product intent and scope.
 - [Deferred register](docs/deferred-architecture.md) owns active requirements and triggers.

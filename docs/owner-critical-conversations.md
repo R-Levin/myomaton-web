@@ -1,5 +1,12 @@
 # Owner-designated critical conversations and decisions — mandatory recovery index
 
+**Latest governing clarification:** [November 20 whole-service reconciliation](#november-20--whole-service-direction-and-interruption-recovery-approved).
+It reaffirms project-wide reuse, delivery independence and the distinction between
+permanent service goals, C0 evaluation and temporary launch arrangements. Earlier
+dated execution instructions are not renewed grants. Follow the current recovery
+index for live/source state; retained historical owner decisions keep their authority
+unless explicitly superseded.
+
 **Status:** Active, owner-directed canonical continuity index. **Priority: P0 development-process reliability.**
 **Created:** 2026-11-15 following repeated harmful loss of strategic context at ChatGPT conversation boundaries.
 **Repository:** `R-Levin/myomaton-web`. **Companion first read:** [development-control.md](development-control.md). **Live execution ledger:** [Issue #12](https://github.com/R-Levin/myomaton-web/issues/12); [adaptive onboarding acceptance #10](https://github.com/R-Levin/myomaton-web/issues/10).
@@ -461,7 +468,7 @@ Technical success (retained 12 Pages, 63 Sections, ten source-bound editorial fi
 
 ## P0-24 — Explicit owner approval of exact P0-22 C0 generation run, not site or production approval (November 18, 2026)
 
-**Direct owner authorization in this chat:** ChatGPT reviewed Codex's P0-22 implementation checkpoint `924fd146601c25ebc77a9ba2ccd9a80409aa6f88`, exact new peer sources, pinned source pack, run cap, expiry and the conservative old ledger. ChatGPT recommended approval and explicitly asked the owner to approve the exact P0-22 proposal. **Owner replied: “Yes.”** The record is [Issue #12 #6983036002](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6983036002) and the mandatory [development-control P0-24 entry](development-control.md#p0-24--owner-approved-exact-p0-22-local-generation-scope-activation-pending-november-18-2026).
+**Direct owner authorization in this chat:** ChatGPT reviewed Codex's P0-22 implementation checkpoint `924fd146601c25ebc77a9ba2ccd9a80409aa6f88`, exact new peer sources, pinned source pack, run cap, expiry and the conservative old ledger. ChatGPT recommended approval and explicitly asked the owner to approve the exact P0-22 proposal. **Owner replied: “Yes.”** The record is [Issue #12 #6983036002](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6983036002) and the mandatory [development-control P0-24 entry](https://github.com/R-Levin/myomaton-web/blob/d51b24236fff06035b49ed660bb95b12ef408396/docs/development-control.md#p0-24--owner-approved-exact-p0-22-local-generation-scope-activation-pending-november-18-2026).
 
 **Precisely approved:** One genuine local isolated Core C0 generation and review using [proposal SHA-256 `f8e48f864853802cfda73907a3fdce66b266b87e202bad9dc010fdc77435dd03`](https://github.com/R-Levin/myomaton-web/blob/924fd146601c25ebc77a9ba2ccd9a80409aa6f88/docs/c0-generation-p0-22-run-proposal.json) and [source pack SHA-256 `175bfeb870f4a375bb27bd6c299e7aaefe11d39731b9d5e94f806488bab6782a`](https://github.com/R-Levin/myomaton-web/blob/924fd146601c25ebc77a9ba2ccd9a80409aa6f88/docs/c0-generation-p0-22-sources.json). Additional cost maximum **$5.95**, with aggregate original $8 unchanged, conservative carried ledger debit **$1.952189** including unresolved $0.45 hold. Two new public read-only peer sites **b12.io** and **sitecare.com**, approved sanitized business/peer data only; exact stage budgets and limits (29 text calls, up to 2 images, 4 searches, 60 provider requests, zero automatic retries), up to **72 hours from verified activation**, not chat reply. Protected/hosted writes, publication, merge, extra source/data permission and acceptance of future marketing output **NOT approved**. Independent functional review/authority and credential procedure still apply.
 
@@ -651,3 +658,70 @@ do not regenerate, reset counters or silently replace source97. The supplied loc
 review artifact compares actual retained captures and proposed direction only.
 Core remains responsible for actual generated public content; Codex's assessment
 and revision brief do not become customer facts or an AI-produced website.
+
+### November 20 — whole-service direction and interruption recovery approved
+
+**Primary source:** the owner's direct conversation in this Codex chat on November
+20, followed by explicit instruction to proceed with the review. No verified public
+chat permalink is assumed; this record and the same-cycle Issue #12 handoff preserve
+the agreed substance. Discussion was initially paused for conversation only; that
+pause was respected after a premature read-only inspection was stopped. The owner
+subsequently authorized this bounded local review, not external execution.
+
+**Product and scope.** MioPages is a managed Web Presence **growth service**. Its
+pole star is the complete connected service, not a C0 website. The C0 generation
+test is one development case. Preserve the full body of owner-approved business
+knowledge and useful prior work; do not replace a broad requirement with a narrow
+proof or equate technical tests with product acceptance.
+
+**Project-wide reuse.** Reuse valuable suitable functional components throughout
+ALL development, not merely between Creation and Ongoing. That sharing of research,
+reasoning, content/media, review, approval, delivery, measurement and improvement
+is one example. Improve or replace a weak component when justified; do not freeze
+an inadequate implementation or create speculative duplication/universal machinery.
+
+**Core and delivery.** Core governs client knowledge, service workflow, proposals,
+approvals, revisions and operational history. WordPress and providers implement
+defined responsibilities without defining the domain. Logical independence does
+not require additional infrastructure for every function.
+
+**Temporary launch realities.** An early public MioPages site for visibility and
+genuine metrics is a separate business-launch workstream. It must not contaminate
+the AI-generation evaluation or silently change permanent product requirements.
+An operator-assisted launch is also a possible temporary bridge: people may cover
+functions intended for Core, using shared records and explicit replacement needs.
+Human judgment, customer confirmation and consequential approval remain deliberate
+permanent roles. A 20i-only initial launch is an **option under discussion**, not
+an approved restriction, market-size finding or decision to abandon off-host users.
+
+**WordPress follow-through.** Review four related areas without diverting the
+entire project into connector work: governed WP-origin changes into Core knowledge/
+content; synchronized Customer/Operator portal history and permissions; complete
+media master/copy/rights/withdrawal/retention/exit coordination; adoption of existing
+sites/themes/forms and off-host operation using only plugin/Admin access. Preserve
+accepted outbound staging/revision/receipt/rollback proofs. They do not prove inbound
+synchronization, complete media policy or universal host compatibility.
+
+**Communication.** Keep owner discussion high-level while doing detailed engineering
+as needed. Conversational simplicity does not authorize a smaller product or shallow
+implementation. Distinguish observations, proposals and actual owner decisions.
+Old assistant text is source evidence to interpret, not new standing authority.
+
+**Two approved actions now.** Reconcile active vision/development assets and verify
+the existing interruption/recovery method, including work not yet in Git. Preserve
+correct contracts and historical evidence; correct demonstrated drift, identify
+actual missing connections and return concise findings/next decisions. Reuse the
+existing Markdown, Git and Issue records. No new documentation/administration
+framework, model spending, private transmission, hosted change, merge or publication.
+
+**Continuity finding and repair.** The old root `runtime-content/chat-recovery.md`
+was stale at November 1 and missing from the active worktree. Preserve that original;
+restore the active rolling note plus the root pointer, update before commits and
+interruptions, and verify chat-free recovery with pending edits still uncommitted.
+This is an actively maintained checkpoint, not an automatic recording of unsaved
+thoughts or a guarantee against every crash. Capture material decisions early.
+
+**State reconciliation:** paid106 recovery/cost uncertainty in the earlier November
+20 entry is resolved; see [the exact no-dispatch evidence](c0-creation-quality-p0-17.md#paid-correction-recovery-and-cost-reconciliation--november-20).
+No source97/106 site approval or new grant follows. New product execution is selected
+after this review; a remaining old grant balance or available API credit is not consent.

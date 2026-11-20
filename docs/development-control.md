@@ -1,2231 +1,769 @@
 # MioPages development control and continuity
 
-Status: **active Git continuity checkpoint**. Originally recorded 2026-11-01; updated after hosted synthetic C0 verification on 2026-11-01.
-This file is the first-read **navigation and operational handoff** when merged to `main`. It does not supersede source code, immutable database state, approved product contracts or live provider evidence. Do not claim current runtime/database state from Git alone.
+**Current review checkpoint: November 20, 2026.** This is the recovery/navigation
+index. Canonical contracts own product requirements; verified records own runtime
+truth; the owner retains consequential authority. A dated checkpoint is not an
+instruction to repeat the operation. Current branch:
+`codex/first-operational-cycle-2026-11-12`.
+
+## Product objective and enduring principles
+
+**MioPages is a managed Web Presence growth service.** Connect useful entry and
+onboarding, business understanding, assessment/Presence Direction, credible sites
+and content, Customer/Operator review, authorized delivery, inquiries/outcomes,
+first-party measurement/reporting and continuing improvement.
+
+- Reuse valuable suitable components across **all development**. Creation/Ongoing
+  sharing is one example. Improve weak implementations; explain a genuine need
+  before adding another mechanism. No parallel demo may silently replace a service.
+- Core governs knowledge, workflow, proposals, approvals, revisions and account
+  history. Delivery and providers stay separable; no requirement for unnecessary
+  separate infrastructure or universal adapter abstractions.
+- C0 is a proving case, not the whole product. Code/tests, fixtures, actual model
+  output, hosted verification and owner acceptance are different evidence.
+- An early public MioPages site and temporary operator-assisted launch are distinct
+  business-launch arrangements. They do not redefine the product or prove Core AI
+  generation. Human judgment and customer approval remain intentional service roles.
+- 20i-only launch is undecided; existing-site/theme adoption and off-host WordPress
+  remain intended scope. WordPress engineering serves the growth service.
+
+Exact owner clarification: [November 20 decision record](owner-critical-conversations.md#november-20--whole-service-direction-and-interruption-recovery-approved).
+The [service model](web-presence-service-model.md#governing-product-principles) owns
+these principles, not the current C0 execution log.
 
 ## Owner-critical recovery sources
 
-At every new or interrupted MioPages session, first read [current main development control](https://github.com/R-Levin/myomaton-web/blob/main/docs/development-control.md), then the full [owner-critical conversation index](https://github.com/R-Levin/myomaton-web/blob/main/docs/owner-critical-conversations.md). Follow the exact linked owner decisions and Issues #12 and #10, then reconcile with the current development branch, working tree and grants. Main maintains the critical-conversation index. This branch maintains its implementation checkpoint. Apply later owner decisions and record important conversations there during the work, with their authority and supersession. Product development remains the overall priority. [Continuity and priority decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6898063682)
+At every new/interrupted session, verify the actual branch, HEAD, worktree and
+outstanding changes before acting. Read current GitHub `main` as the owner's shared
+record, **also** this active branch's index and latest Issue #12/#10 handoff: main,
+the root checkout and the implementation branch may be at different checkpoints.
+Do not merge, reset or switch merely to make their numbers match.
 
-**Current recovery — November 20: paid correction recovered at106; no new generation.**
-Read [the read-only recovery, reconciled costs and product judgment](c0-creation-quality-p0-17.md#paid-correction-recovery-and-cost-reconciliation--november-20).
-Existing SSH access is restored. Queued100 completed the Home/Service/How revisions at106;
-all three saved, independently revalidated, zero pending/failure, grant/ledger unchanged.
-Run usage:40generations/79requests, $10.823604 estimated/$11.183776 conservative.
-Final three revisions added$1.127671; figures are usage estimates, not an invoice or Codex costs.
-The copy is modestly refined but still lacks the fuller commercial explanation; no images added.
-Current WordPress remains97; no recovered version was applied. No WORK/provider call/hosted write.
-Updated local report: `runtime-content/c0-presentation-20261119/morning-review-recovered-20261120.html`.
-Next: owner discussion of the concrete whole-site direction below, then only specifically needed
-Core revisions under fresh spending authority. Available$17.58 credit is not that authority.
+Read [owner-critical conversations](owner-critical-conversations.md) and the exact
+linked decisions relevant to the operation. Preserve the owner's enduring decisions;
+old assistant suggestions, manifests and next-operation instructions do not renew
+expired authority. If a required source is missing/conflicting, continue safe
+independent work and report the precise blocker before dependent protected action.
+Do not ask the owner to repeat knowledge already retained.
 
-**Earlier November 20 comparison, retained:**
-Read [the comparison, concrete recommendation and recovery boundary](c0-creation-quality-p0-17.md#whole-site-comparison-and-recommended-direction--november-20).
-The owner sees real layout progress but has not accepted content/design or commercial operation.
-The complete earlier R3 copy, 29 Knowledge entries/Offering and accepted v3 visual evidence
-support a fuller discovery/content/inquiry/improvement story than source97 currently presents.
-The recommended direction restores that substance and explanatory visuals while preserving
-the improved layout. It is a proposal, not newly generated site content or a new budget.
-Owner-reported API credit: $17.58; no new spending authorization inferred. Existing SSH agent
-is stopped; loading the existing key is the only requested access action. Queued100 output
-and final costs remain unverified. Do not invoke WORK, regenerate or overwrite the current site.
-Local comparison artifact: `runtime-content/c0-presentation-20261119/morning-review-20261120.html`.
-It links actual retained reference/current captures; it is not a parallel product demo.
+**Local recovery before Git:** read `runtime-content/chat-recovery.md` in the active
+worktree. In this Windows root checkout the same filename is a pointer to that note.
+The old November 1 note is preserved locally; its next steps are historical.
+A fresh clone may lack these ignored files: recover the latest pushed record, then
+identify the missing machine-local work instead of assuming it never existed.
 
-**November 19 evening state, still preserved:** local presentation pass complete.
-Open the existing six-page WordPress candidate at http://127.0.0.1:4474/?page_id=203&preview=true.
-Read [the exact evening handoff](c0-creation-quality-p0-17.md#evening-local-presentation-pass--november-19).
-Displayed candidate: source97, Home203/Service215/How-it-works216/FAQ217/Free Review218/Direct Start219,
-local theme0.1.2. Layout corrections passed18 actual browser views and unchanged-copy/native checks.
-This is NOT commercial acceptance. No provider requests were initiated for this local pass.
-The earlier three-Page correction queued100 was not read back or applied: existing SSH key
-authentication is unavailable. Last verified PRE-correction usage:37generations/73requests,
-$9.695933 estimated/$10.056105 conservative; current final balance UNKNOWN, not assumed unchanged.
-Preserve retained outputs/ledger. Do not dispatch, regenerate, reset budgets or assume failure.
-Owner approved local presentation work after rejecting further resource churn. Recover already-paid
-work read-only when existing SSH access returns; no new model round is implied. No protected
-Core/WordPress deployment, publication, credential or infrastructure change.
+## Current authorized work and result
 
-**All earlier checkpoint paragraphs below are historical.** Their former “Current” labels describe
-past checkpoints; do not execute those recovery instructions over this record.
+Owner authorized a bounded **local review and correction of active guidance and
+interruption recovery**, including project-wide reuse, delivery independence,
+transitional-launch separation and WordPress gap inventory. The conversation-only
+pause was explicitly lifted. No new API dispatch, hosted change, infrastructure,
+credential, merge, public-site publication or new WordPress application is authorized.
 
-**Historical: Home81/Service83/How-it-works86 retained; remaining three Pages drafting.** Read [wire correction and exact recovery](c0-creation-quality-p0-17.md#wire-structure-corrected-how-it-works-recovered-without-regeneration). Empty disclosure retained exact visible text as a paragraph; no invented answer or repeat generation. Native wire now enforces kind-specific structure before generation; canonical guards unchanged. Linux75/TypeScript/lint pass. Private worker7db54f79/proof75f41879 active, same grantf024b799/$13 TOTAL/expiry. Normal WORK may be on FAQ; inspect event/ledger first. Still no completed-site visual quality claim or protected WordPress write. Prior checkpoint follows.
+The [current capability map and service-framework inventory](platform-capabilities.md#current-functional-map--november-20-2026)
+distinguish working foundations from missing ordinary-service connections. The
+framework is partly built: reuse the Core workflow/review, canonical data, signed
+WordPress delivery, Contact and first-party ledger. A complete usable recurring
+service is not established; synthetic inquiry/recommendation and measurement
+fixtures are not real performance. The November 13 local archive assessment is
+historical, not an instruction to rebuild its superseded components.
 
-**Historical: Home81 recovered WITHOUT another generation; five supporting Pages drafting.** Read [exact mismatch, lossless recovery and next action](c0-creation-quality-p0-17.md#exact-action-label-recovery-complete-site-drafting-resumed). Native Action nodes referenced exact Page Actions but omitted redundant labels allowed by wire schema; provider recovery binds only that label, preserving raw response/destinations/guards. Actual Home parses; Linux74tests/TypeScript/lint pass. Private worker835c0be3/proof6a5f1cf8 active; grantf024b799 unchanged. Same6-route blueprint78, report73/Direction76, $13 TOTAL/44gen/89requests/expiry. WORK may be pending; inspect before duplicating. No website quality claim or protected WordPress change. Prior checkpoint follows.
+The [WordPress coordination review](wordpress-delivery-feasibility.md#coordination-media-and-adoption-review--november-20)
+covers WP-origin changes/knowledge, portal consistency, media lifecycle, existing
+themes/forms and plugin/Admin-only off-host operation. Signed outbound proofs are
+preserved; they do not prove every inbound/editing/host capability.
 
-**Historical: whole-site continuation APPLIED; genuine report73/Direction76 saved, blueprint77 pending at checkpoint.** Read [actual activation and recovery](c0-creation-quality-p0-17.md#continuation-activated-and-genuine-upstream-work-resumed). Private worker30ea8afa/proofc3b9cba0/grantf024b799 independently verified. Resource-onlyc6d7749e applied once; original ledger/claims/identities/expiry retained. Core report9findings now cites full owned knowledge and continuing-growth. No customer-fact promotion. Normal WORK active; inspect DB/ledger before repeating. Inspect-file71 collision is retained read-only export limitation, not failed auth. No WordPress/protected/public change. Prior readiness checkpoint follows.
+**Local correction verified:** existing shared Creation/Ongoing and P0-22/23 records
+and stage-appropriate access policy were missing from this branch, although linked
+from its owner index. Restored them from main with source/status provenance, not a
+merge or dispatch. Corrected the restriction conflating useful owned R3 reuse with
+third-party copying. Repaired the stale/missing local notes and exercised disk/Git
+recovery of12 uncommitted source files before commit; retained147 old index anchors
+and original evidence.20 focused tests passed without provider calls. Detailed
+findings, verification limits and remaining decisions are in the capability map.
 
-**Historical: owner approved whole-site continuation; correction10 Linux72tests and actual71 preflight PASS.** Read [exact scope, accounting correction and recovery](c0-creation-quality-p0-17.md#approved-whole-site-continuation-ready--november-19), manifest c6d7749e. Site-first sequencing, optional exact per-Page media and separated critique scopes implemented; final review/publication gates unchanged. Owner approved$13 TOTAL (+$5),44/89/7/3 with old spend/counters/expiry retained. Conservative existing debit is$6.012396 versus$5.652224 usage estimate; max future$6.987604. No activation/provider call yet at this checkpoint. Next exact worker30ea8afa/proofc3b9cba0 + resource-only apply, then genuine complete-site Core generation/local WordPress review. Prior source-binding checkpoint below is retained.
+### Preserved C0 state and costs
 
-**Historical: approved binding correction APPLIED; active case71 independently verified.** Read [actual result and recovery](c0-creation-quality-p0-17.md#approved-source-binding-correction-applied-and-independently-verified). Owner explicitly approved worker9e8a7042+manifest5494e0a7. Exact activation/apply passed; normal worker opens258,615byte context and reports71/next report. Independent readback verifies27records (old22+five analysis), exact sources/statuses, unchanged public claims/token/permissions/expiry/limits/ledger, preserved70/research/history and old WordPress native hashes. Rollback/bundle/receipt retained, lock removed. No model calls or new API usage;25gen/49requests/$5.652224 settled/zero pending. Source binding is fixed on the actual isolated host; no new-site quality claim. Latest approval excludes model calls and does not replenish32/65/2/4 or$8. The following hosted-write hold is historical.
+- Local WordPress displays source97, theme0.1.2, at
+  http://127.0.0.1:4474/?page_id=203&preview=true. Six Pages, improved responsive
+  execution, no photo placements. Protected Core41/WordPress6 and prior candidates
+  remain untouched. No final commercial/design/customer acceptance.
+- The already-paid Home/Service/How correction completed at isolated Core106.
+  It was recovered and independently validated, **not applied** to WordPress.
+  No pending/failure receipt. It is a modest refinement, not the needed creative
+  advance. Existing SSH access is restored; no repeat generation is needed.
+- This run:40generations/79requests; **$10.823604 estimated usage /
+  $11.183776 conservative debit**, including the last$1.127671 correction. These
+  are not invoice, Codex or whole-project totals. Owner-reported account credit
+  $17.58 and the old remaining envelope are not new spending authority.
+- Exact [recovery/cost evidence](c0-creation-quality-p0-17.md#paid-correction-recovery-and-cost-reconciliation--november-20)
+  and [whole-site recommendation](c0-creation-quality-p0-17.md#whole-site-comparison-and-recommended-direction--november-20)
+  preserve the details. New generation remains paused. Do not invoke WORK or
+  silently substitute106 while recovering context.
 
-**Current: binding repair complete/tested/prepared; hosted apply needs explicit consent after tool rejection.** Read [exact outcome and resume](c0-creation-quality-p0-17.md#prepared-binding-retained-exact-hosted-write-held-by-automatic-review). Code39117ea pushed; Linux65tests pass. Same-case PREPARE manifest5494e0a7 passed and retains before/after bundle. Automatic approval review rejected private-worker replacement plus APPLY before execution, requiring explicit hosted-write consent. Independent readback confirms70/activef8c51c32/ledgerunchanged; neither operation started. One precise approval question is pending for worker9e8a7042 +manifest5494e0a7, with no model call/spend/WordPress/public change. Owner's limit instruction means context reader only. The following dry-run checkpoint is historical.
+## Canonical contract map
 
-**Current: source-binding repair implemented and verified; actual-case dry run passed.** Read [connected repair and recovery](c0-creation-quality-p0-17.md#source-binding-repaired-through-the-existing-pipeline--november-19). All five actual originals are citable analysis through report/Direction/planning settlement and reload; Page claim authority stays unchanged. Existing recovery/installer supports exact context rebinding without history/counter resets. Reader uses existing36MB source envelope; actual next context258,615bytes exceeds old256KB config limit. Linux65tests/TypeScript/lint pass. Verified code09c ready, not activated; current70/ledger untouched, no new paid call. Exact v2 manifest5494e0a7 prepared after read-only current-case compilation22->27sources. Owner's limit adjustment refers to context reader only; spending cap unchanged. The following diagnosis-only checkpoint is historical.
-
-**Current diagnosis: source registry gap and corrupted provider schema verified.** Read [causal findings, local fixes and remaining work](c0-creation-quality-p0-17.md#retained-reasoning-inspection-causal-defects-not-another-paid-attempt). Owner permitted inspection of report57/Direction60/blueprint62/critique66; completed read-only, no text exported to Git/replies. All five restored originals were attached but absent from allowed analysis citations. Shared JSON-schema arrays also forced source IDs into the risk/avoid field; actual wire61 and offline reproduction confirm it. Local binder/peer-wording corrections pass29tests/TypeScript/lint, not deployed. Original-to-analysis evidence binding and upstream recovery remain incomplete; do NOT claim website repair or buy another Home edit. Live70 idle and untouched; no new provider calls/cost, same25gen/49requests/$5.652224 settled/zero pending. Read the linked owner accountability correction. The following inspection hold is historical.
-
-**Current: Home70 retained, still inadequate; paid calls stopped for diagnosis.** Read [actual result, exact rollback and recovery](c0-creation-quality-p0-17.md#final-permitted-home-retained-diagnosis-only-hold). Complete sources really arrived and the archived-AI duplication fix was used, but meaningful commercial breadth is still missing. No pass/acceptance claimed; supporting Pages remain undrafted. Actual same-ID content/brand/routing rollback and independent native readback passed, prior202posts exact. Current70 idle,25generations/49requests,$5.652224 settled,0pending,$2.347776 remaining;2/2replans and4/4editorial rounds consumed. Stop further calls. One explicit consent request is pending to inspect retained generated report57/Direction60/blueprint62/critique66 over existing SSH in Codex for diagnosis; automatic review rejected that payload export and was not bypassed. No new expense, reset or protected change requested. The following active69 checkpoint is historical.
-
-**Active: complete sources received, narrow Home rejected, final correction running.** Read [actual result and recovery](c0-creation-quality-p0-17.md#complete-sources-received-narrow-home-rejected-and-final-correction-active). Report57/Direction60/blueprint62/Home64 are retained; actual WordPress203 still too narrow, NOT accepted. Core critique66 has11 concerns and scoped negative judgment67. Tested correction08 stops duplicating archived failed AI strategy into current knowledge; Linux54tests/TypeScript/lint pass. Last editorial round queued68; generation69 is active. Inspect event/ledger before continuing, never duplicate. At69:25generations/49requests, $5.249326 settled +$0.680000 pending, unchanged$8/32gen/65req/November22 expiry;2replans/4editorial rounds consumed. Protected41/6/75 and old previews preserved. The following source-restoration checkpoint is historical.
-
-**Owner resumed: whole-knowledge repair, before further generation.** Read [the exact source recovery and implementation checkpoint](c0-creation-quality-p0-17.md#whole-knowledge-source-recovery-in-implementation--november-19-2026) and c0-source-recovery-amendment.json. Actual accepted site/29knowledge entries/full Offering/seven R3 Pages and service/growth/conversion/design contracts are prepared. Local47 tests/TypeScript/lint and actual Linux46 tests pass. Read the linked Linux result/data-transfer hold: automatic approval review rejected the five-source archive because trusted consent did not explicitly name the payload/destination. No data transfer, worker activation, source amendment, rewind or API call occurred. Code/proof are retained; current54/worker/ledger unchanged. That exact clarification has now been received ('Authorized') and accepted. Read the linked active reassessment subsection: complete source/index readback passed, worker647e1174 active, append-only sourceRecovery55 recorded, and actual14.37MB report request verified with full owned sites/29knowledge entries/11reference images before dispatch. Genuine report work is now running; inspect event/ledger before continuing, never duplicate pending work. Core's append-only reassessment preserves research, useful prior work, counters and ledger. Same8-dollar/32generation/65request/November22 expiry limits;19generations/$3.659578 used. No new provider call or hosted deployment claimed. Earlier pause remains historical.
-
-**PAUSED by owner: earlier-site source omission verified.** Read [the exact failure chain and corrected diagnosis](c0-creation-quality-p0-17.md#paused-verified-earlier-site-omission-and-self-confirming-checks--november-19-2026). The manifested R3 original is its development handoff, not the actual seven-page copy; current provider request has zero editorial records. Canonical growth passages and historical images did arrive, so do not claim all knowledge was missing. Earlier 'complete originals' assertions proved delivery of selected files, not correct source selection. No new provider call or implementation; retain54 and all state/costs. Await owner direction after the bounded report. The following checkpoint predates the pause.
-
-**Current recovery: owner participation and actual Home54 capture hold.** Read [judgment provenance, owner feedback, exact current result and recovery](c0-creation-quality-p0-17.md#owner-participation-judgment-provenance-and-current-capture-hold--november-19-2026). Home54 is real local WordPress203 with both photos and current desktop/mobile captures; supporting Pages remain unfinished. The owner reviewed54: writing very good, scope too narrow, result meager for the time/money and progress unacceptable; no product acceptance. The per-Page peer-composition restriction originated in924fd14, an implementation interpretation rather than a necessary integrity rule. Core AI critique is advisory; Codex's delegated judgment is provisional; owner feedback on unfinished work is welcome and distinct from acceptance. Automatic tool review twice refused sending current visitor screenshots/index back to the same authorized private Cloud case; no upload or model call ran. Preserve captures54, current event54, ledger and all prior evidence.37requests/19generations, $3.659578 estimated, zero pending, original$8/November22 expiry; replans2/2 and editorial3/4 used. Resolve only the explicit capture-transfer consent, then concept judgment and supporting Pages; no more Home-only churn. No protected41/6/75 or old preview change. The following checkpoint is historical.
-
-**Fresh source-aware run: real photos and third editorial Home retained.** Start at [actual media, reasoning experiment, regression status and recovery](c0-creation-quality-p0-17.md#real-private-stock-placements-and-reasoning-aware-revision--november-19-2026). Home48 rendered on real local WordPress203 with both reviewed stock Assets/usages, actual desktop/mobile capture and unchanged old202 posts. Source/report stay on Cloud. Core critique50/negative judgment51 led to third editorial correction52, now saved54. Supporting Pages/full-site quality remain unfinished; no founder acceptance. Worker47 Linux tests pass; two focused media/file tests pass; three broader legacy fixtures fail at unchanged fixed-pilot setup, explicitly retained. Current dated cost$3.343858/35requests/18generations before54 receipt. Same$8/32gen/65request cap, November22 15:58:31UTC expiry, protected41/6/75/old previews/ledgers intact. Replans2/2, editorial3/4: inspect current event/ledger before resuming, never reset/buy retained output again. Earlier checkpoints below are historical.
-
-**Current C0 recovery point.** The approved local [visual review and flexible WordPress closeout](c0-integration-spine-phase-b-2026-11-10.md#protected-visual-review-and-flexible-wordpress-drafts-2026-11-15) passed its Linux build and offline rollback checks. Start at the [exact hosted run and recovery gate](c0-integration-spine-phase-b-2026-11-10.md#exact-hosted-c0-run-awaiting-owner-authorization-2026-11-15) and reconcile with the latest [Issue #12 decisions](https://github.com/R-Levin/myomaton-web/issues/12). The [manifest](c0-hosted-presence-run.json) pins the scope, prior ledger, verified artifacts, cost, expiry and rollback. The [hosted preflight](c0-integration-spine-phase-b-2026-11-10.md#hosted-read-only-preflight-and-owner-review-hold-2026-11-15) confirms the live Core and WordPress baselines and the six research URLs. The owner approved the exact run. The migration and protected Core activation passed. Resume from [live research, retained assessment and owner review correction](c0-integration-spine-phase-b-2026-11-10.md#live-c0-research-retained-assessment-and-owner-review-correction-2026-11-16-utc). The approved replacement and no-provider recovery passed. The owner continued the case, real Presence Direction was saved and the exact blueprint recovery passed. Resume from [the live Home response and Page recovery gate](c0-integration-spine-phase-b-2026-11-10.md#blueprint-recovered-and-first-live-page-retained-2026-11-16). Home was recovered without another provider request and eight more Pages were saved. Start at [the tenth Page recovery checkpoint](c0-integration-spine-phase-b-2026-11-10.md#home-recovered-and-tenth-page-retained-2026-11-16). The tenth Page was recovered without another provider request and the last two Pages are saved. Open [the complete hosted text draft and editorial recovery checkpoint](c0-integration-spine-phase-b-2026-11-10.md#complete-hosted-site-draft-and-retained-whole-site-editorial-2026-11-16). The owner rejected the revision-41 website review. Keep that case and its evidence in place. Start at [the product recovery and composed WordPress draft proof](c0-integration-spine-phase-b-2026-11-10.md#product-recovery-and-composed-wordpress-drafts-2026-11-16), then read the latest Issue #12. The local browser proof verifies rendering only. The next genuine generation and any protected WordPress stage require their own authority.
-
-**Owner review and current diagnosis.** The owner sees the most sophisticated implementation yet, but insufficient creative/commercial improvement over earlier hand-edited work. Read [the read-only causal audit and cost reconciliation](c0-creation-quality-p0-17.md#owner-review-and-causal-audit--november-18-2026) before another run. Full originals arrived, but old claim constraints, absent generated-site visual feedback and unwired strategic replan remain material gaps. This is an analysis/proposal, not new implementation/spending authority or product acceptance. The [follow-up code history and proposed prevention](c0-creation-quality-p0-17.md#how-the-restrictions-entered-the-implementation--november-19-2026) distinguishes assistant design choices from actual owner safeguards; approval of an exact run did not establish those choices as good product design.
-
-**Current original-evidence result.** Start at [the completed focused correction, actual site and recovery point](c0-creation-quality-p0-17.md#final-focused-correction-and-viewable-site--november-18-2026): Core75, eight real WordPress Pages/two photos at http://127.0.0.1:4474/, verified rollback and preserved41/6/4473. Final round completed; no provider operation remains in flight. Commercial weaknesses and a temporary local Operator-edit bridge remain explicit. New run debit $9.069494 / $12; all three revision rounds used. Do not repeat the round. The following version64 checkpoint is historical.
-
-Read [eight-page WordPress, real media, quality findings and the pending stage-budget decision](c0-creation-quality-p0-17.md#original-evidence-eight-page-wordpress-and-stock-checkpoint--november-18-2026). Core version 64 and the real local WordPress site at http://127.0.0.1:4474/ are retained, with two reviewed stock Assets/usages. Navigation and rollback pass; substantive commercial defects remain. No founder acceptance is claimed. Preserve Core 41, WordPress 6, 4473 and all ledgers. The owner has now approved the exact three-stage reallocation; read [the amendment and execution checkpoint](c0-creation-quality-p0-17.md#approved-final-correction-budget--november-18-2026) before dispatch. Totals, sources, counters and expiry are unchanged.
-
-**Historical original-evidence activation.** The owner approved the exact expanded run. Read the [verified activation and resume instructions](c0-creation-quality-p0-17.md#original-evidence-run--approved-activation-november-18-2026). The fresh isolated C0 case, original source custody and unchanged ledger prefix are verified. Core's sandboxed public browser capture uses the existing Windows workstation over encrypted stdio; private context/model calls stay on Cloud. Effective expiry is November 19 at 16:03:51 UTC. Continue actual research/generation, not another approval request for that same scope.
-
-**Previous original-evidence correction.** The owner authorized local implementation
-and whole-service reconciliation. Read the [current service map](platform-capabilities.md#current-functional-map--november-18-2026),
-[verified correction and next gate](c0-creation-quality-p0-17.md#original-evidence-and-service-scope-correction--november-18-2026)
-and [one pending run proposal](c0-original-evidence-run-proposal.json).
-Core now has an opt-in full-original/visual request path, research capture and
-nested local native components; existing stock governance accepts private Pixabay
-use. These are local engineering results, not a new generated website or product
-acceptance. The existing five-page preview and its ledger are preserved. Obtain
-the one expanded-data/spending/isolated-runtime authorization before dispatch.
-No protected Core/WordPress deployment or publication is implied.
-
-**Previous P0-22 recovery point.** Open the [genuine five-page WordPress preview](http://127.0.0.1:4473/) on the development workstation. Follow the [durable version 52, cost and review handoff](c0-creation-quality-p0-17.md#p0-22--five-page-c0-wordpress-preview-revisions-and-cost), [P0-23 connected-cycle decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6982137262) and [exact owner approval](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6983036002). Core generated and revised the actual five Pages using the approved sources; its isolated ledger and the earlier candidates are retained. The loopback browser verifies both buyer routes, the exact wordmark and provisional generated illustration. The candidate retains editorial and launch gaps. No protected WordPress staging or product acceptance was recorded.
-
-**Historical P0-18 checkpoint.** Follow the [owner’s local-preview-first direction](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6964327736) and the [stage-appropriate access policy on main](https://github.com/R-Levin/myomaton-web/blob/f9c142fbb7e6b55994efc2448796550d2bbd87e0/docs/security-operations.md#stage-appropriate-access-and-approval--owner-correction-november-17-2026). The owner authorized an exact replacement report with the original $0.45 counted in full. Core saved the replacement report, the site plan and eight revised C0 pages. The disposable WordPress preview is available at [http://127.0.0.1:4471/](http://127.0.0.1:4471/) on the development workstation. See [the verified local review and recovery checkpoint](c0-creation-quality-p0-17.md#p0-18--viewable-c0-wordpress-candidate). This milestone is for visual and content iteration. No protected staging grant or publication event was recorded.
-
-**Previous P0-17 recovery point.** Read the [C0 creation failure, local corrections and independent commercial verdict](c0-creation-quality-p0-17.md). Owner acceptance failed. Core now has a local marketing-authority and independent review gate, and a disposable WordPress comparison proves the approved visual tokens and original wordmark can reach the rendered draft. The retained site's content, journey and media still require substantive revision. No new provider or protected work is authorized by this checkpoint. Continue from the report's **RECOVERY / RESUME HERE** section. The local follow-up adds signed brand delivery and exact restore, per-stage model metering, and the [single $8 C0-only authorization proposal](c0-commercial-authorization-proposal.json). The owner authorized this exact proposal subject to pre-dispatch verification. Linux and actual WordPress/InnoDB apply/rollback passed. The owner then approved the exact source amendment, and the compiler now requires it. A read-only protected inventory confirmed no eligible reviewer on the evaluation scope. The owner has since authorized reuse of the existing reviewer credential for the isolated case, with the owner acting as reviewer and authorizer through separate permissions. The new worker enforces the existing credential expiry, exact artifact and isolated review-only grant. Linux activation and the blank metered ledger passed. The first isolated research response completed and was retained, but it supplied four query strings in one search with five observed origins, below the approved research gate. Further dispatch stopped. See [the verified research stop and recovery point](c0-creation-quality-p0-17.md#isolated-activation-and-first-live-research-result).
-
-**Retained evaluation evidence.** Start at the [hosted C0 revision 6 review handoff](c0-integration-spine-phase-b-2026-11-10.md#hosted-c0-revision-6-staged-for-authenticated-visual-review). The exact approved guard is live and verified. WordPress holds signed revision 6 with all 13 Pages and both images, with the authenticated Core receipt reconciled and the revision 3 restore target verified. Keep the rejected evaluation staged as evidence and preserve the retained rollback, existing C0 revision 41 and publication controls.
-
-## Outcome-first execution and proportional controls — owner decision, 2026-11-14
-
-**Approved operating rule.** The owner directs MioPages development by product outcomes and explicitly rejects repeated penny-level authorizations, arbitrary miniature data limits, and serial approvals for routine technical implementation. **Founder attention and elapsed development time are scarce resources**. A safeguard must be justified by a concrete risk, its likely consequence, and the time/effort it adds. This direction supersedes contrary informal micro-gating habits; it does **not** itself authorize additional spending, protected-data transmission, hosted writes, merging, publication, or changes to explicit active grants.
-
-- **Scope work to an end-to-end visible result.** For the current site-planning workstream, the next acceptance is a **durable, source-linked, business-specific generate → Operator review → edit → private WordPress preview** loop, with real C0 and separately fictional C2 evidence, not another disconnected proof. Maintain the broader Entry/Interview, WordPress, Lead/Measurement and Ongoing strands in parallel.
-- **Delegate ordinary development.** Within an approved local/workstream scope, Codex should build, instrument, test, diagnose, fix and retest without returning for approval on every code change, test fixture or technical design detail. A failure means investigate and retry within scope, not stop automatically. Preserve successful code and working customer experience. Tests are evidence, not owner acceptance.
-- **Obtain one proportional grant for a full external-use cycle.** When protected model calls or other spend require owner authorization, propose a single **aggregate ceiling** sufficient for expected generations plus bounded diagnostic iterations/retries, explicit eligible evidence/data, allowed destinations, expiry, and fail-closed budget protection. Do not convert individual low-cost calls into serial founder decisions. An exhausted or zero-retry historical grant remains exhausted; request a new consolidated grant instead of interpreting this policy as retroactive permission.
-- **Use meaningful stop gates.** Stop for tenant/privacy/security or credential exposure, unapproved protected-data transmission, spend beyond the granted envelope, unresolved duplicate/uncertain financial dispatch, unauthorized hosted/production writes, irreversible data operations, actual customer approval, merger or publication. For a proposed new restriction, document **risk / expected loss / mitigation already in place / founder-time cost / least intrusive alternative**. Arbitrary small record, token, page or question counts are not acceptable product limits.
-- **Make completed work recoverable.** Preserve protected model responses and diagnosis evidence under approved access/retention rules, with provenance, so validation or persistence defects can be fixed without buying the same output again. Keep real customer data out of public Git and preserve knowledge/Operator/customer approval boundaries.
-- **Report product progress, not a list of proofs.** At a meaningful checkpoint state what a customer/Operator can now do, what is still simulated or broken, one next action/owner, acceptance condition and only genuine authority gates. Do not ask the owner to reapprove already-authorized local engineering. Log this decision in Issue #12 alongside the relevant current work; GitHub comments alone do not dispatch Codex.
-
-### Running cost of active tasks (required in existing Git handoffs; no parallel ledger)
-
-At each substantive checkpoint, append one compact **cumulative cost line** to the current canonical workstream handoff and Issue, referencing the protected provider ledger. Do this **at checkpoints**, not for every call. Separate **actual/usage-priced estimated spending**, **uncertain reservations (an accounting ceiling, not a proven charge)**, **other approved expenditure**, and **founder time/elapsed delay**. Report task-specific numbers and broader project totals separately and **never add a task subtotal to an already-inclusive project total**.
-
-Use: `Task / since / model requests+generations / AI usage-estimate spent (delta, cumulative) / uncertain reserve / maximum accounted / other cash costs / owner time minutes (reported/observed, otherwise UNKNOWN) / elapsed time or avoidable delay / remaining authority / outcome and next gate`. Update prior values rather than restarting the running total. Do not invent owner hours, hourly rate, provider invoice charges, Codex effort or grant capacity. If an owner-time rate is explicitly supplied, show `owner minutes × rate ÷ 60` as a **separate opportunity-cost estimate**, never as a paid expense. Prefer the most useful short cost line in owner communications, not a detailed spending bureaucracy.
-
-**Verified historical baseline (source: Issue #12 / checkpoint `894240b`, November 14; not live verification):**
-- **Current site-planning comparison attempts:** three C0 generations (no C2) with reported estimated usage **$0.005925 uncertain + $0.005483 + $0.004394 = $0.015802 estimated**; reserving **$0.008400** rather than the uncertain $0.005925 yields **$0.018277 accounted** for these attempts. These costs are already included in the larger Core figures; three generations have not yet produced a retained live proposal.
-- **Protected Core AI usage ledger, wider scope:** **16 requests / 8 generations**; **$0.015506 settled usage estimates**, plus **$0.008400 retained uncertain reservation**, giving **$0.023906 accounted**. This is **not an OpenAI invoice** and not a separate additional cost. No active live grants at this checkpoint.
-- **Owner time:** owner reports **hours of avoidable disruption**, but no reliable historical minute/rate log exists; record **UNKNOWN, materially costly**, not $0 or invented hours. Start logging the incremental owner attention for future work from direct evidence/owner reports only. Existing hosted infrastructure charges are not allocated to this test without evidence.
-
-Codex maintains the actual measured totals, immutable provider receipts and scoped grant accounting in their existing protected custody. The canonical handoff contains only the sanitized, dated *running summary* and exact evidence reference. Carry forward the previous balance before a new model comparison, report each delta, and show the cumulative balance after it. Budget requests should make clear how much **new authorization** is sought versus already-spent or reserved amounts.
-
-
-**Local remediation is now in implementation.** See [the first source/processing separation and guarded-replan correction](c0-creation-quality-p0-17.md#local-remediation-started--november-19-2026), then [canonical C0 authoring coverage and actual rendered feedback](c0-creation-quality-p0-17.md#c0-authoring-coverage-and-actual-rendered-feedback--november-19-2026). Exact intended growth-service passages and private rendered-evidence custody are implemented locally; actual eight-Page WordPress capture reached an offline provider-format input. Early concept-quality review/replan and trusted local WordPress capture are now connected in the shared engine; read [the exact early-critique and recovery checkpoint](c0-creation-quality-p0-17.md#early-concept-critique-and-strategic-recovery--november-19-2026). Fresh activation/compiler and one consolidated run manifest are next. Hosted Linux verification requires inclusion in that authorization; automatic review rejected an attempted unapproved hosted test and it was not retried. No deployment, paid critique, improved site or complete repair is claimed. Codex handles engineering; the owner is not expected to supervise routine repairs.
-
-## Working delivery targets — November 19, 2026
-
-The owner asks to proceed efficiently and establish key project targets. This
-sequence is based on the verified code/audit and existing service contracts.
-The pasted ChatGPT assessment remains review material, not an instruction source
-or customer knowledge. Dates below are **planning targets**, not owner acceptance,
-publication authority or assertions of completed implementation. Recheck at each
-working product result; surface a missed target and its specific cause promptly.
-
-| Target | Deliverable and business acceptance | Dependencies |
-| --- | --- | --- |
-| November 19–20 | Local correction ready for a controlled live comparison. Preserve approved discovery/contact/content-growth meaning through actual authoring inputs; separate processing instructions from customer knowledge; prepare exact current-render critique and strategic-replan connections. Historical proposals/grants stay exact. | Existing local engineering authority; no provider dispatch or protected mutation. |
-| November 20–23 | Genuine improved visitor journey in actual WordPress, covering Home, service explanation and distinct Review/Direct Start paths. Show the sourced strategic difference and evaluate actual desktop/mobile rendering with selected imagery. | Fresh exact model/data/spending authorization after engineering readiness. A weak candidate is not accepted because the date arrived. |
-| November 23–27 | Coherent complete C0 candidate and Customer/Operator review path. Prepare a separate C0 public-launch readiness decision with real visitor actions and explicit operating requirements. | Quality review, useful review/edit/resume behavior, needed development access; separate staging/deployment/publication authority. |
-| November 30–December 4 | Connected operating-cycle target: accepted inquiry, delivery/notification status, first-party activity, useful report, recommendation, reviewed revision and remeasurement. Label controlled/test inputs and unknown outcomes accurately. | Actual collector/delivery integration and the relevant consent/hosted authority. Tests or synthetic outcomes do not establish real business performance. |
-
-Set a defensible supervised Commercial V1 pilot date after the first improved
-journey and the operating-cycle gaps are verified. Ordinary onboarding/My Business,
-permissions/recovery, commercial/account handling and launch security/operations
-remain required. Public C0 launch and a commercially usable platform have distinct
-acceptance; neither must silently redefine the other or wait for every automation.
-Do not advertise a finished-platform deadline from this schedule.
-
-**Next bounded local engineering task.** Reuse the existing workflow and source
-contracts. Trace the approved growth-service promise through actual knowledge,
-Direction, Page/Revision input and rendering. Correct the knowledge/processing
-boundary and unjustified claim bottleneck without making unconfirmed text factual.
-Provide exact rendered-site evidence to critique and connect the existing guarded
-replan path. Preserve one authoritative editable copy; implement justified reusable
-rendering capabilities where required by the chosen concept. Verify historical
-compatibility and tenant/authority protection. Do not create another interview,
-demo architecture, permissions framework or manually authored substitute website.
-
-**Execution discipline.** Codex owns implementation and verification; Core/API
-performs customer-facing reasoning. Use direct owner review for meaningful results
-and consequential decisions. Keep Entry, portal, leads/measurement and Ongoing
-connected to the same lifecycle while generation is repaired. Reuse working
-storage, acquisition, signed delivery and rollback. Track actual cost deltas and
-report forecast uncertainty. Only the needed fresh external-use/hosted scope is
-brought for consolidated approval; old round/cost/expiry counters are not reset.
-
-**Checkpoint status.** Branch/worktrees/remote Issues #10/#12 and main were
-reconciled without merges. The active branch is clean at75ef747 before this
-scheduling record. Application corrections are the next implementation task;
-this record does not claim they are implemented. Core75/41, protectedWordPress6,
-local4473/4474, evidence, prior grants and ledgers are preserved.
-
-**RECOVERY / RESUME HERE:** follow this sequence with the causal audit above.
-Begin the bounded local source/feedback correction; do not reopen infrastructure,
-reinitialize C0 or dispatch under the completed three-round grant. Next review
-is a materially improved journey, not another test-count handoff. If access or
-a material contract decision blocks that task, name the exact blocker and
-continue independent authorized work.
+| Question | Existing governing record |
+| --- | --- |
+| Service purpose and customer value | [Service model](web-presence-service-model.md) |
+| Architecture, reuse and provider/delivery ownership | [Architecture](platform-service-architecture.md) |
+| Capability/implementation versus beacons | [Capability catalog](platform-capabilities.md) |
+| Launch, Ongoing, Operator/Customer workflow and temporary launch | [Operations](service-operations-model.md) |
+| Entry, knowledge authority and customer confirmation | [Customer journey](customer-journey-and-change-management.md), [onboarding](paid-onboarding-knowledge-transfer-contract.md), [content authority](content-authority-and-editing.md) |
+| Research, content, recommendations and recurring growth | [Content-growth loop](content-growth-loop.md), [opportunity model](opportunity-and-optimization-model.md) |
+| Existing shared Creation/Ongoing interfaces | [Shared intelligence contract](shared-intelligence-creation-ongoing-architecture.md), restored from main; proposed interfaces, not proof of completed modules |
+| Evidence, outcomes and measurement coverage | [Measurement](measurement-and-analytics.md), [conversion](conversion-architecture.md) |
+| WordPress, inbound edits, media and adoption | [Delivery contract](wordpress-delivery-feasibility.md), [Assets](assets.md), [acquisition](media-acquisition.md) |
+| Authority, privacy, release and launch readiness | [Security](security-operations.md), [readiness](progressive-onboarding-and-launch-readiness.md), [active gates](deferred-architecture.md) |
+| Exact development history/proofs | [Issue #12 handoff](https://github.com/R-Levin/myomaton-web/issues/12), [Issue #10](https://github.com/R-Levin/myomaton-web/issues/10), [integration history](c0-integration-spine-phase-b-2026-11-10.md), [C0 quality history](c0-creation-quality-p0-17.md) |
 
 ## Continuous decision documentation
 
-The owner approved this operating practice on November 7, 2026. Record material product, commercial, architectural and operational decisions in Git during the development cycle that makes them. Update the canonical contract or mark a decision explicitly pending. Record the approved direction, rationale, implementation status and unresolved questions. Keep implementation and documentation moving together and coordinate ownership of shared files to avoid conflicting edits.
+Record material decisions in their existing canonical document in the same cycle;
+state approved direction, rationale, implementation status and unresolved questions.
+Capture an explicitly pending decision without pretending it grants implementation.
+Keep one editor per shared file; reconcile concurrent work without overwriting it.
+Codex develops/verifies Core; Core and authorized API AI perform the customer-facing
+service work. Customer Ongoing does not edit/deploy Core's own software.
 
-This practice keeps approval boundaries and work in progress visible while evidence is still current. Capture a small entry as soon as a material decision is made, including its date, source, scope and status. A pending entry records the alternatives and who must decide before dependent work starts. Assign one editor per affected canonical file and review overlapping edits before staging. Review the decision diff with the implementation diff in the same cycle. Git is the durable continuity record. Conversation evidence informs the record, and approval authority stays with the authorized decision maker. Documentation cannot grant additional implementation authority or override an existing approval gate.
-
-Customer Web Presence Ongoing takes place inside Core. Recurring product defects and gaps are reviewed separately as sanitized evidence for GitHub, where the owner and ChatGPT can define a bounded Codex task, review actual results and approve consequential changes. Core does not edit, merge or deploy its own code. [Owner product-improvement direction](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6896512725)
+Keep owner conversation high-level when requested; that does not narrow technical
+work or product ambition. Distinguish an observation, proposal, approval and actual
+result. Existing authority within a bounded task persists; do not manufacture serial
+technical approvals. Spend, protected data, hosted mutations, real customer approval,
+merges and publication retain their exact separate boundaries.
 
 ### GitHub review handoffs
 
-**Owner-approved operating convention, November 9, 2026.** Use GitHub as the
-shared record for approved requirements and decisions, development progress and
-review documents. Publish the reviewable work to the shared development branch
-before asking ChatGPT for feedback. Post a handoff in the relevant issue with
-the exact repository, branch, commit SHA and file paths or section links. State
-the decisions already made, the questions still open and the current approval
-boundary. This lets another session review the same version from GitHub.
-
-Keep credentials, sensitive data and temporary runtime artifacts out of Git.
-The issue handoff is an asynchronous review reference. Existing role assignments,
-owner approval and implementation and publication gates still apply.
-
-**Coordination update adopted November 10, 2026.** Use this file as the recovery
-index. Keep governing requirements in the canonical contracts and use the
-relevant GitHub issue for the current review, owner decision and next gate.
-Codex owns technical coordination, implementation, verification and the
-sanitized Git handoff. ChatGPT reviews strategy and product fit against the
-published artifact. The owner alone authorizes consequential changes.
-
-At session start, verify the active remote branch and commit, local checkout
-and outstanding edits. Read this index and the latest issue decision. At each
-material checkpoint, publish the exact branch, SHA and file links, the approved
-scope, what was verified, unresolved items and one next action with its actor
-and stop condition. Mark live state unknown unless independently checked.
-Keep exact private evidence in protected local storage and reference its hash
-when useful. Use separate review branches or worktrees for parallel work,
-assign a single editor to each shared document and check overlapping diffs
-before integration. A review comment records feedback. Implementation or
-provider spend requires the owner's explicit authorization.
-
-### November 7 customer account operations clarification
-
-The owner superseded the earlier Gutenberg/customer-interaction framing. Use
-WordPress tools for most visual execution on WordPress delivery, with practical
-authorized refinement and Core-owned facts, approvals and releases. Ordinary
-customers interact with the service without WordPress Admin. Extend the existing
-account cadence, opportunity management and attention workflow toward low routine
-work and selective, evidence-backed prompts. The goal is better customer outcomes
-and sustainable service effort. These are approved design directions. Review and
-routing mechanics, customer channels, presentation persistence and V1 phasing
-remain open. The native inbound editing decision and existing implementation,
-publication and authority gates still apply. The authorized local Media-to-Publication
-slice can proceed independently. [Presentation](wordpress-delivery-feasibility.md#content-ownership-and-gutenberg-protection),
-[account operations](service-operations-model.md#exception-driven-attention-queue)
-and [implementation gates](deferred-architecture.md#opportunity-and-evaluation-completion-under-existing-gates).
-
-### November 4–7 deferred decision recovery
-
-Source is the owner-provided November 4–7 recovery handoff supplied after `51d9041`, reconciled against this branch's canonical contracts. The operational checkpoints `8988ff5`, `833bd30`, `1ccba08` and `51d9041` establish delivery acceptance, the authenticated rollback, scoped cleanup and final closeout. The handoff supplies product and commercial intent where original messages were unavailable. ChatGPT history listing was rate-limited. Exact original wording, complete conversation links and unrecorded alternatives remain unverified. The service expression is reproduced from the supplied handoff. This is a bounded recovery. The pending gates in the canonical destinations govern where historical entries describe earlier proposals.
-
-| Handoff topics and source dates | Disposition and canonical destination |
-| --- | --- |
-| A (Nov 4), O (recent hosting discussion) | Approved shared Core and managed PostgreSQL with independently hosted WordPress. Representative 100–150-presence capacity gate remains unrun. [Architecture](platform-service-architecture.md#hosted-assumptions-and-proof-questions) |
-| B, D (Nov 4), H (Nov 5) | Approved bounded Gutenberg design direction, Managed Site first, Connected Presence second and substantial WordPress scope. Exact launch placement and designer specification remain open. [Delivery and designer adoption](platform-service-architecture.md#wordpress-delivery-and-designer-adoption), [service sequencing](web-presence-service-model.md), [WordPress scope](wordpress-delivery-feasibility.md#decision-and-boundaries) |
-| C (Nov 4) | Accepted usable website or static exit handoff. Export format, dependency treatment and rehearsal remain open. [Ownership and exit](web-presence-service-model.md#customer-ownership-and-understandable-exit) |
-| E (Nov 4), I, J (Nov 5–6) | Existing human approval safeguards retained. Appliance-like service and human expertise positioning captured. [C0 positioning](miopages-c0-product-model.md#positioning-and-intended-outcome), [content authority](content-growth-loop.md) |
-| F (Nov 5) | $200–$250 Ongoing hypothesis and acquisition resistance captured. No pricing decision. [Service economics](service-operations-model.md#service-economics-and-planning-hypotheses) |
-| G (Nov 5) | Owner decision required before inbound WordPress editing development. [Pending V1 scope](wordpress-delivery-feasibility.md#operator-gutenberg-editing-as-an-inbound-knowledge-proposal-channel-2026-11-03) |
-| K, L (Nov 6) | External comparison recorded. Existing bounded Review, illustrative mockup and onboarding authority preserved. [Free Review](free-review-synthesis.md#customer-facing-contract-and-quality) |
-| M, N (Nov 6) | Approved progressive real C0 learning and optional early GA4/Search Console comparison. Access, data interpretation and implementation evidence remain pending. [Measurement](measurement-and-analytics.md#early-real-c0-learning-cycle) |
-| P, Q, R, S (recent operating discussions) | Retained reference and test environments, observed PM2/panel discrepancy, evidence reuse and preference for low-friction self-service. Effective provider controls and a durable network policy remain unproven. [Rehearsal closeout](#wordpress-private-delivery-acceptance-closed), [procedure](wordpress-private-stage-rehearsal.md), [operations policy](security-operations.md#blast-radius-and-low-admin-operations) |
-| T (Nov 7) | Immediate same-cycle capture and reconciliation are active above. |
-
-The older-topic audit retains the existing opportunity-led content and effort boundaries, structured Offering model, full/adjunct/Campaign modes, progressive intake and customer ownership. AI-mediated discovery, usable exit and supported video boundaries are clarified in their respective contracts. AI disclosure and Pennsylvania applicability remain an undated historical question pending current legal review. None of those older topics is assigned a new November 4–7 decision date.
-
-## Human-centered Operator orchestration direction
-
-**Owner decision, November 7, 2026; direction approved, implementation pending.**
-Following review of the local C0 Operator interface, the owner approved an
-attention-first daily workspace, designed to remain legible with roughly
-50–150 accounts; protect Operators from mundane work, needless administration
-and overload; select the best permitted human, AI or deterministic resource for
-each outcome; use early bounded/cost-tracked API-assisted triage; support
-context-carrying guidance, escalation and reassignment without an Asana-style
-task-management clone; and work primarily through a consistent MioPages-owned
-browser experience. The owner may initially hold several roles under one
-login, with visible signed-in identity and active role, true server-enforced
-authorization, tenant boundaries and existing approval separation. Integrate
-media selection in the page workflow, preserving the completed Pixabay
-discovery proof and avoiding stock where unsuitable for the C0 brand.
-
-The governing detail, rationale, limits and implementation sequence are in
-[human-centered work orchestration and active-role context](service-operations-model.md#human-centered-work-orchestration-and-active-role-context).
-The current C0 console is local, unauthenticated and read-only. Its persistent
-identity and active-role panel is explicitly simulated. Real role switching, live
-queues, AI triage and reassignment remain pending. No production deployment,
-API expenditure or protected action is authorized by this document.
-
-## Founder-led customer stewardship and contextual review
-
-**Owner-approved direction, November 8, 2026; implementation pending.** The
-founder's 30+ years of customer relationship and account-management judgment are
-a deliberate, distinctive source of MioPages' service standards. Other Operators
-should benefit from governed guidance and practical contextual workflows rather
-than needing to contribute equivalent deep philosophy or manually administer a
-CRM/task system. The owner approved recommendations alongside each item, optional
-expand-in-place questions/notes, AI preselection with human confirmation and
-natural **Approve selected** grouping where the same approval authority applies.
-An Operator can note a problem with a customer photo, have the system propose a
-replacement request beneath it, and inspect/edit/approve the customer message.
-Protect trust through grounded, natural copy and attention to obvious AI mistakes.
-During early operations, a human examines customer-facing material before it
-is sent for approval or published. AI preselection does not convey approval or
-authorization to send, publish or accept customer facts.
-
-Full operating principles and limits:
-[founder-led customer stewardship and contextual decisions](service-operations-model.md#founder-led-customer-stewardship-and-contextual-decisions).
-This does not authorize new AI API calls, live messages, UI writes or release
-authority. Exercise the flow first in a bounded owner-visible interactive
-review; preserve C0 source integrity and separate production gates.
-
-## Conversational escalation and event retention direction
-
-**Owner-approved direction, November 8, 2026; not yet implemented.**
-Operators can raise an unclear concern in ordinary language. AI/system should
-first help resolve it conversationally, escalating an out-of-bounds or
-unresolved issue with its context to an authorized next human or resource.
-After an accepted transfer, the original Operator's portion is **handed
-off** and leaves their active queue; the underlying issue remains open
-until resolved. Notify the original Operator only if they are needed again.
-
-The eventual normal work-event trail should retain scoped issue, evidence,
-resource/role/assignment, handoff, approval and resolution/outcome provenance
-without separate timekeeping or task-admin chores. Performance/coaching review
-based on appropriately retained history is deferred, not a current feature;
-do not build worker scoring or surveillance. Data retention, access,
-correction and minimization require explicit policy before production.
-See [conversational resolution and accountable handoff](service-operations-model.md#conversational-resolution-accountable-handoff-and-retained-outcomes).
-The current read-only console does not yet collect operational events.
-
-## Core-defined WordPress site and inbound editing clarification
-
-**Owner clarification, November 8, 2026; implementation boundaries pending.**
-The Operator expects Core to specify and retain the site architecture,
-initial themes/design, page/section tree, navigation, media and content.
-The WordPress plugin materializes the approved initial site using native
-WordPress presentation and rendering. Operators review/refine in WordPress;
-supported edits must be captured back as versioned, scoped proposals and,
-when accepted, persist in Core without being overwritten by future releases.
-Core can originate new pages/sections; WordPress-origin additions should
-also return to Core through governed creation/review, not exist only as
-untracked managed pages. Routine blog editing should remain template-driven
-with article content and featured image instead of bespoke layout per post.
-See [Core-specified site and WordPress round-trip clarification](wordpress-delivery-feasibility.md#core-specified-site-and-wordpress-round-trip-clarification).
-This does not close the pending native-editing ownership/mapping/conflict
-decision or authorize a production write.
-
-## Full-site customer approval and standing-authorization scope
-
-**Owner clarification, November 8, 2026.** Customer launch acceptance
-should normally review the complete actual WP-rendered proposed website
-(navigation, page structure, demonstrable forms, sample blog and key
-layouts) via the simple MioPages customer approval/request-changes
-experience; bind approval to the reviewed site version. After launch,
-do not routinely require page/site customer approvals for normal
-maintenance, technical/conversion refinements or verified minor factual
-changes. Reserve bounded customer review for major/new pages, material
-site sections and consequential changes. Allow explicitly customer-set
-and revocable standing authorizations for named low-risk change types,
-while retaining evidence, testing, privacy, factual confirmation,
-applicable approvals and release safeguards. The exact preference
-categories and existing launch checkpoint alignment remain open.
-Canonical rationale:
-[whole-site launch approval versus ongoing delegated changes](service-operations-model.md#whole-site-launch-approval-versus-ongoing-delegated-changes).
-These are design decisions, not implemented production behavior.
-
-## First C0 build milestone: the full becoming-a-customer questionnaire
-
-**Owner-approved priority clarification, November 8, 2026.** Before
-starting the new C0 WordPress site, build and use the **complete
-client-entry and paid-onboarding process**: Review/direct-start
-foundational knowledge reuse → fit and scope confirmation → verified
-commercial commitment (explicit rehearsal surrogate in C0 until
-agreement/payment integration is approved) → full conditional,
-resumable customer questionnaire → confirmed business knowledge →
-one Presence Direction, then Core-managed WordPress generation.
-
-The earlier plan's narrow "view C0 interview summary and one correction"
-is **not sufficient as the first milestone**. C0 should exercise the
-same longer real customer onboarding questions a new client would,
-while preloading only verifiable prior authentic discovery answers
-and explicitly preserving original source/confirmation. The
-underlying full interview is not implemented yet, so Codex
-should inspect and extend existing intake/activation/knowledge
-systems rather than create a competing form or pretend the
-commercial gate is operational. Start with a scoped genuine
-interactive flow and expand in tested iterations. Prevent
-hosted writes, customer-status mutation, WordPress/public
-publication and fake payment assertions.
-
-Implementation spec:
-[full becoming-a-customer onboarding questionnaire](commercial-v1-full-onboarding-questionnaire.md);
-[revised C0 rehearsal](c0-onboarding-wordpress-rebuild-rehearsal.md);
-[recovery audit](c0-discovery-question-recovery-audit.md).
-Issue #9 is the initial executable task; align its acceptance
-with this updated priority before coding.
-
-### C0 owner walkthrough — full interview NOT accepted
-
-**November 8–9, 2026: customer experience failed product acceptance.**
-The owner actually completed the local ten-step Customer 0 interview.
-Step 9 misleadingly asked whether the customer preferred to
-"Discuss updates individually" when MioPages is a managed service;
-owner selected "Not sure yet" because the choices were inappropriate.
-At the final question, the owner said **“This seems like the initial
-interview, and it feels like it's not asking the kinds of questions we
-need to provide an initial assessment.”** On reflection, the owner
-called the outcome a serious departure from extensive earlier design:
-the full interview should resemble an easy, comprehensive
-doctor's-office intake, accept as much relevant business knowledge
-as the customer can give, ask as many conditional/detail questions
-as needed, reuse prior answers, and establish both **what to retain
-AND what to remove/avoid** from the existing site.
-
-**Root cause:** The working ten-heading spec did not require deep
-business-knowledge collection or readiness tests. The subsequent
-`paid-onboarding/1` implementation captured mostly one superficial
-answer per broad topic and used completing ten screens as the
-submission threshold. The 388 reported tests validate technical
-behavior (isolation, draft/resume, stale edits and immutability),
-**not a meaningful assessment or build-ready knowledge**.
-The assistant's earlier instructions were too thin. Treat commit
-`4672bfa` as a useful local technical experiment, **not an
-accepted Commercial V1 full onboarding interview**. Do not quietly
-expand the form to a fixed 20/50-question checklist, claim
-customer acceptance, restart/delete the owner test without
-permission or proceed to WordPress generation on this basis.
-
-The corrective product contract is
-[deep adaptive paid onboarding knowledge transfer](paid-onboarding-knowledge-transfer-contract.md);
-it clarifies that "no giant second form" forbids irrelevant
-repeated work, not depth. The immediate next step is a grounded
-read-only coverage gap analysis of real C0 and a **reviewable
-sample adaptive interview** that surfaces relevant deep follow-ups,
-reused known material, offering-level details, explicit
-retain/improve/replace/retire/avoid inventory, customer proof and
-first assessment. Review the **content and customer experience**
-before coding a replacement. Full system implementation requires
-source/provenance and customer authorization checks and must
-respect existing production/hosted safeguards.
-
-### Issue #10 · reviewed C0 interview design
-
-The [C0 adaptive onboarding walkthrough](c0-adaptive-onboarding-walkthrough.md)
-records the source and prototype coverage gaps, a November 9 read-only public
-site inventory, concrete interview questions and branches, and a first C0
-assessment with proposed content and conversion direction. It uses the approved
-discovery and recorded exclusions, separates observations and proposals, and
-leaves unresolved answers visible. The legacy site inventory includes active
-URLs for older QR and Kickstart offers in addition to the main navigation.
-The original design was published at `391a7db`. The
-[owner's November 9 decisions](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6740683772)
-now govern the draft: one managed service replaces the entire legacy catalog.
-The public homepage's existing-customer button was verified to lead to
-[HostShop sign-in](https://my.miopages.com/login), the sole legacy service-related
-destination to retain. The [C0 product model](miopages-c0-product-model.md#founder-led-transition-to-the-managed-service)
-records the exceptional founder/ChatGPT strategy collaboration, Codex's
-supporting role and the owner's final approval. The
-[knowledge-transfer contract](paid-onboarding-knowledge-transfer-contract.md#normal-contact-and-existing-site-evidence-are-welcome)
-also confirms that actual business contacts and appropriate existing-site
-materials are normal onboarding inputs for C0 and ordinary customers.
-
-The design handoff covered the
-[Standard Launch conversation](c0-adaptive-onboarding-walkthrough.md#understand-the-offering-well-enough-to-explain-it),
-[existing-site inventory](c0-adaptive-onboarding-walkthrough.md#the-existing-site-review)
-and [proposed assessment](c0-adaptive-onboarding-walkthrough.md#the-assessment-c0-would-see-today)
-with the owner and ChatGPT. Legacy URL dispositions and transition obligations
-remain separate from the approved catalog decision. The agreed implementation
-and current review boundary are recorded below.
-
-<a name="issue-10--adaptive-intake-rehearsal-ready-for-review"></a>
-
-### Issue #10 · historical adaptive intake rehearsal
-
-The [November 9 owner authorization](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6741173857)
-opens the bounded local implementation. It keeps the existing-site inventory
-and earlier Free Review distinct, reuses confirmed discovery and focuses on a
-material source difference, one offer and visitor branch, one additional
-existing-site decision, and a provisional assessment. The
-[optional Review clarification](https://github.com/R-Levin/myomaton-web/issues/10#issuecomment-6741359817)
-adds a direct-start check of the missing foundational goal and a local fit and
-scope checkpoint before deeper discovery in the same draft. No Free Review
-assessment is required on direct start. C0's retained October 14
-Review is separate from its October 5–6 discovery. The local view shows four
-selected business answers and the exact approved, undelivered assessment if
-the existing protected Review record can be verified. Older Review wording
-about startups and the old site's legacy catalog are visible alongside the
-current owner-confirmed direction. Fictional C2 uses the supplied old-site
-observations and flags missing Review evidence. No transcript, delivery or
-confirmed tree-service claims are inferred.
-
-The following is the historical disposable-fixture procedure. The owner
-rejected this fixture as a meaningful interview. The preserved C0 draft needs
-no further walkthrough, submission or restart. See the current proposal below.
-
-From the repository root in local PowerShell:
-
-```powershell
-$env:NODE_ENV = 'development'
-$env:MIOPAGES_REVIEW_SYNTHESIS = 'local-operator'
-node --import tsx scripts/intake/c0-onboarding.ts --adaptive
-```
-
-Open [Customer 0](http://127.0.0.1:4321/onboarding) or
-[fictional Customer 2](http://127.0.0.1:4321/onboarding/customer-2). Select
-**Open prepared interview**, expand the sources, then choose **Needs a
-correction** or confirm the prepared summary. In C2, add a fictional business
-goal. Review the proposed scope and choose **Continue in this rehearsal**.
-In C0, choose **Request a Free Review** to see the handoff follow-up.
-In C2, choose **Emergency calls and routine
-estimates**, then switch to **Request an estimate** to see the emergency
-follow-up disappear. Use **Save progress**, reload, and add an **Explicitly
-exclude from future drafts** decision before reading the assessment. Submission
-preserves the answers and prepared-source fingerprint for review in the
-disposable database. It cannot serve as activation evidence.
-
-The new mode uses port 4321, a fresh disposable cluster, separate scenario
-scopes and cookies, and the existing draft, optimistic version and immutable
-submission contracts. The earlier 4320 rehearsal and any saved owner run stay
-separate. Saving and resuming works while the same local launcher is running.
-Private Review material stays in the existing local store and the loopback
-session. Source selection and reconciliation in this slice are prepared from
-reviewed records. Automated site or document import, matching delivered Reviews
-from live accounts, AI follow-ups, durable canonical exclusion, authenticated
-onboarding and launch remain future work.
-
-Verification passed: 388 application tests, 23 PostgreSQL intake and activation
-tests, TypeScript and focused lint. A desktop Chrome C0 walkthrough loaded the
-verified Review, saved and reloaded a conditional answer, recorded an exclusion
-and submitted an immutable draft. A mobile Chrome C2 walkthrough confirmed the
-foundational priority and local scope gate before deeper questions, and verified
-that switching from emergency calls to routine estimates hides the obsolete
-follow-up. The database regression also verifies tenant and stale-source refusal.
-Pause here for owner review before further implementation or WordPress generation.
-
-### Issue #10 · shared intelligent onboarding offline proof
-
-The owner prioritized one shared onboarding engine for Review-led and
-direct-start customers. The earlier C0 fixture is a completed diagnostic.
-Keep the preserved draft as evidence and leave it outside further testing.
-The [strategy recovery](https://github.com/R-Levin/myomaton-web/blob/2c6a41f22a811090b3a24d3f84607c41f2b33cc4/docs/c0-strategy-recovery-and-intelligent-onboarding-2026-11-10.md)
-supplies the business context. The
-[shared-engine proposal and offline checkpoint](shared-intelligent-onboarding-proposal-2026-11-10.md#offline-implementation-checkpoint)
-records the authorized local proof. It covers both post-gate entry paths, C0
-buyer proof and Ongoing, and an isolated fictional C2 control. The transport
-is simulated. The original C0 run stays outside testing. Review the saved
-examples and safeguards before deciding whether to authorize the separately
-bounded live reasoning run. See [Issue #10](https://github.com/R-Levin/myomaton-web/issues/10)
-for the pinned handoff and next owner decision. Draft PR #11 remains a separate
-review.
-
-### Issue #9 · first local signup and onboarding slice
-
-Run `node --import tsx scripts/intake/c0-onboarding.ts` from the repository root
-and open `http://127.0.0.1:4320/onboarding`. The listener is loopback-only. It
-creates a password-protected disposable PostgreSQL cluster on an unused local
-port, applies the existing migrations there, and seeds random rehearsal owner
-and site IDs. It never reads `DATABASE_URL` or an existing customer database.
-The default Windows client directory is `C:/Program Files/PostgreSQL/18/bin`.
-Set `PG_BIN_DIR` if the matching local PostgreSQL binaries are elsewhere.
-
-As Customer 0, choose **Review fit and scope**, then **Continue with rehearsal
-authorization**. Review the prefilled business details and advance to **What
-you provide**. Add a test priority, select **Save progress**, and reload to
-confirm the answer and current step return. Use **Not sure yet** if the main
-contact action is undecided. Choose the applicable existing-website option,
-complete the ten steps, then select **Review my answers** and **Submit for
-review**. The same browser can resume while the launcher is running. Stopping
-it removes that disposable run. Use a fresh private browser window for a new
-run if the browser still has a cookie from an earlier rehearsal.
-
-The rehearsal uses the approved October 5–6 discovery via the scoped C0
-Business Knowledge and Offering data retained in
-`scripts/customer-updates/miopages-focus-reviewed.json`. The recovery audit
-records partial prompt evidence, including the audience and ongoing-service
-questions. Git history and a targeted local filename check found the approved
-brief and audit, without an independently verified full transcript or copies
-of the named historical pasted files in the checked repository and attachment
-locations. The October 14 Free Review was excluded from this direct-start
-rehearsal. The source label distinguishes approved synthesis from quotations
-and new, unconfirmed answers.
-
-The working slice reuses the intake question and field renderer, origin and
-cookie checks, transactional drafts and immutable submission ledger. The new
-`paid-onboarding/1` groups ten topics and records source, freshness and scoped
-rehearsal author. The summary separates previously approved inputs, new
-answers and open questions. It gives the Operator a next step in the same
-scoped view. The commercial checkpoint is a rehearsal surrogate. Live
-agreement/payment, authenticated access, a separate Operator queue, governed
-business confirmation and publication remain outside this slice. Submitted
-rehearsal records are refused as activation evidence.
-
-Verified 388 repository tests, TypeScript and targeted lint. The disposable
-PostgreSQL integration test passed origin and session refusal, inapplicable
-answer removal, stale save refusal, resume with the same database after an
-HTTP listener restart, immutable submission and activation refusal. Chrome
-walked all ten steps at 1440 and 390 px, saved and reloaded an added answer,
-changed the contact branch and resumed the submitted summary. Next is the
-owner’s C0 walkthrough and feedback, followed by a separately governed
-Checkpoint 1. WordPress generation remains gated behind review and direction.
-
-## Parallel C0 integration spine · Issue #12
-
-[Phase A source map and proposal](c0-integration-spine-phase-a-2026-11-10.md) is the
-recovery entry for [Issue #12](https://github.com/R-Levin/myomaton-web/issues/12).
-The proposed first walkthrough connects one answer to a reviewed Service Intro,
-the existing signed WordPress stage and a private review view. The owner and
-ChatGPT review the text-only scope and the staged-object preview seam before
-implementation. The accepted WordPress HTTPS delivery remains closed.
-
-[Issue #10](https://github.com/R-Levin/myomaton-web/issues/10) retains ownership of
-the intelligent interview and its separate live reasoning approval. The Issue #12
-handoff lives on `codex/c0-integration-spine-phase-a-2026-11-10`, isolated from the
-preserved C0 rehearsal and the other onboarding worktrees.
-
-The owner authorized the [local Phase B text-only proof and public launch assessment](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6774531879).
-[Phase B implementation and review](c0-integration-spine-phase-b-2026-11-10.md)
-records the connected local proof. The preferred [public launch plan](miopages-accelerated-public-launch-2026-11-10.md)
-uses the existing public WordPress site for a manual editorial relaunch, subject
-to verified access, recovery, inquiry delivery and separate owner release
-approval. Phase B and Issue #10 are independent of that publication decision.
-
-The owner reaffirmed the [first connected local service cycle](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6813306713).
-The [walkthrough and replacement inventory](c0-integration-spine-phase-b-2026-11-10.md#first-connected-operational-cycle)
-extend Phase B on `codex/first-operational-cycle-2026-11-12` from `4a93ed8`.
-The Issue #10 interview and live AI proof remain on their separate branch
-at `d9ef9ae`. This slice uses their existing engine and the explicitly
-deterministic Phase B adapter. It does not resolve the owner's AI interview
-acceptance concerns. The closed hosted WordPress transport acceptance remains
-independent of this local cycle.
-
-The [next Issue #12 increment](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6825736318)
-groups Home and Service into a [versioned private review candidate](c0-integration-spine-phase-b-2026-11-10.md#unified-private-site-candidate).
-The review bridge retains exact per-page authority and signed receipts.
-It records C0 as transitioning to the managed service. The native
-multi-page approval and WordPress draft materialization boundaries remain
-open. Issue #10 owns the real AI work on its separate branch.
-
-Owner clarification: Managed Site development is non-public, with
-stage-appropriate Customer and Operator access and distinct permissions.
-See the [architecture](platform-service-architecture.md) and [handoff](c0-integration-spine-phase-b-2026-11-10.md#unified-private-site-candidate).
-This is a documentation clarification within the existing implementation scope.
-
-The [role-play acceptance decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6826131281)
-is implemented in the [same local site walkthrough](c0-integration-spine-phase-b-2026-11-10.md#role-played-operator-review-and-draft-plan).
-The Content Reviewer and Technical Operator are provisional test perspectives.
-The draft plan is derived from verified stage bytes and binds to the candidate
-digest. It cannot be applied until exact site-level approval and native private
-materialization are implemented.
-
-The next Issue #12 milestone is native non-public WordPress drafts, with
-the same intake-to-improvement cycle. The [hosted continuation](c0-integration-spine-phase-b-2026-11-10.md#hosted-native-draft-continuation)
-records the owner direction, actual access checks and the exact site
-preview implementation. The existing site review bridge remains the
-local baseline until a native WordPress application and rollback pass.
-
-The [theme and draft authorization checkpoint](c0-integration-spine-phase-b-2026-11-10.md#theme-and-draft-authorization)
-records the installed development theme and the local exact draft-approval
-extension. Core retains knowledge, approval and delivery authority. The
-theme owns rendering. The native writer, receipt and rollback still gate
-hosted draft acceptance.
-
-The [signed native draft continuation](c0-integration-spine-phase-b-2026-11-10.md#signed-native-draft-continuation)
-records the separate Core envelope, internal draft writer, hosted storage
-check and migration prerequisite. Existing staging remains compatible.
-
-The [hosted native draft verification](c0-integration-spine-phase-b-2026-11-10.md#hosted-native-draft-apply-and-restore)
-records two non-public WordPress revisions, reconciled application
-receipts, and restoration of the prior draft set. Customer preview access
-through Core and the full growth-service acceptance remain open.
-
-The [stable native WordPress Page checkpoint](c0-integration-spine-phase-b-2026-11-10.md#stable-native-wordpress-page-identities)
-replaces duplicate Page creation on ordinary revisions. The hosted
-synthetic change and exact restore used the same Home and Service
-IDs, slugs and preview links. Earlier proof Pages are retained
-pending a reviewed cleanup plan. Core-mediated Customer review remains open.
-
-The [connected operating-cycle checkpoint](c0-integration-spine-phase-b-2026-11-10.md#connected-operating-cycle-hosted-readback)
-links the real AI proof, the existing intake integration and verified hosted
-WordPress revisions with a scoped development measurement readback. Hosted
-adaptive intake, Contact acceptance and browser workflow remain open.
-
-The [source-aware understanding readback](c0-integration-spine-phase-b-2026-11-10.md#source-aware-understanding-readback)
-is the first integration step following the [functional assessment](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6854443846).
-The same scoped interview now returns the sources and saved answer behind
-each draft finding. Hosted customer review and fresh AI dispatch remain open.
-
-The [protected C0 browser journey](c0-integration-spine-phase-b-2026-11-10.md#protected-c0-browser-journey)
-resumes verified local answers and shows how a saved prospect-path
-decision changes the draft assessment, direction and proposed Home and
-Service. The existing exact proposal and signed-draft test now exercises
-that planning projection on both Pages. The handoff distinguishes the
-local browser view, disposable signed proof and pending hosted revision.
-
-The [protected HTTPS Core checkpoint](c0-integration-spine-phase-b-2026-11-10.md#protected-https-core)
-records the hosted route, scoped interview and Responses wiring, current
-20i observations, and the consolidated authorization for the protected
-deployment. Owner product acceptance requires a working online journey.
-
-The [external Core access correction](c0-integration-spine-phase-b-2026-11-10.md#external-core-access)
-records the exact slash-path fix, authenticated Edge verification and
-the hosting handoff. The owner superseded the earlier `core-dev` approval:
-keep the existing Core URL and 20i deployment footprint. No hostname cutover
-is pending.
-
-The [business answer to editable site direction checkpoint](c0-integration-spine-phase-b-2026-11-10.md#business-answer-to-editable-site-direction)
-records the protected AI projection, editable page draft, existing proposal
-compiler seam, inquiry readback and current approval boundaries.
-The [integrated Core operating-cycle checkpoint](c0-integration-spine-phase-b-2026-11-10.md#integrated-core-operating-cycle)
-records the consumed exact-answer approval, hosted model response refusal,
-scoped inquiry policy and proposal preparation path. Read this before any
-further provider dispatch or private WordPress application. The [hosted synthetic inquiry checkpoint](c0-integration-spine-phase-b-2026-11-10.md#hosted-synthetic-inquiry-and-ongoing-readback)
-records one durable revision-scoped acceptance and the Operator readback.
-The [live cited follow-up and editable site checkpoint](c0-integration-spine-phase-b-2026-11-10.md#live-cited-follow-up-and-site-preparation)
-records the successful exact AI turn, hosted Operator-authored v15 plan,
-linked synthetic inquiry and private WordPress review input. The native
-apply remains gated by separate approval. The [private revision 5 review and
-recovery checkpoint](c0-integration-spine-phase-b-2026-11-10.md#private-revision-5-review-and-recovery)
-records the v2 rollback correction, local v15 previews and the exact
-preparation scope. The [approved v15 preparation handoff](c0-integration-spine-phase-b-2026-11-10.md#approved-v15-preparation)
-records the verified transfer and live revision 3 baseline. The [durable v15 previews and application decision](c0-integration-spine-phase-b-2026-11-10.md#durable-v15-previews-and-application-decision)
-record the two independently verified preview events and approved
-application scope. The [hosted revision 5 apply and restore](c0-integration-spine-phase-b-2026-11-10.md#hosted-revision-5-apply-and-restore)
-passed. WordPress displays revision 3 on Home 13 and Service 14, with
-high-water 5, Delivery 0.0.10 active and both receipts reconciled.
-Publication retains separate authority. The next product milestone is
-the [authenticated site-planning review](c0-integration-spine-phase-b-2026-11-10.md#authenticated-site-planning-and-exact-live-decision). The [bounded live comparison stopped](c0-integration-spine-phase-b-2026-11-10.md#bounded-live-ai-site-comparison-stopped) after the C0 generation reached the output ceiling and its receipt was marked uncertain. The [compact proof and usage gate](c0-integration-spine-phase-b-2026-11-10.md#compact-site-planning-and-usage-reconciliation-gate) records tested sizing, the unchanged uncertain ledger and the exact next authorization. The [first compact run](c0-integration-spine-phase-b-2026-11-10.md#compact-c0-completed-but-hit-the-draft-storage-limit) completed generation but hit draft capacity. C2 did not run. The [protected storage handoff](c0-integration-spine-phase-b-2026-11-10.md#protected-storage-deployment-and-database-guard) records the deployed lossless build, partial hosted persistence proof, locally tested trigger correction and the remaining hosted verification. The [hosted storage verification](c0-integration-spine-phase-b-2026-11-10.md#hosted-draft-storage-verification-passed) passed after the approved function-only correction, with a complete synthetic save, edit and review and zero residual rows. The [fresh comparison](c0-integration-spine-phase-b-2026-11-10.md#fresh-compact-comparison-stopped-after-c0) used its one C0 generation but did not save a proposal. C2 did not dispatch and both gates are inactive. The [local response custody and recovery correction](c0-integration-spine-phase-b-2026-11-10.md#local-proposal-response-custody-and-recovery) verifies diagnostic stages and replay without another model call. The [authorized live comparison](c0-integration-spine-phase-b-2026-11-10.md#consolidated-hosted-c0c2-result) retained both reviewable proposals. The [verified owner login](c0-integration-spine-phase-b-2026-11-10.md#protected-owner-login-verified) records the approved deployment, HTTPS sign-in and sign-out, and independent readback of unchanged C0 draft 28 and scoped grants. Personal review is pending. The [researched C0 business report and complete text candidate](c0-integration-spine-phase-b-2026-11-10.md#researched-c0-understanding-and-complete-site-candidate) provide a separate owner-review draft and a tested fuller planning projection. The [durable Core intake-to-site review](c0-integration-spine-phase-b-2026-11-10.md#core-intake-to-site-workflow-with-durable-local-review) supersedes the editorial drafts as the executable path. It records the local UI, real PostgreSQL workflow, fixture/provider boundaries, first-party measurement and external WordPress decision. The [local access correction](c0-integration-spine-phase-b-2026-11-10.md#local-core-access-cookie-recovery) covers older loopback cookies and the workaround for a listener already running the previous build. Use **RECOVERY / RESUME HERE** with the latest Issue #12 checkpoint. The production customer review and any private WordPress preview remain separate gates.
-
-## Next proving focus: authentic C0 interview-to-WordPress rebuild
-
-**Owner clarification, November 8, 2026; supersedes the earlier
-"fresh actual interview" instruction.** MioPages is the rehearsal
-customer. Its original early-October three-pass discovery was a real
-interview and the approved outcome survives in
-`docs/miopages-c0-business-brief.md`. **Reuse this evidence; do not
-repeat the interview.** Historical chat context contains **some recoverable
-original interview questions and responses**, and first-/second-pass
-written syntheses preserve further explicit follow-up questions.
-The complete verbatim transcript remains **unverified**, not proven absent.
-See [C0 question recovery audit](c0-discovery-question-recovery-audit.md).
-Distinguish attributable original Q&A, synthesis follow-up lists, and
-approved discovery conclusions from the separate later Free Review interview.
-
-Run a new, isolated and realistic C0 onboarding/build sequence
-without overwriting the already accepted C0 business state, service-led
-v3, historical site or hosted PG17/WordPress acceptance fixtures.
-Implement through actual customer/Operator surfaces: review and confirm
-existing discovery, Presence Direction, proposed pages/site design,
-Core-managed WordPress site generation, authorized Gutenberg edits
-automatically recorded back to Core, complete-site customer preview
-and approval, verified launch gates, then Ongoing. The existing
-WordPress plugin has guarded proof capabilities, not the completed
-bidirectional production workflow; expand it in tested slices, not by
-claiming that a preview is a complete build.
-
-**Next bounded implementation:** the interactive C0 onboarding
-resume + provenance/confirmation flow, with isolated durable data
-and actual Operator/customer interactions. Establish the plugin
-rendering seam and do a real WordPress Home/nav proof next. Label
-manual surrogates, missing UI/integration and approvals explicitly;
-no public deployment, hosted canonical writes or credential changes
-without existing separate approvals. Preserve actual acceptance
-evidence, operator effort and next gaps in Git.
-
-Authoritative executable plan:
-[C0 onboarding WordPress rebuild rehearsal](c0-onboarding-wordpress-rebuild-rehearsal.md).
-Review the relevant contracts and live repo/host state before coding.
-
-## Local Operator overview and C0 account review
-
-The first integrated Operator view groups actionable evidence ahead of the
-account directory. It reads the checked-in, human-reviewed C0 service-led v3
-graph and opens actual read-only previews through the existing v3 renderer.
-The next action points to the Experience page because permission for the
-featured historical work remains unresolved in the snapshot. Other recorded
-visual needs stay in the account detail. This is a display rule for the local
-review, not a new persisted task, escalation or approval workflow.
-
-From the repository root, run `node --import tsx scripts/operator-overview.ts`
-and open `http://127.0.0.1:4317/`. Follow **Open MioPages journey → Next action →
-Preview Experience**. All four snapshot pages can be inspected. The preview
-uses reviewed copy, canonical source projections and design tokens. Asset
-delivery and visitor interactions are outside its scope. Content proposal,
-release, activity and monitoring records are outside this snapshot, so the
-view makes no claim about current health, pending approvals or live delivery.
-The script has no database connection or mutation routes.
-
-At the initial checkpoint, all 387 repository tests, TypeScript and targeted lint passed. Focused checks
-verified account ownership, quiet-account rendering, four scoped v3 previews,
-method refusal and host checks. Chrome followed overview → account → Experience
-→ Home at desktop and mobile widths.
-
-### C0 journey and retained human Review
-
-The owner found the initial Operator direction encouraging and the mixture of
-C0 and an unrelated synthetic proposal confusing. The primary account journey
-now follows Interview → Confirmed business knowledge → Website content and
-design → Operator review → Next action. Links keep ordinary review inside the
-console. Synthetic proposal evidence is under **Development evidence** on the
-overview, outside the C0 journey.
-
-The approved October 6 [business brief](miopages-c0-business-brief.md) is the
-retained synthesis of the original discovery. The console did not load a complete
-verbatim original interview; some October 5–6 prompt/answer fragments are
-recoverable separately (see [question audit](c0-discovery-question-recovery-audit.md)).
-The journey presents the exact C0 Business Knowledge and
-Offering revisions used in the October 8 [four-page milestone](miopages-canonical-promotion.md),
-its proposed site structure, accepted design, scoped content previews and
-retained visual captures when their bytes match. The later C0 revamp is a
-separate milestone. An exact C0 website proposal and approval ledger is
-unavailable in this snapshot. Publication remains outside this review.
-
-The separate October 14 human Free Review intake supplies four selected
-business answers with contact fields omitted. The console reuses the existing
-development-only Review store to validate the C0 owner, retained evidence and
-revision/event chain before showing the approved October 19 revision 3 text
-and its history. Approval concerns that undelivered [Free Review](free-review-synthesis.md),
-not the website design or a release. Raw human files stay local and Git-ignored.
-If that evidence is unavailable, the view shows the documented status and
-identifies which details could not be loaded.
-
-To include the retained human evidence, launch the local console with
-`NODE_ENV=development` and `MIOPAGES_REVIEW_SYNTHESIS=local-operator`. The
-normal local entry remains `http://127.0.0.1:4317/`. All 388 repository tests,
-TypeScript and targeted lint passed. Chrome verified the full journey at 1440
-and 390 px, including all four accepted captures, the retained Review, and
-same-tab navigation. The Experience decision
-asks what past work MioPages can substantiate and has permission to show.
-The next practical review is to select one permission-cleared project or keep
-the page text-led. Any exact page proposal uses the existing approval path.
-
-### Persistent identity and simulated role switching
-
-On November 8, 2026 the owner requested the simulated identity back in the
-shared header. **MioPages owner** can switch between Content Reviewer and
-Technical Operator on the same console pages. The browser retains only the
-selected example role. Content Reviewer emphasizes the recorded Experience
-decision, interview evidence and content review. Technical Operator adds a
-labeled example checklist for the four page previews, navigation and design
-captures. The recorded Experience decision stays visible and the example
-does not affect the recorded attention count.
-
-The selector changes presentation and read-only shortcuts. It grants no
-access or authority, and the exact synthetic proposal artifacts stay separate
-and byte-identical. All 388 repository tests, TypeScript and targeted lint
-passed. Chrome verified switching, navigation and role persistence at 1440,
-390 and 320 px. The next owner review returns to the C0 Interview section.
-
-### Proposal evidence and simulated active-role context
-
-The earlier C0 account linked to a separately scoped synthetic proposal walkthrough.
-The console replays the retained disposable PostgreSQL proposal history when
-that exact known artifact is available. Three revisions are listed. Revisions
-2 and 3 have exact recorded previews and approval events. Revision 1 has no
-recorded preview. The earlier approval stays with revision 2. The exact HTML
-is checked against the preview event digest and the latest archived bytes.
-On a fresh checkout the known checked-in single-revision proof supplies the
-same review flow. Evidence with a changed binding, digest or archive is withheld.
-
-The two proof sources are pinned synthetic artifacts in their original Web
-Presence and Managed Site scopes. This console does not enumerate proposal
-stores or connect to PostgreSQL. C0 proposal status remains unknown, synthetic
-examples stay outside attention counts, and the recorded Experience issue
-remains the actionable item. The identity panel shows one simulated owner with
-two example roles and an active Content Reviewer display. It grants no access
-and supplies no approval or release action.
-
-All 388 repository tests, TypeScript and targeted lint passed. The focused
-checks exercised exact preview bytes, foreign-account refusal and the checked-in
-fallback. Desktop and mobile Chrome followed the role panel and C0 account
-through to the exact revision 3 preview.
-
-Next, connect the existing inspection authority to an authenticated,
-tenant-scoped, read-only account detail and show an exact revision from its
-authorized proposal ledger. Validate role visibility and account scope before
-adding role selection or any approval action. Keep approval and publication
-under their existing authorities.
-
-## Corrected C0 stock image review
-
-The owner rejected the TiBine workbench photo (Pixabay `384740`) for MioPages
-Home. The `workshop workbench` search verified the API and was outside the
-brand imagery brief. The placement proposal and its exact download command
-are withdrawn. The bounded download and safe ingestion helpers remain
-available for a future separately approved selection.
-
-The owner authorized one new human-initiated Pixabay search for C0. The phrase
-`small business laptop` looks for credible small-business context and a digital
-touchpoint. For the accepted service-led v3 Home, use photography only if it
-supports audience recognition or helps explain the shared responsibilities.
-The conceptual Hero and example Review report retain their dedicated roles.
-A convincing authored service graphic or the existing text can be the better
-fit. The shortlist is an editorial review. No candidate or download is
-approved. [Placement and search record](media-acquisition.md#c0-brand-imagery-review).
-
-The C0 launcher passed the fixed-query and exclusive-attempt test, all 385
-repository tests, TypeScript and targeted lint. The withdrawn command refuses
-before any download. The owner completed the C0 request through the existing
-hidden key handoff on November 7, 2026 at 20:50 UTC. The verified receipt records
-one request, HTTP 200 and eight unique normalized hits. All hit digests and the
-24-hour cache boundary matched. Receipt SHA-256 is
-`819489c0d9a1067000d1d9b68bb6ebe427e6e0ae1276d19848b1b31b08bdc08f`.
-
-The local owner review at `runtime-content/pixabay-live/c0-home-editorial-9a638b2/owner-review.html`
-shows two exploratory candidates beside excerpts and the accepted Home capture.
-The shortlist is based on provider metadata and accessible source pages. The
-laundry-shop source page still needs visual confirmation. Neither candidate
-clearly conveys the managed-service handoff. Keeping the current page remains
-a valid outcome. Chrome verified the review at 1440 and 390 px with no external
-requests. There was no image acquisition, canonical write or hosted change.
-The owner declined both photos and closed further C0 stock searches. The C0
-search command now refuses before reading credentials. The validated Pixabay
-discovery adapter remains available for future scoped customer use.
-
-## First live Pixabay search verified
-
-On November 7, 2026 at 18:49 UTC the owner completed the single authorized
-`workshop workbench` photo search. The launcher recorded one provider request,
-HTTP 200 and eight unique normalized results. Independent local verification
-matched each result digest and source link, checked creator, tags and dimensions,
-confirmed the private 24-hour cache and verified that the review embeds no external
-resources. The sanitized result receipt SHA-256 is
-`74c3fd6f296a320ecf24eab16a9c18658245a5520512fdfe8b874df4d28295d4`.
-The receipt and linked HTML review remain in ignored local runtime storage.
-
-The previously saved encrypted value failed local format validation before any
-network request. The successful run used a separate hidden PowerShell prompt and
-stdin, leaving the earlier encrypted file untouched. No usable persistent key
-was established by this run. Preparation at `e13b450` passed TypeScript, targeted
-lint, PowerShell syntax and 381 repository tests, including the recorded-response
-and one-attempt tests. This closeout verifies live discovery and updates only
-documentation. There were no selected-image downloads, canonical Asset or
-AssetUsage writes, or hosted changes.
-
-The technical trial is closed. The separate C0 brand search is recorded above.
-[Trial and review boundary](media-acquisition.md#one-authorized-local-live-search).
-
-## Pixabay priority and first owner-visible review
-
-The owner requested a provider transition and an inspectable product review.
-Pixabay is the preferred first live candidate for one human-initiated Operator
-search. Openverse with independently verified CC0 is the fallback. Pexels is
-deferred because new keys are paused and MioPages has no key. Prefer customer
-pages without per-image credits. Display required source attribution in
-Operator results. Use a centralized customer credits page only where the
-applicable terms permit it. Avoid routine per-image reporting obligations.
-
-The recorded-response adapter verified one authorized photo query, source and
-creator normalization, in-process 24-hour caching and exact result selection.
-A selected result is an unapproved draft. The adapter has no network
-composition, download, license grant or release write. TypeScript, targeted
-lint and 378 repository tests passed, including three new adapter tests.
-The existing stock lifecycle proof remains the release evidence.
-
-The first owner-visible review uses the accepted service-led v3 desktop and
-mobile Home captures. The prior loopback listener was unreachable. The captures
-show native rendering and real reference copy with simulated illustrative
-media and Review content. Record owner feedback on offer clarity, visual
-usefulness and mobile readability. Future material milestones should point to
-an inspectable result and distinguish functional, simulated and pending parts.
-[Owner-visible preview](miopages-business-focus.md#owner-visible-review).
-
-The next live boundary requires an authorized standard Pixabay key and review
-of protected transport, shared cache and quota, credit presentation, allowed
-use, retention, withdrawal and exit. No key was created or used. WordPress
-storage and synchronization remain pending. [Provider policy and live gate](media-acquisition.md#pixabay-first-openverse-fallback).
-
-## Commercial V1 permissioned stock fixture verified locally
-
-The owner authorized a project-created PNG under synthetic stock permission.
-The disposable Operator intake reuses the acquisition candidate, decision and
-Asset preparation path. It binds the provider, source and creator reference,
-selected representation and exact source/prepared digests, separately recorded
-license and integration conditions, and reviewed Intro placement. Only the
-synthetic project grant can pass. Unknown, incompatible, expired or withdrawn
-permission prevents release. Exact page approval and rollback reuse the
-existing site release evidence.
-
-TypeScript, targeted lint, 375 repository tests and 30 disposable PostgreSQL 18
-checks passed. Coverage includes scoped intake, incompatible terms, duplicate
-and conflicting requests, altered bytes, stale placement, rejection, expiry and
-withdrawal after page approval, private staging, exact release and rollback.
-Customer upload, Operator-assisted intake, existing Intro media, text-only
-release and historical preview checks passed. The canonical migration ledger
-and hosted state were outside the fixture. No live provider request or
-credential was used.
-
-At the stock fixture checkpoint, official Pexels sources were reviewed on November 7, 2026. The provider reported
-a pause on issuing new keys. Prepare one search/credit adapter against recorded
-responses first. Live use needs approved access, provider-specific credit and
-an approved use, retention, withdrawal and exit policy. WordPress copy/storage
-remains pending. The later provider decision above supersedes this plan. [Stock proof and provider gate](media-acquisition.md#permissioned-stock-fixture-and-provider-integration).
-
-## Commercial V1 agreement-based customer upload verified locally
-
-The owner approved standing agreement rights evidence for routine customer
-media, with targeted review of exceptions and qualified legal review before
-commercial launch. The disposable request adapter authenticates an upload-only
-customer credential, obtains the exact scoped grant and representative acceptance
-from a trusted synthetic adapter, and stages the original and prepared PNG with
-both digests in the existing acquisition ledger. Current evidence is rechecked
-at review and exact release. Image-specific revocation uses the same ledger.
-Customer submission, Operator review, page consent and release stay separate.
-
-TypeScript, targeted lint, 375 repository tests and ten disposable PostgreSQL 18
-checks passed. Coverage includes credential and tenant refusal, missing or
-unverified agreements, actual format and stream limits, conflicting retries,
-changed original and prepared bytes, superseded authority, dispute, withdrawal,
-rejection, revocation, exact approval and rollback. The historical preview digest
-and operator-assisted intake regressions passed. No customer route or production
-authority is installed. Hosted state and the canonical migration ledger were
-outside this checkpoint.
-
-The next practical slice is one provider-neutral, permissioned stock candidate
-through the same acquisition and approval path, using a local fixture until a
-provider/license review authorizes more. The production customer-upload route
-still needs P7 account and durable agreement integration, legal and exception
-policy approval, rate/retention safeguards and a minimal customer UI. Supported
-AI-generated media completion and the separate WordPress storage decision stay
-on the roadmap. [Standing rights and upload contract](media-acquisition.md#standing-customer-media-rights-and-authenticated-upload).
-
-## Commercial V1 customer-supplied media intake verified
-
-The owner authorized one disposable operator-assisted image. The supplied-image
-subtype reuses the acquisition work, candidate and review records, private
-content-addressed storage, and existing Asset and page release path. The
-Operator records the supplier and claimed rights separately from the review
-basis. An exact approved candidate produces one unattached Asset. A separately
-approved page release can use it only for the reviewed placement while evidence
-and bytes are current. The guarded fixture adds the subtype only on disposable
-loopback PostgreSQL. The canonical migration ledger and hosted schemas were
-outside this checkpoint.
-
-TypeScript, targeted lint, 375 repository tests and nine disposable PostgreSQL 18
-checks passed. The supplied-media integration covered scoped authority, invalid
-inputs, evidence conflicts, changed bytes and placement, reject/revoke, duplicate
-receive and review, atomic ingestion failure and retry, authorized reuse, and
-compatibility with exact preview, release and rollback. Revocation invalidated
-an otherwise current page approval at release. Existing Intro and historical
-preview regressions passed.
-
-Next, review the authenticated upload contract and acceptance rules for
-customer attestations, then connect one bounded upload to the same intake.
-Production identity/authority, reviewed shared schema and grants, retention
-and abuse handling remain gated. Practical stock sourcing is still required.
-WordPress storage and synchronization remain pending. [Media intake contract](media-acquisition.md#operator-assisted-customer-supplied-raster)
-and [exact approval and release](content-authority-and-editing.md#media-to-publication-handoff).
-
-## Commercial V1 disposable Intro media release verified
-
-The owner approved one project-created raster with explicit synthetic permission in
-an existing Intro slot. The proposal revision binds the verified prepared bytes,
-source and rights evidence, intended AssetUsage and accessibility metadata. The
-private preview renders the image in context and the existing exact approval
-binds the revision and HTML. Release revalidates eligibility and atomically writes
-the usage and content under the existing separate mandate. Rollback removes a
-new usage or restores its exact predecessor. The local slice uses the existing
-proposal and release records without a migration. The generated Hero policy
-retains its existing context-bound eligibility.
-
-TypeScript, targeted lint, 375 repository tests and 40 disposable loopback
-PostgreSQL 18 checks passed. Coverage includes the historical text approval
-digest, media-bound text refusal, image placement and bytes, changed rights
-and bytes, stale rollback, authority, concurrent retries, atomic failure and
-microsecond-accurate prior usage restoration. The first integration run needed
-a synthetic foreign canonical fact for an existing persistence test. It passed
-after the fixture was seeded through the canonical writer in the disposable cluster.
-There were no hosted writes, paid provider calls or public releases.
-
-Customer upload and practical permissioned stock sourcing remain required
-Commercial V1 work. The next bounded step is to define the first customer-supplied
-media intake and rights evidence path against the common lifecycle. WordPress
-storage and synchronization remain pending, with Core-owned masters plus verified
-Media Library copies recommended for review. [Media proposal and release](content-authority-and-editing.md#media-to-publication-handoff),
-[acquisition](media-acquisition.md#commercial-v1-completion-boundary) and
-[WordPress media decision](wordpress-delivery-feasibility.md#pending-media-delivery-architecture).
-
-## WordPress private delivery acceptance closed
-
-The owner accepted the signed delivery, private staging, idempotent retry, revocation, v0.0.6 restoration, authenticated rollback output and scoped resource cleanup. The final bounded read-only inspection confirmed an empty test webroot and saved PM2 list, absent supervisor and child, removed pull configuration, and unused port8081. Production port8080 still belonged to UID3318461 and both public HTTPS body digests matched. The test hostname root and former pull path returned identical generic nginx502 bodies with no redirect. The result is consistent with the intentionally absent upstream. The account evidence does not establish nginx's configured upstream. This inspection found no indication of cross-package routing or credential exposure.
-
-The retained package resolves to185.146.167.100 and serves valid hostname-verified TLS. The observed certificate SHA-256 is `0cc3b524a416235bc6935239744eb0c98898814d73d1aa0fc8e5b41769667638`, differing from the earlier capture. The certificate validity window is November6,2026 19:28:20UTC to February4,2027 19:28:19UTC. The cause of the fingerprint difference is unverified. The idle502 is a test-host maintenance item for the next time the account needs an idle landing response. Acceptance is closed under the owner's explicit disposition. The package, DNS and SSL remain available for future testing.
-
-Commercial V1 resumed at the local Media-to-Publication slice. The first disposable integration check verified the existing release refusal for a media-bound Page and preserved its content, AssetUsage and release history. The historical exact-preview check also passed. This was the pre-implementation baseline for the disposable Intro proof recorded above. The signed delivery proof provides the transport foundation for the planned WordPress integration. Later WordPress capabilities and their approval gates remain on the roadmap. [Media-to-Publication handoff](content-authority-and-editing.md#media-to-publication-handoff) and [Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence).
-
-## Scoped rehearsal cleanup passed on host. Retained HTTPS route verification (historical)
-
-The owner approved the exact `833bd30` cleanup. All SSH operations used only `wp-acceptance.miopages.com`. The account-local PM2 socket and manager248412/UID3326411, sole app name, cwd, executable, supervisor250119/child250164 and start ticks matched the reviewed evidence. Restart count remained1 before cleanup. The earlier8:46p.m. Eastern restart remains an unresolved observation.
-
-The checksummed `.env` and `ecosystem.config.js` were moved into the owned0700 `miopages-private-acceptance/retired-discovery-833bd30` directory. The package-local CLI deleted only `miopages-wp-acceptance`. The live list was empty before `save --force`, and the saved list was independently verified empty. Both processes exited and the kernel showed no8081 listener. Loopback returned connection refused. The supervisor recorded `requested-stop`, `cleanupVerified=true`, peak RSS217,821,184 bytes and minimum available memory749,858,816 bytes.
-
-The installed runtime inventory exactly matched the pinned build and dependency manifests. All32,967 regular files and37 symbolic links were checked before removal. The dedicated webroot remains in place and empty. The exact revoked installation's Cloud `pull-config.json` copy and reviewed active launcher were removed. The protected discovery archive, artifact and recovery archives, prior runtime evidence and logs remain available. The audited staged object, WordPress rollback archives and existing database roles and release records were retained.
-
-Post-cleanup verification from the acceptance account confirmed production PM2 manager61759, supervisor224900 with unchanged start ticks59014428, and child224918 in the same parent chain. Port8080 belongs to production UID3318461. Both public Core HTTPS200 body digests matched the accepted values. The authenticated WordPress post-rollback receipt remains byte-identical to the original, SHA-256 `add4b931b863c7e664c23679f8caf9948a4d15ab248fc8552439bd69a63594d7`. A fresh unauthenticated request confirmed the WordPress401 Basic Auth challenge. Active WordPress0.0.6 and all17 rollback files were verified during restoration in `8988ff5`. No additional Reseller SSH session was used in this cleanup.
-
-The reusable hosting account remains reachable over SSH and its hostname resolves to185.146.167.100 with valid hostname-verified TLS. The served certificate fingerprint is `0cc3b524a416235bc6935239744eb0c98898814d73d1aa0fc8e5b41769667638`, which differs from the earlier capture. Its validity began November6,2026 at19:28:20UTC, before this cleanup. The cleanup made no DNS or SSL changes. A fresh HTTPS request to both the test hostname root and former pull path returns nginx502 with the same generic gateway body. This is consistent with a remaining provider-side route to the stopped application. Account-local logs did not establish the upstream or the cause. Per the owner's discrepancy gate, hosted changes stopped at this observation. The remaining action is to identify and retire any stale package-specific route through 20i's account controls while retaining the account, DNS and SSL. Verify the idle package response before formal closure. No app rediscovery or replacement listener is needed.
-
-Signed delivery acceptance, receipt retry, revocation, authenticated rollback and scoped PM2/file cleanup all passed. Formal milestone closure is pending the retained hostname route check. The next authorized Commercial V1 step is the local Media-to-Publication slice. Start from the existing acquisition pilot and prove one permissioned asset through provenance and rights review, approved Managed AssetUsage, operator QA, exact approval and a disposable release/rollback rehearsal. The completed WordPress transport proof is the foundation for the planned integration scope, which remains in the canonical roadmap. [Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and [media acquisition boundary](deferred-architecture.md#media-acquisition-and-external-intelligence-pipeline).
-
-## Authenticated rollback output matched. Rehearsal PM2 cleanup remains open (historical)
-
-The operator supplied `runtime-content/wordpress-http-baseline-20261107T122401437692Z.json` and reported that the acceptance package's My20i Registered Applications panel was empty. The operator took no registration or process action. Both authenticated WordPress responses were HTTP200 over verified TLS and matched the original69,626-byte body digest `778588f99e928dfcf835b6ad3bf84ea0c5fd788f65bfa8d02e65a8b2c0a786e7`. The receipt itself matched the original receipt SHA-256 `add4b931b863c7e664c23679f8caf9948a4d15ab248fc8552439bd69a63594d7`.
-
-Independent SSH verification found one **live and saved** app named `miopages-wp-acceptance` in the acceptance account's own PM2 manager PID248412/UID3326411. Supervisor250119 retained start ticks63247539, child250164 was present and restart count remained1 with autorestart=false. The child still bound127.0.0.1:8081 and a loopback connection succeeded. The `unknown` row's disappearance is an unresolved panel observation. Host checks establish that the app and listener remain active. The protected Cloud `pull-config.json` copy and rehearsal discovery metadata also remain. The installation is revoked, the Reseller copy was removed after rollback, and the memory-only operator holder was retired after the final revocation audit.
-
-Public Core's separate PM2 manager PID61759/UID3318461 still reported its sole online `miopages-runtime` PID224900 at restart count0 and checkout `62439fc0c8bde7fe98339625d33a845102a7995a`. Both public HTTPS200 body digests independently matched the accepted baselines. No additional restart was observed in the rehearsal app. The prior8:46p.m. Eastern restart cause remains unresolved.
-
-**Smallest remaining cleanup.** In the `wp-acceptance.miopages.com` SSH account, verify the current manager socket owner and the sole exact app name, executable, cwd and process identity. Withdraw the reviewed rehearsal discovery files from the package webroot to protected storage to prevent rediscovery. Use the package's existing `/usr/bin/node /home/virtual/vps-bef564/e/e494602172/node_modules/pm2/bin/pm2 delete miopages-wp-acceptance` with `PM2_HOME=/home/virtual/vps-bef564/e/e494602172/.pm2`. Verify its live app list is empty, then run the same package-local CLI with `save --force` to persist the empty list. Verify the owned supervisor/child are gone and8081 is unused before removing the scoped credential copy and remaining reviewed rehearsal runtime files. Retain the hosting account, DNS, SSL, audit and recovery evidence. This inspection made no process or hosted configuration changes. End-to-end delivery and authenticated rollback output have passed. The milestone remains open for process and resource cleanup.
-
-## Private HTTPS delivery acceptance passed. Final cleanup verification pending (historical)
-
-The owner explicitly approved the exact encrypted transfer described at3652bac. The relay ran once and verified readback equality in memory, account UID3322659, destination mode0600, parent mode0700, and exact installation9a511424/release7c3c0030 binding. The CLI-only WordPress config contained the installation HMAC and public pins. Verification evidence contains no secret values. Listener supervisor250119 and child250164 kept their recorded start identities, with restart count1 across transfer, plugin swap, staging, retry and revocation. The earlier8:46p.m. Eastern restart remains an unresolved operational observation.
-
-Both protected plugin archives passed checksum and ZIP integrity checks. Active WordPress0.0.7 matched all nine reviewed files and registered the private-stage command only with its protected CLI bootstrap. The existing memory-only holder issued the exact reviewed release `7c3c0030-ac9d-42ca-8222-3412b282da95` through its issuance-only signer path. The signed envelope SHA-256 is `fad631197bae6ec2a6876c0f4172a63b68f351b745c46ca9a6db931dbe2ba94e`. Independent read-only PostgreSQL verification under the restricted role confirmed the Ed25519 signature, approved event `e610fbb465226d352c0e33839f907693b2ec1376759d69b7dc2832c65f9d2e75`, exact installation and site IDs, source/projection digests and sequence1.
-
-| Acceptance step | Verified result |
-| --- | --- |
-| First authenticated HTTPS pull and receipt | WordPress staged one 1,492-byte immutable object. Its digest matched Core's envelope and the first durable `staged_at` was `2026-11-07T05:11:02.865Z`. |
-| Retry with fresh request nonces | The same object digest, inode and modification timestamp persisted. The original `staged_at` was preserved and Core recorded one `receipt-retry` event. |
-| Installation revocation and refusal | The holder reported revocation and independent PostgreSQL readback confirmed revoked status. The same WordPress adapter made an authenticated HTTPS pull and observed HTTP403. The object and `staged_at` remained intact. |
-| Final audit | One enrolled, one issued, two pulled, one staged, one receipt-retry and one revoked. Both the rehearsal and original synthetic `active.json` markers remained absent. |
-| WordPress restoration | Active0.0.6 matched all17 rollback archive files. The temporary Reseller pull config and bootstrap were removed. The protected staged object and rollback archives were retained. The unauthenticated Basic Auth401 remained in effect. |
-| Public Core preservation | Both original public hostname responses matched their accepted HTTP200 body digests after WordPress restoration. |
-
-The application still needs scoped My20i unregistration and final SSH verification/cleanup. The owner also needs to collect the authenticated post-rollback WordPress receipt using the existing hidden-prompt launcher. Preserve the reusable account and DNS/SSL, existing DB roles and schema, release audit and recovery evidence. After those cleanup gates pass, close this milestone and return to Commercial V1 Media-to-Publication. No application source changed during this operational checkpoint.
-
-## Bounded stability and actual private HTTPS refusals — PASS (transfer later approved above)
-
-The owner reviewed3dcf0c2 and authorized continuation after one bounded stability check if no additional restart occurred. My20i's `unknown` label and the clean8:46p.m. Eastern restart remain unresolved operational observations, not blockers by themselves. Do not attribute their cause, rediscover, unregister or alter metadata to investigate the label. Stop on another unexpected restart or an actual security/integrity/acceptance failure.
-
-A20-second read-only check took three snapshots: the same supervisor250119/child250164 and kernel start ticks persisted; PM2 restart count remained1, autorestart=false, with no additional restart. Combined RSS ranged192,192,512–201,981,952 bytes; MemAvailable stayed at least840,925,184 bytes. The reviewed supervisor hash and exclusive127.0.0.1:8081 binding remained verified. Resource/process gates passed. The existing supervisor continues its500ms resource/identity guard; check stability between subsequent acceptance operations.
-
-Actual verified-TLS HTTPS requests from outside Cloud passed for **both** exact endpoints: GET404/no-store, bodyless missing-auth POST400/no-store, well-formed unenrolled-identity POST403/no-store; all had no redirect. These sent only synthetic invalid IDs/MACs, not the real installation credential, and were refused before nonce/delivery mutation. Direct external TCP8081 to the advertised package IPv4 was unreachable (bounded timeout). Sanitized local `runtime-content/wordpress-acceptance-preparation/https-refusal-preflight.json` SHA-256 `45ae62ca4e4b0ae82829c8ce4c1cdb50b67dbd30e35e9972856f636389d24ff2`. Existing public Core and the accepted refreshed WordPress baseline remain preserved; no new registration is needed.
-
-Prepared the already-planned CLI-only WordPress configuration for exact installation9a511424/credential421ef5e7/reviewed release7c3c0030, with the original synthetic graph and pinned public verification key. A fixed relay reads only the existing Core installation-secret/public JSON files, transmits in encrypted SSH/process memory and creates only owned0600 private-pull configuration and a0700 private staging child on the existing Reseller account. It copies no operator token, database credential, public runtime configuration or signing private key. PHP8.4 syntax validation and Python/receiver syntax plus fixed-source/target review passed; no application code/test gate was changed by this preparation.
-
-**Actual authorization gate:** automatic approval review rejected the relay before process creation, stating the exact existing installation-secret payload/destination needed explicit user authorization despite broader rehearsal/configuration approval. No secret was read/transmitted by that rejected execution. Independent read-only Reseller inspection confirms `private-pull-config.json`, `private-stage` and the CLI bootstrap are all absent. No retry/workaround, plugin swap, signer access, signed issuance or staging followed the rejection. A narrow question is pending for explicit one-time transfer of `secretHex` from Core's protected174621Z installation file to `miopages.org@ssh.us.stackcp.com`, `/home/sites/36a/9/9fe7ae6df4/miopages-private/https-acceptance-9a511424-79af-4d02-801e-8d191d4b0d2f/private-pull-config.json`, with0600/0700 protections and only public identity/release/key metadata alongside it. Never send the credential value in chat.
-
-The prepared relay/bootstrap remain local ignored preparation files under `runtime-content/wordpress-acceptance-preparation`; they contain code/pins, not actual secret values. Wait for the explicit transfer decision before executing the dependent configuration operation. After approval, recheck process stability, run only that transfer, install the CLI-only bootstrap, verify retained006/007 archives/state, and continue the existing007/issuance/authenticated HTTPS private stage/exact receipt/retry/revocation/refusal/006 rollback sequence. Preserve exact candidate/Core approval/review, credentials/expiry, canonical content, original public runtime, reusable account/DNS/SSL and required evidence. No broader infrastructure, provisioning or candidate work is needed.
-
-## Existing acceptance app identified read-only; refreshed WordPress baseline — PASS (hold superseded above)
-
-The operator reported one My20i Registered Applications entry labelled `unknown` and explicitly requested **read-only inspection**, with no discovery/rediscovery, restart, unregister or configuration change. Its View in File Manager link opened the correct account home `/home/virtual/vps-bef564/e/e494602172/`; manually opening public_html showed the prepared build. That generic home link confirms the account but does not independently map the control-plane record to a specific application. **Do not create/register a duplicate or repeat the previous discovery request.**
-
-SSH independently identified exactly one saved PM2 app, correctly named **miopages-wp-acceptance**, with reviewed supervisor `/home/virtual/vps-bef564/e/e494602172/miopages-private-acceptance/wordpress-private-listener.cjs`, cwd `/home/virtual/vps-bef564/e/e494602172/public_html`, Node production/PORT8081, one fork and autorestart=false. The actual owned process chain matched PM2→reviewed supervisor→reviewed `.rehearsal/private-server.cjs`, and only127.0.0.1:8081 listened for that UID. The installation credential was present only in the child environment; no normal DATABASE_URL/operator/migration/signer authority was present in these processes. No values from protected environments were printed. `.env` is exactly `PORT=8081\nNODE_ENV=production\n`; its SHA-256 is `14b2bc361b6a45bc12bc3104b2b0d79a123cdbaea44597e81d0b9466b590c064`. Ecosystem SHA remainsd96ef396...4083ff; supervisor/private-entry hashes matchd75ffebd...b0bae3/ea0d1454...7e8854 and artifact source49f76e0/private flags match. Configuration files remain owned0600.
-
-**Conclusion: no further application registration is necessary.** The correct prepared application already exists and is running. The `unknown` label is inconsistent with the verified PM2 name, not evidence of a missing `.env`, wrong cwd/port or second app. Its exact display/control-plane mapping and cause remain **unproven**: no readable account-local registration record explained it. The ecosystem follows the documented apps-array/name contract and is valid JavaScript; quoted JSON-style keys differ from the example and the public runtime's literal keys, but there is no evidence that this causes the label. Do not rewrite metadata or rediscover to test that hypothesis. Official [registration documentation](https://docs.20i.com/managed-cloud-servers/using-the-nodejs-application-registration-tool) describes discovery/name requirements but does not explain an `unknown` label.
-
-Initial PM2 logs showed the app online at01:29:51UTC (November6,8:29:51p.m. Eastern), supervisor248424/child248474. During read-only inspection, a later PID-file observation showed supervisor250119. PM2 logs independently record a stop at01:46:07UTC, exit0/SIGINT at01:46:09, and online again01:46:10 (November6,8:46:07–8:46:10p.m. Eastern); saved restart_time=1, autorestart=false, current child250164. The supervisor logged `requested-stop` with verified cleanup, peakRSS206,880,768/minimumMemAvailable806,526,976 bytes, then the new child spawn. This was **not a resource-gate failure**. These SSH diagnostics made no PM2/control-plane process-control call and the operator reports no restart/discovery action. The logs do not identify the actor; do not attribute it to the operator, a provider reconciler or automatic restart without evidence. Further acceptance remains on the requested read-only hold while this unexpected control-plane activity is assessed. Leave the running app untouched; no stop/restart/unregister was performed by Codex.
-
-Read-only HTTPS GETs on the private hostname at `/`, exact pull path and trailing-slash pull path returned404/no-store with no redirects. No authenticated/HMAC POST, release issuance or staging was attempted in this inspection, so full HTTPS acceptance is not claimed. Both original public HTTP200 root hashes remain unchanged and the public supervisor PID remains224900. WordPress006 was not changed.
-
-The refreshed operator-generated baseline `runtime-content/wordpress-http-baseline-20261107T014205074587Z.json` was strictly validated: two authenticated HTTPS200 responses,69,626 bytes, original body SHA-256 `778588f99e928dfcf835b6ad3bf84ea0c5fd788f65bfa8d02e65a8b2c0a786e7`, verified TLS, zero hosted writes and no stored credentials. Receipt SHA-256 remains `add4b931b863c7e664c23679f8caf9948a4d15ab248fc8552439bd69a63594d7`. Its incidental terminal text was not used as current directory evidence; live SSH confirmed the populated artifact webroot. No credential information from the operator's prompt was copied to Git.
-
-This checkpoint changes continuity documentation only; Git whitespace validation passed, and no application tests/builds/provisioning were repeated. The bounded next unresolved question is which control-plane record produces `unknown` and what requested the01:46UTC PM2 restart—not whether another application should be registered. No hosted configuration correction is justified by present evidence. Preserve exact candidate/approval/review/credentials, all remaining acceptance scope and reusable hosting/DNS/SSL cleanup rules.
-
-## Corrected Linux artifact and hosted loopback smoke — PASS; historical registration-pending state
-
-Implementation `49f76e0c153b08deff81b164d775c69ebcb22240` was normally pushed. The single [Linux workflow42323311633](https://github.com/R-Levin/myomaton-web/actions/runs/42323311633), Node22.23.2/Linuxx64, passed production audit (zero production advisories), retained exact-candidate HTML/approval regression, normal/private configuration comparison, portable links/raw-routing tests, production build and **283 relocated-artifact smoke checks**. No hosted build/install, credentials or deployment access were used by CI.
-
-Artifact13554205964 was independently downloaded and checked against its GitHub ZIP digest `67d2951e41f869142390d496f65dcc1e968d853fd4fb97da6f50d865f22827c8`; inner tar SHA-256 `ccff106a188d8f3a918c8d1166e9897e7134b0145da05d02faa58b14a16efb39`. All309 runtime-file hashes/four portable links, exact source49f76e0, embedded/separate metadata, private entrypoint and unchanged lockfile9f08a1e were verified. Compiled private flags are true and routes-manifest contains zero automatic redirects. The exact `.rehearsal/private-server.cjs` entry hash is `ea0d14547699b4eedd9a2e9a9d381b7f2e8488f41982b3238161c17c437e8854`.
-
-Only the stopped new-account runtime was replaced after rechecking the old artifact's308 hashes/four links and unused8081. Existing physical matching node_modules, protected pull configuration and `.env` remained unchanged; prior runtime and supervisor were preserved under `~/miopages-private-acceptance/routing-49f76e0/previous-runtime` and `previous-launcher.cjs`. Independent hosted309-file/four-link verification passed. Replacement receipt in that same directory is SHA-256 `df72069a350b50e2a4ce88ceaff823569b7774527390b5636e9b4c1be4f740e1`.
-
-The newly authorized hosted loopback smoke **passed285 checks**: the full283-case production matrix plus well-formed unenrolled pull/receipt403 authentication refusals using the actual restricted database connection. Trailing-slash and normalization variants return404/no-store without redirects. Only127.0.0.1:8081 listened. The supervisor stopped and independently verified cleanup after2.61seconds; peak wrapper/child RSS199,589,888 bytes, minimum system MemAvailable846,974,976 bytes. No signing, nonce-authorized delivery or WordPress staging occurred. Hosted receipt `~/miopages-private-acceptance/loopback-smoke-20261107T012406Z.json` was independently collected, SHA-256 `b4a9de16a424e14e497a2d2a8b4c87547a27632d924672e22d650ba0e1b37b2c`. UTC filenames are November7; this work is November6 in the operator's local timezone.
-
-Prepared only the new account's single `ecosystem.config.js`, SHA-256 `d96ef3966261c5d0be94d879cfc3f122be73c9fb7e525b73532faa79694083ff`, for `miopages-wp-acceptance`, cwd `/home/virtual/vps-bef564/e/e494602172/public_html`, fixed supervisor/loopback8081, one fork, automatic restart disabled and owned0600 logs under the existing0700 private root. The file contains no credentials. **No registration/start has occurred.** Only that package's Node Application Manager may discover/register it; never server-wide/live-package rediscovery. The operator-assistance request explains discovery starts the app. UI automation remains unavailable as already verified; do not investigate/change the locked backup drive.
-
-Post-smoke preservation checks matched both accepted public HTTP200 body hashes. Read-only Reseller verification again matched all17 current006 plugin files to the retained rollback, validated both006/007 archive hashes/CRCs and confirmed the original synthetic-staging active marker absent. The current memory holder still reports both principals authenticated with the exact approval/review/enrollment retained. No candidate, verifier, grant, expiry, canonical content, protected configuration or public listener changed.
-
-**Next actual external access:** the operator has been asked to register only the prepared new-package app and to run the existing hidden-prompt Python HTTP-baseline launcher, returning only nonsecret status/receipt path. No new authorization or credentials in chat are requested. Await those results, independently verify actual private HTTPS Host/proto/authentication refusals/allowlist and inaccessible external8081, validate the refreshed authenticated baseline, then resume the existing007/issuance/stage/receipts/retry/revocation/006 rollback sequence. Neither actual HTTPS acceptance nor WordPress acceptance is claimed by loopback success. Keep the full integration scope open and retain the reusable account/DNS/SSL at cleanup.
-
-## Approved private routing correction — preparation record (Linux gate now passed above)
-
-The owner approved a narrow private-build correction after checkpoint6cddd1e, expanded production-artifact negative-route coverage, sanitized failure evidence and continuation only after a newly verified Linux artifact. Retain exact candidate/Core approval/technical review and credentials; do not repeat database or infrastructure groundwork. Retain the reusable acceptance account/DNS/SSL at final cleanup.
-
-Installed Next16 documentation and runtime source were inspected. `skipTrailingSlashRedirect` and `skipProxyUrlNormalize` are now enabled **only** when building the private rehearsal (`MIOPAGES_WP_PRIVATE_STAGE=enabled`); normal Core config/default routing remains byte-for-byte equivalent after removing those private flags. Since Next also normalizes repeated slashes/backslashes before Proxy regardless of these flags, the same private loopback listener now uses a fixed private-artifact Node entrypoint with an exact raw IncomingMessage method/target check before invoking Next. It is not an additional listener/proxy/service. All non-allowlisted valid HTTP paths/methods, CONNECT and upgrade requests are denied404/no-store; only the exact two POST paths reach unchanged Proxy/ingress/authentication. It binds127.0.0.1:8081 and refuses startup without the private production flag/compiled flags or with privileged Core/operator/migration/signer configuration. The existing supervisor's resource/process-identity/cleanup guards remain unchanged apart from the child entrypoint.
-
-The shared unit/production smoke includes trailing-slash, doubled-separator/backslash, dot-segment, encoded path, query/internal-data, absolute-target, case/parameter and alternate-method cases. Failure evidence retains status and tightly allowlisted cache/location/content headers, never bodies, cookies, arbitrary URLs or authentication headers. The Linux artifact workflow builds with private flags, tests the exact relocated artifact entry and records its routing-smoke result/source/checksums. Normal Core package start/public deployment is unchanged.
-
-Focused raw-server/diagnostic and private-vs-normal configuration tests passed; the retained candidate's exact HTML/approval digest regression passed. Consolidated375 application tests, TypeScript, scoped lint, eight Python custody tests, three raw-server/diagnostic/artifact-link tests and Git whitespace validation passed. The required Linux production build/artifact verification is pending at this preparation entry. No corrected artifact was uploaded to hosting or smoked yet, and no registration, WordPress upgrade or signed issuance followed the earlier failed gate. Continue only from actual passing results; do not treat these unit tests as production-artifact acceptance.
-
-## Outbound correction verified; loopback smoke stopped at routing gate — November 6, 2026
-
-The owner reported20i's outbound correction and authorized resuming the existing acceptance milestone, while retaining the reusable `wp-acceptance.miopages.com` hosting account and its DNS/SSL after cleanup. **This retention decision supersedes all earlier instructions to delete that account or its DNS/SSL.** Remove only approved rehearsal-specific applications/configuration/credentials/test resources, preserve required audit/recovery evidence, and leave the reusable account available. No new package, DNS, certificate or database provisioning is required.
-
-The previously failed read-only probe was rerun once from account e494602172 using its existing protected configuration. It returned **PASS**: actual `miopages_wp_pull` role, verified TLS/certificate hostname, verified session/transaction/advisory-lock behavior, and exact enrolled installation/key/reviewed-release metadata. This establishes TCP connectivity as well as the higher-level checks; no separate port matrix or old database groundwork was repeated. No signer was read and no database content was changed by the probe.
-
-Before smoke, independent preservation checks verified live dependency-only62439fc, the same sole `miopages-runtime` PID224900/restart0/online, and both accepted public HTTP200 root hashes. The memory-only holder remained usable with both identities authenticated and approval/review/enrollment retained. No rekey, principal/grant/expiry change or repeated exact-candidate approval occurred.
-
-The authorized90-second-maximum loopback smoke started the exact verified private artifact using the tested launcher. It verified127.0.0.1-only binding and30 denied-path/method checks, then **stopped on the first trailing-slash check**, GET `/api/wordpress-delivery/pull/`, because the expected404/no-store assertion failed. No later ingress/authentication checks were reached in this smoke. The harness retained stage/error type and successful checks but omitted the failing response's status/headers; do not claim those were directly captured. Read-only inspection independently found compiled `skipTrailingSlashRedirect=false`, `trailingSlash=false`, and the internal308 redirect `/:path+/` → `/:path+`. Installed Next's router processes redirects before Proxy; the production artifact therefore cannot meet the exact trailing-slash denial contract. The CI artifact smoke omitted this negative path, although the isolated Proxy unit regression included it.
-
-The harness stopped the wrapper and independently verified child cleanup and unused8081. Peak wrapper/child RSS181,485,568 bytes; minimum system MemAvailable883,134,464 bytes; both resource gates passed. Duration1.72seconds, wrapper exit0 after requested stop, overall smoke **BLOCKED**. Receipt `/home/virtual/vps-bef564/e/e494602172/miopages-private-acceptance/loopback-smoke-20261107T010355Z.json` (UTC timestamp; November6 local) was independently collected and validated, SHA-256 `98256c7bb13668b835e8d94703120af5f2180c2505fa2a6ac172bb8133b50296`. Both public root hashes remained unchanged after cleanup. No new-account process-manager socket/ecosystem entry exists; no app registration, HTTPS acceptance, signed issuance, WordPress007 swap, private staging, receipt or revocation step was attempted.
-
-**Stop-on-failure boundary:** acceptance is paused for a bounded private-build routing correction, an expanded Linux production smoke that includes trailing-slash routes and retains sanitized failure status/header evidence, and a newly verified artifact before any hosted retry. The installed Next guide documents `skipTrailingSlashRedirect` for handling exact paths in Proxy; scope any correction to the private rehearsal build, preserve normal/public Core behavior, exact rendering/approval digests and all existing authentication checks. No routing correction, artifact replacement or automatic retry was performed after this failure. Do not weaken expected404/no-store assertions or treat a308 as acceptance. No additional infrastructure investigation is indicated.
-
-The **full remaining integration scope stays open**: successful loopback smoke, new-package-only registration, actual private HTTPS allowlist/authentication checks, reviewed007 swap with006 rollback ready, issuance-only signing, authenticated pull, private staging, matching receipts, idempotent retry, revocation/refusal,006 restoration and unchanged authenticated public output. Cleanup must now retain the reusable account/DNS/SSL while removing approved rehearsal-only resources. After successful acceptance/cleanup, close this WordPress milestone and return to canonical Commercial V1 Media-to-Publication. This checkpoint changes continuity/cleanup documentation only; application tests were not repeated after the failed hosted smoke, and the prior374/eight-custody gates remain historical local results rather than a claim of current deployability.
-
-## Authenticated My20i inspection complete — privileged network-rule inspection required (historical, now resolved)
-
-The owner completed the actual read-only Manage Server inspection for vps-bef564. Tabs displayed: Overview, Usage Graphs, Upgrades and Manage Service; no Settings tab. Manage Service lists MariaDB, nginx, per-package PHP-FPM and ProFTPD, with no visible network firewall/outbound-port/external-connection control. Overview confirms both runtime.miopages.com and wp-acceptance.miopages.com are active packages on the same Node.js Optimised Cloud server. Neither examined screen displays the existing5432/6543 exceptions or their scope. Nothing was saved, toggled, registered or changed. This supersedes the pending authenticated-inspection question below; it does not prove that every possible provider/customer control was examined.
-
-Combined with the completed SSH comparison and denied firewall reads, **no further specific self-service diagnostic or correction is available through the demonstrated access**. Repeating DNS/TCP/TLS tests, changing services, using Remote MySQL Access or exploring unrelated infrastructure will not reveal the enforcing rule. The account-dependent TCP refusal is verified; UID/cgroup filtering remains a hypothesis, not a proven cause. Unknown provider-only or unexamined controls must not be represented as absent.
-
-The next narrowly justified provider question is ready for the operator to submit; Codex has not contacted20i:
-
-> On existing Node.js Optimised Cloud server vps-bef564, runtime.miopages.com (Unix UID3318461) connects to aws-0-us-east-1.pooler.supabase.com on TCP5432 and6543, while wp-acceptance.miopages.com (account e494602172, UID3326411) receives immediate ECONNREFUSED on both ports at all three resolved IPv4 addresses. Both SSH sessions share the same server boot identity, network namespace, DNS answers, policy routes and kernel source address; both can connect over443 and show the same public IPv4 on HTTPS. You previously opened these outbound ports. Please inspect the effective outbound rules and existing exception scope for these two account contexts, including UID/cgroup/mark/NAT or other applicable policy, and identify the actual refusal cause. Is there an existing customer-accessible control for this exact exception? If so, provide its precise My20i path. Otherwise, propose the smallest temporary account-scoped TCP5432-only correction for e494602172, including exact scope and rollback, preserving the original account and default restrictions. Do not apply changes yet. No6543 expansion, inbound port opening, DNS/proxy/service/package change or credentials are requested.
-
-Provider inspection is needed to read the effective policy that our SSH roles cannot read and My20i's examined screens do not expose, or to identify an actual self-service control. Review the returned cause/change before authorizing execution; no automatic firewall correction is authorized. After an approved correction, resume at the existing pull-role session probe and bounded loopback smoke, not provisioning, rekeying, migration or candidate approval. Public Core, WordPress006, the stopped temporary runtime, exact candidate approval and original principal expiry boundaries remain preserved.
-
-This checkpoint changes existing continuity documentation only. Git whitespace validation passed; no hosted tests, database calls or application tests were repeated, and no hosted configuration or credential was changed. Existing comparative evidence and374-application/eight-custody test results remain as recorded below.
-
-## Read-only account network comparison — November 6, 2026; historical pending-check state
-
-The owner requested self-service diagnosis **before provider escalation**, with no firewall/DNS/proxy/database/hosting changes or application registration. This supersedes the earlier instruction below to ask Support immediately. No provider was contacted and no hosted configuration was changed during this investigation. No database credential or protected configuration file was read by the network diagnostics; no database session or transaction-pooler session was opened.
-
-One bounded, contemporaneous SSH comparison of both accounts established:
-
-| Observation | runtime.miopages.com | wp-acceptance.miopages.com |
-| --- | --- | --- |
-| Actual Unix UID |3318461|3326411|
-| Server boot identity / hostname |same vps-bef564|same vps-bef564|
-| Network namespace |net:[4026531840]|net:[4026531840]|
-| DNS resolvers and Session Pooler answers |8.8.8.8/8.8.4.4; same three IPv4s|identical|
-| Visible route to every destination |eth0 via10.5.68.250, source10.5.69.12|identical, except caller UID|
-| Policy routing |local/main/default|identical|
-| TCP5432, each of three pooler IPs |3 connected|3 ECONNREFUSED|
-| TCP6543, each of three pooler IPs |3 connected|3 ECONNREFUSED|
-| HTTPS443 TCP control |connected|connected|
-| Public IPv4 observed by verified HTTPS request |194.38.52.241|194.38.52.241|
-| Effective capabilities / seccomp filters |none / none|none / none|
-| iptables filter/mangle OUTPUT read |permission denied|permission denied|
-
-Port6543 was tested only with connect-and-close TCP sockets to compare the operator-reported pre-existing exceptions. It remains prohibited for the adapter and was not used for PostgreSQL authentication. The public egress observation used [ipify's documented HTTPS IPv4 endpoint](https://www.ipify.org/), with system certificate verification, no proxy/redirect, cookies or credentials. That443 observation does **not** prove PostgreSQL-specific post-routing NAT behavior. Visible routing is identical; hidden NAT/mark/cgroup policies remain unreadable. Different SSH cgroup identities are expected and do not establish a cgroup denial rule by themselves.
-
-**Verified finding:** behavior depends on account context, on the same host/network namespace and visible source route, before TLS or database authentication. **Strong hypothesis, not proven rule:** the original outbound port exception is scoped to the original UID/account (or a related cgroup/security policy) and does not include the temporary account. DNS disagreement, a separate visible network namespace, a different visible route/source IP, and a general HTTPS egress outage were not observed. Do not assert the exact firewall rule, original exception scope, packet rejection origin or provider ownership from these tests alone.
-
-Both accounts expose iptables1.8.10 using the nf_tables backend but cannot list OUTPUT rules; nft/ufw/firewall-cmd/csf tools are unavailable. `/etc/sysconfig/iptables` exists but is neither readable nor writable. `sudo -n -l` requires a password, so no passwordless administrative path was established and no privileged command was attempted. There is no demonstrated SSH self-service firewall correction. Do not request a root password, change identity, bind a different source IP or tunnel around the restriction.
-
-**My20i access limitation:** both supported UI runtimes again failed before opening a page because their launcher encountered the intentionally locked backup drive. No drive/security change or workaround was attempted. The owner reviewed public documentation: Managed Cloud Server Manage Services/Settings and package SSH/SSL/Hotlink/Password/Directory Indexing/Malware controls, with no documented outbound PostgreSQL rule editor. The owner explicitly states this was **not an authenticated inspection** of the server controls or existing exceptions. Therefore neither availability nor absence of a customer-managed outbound-rule control is proven. Remote MySQL Access is unrelated. A focused question remains pending for the operator to inspect the actual existing server's Options → Manage → Manage Services and Settings read-only, report visible network controls and5432/6543 scope, and save/toggle nothing. Do not escalate before completing that available control-plane check or documenting that its access is unavailable.
-
-**Smallest proposed correction, conditional on the actual control:** if a package/UID-scoped outbound exception editor exists and its current rule confirms the mismatch, review one temporary allow entry for account e494602172/UID3326411 to the established Session Pooler on TCP5432, preserving the original rule and default-deny policy. No6543 expansion, public inbound port, DNS/proxy change, new service or credential rotation is needed. This is a proposal only; do not execute it without review. If the authenticated page has no such control, the remaining privileged work is inspection of the enforcing UID/cgroup/NAT rule and a package-only5432 correction; that would explain precisely what requires provider intervention, without assuming it now.
-
-Sanitized local evidence remains in ignored `runtime-content/wordpress-network-diagnosis`: eight account comparison/access/egress/restriction receipts and `network-assessment.json`, SHA-256 `3c1c980442350e7e3e7911687e7405a34f4031827da57b8eaf9dc964a85bb8ba`. Independent comparative assertions and diagnostic Python syntax checks passed. No application source/dependency changed, so the existing374 application/eight custody/TypeScript/lint gates were retained rather than repeated. Holder2644 again reports both identities authenticated and approval/review/enrollment retained; no token, grant, expiry or candidate was changed. Keep the prepared runtime stopped, WordPress006 and public Core unchanged, and the exact candidate approval valid. Resume the existing rehearsal only after the network gate is resolved and reviewed; do not redo completed database or approval groundwork.
-
-## Current stop gate — new account's Session Pooler TCP refusal
-
-The isolated runtime was installed only in new account `e494602172` after independently verifying/extracting all308 private runtime files,32,657 matching dependency files and37 links. Actual installed Next16.4.5, React/ReactDOM19.2.8, sharp0.35.5 and DOMPurify3.4.17 match the pinned artifacts; native image and jsdom/DOMPurify probes passed. No build or package installation ran on the server. Only nonsecret PORT8081/NODE_ENV discovery metadata was created; **no ecosystem entry, application registration, listener startup or WordPress swap occurred**.
-
-The authorized scoped configuration was relayed through encrypted SSH/process memory into owned0600 `miopages-private-acceptance/pull-config.json` under0700. Independent readback compared the complete six-key object to its original sources in memory: pull URL, CA, installation ID/credential/secret and private Core origin match exactly. No operator/migration credential, signer or public runtime configuration was copied. Never print or commit this file.
-
-**Actual failure:** the new account's read-only pull probe stopped at `connection-tls`, with an AggregateError containing three `ECONNREFUSED` failures on TCP5432, each matching a resolved IPv4 address of `aws-0-us-east-1.pooler.supabase.com`. No TLS handshake/database authentication or SQL validation was reached in that account. Narrow diagnostics inspected only safe stage/code/port/address-match metadata, not error messages or credential-bearing objects. A contemporaneous probe from the original runtime account, using the same protected pull-role connection and existing Core connection/session implementation, independently passed verified TLS and session behavior. Configuration mismatch and unavailable database credentials are not indicated. The underlying provider/network policy is **not yet established**; do not claim a firewall cause without provider evidence.
-
-As required by stop-on-failure, no loopback smoke, Node discovery, signed issuance, WordPress007 deployment, staging or receipt operation followed this failure. Port8081 remains unused, the new account has no process-manager socket, and the scoped configuration remains protected. Both public hostnames independently returned HTTP200 with their accepted exact body hashes (`03b866d3...e9729f` and `07639831...a5f62b`). The current holder again returned authenticated[0,1], verified approval/review/enrollment true, revoked false; no restart, token replacement or expiry extension occurred. Preserve exact candidate approval and original November7 15:40:31UTC operator expiries.
-
-The pull probe's local error reporting was corrected to retain a fixed operation stage, allowlisted network/TLS/SQL error code and bounded nested connection codes without exporting messages, addresses, URLs, tokens or arbitrary configuration. Final consolidated local validation: **374 application tests, eight Python custody tests, TypeScript, scoped ESLint and Git whitespace checks passed**. The original ingress allowlist test remains intact. Hosted extraction/native probes passed; hosted loopback/HTTPS acceptance remains **BLOCKED**, not passed. This diagnostic correction has not been executed as a new hosted probe or used to retry a write.
-
-**Smallest next external action:** ask20i to inspect the difference between this temporary account and the working original account for outbound TCP5432 to the existing Session Pooler. Current resolved IPv4s were52.45.94.125,44.208.221.186,44.216.29.125; do not pin these rotating addresses in application configuration. Request the smallest package-only proposed correction, without changing firewall, placement, DNS, proxy or services yet. Do not discover/register the app while this gate is unresolved. No new server, database, direct PostgreSQL path, credentials or broad infrastructure work is justified. Review any actual required hosted change before execution. After resolution, reverify the existing pull-role session, then resume bounded loopback smoke and new-package-only registration at the existing milestone; do not repeat completed database/principal/candidate groundwork.
-
-## Temporary account isolation and HTTPS package routing — PASS; listener preparation
-
-The owner confirmed `wp-acceptance.miopages.com` is exclusively reserved for this temporary rehearsal on existing vps-bef564, with no additional package subscription/charge, and may be removed during approved cleanup. Its unavailable internal My20i package ID is not a technical blocker. My20i advertises IPv4 `185.146.167.100`, matching DNS; runtime/domain-test remain on `.103`. Do not change DNS, SSL, existing packages or the public application to reconcile this intentional difference.
-
-SSH independently verified account `e494602172`, UID3326411, canonical home `/home/virtual/vps-bef564/e/e494602172`, empty public_html, Node22.23.2, Python3.9.25, no inherited rehearsal credentials and no access to the original account's protected files. Existing trusted wildcard TLS covers the exact hostname. A single nonsecret, uniquely named marker in the empty webroot returned HTTPS200 with exact SHA-256 `61655ad57d19cdbef6670bd9fb6b83ae35b5644b48066b7fca65a3980d43be56`; guarded removal restored the empty webroot and the same URL returned404. This proves static package routing, not yet Node proxy routing. No DNS/configuration change was required.
-
-The new account's owned0700 `miopages-private-acceptance` directory was created for the authorized runtime preparation. The existing verified private Linux artifact remains sourceb6fc873/tar232b6ec. Its package-lock matches the independently verified Linux62439fc security artifact exactly (`9f08a1e68084ea823f1f3a2f3ae793c1a76de4345f839bc391fa249ed56d5ec1`). A separate dependency-only archive was derived locally from that verified artifact:32,657 files/33 links, SHA-256 `12419dcee733294cead34bb24719c41849294f1726c15f812827aa53c6404f5d`. No public application code/configuration is copied; no build or npm install runs on the2GB server. Transfer/extraction and hosted probes remain subject to independent hash verification.
-
-Added only the fixed new-account launcher and read-only pull probe. The launcher injects a closed pull-role/CA/installation-secret environment, binds exclusively127.0.0.1:8081, limits the child heap256MiB and total wrapper/child RSS384MiB, stops below512MiB available memory, disables child output and automatic restart, and verifies owned process-group identity before cleanup. `--smoke` imposes a90-second deadline. The probe reuses an off-server transpilation of the existing protected-connection module for verified TLS, actual-role and session behavior, then reads only the exact enrolled installation/key/reviewed release. Neither receives operator/migration tokens, normal DATABASE_URL or signer authority.
-
-Local validation:373 application tests passed (including the preserved ingress allowlist regression plus four launcher custody/resource/process-identity tests), TypeScript and scoped ESLint passed. Existing artifact Linux build/smoke and previous database/custody gates are retained; these local results do not claim hosted listener acceptance. Current memory holder session2644 independently returned authenticated[0,1], approvalVerified/reviewCommitted/enrolled true, revoked false; no token replacement or issuance occurred.
-
-Next: independently verify/extract the isolated runtime and matching dependencies, transfer only the approved pull configuration, run the read-only role probe and bounded loopback smoke, then use **only this new package's** Node Application Manager to discover/register `miopages-wp-acceptance` (discovery starts it). My20i UI automation remains unavailable; that one control-plane action needs the operator after preparation passes. Require real HTTPS authentication-refusal/allowlist and direct-port isolation checks before the temporary WordPress swap or signed issuance. All existing exact-candidate approval, v0.0.6 rollback, unchanged public-output and stop-on-failure boundaries remain active. No Node app, WordPress plugin or release has yet been started/deployed/issued by this preparation checkpoint.
-
-## Hosted continuation, exact Core approval, independent technical review and enrollment — PASS
-
-The operator executed the reviewed absolute-path continuation and returned PASS. Codex independently collected its protected receipt, compared both live database verifiers with both manifests and verified exactly two replacements, unchanged operator UUIDs/all ten actual grant references/scopes/mandates and original unrevoked/unexpired November7,2026 15:40:31.259/.289UTC expiries. Both replacement raw tokens then separately authenticated through existing Core checks, including denied opposite approval/review permission and C0 access. **Do not repeat the continuation command or original enrollment/provisioning/migrations.** The original two verifiers no longer authenticate; manifests remain recovery/audit evidence.
-
-The previously approved exact proposal `b6beda24-564c-4e19-9de0-09861ec32f24`, revision1, preview digest `10692cea76d3afb3eb825d7eaabfa53fbf73c8b4f7e9abdf07dda86c38548bd3` was revalidated against its current canonical base/renderer and owner grant, then approved through the actual owner principal `72bb2f38-28d7-4d3c-bea6-72540bf3d603`, grant `da70a65e-a89e-4b38-938f-87290bf1447e`. Core approval event **`e610fbb465226d352c0e33839f907693b2ec1376759d69b7dc2832c65f9d2e75`** and protected provenance marker were independently replayed/verified in a fresh read-only session before technical review. State is APPROVED with exactly three events; no different candidate or customer approval was substituted.
-
-Different authenticated reviewer `c606cd74-b587-4248-8cba-3df6718fefec`, grant `dd627df4-58b8-480d-8ac2-bdde7c3577b7`, inspected the exact text-only projection and explicitly committed its matching review. Private review-record ID `7c3c0030-ac9d-42ca-8222-3412b282da95`; projection digest `f71a65739ec0b18d75516b27584d4042446e9c4df8721f0d49b346cef5f1327e`; record digest `96353ab72fd84c7ea18a9dc4de527eed9fb210d2ee0a5a3ac8ca27542df1ede9`. Exact source/base digest remains `8ffe7283ada7fa2da60ac9848dea557a9189a069183bd44ae72f175e27005bc1`. This is functional separation of independently authenticated test principals, not independent human governance or real customer mandate. A reviewed private-release metadata row is **not signed delivery issuance or public publication**.
-
-After verified approval/review, generated only the authorized test Ed25519 material and installation HMAC secret in existing Core run directory `~/miopages-wp-principals-20261106T174621Z`, parent0700/files0600. `signing-key.pem` and `installation-secret.json` contain secrets and must never be printed/copied to Git; `installation-public.json` contains only public pins/identifiers. No operator token was written to a file or regenerated. Signer generation used no signatures; the holder never read it, and its issuance-only gates remain mandatory. Public-key SHA-256 `e76d94ba15b7e39d043d06ff292797e317946f71afb273f35add4956e4516212`, key ID `wp-acceptance-20261106`.
-
-The reviewer enrolled installation **`9a511424-79af-4d02-801e-8d191d4b0d2f`**, credential ID `421ef5e7-06da-4485-830c-91b1611c7225`, origin `https://miopages.org`, generation1/request epoch0. Independent SQL verified exact site identity, key pin/credential, active adapter-installation status and one `enrolled` audit entry attributed to the reviewer. The canonical Organization/Web Presence/Managed Site remain inactive/unhosted; all18 non-proposal canonical table counts/row digests remain identical. Delivery count is **zero**: no signed issuance, pull, stage, receipt or revocation yet.
-
-Sanitized hosted receipts in that same Core run directory, independently collected locally under ignored runtime-content:
-
-| Receipt | SHA-256 |
-| --- | --- |
-| continuation-evidence.json | `0b57521ac43083555d1f7e7e26e3860d46a9e98397c9c4c3c05af4693c85b292` |
-| approval-review-evidence.json | `4e2f72feaac1c70526113d583ac58f42e1e910222286270b2ffcb6d790080aca` |
-| enrollment-evidence.json | `b56e45c785e18ead2a8fe678aa4192dd3c723e5884af17f9ac5f525ec5b56652` |
-| acceptance-preparation-public-evidence.json | `33a27e4977009c01cff811a5d55cee2e746f02ab92e1e7968647d51533881746` |
-
-Original legacy holder pid59180/session44687 was retired only after replacement authentication. Automatic review initially held cleanup for missing terminal identity; read-only process/source/creation metadata and its distinct legacy response established identity, after which only that obsolete holder exited. Current holder **pid97632/session2644** remains live with both replacement tokens in memory, authenticated[0,1], verified approval, committed review and enrollment true. These ephemeral IDs must be freshly checked before reuse; do not restart/recreate the holder, rekey again or extend expiry. Its original Python source remains unchanged.
-
-Fresh public checks passed: live62439fc, same miopages-runtime pid224900/restart0, both accepted HTTPS root hashes unchanged and8081 absent. WordPress unauthenticated HTTPS still401/Basic challenge; the previously accepted authenticated baseline receipt is byte-identical but was not freshly recollected without its hidden credential prompt. Reseller read-only verification matched all17 live v0.0.6 plugin files to the retained rollback archive and confirmed owned0700 private storage,0600 lock and absent exact synthetic-staging/active.json (sequence0).
-
-Reseller protected staging for the upcoming swap is `/home/sites/36a/9/9fe7ae6df4/miopages-private/https-acceptance-9a511424-79af-4d02-801e-8d191d4b0d2f`,0700. It now retains independently verified0600 `miopages-delivery-0.0.6-rollback.zip` (SHA71d75c6c3d4ea418db77d6218a389377a3d98ca313e3a90e26a2401ee3ecaf2c) and `miopages-delivery-0.0.7-reviewed.zip` (SHA6f25e75a4e5255cea51fc11240abb235e5950f23e23b1047ae1ddc0f2d88c5c6). No plugin was installed, activated or replaced, and no WordPress configuration/content changed. Existing synthetic-staging was not repurposed or advanced.
-
-Private Linux artifact sourceb6fc873 was fully reverified against original GitHub ZIPc47e1f53cdb3bf3affeada913e38bf60fd0ff202765c8fdb241b9a5f9ed2e585 and tar232b6ec21654d61badbdc16cd19c10121443d1df60b9778fb5eab1e07acdee65:308 runtime-file hashes, four exact portable locked links and byte-identical embedded/separate manifests; no extraction or archive change. An initial read-only checker assertion omitted the producer's embedded self-manifest metadata rule. The producer contract was inspected and that one entry checked byte-for-byte against the pinned manifest; no unexpected entry or integrity mismatch remained. No renderer/digest rule changed. Existing369 application/eight custody/three disposable-PostgreSQL local gates remain passed; this operational checkpoint changed no application code.
-
-**Actual external dependency:** My20i UI automation cannot initialize: both the required Computer Use runtime and browser API exit before opening any page because their launcher encounters the intentionally locked H backup volume. No drive/security/backup change or workaround was attempted. Existing SSH works, but the account cannot provision provider packages/DNS/SSL through the approved control plane. The already approved self-service package plan remains feasible; this is access unavailability, not evidence that another server/service is required.
-
-An operator-assistance question is pending for **already authorized** setup only: create/reuse empty `wp-acceptance.miopages.com` on existing Node.js Optimised vps-bef564 with zero extra charge, only its exact DNS to the assigned Cloud target/dedicated SSL, temporary SSH using existing miopages_20i.pub, and return package ID/SSH endpoint/port/user/absolute roots/targets/SSL status. Preserve apex/wildcard and both existing public hostnames; stop on conflict, cost, upgrade or existing-package change. Do not Discover/Register/start apps yet. No such package/DNS/SSL/app change was performed by Codex; await current operator evidence rather than assuming absence or success.
-
-Next after those nonsecret access details: verify new-account isolation/resources/TLS, install the retained prebuilt private runtime with its own matching dependencies without building on the2GB live server, transfer only scoped pull-role/CA/installation-secret configuration (never operator/migration/signer), smoke/protect the sole8081 listener, refresh the protected WordPress HTTP baseline as needed through its existing hidden prompt, temporarily deploy reviewed v0.0.7, and execute issuance/authenticated HTTPS pull/private stage/exact receipts/retry/revocation/refusal. Full v0.0.6/listener/package/DNS rollback and unchanged public output remain mandatory. No new authorization is requested for the approved plan; stop on a new security/integrity/authorization/rollback gate. Only after successful acceptance and complete cleanup close WordPress proof and resume canonical Commercial V1 Media-to-Publication.
-
-## Path-normalization correction approved and tested — no rekey retry
-
-The owner authorized only the narrow path-normalization/configuration-diagnostic correction after the failed continuation at checkpoint79962a1. The exact failure was reproduced read-only: provider HOME ends in `/`; tilde expansion produced `.../53b4381d42//miopages-wp-principals-20261106T144226Z/manifest.json`, while the first pinned-path assertion compared it with path.join's single-separator spelling. Both resolve to the same physical manifest. Raw HOME also made the manifest-parent and dispatcher-root assertions fail. The launcher failed in configuration before creating a database pool; its ERR_ASSERTION was incorrectly mapped to a migration-ledger detail. The earlier safe-to-run assessment missed literal argument/parent comparisons and is superseded by this finding.
-
-Independent read-only post-failure verification confirmed both database verifiers still match the originals (neither prepared verifier installed), both IDs/all ten grant UUIDs/scopes/mandates and original unrevoked November7,2026 15:40:31UTC expiries are intact, both manifest checksums/modes unchanged, all18 canonical source-table digests unchanged, exact candidate/base/preview valid, PROPOSED/two events/approval null and zero approval markers/releases/installations/deliveries. Original foreground holder pid97632 remained responsive with its original creation time and reserved IDs. No retry, reset, new operational token generation, expiry change, database repair, hosted code change or approval recording occurred during investigation. The owner's exact-candidate approval remains valid.
-
-Implemented lexical path.resolve normalization in a shared private-tool helper for HOME and absolute manifest/root arguments. Relative arguments still refuse; original-manifest pin, direct-home containment and directory-name checks remain, followed by the existing owned private-mode/no-symlink file and directory checks and exact checksums. File/directory types are explicitly checked. Continuation and dispatcher use the same normalization; no environment HOME value, connection/TLS setting, operator authority, verifier-update transaction, signer gate or Python holder code changed. Configuration diagnostics now return fixed `configuration` scope, a sanitized check label and configuration-specific detail. They never copy assertion actual/expected, arbitrary error text, URLs, tokens or certificate contents, and no longer label configuration assertions as ledger failures.
-
-Passed local gates:369 application/security/regression tests, including four new path/diagnostic regressions and existing dispatcher/grant checks; eight Python custody tests; three disposable PostgreSQL integrations covering delivery/exact PHP receipt, protected authority/reviewed release and atomic verifier/fixture preservation; TypeScript, focused ESLint and whitespace checks. Regressions reproduce trailing HOME/double separators and cover canonical/native paths, relative/foreign/public/nested/escaped locations, incorrect original manifest and sanitized diagnostic values. PG18 remains local disposable tooling only; hosted PG17 recovery contract/checkpoints are unchanged.
-
-Live correction verified: the separate rehearsal worktree is clean at `7e44f3a738e49ac15c44725da9b9d0797138e53f`. Actual provider HOME/trailing-slash and doubled manifest/root paths now pass normalization plus unchanged ownership/mode/no-symlink/checksum checks. Only the five reviewed files changed; dependency lockfile, Python holder source and public62439fc are unchanged. No install or rekey occurred.
-
-Independent read-only database verification at November6,2026 19:34:38.823UTC passed: both original verifiers remain installed, neither prepared verifier is installed, all ten grants/scopes/mandates and original unrevoked/unexpired November7 expiries remain exact,18 canonical table digests and exact candidate/base/preview remain unchanged. State is PROPOSED/two events; approval markers/releases/installations/deliveries remain zero. Ignored local `runtime-content/wordpress-path-correction-state.json` SHA-256 `c3cf6d682e437595320b71ae31a38fc455080a3132969316090dc7d0d085c328` contains only sanitized evidence.
-
-Original holder pid97632 answered fresh status after correction with its original reserved IDs and no completed operations. Its source SHA-256 remains `3b56eb510bb18057a89f3618d521025524d75eabc0d0f51467ece8089a42a326`, identical to launch sourcec0564c0. It was not restarted/recreated; no operational tokens/manifest were regenerated. Existing prepared manifest94512f3 and the same in-memory pair remain available for handoff.
-
-Next is operator execution only: provide one reviewed PowerShell2/authenticated Cloud command with explicit absolute original/prepared manifest paths, unchanged6c7cb17/94512f3 checksums and REKEY-EXISTING-TEST-TOKENS. Use the existing hidden miopages_migration password prompt. No automatic rekey retry or Core approval occurred. Independently verify the resulting receipt and both identities before recording owner approval/review. Existing exact-candidate approval remains valid; stop on any new failure or broader authority requirement.
-
-## Bounded continuation explicitly approved — fixed holder tested, protected handoff pending
-
-The owner explicitly approved the complete bounded credential-continuation method under checkpoint `0fcb7d0`: replace exactly two temporary token verifiers while preserving both UUIDs, all grants/customer scope/authority restrictions and original expiries; implement the fixed memory-only holder for distinct approval, review, enrollment, issuance and revocation; pass security/custody/allowlist/separation tests first; use the existing hidden migration-password prompt. This supersedes the separate-authorization-pending statements below. Existing exact-candidate approval remains valid and must not be requested again unless the candidate/base/preview changes. No credential replacement or Core approval is claimed by this implementation checkpoint.
-
-Implemented `scripts/wordpress-rehearsal-operator.py` as a foreground fixed-command custody process around `scripts/wordpress-rehearsal-dispatch.ts` and the existing Core CLI. Startup requires `--approved-continuation-0fcb7d0`, pins both original manifest and exact candidate receipt checksums, preserves original IDs/grants in the next hash-only manifest, and generates two distinct32-byte tokens only in memory. It stages only that owned0600 hash manifest in a new off-webroot0700 directory. No raw tokens are displayed, written, exported, passed in argv or stored in Git. No arbitrary-code/remote-command interface, debugger or dynamic reload exists. It never reads public runtime credentials.
-
-The holder requires both separate authentications, comparing all actual grant references and requiring negative opposite-permission/C0 checks. Owner approval is pinned to the existing exact binding/preview; reviewer credentials cannot be selected for it. `verify-approval` independently reconnects, replays the exact approved history, and verifies the protected approval provenance marker before technical review is enabled. It also supports read-only reconciliation of an uncertain approval without replaying the write. Technical projection must equal the pinned pages/digest before an explicit commit-review. Enrollment, issue and revoke remain separately requested, fixture/installation/release-bound actions. Startup never approves, enrolls, issues or stages anything automatically.
-
-`scripts/db/wordpress-rehearsal-candidate.ts` shares exact base/source/renderer/preview/history checks with both the continuation and dispatcher. The dispatcher authenticates/authorizes using existing ProtectedOperator, pins actual operator/grant UUIDs, and invokes the existing Core CLI, which independently authenticates and reauthorizes again for every write. No parallel authorization system was added. Signer access occurs only after successful issue authentication, exact issue grant, active fixture installation, current approved candidate and eligible exact reviewed release. Only then can it read the owned0600 `signing-key.pem` in this run's protected0700 root, and pass it only in the isolated issuance child environment. Authentication, approval/verification, review, enrollment and revoke never read or receive the signer. Child environments exclude normal DATABASE_URL, migration/provider credentials, unrelated NODE/PG options and all runtime configuration.
-
-On failure the holder retains tokens in memory but stops remote operations; only sanitized status is available. Resumption requires a separate explicit local `resume-after-review` control with a reviewed40-hex checkpoint and `EXPLICIT-OPERATOR-REVIEW-COMPLETE` acknowledgment after independent inspection/operator decision. That control performs no remote operation or automatic retry. Do not use it to proceed automatically after an unexpected failure or to avoid the stop/review boundary. There is no automatic credential reset, expiry extension, rotation, alternate identity or fallback.
-
-Passed consolidated gates:365 application/security/regression tests; eight Python custody/allowlist/redaction/freeze/reconciliation tests; five dispatcher authorization/candidate/separation/signer-order tests (included in365); three disposable PostgreSQL integration tests covering Core delivery/PHP receipt, protected operator/reviewed release/restricted roles and fixture/verifier handoff; TypeScript, focused ESLint and whitespace checks. Local PG18 remains disposable integration tooling only, not the hosted PG17 recovery utility contract. No dependency, public build, existing recovery artifact, canonical content or WordPress file changed. No new Linux application build is needed for this private operator-only correction.
-
-Prepared live operator source: the separate Cloud rehearsal worktree is clean at tested `c0564c0a87634c539f924518d4bdfa3d429fc770`. It reuses the already-patched dependency link read-only with identical lockfiles; no npm install occurred. Fresh read-only readiness passed for the exact candidate, both original verifiers, all ten grants and original unrevoked expiries (owner November7,2026 15:40:31.259UTC; reviewer15:40:31.289UTC). The approved foreground holder now retains its two fresh tokens only in memory. No new-token authentication, verifier replacement, Core approval, review, enrollment, issuance or staging has occurred.
-
-New hash-only manifest: `/home/virtual/vps-bef564/5/53b4381d42/miopages-wp-principals-20261106T174621Z/manifest.json`, independently verified owned0600 in0700 directory, SHA-256 `94512f3ed314b050e59f98ccb0ce9fa397f5df62f5aa565843ba19f2a6c5e65e`. Both fresh hashes differ from each other and both old hashes; all non-hash fields/UUIDs/grants remain exact. Private `continuation-prepared.json` receipt SHA-256 `6de9bab09a4dbe56dd7559a675c7e8fbeea5f53ff9580abc5b815d793b3bdda6` records source, manifest/modes, zero database writes and unchanged patched public HEAD/both HTTPS baselines. Future reserved, not enrolled/issued, IDs: private release `7c3c0030-ac9d-42ca-8222-3412b282da95`; installation `9a511424-79af-4d02-801e-8d191d4b0d2f`; credential `421ef5e7-06da-4485-830c-91b1611c7225`. The issuance-only signer path, not created, is `signing-key.pem` in this new private directory. No signer is needed for credential handoff, authentication, approval or review.
-
-Next bounded operation needs **operator secret entry only, not another authorization decision**: in PowerShell2's authenticated Cloud shell, run the existing `scripts/wordpress-enroll-rehearsal-principals.sh` with original manifest/hash, next manifest/hash and explicit `REKEY-EXISTING-TEST-TOKENS` final argument. Enter only the existing miopages_migration password at its hidden prompt. Keep this holder alive; do not restart it, start another holder or use ordinary two-argument enrollment. Expected PASS points to `continuation-evidence.json` in the new directory. Return only that evidence path or a sanitized failure, never credentials.
-
-After PASS, independently validate the continuation receipt, unchanged expiries and actual grants before separately authenticating both replacement tokens. Reverify owner grant/base/preview, record/independently verify Core approval, then perform the different-reviewer projection inspection before explicit review commit and remaining acceptance steps. Retire the original holder only after verified new authentication. Never derive migration credentials from runtime.env. No additional authorization is needed for this method; stop on a new failure, privilege requirement or broader change. Preserve existing recovery, WordPress baseline/v0.0.6 rollback, public62439fc and publication prohibitions.
-
-## Owner exact approval received — Core recording blocked on reviewed credential continuation
-
-The owner confirmed actual HTML/JSON inspection and explicitly approved proposal `b6beda24-564c-4e19-9de0-09861ec32f24`, revision1, preview digest `10692cea76d3afb3eb825d7eaabfa53fbf73c8b4f7e9abdf07dda86c38548bd3`, solely for the existing nonpublic HTTPS rehearsal. This decision supersedes the owner-approval-pending statements below. **No Core approval event has yet been recorded.** It does not authorize another candidate, canonical/customer changes, publication or modification of the existing website.
-
-Fresh live revalidation passed: the original owner token again authenticated as `72bb2f38-28d7-4d3c-bea6-72540bf3d603`; its exact approval grant `da70a65e-a89e-4b38-938f-87290bf1447e` remains valid, unrevoked and fixture-scoped, with C0/opposite-review access refused. Independent read-only replay verified the exact binding, revision, preview event/digest, raw HTML checksum, current canonical base and resolved source/candidate. State remains PROPOSED, approval null, two events. Hosted `owner-approval-preflight.json` in the existing private enrollment directory has SHA-256 `de3dbd382ac02991bd85da2e1998329f796c233ef1a5a5c3f1006e0afc2f2239`. No credentials, grants, canonical content, publication, hosted configuration, services or WordPress changed.
-
-### Specific credential-continuation method awaiting separate approval — NOT APPLIED
-
-The original local memory-only holder cannot perform later commands or export its tokens. Editing its source does not update the running interpreter. Do not extract tokens through debugging, inject code into it, overload preview commands, replace the Core CLI or bypass authentication. This is a local token-custody limitation, not failed PostgreSQL authentication or a missing database-role password.
-
-The proposed smallest correction is a new foreground **fixed-operation holder around the existing Core CLI**, with two fresh32-byte tokens retained only in process memory and a protected off-webroot hash-only manifest. Preserve the same owner/reviewer operator UUIDs, all ten grant UUIDs/scopes/mandates and the original November7,2026 15:40:31UTC expiries. Reuse the existing hidden migration-password prompt and verified Session Pooler5432/CA/role checks; never source public runtime configuration or request secrets in chat. No token files, logs, argv or export interface; no arbitrary caller-supplied code or general remote executor.
-
-The only proposed hosted credential write is one guarded transaction updating **token_sha256 on exactly the two existing rows**, compare-and-swapping both pinned old hashes. It requires both original IDs to exist, be unexpired/unrevoked, all exact grants to match, four distinct old/new hashes and the accepted inactive/unhosted fixture. Lock both credential rows and the grants; preserve expires_at/revoked_at exactly. No INSERT, new identity/grant, role/password change, expiry extension, migration, canonical write or publication. Independently reconnect and verify the new verifiers/grants and exact candidate, then independently authenticate both new raw tokens through existing ProtectedOperator. Stop on any failed/uncertain write/authentication; no automatic retry or old-hash reactivation. Stop the old holder only after verified handoff.
-
-The replacement holder's separately reviewed allowlist must cover owner approval of **only this exact candidate**, and different-reviewer projection inspection/commit, enrollment, issuance and revocation through the existing Core CLI under the already approved acceptance gates. Pin the accepted fixture/proposal/preview and exact reviewed release. Signer access is issuance-only via an owned0600 off-webroot file. Signer/migration/operator credentials stay out of the pull listener and WordPress. No automatic approval/enrollment/issuance/staging on startup, no reviewer substitution and no publication capability. Local allowlist, custody, redaction and separation tests must pass before hosted use.
-
-Prepared narrow guard: `replaceRehearsalTokenVerifiers` in `scripts/db/wordpress-rehearsal-principals.ts`; exact-candidate/pinned-manifest entry `scripts/wordpress-continue-rehearsal-principals.ts`; existing hidden-prompt launcher accepts an explicit five-argument continuation ending `REKEY-EXISTING-TEST-TOKENS`. Normal two-argument enrollment remains unchanged. The continuation checks the prepared candidate rather than replaying the initializer's original zero-proposal snapshot. Do not rerun that initializer, role provisioner or migrations. **Do not execute continuation yet:** no replacement holder or usable next manifest exists.
-
-Disposable PostgreSQL regression passed for atomic replacement/rollback, identity/stale-hash refusal, unchanged canonical data/exact grants, original expiry/revocation preservation, new-token authentication under the same IDs, refusal of both old tokens/old contexts, and refusal of repeated replacement. Manifest regression, TypeScript and focused lint passed. This is preparation/test evidence, not a hosted rekey or durable approval pass.
-
-**Automatic approval review rejected the proposed replacement controller** because combined approval/review-commit/enrollment/issuance/revocation/signer custody exceeded the separately reviewed verifier-continuation scope. The rejected file was not created or launched. Narrow guard preparation/read-only checks completed. Request the owner's explicit approval of the complete fixed-operation custody method plus the two verifier updates above; do not bypass rejection through indirect execution. Existing exact-candidate owner approval remains valid unless the binding/base/preview changes and must not be requested again merely because custody needs correction. After approved continuation, authenticate both identities, reverify owner grant/base/preview, durably record and independently verify owner approval, then proceed with different-reviewer acceptance/rollback. No broad infrastructure discovery is needed.
-
-## Latest WordPress checkpoint — independently authenticated, durable candidate preview ready for owner review
-
-The owner reported enrollment PASS and authorized independent authentication followed by durable preparation/preview only. Hosted enrollment evidence `/home/virtual/vps-bef564/5/53b4381d42/miopages-wp-principals-20261106T144226Z/principals-evidence.json` was independently collected, strictly validated against the reviewed manifest and protected ownership/modes, SHA-256 `f87cd010f269de6c56326d0725978867d1a20bef7b51b4914e25b2956339ccbf`. This supersedes the earlier enrollment-pending statements below. The actual enrolled principals are:
-
-| Principal | Operator UUID | Exact scoped grant references |
-| --- | --- | --- |
-| rehearsal-owner-approver | `72bb2f38-28d7-4d3c-bea6-72540bf3d603` | inspect `7f444272-73e3-45e4-9ea3-e8496f6a5011`; preview `eb438c3f-395b-4980-9758-f507048f9990`; approve `da70a65e-a89e-4b38-938f-87290bf1447e` |
-| rehearsal-technical-reviewer | `c606cd74-b587-4248-8cba-3df6718fefec` | prepare `761eeade-0d4b-479b-97a6-f847936179ad`; inspect `449f7c04-7534-4f89-8483-c571e3224426`; preview `bf9f0cac-4ca4-4118-af2a-296605c0ea00`; review `dd627df4-58b8-480d-8ac2-bdde7c3577b7`; enroll `0ac7484a-f076-4e9c-a59b-af077bc749d4`; issue `f9b1db32-5c88-4bc9-868b-f81ace5f87b1`; revoke `8b097b11-0b61-4d70-b1fb-35d246bda3a6` |
-
-Both distinct raw tokens separately passed the existing `ProtectedOperator.authenticate` and every exact grant check over the verified-TLS restricted operator connection. Each was denied the opposite approval/review permission and C0 scope. No identity was asserted instead of authenticated. This is a functional separation of independently authenticated test principals, not independent human governance or real customer identity/mandate. Grants remain limited to the accepted inactive synthetic Organization/Web Presence/Managed Site. Credentials expire November7,2026 at15:40:31.259UTC (owner) and15:40:31.289UTC (reviewer); no extension or rotation occurred.
-
-The reviewer prepared exactly one proposal through the existing protected `SiteProposalService` and append-only PostgreSQL persistence, then rendered its preview through the unchanged shared Section renderer. An independent read-only connection replayed and validated the stored event history, resolved the current owned revision-linked canonical fact, checked its approved public-projection eligibility and reproduced the exact preview digest. The local downloaded HTML independently reproduces that digest too. It has no scripts, forms, media, external resources or operational links and retains noindex,nofollow.
-
-| Exact candidate identity | Value |
-| --- | --- |
-| Proposal / revision | `b6beda24-564c-4e19-9de0-09861ec32f24` / **1** |
-| Candidate binding digest | `fce4a96bd33a4d6ff2e7e50b380e735fe4d1e636a7dd98b2a57f2c40c335662c` |
-| Base fingerprint | `8ffe7283ada7fa2da60ac9848dea557a9189a069183bd44ae72f175e27005bc1` |
-| Preview approval digest | `10692cea76d3afb3eb825d7eaabfa53fbf73c8b4f7e9abdf07dda86c38548bd3` |
-| Preview event | `e2d0f346e4060bef9f0c83e3e10268cc3d91ac452c71bc735da8a9c6cb7a3190` |
-| Prepare event | `b07a8e48f744d4d275675722c663b3f90e37850c668369709a1a17216596ae97` |
-| Raw HTML SHA-256 / size | `816c135718cb1c06c62ec72ad61cf9301729ae8f133ced929853b750f0017bb1` /10,923bytes |
-| Prospective projection digest, not an approved/reviewed release | `f71a65739ec0b18d75516b27584d4042446e9c4df8721f0d49b346cef5f1327e` |
-
-Candidate: one proposed Page `/`, ID `29796cfe-a70b-4ca0-a05b-d5febdedc221`, title **MioPages private staging rehearsal**; one intro Section `514c00b4-4f93-4e10-9f5e-4633a3cd5f3b`, heading **Synthetic acceptance fixture**, body **Synthetic content used only for the private MioPages HTTPS staging rehearsal.** Title/heading are explicit technical editorial labels; the body resolves the existing Knowledge record `52f23cfc-b690-447e-9475-0c3d8324d929`, revision1, field rehearsal-purpose, fingerprint `39b61a6ed33835b70af3631830940221f405d147ca354476a41679fe1d080768`. No canonical Page or Section was created.
-
-Private hosted artifacts in the same0700 enrollment directory: `candidate-before.json`, `candidate-prepared.json`, exact `candidate-preview.html`, and `candidate-preview.json` (receipt SHA-256 `6feef09c0b96b5ae89be4f577b7a4186abef3c2239f8bea4f522ae137d27cf91`), files0600. Exact local review copies remain ignored: `runtime-content/wordpress-private-candidate-b6beda24.html` and `.json`. These synthetic review artifacts are not public content and are not published to GitHub Pages or WordPress.
-
-Preservation checks passed: all18 non-proposal canonical source tables have identical before/after counts and row digests, aggregate `27f19d657cb8c27c1ea5ae9f8a3358718ffce14feb2cc7b38472dbab19f9fb33`. The only proposal changes are one proposal, one revision and two events (prepare/preview). Adapter approval markers, private releases, installations and deliveries remain zero. State is PROPOSED with approval null. No release issuance, staging, public publication, database migration, role/grant change, WordPress deployment, listener or hosting change was performed. Patched public HEAD62439fc, existing app pid224900/restart count0 and both accepted public HTTPS hashes remain unchanged. Sanitized `candidate-public-preservation.json` SHA-256 `fab19a01029e166640ead45ab306a13f59b845e751d00f5cf50c4df9c9693f6f` records that independent check.
-
-**Next boundary:** present the exact HTML and digest above for the owner's explicit synthetic-only private-staging approval. No approval has been recorded or inferred. Recheck current base, renderer, exact binding, preview event, credential validity and grants before any subsequent approval. The current local memory-only token holder implements authentication/prepare/preview only; it cannot run approval, projection review or issuance. A reviewed credential-continuation correction is therefore also required before those later commands. Keep the two token verifiers/IDs/grants intact unless an explicit reviewed change is authorized; do not extract tokens through debugging, fabricate authentication, silently rotate them or mint replacement principals. Raw tokens remain only in the existing process memory, not files or chat. Losing that process or reaching expiry is a genuine credential gate, not permission to reset credentials. No new provisioning or architectural system was added in this phase. After explicit approval and resolved credential continuation, perform the existing separate technical projection review and remaining already-authorized HTTPS rehearsal; then full cleanup and Commercial V1 Media-to-Publication.
-
-## Latest verified operational checkpoint — public security deployment PASS, November 6, 2026
-
-This checkpoint supersedes earlier statements below that public Core is still at vulnerable `5b94a1d`, that public remediation is pending, or that WordPress must wait for that remediation. Historical proofs remain historical. The owner explicitly authorized this one corrected deployment after checkpoint `1479308`.
-
-**Live verified:** existing `~/public_html` is clean at exact dependency-only `62439fc0c8bde7fe98339625d33a845102a7995a`. Only the existing PM2 `miopages-runtime` was stopped/restarted on8080; no rollback was needed. Installed Next16.4.5, sharp0.35.5, DOMPurify3.4.17 and React/react-dom19.2.8 were verified, including actual running Next16.4.5. PM2 id0/pid224900 is online with restart count0; Next child224918 owns8080. A subsequent independent process check measured198,922,240bytes RSS;8081 is unused. These PIDs are observations, not future assumptions.
-
-The independently verified Webpack artifact came from [successful Linux run42153271684](https://github.com/R-Levin/myomaton-web/actions/runs/42153271684), artifact13472917782, tar SHA-256 `24e0bff248ae1ff377c253925a91b84cebc1138b46fd11faaec9cc01a1f3ee08`. All33,260 installed file hashes and33 links were independently rechecked after promotion. Before stopping the app, available memory was991,485,952bytes and free disk43,630,178,304bytes. The complete matching previous deployment/configuration/CA rollback archive was independently verified across36,790 entries and retained: `/home/virtual/vps-bef564/5/53b4381d42/miopages-public-security-20261106T023853Z/rollback.tar`, SHA-256 `eeefab07a5afbf43f0aefa17c8b5b62b8de882222dee2a35016723cb0857f5eb`. Its protected hardlink and previous live tree are also retained in the current run. Restoring it would restore vulnerable dependencies; it is recovery material, not WordPress cleanup instructions.
-
-**Public acceptance:** all14 hostname/route cases passed, with repeated observations and unchanged existing DOM/SEO/JSON-LD/navigation comparison. Home, Service, Experience and Review return200 on both hosts; intake503, contact GET405 and malformed asset404 preserve existing behavior. Twelve actual public build assets returned200 and matched the new manifest hashes exactly. Independent external verified-TLS GETs matched the candidate root bytes. Raw HTML build differences were expected and recorded; content checks were not relaxed. This verifies rendered responses and asset delivery, not a browser-driven form submission or load test. Protected configuration/startup/CA ownership, modes and hashes remained unchanged. No database writes/migrations, customer-content changes, asset changes, C0 binding changes, publication changes, server-wide registration, DNS, SSL, proxy or WordPress operations occurred.
-
-**New accepted public Core root baselines**, replacing the historical pre-security hashes for subsequent rehearsal preservation checks:
-
-- `runtime.miopages.com`: HTTP200, SHA-256 `03b866d3ce564011e8d80036ea60812d39feb0ecd943a39a28112e5018e9729f`.
-- `domain-test.miopages.com`: HTTP200, SHA-256 `07639831cd107068589fb5fca6d95f22e572b56912b9dc94f36ea4517ea5f62b`.
-
-Sanitized hosted evidence: `/home/virtual/vps-bef564/5/53b4381d42/miopages-public-security-20261106T132103Z/deployment-evidence.json`, SHA-256 `f607cf4200322c4771f072545dbdf94c44c070e8621a0e6f3c05d645d8bddfe2`. Independent external verification receipt SHA-256 `c7c44f9b05453af6fdab098f8a569971e1c7e8ca3d3f27e0401712d9f563f95d`. Sanitized copies, recovery receipt and asset observations remain in ignored `runtime-content/public-security-final-evidence`; private raw observations stay off-webroot, outside Git. The applied guard script SHA-256 was `d5d4a5ddc37f19d1d638b55efef733bfd5471b574d470d197b293fc52e55f4af`. It now uses read-only Git status without optional index locks to avoid changing recovery metadata while inspecting it. Thirteen consolidated rollout/loopback safety regressions and whitespace checks passed. Existing candidate Linux gates passed336 tests/one Windows-only skip, build/native/package smoke and zero production advisories;12 moderate development-tool findings remain as previously recorded.
-
-**Next bounded WordPress step:** resume the already-approved acceptance plan at actual fixture-scoped test-principal enrollment, then durable prepare/preview and the owner's separate exact-candidate approval. No principal enrollment or WordPress deployment was performed in this maintenance. The existing `miopages_migration` password is not persisted in rehearsal configuration; its protected hidden-prompt availability is the current credential prerequisite. Never derive it from the public runtime configuration, guess/reset it, or repeat passed database/recovery provisioning. Existing WordPress operator/pull credentials remain in their protected hosted file. Proposed principals remain `rehearsal-owner-approver` and `rehearsal-technical-reviewer`, strictly scoped to the accepted inactive synthetic fixture; actual IDs/grants must be reported before use. This proves independently authenticated technical principals, not independent human governance or real customer mandate. Prior infrastructure authorization, exact-candidate approval boundary, authenticated WordPress baseline and v0.0.6 rollback requirements remain intact. After successful HTTPS acceptance and complete temporary-environment cleanup, close this proof and resume canonical Commercial V1 Media-to-Publication.
-
-## WordPress resume — hidden-prompt principal enrollment prepared, not executed
-
-The owner confirmed the existing `miopages_migration` password is available for hidden input. The next bounded operation uses `scripts/wordpress-enroll-rehearsal-principals.sh`, solely in the existing separate Cloud rehearsal worktree. It prompts only for that existing migration-role password, exports it without a command-line password argument, strips unrelated inherited environment, and immediately cleans it up on exit. Connection parameters come from the established protected WordPress operator-role file; that role's password is not reused as migration authentication. Existing verified Session Pooler5432, exact role identity, CA and hostname verification are reused. No public runtime configuration is loaded.
-
-The narrowly scoped entry point independently verifies the accepted existing synthetic fixture, writes only two credentials and ten exact fixture-scoped grants through the existing Core tables in one transaction, then reconnects for independent read-only fixture/grant verification. Credentials expire24hours after creation; retries never extend them. Partial, expired or conflicting credentials/grants refuse without repair. No approval, release, canonical content, hostname, database role, migration, listener or WordPress deployment is performed. A PASS enrollment receipt explicitly does not claim authentication until both raw test tokens have separately passed existing `ProtectedOperator` checks.
-
-Prepared hash-only manifest: `/home/virtual/vps-bef564/5/53b4381d42/miopages-wp-principals-20261106T144226Z/manifest.json`, mode0600 in owned0700 directory; independently verified SHA-256 `6c7cb17cfd45b4fb48c63e17e1327455ed09981e0f1d03cde45b13b753644384`. Reserved, **not yet enrolled**, IDs: owner `72bb2f38-28d7-4d3c-bea6-72540bf3d603`; reviewer `c606cd74-b587-4248-8cba-3df6718fefec`. Grant UUIDs are fixed in that manifest and will be reported by enrollment verification. Raw tokens were generated separately and remain only in the current local process memory, never displayed, written to files or committed. If that memory process is lost, stop and inspect existing enrollment/expiry; do not pretend authentication succeeded, reset credentials or silently mint replacement principals. Only fixed authentication/prepare/preview commands are enabled in this temporary local helper. Automatic review refused an unlaunched general remote-code controller; the narrower fixed-command alternative was accepted.
-
-Validation passed:360 application/security/regression tests, TypeScript, focused lint, strict manifest regression and expanded disposable PostgreSQL fixture/enrollment integration (including idempotency, conflicts/expiry, inactive/unhosted guards, separate authentication, cross-permission denial, C0 denial and unchanged canonical data). Local PostgreSQL18 is disposable test tooling, not a replacement for the retained hosted PG17 recovery contract. The existing separate Cloud worktree is now clean at implementation `950d05bb5f3fd2fd3a2791f729a28fcaaa8c523f`; Bash syntax, tsx import and manifest checksum were verified there. Its pre-existing node_modules symlink points to the patched public dependency tree. A guard stopped before any install; the rehearsal and public lockfiles were then independently verified byte-identical (SHA-256 `9f08a1e68084ea823f1f3a2f3ae793c1a76de4345f839bc391fa249ed56d5ec1`), so those dependencies are reused read-only. No npm installation or dependency-tree modification occurred. Public HEAD62439fc and both accepted HTTPS root hashes were rechecked unchanged after preparation. The hosted enrollment itself remains operator-prompt pending. On success, collect its sanitized `principals-evidence.json`, authenticate both test tokens independently, report actual IDs/grants, prepare/preview the durable exact synthetic candidate and request the owner's separate digest-bound approval. No temporary hosting package is needed for this step. Preserve patched public62439fc and the accepted baselines; the existing WordPress acceptance/cleanup and Commercial V1 return path remain unchanged.
-
-## Mandatory start-of-chat protocol
-
-1. Read this document **from GitHub's current `main`**, not a remembered excerpt or a stale local copy. If it is absent, inaccessible or conflicts with another source, **stop before hosted writes** and explicitly report the gap.
-2. Check current `main` SHA and compare to the last recorded checkpoint below. Check the relevant 20i/local checkout separately before running commands; a local `origin/main` can be stale without `git fetch`. Do not presume a clean checkout, running process, successful credential setup, or current database contents.
-3. Read the linked operator/architecture contracts and any more recent committed evidence. Classify every operational fact as **live verified**, **reported historical proof**, **planned**, or **unknown**. Current database truth requires authorized direct read-only verification.
-4. State the **exact next bounded operation**, prerequisites, scope, expected success, failure/unknown-outcome stop rules and whether it mutates live state. Never replay a previous bootstrap, role provision, migration or initializer to recover context.
-5. Read the Commercial V1 roadmap below **at every phase exit**. Completing infrastructure never implies that MioPages commercial V1 is complete.
-6. After each material operation, checkpoint a sanitized evidence record in Git (or explicitly report why not possible). The handoff is incomplete until the record is retrievable through GitHub. Do not place credentials, tokens, database URLs, private business/customer details, raw query results or sensitive logs into Git.
-7. At a new-chat boundary: **fetch this file afresh, verify SHA and cite the next action**. If the file cannot be retrieved, say so immediately rather than relying on chat memory. This process is a verifiable retrieval requirement, not an assertion that ChatGPT automatically opens files.
-
-## Current source and hosted boundary (2026-11-01)
-
-- Repository: `R-Levin/myomaton-web`; branch `main`.
-- Source checkpoint: `b3722dd37045e8e200ba0aff8ceff2e201a5e228` — **Add fresh hosted C0 initialization and hostname binding**. At time of recording GitHub `main` pointed to this SHA. User-provided 20i shell output showed `HEAD` at this SHA, synchronized `main...origin/main` and a clean tracked tree after a fast-forward pull. **Future sessions must recheck.**
-- 20i hostname: `runtime.miopages.com`. User reported Node 22.23.2 and installed dependencies. Earlier recovery says 20i Application Manager supervises the runtime on port 8080 with `shared-hostnames` routing. The last known-host 404 was the expected unbound tenant state, **not** an application failure.
-- Provider/database historical proof (from the uploaded latest `runtime-content/chat-recovery.md`, 2026-11-01): Supabase PostgreSQL 17 (previously 17.11), session pooler 5432, verified TLS `sslmode=verify-full`, ICU identity validated, 16 migrations applied/zero pending, valid PG17 compatibility receipt. Three permanent dedicated roles `miopages_runtime`, `miopages_migration`, `miopages_backup` were **already created and independently verified**. These are reported earlier hosted results, **not fresh database inspection in this documentation task**.
-- The latest recovery note reports hosted customer/operational application inventory empty, including **zero** Organization, Web Presence, Managed Site, Page, Section and hostname-binding rows. The historical nine-migration C0 initializer refused safely; **do not use it or try repair/reset**.
-- The new protected fresh-hosted operator and separate generic hostname operator are committed and locally tested. Native local PG17 integrations were partially skipped owing to missing binaries; do not count skipped tests as passing. No fresh hosted C0 create or hostname bind has occurred in the current chat.
-- In the current conversation, three nonsecret role environment variables were set in an interactive 20i shell. `DATABASE_URL` and `MIOPAGES_DATABASE_NAME` were **unset at that moment**. A separate ignored 20i note `runtime-content/hosted-provisioning-recovery.md` was created; it is supplementary, not a source-of-truth replacement. No hosted writes were made. The operator connection has **not** been established.
-- **Current operational decision: PAUSED for continuity repair.** This proposed documentation change does not authorize hosted database writes. Resume only after a deliberate review of current source, connection procedure and live prerequisites.
-
-
-## Hosted synthetic C0 proof — 2026-11-01 (reported live SSH output)
-
-**Source of evidence:** operator-returned terminal outputs in the development conversation on 2026-11-01; recorded here without credentials, endpoints or private query results. GitHub documentation commit is not proof of additional hosted writes.
-
-- 20i checkout: fast-forwarded to `77487cdbc178982c871671ddfd570ade9126d5d0`; `main...origin/main`, clean at that time. Later documentation updates require a fresh pull before executing future source-dependent commands.
-- Protected operator connection: direct `miopages_migration` login verified against database `postgres`; read-only transaction, PostgreSQL-reported TLS v1.3 active, connection configured with `sslmode=verify-full`. An independent hostname/certificate validation beyond the client's TLS setting was not separately observed. Persistent application runtime config not modified.
-- Fresh-hosted preflight: 16 applied migrations, PG17 bootstrap receipt present, 32 inventoried application tables inspected, all empty (zero application rows). The quick receipt-presence check did not independently validate full receipt contents; the guarded initializer subsequently ran its stricter checks.
-- Guarded create (one-time): `MIOPAGES_DATABASE_OPERATION=fresh-hosted-c0`, `MIOPAGES_C0_ACTION=create node --import tsx scripts/initialize-fresh-hosted-miopages-c0.ts` returned `verified:true`, 38 inserted, **2 updated** (actual CLI output), 0 deleted. Organization `152aebd3-00b3-4296-a64e-e281522e64f0`, Web Presence `926cb772-7507-4542-8acd-e7e57ce71324`, Managed Site `312b8081-4582-47fa-bedb-a551fd6e2b36`. Actual 2 updates differ from older contract's narrative of one; investigate only if needed, **do not replay create as a diagnostic**.
-- Independently executed `MIOPAGES_C0_ACTION=verify node --import tsx scripts/initialize-fresh-hosted-miopages-c0.ts`: `verified:true`, 0 inserted, 0 updated, 0 deleted; same three identifiers. **Hosted synthetic C0 establishment is complete.** Initial graph is 4 Pages / 19 Sections (not later canonical 4/23); synthetic, not commercial customer publication approval.
-- Runtime config anomaly discovered during connection setup: protected runtime `DATABASE_URL` parsed with database path `/postgres\\` instead of `/postgres` even though the raw value did not end in backslash. The temporary migration connection corrected its path **only in memory**. Persistent runtime file remains unchanged. Root cause not proven. **Controlled, backed-up permanent configuration correction and runtime validation are outstanding before accepting hosted provisioning.** Do not commit or display raw URL.
-- **Next bounded operation:** after reviewing the managed-hostname contract, perform a separate `runtime.miopages.com` synthetic hostname bind with the IDs above using the dedicated operator, then independent read-only bind verification, known Host 200 / unknown Host 404 and public HTTPS checks. A hostname bind is a hosted database **write and changes public routing**; technical exposure is not commercial launch authorization. Stop on any refusal or uncertain commit outcome, do not retry blindly. Operator secret remains temporary in the user's SSH session; clear it after operator operations.
-- Hosted C1 isolation, backup, restart, deployment, recovery and monitoring are not yet proven by this milestone.
-
-
-## Hosted C0 hostname and HTTP proof — 2026-11-01 (reported live SSH output)
-
-- Separate managed-hostname `bind`: `verified:true`, hostname `runtime.miopages.com`, binding ID `bfd0daa1-3a9d-429d-8b60-b2d9851f9603`, inserted 1, updated/deleted 0.
-- Independently executed `verify`: same hostname and binding ID, `verified:true`, inserted/updated/deleted 0 (read-only).
-- HTTP proof from 20i shell: `Host: runtime.miopages.com` on 127.0.0.1:8080 returned 200; deliberately unknown `Host: unknown-test.invalid` returned 404; public `https://runtime.miopages.com/` returned 200, curl `ssl_verify_result=0`. User independently saw page in browser.
-- **Known content mismatch:** hosted output is the initial reviewed **4-page/19-section** manifest, not the later accepted service-led v3 **4-page/23-section** canonical state. The latter has a historically verified development-only promotion described in `docs/miopages-canonical-promotion.md`; its frozen precondition includes a nine-migration development baseline and must **not** be directly replayed or forced against the hosted 16-migration state. A separate reviewed, tested hosted promotion path is needed. No further hosted content mutation authorized or executed in this proof.
-- **Current next bounded task:** plan and implement protected, fail-closed promotion from hosted synthetic initialized 19-section state to the reviewed v3 canonical graph, preserving tenant isolation, nonsecret evidence, asset eligibility and independent read-only verification. Use Codex for implementation/testing as appropriate. Also separately correct the protected runtime URL backslash anomaly with backup and process validation; do not expose secrets or silently change runtime config.
-- After those, continue hosted foundation (C1 isolation, supervision/restart, deployment/rollback, durable media and independent backup/recovery, monitoring and capacity); follow Commercial V1 canonical roadmap, not an invented backlog. Technical C0 access is not commercial publication approval.
-
-## Additional hostname routing proof — November 1, 2026
-
-**Evidence classification:** user-reported live 20i SSH commands and results, not a fresh independent provider audit.
-
-- Added `domain-test.miopages.com` to the existing Cloud hosting package for `runtime.miopages.com`; no additional package or Node process.
-- Initial DNS pointed to shared hosting IP `185.146.167.193` and returned Apache 403. 20i Support identified the Cloud IP as `185.146.167.103`. The corrected A record resolved at the default resolver and 1.1.1.1. HTTPS to the Cloud IP with the intended Host returned expected unbound Next.js 404.
-- Guarded hostname bind returned `verified:true`, binding ID `46bbd56e-9f28-4006-8bc0-df70c955cda3`, 1 insert and zero updates/deletes; it selects the existing synthetic C0 Web Presence and Managed Site.
-- Independently executed `MIOPAGES_HOSTNAME_ACTION=verify node --import tsx scripts/manage-hostname-binding.ts`: `verified:true`, same hostname and binding ID, zero inserts/updates/deletes.
-- After binding, both public HTTPS hostnames (`runtime.miopages.com` and `domain-test.miopages.com`) returned HTTP/2 200 through nginx 1.30.5 / Next.js. This proves shared delivery and HTTPS for two hostnames; certificate wildcard type, issuance and renewal automation are **not** yet proven.
-- **Next infrastructure experiments:** a spare second-level domain with split Reseller/Cloud domain, mail, DNS and website services; then a customer domain retaining external authoritative DNS and requiring independent certificate coverage. Inspect 20i API capabilities after manual procedures are proven. No domain changes to customer services without DNS/mail inventory and authorization.
-- **Still open:** protected runtime connection-string path anomaly (permanent controlled correction), hosted synthetic C1 isolation, deployment/restart/recovery, durable assets, independent backup and capacity/monitoring proofs. Optional newer C0 visual/content promotion is not a prerequisite for these domain tests.
-
-## Guarded next hosted sequence (historical sequence; consult latest proof above)
-
-Authoritative procedure: [C0 canonical state / fresh-hosted synthetic establishment](miopages-c0-canonical-state.md#fresh-hosted-synthetic-establishment).
-
-1. Confirm clean/current 20i checkout and read the exact operator contract.
-2. Establish protected `miopages_migration` operator credentials **separately** from persistent `miopages_runtime` app credentials. Obtain actual endpoint and certificate paths from protected existing configuration, never guessed values; require verified TLS and expected database/role identity. Do not overwrite persistent runtime configuration.
-3. Run protected fresh-hosted C0 `create` **once**, stop on unexpected failure; a disconnect around COMMIT is an unknown outcome requiring independent read-only verification before any deliberate retry.
-4. Independently run fresh-hosted C0 `verify` (read-only). Only then bind `runtime.miopages.com` to reviewed Web Presence `926cb772-7507-4542-8acd-e7e57ce71324` and Managed Site `312b8081-4582-47fa-bedb-a551fd6e2b36` via the dedicated managed-hostname operator. Independently verify.
-5. Clear temporary migration/operator credentials. Verify bound Host responds with the expected rendered Managed Site (200); unknown Host still refuses (404); validate public HTTPS separately. The existing normal runtime renderer supplies the HTML—**a stub page is neither needed nor equivalent to a tenant-routing proof**.
-6. Do not equate technical routing with commercial publication or customer approval. Follow with separately scoped hosted C1 isolation, restart, deployment/rollback, persistent assets, independent recovery/off-provider backup, monitoring and capacity proofs. Do not rerun fresh C0 initialization after binding: the initializer deliberately refuses later operational inventory.
-
-**Explicit prohibitions:** no bootstrap/migration/role-provision replay; no historical initializer; no broadening runtime permissions; no `postgres` as production application runtime; no arbitrary SQL repair, credential disclosure, silent retry, live-customer data or commercial launch inference.
-
-**Synthetic meaning:** hosted C0 is a controlled synthetic tenant **using the reviewed MioPages C0 manifest and fixed IDs**. It is not a real paying customer. Its initial hosted graph is recorded as **4 Pages / 19 Sections**. The later reviewed canonical visual/content direction describes **4 Pages / 23 Sections**; these are distinct stages and must not be conflated. Public access after hostname binding is a separate exposure decision.
-
-## Proof/evidence ledger (nonsecret)
-
-| Boundary | Current classification | Evidence or qualification |
-| --- | --- | --- |
-| Source/operator implementation | GitHub verified at checkpoint | Commit `b3722dd`; [C0 operator procedure](miopages-c0-canonical-state.md) |
-| 20i Git checkout | User live shell output, 2026-11-01 | Clean `main...origin/main`, HEAD `b3722dd` after `git pull --ff-only` |
-| Hosted 20i runtime | Historical reported proof | Application Manager, port 8080, expected unknown Host 404 |
-| Hosted PG17 TLS/migrations/roles | Historical reported proof | 16/0, verified TLS, permanent three roles; fresh read-only check pending |
-| Hosted customer rows before next write | Historical reported empty | No fresh inspection in this continuity task |
-| Protected migration operator connection | Not established | All five operator variables initially unset; only three nonsecret roles set |
-| Fresh hosted C0 create/verify | Not attempted | Requires separate scoped execution |
-| Hostname bind/verify | Not attempted | Requires verified C0 |
-| Bound public HTTPS known-host 200 | Not verified | Known-host 404 before binding is expected |
-| Hosted C1 isolation / backup / restart / deploy / monitoring / scale | Not proven | Must remain explicit hosted gate |
-
-Never promote historical evidence to live without an actual check. Add new evidence here or in a reviewed linked committed ledger after each operational boundary, with date, SHA, environment, action, sanitized outcome and any unknowns.
-
-
-## WordPress delivery feasibility decision — 2026-11-02
-
-**Operator-approved evaluation, not commercial deployment approval.** The operator reviewed and accepted WordPress Delivery Feasibility Specification v0.1, then clarified that normal customers should not need WordPress credentials; managed Gutenberg content must be protected beyond editor locking; and the publishing transport should work with other WordPress hosting providers. A standardized 20i Reseller WordPress installation per customer is the leading candidate for an initial delivery adapter; agency/connected-site deployment is a later opportunity. Existing Next.js shared renderer and Supabase canonical database remain intact.
-
-- Read [WordPress delivery feasibility and implementation gap analysis](wordpress-delivery-feasibility.md) for transport, ownership, operational risks and explicit proof gates.
-- **Priority shift:** pause speculative expansion of the shared Next.js runtime's additional-domain/SSL infrastructure while validating the WordPress approach. Preserve hosted C0 and all earlier proofs. The previous 'WordPress post-V1' language in the platform architecture is now an **open architecture revision**, not automatically changed; reconcile roadmap only after proof and approval.
-- **Exact next bounded operation (read-only):** inspect existing Pages/Sections/Actions/Assets schemas, release/approval and renderer source; document module-level reuse and produce a synthetic, versioned sample release manifest for a WordPress adapter. No hosted writes, reinitialization, migrations, customer DNS/SSL changes, plugin deployment or secrets.
-- The future proof will require explicit authorization for one isolated 20i WordPress test site and later one separate-host test; test signed, tenant-scoped pull/notify transport, invalid-release refusal, atomic publication, local last-good serving, rollback, drift detection, restore and fleet operations.
-
-## WordPress C0 v3 source fixture checkpoint — 2026-11-02
-
-- Source-derived **read-only** exporter: `scripts/export-wordpress-c0-v3-fixture.mjs`; checked-in nonpublishable `docs/wordpress-c0-v3-structural-fixture.json`; first mapping `docs/wordpress-c0-v3-mapping.md`.
-- Based on frozen, human-accepted `scripts/customer-updates/miopages-focus-reviewed.json`: 4 pages, 23 sections (5/8/5/5), page recipes arrival/service/evidence/assessment; 5 bound Sections left as explicitly unresolved canonical projections.
-- The exported record is deliberately **not** an approved distributable release: no media bytes or unapproved FPO, no pretense of enabled Review workflows, no exposure of private price amounts, and no central DB/hosted changes.
-- **Next bounded step:** validate exporter reproducibility and resolve public content through authorized existing canonical projections in a **local, read-only** fixture path; then specify signed release format and build WordPress page/section proof. Source module inventory is preliminary, not proof of code reuse.
-- Existing hosted 20i synthetic C0 and its DNS/SSL experiment remain untouched.
-- Added `scripts/project-wordpress-c0-v3.ts`: read-only local C0 v3 public canonical projection exporter using existing `normalizeBinding` / `projectContent`; correct action destination/navigation target mappings in earlier structural exporter and fixture. **New TS script not yet executed or reproducibility-validated** in this session. Next run it locally twice, audit data, then explicitly generate and review nonpublishable JSON; no hosted DB access.
-
-
-## WordPress operator-editor inbound proposal track — 2026-11-03
-
-Operator requested evaluation of Gutenberg/WordPress Posts, Pages and CPTs as an editing interface for content-form business knowledge instead of building a rich-text editor from scratch. Added to [WordPress delivery feasibility](wordpress-delivery-feasibility.md#operator-gutenberg-editing-as-an-inbound-knowledge-proposal-channel-2026-11-03) as a separate **inbound editorial adapter**. Edits create authenticated tenant-scoped **pending proposals** with actor, base version, source revision and provenance; approval and public release stay in core MioPages. Do not conflate with the **outbound** WordPress delivery release, hosted WordPress page locks or the 20i service adapter. Begin with a single restricted article/CPT editorial proof; do not establish 100 per-customer editing workflows or a central editorial WP hub without subsequent evidence. This decision adds design/proof scope, not a completed feature or authorization for live writes.
-
-## Active development handoff — WordPress two-way delivery/editorial + 20i service adapter (2026-11-03)
-
-**Decision status:** Operator approved a bounded dual-track WordPress proof alongside investigation of 20i Reseller API automation. These are **not live features, not production authorization, and not a silent rewrite of the Commercial V1 roadmap**. The WordPress track was historically deferred; this is a deliberate evaluation-priority change pending proof and later roadmap reconciliation. Existing Next.js renderer, hosted synthetic C0 and managed PG17 remain unchanged.
-
-**Three independently replaceable boundaries:**
-1. **Core MioPages** owns structured business knowledge, derived editorial artifacts, approvals, versioning, impact assessments, authorized releases and audit/provenance.
-2. **Provider-independent WordPress delivery/editorial adapter:** outbound signed, tenant-bound approved release staging/activation with local last-good serving and rollback; *separately* inbound authenticated operator-edit proposal capture from supported WP posts/pages/CPTs. Native Gutenberg is a candidate operator editor, **not** authority over canonical truth or public publication.
-3. **20i service delivery adapter:** optional hosting/package inventory and provisioning, WordPress install/environment preparation, DNS/SSL, backups/operations. It does not make content/publication decisions and is **not** a core business/knowledge component. Other WP hosts must remain supported without 20i.
-
-**Editorial governance contract (agreed design direction):** An authorized WP Editorial Operator edits a supported document or structured knowledge-backed record. Plugin captures actor, installation/tenant/record/revision IDs, normalized diff, base canonical version and provenance into an idempotent **pending proposal**. A separately authorized MioPages Reviewing Operator can approve, reject, request changes or suggest alternative wording, including return to the originating operator or customer for factual confirmation. A customer confirmation is evidence/attestation, **not automatically final publication authorization**. Approval updates the appropriate canonical knowledge entity or governed editorial artifact; impact assessment distinguishes direct linked references, possible semantic effects needing review, and unaffected surfaces. Knowledge acceptance, derivative copy approval and per-channel release are separate governed decisions. Do not cascade edits or overpromise cross-channel automatic updates. Preserve versioned discussion, evidence, review assignment, scope, conflicts, audit and loop prevention; design for workflow complexity but implement a narrow first proof. See [detailed contract](wordpress-delivery-feasibility.md#operator-gutenberg-editing-as-an-inbound-knowledge-proposal-channel-2026-11-03).
-
-**Verified committed reference:** `docs/wordpress-c0-v3-public-projection-fixture.json` is available on this branch and deliberately `publishable:false`. It is based on frozen accepted service-led v3, 4 Pages / 23 Sections, five canonical projections, four recipes; digest `f4d7a71c9af0b7c430e9fb24d6416c7fd1764170ed5cd0da39b470ea5a91ccc4`. Asset bytes/rights, five unresolved media roles, review workflow and plugin release transport remain unverified or unimplemented. Do **not** publish this fixture on the public domain as if it were an approved release. Historic hosted Next.js C0 is older, 4/19, and is **not** the fixture source for this proof.
-
-**Operator-reported 20i test environment:** Dedicated 20i Linux Unlimited reseller package for `miopages.org`, SSL active and PHP 8.3. WordPress installation and protected development access are not verified here. 20i provided `20i API Blueprint.apib` after its hosted Apiary documentation viewer returned 404; treat the file as an external reference to preserve privately or sanitize before Git, *not* proof that any API operation is available to the account. Read-only inventory is the first 20i API proof; no API credentials/secrets in Git. WordPress Blueprint/WordPress Platform compatibility and provider-specific limits require verification. No endpoint operations were executed in this checkpoint.
-
-**Next bounded engineering proof sequence (not a broad build authorization):**
-1. Re-fetch Git `main` + this active branch, compare source and approval gates; do not trust stale local checkout.
-2. Confirm protected/nonpublic dev WordPress at `miopages.org` before loading **nonpublishable** C0 v3 sample content. Build provider-neutral renderer/plugin package and test controlled local preview/fidelity without live publication or hosted PG writes.
-3. Implement a single inbound operator **article draft → authenticated pending proposal** path with idempotency, source revision and central actor validation. Then one structured **service or location** CPT path with explicit knowledge mapping; prove reviewer alternative/return for revision and separate approval/release.
-4. Demonstrate one dependency/impact report for a changed structured fact; no blanket rewrite. Verify outbound release does not create duplicate inbound proposals and protected WP pages cannot be casually edited.
-5. In parallel, create a read-only 20i service-adapter inventory operation for the test package, only after credential storage/IP restriction and account entitlements are checked; keep provisioning writes separate and opt-in.
-6. Record test results, remaining unknowns and explicit failed gates in Git after each bounded proof; **do not** assert implementation completion before tested evidence.
-
-**Continuity constraint:** Source of truth for active branch work is [PR #5](https://github.com/R-Levin/myomaton-web/pull/5); ensure `main` has a navigational link until merged. Do not merge or silently change canonical roadmap/production deployment authority as part of this checkpoint. Current development spec and this record reflect agreed direction and research/proof gates, not a delivered WordPress plugin or operational 20i integration.
-
-## First WordPress plugin source checkpoint — 2026-11-03
-
-**GitHub-source verified, execution/deployment unverified:** Added `wordpress/miopages-delivery/miopages-delivery.php`, `includes/class-miopages-fixture-preview.php`, `tests/preview-smoke.php` and README on the active WordPress development branch. The experimental plugin has a *WordPress-administrator-only* Tools preview that accepts pasted **nonpublishable** C0 v3 JSON, verifies the 4-route/23-section schema and allowlisted five section types, renders escaped content and nonclickable action labels. It performs no content or database writes, has no public route, does not transmit to MioPages or 20i, and cannot publish the frozen fixture. This is a structural proof, **not design fidelity, authenticated release delivery, or the promised bidirectional integration**. Its schema gate is not a cryptographic signature/source digest validation.
-
-**Next bounded action:** Run the three PHP syntax checks and `php wordpress/miopages-delivery/tests/preview-smoke.php` on the existing Windows repo (CLI available only if installed); capture exact outcomes. Confirm `miopages.org` WordPress installation and private access protection before **any** staging upload. Do not claim WordPress installed or site protected yet. Then test the administrator-only preview on the isolated dev site. Independently implement the inbound editorial proposal proof and read-only 20i API inventory in later guarded slices; do not conflate those with the current preview.
-
-## WordPress hosted private-preview field result — 2026-11-03
-
-**User-reported interactive result, not an independent content/fidelity audit:** On `miopages.org` (20i Linux Unlimited Reseller, PHP 8.3, WordPress version reported 7.1.4), user installed WordPress and confirmed 20i `public_html` directory password protection works when opening the site in a private browser window. Experimental `MioPages Delivery (Development Proof)` plugin was installed and activated. Under WP Tools → MioPages Preview, user pasted `docs/wordpress-c0-v3-public-projection-fixture.json` and reported the simplified private preview rendered properly. This is **a preliminary successful admin-preview smoke proof**, not verified pixel/design parity, production authorization, actual WP page publishing, central authority, release transport or full automated tests.
-
-**Packaging failure and resolution:** Original Windows `Compress-Archive` ZIP listed plausible entries under `tar -tf` but 20i extraction produced literal filenames with backslash-separated path components in a randomized plugin directory; WP reported “Plugin file does not exist.” Rebuilt using `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`; user reported successful plugin activation. Preserve portable ZIP entry-path guidance in later deployment packaging.
-
-**Independent local tests reported by user:** All three `php -l` checks passed; `php wordpress/miopages-delivery/tests/preview-smoke.php` returned PASS for 4/23 inventory, publication gate, section allowlist and HTML escaping. These are reported user terminal outputs, not new CI proof. No evidence of hosting/central DB/API writes from the preview tool. Nonpublishable fixture remains `publishable:false`.
-
-**Next bounded development step:** Design and implement a provider-neutral, restricted section/theme renderer using the accepted v3 fixture **only in protected development preview**; verify content mapping, styles and responsive fidelity; enforce nonpublishable and unresolved media/publication gates. Use reproducible platform-safe packaging. Keep inbound WordPress→MioPages editorial proposal and read-only 20i API adapter as separate tracks, and do not prematurely publish managed pages or enable public releases.
-
-## WordPress visual-preview v0.0.2 source checkpoint — 2026-11-03
-
-**Source committed, runtime verification pending:** The admin-only WordPress prototype was extended with `wordpress/miopages-delivery/assets/preview.css` and a class-based renderer for all four accepted C0 v3 routes / 23 sections. Includes reviewed surface colors (light, brand, tonal, strong, supporting, contrast), recipe-class page shells, responsive card layouts, stage/relationship items, structured party/responsibility rows, illustrative header/navigation and nonclickable actions. All text is escaped, section type/surface/region class values are allowlisted, and the stylesheet is enqueued only on the administrator's Tools → MioPages Preview screen. Plugin bumped from 0.0.1 to 0.0.2; standalone PHP smoke harness covers new visual structure. **No actual public Managed Site rendering, routes, assets, forms or approval/release transport exist.** This must never be confused with production readiness or approved pixel fidelity.
-
-**Verification required before upload:** User's Windows repo `C:\Users\mplxs\Projects\myomaton-web` must fast-forward branch, run PHP lint for plugin, renderer and smoke script, then run `php wordpress/miopages-delivery/tests/preview-smoke.php`. Observe output; no claim of tests passing for v0.0.2 yet. Package with `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery` (not earlier Windows Compress-Archive path format). Replace **only** the experimental plugin on private `miopages.org`; confirm the version, nonpublic status and styled preview by manual inspection at desktop and narrow width. Preserve reported directory password protection and nonpublishable fixture `publishable:false`. If a test or deployment step fails, stop and inspect rather than changing hosted DB or publishing content.
-
-**Next technical boundary after validation:** Compare rendered layouts with accepted service-led v3 reference; address verified design tokens, local font/media ownership and section visual grammar without violating unresolved asset gates; then move to a real provider-neutral release contract and separately scoped inbound operator-proposal/20i read-only API proofs. Continue recording actual versus planned states in Git.
-
-## Visual-preview v0.0.2 local validation report — 2026-11-03
-
-**User-reported Windows PowerShell checks:** All three PHP lint commands for `miopages-delivery.php`, `includes/class-miopages-fixture-preview.php`, and `tests/preview-smoke.php` returned `No syntax errors detected`. The CLI smoke command `php wordpress/miopages-delivery/tests/preview-smoke.php` returned `PASS: C0 private preview smoke tests (structure, visual shells, publication gate, section allowlist, HTML escaping).` This is user-provided local evidence; WordPress v0.0.2 upgrade, styling and visual fidelity are **not yet independently verified**.
-
-**Next:** rebuild with portable `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`, inspect ZIP entries, replace only the development plugin in password-protected WordPress, and verify the styled administrator preview. Do not enable public release, import pages or change the canonical database.
-
-## WordPress v0.0.2 visual preview acceptance observation — 2026-11-03
-
-**User-reported visual outcome:** Following successful local PHP lint and smoke tests, the user reported that the v0.0.2 styled WordPress preview **"looks very good. Pretty much as I remember it."** This is encouraging initial qualitative validation of the password-protected admin-only renderer, but **not** an independently captured screenshot comparison against the accepted service-led v3 reference, responsive/accessibility evaluation, public WordPress page publishing, or production approval. The installed v0.0.2 version and full content inventory were not independently inspected by the assistant in this report. Preserve nonpublishable C0 fixture restrictions, unverified logos/media, unimplemented review form and release transport.
-
-**Next bounded technical operation:** capture reproducible visual-fidelity observations (desktop/mobile screenshots, content mapping/spacing, missing media), then design the versioned provider-neutral outbound release contract and protected staging/activation *without* publishing the nonpublishable fixture. In parallel, plan one restricted WordPress editorial draft-to-pending-proposal path; read-only 20i API inventory remains separate and no credentials should enter Git.
-
-## Signed release contract v0.1 and offline validator — 2026-11-03
-
-**Source committed; tests NOT YET executed:** `docs/wordpress-release-contract-v0.1.md` defines an Ed25519 signed, exact-bytes, SHA-256-checked, installation/tenant-bound release envelope with monotonic sequence + previous release pointer, scoped approval claim, UTC acceptance window and limited synthetic content. Added independent `wordpress/miopages-delivery/includes/class-miopages-release-validator.php` and `tests/release-contract-smoke.php` using fresh in-memory test signing keys. This is a **pure offline eligibility checker** and **not integrated into live WordPress plugin hooks**, HTTP transport, WP storage, page publication, or the 20i API. Existing public projection C0 v3 fixture remains `publishable:false` and incompatible with the release schema; no conversion, signing or publication of it has been authorized.
-
-**Trust caveat:** a signed `approval.state=approved` claim is only meaningful when the central signer is itself subject to MioPages approval and release authority. That central signer/enrollment, revocation, provisioning identity and protected local key pinning do **not** yet exist. Validator receives active release state as a trusted caller input; there is no atomic compare-and-swap or durable staging, so this does not yet prove anti-replay under concurrency or recoverability. Contract is purposely minimal: one or more synthetic text-only pages/sections, no assets, scripts, arbitrary HTML or forms; full v3 grammar is not currently a publishable release payload.
-
-**Next bounded step:** locally run `php -l wordpress/miopages-delivery/includes/class-miopages-release-validator.php`, `php -l wordpress/miopages-delivery/tests/release-contract-smoke.php`, and `php wordpress/miopages-delivery/tests/release-contract-smoke.php`; require `PASS`, not `SKIP`. Investigate failures and review crypto/key pinning and schema before any staging storage implementation. No WordPress ZIP update is needed/authorized for this offline-only slice. After tests, specify an atomic storage plan and enrollment boundary for a protected test installation; do not connect to production or public pages.
-
-## Release-contract offline test blocker — 2026-11-03
-
-**User-reported local Windows results:** `php -l wordpress/miopages-delivery/includes/class-miopages-release-validator.php` and `php -l wordpress/miopages-delivery/tests/release-contract-smoke.php` both returned "No syntax errors detected". Running `php wordpress/miopages-delivery/tests/release-contract-smoke.php` returned **`SKIP: libsodium is unavailable; do not deploy without it.`** This is **not a passing security test** and does not verify signatures/refusals. No workaround should weaken Ed25519 verification or change the release contract until the local PHP extension environment is investigated.
-
-**Next bounded action:** inspect Windows CLI PHP with `php -v`, `php --ini`, and `php -m | findstr /i sodium` to identify the loaded configuration and whether the Sodium extension is available/enabled. Enable supported libsodium in the user's local PHP environment if present, then rerun the offline tests. Do not deploy the validator or connect it to WordPress while the test is skipped. The 20i hosted PHP 8.3 and Windows CLI PHP are separate environments; neither site's sodium availability has been verified.
-
-## Release Contract v0.1 offline security validation PASSED — 2026-11-03
-
-**User-reported direct Windows CLI evidence:** `C:\php\php.ini` is the active PHP 8.3.27 CLI config; `C:\php\ext\php_sodium.dll` exists. After enabling the sodium extension, `php -m | findstr /i sodium` returned `sodium`. Running `php wordpress/miopages-delivery/tests/release-contract-smoke.php` returned **`PASS: offline release-contract smoke tests (signature, targets, approval, replay, time, content gates).`** Both validator and smoke-test PHP syntax lint previously passed. This closes the **local missing-sodium test blocker**; it does **not** prove that the hosted 20i PHP process loads sodium or that signed release staging is operational.
-
-**Scope of proof:** The isolated pure-PHP test accepts a synthetic valid signed envelope and rejects bad signature/hash, wrong tenant/installation, unapproved claim, replay/order error, expired/overlong release, external route, unsupported section and HTML content. It uses ephemeral in-memory test keys and no deployed signing key. The validator is deliberately disconnected from WordPress hooks, persistent storage, API transport and publication. The central signer approval authority, secure enrollment/key rotation, durable atomic stage/activation/rollback, and production tests remain open.
-
-**Next bounded task:** review and design protected staging storage plus race-safe activation/rollback semantics, including immutable staged objects, monotonic revision and compare-and-swap; write a local/offline proof before any WordPress write integration. Keep the existing password-protected WP visual preview operational and C0 v3 fixture nonpublishable. No 20i API or hosted DB operations authorized by this evidence.
-
-## Offline release staging and activation first slice — 2026-11-03
-
-**Committed source, NOT YET runtime tested:** `docs/wordpress-release-staging-v0.1.md` sets the private immutable-object and guarded active-marker design. Added `wordpress/miopages-delivery/includes/class-miopages-release-store.php` and `tests/release-staging-smoke.php`. This is an **offline, PHP-only** store: requires an existing caller-supplied private directory, stages exact signed envelope bytes in digest-addressed objects, uses a cooperative exclusive file lock, checks immutable object integrity, and conditionally advances an `active.json` marker only after signature/tenant/approval/sequence/time revalidation. It has NO WordPress hooks, public routes, site rendering, imported WP posts, database writes, live HTTP transport or 20i credentials. `miopages.org` plugin v0.0.2 requires **no update** for this slice.
-
-**Rollback design:** Directly rewinding the active marker is forbidden; controlled restoration means a **new centrally signed, approved forward-sequence release** with previously approved desired content. This is not proof of deployed rollback; central authority and signer, release transport, staged asset coherence and actual public serving remain unimplemented.
-
-**Safety/portability gaps:** Required outside-webroot storage, correct OS-level permissions, no symlink escapes, lock semantics on target filesystem, crash durability, cross-process/cross-host concurrency, staging retention and recovery have not been security-audited. PHP hard-link and atomic-rename behavior must be validated on intended environments (including local Windows and 20i Linux). This is a feasibility proof, not a production persistence implementation. The marker does not switch a working WordPress website.
-
-**Next exact action:** In `C:\Users\mplxs\Projects\myomaton-web` fetch active branch, run `php -l wordpress/miopages-delivery/includes/class-miopages-release-store.php`, `php -l wordpress/miopages-delivery/tests/release-staging-smoke.php`, and `php wordpress/miopages-delivery/tests/release-staging-smoke.php`. Only record a PASS if observed; otherwise stop, inspect and repair offline. Rerun earlier release-contract smoke test to detect regression. Do not deploy staging code on WordPress or create public pages.
-
-## Offline staging/recovery local test PASS — 2026-11-03
-
-**User-reported Windows CLI evidence:** `php -l wordpress/miopages-delivery/includes/class-miopages-release-store.php` and `php -l wordpress/miopages-delivery/tests/release-staging-smoke.php` both returned **No syntax errors detected**. `php wordpress/miopages-delivery/tests/release-staging-smoke.php` returned **`PASS: offline immutable staging proof (signed stage, retry, tamper refusal, activation order, forward restoration).`** This completes the intended first local *offline functional* smoke proof. Existing release-contract Ed25519 checks passed separately earlier.
-
-**Interpretation and remaining boundaries:** The smoke test demonstrates the basic lock-protected immutable object store, stage-without-activation, integrity refusal, forward sequence and signed restoration behavior *on the local Windows PHP environment*. It does **not** prove crash-safe durability, security of filesystem permissions, concurrent multi-process behavior, hostile filesystem/symlink attacks, cross-host storage, 20i Linux runtime support, WordPress durable publication, actual backup restoration or centrally authorized signer/enrollment. The installed WordPress v0.0.2 visual preview is unchanged and does not invoke this storage code. No live hosted writes or API operations have been reported.
-
-**Next bounded engineering sequence:** Review the offline store for file/symlink race and failed/unknown-write handling, validate full concurrency/retention/error recovery with separate test processes and the target 20i filesystem in an isolated nonpublic proof only when explicitly authorized. Design WordPress-specific protected private location and transactional serving/activation state before adding WordPress integration. Preserve nonpublishable C0 fixture and signed approval authority. Continue parallel inbound editorial proposal and read-only 20i service-adapter track without conflating them.
-
-## Offline staging failure/recovery hardening — source checkpoint 2026-11-03
-
-**Source committed; NEW tests not yet run:** Offline release store `wordpress/miopages-delivery/includes/class-miopages-release-store.php` now rejects symlinked storage ancestors (where detectable), symlink/nonregular paths for object, active marker and lock; object directory creation and expected low-level filesystem errors fail closed. `tests/release-staging-smoke.php` includes malformed active-marker and missing-active-object fault injections, requiring that read-only status and subsequent writes refuse rather than reset release history. Added `tests/release-staging-concurrency.php` with two independent workers racing to activate the same signed first release under local `flock`; expect exactly one winner, one refusal, correct sequence-1 marker. See [staging specification](wordpress-release-staging-v0.1.md#hardening-test-slice--2026-11-03).
-
-**Important:** User previously confirmed base offline staging smoke passed before these new edits; neither the updated smoke nor the two-process race test has passed in the current checkpoint. No live WordPress hooks, active public page router, signing enrollment, 20i filesystem validation or operational restore exist. No public/canonical writes were made. File locks are cooperative and local; OS permission tests, TOCTOU attacks, file durability/unknown-result recovery and multi-host safety remain unresolved. This is *not* production-ready staging.
-
-**Exact next bounded action:** In Windows repo, fetch/fast-forward WordPress development branch and run syntax for release store, updated staging smoke, new concurrency test; execute updated staging smoke, concurrency test and original signature contract regression smoke. Preserve output and **stop on failure or skip**. Do not upload WordPress plugin. After tests, review errors and design explicit private storage and read-only post-uncertain-commit reconciliation before any host integration.
-
-## Offline release hardening regression checks PASSED — 2026-11-03
-
-**User-reported Windows PowerShell evidence:** Active development branch `docs/wordpress-delivery-feasibility-2026-11-02` fast-forwarded from `81c9ae4` to `1ed3130` (30 Git objects, 5 tracked files changed). Three syntax checks returned **No syntax errors detected** for `class-miopages-release-store.php`, `release-staging-smoke.php`, and `release-staging-concurrency.php`. All three executable smoke tests returned explicit **PASS**:
-- `release-staging-smoke.php`: `PASS: offline immutable staging proof (signed stage, retry, tamper refusal, activation order, forward restoration, corrupt-state refusal).`
-- `release-staging-concurrency.php`: `PASS: two-process release activation race (one winner, one refused, single monotonic active pointer).`
-- `release-contract-smoke.php`: `PASS: offline release-contract smoke tests (signature, targets, approval, replay, time, content gates).`
-
-**Scope:** These are successful **local Windows/PHP 8.3 + sodium** tests, based on exact user terminal output, not CI or 20i runtime proof. They demonstrate fail-closed recovery behavior on malformed/missing active state, cooperative two-process local filesystem locking, and regression coverage for detached signature/tenant/approval/order gates. They do **not** establish crash-durable atomicity, defense against hostile path races, reliable distributed locking, hosted Linux filesystem semantics, centrally governed signing/enrollment, or public WordPress publication and rollback. The existing 20i WP v0.0.2 visual-preview plugin remains unchanged by this step.
-
-**Next bounded action:** Before wiring the offline store into WordPress, design and validate (read-only where possible) a private off-webroot storage location and installation identity/key enrollment on the 20i Linux Unlimited package, plus a consistent marker read/reconciliation plan after uncertain write outcomes. Verify that hosted PHP 8.3 has sodium and that storage supports required filesystem operations. Do **not** copy signing private keys to WordPress or activate any public release. Separately retain inbound operator-edit proposal and 20i API inventory tracks.
-
-## Hosted WordPress environment-readiness diagnostic v0.0.3 — 2026-11-03
-
-**Code committed; installation/tests NOT YET verified:** Experimental WP plugin version incremented to `0.0.3`. Added `includes/class-miopages-environment-check.php`, a restricted WordPress **Tools → MioPages Environment** administrator-only, read-only report. It checks actual WP PHP runtime, Ed25519 Sodium function availability, `flock`/`link`/`rename` function availability (NOT functionality), `open_basedir` configured/not configured, and whether the parent's filesystem location could be off-webroot. It displays only status descriptions, not server paths or credentials; performs no filesystem writes, key installation, API requests, content changes or publication. Added `tests/environment-check-smoke.php` for path classification and report shape. Existing visual preview is preserved. Do not confuse apparent outside-webroot parent with a verified private staging directory.
-
-**Public provider research:** 20i's [shared-host PHP module list](https://docs.20i.com/web-hosting/php-modules-available-on-shared-hosting) documents sodium in multiple PHP versions. That does not prove the extension or filesystem operations are available for this particular `miopages.org` WP process. 20i warns that public phpinfo pages expose sensitive details; the diagnostic does not expose PHP configuration/path output.
-
-**Exact next bounded operation:** Fast-forward `docs/wordpress-delivery-feasibility-2026-11-02` in `C:\Users\mplxs\Projects\myomaton-web`. Run `php -l` for `miopages-delivery.php`, environment class and test; then `php wordpress/miopages-delivery/tests/environment-check-smoke.php`, plus `tests/preview-smoke.php`. Only if passing, rebuild plugin ZIP using verified portable `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`; replace plugin on **password-protected dev WordPress** and visit Tools → MioPages Environment. Capture nonsecret descriptive results. Do not install staging, create private folders, expose paths, use API credentials or publish C0. The installed plugin remains `0.0.2` until user verifies upgrade.
-
-**After hosted results:** Assess whether 20i permits a suitable actual off-webroot private directory and separately test host PHP sodium, lock, link, rename, isolation/permissions and recovery. Keep signer private keys only centrally. Do not infer trust/enrollment from a diagnostic.
-
-## WordPress environment diagnostic path classification fix — 2026-11-03
-
-**User-reported local test:** After fast-forward to `c6ed48f`, PHP syntax lint passed for the plugin, `class-miopages-environment-check.php` and `environment-check-smoke.php`; existing `preview-smoke.php` passed. New environment test returned **`FAIL: same root can identify possible parent`**. Root cause: `candidateStatus()` incorrectly required WordPress root to be a *strict child* of document root, rejecting a common installation where WordPress root **equals** document root. Code corrected in `class-miopages-environment-check.php` to allow equality while still refusing candidates inside document root and treating unexpected path relationships as unknown.
-
-**Verification not yet received after fix.** Next: `git pull --ff-only`; run `php -l wordpress/miopages-delivery/includes/class-miopages-environment-check.php`, `php wordpress/miopages-delivery/tests/environment-check-smoke.php` and `php wordpress/miopages-delivery/tests/preview-smoke.php`. Require both smoke suites PASS. **Do not upgrade WordPress v0.0.2 to v0.0.3 before these checks pass.** No hosted PHP, private directory, activation, signer or 20i API work performed by this fix.
-
-## Environment-classification repair verified locally — 2026-11-03
-
-User-reported after fast-forward to `5e2e829`: `php wordpress/miopages-delivery/tests/environment-check-smoke.php` returned **`PASS: WordPress environment read-only diagnostic (root classification and capabilities).`** Separately, `php wordpress/miopages-delivery/tests/preview-smoke.php` returned **`PASS: C0 private preview smoke tests (structure, visual shells, publication gate, section allowlist, HTML escaping).`** This closes the local path-classification test failure. Original new-plugin syntax checks had also passed before the fix; code change is a single path-condition adjustment. No hosted v0.0.3 installation result yet.
-
-**Next authorized operator action:** Build portable plugin ZIP with `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`; replace plugin on protected `miopages.org` WordPress development site; verify v0.0.3 and visit Tools → MioPages Environment. Record only descriptive diagnostic outcomes (PHP/Sodium, available filesystem functions, open_basedir, off-webroot-candidate classification), no absolute paths or secrets. Do not create private storage, issue signing keys, enable public publishing, or touch MioPages core.
-
-## 20i WordPress hosted diagnostic observed — 2026-11-03
-
-**User-reported output from Tools → MioPages Environment on protected `miopages.org` (v0.0.3 update implied by presence of screen):** PHP **8.4.27 (fpm-fcgi)**; `sodium_crypto_sign_verify_detached` **available**; `flock`, `link`, `rename` **functions available**, actual behavior **unverified**; `Private storage candidate: Potential off-webroot parent detected; private subdirectory, rights and access are NOT verified`; `open_basedir` **not detected**; diagnostic reports **no filesystem writes** and **no WordPress publication**. Exact runtime diagnostics supplied by user; not independently probed by developer. Do not confuse PHP 8.4 hosted with local Windows PHP 8.3.27.
-
-**Assessment:** Basic host capabilities support proceeding to a bounded private filesystem proof; **not production-ready**. Outstanding: verify actual physically isolated off-webroot private subdirectory (including no HTTP access, permissions, symlink handling), true `flock`/`link`/`rename` behavior on the hosting filesystem, write failure/uncertain pointer state reconciliation, backups and recovery. Next bounded implementation should be a restricted admin-only or CLI-only synthetic diagnostic, gated independently and NOT invoked by normal site requests; one-shot cleanup; no real release data, no private signing key, no publication. Do not automatically create directories in unverified locations or claim that `open_basedir` absence means filesystem security. Existing offline staging code not yet deployed/connected.
-
-## Gated one-shot private filesystem test v0.0.4 — code checkpoint 2026-11-03
-
-**Source committed, local tests NOT YET executed and hosted probe NOT YET RUN:** WordPress plugin increments to `0.0.4`, adds `includes/class-miopages-filesystem-probe.php` and `tests/filesystem-probe-smoke.php`. New **Tools → MioPages Filesystem Probe** is administrator-only, nonce-protected and disabled without explicit `MIOPAGES_PROBE_PRIVATE_DIR` in non-Git `wp-config.php`. Path must exist and be outside public document root and WP directory, with preliminary path/symlink refusal. Operator must *independently* verify HTTP non-exposure, access rights and hosting provider permission before setting constant. No default path is guessed or created. Clicking the opt-in action creates only a randomly named synthetic child and tests write/read, single-process `flock`, hard `link`, rename, cleanup. Reports status without server paths; does not stage releases, load signer private keys, publish content, call APIs or touch canonical runtime. Current deployed 20i plugin remains v0.0.3 until user confirms upgrade.
-
-**Exact next bounded user action:** `git pull --ff-only`, PHP syntax-check plugin entry, probe class and probe test; run `filesystem-probe-smoke.php`, `environment-check-smoke.php`, `preview-smoke.php`. Require explicit PASS on all smoke tests. If successful, package ZIP with `tar` portable separators and replace plugin on **protected development WP**. Visit new Tools → MioPages Filesystem Probe and confirm it displays **Disabled** by default; preserve prior preview and environment screens. **Do not set private path or click Run** until a real private directory has been separately verified. See `wordpress/miopages-delivery/README.md` v0.0.4. No hosted private write test is proved by simply installing v0.0.4.
-
-**Remaining risk:** PHP path checks are defense in depth, not proof against malicious symlink/TOCTOU races, shared hosting account exposure, crash durability or cross-process locking on 20i. Physical ACL, open_basedir, permissions, URL accessibility and backup rules need independent review before using release storage.
-
-## Filesystem probe v0.0.4 local checks — partial user results, 2026-11-03
-
-**User-reported PowerShell output:** `php -l` passed for `miopages-delivery.php`, `class-miopages-filesystem-probe.php` and `filesystem-probe-smoke.php`. `filesystem-probe-smoke.php` returned **`PASS: synthetic filesystem probe (off-webroot guard, lock, hard link, rename, cleanup).`** `environment-check-smoke.php` returned **`PASS: WordPress environment read-only diagnostic (root classification and capabilities).`** The user supplied the command invocation for `preview-smoke.php` but **no output**; do not mark that regression check PASS until separately confirmed.
-
-**Next step:** rerun `php wordpress/miopages-delivery/tests/preview-smoke.php` and verify explicit PASS before packaging/deploying v0.0.4. Keep the hosted private filesystem probe disabled until an independently inspected off-webroot directory is configured. None of the successful local checks establishes hosted write behavior.
-
-## Filesystem probe v0.0.4 local test gate CLEARED — 2026-11-03
-
-User separately reran `php wordpress/miopages-delivery/tests/preview-smoke.php` and received **`PASS: C0 private preview smoke tests (structure, visual shells, publication gate, section allowlist, HTML escaping).`** Combined with previous three successful PHP lint checks and both successful filesystem/environment test suites, **all six local checks are now user-reported PASS**. This supersedes the prior partial-output checkpoint; no failures remain in that bounded smoke gate.
-
-**Next authorized operator action:** fast-forward branch, build plugin ZIP with portable `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`, replace plugin on protected `miopages.org`, confirm installed v0.0.4 and new Tools → MioPages Filesystem Probe displays **Disabled: no private path has been explicitly configured**; confirm existing Tools → MioPages Preview and Environment work. **Do not set `MIOPAGES_PROBE_PRIVATE_DIR` or click Run** until 20i private path/permissions/HTTP access are independently reviewed. Source commit is not proof of hosted installation or filesystem writes.
-
-## Hosted v0.0.4 filesystem probe safe default confirmed — 2026-11-03
-
-**User-reported:** On protected `miopages.org`, new Tools → MioPages Filesystem Probe screen **shows Disabled**. This is positive proof that the explicit `MIOPAGES_PROBE_PRIVATE_DIR` opt-in gate has not been armed on that installation, and strongly indicates v0.0.4 diagnostic screen was deployed. User has not separately reconfirmed version number or both earlier admin screens. No hosted filesystem write test was run and no private directory was configured.
-
-**Next bounded operator action:** Through 20i StackCP File Manager for the `miopages.org` Linux hosting package, inspect only whether the account root contains `public_html` and whether nonpublic sibling folders/private directory placement are possible. Do not create/edit/delete yet and do not share absolute home paths. 20i documentation confirms File Manager is a standard StackCP feature and the package home directory is distinguished from `public_html` (see https://docs.20i.com/reseller-guide/reseller-hosting-stackcp and https://docs.20i.com/migrations-and-transfers/transfer-files-with-rsync). Avoid inferring directory HTTP privacy solely from it appearing outside `public_html`. Only after manually reviewing package layout and actual permissions/design can a dedicated private test directory be authorized. Then a separate explicit action may set `MIOPAGES_PROBE_PRIVATE_DIR` server-locally. No real releases or signer keys allowed in probe.
-
-## 20i package directory layout observed — 2026-11-04
-
-**User-reported read-only File Manager observation:** In the `miopages.org` 20i hosting package File Manager, the operator can see the `public_html` folder from the current directory level. This suggests (but does not prove) that a separate sibling directory for private test storage may be possible. No folder has been created or written, no permissions or HTTP inaccessibility verified, and the filesystem probe remains disabled.
-
-**Next operator check:** Confirm whether File Manager exposes a **Create Folder/New Folder** action at the same level as `public_html`, without using it yet. If yes, separately plan a narrowly scoped `miopages-private` sibling, verifying host ownership, restrictive permissions, nonpublic URL access and PHP access before enabling any one-shot synthetic probe; avoid sharing absolute paths or credentials. Do not create files inside `public_html`, do not publish customer content or insert signer private keys.
-
-## 20i private sibling folder created; permissions 0700 — 2026-11-04
-
-**User-reported:** In the 20i File Manager for protected `miopages.org` WordPress, a sibling directory `miopages-private` was created at the same level as `public_html`. Its initial permissions were `755`; operator changed them to **`700`**. This is a useful filesystem permission boundary but is **not proof** of PHP runtime access, owner identity, web non-exposure, or hosted lock/link/rename behavior. The v0.0.4 probe remains disabled pending explicit trusted config.
-
-**Next bounded operator check:** In File Manager, open `public_html` and confirm `wp-config.php` is located there (without showing its contents or credentials). After confirming actual config location, provide a safe backup-first instruction to define `MIOPAGES_PROBE_PRIVATE_DIR` as a path derived from that known location, with no paths pasted in chat; then run only the nonce-gated synthetic filesystem probe. Do not put secrets in Git, create public probe files, stage real releases, or infer HTTP isolation solely from mode 0700.
-
-## Hosted filesystem probe visibly armed; public isolation check pending — 2026-11-04
-
-**User-reported:** In password-protected `miopages.org`, after adding `MIOPAGES_PROBE_PRIVATE_DIR` via relative `dirname(__DIR__) . '/miopages-private'` expression in `public_html/wp-config.php`, Tools → MioPages Filesystem Probe now **shows the run button**. This means the plugin's preliminary `safeDirectory` check passed, not that private HTTP isolation, owner identity, or hosted filesystem semantics have been independently verified. The sibling `miopages-private` was set to mode 0700. No hosted synthetic write was reported yet.
-
-**Immediate next step:** User checks public URL `https://miopages.org/miopages-private/` in incognito, reporting status only and not credentials/paths. A 403 or 404 is preliminary supporting evidence only, **not a complete proof** of isolation against aliases, alternate virtual hosts or direct access. If directory listing or private file appears, stop, disable probe, review server document root. Before running one-shot probe, verify separately that 20i document root is `public_html` and there are no aliases to private storage; run only synthetic test after boundary review. No live releases or signer key provisioning.
-
-## Private storage preliminary URL check — 2026-11-04
-
-**User-provided screenshot:** An incognito visit to `https://miopages.org/miopages-private/` displayed the ordinary WordPress "Page not found" template, with no directory listing or files exposed. This is consistent with the sibling `miopages-private` directory (mode 0700) lying outside the web document root. **It is not a comprehensive HTTP isolation or alternate-vhost/alias/security audit.**
-
-**Next bounded action authorized in chat:** Run exactly one one-shot synthetic filesystem probe in protected WP admin via Tools → MioPages Filesystem Probe (path guard and config already visibly armed); report descriptive results only. Probe tests one-host write/read, nonblocking lock, hard link, rename, and cleanup in randomly named temporary child. If any result FAIL or cleanup incomplete, stop and inspect; do not blindly repeat. This is still not approved release staging, central signing enrollment or public publication.
-
-## Hosted filesystem probe results, November 4, 2026
-
-The operator reported seven successful checks from the private filesystem probe on the password-protected miopages.org WordPress development installation. The configured sibling directory is miopages-private, outside the document root; the directory was previously set to permissions 0700.
-
-Results: directory boundary PASS; temporary subdirectory creation PASS; write/read PASS; exclusive single-process lock PASS; same-filesystem hard link PASS; rename PASS; cleanup PASS. The probe reported that synthetic files were removed. Earlier, a browser request to /miopages-private/ displayed a WordPress not-found page.
-
-Evidence is limited to the reported single-process hosted test. Concurrent PHP-process locking, crash durability, comprehensive HTTP isolation and recovery remain unverified. No approved release was staged or published, and no central signing keys were installed.
-
-Next: plan a bounded concurrency and interrupted-operation recovery proof before enabling private release staging. Keep public publication disabled.
-
-## Hosted two-process recovery proof source — 2026-11-04
-
-**Source committed; no CLI execution claimed:** New `scripts/wordpress-host-filesystem-recovery-proof.php` is a standalone PHP CLI-only, synthetic filesystem test for the existing protected `miopages.org` 20i package. See [operator/recovery notes](wordpress-host-cli-recovery-proof.md). It requires execution from a directory named `miopages-private`, with a sibling `public_html`, and uses an isolated random child, two distinct PHP worker processes and cooperative file locks. The test checks one marker activation and one refused replay, abandoned temporary-write isolation, malformed test marker refusal and bounded cleanup. It never stages real signed releases, touches WP content, accesses MioPages Core or installs keys. Not deployed to hosting.
-
-**First prerequisites:** confirm **My20i → Manage Hosting → miopages.org → Security → SSH Access** is available (provider documentation states reseller hosting can use SSH, but account support remains unverified). Run local syntax check `php -l scripts/wordpress-host-filesystem-recovery-proof.php` and review before uploading anything. If 20i SSH and CLI process spawning are permitted, use a protected SSH session to run the test within the existing private sibling directory only, not the webroot. Stop on failed/missing runtime dependencies or incomplete cleanup. The existing v0.0.4 admin probe and WordPress visual preview remain as-is.
-
-**Upcoming major milestone:** privately stage a canonical-authorized signed test release in WordPress, with verified installation-scoped public-key enrollment, safe storage and an end-to-end no-publication rejection/acceptance rehearsal. Controlled public activation/rollback is a **subsequent** milestone. Crash durability and PHP-FPM/CLI differences require further review even after a CLI concurrency PASS.
-
-## SSH option confirmed for 20i miopages.org — 2026-11-04
-
-**User-reported:** The SSH Access feature is visible for the `miopages.org` package in 20i. This confirms the hosting panel offers the feature, **not** that it is activated, credentials are configured, CLI PHP permits `proc_open`, or the hosted concurrency proof has run.
-
-**Next bounded user action:** From Windows repo, `git pull --ff-only` and `php -l scripts/wordpress-host-filesystem-recovery-proof.php`. Then inspect 20i SSH Access activation/connection options without sharing passwords, private SSH keys or account secrets. Prefer key-based authentication if supported. Do not upload/execute the script or change WordPress content until syntax review and SSH access are verified. See `docs/wordpress-host-cli-recovery-proof.md`.
-
-## Hosted CLI recovery script syntax validation — 2026-11-04
-
-**User-reported Windows terminal output:** `php -l .\\scripts\\wordpress-host-filesystem-recovery-proof.php` returned `No syntax errors detected in .\\scripts\\wordpress-host-filesystem-recovery-proof.php`. This validates PHP syntax only; no test execution or 20i deployment has taken place.
-
-**Next step:** Determine whether 20i SSH Access for `miopages.org` supports key-based authentication, password authentication or both; do not disclose credentials or private keys. Prefer protected key-based authentication and then verify shell connection before copying any test script. The existing private directory and WordPress plugin remain unchanged.
-
-## 20i WordPress SSH connection succeeded — November 4, 2026
-
-**User-reported:** After the initial 20i SSH activation delay (provider indicated up to 30 minutes), the dedicated WordPress key `miopages_wp_20i` successfully connects to the hosting account. The earlier debug trace had accepted public-key authentication but temporarily denied shell authorization; this is now resolved **without key changes or 20i support**. Preserve the separate `miopages_20i` runtime server key; never commit private key material.
-
-**Next read-only step:** From the newly connected SSH shell, run `pwd`, `ls -ld public_html miopages-private`, and `php -v`, share only nonsecret results and omit absolute home path if desired. Confirm directory visibility, restricted permissions and PHP CLI before uploading/executing `scripts/wordpress-host-filesystem-recovery-proof.php`. No hosted test was run yet.
-
-## WordPress 20i SSH CLI runtime and private directory confirmed — November 4, 2026
-
-**User-reported read-only SSH shell evidence:** Account root contains sibling `miopages-private` (directory mode **0700**, owner account user) and `public_html` (mode 0711). Hosted PHP CLI version is **8.4.27** (NTS), consistent with earlier PHP-FPM version. This confirms actual SSH shell access, folder visibility and restrictive mode; no host concurrency test has yet run. Do not store account home absolute path in Git.
-
-**Next bounded operation:** From local Windows PowerShell, upload only `scripts/wordpress-host-filesystem-recovery-proof.php` using the dedicated WordPress SSH key to `miopages-private/` by SCP. From the already open SSH shell, run `ls -l miopages-private/wordpress-host-filesystem-recovery-proof.php` and `php -l miopages-private/wordpress-host-filesystem-recovery-proof.php`. Require file present and syntax PASS before executing the synthetic worker test. Preserve WordPress pages, central database, and release signer credentials unchanged.
-
-## Hosted CLI test script ready — November 4, 2026
-
-The operator confirmed successful transfer of the isolated synthetic recovery script into the private hosting directory, and PHP 8.4 CLI syntax validation passed. The script has NOT been executed yet. Next: run it from within that private directory and record the complete PASS, FAIL, and cleanup outcome. Stop on any failure; publication and real release storage remain disabled.
-
-## Hosted concurrency and interrupted-write proof PASSED — November 4, 2026
-
-**User-reported direct 20i SSH CLI execution:** From the dedicated nonpublic WordPress sibling directory, `php wordpress-host-filesystem-recovery-proof.php` completed with:
-
-```text
-PASS: 20i CLI synthetic concurrency (one winner), orphan write isolation, corrupt marker refusal.
-NOTE: Process contention verified; crash-durable fsync and real WordPress activation remain unverified.
-```
-
-This establishes basic two-process cooperative filesystem locking and rejection/recovery inspection against synthetic test markers on the 20i SSH/PHP 8.4 CLI filesystem, building on seven earlier hosted FPM-admin filesystem checks and local signed-release tests. It is not evidence of real signing authorization, HTTP publication, FPM concurrent process equivalence, power-loss durability, network/distributed locking, full filesystem security audit, or installed release staging. No real canonical/customer content or WordPress posts were changed.
-
-**Next major milestone:** **Private signed-release staging in WordPress**, without public page effects. Plan enrollment (pinned verification public key, scoped installation identity, centrally governed signing), protected private release storage, administrator-gated stage/inspect flow, signature/tenant/approval/order validation and synthetic rejection/acceptance rehearsals. Preserve `publishable:false` C0 v3 preview fixture. Keep release signer private key entirely outside WordPress and Git. No automatic release activation/public routing until separately designed and authorized. Treat crash-durability, hosted PHP-FPM concurrency and last-known-good public serving as open gates.
-
-## Private signed-release staging v0.0.5 — synthetic-only code checkpoint (Nov 4, 2026)
-
-**Source committed, local tests pending, NOT deployed:** The experimental WordPress plugin now includes `class-miopages-private-staging.php` and a distinct Tools → MioPages Private Staging screen, initially **Disabled**. The screen cannot stage unless an explicit server-local `MIOPAGES_SYNTHETIC_STAGE_CONFIG` with separate outside-webroot staging directory, pinned Ed25519 *public* verification key, and synthetic-scoped organization/presence/site/installation IDs is configured. Existing `MIOPAGES_PROBE_PRIVATE_DIR` does not enable staging. The facade limits staged envelopes to synthetic release/approval IDs, while the underlying existing validator and lock-protected store verify signature, digest, identity, sequence, claimed approval, time and section schema. A valid signed synthetic envelope can only be stored as an immutable digest object. There is **no activation button, no call to activate(), no WordPress post/public route changes, no private signing key or central signer enrollment**. Existing visual preview and environment/probe screens are preserved.
-
-**New local regression:** `wordpress/miopages-delivery/tests/private-staging-smoke.php` covers valid synthetic staging, exact-object idempotency, wrong installation, unsynthetic release, draft claim, tampered hash, unsafe storage, unsupported real identity and unchanged activation. Full scope and enrollment boundary: `docs/wordpress-private-staging-v0.1.md`. These tests were written but **have not yet been executed**. Do not claim the code is tested or deploy to 20i before local tests pass.
-
-**Next exact local check:** Fast-forward `docs/wordpress-delivery-feasibility-2026-11-02`, then syntax-check `miopages-delivery.php`, `includes/class-miopages-private-staging.php` and `tests/private-staging-smoke.php`. Run `tests/private-staging-smoke.php`, `tests/release-contract-smoke.php`, `tests/release-staging-smoke.php` and `tests/preview-smoke.php`. Stop on any FAIL or SKIP; repair in Git before package upgrade. Only after successful local tests may v0.0.5 be installed on the password-protected `miopages.org` development WordPress; first verify staging screen **Disabled**. Do not create key material, configure stage directory or upload synthetic release until separate enrollment review. Hosted concurrency proof remains historical, and 100+ tenant load/isolation proof is a separate future Commercial V1 gate.
-
-## WordPress private signed staging v0.0.5 local regression PASS — November 4, 2026
-
-**User-reported PowerShell results:** Git branch `docs/wordpress-delivery-feasibility-2026-11-02` fast-forwarded from `90c384f` to `c9f21b5`. Three syntax checks passed for the plugin entry, synthetic staging facade and synthetic staging smoke test. Four smoke suites all explicitly PASS: `private-staging-smoke.php` (signed acceptance, tenant refusal, no activation, no publication), `release-contract-smoke.php` (signature/target/approval/order), `release-staging-smoke.php` (immutable staging, tamper/refusal/recovery), and `preview-smoke.php` (original private visual preview). This clears the **local** v0.0.5 regression gate; these are user terminal reports, not CI/hosted validation.
-
-**Next bounded operator step:** Package v0.0.5 using portable `tar` ZIP from the WordPress directory, replace the existing plugin on password-protected `miopages.org`, confirm version 0.0.5 and Tools → MioPages Private Staging shows **Disabled** with no `MIOPAGES_SYNTHETIC_STAGE_CONFIG` configured. Confirm existing Tools Preview/Environment/Filesystem Probe screens remain available. **Do not** configure synthetic enrollment, generate or install keys, stage any test data or publish until a separate reviewed test-issuer and private subdirectory plan is ready. Production signer and 100+ tenant load proof remain open.
-
-## Hosted WordPress v0.0.5 disabled staging screen confirmed — November 4, 2026
-
-**User-confirmed hosted UI state:** After v0.0.5 deployment to protected `miopages.org`, Tools → MioPages Private Staging displayed exactly `Disabled: separately enrolled synthetic test identity and private staging directory have not been configured.` This confirms the new admin screen is present and its default-off enrollment guard is effective. No stage/activate operation or public publication occurred. Existing other Tools screens were not reverified in this step.
-
-**Next bounded operation:** Via existing authenticated 20i SSH, create an isolated child `~/miopages-private/synthetic-staging` using `mkdir -m 700`, then verify `ls -ld` reports `drwx------`. Do not install staging enrollment constants or keys yet. Subsequently devise a synthetic-only test issuer with secret key kept off WordPress/hosted webroot/Git and a pinned public key in reviewed non-Git configuration. No central approval authorization claim is made by the synthetic signer.
-
-## Isolated hosted synthetic staging storage verified — November 4, 2026
-
-**User-reported 20i SSH evidence:** Under the dedicated WordPress hosting account, `mkdir -m 700 ~/miopages-private/synthetic-staging` completed and `ls -ld` showed `drwx------`, owned by the hosting user. This is an isolated child of the previously verified off-webroot private sibling. No release staged, identity enrolled or signing keys created; hosted v0.0.5 admin interface remains disabled as last confirmed.
-
-**Next bounded check:** In **local Windows PowerShell**, verify `php -r "echo function_exists('sodium_crypto_sign_keypair') ? 'Sodium available' : 'Sodium unavailable';"`. Then design an isolated synthetic Ed25519 issuer with a protected private signing key stored outside the repository and WordPress/20i, separate public-key enrollment and a strictly synthetic test envelope. Never paste the private key into chat, Git, WordPress or CLI history. No real customer content, release activation or publication.
-
-## Synthetic Ed25519 issuer generated locally — November 4, 2026
-
-**User-reported Windows evidence:** A dedicated synthetic Ed25519 keypair was generated using a temporary PHP script under the existing access-restricted local user configuration directory, outside Git and outside WordPress. PHP reported `PASS: Synthetic Ed25519 key pair created locally.` File metadata showed `synthetic-signing-secret.key` **64 bytes** and `synthetic-signing-public.b64` **44 bytes**. The temporary PHP generator script was deleted. No key contents were supplied in chat or checked into Git. File sizes alone do not demonstrate that keys match or remain confidential.
-
-**Next bounded step:** Verify the private key and public key match locally using PHP/libsodium without printing secrets or public-key contents, then review restricted server-local WordPress enrollment of **public key only** against the verified 0700 off-webroot synthetic staging directory. Do not install or transmit the secret signing key to WordPress, 20i or Git, and do not stage data until the separate synthetic issuer preparation and enrollment are confirmed. Real central authorization remains unimplemented.
-
-## Synthetic signing key consistency check PASSED — November 4, 2026
-
-**User-reported local result:** PHP/libsodium matched the 64-byte protected local synthetic Ed25519 signing secret to the decoded 32-byte public verification key, reporting `PASS: Synthetic signing keys match.` Temporary verifier script was removed by the supplied PowerShell command (removal not independently verified). No key contents were shared and no private signing key was placed on 20i or in Git.
-
-**Next bounded step:** Prepare protected WordPress server-side configuration. Find existing `public_html/wp-config.php` and create a permission-restricted backup **outside public_html**, preferably under existing off-webroot `miopages-private`. Do not put backups containing DB credentials under publicly reachable paths, print file contents, or add new enrollment constants yet. Next, insert the synthetic-only `MIOPAGES_SYNTHETIC_STAGE_CONFIG` with pinned *public* verification key and explicitly agreed synthetic identity IDs and private staging directory, with a test release using exactly matching identifiers. Do not enable real publication or import signing private key.
-
-## Protected wp-config backup confirmed — November 4, 2026
-
-**User-reported 20i SSH evidence:** Before any WordPress enrollment edit, the existing `public_html/wp-config.php` was copied using `cp -p` to `~/miopages-private/wp-config-before-staging.php`, then `chmod 600`. `ls -l` confirmed the backup exists (2,955 bytes) and permissions `-rw-------`, owned by the hosting account. The source configuration remained unmodified as of this step. This backup contains sensitive WordPress configuration and must never be placed in a public web directory, committed to Git, or printed in chat.
-
-**Next operator step:** Transfer **only** the locally verified 44-byte Ed25519 public verification key `synthetic-signing-public.b64` from protected Windows issuer storage to `~/miopages-private/` using dedicated SSH identity and legacy `scp -O`. Verify chmod 600 and `wc -c` = 44 under SSH. The synthetic signing **secret** stays on the Windows developer machine. Do not edit wp-config or configure actual staged release until public-key transfer is verified and an agreed synthetic identity config is ready.
-
-## Synthetic public verification key present on 20i; enrollment proposed — November 4, 2026
-
-**User-reported 20i SSH verification:** The local synthetic issuer's **public only** `synthetic-signing-public.b64` was transferred through legacy SCP (44 bytes, status 0); hosted `chmod 600`, `wc -c` and `ls -l` confirmed 44 bytes, mode `-rw-------`, hosting-account ownership, and storage in `~/miopages-private` outside the webroot. The protected `wp-config.php` backup and separate `0700` `synthetic-staging` directory are already verified. Private signing key remains local Windows only.
-
-**Next operator action proposed, NOT yet verified:** In the existing `public_html/wp-config.php`, add `MIOPAGES_SYNTHETIC_STAGE_CONFIG` above WordPress's 'stop editing' line. Its `directory` is `dirname(__DIR__) . '/miopages-private/synthetic-staging'`; `identity.publicKeyBase64` uses `trim(file_get_contents(dirname(__DIR__) . '/miopages-private/synthetic-signing-public.b64'))` (public key only). Exact test identifiers: `keyId=synthetic-test-key`, `organizationId=synthetic-org`, `webPresenceId=synthetic-presence`, `managedSiteId=synthetic-site`, `installationId=synthetic-installation`. Preserve existing `MIOPAGES_PROBE_PRIVATE_DIR` setting. Save, then check Tools → MioPages Private Staging for **Enabled for synthetic test releases only**, active sequence **0**, publication **disabled**. Do NOT submit an envelope yet. No real customer keys, canonical approval or publication is enabled by this configuration.
-
-## Hosted synthetic enrollment confirmed; local test-envelope generator prepared — Nov 4, 2026
-
-**User confirmation:** After the pinned synthetic public-key installation and local `wp-config.php` enrollment instructions, the operator replied “Yes. All good.” Treat this as operator confirmation that the hosted private staging screen enabled as expected, **not** as evidence any signed release was staged or that an active marker was created. The local signer private key remains exclusively on Windows, while the 44-byte verification public key is present off-webroot on 20i, mode 0600. Protected `wp-config.php` backup is present, mode 0600.
-
-**New source (not yet executed):** `scripts/wordpress-create-synthetic-release.php` is a Windows PHP CLI-only generator. It reads the verified synthetic Ed25519 local signing secret and public key from the restricted user configuration folder outside Git, checks they match, signs one bounded text-only release targeted at the exact development-only installation IDs (`synthetic-org`, `synthetic-presence`, `synthetic-site`, `synthetic-installation`; key ID `synthetic-test-key`), sequence 1, previous null, synthetic approval ID, and short UTC expiry. It self-verifies the Ed25519 detached signature and writes the full signed JSON envelope exclusively into that same protected local issuer directory using create-new/no-overwrite; it never prints the secret, sends an HTTP request or touches WordPress. Claims of synthetic “approved” are test-only and have **no central authorization significance**.
-
-**Next bounded action:** From Windows repo, `git pull --ff-only`, then `php -l .\scripts\wordpress-create-synthetic-release.php`; stop on lint error. Then `php .\scripts\wordpress-create-synthetic-release.php` and request only PASS/FAIL messages without pasting key or envelope data. Do not submit envelope to WordPress until generated and checked; later step will paste only the signed JSON envelope into the admin-only synthetic staging form, then verify unchanged active sequence 0 and no public page changes. Generated envelope expires in ~2 hours; on expiration, do not blindly reuse it. No WordPress signer or public activation.
-
-## Local signed synthetic release envelope generated and self-verified — November 4, 2026
-
-**User-reported PowerShell result:** `php .\\scripts\\wordpress-create-synthetic-release.php` reported both `PASS: Signed synthetic envelope created in local protected issuer directory.` and `PASS: Signature self-verification completed.` Script confirmed synthetic approval claim only, local signing secret retained and no WordPress submission. No envelope or key material was shared. This verifies generation and local signature self-check, **not** hosted ingestion.
-
-**Next explicit operator action:** From Windows PowerShell, copy the generated `%USERPROFILE%/.config/miopages/wp-synthetic-issuer/synthetic-release-envelope.json` to the clipboard with `Get-Content ... -Raw | Set-Clipboard`. In password-protected WordPress admin Tools → MioPages Private Staging, paste into the signed synthetic envelope JSON form and submit **Validate and stage synthetic release (no publication)** exactly once. Report only success/error message and digest (no need to share full envelope). Expected: private stage succeeds, active sequence remains **0**, publication remains disabled. Stop and investigate any error; do not activate, publish, submit customer data or move signer secret to 20i. Generated envelope has short expiry; do not reuse after expiry.
-
-## Hosted synthetic private staging completed — November 4, 2026
-
-User-confirmed result from protected WordPress admin: synthetic signed test release was staged privately, digest `709f5cc55421abe260b14c160913a38cd56ceb3dba39bde48fb94e9aace85e3f`. The interface indicated publication disabled and active sequence 0. This verifies an initial hosted signed synthetic staging success, not live content publication, real central signer approval, or a full recovery guarantee.
-
-Next: read-only SSH inspection of staged object integrity, private storage permissions, and absence of an active marker; do not print envelope or key material. Production authorization, key rotation, public activation and rollback, and 100+ tenant load testing remain separate acceptance gates.
-
-## Hosted synthetic storage permissions confirmed — November 4, 2026
-
-User verified the hosted synthetic release SHA256 matches the staging receipt, directories are mode 0700, object is mode 0600, no active marker exists, and the lock file is now manually changed to mode 0600 (confirmed by `ls -l`). This completes the initial synthetic hosted staging proof without public activation. The lock-file mode had originally been 0644 due to creation umask.
-
-Development branch also contains a source-only hardening edit in `class-miopages-release-store.php`: after acquiring the file lock, operations call `chmod(..., 0600)` and refuse when hardening fails. This edit has **not been validated locally or deployed**, so the installed v0.0.5 code remains as previously tested. Next action: pull branch, lint the store and run offline release-staging and private-staging smoke tests; only then consider a plugin upgrade. Real central signing authority, publishing, rollback and 100+ tenant loading remain open gates.
-
-## Lock permission hardening local regressions passed — November 4, 2026
-
-**User-reported Windows PowerShell results after pulling branch:** `php -l wordpress/miopages-delivery/includes/class-miopages-release-store.php` found no syntax errors. `release-staging-smoke.php` PASS (immutable signed staging, retry/tamper rejection, activation ordering, forward restoration, corrupt state refusal). `private-staging-smoke.php` PASS (signed synthetic staging, tenant refusal, no activation or publication). These validate existing regression coverage for the store's new chmod(0600) under lock, **not** a dedicated assertion of newly created lock-file mode or a hosted deployment.
-
-**Next boundary:** Add a targeted test to assert mode 0600 on newly created `.release.lock` (where POSIX filesystem mode can be observed). Then lint and rerun local suites before packaging and deploying a version-bumped WordPress plugin on the protected test host. Do not claim a production-ready signer or public publication capability. Already-staged hosted synthetic object remains inactive and private.
-
-## Dedicated lock-file permission regression added — November 4, 2026
-
-**Source committed, execution pending:** `wordpress/miopages-delivery/tests/lock-permissions-smoke.php` creates its own random temporary store, calls the store read-only status method (thereby creating the advisory lock), and verifies the lock is a regular zero-byte file while no active marker or objects folder exists. On **Linux**, it checks POSIX mode bits are exactly `0600` and fails otherwise. On **Windows**, it reports that POSIX mode is **not verified** because NTFS ACLs rather than Unix mode bits govern access. It does not use any real WP installation or live staging path. This augments earlier passing release-staging and private-staging smoke suites.
-
-**Next operator step:** `git pull --ff-only`, then run `php -l .\\wordpress\\miopages-delivery\\tests\\lock-permissions-smoke.php` and `php .\\wordpress\\miopages-delivery\\tests\\lock-permissions-smoke.php` on Windows. Require PASS for lock creation and explicit acknowledgement that Linux permission behavior remains untested. After local checks, transfer **only this isolated test file** (and a reviewed copy of the current release-store class or plugin packaging) for a 20i PHP CLI Linux mode check in a synthetic temporary directory, with no interaction with existing staged releases. Do not claim Linux permission PASS or deploy plugin hardening until that gate is completed.
-
-## Local Windows isolated lock-file test passed — November 4, 2026
-
-User-reported local PowerShell results: syntax check for `wordpress/miopages-delivery/tests/lock-permissions-smoke.php` passed; script printed `PASS: isolated new lock created; no activation or release files.` and `NOT VERIFIED: POSIX mode requires a Linux CLI run (Windows ACL semantics).` The actual POSIX lock-file mode of newly created files remains unverified.
-
-Next bounded host check: create `~/miopages-private/lock-test/{tests,includes}` under the existing off-webroot 0700 directory; transfer the exact Git-tracked `tests/lock-permissions-smoke.php` and `includes/class-miopages-release-store.php` into matching relative paths, verify PHP CLI lint and run the isolated test on Linux. It creates/deletes only a random temporary store under PHP's temporary directory. Do not touch the hosted synthetic staging folder, active marker or installed WordPress plugin until this proof passes. Only then package reviewed versioned plugin update.
-
-## 20i Linux lock-file hardening PASS — November 4, 2026
-
-**Direct operator-reported SSH CLI output:** Both `includes/class-miopages-release-store.php` and isolated `tests/lock-permissions-smoke.php` passed PHP syntax checks on 20i PHP 8.4. The isolated test reported `PASS: new lock created with mode 0600 and no activation/publication state.` These files ran from a separate off-webroot `lock-test` folder, not the installed plugin or previously staged synthetic release. The Windows version of the same test passed lock creation earlier; POSIX mode was specifically verified on 20i Linux here.
-
-**Next:** The plugin header version has been incremented to **0.0.6** to package the lock-permission code hardening. This version bump has been committed but is **not yet locally retested or deployed**. Pull branch, lint plugin header, store and lock-test PHP; rerun lock, private staging, release staging, release-contract and preview suites. On PASS, rebuild ZIP with the established `tar -a` packaging procedure, replace v0.0.5 on protected `miopages.org`, then verify version 0.0.6, synthetic staging still enabled with active sequence 0 and publication disabled. Do not submit a new envelope, activate, or publish. Avoid including the local signing secret or wp-config in plugin ZIP. Review additional hosting readiness checks before wider availability.
-
-## v0.0.6 local regression suites passed — November 4, 2026
-
-User-reported local Windows PowerShell output after prior v0.0.6 instructions: isolated lock regression PASS (explicit POSIX mode NOT VERIFIED on Windows; Linux 20i mode 0600 passed previously), private synthetic staging PASS, offline immutable staging PASS, release-contract smoke PASS, and C0 private preview PASS. PHP lint for plugin header was not included in the pasted excerpt and should be confirmed before packaging. No new hosted plugin deployment yet.
-
-Next: confirm `php -l wordpress/miopages-delivery/miopages-delivery.php`, rebuild plugin zip with `tar -a -c -f miopages-delivery.zip -C wordpress miopages-delivery`, inspect archive entry listing, install/replace on protected WordPress, confirm version 0.0.6 and staging still enabled with active sequence 0/publication disabled. Do not stage new envelopes, change signer credentials or activate content. Verify original stored release still present via read-only checks if needed.
-
-## Hosted staging guard remains unchanged after attempted plugin upgrade — November 4, 2026
-
-**User-provided WordPress admin output:** Tools → MioPages Private Staging continues to show **Enabled for synthetic test releases only**, **Public publication: disabled**, and **Active sequence: 0**. The view retains the statement that no central release signer or production enrollment is installed. This establishes the hosted staging guard remains intact after the operator's plugin-update workflow, but the pasted output alone does **not** prove the installed plugin version is 0.0.6.
-
-**Next bounded verification:** In WordPress Plugins → Installed Plugins, check **MioPages Delivery (Development Proof)** explicitly reports **0.0.6** active. If so, lock-file hardening integration milestone may close, anchored in the prior 20i Linux POSIX mode-0600 isolated test and local regression passes. Do not claim staged object rehash was repeated after update (previous independent on-disk hash proof remains valid unless contradicted). Public release activation, central approval, signer credential management and 100+ tenant capacity remain out of scope.
-
-## Installed plugin v0.0.6 confirmed — storage hardening milestone closed — November 4, 2026
-
-**User explicitly confirmed** WordPress Plugins → Installed Plugins reports MioPages Delivery (Development Proof) **v0.0.6** active on protected `miopages.org`. The preceding hosted Tools → MioPages Private Staging view continued to report synthetic-only enrollment enabled, active sequence **0**, and public publication **disabled**. This completes the narrow WordPress plugin lock-permission hardening deployment checkpoint, backed by hosted Linux CLI isolated new-lock `0600` PASS, Windows/local regression PASS, and the earlier independent synthetic staged-object SHA-256 integrity proof.
-
-**Next scoped milestone:** MioPages Core → WordPress centrally governed signed release delivery design and implementation. Begin by reviewing existing canonical approval/release authority and tenant-target mapping in Git; define trusted issuer enrollment, key rotation/revocation, transport provenance/idempotency and operator audit before permitting any real approval claims. Preserve synthetic-only plugin behavior and publication disabled. Do not confuse this future authorized workflow with the already successful synthetic manual staging proof. The existing broader Commercial V1 architecture and 100+ tenant readiness gate remain authoritative.
-
-## Development efficiency policy for remaining WordPress delivery work — November 4, 2026
-
-**User preference / active execution direction:** Streamline remaining work to reduce redundant commands, chat turns, piecemeal plugin upgrades and time spent on narrow substeps. Preserve security, tenant isolation, and explicit acceptance evidence. Organize work into four cohesive batches: (1) canonical Core authorization + installation enrollment + secure signed-release transport; (2) controlled WordPress publication/update/rollback; (3) recovery, monitoring and operational hardening; (4) 100+ tenant scalability and end-to-end acceptance. Use automated consolidated test scripts/CI where possible, implement/review related changes together, and deploy the plugin at batch boundaries rather than on every minor change. Prefer Codex for substantial repository development; require the operator only for credentials, hosting configuration, outside-Git privileged actions, and milestone acceptance. Maintain Git-tracked continuity at meaningful checkpoints and stop on unexpected security or integrity failures.
-
-**Immediate next step:** Review existing canonical Core approval and release authority and installation targeting in repository, then implement Batch 1 as a cohesive bounded branch increment with consolidated automated tests and a single operator acceptance gate. Do not imply production signer exists already or enable public publication during Batch 1.
-
-## Streamlined Batch 1 implementation kickoff — November 4, 2026
-
-Reviewed actual `lib/platform/content-editing/releases.ts`, `release.ts`, canonical activation and `docs/wordpress-delivery-feasibility.md`. The current `SiteReleaseService` includes approval/revision/preview evidence and tenant-scoped durable release history, but `releaseEnvironment()` explicitly **blocks anything except disposable development databases**. Thus Core-to-WordPress production authorization is NOT present; never bypass this guard or treat the synthetic approved payload as a real publication permit.
-
-**Committed source, not yet test-verified:** `docs/wordpress-delivery-batch1.md` defines the cohesive Core authorization + enrolled signing + authenticated pull + staged receipt + audit acceptance matrix (publication explicitly excluded). `scripts/test-wordpress-delivery.php` runs all existing WordPress offline PHP regressions in one command. `scripts/wordpress-cross-runtime-signature-proof.mjs` signs a synthetic release using an ephemeral Node Ed25519 private key held in memory, and `wordpress/miopages-delivery/tests/node-issuer-compat.php` runs the actual PHP verifier against its envelope with wrong-installation, replay and tamper refusals. No credentials, private keys, external services or production sources are accessed by these fixtures. `.github/workflows/wordpress-delivery.yml` runs the consolidated gate on matching pushes/PRs using Node 22 and PHP 8.4. GitHub Actions status has NOT yet been confirmed; tests are NOT claimed to pass until execution.
-
-**Next meaningful gate:** Execute `php scripts/test-wordpress-delivery.php` from Windows repository (or inspect CI workflow execution) and resolve any failures as one batch. Continue implementing central trusted entitlement, issuer enrollment, authenticated transport and receipt reconciliation against explicit sources before requesting any new WordPress deployment. The installed protected WordPress v0.0.6 remains enabled for synthetic private staging only, active sequence 0, public publication disabled. Revisit broader Commercial V1 priority alignment before formal release architecture migration.
-
-## GitHub Actions CI failure diagnosed and corrected — November 4, 2026
-
-**Original workflow failure confirmed directly from GitHub job log:** Workflow run `41882677201` at commit `ca8c88c` failed with `PHP Parse error: syntax error, unexpected single-quoted string "tests/node-issuer-compat.php", expecting "]"` on line 10 of `scripts/test-wordpress-delivery.php`. The defect was an incorrectly inserted literal escape sequence in the consolidated test runner, not a WordPress hosted deployment or live staging problem.
-
-**Fix committed:** `7a92432a6100ec2dc93247ec3fd8875f4f154a6d` cleanly rewrote the consolidated runner and ensured the Node-to-PHP proof actually runs.
-
-**Confirmed CI PASS, direct GitHub Actions evidence:** Replacement workflow run `41885205129` completed with conclusion **success**, `offline-adapter-contracts` job PASS. Job log explicitly reports all five PHP lint checks, eight offline smoke suites (including two-worker race and POSIX 0600 lock mode), and Node Ed25519 envelope accepted by PHP with foreign/replay/tamper refused; final line `PASS: consolidated WordPress offline gate (5 lints, 8 smoke suites, 1 Node-to-PHP compatibility test).` No need for manual Windows rerun of this same CI gate. The protected 20i WordPress v0.0.6 plugin remains unchanged: synthetic staging only, active sequence 0 and publication disabled.
-
-**Next:** Continue Batch 1 central trusted entitlement, proper issuer-enrollment and authenticated pull/receipts with cohesive commits and automatic CI. Do not turn off disposable-only Core authority guard, claim real production approval or deploy public publication.
-
-## Batch 1 synthetic Core entitlement and authenticated pull rehearsal — November 4, 2026
-
-**Implemented in Git development branch only (NOT deployed to WordPress/Core runtime):** `lib/platform/wordpress-delivery/synthetic-gateway.mjs` and `tests/wordpress-synthetic-gateway.test.mjs` cover explicit synthetic installation enrollment, exact matching tenant/site/installation IDs, refusal of nonpublishable source, fake authority, sequence mismatch, foreign issuer key and incorrect stage receipts. A Node Ed25519 gateway-issued envelope is checked by the actual existing PHP v1 validator (including target/replay/tamper checks). `lib/platform/wordpress-delivery/synthetic-pull.mjs` and `tests/wordpress-synthetic-pull.test.mjs` simulate installation-scoped authenticated pulls and nonce-replay/expiry/refusal, revocation and exact envelope digest checks in memory. They have **no network endpoint, real approval, durable enrollment registry, HTTP credentials, DB connection or public publication**. Production `releaseEnvironment()` restriction remains intact. This is an engineering rehearsal, not a production-ready Core delivery system.
-
-**Automated tests:** `.github/workflows/wordpress-delivery.yml` now runs both Node suites plus the consolidated existing PHP/Node offline adapter gate. GitHub Actions run `41888799759` passed for initial Node-to-PHP cross-runtime issuer test. After adding queue digest refusal, runs `41888952969` and `41888990504` failed because the prior test still expected a conflict exception rather than the earlier strict rejection; test expectation corrected in commit `863eb96e4cd61dffdaeabe8e0aad49e4e4c51927`. **Do not mark the latest CI passing unless the newest run `41889067645` completes successfully.**
-
-**Next substantive Batch 1 work:** replace synthetic-only evidence input with a real centrally validated release entitlement that reads durable, operator-approved canonical release history; implement installation enrollment/revocation storage and secure pull transport with exact stage receipt reconciliation. Do not weaken existing development-only release boundary or enable publication. Keep WP v0.0.6 unchanged until reviewed deployable components and tests are complete, then one batch deployment.
-
-## Latest Batch 1 automated gate PASS — November 4, 2026
-
-GitHub Actions workflow run `41889067645` at commit `863eb96e4cd61dffdaeabe8e0aad49e4e4c51927` completed with conclusion **success**. The workflow includes the new synthetic Core enrollment/issuer/receipt suite and authenticated-pull/replay suite, plus consolidated PHP staging and Node-to-PHP verifier tests. Earlier transient failed runs were from an overly narrow test error-message expectation after adding stricter digest rejection; that test was corrected. CI success is for synthetic/offline code only, not real central approval credentials, live network pull, WordPress activation or 100+ capacity. Latest source is committed to the active development branch, not deployed.
-
-## Batch 1 private delivery integration checkpoint — November 4, 2026
-
-Issue #6 development branch now has a disposable integration proof through private staging. Scoped operator enrollment, key generation and revocation, exact Core release evidence and projection checks, authenticated pull, WordPress private storage and exact receipt reconciliation ran against disposable PostgreSQL 18 and PHP 8.3. The consolidated `npm run test:wordpress-delivery` gate passed on Windows. The Linux-only 0600 assertion belongs to the independent CI gate.
-
-The production authority adapter defaults to deny. No hosted schema, application routes or WordPress caller were enabled. The opt-in adapter schema and rollback constraints are recorded in [Batch 1 delivery](wordpress-delivery-batch1.md). The next milestone is reviewed production identity and publishable release authority, followed by migration and credential review and one isolated HTTPS private-stage rehearsal. Public activation is a later milestone.
-
-## Protected Core authority and WordPress rehearsal checkpoint — November 4, 2026
-
-Built on Batch 1 commit `021c1af`. The protected Core command authenticates an individual operator and requires an exact scoped grant. It reuses the durable proposal and approval ledger, records protected approval provenance in the same transaction, and records independent review of the exact WordPress projection digest. Core rederives the private release from public-scope canonical facts when issuing or serving it. The existing disposable canonical release service remains guarded.
-
-The opt-in migration and restricted PostgreSQL grants are prepared. The authenticated Core HTTPS routes and WP-CLI staging command are disabled by default. The local consolidated gate passed, including both disposable PostgreSQL/PHP integrations with exact stage reconciliation. The managed PostgreSQL 18 backup and restore regression also passed. No hosted migration, credential installation, activation or publication was performed.
-
-The next bounded operation is the single isolated HTTPS acceptance test in the [protected rehearsal handoff](wordpress-private-stage-rehearsal.md), after external identity and mandate verification, scoped role and credential provisioning, and review of adapter recovery. Preserve the canonical managed-backup boundary and verify the adapter schema against the matching canonical snapshot.
-
-## Isolated HTTPS rehearsal preflight — November 4, 2026
-
-Verified public TLS and HTTP status from the local workspace. Core root 200, delivery pull and receipt HEAD 404, protected WordPress root 401. No authenticated hosted session was available. Hosted checkout, database and fixture identity, role grants, WordPress CLI, private directory and active state remain to be verified by the operator. The historical session pooler does not meet the current direct-role URL guard.
-
-Prepared a strict Next.js ingress adapter for the protected proxy, a PostgreSQL read-only preflight operation and a local WordPress 0.0.7 rehearsal package. The consolidated gate passed with 339 repository tests, seven synthetic tests, the PHP offline suites and both disposable PostgreSQL/PHP integrations. The POSIX mode assertion still requires Linux. The rehearsal package contains the plugin code and assets and has SHA-256 `6f25e75a4e5255cea51fc11240abb235e5950f23e23b1047ae1ddc0f2d88c5c6`.
-
-The next bounded action is to return sanitized protected preflight evidence for an isolated origin and database, then review the exact rollout before any hosted change. The real HTTPS stage and receipt acceptance is pending. The [rehearsal handoff](wordpress-private-stage-rehearsal.md) records the single acceptance sequence and return to Commercial V1.
-
-## Rehearsal scope refinement
-
-Reuse the existing 20i Cloud server, protected miopages.org installation and Supabase project. Keep public Core on port 8080. Cloud direct IPv6 reachability failed with ENETUNREACH. The next read-only gate is the adapter's Session Pooler preflight on port 5432, followed by dedicated operator and pull role probes before rehearsal enablement. The [operator procedure](wordpress-private-stage-rehearsal.md#operator-procedure-on-the-existing-20i-environments) supersedes the earlier separate WordPress installation assumption and includes restoration to v0.0.6. Return to Commercial V1 and Media-to-Publication after acceptance.
-
-## Shared inventory accepted and bounded rehearsal fixture prepared — November 5, 2026
-
-Operator-reported hosted evidence confirms C0 and both hostname bindings, 38 C0 records over 21 canonical grant tables, zero unknown/real records, acceptable PUBLIC permissions and no separate rehearsal fixture. PostgreSQL 17 verified-TLS Session Pooler preflight and its compatibility receipt already passed.
-
-The [guarded fixture procedure](wordpress-rehearsal-fixture.md) prepares one inactive synthetic graph, a valid activation binding and one revision-linked public Knowledge fact. It reuses the existing intake, activation, foundation and canonical writers in one transaction with an independent read-only verify command. Hosted writes have not been executed. The next approval is for this fixed fixture operation, followed by the existing restricted-role, migration and HTTPS acceptance sequence. Close the proof after acceptance and return to Commercial V1 Media-to-Publication.
-
-## Database-only rehearsal rollout approved — November 5, 2026
-
-The operator reports successful creation and independent verification of the inactive fixture. Organization b3b46645-0364-4329-83c7-86a6ea9e56c4, Web Presence 819d007a-595d-4374-a2f0-96b900d46559 and Managed Site 1d92a248-416f-4e22-baaf-d2f1fca70352 are the accepted rehearsal target. C0 and both public bindings remain preserved according to the accepted inventory.
-
-Operator approval now covers creation of only miopages_wp_operator and miopages_wp_pull, followed by adapter 0016/0017 and the reviewed grants. The [sequential database procedure](wordpress-database-rollout.md) starts with the existing managed recovery bundle and an independent verification. A dedicated two-role helper refuses existing or partial role sets, preserves the three Core roles and uses the established SCRAM and verified-TLS conventions. A new read-only verifier checks adapter migration checksums, ownership and exact grants. Hosted database setup has not been executed by Codex. WordPress replacement and Core listener changes remain outside this approval.
-
-## Database-only execution access checkpoint — November 5, 2026
-
-Resume from `044825b` on the existing WordPress development branch, using the separate Cloud rehearsal checkout, never `public_html`. The operator confirms both backup scripts match their committed versions, PostgreSQL 17.11 `pg_dump`/`pg_restore` work, the managed asset root is readable and empty, and 44 GB is free. These are operator-reported prerequisites, not a completed recovery gate. The existing `DATABASE_URL` authenticates as `miopages_runtime` and must not be used for the backup connection.
-
-Codex attempted the operator-provided Cloud SSH endpoint and key. The server accepted the public key, but noninteractive authentication could not complete signing. The local Windows SSH agent was stopped and disabled. No authenticated Cloud command ran, no protected database configuration was loaded, and no hosted writes were attempted. Recovery creation and independent verification, both WordPress role creations, migrations 0016/0017, grant/checksum verification and restricted-session probes remain pending.
-
-The immediate external requirement is an interactively unlocked SSH key available to the command runner, or operator execution in the existing authenticated Cloud shell. Keep passphrases and database credentials in the established protected process. After access is restored, use the [existing sequential procedure](wordpress-database-rollout.md): establish the actual `miopages_backup` connection, create and independently verify the bundle, then run the approved two-role provisioner and independent role verification, adapter migration, exact grant/checksum verification and both session probes. Stop on any failed or ambiguous gate. The database-only approval remains in force. WordPress deployment and a Core listener remain outside this boundary.
-
-## SSH restored; rehearsal credential source required — November 5, 2026
-
-This checkpoint supersedes the SSH access blocker above. The operator unlocked the existing key in the Windows SSH agent, and Codex successfully authenticated to Cloud. The separate `/home/virtual/vps-bef564/5/53b4381d42/miopages-wp-rehearsal` checkout is clean and detached at `044825b7a497b2dd8edb797f7e254acb910e75e4`. Read-only Cloud checks confirmed PostgreSQL 17.11 `pg_dump` and `pg_restore`, Node 22.23.2, the readable existing CA file, required dependencies, and no tracked changes to the recovery and rollout implementations. No public runtime checkout or hosted configuration was changed.
-
-The new SSH session has no protected rehearsal variables. The operator confirmed that a rehearsal credential source has not been established and instructed Codex to stop at that prerequisite. The runtime configuration was inspected only for relevant variable names, not credential values; its connection must not be reused or transformed into a backup connection. No hosted database connection was attempted, no recovery bundle was created, and neither hosted roles nor migrations were changed.
-
-Independent local verification passed all 18 tests in `managed-recovery.test.tsx`, `wordpress-protected-connection.test.tsx`, `wordpress-private-stage-diagnostic.test.tsx` and `integration/wordpress-database-setup.test.ts`. The disposable integration used PostgreSQL 18 and exercised two-role creation and rollback, preservation of existing roles, role logins, migration/grant verification and rejection of excess grants and altered checksums. This is local regression evidence, not a hosted PostgreSQL 17 backup or restore claim.
-
-The next external requirement is to establish the protected rehearsal configuration described in [the approved database rollout](wordpress-database-rollout.md#protected-configuration), including the actual existing `miopages_backup` credentials, migration connection and authorized provider-owner connection. Keep secrets off chat, command arguments, Git and the public runtime environment. Once the credential source is available to the rehearsal session, resume the existing recovery-first sequence without repeating passed connectivity or infrastructure checks. Recovery creation and independent verification must pass before the two approved roles and adapter migrations 0016/0017. WordPress deployment and Core listener changes remain unauthorized. After the separately approved HTTPS acceptance test, return to Commercial V1 Media-to-Publication.
-
-## Consolidated interactive database launcher prepared — November 5, 2026
-
-Built from `4403f4c`. The [approved database procedure](wordpress-database-rollout.md#consolidated-interactive-launcher) now has one Cloud-shell entry point, `bash scripts/wordpress-database-rollout.sh`, for the existing separate rehearsal worktree. It uses hidden interactive prompts for the actual existing backup, migration and authorized provider-owner passwords, fixed Session Pooler session mode and verified TLS, and no runtime configuration loading. Blank input identifies the specific unavailable role password and stops without guessing, rotation or provisioning.
-
-The operator must explicitly approve a new private directory for the two generated WordPress credentials. Only those new credentials are saved there, with mode 0700 on the directory and 0600 on the file, exclusive creation, file/directory synchronization and independent readback before role creation. Existing secrets remain temporary. The launcher reuses managed backup, a fresh-process bundle verification, the existing recovery-equivalence-gated two-role provisioner, independent restriction verification, adapter migrations 0016/0017, exact grant/checksum verification and role-scoped session probes. Every receipt is validated; failures and ambiguous writes stop without retry. A private sanitized evidence file records only fixed gate receipts, source commit, status and allowlisted failure code.
-
-Validation passed: TypeScript, Bash syntax, all 350 repository tests including six new orchestration/security tests, and the disposable PostgreSQL 18 database rollout integration. Tests cover refusal before independent recovery, stopping after every operation/evidence failure, receipt redaction, connection-secret isolation and exact encoding of password punctuation. The disposable integration confirms role creation/rollback, preservation of existing roles, logins, adapter grants and refusal of extra grants or altered checksums. These are local results; they do not claim a hosted PostgreSQL 17 recovery or migration.
-
-No hosted changes were executed for this launcher preparation. The remaining operator action is one interactive launch in PowerShell 2's authenticated Cloud shell at the reviewed launcher commit, using known existing role passwords. If any password is unavailable, that specific credential is the blocker. After execution, give Codex only the sanitized evidence-file path so it can read receipts through the established SSH access and update/commit/push this existing checkpoint. The launcher does not perform Git mutations in the detached hosted worktree. The public runtime, C0 and its hostnames, WordPress v0.0.6 and Core listener remain unchanged. The next authorization boundary after successful database setup is the protected HTTPS rehearsal's listener and temporary plugin changes. Return to Commercial V1 Media-to-Publication after that acceptance test.
-
-## Recovery separated from resumable database setup — November 5, 2026
-
-The operator reports that hosted execution of `33c19d5` stopped at `provider-credential` with PostgreSQL `28P01`; no hosted database changes occurred. The launcher incorrectly required administrator authentication before recovery. That dependency is corrected in the existing launcher and [rollout procedure](wordpress-database-rollout.md#consolidated-interactive-launcher), without a new continuity or provisioning system.
-
-Select `all` to perform recovery and then the approved setup, `recover` for backup only, or `setup` to resume from a verified recovery run directory. Recovery authenticates only `miopages_backup`, uses matching PG17 tools, assets and verified TLS, creates the managed bundle and verifies it in an independent Node process. It atomically synchronizes the verified checkpoint, archive checksum identity, source commit and fixed receipts into the existing private evidence file before any migration or administrator password is requested. Setup failures preserve that checkpoint. Setup resume independently checks its nonsecret connection identity, recorded hash and complete bundle integrity without repeating backup creation or requiring the backup password, PG tools or asset root. The provisioner's current-state equivalence check still refuses a stale recovery snapshot.
-
-Credential prompts distinguish the existing MioPages `miopages_backup` and `miopages_migration` passwords from `postgres`, the original Supabase project database administrator password. Migration authentication is checked before requesting the administrator password. Missing or rejected credentials identify their role/stage and stop; no guessing, reset or rotation is performed. The role provisioner's recovery comparison now uses the existing restricted migration reader on the same verified database endpoint, while the provider connection creates the two roles. No additional canonical grants are needed. Newly generated WordPress credentials retain the existing explicitly approved private-file storage and readback gate. Existing-role or ambiguous-write recovery still requires independent verification rather than blind recreation.
-
-Consolidated local validation passed: TypeScript, Bash syntax and 354 tests (353 repository tests plus the expanded disposable PostgreSQL 18 rollout integration). The integration rejects an incorrect original administrator password with `28P01`, completes a real backup using only the backup login, independently verifies its unchanged archive, then validates recovery equivalence through the migration reader and completes role/migration/grant tests. Unit regressions verify backup-only ordering, setup resume without backup recreation, preserved checkpoints after provider failure, tamper/identity refusal, redaction and per-operation secret isolation. A local `pg_ctl` transient on one intermediate retry passed on rerun; no hosted infrastructure change was needed.
-
-No corrected hosted execution has occurred yet. The remaining operator action is one launch of the reviewed commit in PowerShell 2's authenticated Cloud shell. Start with `all`; the failed earlier run contains no verified recovery point to reuse. If a later setup credential is unavailable, retain the printed verified run directory and resume with `setup` when that specific existing password is available. Return only the sanitized evidence-file path for Codex to collect and commit/push actual hosted receipts. The public runtime, WordPress installation, C0 and its hostname bindings remain unchanged. The already-approved database-only scope continues; listener/plugin changes still require separate approval, followed by the bounded HTTPS test and return to Commercial V1 Media-to-Publication.
-
-## Hosted native recovery failure diagnosed without retry — November 5, 2026
-
-Read-only SSH inspection of the `8676646` run `/home/virtual/vps-bef564/5/53b4381d42/miopages-wp-db-20261105T175121Z` confirmed successful `miopages_backup` TLS/session authentication, followed by a backup failure whose native detail was suppressed as `WP_ADAPTER_VALIDATION_FAILED`. Its only files are the 739-byte sanitized evidence JSON, 39-byte backup-root marker and zero-byte `recovery/application.dump`. COMPLETE and role-credential files are absent. All three artifact SHA-256 values were rechecked unchanged after diagnostics. This is an incomplete run, not a verified recovery checkpoint.
-
-Verified native incompatibility: the PG17.11 `pg_dump` dynamically loaded `/lib64/libpq.so.5`, reporting library version 130023 (13.23), and its required `PQmblenBounded` symbol was missing. A no-connection `LD_BIND_NOW=1 pg_dump --version` reproduced the symbol lookup failure with exit 127. Using the existing sibling PG17 `lib` directory only in that command's environment made eager version checks for both `pg_dump` and `pg_restore` pass; the selected libpq reported 170011 (17.11). No installation or system configuration change is needed. The original native stderr was not retained, so no additional claim about the failed dump's database-side behavior is made.
-
-The native runner now prefers an existing bundled libpq inside the configured client prefix for Linux PostgreSQL utilities and eagerly binds symbols, including during the launcher's preflight version validation. The environment is child-local. TLS hostname/CA verification, restricted roles, read-only source options, matching-major enforcement and exported snapshots are unchanged. Recovery reports a fixed substage, allowlisted native category, safe detail and bounded numeric exit code; raw native stderr, arguments and credentials remain suppressed. Recovery assertions use a recovery-specific explanation. A native failure no longer misleadingly identifies the backup password as the cause after successful authentication.
-
-Consolidated validation passed: TypeScript, Bash syntax and 358 local tests (357 repository tests and the disposable PostgreSQL 18 recovery/role/migration integration). New regressions cover bundled-library precedence, eager binding, unchanged TLS/read-only settings and parent environment, escaping-library refusal, loader-error redaction and safe substage/exit propagation. The integration verifies the complete fixed progress sequence through a real disposable backup and independent bundle check. Hosted PG17 recovery success remains unclaimed.
-
-No hosted database connection, backup retry, role creation, migration or production configuration change was executed during diagnosis. Preserve the failed run indefinitely through this rehearsal. The next operator action is a reviewed retry with the corrected launcher in a **new** private run directory; the old incomplete directory cannot be used with `setup`. `all` creates and independently verifies that new recovery point before the already-approved database setup; `recover` stops after recovery. If later credentials are unavailable, the verified new checkpoint remains resumable through `setup`. Collect actual sanitized receipts before advancing hosted status. Public Core, WordPress, C0 and both hostname bindings remain unchanged; the subsequent listener/plugin boundary and Commercial V1 return path are unchanged.
-
-## Hosted PG17 recovery checkpoint independently verified — November 5, 2026
-
-Codex retrieved the operator-supplied private evidence file `/home/virtual/vps-bef564/5/53b4381d42/miopages-wp-db-20261105T181534Z/database-rollout-evidence.json` through established SSH access. Its status is `RECOVERY_VERIFIED`, sourced from `3abafdf388716a92192a8075ce71d96599a3a6f1`. Exact receipts confirm `miopages_backup` authentication with verified TLS and session behavior, recovery creation and bundle verification, and independent verification with all 16 canonical migrations. COMPLETE is present; no WordPress role-credential file or setup receipts are present in this run.
-
-Codex then independently reran the existing read-only checkpoint and bundle-file verifiers in a fresh hosted Node process. They passed, confirming PostgreSQL major 17, 16 canonical migrations and zero managed asset objects. The SHA-256 of `recovery/checksums.json` matches the durable checkpoint: `80393acc2f6a2f25e09a33641b76adca3e6955795343b7637b2d977ed7f9afae`. This closes the recovery archive creation/integrity gate after the native libpq correction. No restore was executed, and no new database connection, backup, role or migration operation was run while collecting these results. Both this verified bundle and the earlier incomplete `175121Z` artifacts remain preserved.
-
-The next already-approved phase is `setup` using the same verified `181534Z` run directory, without repeating the backup. The operator must enter the existing `miopages_migration` password and the original Supabase project `postgres` database administrator password through the launcher's hidden prompts. The backup password is no longer required. No protected source for those setup credentials has been established for a separate Codex SSH process, so interactive entry in the existing authenticated Cloud shell remains the execution boundary. The launcher will recheck bundle integrity and current-state equivalence before two-role creation, then independently verify restrictions, apply 0016/0017, verify exact grants/checksums and probe both role sessions. Stop if the checkpoint is stale, a credential is unavailable or any result is ambiguous.
-
-Hosted role creation, migrations, grant/checksum verification and restricted-session probes remain pending until their actual receipts are collected. Core listener and WordPress plugin changes remain outside the database-only authorization. The public runtime, C0 and its hostname bindings are unchanged by this evidence collection. After separately approved HTTPS private-staging acceptance, return to Commercial V1 Media-to-Publication.
-
-## Hosted WordPress database-only rollout complete — November 5, 2026
-
-Codex independently retrieved and strictly validated all nine ordered PASS receipts from `/home/virtual/vps-bef564/5/53b4381d42/miopages-wp-db-20261105T181534Z/database-rollout-evidence.json`, using the existing receipt validators over SSH. Execution source is `3abafdf388716a92192a8075ce71d96599a3a6f1`. The stable evidence file's SHA-256 is `974ac261f1a2ebea81185c1048f693840119afecba90519ec28a3db7b9fc66b4`.
-
-Completed hosted gates: backup-role verified TLS/session authentication; managed recovery creation and independent verification with all 16 canonical migrations; creation of exactly two restricted roles, `miopages_wp_operator` and `miopages_wp_pull`; independent read-only role restriction verification; both adapter migrations 0016/0017; read-only checksum and exact-grant verification; and separate operator/pull probes with verified TLS and session behavior. The database-only rollout is PASS. Do not repeat role creation, provisioning or migration merely to enter the next milestone.
-
-Codex also independently revalidated the retained bundle files and durable recovery checkpoint without a database connection. PostgreSQL major 17, 16 canonical migrations and zero managed asset objects remain verified. The checksum-file SHA-256 remains `80393acc2f6a2f25e09a33641b76adca3e6955795343b7637b2d977ed7f9afae`. The run directory and evidence/credential files have private permissions and the expected owner; credential-file contents were not opened. Both the successful bundle and earlier failed artifacts remain retained. This validates archive integrity, not a new restore rehearsal. Database-operation conclusions above come from the strictly validated hosted receipts; this collection did not rerun SQL probes, backup, roles or migrations. Existing code validation remains the 358-test gate recorded above; this checkpoint changes documentation only.
-
-**Next planned milestone:** the single protected HTTPS Core-to-WordPress private-staging acceptance test in [the existing rehearsal procedure](wordpress-private-stage-rehearsal.md#operator-procedure-on-the-existing-20i-environments). Reuse the accepted inactive, unhosted synthetic fixture, existing Cloud rehearsal checkout, existing protected miopages.org installation and the now-verified restricted database integration. Remaining preparation is the bounded change set for individual operator identity/mandate and scoped grants, protected signer/installation configuration, a private Core listener and exact HTTPS proxy routes, authoritative WordPress inactive-state/public-output baselines, and temporary plugin v0.0.7 with the preserved v0.0.6 rollback package. The current listener and WordPress changes are not authorized by database-only approval.
-
-After separate approval, execute independent exact-projection review/approval, release issuance, authenticated HTTPS pull, private staging, matching receipt reconciliation, idempotent retry and revocation/refusal. Confirm public output and active sequence remain unchanged, restore v0.0.6, and stop only the temporary listener/route while retaining audit and recovery evidence. No listener, proxy, plugin, publication or hosted credential-installation change was performed in this evidence-collection task. Preserve public Core on port 8080, C0 and both hostname bindings. After this one acceptance test, close the WordPress rehearsal and return to the canonical Commercial V1 roadmap, prioritizing Media-to-Publication.
-
-## Protected HTTPS rehearsal authorized; read-only preflight checkpoint — November 5, 2026
-
-The owner separately authorized one bounded protected HTTPS Core-to-WordPress private-staging acceptance test, including the required protected operator/installation configuration, temporary private listener, exact HTTPS proxy routes and temporary v0.0.7 deployment. Preserve public Core on port 8080, C0/both hostnames and canonical content; never enable publication. Require exact owner approval only after the durable candidate/digests are available, independent technical projection review, receipt/retry/revocation tests, v0.0.6 restoration and temporary listener/route removal. This authorization is active but execution has not reached a hosted change.
-
-The owner selected two test-principal references: `rehearsal-owner-approver` (project owner makes the exact candidate approval decision) and `rehearsal-technical-reviewer` (Codex performs technical projection review). Both must be independently authenticated and scoped only to the accepted inactive synthetic graph: Organization `b3b46645-0364-4329-83c7-86a6ea9e56c4`, Web Presence `819d007a-595d-4374-a2f0-96b900d46559`, Managed Site `1d92a248-416f-4e22-baaf-d2f1fca70352`. This is a functional test of distinct authenticated principals, not independent human governance or a real customer mandate. These references are not provisioned accounts. Report actual operator UUIDs and scoped grant references before use; do not manufacture identity evidence or bypass different-operator review. Read-only Core inventory found zero operator credentials, grants, installations, private releases and deliveries. No test identity/grant has been written yet; migration-role protected credential entry is still needed for that bounded bootstrap.
-
-Both existing SSH connections now work through the operator-unlocked Windows agent. Reseller WordPress root is `/home/sites/36a/9/9fe7ae6df4/public_html`. Read-only CLI/database checks confirmed active plugin v0.0.6 and HTTPS home/siteurl `https://miopages.org`. The exact configured synthetic staging directory is `/home/sites/36a/9/9fe7ae6df4/miopages-private/synthetic-staging`, mode 0700, with a 0600 `.release.lock` and no active marker or marker symlink. The parent is also mode 0700. No plugin status method, staging call or write probe was invoked.
-
-The preserved local v0.0.6 ZIP has SHA-256 `71d75c6c3d4ea418db77d6218a389377a3d98ca313e3a90e26a2401ee3ecaf2c`, valid CRCs and a source-file set/content matching Git `a8d1e30290eb775d4032fe5cb09dd87316df4243` after LF normalization. All 17 installed plugin files match that rollback source after the same normalization. The existing local v0.0.7 rehearsal ZIP matches reviewed SHA-256 `6f25e75a4e5255cea51fc11240abb235e5950f23e23b1047ae1ddc0f2d88c5c6`, valid CRCs and current tracked source. Neither package has been uploaded/deployed during this preflight; protected host-side rollback staging/hash verification remains a prerequisite to replacement.
-
-Two consecutive unauthenticated GETs produced stable public Core hashes: runtime.miopages.com `4bd1e2f0009582b39ed10dbd26a2d80d43b12a53ffce9b943056deeef72d14c6`, domain-test.miopages.com `6332ec63c074191bddd65ac00ad28955d1b68aa48b9b8209c0166e5a012a68f6`, both HTTP 200. Protected WordPress returned stable HTTP 401 with an access challenge. The browser tool could not initialize; no browser action occurred. The owner selected hidden credential prompts. The generated PowerShell launcher's invocation was blocked by the user's script execution policy before prompts or network access. It was replaced with `scripts/wordpress-http-baseline.py`, using the existing `C:\Python314\python.exe`, without changing execution policy. The replacement sends the HTTP Basic Auth credential only over encrypted stdin, performs fixed-HTTPS/no-redirect GETs, and saves only a sanitized local receipt under the existing ignored runtime-content folder.
-
-**Authenticated WordPress baseline now passed.** The operator ran the replacement launcher and supplied `runtime-content/wordpress-http-baseline-20261105T232314252826Z.json`. Codex strictly validated its complete field set and values and computed receipt SHA-256 `add4b931b863c7e664c23679f8caf9948a4d15ab248fc8552439bd69a63594d7`. It records two identical authenticated HTTPS HTTP-200 responses from miopages.org, 69,626 bytes, body SHA-256 `778588f99e928dfcf835b6ad3bf84ea0c5fd788f65bfa8d02e65a8b2c0a786e7`, verified TLS, zero hosted writes and no stored credentials. Retain this digest for the post-rollback comparison. This receipt collection made no additional HTTP requests and accessed no credentials. The privileged routing confirmation below remains outstanding; the acceptance test has not started.
-
-An important runtime distinction was verified: default Reseller CLI `php` is 8.0.30 without Sodium, but the existing `/usr/php84/usr/bin/php` is 8.4.27 with Sodium and cURL and runs `/usr/local/bin/wp` (WP-CLI 2.5.0). Use that explicit interpreter for every rehearsal WP-CLI call, as recorded in the existing [procedure](wordpress-private-stage-rehearsal.md). Do not change system/site PHP defaults. The Cloud rehearsal checkout remains `3abafdf` and has no production build yet; a compatible build must be prepared before starting the isolated listener, without disturbing public Core. No service/build/plugin change has been attempted.
-
-**Actual external routing gate:** the owner identified 20i support or a privileged operator as the route manager. The account has no `.htaccess` or account-owned proxy config; no support connector is available, and no provider confirmation, responsible operator or coordinated installation/removal window has been supplied. Repeating the proposed support request is not confirmation. The bounded route contract is in the existing procedure: two exact POST routes on the existing runtime.miopages.com HTTPS vhost to loopback 8081, fixed trusted Host/proto headers, no cache/credential-header logging, all other routes unchanged on 8080, no public exposure of 8081, and exact rollback. Do not activate routing or deploy while this gate is unresolved.
-
-Local launcher validation passed: Python syntax, five focused credential/receipt security regressions, three isolated PHP success/401/unstable-body checks with Unicode passwords and redaction, and an actual SSH/PHP8.4 empty-credential refusal before any HTTP call. These are preflight-tool checks, not acceptance success. No hosted writes, operator enrollment, proposal recording, signed issuance, listener/proxy changes or WordPress upgrade have occurred. A text-only candidate was resolved read-only from the fixture's revision-1 public synthetic fact, but it is not a durable proposal and has no owner approval yet. Keep the HTTPS milestone open; only after successful acceptance and rollback return to Commercial V1 Media-to-Publication.
-
-## Separate self-service rehearsal package plan — November 5, 2026
-
-The original baseline checkpoint `a24bcad623424ff07dc432e8eb083e67f14e517c` was successfully fast-forward pushed and its exact remote SHA verified. No force push or duplicate commit was used. The authenticated WordPress baseline remains 69,626 bytes, SHA-256 `778588f99e928dfcf835b6ad3bf84ea0c5fd788f65bfa8d02e65a8b2c0a786e7`.
-
-The owner supplied read-only My20i findings: Node.js Optimised server, 1 CPU, 2 GB RAM, 50 GB SSD; one existing runtime.miopages.com package; Add Hosting permits another domain on this same server and shows no additional charge; subdomains have separate document roots; Registered Applications lists miopages-runtime. The original deployment used package public_html, port 8080, ecosystem.config.js and Node discovery. Official 20i documentation confirms the same-server package creation and registration/unregister model. Based on these account findings, a separate temporary Node package and HTTPS hostname is **feasible and preferred**, without a new server or database service. The earlier support-only path-routing gate is superseded, not a reason to request custom routes on runtime.miopages.com.
-
-The cohesive [implementation and rollback plan](wordpress-private-stage-rehearsal.md#preferred-self-service-package-plan--pending-change-approval) proposes `wp-acceptance.miopages.com`, app `miopages-wp-acceptance`, loopback port 8081, on the same vps-bef564 server. Creation/DNS/SSL/app discovery remain pending explicit approval of this exact change set. DNS inspection found 20i StackDNS authority and wildcard resolution for the proposed name to an address different from the Cloud runtime; inspect exact name ownership first, then change only approved records for the new hostname. Do not edit apex/wildcard, runtime.miopages.com, domain-test.miopages.com or canonical hostname bindings. Stop on ownership conflicts, unexpected charges or requested primary-package changes.
-
-Read-only resource checks found approximately 1,009 MiB MemAvailable, no swap and 44,288 MiB disk headroom; 8080 remains listening and 8081 is unused. A second package shares those resources. The plan calls for one Linux CI artifact build with no hosted secrets, rather than compiling Next.js alongside live Core, then one bounded runtime with no automatic restarts. A 256 MiB V8 heap limit is distinct from the proposed 384 MiB RSS / 512 MiB remaining-system-memory stop thresholds. These are rehearsal guards, not performance/capacity acceptance claims. No upgrade or swap change is authorized.
-
-Code review confirmed the Core origin is configurable and HMAC-bound, so the new HTTPS origin needs no release-protocol, role or schema redesign. A small rehearsal-only outer request allowlist is still required before deployment: current privateStageIngress validates only its own two endpoints and does not close unrelated Next.js routes. The new listener must receive only the pull-role configuration, CA and installation secret, with no normal Core DATABASE_URL, operator/migration tokens or signer. A harmless build-only DATABASE_URL placeholder satisfies eager build module loading; no hosted credential belongs in the build artifact. Keep the normal deployment behavior unchanged when the private-stage flag is absent, and prove the private runtime starts without normal Core credentials.
-
-The plan retains separate authenticated test-principal enrollment and exact owner approval after durable candidate preparation, the already-reviewed PHP8.4/v0.0.7 staging/retry/revocation sequence, v0.0.6 restoration and baseline comparison. Actual operator UUIDs and grant references remain unprovisioned and must be reported before use. Clean removal must unregister/stop only the test app, preserve audit/recovery data, then remove only the new package/certificate/specific DNS records; do not use domain-wide Disable/Suspend. If the new package cannot meet loopback, trusted-header, TLS or no-logging requirements, stop on that verified limitation before considering support or a different design.
-
-This turn performed read-only source, DNS and resource inspection and prepared documentation only. No hosting package, DNS/SSL change, application discovery, process/build, credential installation, operator enrollment, WordPress deployment or canonical data write was performed. No new application tests were run for this plan-only change. The next step is the owner's approval of the bounded plan, not automatic execution. After eventual verified acceptance and complete rollback, close WordPress rehearsal and resume Commercial V1 Media-to-Publication.
-
-## Approved isolated package implementation — build preparation
-
-The owner approved the bounded self-service plan in `cba52f3`, including temporary `wp-acceptance.miopages.com` on the existing server at no additional charge, its dedicated DNS/TLS/SSH access, loopback 8081 app, scoped test-principal configuration, temporary WordPress v0.0.7 and full cleanup. Preserve public Core 8080, C0/both bindings and publication state. Exact digest-bound candidate approval remains outstanding and must follow durable prepare/preview. The test-principal distinction remains functional separation, not independent human governance or customer mandate.
-
-Implemented the narrowly scoped outer Next.js `proxy.ts` allowlist, using the installed Next16 guide: with private-stage mode enabled only exact bodyless-protocol delivery POST paths can reach the existing ingress/authentication handler; all other paths/methods, including static assets, are denied. Body/origin/HMAC checks remain in the existing handler. Normal Core behavior is unchanged with the flag absent. Added a focused regression and one source-filtered Linux CI build on this branch, with a nonsecret build-only loopback URL and no hosted/deployment credentials. The artifact script must prove the compiled private runtime starts without DATABASE_URL and reaches existing ingress/authentication refusals before creating a checksummed allowlisted archive/source manifest. Linux build and smoke results are pending at this checkpoint; do not deploy an unverified artifact.
-
-Consolidated local validation passed: TypeScript, 358 application tests (including the new private-listener regression), seven synthetic gateway/pull tests, PHP lints/eight smoke suites/Node-to-PHP signature interoperability, four disposable PostgreSQL integration tests and five Python HTTP-baseline regressions. PostgreSQL 18 is the disposable local test server only, not the hosted PG17 recovery tool. Script syntax and Git whitespace checks passed. The local log is retained under ignored runtime-content. No hosted writes, package creation, DNS/TLS/discovery, principal enrollment, candidate approval or WordPress upgrade occurred in this preparation. Preserve the accepted authenticated WordPress baseline digest and both plugin archives. Necessary next external access is My20i's new-package controls (unavailable through the current automation surface) and hidden migration-role credential entry for the scoped principal bootstrap; neither is authorization to use public runtime credentials.
-
-## Isolated Linux build stopped before hosted changes — November 5, 2026
-
-Implementation `dce5e67d8508b3362baf5c7b713475f647b8f27d` was normally fast-forward pushed and the exact remote branch SHA independently verified. The single [Linux build run](https://github.com/R-Levin/myomaton-web/actions/runs/42142016206), Node 22.23.2 on Ubuntu 24.04, installed the lockfile successfully but failed in Next16.3.5 production compilation. No artifact was uploaded and the compiled isolation smoke did not run. The local consolidated tests recorded above passed; they are not a substitute for this failed production build gate.
-
-Verified build failure: `wordpress-delivery/private-source.ts` imports the existing `content-editing/proposal-preview.tsx` to recompute the exact approved preview digest. That renderer imports `react-dom/server`, rejected by Turbopack in the API-route dependency graph. Do not remove preview-digest revalidation or substitute another renderer to bypass this error. A narrowly scoped Node renderer import/build compatibility correction must preserve byte-identical previews and the approval security check. Instrumentation also emitted a Node `net` import warning in its Edge graph; this was not the fatal compiler error. Neither correction has been made in this stopped checkpoint.
-
-The dependency installation also surfaced security advisories. A separate read-only `npm audit --omit=dev --json` against the unchanged lockfile reported two critical and four high production-dependency findings; its sanitized package/advisory data is retained locally under ignored `runtime-content/wordpress-rehearsal-audit.json`. Next16.3.5 is in the affected ranges of maintainer [typed-array cache RCE](https://github.com/advisories/GHSA-673q-mjm6-r5xr) and [Linux SVG image-optimization RCE](https://github.com/advisories/GHSA-2464-fhr4-w9xw) advisories. The first recommends upgrading even without a matching cache function; the second identifies sharp >=0.35.5 as its workaround. Repository search found no use-cache/ImageResponse implementation, but that is not a full exploitability assessment. The isolated runtime guard is still unproven in the compiled server. No exploitation or hosted incident is claimed. The normal public runtime was not inspected or changed by this build/audit.
-
-**Stopped boundary:** the owner expressly required stopping on an unexpected security or failed acceptance gate. Do not create the package, install rehearsal credentials, discover/start an app or upgrade WordPress from this checkpoint. The smallest proposed continuation is a reviewed local dependency-security/build correction for the rehearsal artifact (audit proposes Next16.4.5, DOMPurify3.4.17 and sharp0.35.5; assess the complete transitive findings rather than blindly running audit fix), preserving existing Core authorization and exact preview bytes, followed by consolidated tests and a fresh Linux build/smoke. Do not upgrade the hosted public application as part of that correction. No automatic dependency upgrade, security waiver or hosted change was performed. The existing infrastructure approval remains recorded; exact candidate approval, actual test-principal enrollment, hidden migration credential input and necessary My20i control-panel access remain later gates, not reasons to reopen completed database setup or infrastructure discovery. WordPress acceptance is still open; Commercial V1 Media-to-Publication follows successful acceptance and rollback.
-
-## Bounded dependency and renderer correction — local gates passed, Linux gates pending
-
-The owner authorized the dependency-security/renderer correction from `458328e`, plus read-only inspection and preparation of a separately authorized public-runtime update. No hosting, credential, listener, WordPress or live-service change is authorized by this corrective task. Earlier database/recovery passes, WordPress/public baselines, separate exact candidate approval and bounded infrastructure authorization remain preserved.
-
-The standalone preview now explicitly imports React's `react-dom/server.node` entry. The JSX, shared Section renderer, preview fingerprint computation and approval revalidation are unchanged. The retained November 1 synthetic disposable APPROVED proposal, approval event and candidate HTML were copied into regression fixtures, clearly labeled historical synthetic proof, not owner approval of the pending hosted WordPress candidate. Before any dependency or renderer change the regression passed against those retained artifacts. It also passed after correction: byte-identical HTML SHA-256 `f553bbb5c8538c26f07b52951fedabc395cac0dd9e78f11c4eee493080b83081`, original preview fingerprint `0936664b74f1aeca9a06e77e1062287ae99e641e888fe8d65fc2057189891e0d`, exact binding and intact approval-event hash. Changed HTML cannot reuse that digest. Node-only instrumentation is now conditionally imported inside register per the installed Next guide; production routing validation is retained, not skipped. The isolated smoke supplies explicit shared-hostnames mode without a tenant binding or normal database credential.
-
-Patched direct dependencies: Next/eslint-config-next16.4.5, sharp0.35.5, DOMPurify3.4.17 and Puck0.24.0. React/react-dom remain19.2.8. Puck's patch path requires its 0.24 release to use patched Happy DOM; a fresh compatible lock resolves Tiptap3.33.0/Happy DOM21.0.4, Undici8.12.4 and source-map-js1.2.2 without forced peer overrides. An intermediate in-place update retained affected transitive versions, so it was superseded by a fresh package-only resolution in an ignored empty local directory and clean npm ci. npm ls --all passed with no invalid peers. Lockfile SHA-256 `9f08a1e68084ea823f1f3a2f3ae793c1a76de4345f839bc391fa249ed56d5ec1` was unchanged by npm ci. Current production audit: **zero findings**. Full audit: **12 moderate development-tool package entries**, tracing to [Drizzle tooling's older esbuild dev server](https://github.com/advisories/GHSA-67mh-4wv8-2f99) and [ESLint/typescript-eslint's minimatch chain](https://github.com/advisories/GHSA-g3hv-75wg-m249). Those tools are not public request handlers; no dev server is started. Do not claim the entire dependency graph is advisory-free or apply suggested major downgrades automatically.
-
-Consolidated local gates passed: TypeScript, 359 application/security/regression tests, seven synthetic gateway/pull tests, PHP lints/eight smoke suites/Node-to-PHP signature interoperability, four disposable PostgreSQL integration tests, five Python baseline regressions, focused ESLint and script syntax/whitespace checks. Managed-media tests cover raster orientation/metadata/multipage rejection, active SVG/SMIL/reference removal and PDF validation on the patched libraries. Disposable PostgreSQL18 remains local test tooling, separate from the retained hosted PG17 recovery contract. Logs/audits remain in ignored runtime-content. Linux production compilation, retained-artifact compatibility and the compiled isolated listener smoke must all pass before declaring the rehearsal build deployable. CI now enforces zero production advisories before building; it has no hosted/deployment credentials.
-
-### Independent read-only public-runtime assessment and prepared security candidate
-
-SSH read-only inspection of the existing public `~/public_html` confirmed clean commit `5b94a1d118b8ea7da0087fcab76786c5be9c0c13`, a production build, Node22.23.2, installed AND locked Next16.3.5, sharp0.35.4, DOMPurify3.4.16, React/react-dom19.2.8, jsdom30.1.1 and pdfjs-dist6.3.289. Installed Happy DOM20.14.5, Undici8.11.2 and source-map-js1.2.1 are also affected. Port8080 remains listening and8081 unused. No runtime.env/.env/credential contents were read, no exploit requests were sent and no hosted file or process was changed.
-
-The compiled public config has Cache Components false, zero Node/Edge Server Actions, image optimization enabled, SVG optimization false, zero remote image patterns/domains and local image pathname `**`. Source inspection found next/image in four managed-site components, no use-cache/ImageResponse/use-server implementation, and DOMPurify/sharp only in asset ingestion/validation/acquisition modules. This narrows feature-specific exposure but is not proof that all advisories are unreachable: the public image optimizer is enabled and installed sharp/Next are affected. No compromise is claimed. Maintainer [Next cache RCE guidance](https://github.com/advisories/GHSA-673q-mjm6-r5xr) recommends upgrading even without a matching cache function; [image optimization guidance](https://github.com/advisories/GHSA-2464-fhr4-w9xw) specifies patched sharp. A public-runtime security update is warranted and remains separately approval-gated.
-
-Prepared branch `codex/public-runtime-security-2026-11-05`, commit `62439fc0c8bde7fe98339625d33a845102a7995a`, directly from deployed `5b94a1d`. Independently verified its entire source diff contains **only package.json and package-lock.json**, with the same patched dependency graph; it includes no WordPress development routes, proxy or schema changes. It was normally pushed without creating/merging a PR. The single corrective Linux workflow also checks out that exact candidate and runs clean installation, production audit, its existing application tests and production build. Those Linux results are pending here. Do not deploy the WordPress branch to public Core as a dependency security fix.
-
-**Approval-ready public update sequence (not executed):** (1) accept the exact dependency-only candidate and successful Linux evidence and authorize a brief targeted restart window; (2) build/archive its exact Linux code/build/dependencies away from the 2GB live server, retaining checksums, then independently verify the uploaded off-webroot candidate; (3) record both current public outputs and preserve the existing matching source/lock/node_modules/.next/config metadata in a protected off-webroot rollback directory, verifying ownership/integrity and restore access before stopping anything; retain current protected environment, asset root, database configuration and hostname bindings; (4) during that separately authorized window stop only miopages-runtime, install only the reviewed dependency-only source plus matching build/dependencies, and restart that named app with its existing protected startup/configuration on8080; never run migrations, rediscover all apps or deploy the WordPress branch; (5) verify installed versions, healthy process/port, both hostname outputs and existing functional gates; (6) on failure stop that app and restore its matching previous source/build/dependencies and named-process configuration, verify recovery, and report that this rollback restores the previously vulnerable version rather than claiming security remediation. Do not discard rollback/recovery evidence. This is a proposed reversible maintenance operation, not authorization to execute it.
-
-The next WordPress boundary remains actual fixture-scoped principal enrollment through protected migration credential entry, durable prepare/preview and the owner's separate exact approval, then the existing new-package procedure. This correction does not reopen recovery/database provisioning or require another installation. Commercial V1 Media-to-Publication follows successful acceptance and complete rollback.
-
-### Final corrective Linux and artifact gates — PASS
-
-The bounded correction is complete. Final build source `b6fc873b2b5a8771f59bb0cf42989826b2a7da4b` passed [Linux run42146115923](https://github.com/R-Levin/myomaton-web/actions/runs/42146115923): clean npm ci, zero production advisories, the retained approved-candidate byte/digest regression, portable-dependency security regression, Next16.4.5 production compilation/type checking, relocated private-listener smoke and artifact upload. Node22.23.2/Linux x64. The smoke starts the actual packaged Next runtime with no normal DATABASE_URL/operator token/migration login/signer; unrelated paths/methods/assets return404/no-store and both exact POST endpoints reach the existing400 authentication/ingress refusals. This is build/isolation proof, not the still-pending authenticated hosted HTTPS acceptance test.
-
-Linux exposed two remaining packaging details, corrected within this same task: the explicit server.node import alone still selected React's react-server conditional export, so the documented `serverExternalPackages: ["react-dom"]` now keeps that standalone renderer native; no JSX or digest check changed. Next also emits four external-package links. The artifact now permits only generated .next/node_modules links to exact installed registry-package roots present in the lockfile at the verified version, rewriting them to portable relative links. Unexpected locations, escaping targets, unlocked roots and version mismatches refuse. The relocated package is smoke-tested using destination-equivalent dependencies; copied-file hashes and link targets are rechecked afterward, and the temporary dependency link/cache are excluded from the archive. Local and Linux security regression passed.
-
-Artifact13470261689 (`wordpress-rehearsal-linux-x64`) belongs to the exact final source/run and initially expires November13 at01:47:57UTC. Codex independently downloaded the GitHub archive using the existing authenticated Git workflow, validated the outer ZIP digest/CRC, inner tar checksum, source manifest, all308 regular-file hashes and four portable links (jsdom,pg,react-dom,sharp), rejecting absolute/traversal/unknown entries. The connector's temporary file-host URL initially failed certificate-expiry verification; no TLS bypass was used. A separately authenticated GitHub HTTPS download succeeded, with its authorization header confined to api.github.com and not forwarded to artifact storage. Retained locally under ignored runtime-content/verified-wordpress-linux-artifact; no executable tree was extracted or hosted artifact installed. Outer ZIP SHA-256 `c47e1f53cdb3bf3affeada913e38bf60fd0ff202765c8fdb241b9a5f9ed2e585`; inner runtime tar SHA-256 `232b6ec21654d61badbdc16cd19c10121443d1df60b9778fb5eab1e07acdee65`. Reverify the manifest/checksums before any later hosted installation.
-
-The separate public dependency-only candidate `62439fc0c8bde7fe98339625d33a845102a7995a` passed [Linux compatibility job127656206624](https://github.com/R-Levin/myomaton-web/actions/runs/42145605545/job/127656206624): clean installation, zero production advisories,336 application tests passed/zero failed/one existing Windows-only test skipped, and successful production build. The original public instrumentation's nonfatal Node-net/Edge warning remains; this candidate intentionally changes only the two dependency files. An initial test attempt inherited build-only shared-hostnames settings, conflicting with the tests' intentional local tenant bindings. This was independently reproduced and passed with the intended test environment, then fixed by confining production settings to the build step, without changing or excluding the security tests. The successful one-off public compatibility job was removed from subsequent rehearsal builds to avoid repeating unchanged work. No public candidate was deployed; installed public Next16.3.5/sharp0.35.4/DOMPurify3.4.16 remain vulnerable until a separate maintenance authorization and verified rollout.
-
-All earlier local consolidated results remain passed; the final additional packaging-security regression, focused proposal/release/approval tests, TypeScript and focused lint passed. The WordPress baseline receipt and both plugin archive hashes were independently rechecked and remain identical to the prior checkpoint. Hosted database/recovery artifacts and C0/bindings were not changed or reprovisioned. No hosting package, DNS, SSL, WordPress replacement, new hosted credential or live port8080 operation occurred. Existing infrastructure authorization is preserved; the next WordPress step is the existing protected fixture-scoped principal bootstrap and durable prepare/preview, followed by separate owner exact-candidate approval. This instruction's no-new-credentials/no-hosted-change boundary was honored. Recommended next decision: separately authorize the dependency-only public security candidate and its bounded restart/rollback window described above; do not substitute the WordPress branch. The remaining private HTTPS rehearsal then follows the already-approved plan, with no repeated database/recovery discovery. Commercial V1 Media-to-Publication remains the return milestone after acceptance and rollback.
-
-## Approved public security update attempted; verified rollback — November 6, 2026 UTC
-
-The owner explicitly approved exact public dependency-only candidate `62439fc0c8bde7fe98339625d33a845102a7995a`, an off-server build, a complete matching rollback archive and targeted maintenance of only miopages-runtime. Preserve protected configuration, C0/bindings/assets/database/publication state; no migrations, WordPress development deployment or application rediscovery. This authorization was exercised for one guarded live attempt. **The update did not pass hosted acceptance. The old application is restored and remains vulnerable. Do not report this as security remediation or resume WordPress acceptance yet.**
-
-Read-only inspection confirmed the sole account-owned PM2v7.1.1 application: name miopages-runtime, id0, original pid61773, cwd public_html, bash interpreter and existing `.config/miopages/start-runtime.sh` on8080. PM2 CLI is under the account's existing parent node_modules, not on SSH PATH; no new manager/daemon was installed or registered. The approved package was built off-server on Linux x64/Node22.23.2, clean-installed/audited/tested (336 passed, one Windows-only skip), and its relocated runtime/native probes passed in [run42150601902](https://github.com/R-Levin/myomaton-web/actions/runs/42150601902). Artifact13472675157 contains exact approved source plus matching dependencies/build, independently checked locally against all33,395 file hashes and36 portable links. Initial tar SHA-256 `3f4a9f0b15a33b2367aea16b6793e79d71aed9f2b11d51fcb33aa0310be13ad8`; ZIP SHA-256 `ca53b86aa277aba2248f3cb3d6a0ae339003b640d206c26902937adbade95e04`. Initial packaging metadata-reader export assumptions were corrected off-server, without changing the candidate application source.
-
-Private hosted run: `/home/virtual/vps-bef564/5/53b4381d42/miopages-public-security-20261106T023853Z`, mode0700. Before the stop, the staged package passed host native ABI probes and independent Git-blob verification of the exact candidate; the entire Git diff from deployed5b94a1d is only package.json/package-lock.json. A complete uncompressed rollback.tar retains public_html (source/Git/dependencies/build/config/runtime files), `.config/miopages` and the verified Supabase CA, mode0600. All36,790 filesystem entries, ownership/modes/links/file checksums and full archive were independently verified; SHA-256 `eeefab07a5afbf43f0aefa17c8b5b62b8de882222dee2a35016723cb0857f5eb`, tree digest `e32a0f67c3f4fdd9a0e1c97963457debe5730520e714d03c05845f58889e2e32`. A PAX long-directory trailing-slash verifier issue initially refused the archive; read-only diagnostics established that format distinction, a regression test was added, and the same retained archive was fully verified without taking another backup or weakening integrity checks.
-
-The guarded procedure stopped only miopages-runtime, exchanged .next/node_modules while retaining the originals, switched the dependency-only Git commit and restarted the same existing application. New runtime root requests reached HTTP200, but the post-deployment HTTP/content gate raised an assertion before its success receipt. The guard immediately stopped that application and restored the original matching dependencies/build and main at5b94a1d. **The original failed assertion and candidate HTTP response were not retained**, so the exact trigger is not proven. That diagnostic gap was corrected locally: future attempts persist both per-request observations and the full candidate comparison before assertion, plus an allowlisted invariant code before rollback; arbitrary error/credential text remains redacted. No check was bypassed and no automatic second live attempt was made.
-
-Independent restoration verification passed: clean main at `5b94a1d118b8ea7da0087fcab76786c5be9c0c13`, Next16.3.5/sharp0.35.4/DOMPurify3.4.16/React19.2.8, PM2 id0 online (restored wrapper pid208045; Next child208063) and8080 listening,8081 unused. All36,390 non-Git application/configuration/CA entries match the original archive manifest, including ownership/modes/file bytes/link targets, with no missing/extra entries. Two dependency-file modes made restrictive by Git checkout under umask077 were restored to their original0644; the full comparison then passed. Git audit metadata is intentionally retained rather than reverted. Both original public root responses are byte-identical to the pre-maintenance baselines: runtime `4bd1e2f0009582b39ed10dbd26a2d80d43b12a53ffce9b943056deeef72d14c6`; domain-test `6332ec63c074191bddd65ac00ad28955d1b68aa48b9b8209c0166e5a012a68f6`. Both hosts' Home/Service/Experience/Review returned200; existing intake refusal503, contact GET405 and malformed asset404 remain unchanged. TLS verification stayed enabled. Protected startup/runtime environment, discovery metadata, ecosystem configuration and CA hashes/modes/ownership match. No SQL write/migration, asset change, hostname/registration/DNS/SSL/publication change or WordPress operation was executed.
-
-Retained sanitized receipts: deployment-evidence.json says ROLLED_BACK/previousVersionRemainsVulnerable true; rollback-restoration-verified.json says PASS/36,390 entries; recovery-verified.json retains the full backup gate. Codex independently collected/validated them under ignored runtime-content/public-security-hosted-evidence. Their SHA-256 values are respectively `a2b0bccd294e5a4ebc9c148d378101b8fd88ae37c092ed31f7c51f74ce78ebd2`, `f3a8b81f60a4835b7d5be4d310ec428851c2ef3ae20b89fb5a97b0720533b662` and `363afef068164da1ce279ccc0598debd1e35221533da03cf1c140699430cf92e`. Keep the complete archive, original tool, corrected tool, failed candidate directories and all receipts; no failed-run artifact was discarded.
-
-### Verified build-contract mismatch and prepared next decision
-
-Read-only artifact inspection established that the old deployment contains server/webpack-runtime.js, whereas the rejected candidate contains Turbopack runtime chunks. Old public HTML uses `__variable_8c25df`/`__variable_8eaea4` font identifiers; the Turbopack CSS uses a different generated identifier form (for example T19VSG_variable). This difference would fail the DOM check and is a verified compatibility mismatch, **not proof of the exact lost assertion or a canonical-content regression**. Keep that distinction explicit.
-
-The same approved source62439fc has now been rebuilt off-server using the installed documented `npm run build -- --webpack`, matching the original deployment contract, without any source/lockfile change. [Run42153271684](https://github.com/R-Levin/myomaton-web/actions/runs/42153271684) passed clean installation, zero production advisories,336 tests/one existing Windows-only skip, build, native probes and relocated runtime smoke. Artifact13472917782 was independently downloaded and verified locally:33,260 file hashes,33 links, exact source/versions, Webpack manifest/runtime and both font variable identifiers identical to the previous build. New tar SHA-256 `24e0bff248ae1ff377c253925a91b84cebc1138b46fd11faaec9cc01a1f3ee08`; ZIP SHA-256 `1cb5089ff95285e2893b34cfd9b3512de18e7d3e041f67dcccf89fce636a1fd5`. Retained under ignored runtime-content/verified-public-security-release-webpack; it has not been uploaded or deployed to the host. Seven focused rollout security/diagnostic regressions pass, including long PAX directory attributes, tamper/traversal/link refusal, content/SEO checks, redaction and capture of failed HTTP observations. Production audit remains zero;12 moderate development-tool entries remain as previously disclosed.
-
-**Next decision after this failed public gate:** approve one bounded, read-only comparison using the corrected exact62439fc package on loopback127.0.0.1:8081, maximum120seconds, before considering another public maintenance attempt. This is a temporary diagnostic process, not a hosting package or registered application. It would use the existing protected runtime configuration only in its child environment, with no credential installation, keep public8080 running, perform only GETs with the two existing Host identities, compare/save DOM/SEO/navigation/status observations against HTTPS baselines, cap V8 heap256MiB and stop on RSS384MiB/MemAvailable below512MiB. No DNS/proxy/SSL/PM2 registration, canonical writes, publication, WordPress operation or automatic public swap. Stop/retain evidence on any mismatch and terminate only that diagnostic process at completion. This additional listener is outside the security maintenance instruction to operate only the existing registered application; obtain the owner's decision before executing it. The original candidate/infrastructure authorizations and exact WordPress-candidate approval boundary remain recorded; do not reopen passed database/recovery discovery. Only after verified public remediation resume WordPress at its unfinished scoped-principal/durable-candidate milestone, then return to Commercial V1 Media-to-Publication after acceptance and rollback.
-
-## Authorized Webpack loopback diagnostic — PASS, November 6, 2026
-
-The owner separately authorized the checkpoint c8d9002 diagnostic only: exact independently verified Webpack artifact from62439fc, exclusively127.0.0.1:8081, maximum120seconds, heap256MiB/RSS384MiB/MemAvailable512MiB gates, protected configuration only in the temporary child, GET-only comparison, mandatory process removal and no public deployment/restart/configuration/registration/DNS/SSL/database/WordPress/publication change. That bounded diagnostic is now complete and independently verified. **The corrected candidate is ready for a separately approved public security deployment; none was performed in this task.** Live public Core remains the restored5b94a1d/Next16.3.5 and therefore has not received security remediation yet.
-
-Implemented a narrowly scoped `scripts/public-runtime-loopback.py` using the existing archive verification, content comparator and protected-file integrity helpers; it never invokes application lifecycle, registration, migration or database-writer commands. It validates archive SHA-256 `24e0bff248ae1ff377c253925a91b84cebc1138b46fd11faaec9cc01a1f3ee08`, Webpack manifest/runtime, exact versions, every packaged file/link and the approved source's Git blobs. The candidate has no WordPress development route/proxy. Protected runtime configuration is sourced only inside the temporary child environment. The exact Node CLI binds127.0.0.1:8081 with a256MiB V8 heap. An independent GNU timeout kills its own session at115seconds, reserving cleanup margin below120; a100ms monitor enforces aggregate diagnostic-group RSS and system MemAvailable thresholds. Listener PID/ownership/session identity and exact loopback address are checked. Cleanup signals only that newly spawned session, never the live app or a foreign process. Eleven local safety/comparison regressions passed; the Windows-only mock portability issue was corrected before hosted execution. No GitHub Actions build was needed for this diagnostic.
-
-Private diagnostic directory: `/home/virtual/vps-bef564/5/53b4381d42/miopages-public-security-20261106T132103Z`, mode0700. The **one** diagnostic process ran5.869seconds including cleanup. Peak sampled aggregate RSS was218,820,608bytes (208.68MiB); minimum MemAvailable819,011,584bytes (781.07MiB). No resource/deadline gate failed. Temporary session/pids223629 and223632 were terminated, independently verified absent from their session, and8081 was independently verified unused. The sole live PM2 app stayed online at id0/pid208045/restart count0; its Next child208063 still owns8080. All36,390 non-Git application/configuration/CA entries and protected-configuration digest are unchanged before/after, as are live tracked source and clean5b94a1d. Both live HTTPS roots retain their accepted raw response hashes (runtime4bd1e2f0009582b39ed10dbd26a2d80d43b12a53ffce9b943056deeef72d14c6; domain-test6332ec63c074191bddd65ac00ad28955d1b68aa48b9b8209c0166e5a012a68f6). HTTPS certificate verification remained enabled.
-
-**Comparison results:** all14 hostname/route cases passed using two candidate GETs per case. Home, Service, Experience and Review returned200 on both Host identities; intake remained503, contact GET405 and malformed asset404. Candidate responses were raw-byte stable between repeated requests, and their status/DOM/SEO/JSON-LD/navigation matched fresh live HTTPS baselines under the existing, unchanged comparator. All normalized difference lists were empty. The eight HTML page responses differ in raw bytes across the old/new builds; the six negative endpoint responses are byte-identical. Exact raw SHA-256 values and changed-span byte offsets/lengths/hashes were retained without exporting response values. This does not claim byte-identical HTML across framework builds or relax the original acceptance criteria.
-
-Sanitized hosted `loopback-evidence.json` SHA-256 `346ff5cec02db382516836a4846446231a8764f92534aaf092c68c66f8094046` was independently collected and strictly validated, including artifact/source identity, all14 matches, timing/resource limits, cleanup and unchanged live state. A second sanitized raw-difference receipt has SHA-256 `20cc559c66f99c3ca3363b0b86798996afeaddda4fbaa4951f1b78f71c3d5d69`. Both are retained locally under ignored runtime-content/public-loopback-hosted-evidence, with originals in the private hosted directory. Automatic approval review rejected an optional raw-body export as outside sanitized-evidence authorization; that export was not executed. A permitted safer alternative computed only cryptographic/byte-offset summaries on-host and collected those summaries. Raw bodies and the private child log remain off-webroot on-host and were not copied to the repository or committed. No credentials, connection strings, environment contents or certificate contents appear in collected/committed evidence.
-
-A fresh production audit was run locally only after verifying the local lockfile SHA matches the exact deployed-candidate artifact's lockfile; it returned zero advisories. Earlier12 moderate development-tool findings remain separately disclosed, not represented as production findings. No dependency or artifact was changed. Existing database roles/schema/fixture/recovery, the prior complete public rollback archive and WordPress baselines remain retained and untouched.
-
-**Readiness and remaining boundary:** the exact62439fc Webpack package now passes Linux/off-server build/tests/native probes, artifact integrity, real protected-config loopback operation, resource/cleanup gates and all hosted GET comparisons. It is suitable for a separately approved targeted security deployment using the retained complete matching rollback and the corrected HTTP observation/invariant capture. This diagnostic did not run the new package behind the actual public HTTPS proxy on8080, perform a live switchover/restart, test browser interactions or establish load capacity; repeat the existing full HTTPS/content/configuration/health gates after any separately authorized deployment. The exact failed assertion from the first Turbopack attempt remains historically unproven, although the verified build mismatch is corrected and the current Webpack candidate passes the same comparison gates. Do not automatically deploy or claim public remediation. WordPress acceptance remains paused until public remediation is verified, retaining its existing infrastructure authorization and separate exact-candidate approval requirement; after successful WordPress acceptance/rollback, return to Commercial V1 Media-to-Publication.
-
-## Return path: full MioPages Commercial V1
-
-The canonical roadmap remains [Platform/service architecture — Commercial V1 sequence](platform-service-architecture.md#commercial-v1-scope-and-development-sequence) and outstanding gates remain in [deferred architecture](deferred-architecture.md). There is **no second independent backlog**.
-
-1. Hosted foundation: 20i + PostgreSQL + independent backup proof, C0/C1 routing, persistent media, restart/deploy/recovery, monitoring, scaling observations. **Active gate.**
-2. Production authority: authenticated operator, scoped production operations and tenant boundaries.
-3. Commercial intake and near-finished AI-assisted site generation from confirmed structured business knowledge, with operator QA, copy/SEO/media preparation.
-4. Minimal customer portal, including onboarding, review/approval, status/reporting and supported HostShop handoff.
-5. Safe authorized publication, Contact/leads and conversion delivery.
-6. First-party measurement, Performance Snapshot, improvement proposals, approved release and remeasurement.
-7. End-to-end Commercial V1 rehearsal.
-8. Full real MioPages C0 cutover, then Customer #1 after readiness gates. Individually ready and authorized C0 capabilities can be exercised earlier.
-
-The approved Free Review Draft D Revision 3 remains approved **but undelivered** according to the latest recovery record. Delivery and publication retain separate authorization. Substantial WordPress integration remains committed. Its exact Commercial V1 launch placement and native editing scope await the [owner decisions in the WordPress contract](wordpress-delivery-feasibility.md#decision-and-boundaries).
-
-**Phase-exit rule:** when hosted foundation is accepted against its evidence, do not keep inventing infrastructure work. Open the canonical roadmap, record completed gates and move to the next applicable stage. Exceptions require explicit priority rationale and revised checkpoint.
+Before requesting another session's review, push verified sanitized work on the
+correct branch and post exact repository/branch/commit/file links in the existing
+Issue. State actual versus simulated functionality, verification/limits, unresolved
+issues, one next action and **RECOVERY / RESUME HERE**. Do not claim a commit is on
+GitHub until push/readback succeeds. A new session must inspect uncommitted work
+as well as Git; a Git handoff is not a capture of every conversation turn.
+
+## Interruption recovery, including work not yet committed
+
+Use the existing ignored **`runtime-content/chat-recovery.md`**, not another tracker.
+Update it during material work, after meaningful decisions/failures and before
+long operations or a handoff. Capture sanitized:
+
+1. Current assignment, owner decisions, limits and pending questions.
+2. Exact worktree/branch/HEAD, staged/unstaged/untracked source files and what they do.
+3. Completed work, failed/partial checks, evidence paths/hashes and unverified claims.
+4. Any in-flight operation, request/receipt reference, last known status and what
+   must be inspected before retry. Record a potentially paid operation before
+   dispatch and reconcile it after completion; never guess at an uncertain result.
+5. The next safe action, remaining gate and rollback/recovery location.
+
+Preserve old notes and update the current one atomically. Keep credentials, tokens,
+connection strings and protected customer/model text in their approved custody,
+not in notes/Git. Record locations and sanitized evidence, not secret contents.
+This procedure is **actively maintained**, not a background recorder: unsaved thoughts
+or turns never written anywhere cannot be guaranteed recoverable. Saved accessible
+chat history is a supplemental primary source; retrieve targeted owner decisions
+and label assistant interpretations rather than automatically treating them as policy.
+
+A chat-free recovery check must locate the active note from the root pointer,
+reconcile Git/working files and reconstruct the current scope/state/next action.
+Test it while changes are still **uncommitted**. A later commit does not erase that
+intermediate progress; refresh the note with pushed SHA and Issue link afterward.
+Never replay provisioning, migrations, grants, WORK or model calls to recover context.
+No generic hook, automation service or second documentation framework is introduced.
+
+## Outcome-first execution and proportional controls — owner decision, 2026-11-14
+
+Deliver customer/Operator outcomes through existing architecture. Tests establish
+bounded technical evidence, not product acceptance. Preserve valuable components;
+diagnose ordinary local failures and retry within authorization. Stop for concrete
+security, privacy, authority, budget or uncertain-state failures, not arbitrary
+page/question counts or harmless implementation details. New constraints need a
+real risk and a proportionate mitigation. Do not starve quality to save pennies or
+spend to a ceiling simply because it exists. See the [owner-critical record](owner-critical-conversations.md).
+
+### Running cost of active tasks (required in existing Git handoffs; no parallel ledger)
+
+At substantive checkpoints report task/date, request/generation counts, usage-priced
+estimate, uncertain reservation/conservative debit, other known expenditure and
+remaining authority. Separate broader totals from included subtotals. Codex usage,
+founder time and invoice charges are unknown unless independently evidenced; do not
+call them zero. Keep detailed provider ledgers protected and immutable.
 
 ## Sources, scope and maintenance
 
-- [Architecture and Human/ChatGPT/Codex responsibility](platform-service-architecture.md)
-- [Shared hostname routing](shared-hostname-routing.md)
-- [Managed PostgreSQL recovery/role contract](managed-postgres-recovery.md)
-- [C0 operator commands/IDs](miopages-c0-canonical-state.md)
-- [Deferred architecture / actual open readiness gates](deferred-architecture.md)
-- Historical detailed handoff: ignored local `runtime-content/chat-recovery.md`, user-uploaded on 2026-11-01. This file **was read in its actual latest form** during continuity repair. It is not fetched by Git and must not be assumed available in later chats. Git control now carries the critical current state/next-boundary facts.
-- Live secrets/credentials/runtime config stay outside Git. The checked-in operations record must contain only nonsecret context.
-- After review/merge, modify the README to link this as the **mandatory current-status entry point**, and correct any stale 'external provisioning has not begun' summary. Do not silently rewrite historical proofs; mark them historical.
-- Before declaring this handoff reliable, test it from a separate read of GitHub `main`, checking the commit/status/next boundary/Commercial V1 route without local recovery-file access. Until merged and tested, **continuity fix remains incomplete**.
+Maintain this file as a concise **current** index. Detailed execution history belongs
+in the existing workstream handoffs/Issues; enduring contracts retain ownership.
+Replace the current state summary when it changes and preserve its prior evidence
+by commit link. Do not keep prepending competing Current/next-operation paragraphs.
+The older working delivery targets remain historical hypotheses at the source
+below; this review creates no new delivery-date promise or revised product roadmap.
 
-### Original-evidence cycle: retained responses and actual WordPress review
+The pre-reconciliation385503-byte/2231-line index is preserved exactly at
+[checkpoint caa5dd8](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md), with a private local byte-identical copy. Historical
+owner decisions still matter unless explicitly superseded; operational claims and
+old next steps require current verification/authority. The links below retain old
+section anchors for incoming references without making their old commands current.
 
-Continue from [the current retained-generation checkpoint](c0-creation-quality-p0-17.md#original-evidence-retained-generation-and-local-review--november-18-2026).
-Actual report, Direction and Pages are saved; generation is in progress.
-The local comparison is development-only and still needs substantive revision,
-two source-bound stock placements and whole-site review. Existing 4473, Core 41
-and WordPress 6 are preserved. Read current case/ledger before dispatch.
-The existing approved cycle and expiry apply; no new approval is needed for
-ordinary in-scope recovery. Do not present this engineering checkpoint as
-founder product acceptance or repeat a completed paid response.
+<details>
+<summary>Historical section references (preserved evidence, not a dispatch queue)</summary>
+
+<a id="working-delivery-targets--november-19-2026"></a>
+
+- [Working delivery targets — November 19, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#working-delivery-targets--november-19-2026)
+
+<a id="november-7-customer-account-operations-clarification"></a>
+
+- [November 7 customer account operations clarification](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#november-7-customer-account-operations-clarification)
+
+<a id="november-47-deferred-decision-recovery"></a>
+
+- [November 4–7 deferred decision recovery](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#november-47-deferred-decision-recovery)
+
+<a id="human-centered-operator-orchestration-direction"></a>
+
+- [Human-centered Operator orchestration direction](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#human-centered-operator-orchestration-direction)
+
+<a id="founder-led-customer-stewardship-and-contextual-review"></a>
+
+- [Founder-led customer stewardship and contextual review](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#founder-led-customer-stewardship-and-contextual-review)
+
+<a id="conversational-escalation-and-event-retention-direction"></a>
+
+- [Conversational escalation and event retention direction](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#conversational-escalation-and-event-retention-direction)
+
+<a id="core-defined-wordpress-site-and-inbound-editing-clarification"></a>
+
+- [Core-defined WordPress site and inbound editing clarification](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#core-defined-wordpress-site-and-inbound-editing-clarification)
+
+<a id="full-site-customer-approval-and-standing-authorization-scope"></a>
+
+- [Full-site customer approval and standing-authorization scope](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#full-site-customer-approval-and-standing-authorization-scope)
+
+<a id="first-c0-build-milestone-the-full-becoming-a-customer-questionnaire"></a>
+
+- [First C0 build milestone: the full becoming-a-customer questionnaire](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#first-c0-build-milestone-the-full-becoming-a-customer-questionnaire)
+
+<a id="c0-owner-walkthrough--full-interview-not-accepted"></a>
+
+- [C0 owner walkthrough — full interview NOT accepted](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#c0-owner-walkthrough--full-interview-not-accepted)
+
+<a id="issue-10--reviewed-c0-interview-design"></a>
+
+- [Issue #10 · reviewed C0 interview design](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-10--reviewed-c0-interview-design)
+
+<a id="issue-10--historical-adaptive-intake-rehearsal"></a>
+
+- [Issue #10 · historical adaptive intake rehearsal](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-10--historical-adaptive-intake-rehearsal)
+
+<a id="issue-10--shared-intelligent-onboarding-offline-proof"></a>
+
+- [Issue #10 · shared intelligent onboarding offline proof](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-10--shared-intelligent-onboarding-offline-proof)
+
+<a id="issue-9--first-local-signup-and-onboarding-slice"></a>
+
+- [Issue #9 · first local signup and onboarding slice](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-9--first-local-signup-and-onboarding-slice)
+
+<a id="parallel-c0-integration-spine--issue-12"></a>
+
+- [Parallel C0 integration spine · Issue #12](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#parallel-c0-integration-spine--issue-12)
+
+<a id="next-proving-focus-authentic-c0-interview-to-wordpress-rebuild"></a>
+
+- [Next proving focus: authentic C0 interview-to-WordPress rebuild](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#next-proving-focus-authentic-c0-interview-to-wordpress-rebuild)
+
+<a id="local-operator-overview-and-c0-account-review"></a>
+
+- [Local Operator overview and C0 account review](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#local-operator-overview-and-c0-account-review)
+
+<a id="c0-journey-and-retained-human-review"></a>
+
+- [C0 journey and retained human Review](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#c0-journey-and-retained-human-review)
+
+<a id="persistent-identity-and-simulated-role-switching"></a>
+
+- [Persistent identity and simulated role switching](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#persistent-identity-and-simulated-role-switching)
+
+<a id="proposal-evidence-and-simulated-active-role-context"></a>
+
+- [Proposal evidence and simulated active-role context](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#proposal-evidence-and-simulated-active-role-context)
+
+<a id="corrected-c0-stock-image-review"></a>
+
+- [Corrected C0 stock image review](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#corrected-c0-stock-image-review)
+
+<a id="first-live-pixabay-search-verified"></a>
+
+- [First live Pixabay search verified](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#first-live-pixabay-search-verified)
+
+<a id="pixabay-priority-and-first-owner-visible-review"></a>
+
+- [Pixabay priority and first owner-visible review](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#pixabay-priority-and-first-owner-visible-review)
+
+<a id="commercial-v1-permissioned-stock-fixture-verified-locally"></a>
+
+- [Commercial V1 permissioned stock fixture verified locally](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#commercial-v1-permissioned-stock-fixture-verified-locally)
+
+<a id="commercial-v1-agreement-based-customer-upload-verified-locally"></a>
+
+- [Commercial V1 agreement-based customer upload verified locally](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#commercial-v1-agreement-based-customer-upload-verified-locally)
+
+<a id="commercial-v1-customer-supplied-media-intake-verified"></a>
+
+- [Commercial V1 customer-supplied media intake verified](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#commercial-v1-customer-supplied-media-intake-verified)
+
+<a id="commercial-v1-disposable-intro-media-release-verified"></a>
+
+- [Commercial V1 disposable Intro media release verified](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#commercial-v1-disposable-intro-media-release-verified)
+
+<a id="wordpress-private-delivery-acceptance-closed"></a>
+
+- [WordPress private delivery acceptance closed](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-private-delivery-acceptance-closed)
+
+<a id="scoped-rehearsal-cleanup-passed-on-host-retained-https-route-verification-historical"></a>
+
+- [Scoped rehearsal cleanup passed on host. Retained HTTPS route verification (historical)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#scoped-rehearsal-cleanup-passed-on-host-retained-https-route-verification-historical)
+
+<a id="authenticated-rollback-output-matched-rehearsal-pm2-cleanup-remains-open-historical"></a>
+
+- [Authenticated rollback output matched. Rehearsal PM2 cleanup remains open (historical)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#authenticated-rollback-output-matched-rehearsal-pm2-cleanup-remains-open-historical)
+
+<a id="private-https-delivery-acceptance-passed-final-cleanup-verification-pending-historical"></a>
+
+- [Private HTTPS delivery acceptance passed. Final cleanup verification pending (historical)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#private-https-delivery-acceptance-passed-final-cleanup-verification-pending-historical)
+
+<a id="bounded-stability-and-actual-private-https-refusals--pass-transfer-later-approved-above"></a>
+
+- [Bounded stability and actual private HTTPS refusals — PASS (transfer later approved above)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#bounded-stability-and-actual-private-https-refusals--pass-transfer-later-approved-above)
+
+<a id="existing-acceptance-app-identified-read-only-refreshed-wordpress-baseline--pass-hold-superseded-above"></a>
+
+- [Existing acceptance app identified read-only; refreshed WordPress baseline — PASS (hold superseded above)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#existing-acceptance-app-identified-read-only-refreshed-wordpress-baseline--pass-hold-superseded-above)
+
+<a id="corrected-linux-artifact-and-hosted-loopback-smoke--pass-historical-registration-pending-state"></a>
+
+- [Corrected Linux artifact and hosted loopback smoke — PASS; historical registration-pending state](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#corrected-linux-artifact-and-hosted-loopback-smoke--pass-historical-registration-pending-state)
+
+<a id="approved-private-routing-correction--preparation-record-linux-gate-now-passed-above"></a>
+
+- [Approved private routing correction — preparation record (Linux gate now passed above)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#approved-private-routing-correction--preparation-record-linux-gate-now-passed-above)
+
+<a id="outbound-correction-verified-loopback-smoke-stopped-at-routing-gate--november-6-2026"></a>
+
+- [Outbound correction verified; loopback smoke stopped at routing gate — November 6, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#outbound-correction-verified-loopback-smoke-stopped-at-routing-gate--november-6-2026)
+
+<a id="authenticated-my20i-inspection-complete--privileged-network-rule-inspection-required-historical-now-resolved"></a>
+
+- [Authenticated My20i inspection complete — privileged network-rule inspection required (historical, now resolved)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#authenticated-my20i-inspection-complete--privileged-network-rule-inspection-required-historical-now-resolved)
+
+<a id="read-only-account-network-comparison--november-6-2026-historical-pending-check-state"></a>
+
+- [Read-only account network comparison — November 6, 2026; historical pending-check state](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#read-only-account-network-comparison--november-6-2026-historical-pending-check-state)
+
+<a id="current-stop-gate--new-accounts-session-pooler-tcp-refusal"></a>
+
+- [Current stop gate — new account's Session Pooler TCP refusal](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#current-stop-gate--new-accounts-session-pooler-tcp-refusal)
+
+<a id="temporary-account-isolation-and-https-package-routing--pass-listener-preparation"></a>
+
+- [Temporary account isolation and HTTPS package routing — PASS; listener preparation](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#temporary-account-isolation-and-https-package-routing--pass-listener-preparation)
+
+<a id="hosted-continuation-exact-core-approval-independent-technical-review-and-enrollment--pass"></a>
+
+- [Hosted continuation, exact Core approval, independent technical review and enrollment — PASS](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-continuation-exact-core-approval-independent-technical-review-and-enrollment--pass)
+
+<a id="path-normalization-correction-approved-and-tested--no-rekey-retry"></a>
+
+- [Path-normalization correction approved and tested — no rekey retry](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#path-normalization-correction-approved-and-tested--no-rekey-retry)
+
+<a id="bounded-continuation-explicitly-approved--fixed-holder-tested-protected-handoff-pending"></a>
+
+- [Bounded continuation explicitly approved — fixed holder tested, protected handoff pending](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#bounded-continuation-explicitly-approved--fixed-holder-tested-protected-handoff-pending)
+
+<a id="owner-exact-approval-received--core-recording-blocked-on-reviewed-credential-continuation"></a>
+
+- [Owner exact approval received — Core recording blocked on reviewed credential continuation](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#owner-exact-approval-received--core-recording-blocked-on-reviewed-credential-continuation)
+
+<a id="specific-credential-continuation-method-awaiting-separate-approval--not-applied"></a>
+
+- [Specific credential-continuation method awaiting separate approval — NOT APPLIED](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#specific-credential-continuation-method-awaiting-separate-approval--not-applied)
+
+<a id="latest-wordpress-checkpoint--independently-authenticated-durable-candidate-preview-ready-for-owner-review"></a>
+
+- [Latest WordPress checkpoint — independently authenticated, durable candidate preview ready for owner review](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#latest-wordpress-checkpoint--independently-authenticated-durable-candidate-preview-ready-for-owner-review)
+
+<a id="latest-verified-operational-checkpoint--public-security-deployment-pass-november-6-2026"></a>
+
+- [Latest verified operational checkpoint — public security deployment PASS, November 6, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#latest-verified-operational-checkpoint--public-security-deployment-pass-november-6-2026)
+
+<a id="wordpress-resume--hidden-prompt-principal-enrollment-prepared-not-executed"></a>
+
+- [WordPress resume — hidden-prompt principal enrollment prepared, not executed](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-resume--hidden-prompt-principal-enrollment-prepared-not-executed)
+
+<a id="mandatory-start-of-chat-protocol"></a>
+
+- [Mandatory start-of-chat protocol](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#mandatory-start-of-chat-protocol)
+
+<a id="current-source-and-hosted-boundary-2026-11-01"></a>
+
+- [Current source and hosted boundary (2026-11-01)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#current-source-and-hosted-boundary-2026-11-01)
+
+<a id="hosted-synthetic-c0-proof--2026-11-01-reported-live-ssh-output"></a>
+
+- [Hosted synthetic C0 proof — 2026-11-01 (reported live SSH output)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-c0-proof--2026-11-01-reported-live-ssh-output)
+
+<a id="hosted-c0-hostname-and-http-proof--2026-11-01-reported-live-ssh-output"></a>
+
+- [Hosted C0 hostname and HTTP proof — 2026-11-01 (reported live SSH output)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-c0-hostname-and-http-proof--2026-11-01-reported-live-ssh-output)
+
+<a id="additional-hostname-routing-proof--november-1-2026"></a>
+
+- [Additional hostname routing proof — November 1, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#additional-hostname-routing-proof--november-1-2026)
+
+<a id="guarded-next-hosted-sequence-historical-sequence-consult-latest-proof-above"></a>
+
+- [Guarded next hosted sequence (historical sequence; consult latest proof above)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#guarded-next-hosted-sequence-historical-sequence-consult-latest-proof-above)
+
+<a id="proofevidence-ledger-nonsecret"></a>
+
+- [Proof/evidence ledger (nonsecret)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#proofevidence-ledger-nonsecret)
+
+<a id="wordpress-delivery-feasibility-decision--2026-11-02"></a>
+
+- [WordPress delivery feasibility decision — 2026-11-02](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-delivery-feasibility-decision--2026-11-02)
+
+<a id="wordpress-c0-v3-source-fixture-checkpoint--2026-11-02"></a>
+
+- [WordPress C0 v3 source fixture checkpoint — 2026-11-02](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-c0-v3-source-fixture-checkpoint--2026-11-02)
+
+<a id="wordpress-operator-editor-inbound-proposal-track--2026-11-03"></a>
+
+- [WordPress operator-editor inbound proposal track — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-operator-editor-inbound-proposal-track--2026-11-03)
+
+<a id="active-development-handoff--wordpress-two-way-deliveryeditorial--20i-service-adapter-2026-11-03"></a>
+
+- [Active development handoff — WordPress two-way delivery/editorial + 20i service adapter (2026-11-03)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#active-development-handoff--wordpress-two-way-deliveryeditorial--20i-service-adapter-2026-11-03)
+
+<a id="first-wordpress-plugin-source-checkpoint--2026-11-03"></a>
+
+- [First WordPress plugin source checkpoint — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#first-wordpress-plugin-source-checkpoint--2026-11-03)
+
+<a id="wordpress-hosted-private-preview-field-result--2026-11-03"></a>
+
+- [WordPress hosted private-preview field result — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-hosted-private-preview-field-result--2026-11-03)
+
+<a id="wordpress-visual-preview-v002-source-checkpoint--2026-11-03"></a>
+
+- [WordPress visual-preview v0.0.2 source checkpoint — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-visual-preview-v002-source-checkpoint--2026-11-03)
+
+<a id="visual-preview-v002-local-validation-report--2026-11-03"></a>
+
+- [Visual-preview v0.0.2 local validation report — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#visual-preview-v002-local-validation-report--2026-11-03)
+
+<a id="wordpress-v002-visual-preview-acceptance-observation--2026-11-03"></a>
+
+- [WordPress v0.0.2 visual preview acceptance observation — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-v002-visual-preview-acceptance-observation--2026-11-03)
+
+<a id="signed-release-contract-v01-and-offline-validator--2026-11-03"></a>
+
+- [Signed release contract v0.1 and offline validator — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#signed-release-contract-v01-and-offline-validator--2026-11-03)
+
+<a id="release-contract-offline-test-blocker--2026-11-03"></a>
+
+- [Release-contract offline test blocker — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#release-contract-offline-test-blocker--2026-11-03)
+
+<a id="release-contract-v01-offline-security-validation-passed--2026-11-03"></a>
+
+- [Release Contract v0.1 offline security validation PASSED — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#release-contract-v01-offline-security-validation-passed--2026-11-03)
+
+<a id="offline-release-staging-and-activation-first-slice--2026-11-03"></a>
+
+- [Offline release staging and activation first slice — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-release-staging-and-activation-first-slice--2026-11-03)
+
+<a id="offline-stagingrecovery-local-test-pass--2026-11-03"></a>
+
+- [Offline staging/recovery local test PASS — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-stagingrecovery-local-test-pass--2026-11-03)
+
+<a id="offline-staging-failurerecovery-hardening--source-checkpoint-2026-11-03"></a>
+
+- [Offline staging failure/recovery hardening — source checkpoint 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-staging-failurerecovery-hardening--source-checkpoint-2026-11-03)
+
+<a id="offline-release-hardening-regression-checks-passed--2026-11-03"></a>
+
+- [Offline release hardening regression checks PASSED — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-release-hardening-regression-checks-passed--2026-11-03)
+
+<a id="hosted-wordpress-environment-readiness-diagnostic-v003--2026-11-03"></a>
+
+- [Hosted WordPress environment-readiness diagnostic v0.0.3 — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-wordpress-environment-readiness-diagnostic-v003--2026-11-03)
+
+<a id="wordpress-environment-diagnostic-path-classification-fix--2026-11-03"></a>
+
+- [WordPress environment diagnostic path classification fix — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-environment-diagnostic-path-classification-fix--2026-11-03)
+
+<a id="environment-classification-repair-verified-locally--2026-11-03"></a>
+
+- [Environment-classification repair verified locally — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#environment-classification-repair-verified-locally--2026-11-03)
+
+<a id="20i-wordpress-hosted-diagnostic-observed--2026-11-03"></a>
+
+- [20i WordPress hosted diagnostic observed — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-wordpress-hosted-diagnostic-observed--2026-11-03)
+
+<a id="gated-one-shot-private-filesystem-test-v004--code-checkpoint-2026-11-03"></a>
+
+- [Gated one-shot private filesystem test v0.0.4 — code checkpoint 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#gated-one-shot-private-filesystem-test-v004--code-checkpoint-2026-11-03)
+
+<a id="filesystem-probe-v004-local-checks--partial-user-results-2026-11-03"></a>
+
+- [Filesystem probe v0.0.4 local checks — partial user results, 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#filesystem-probe-v004-local-checks--partial-user-results-2026-11-03)
+
+<a id="filesystem-probe-v004-local-test-gate-cleared--2026-11-03"></a>
+
+- [Filesystem probe v0.0.4 local test gate CLEARED — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#filesystem-probe-v004-local-test-gate-cleared--2026-11-03)
+
+<a id="hosted-v004-filesystem-probe-safe-default-confirmed--2026-11-03"></a>
+
+- [Hosted v0.0.4 filesystem probe safe default confirmed — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-v004-filesystem-probe-safe-default-confirmed--2026-11-03)
+
+<a id="20i-package-directory-layout-observed--2026-11-04"></a>
+
+- [20i package directory layout observed — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-package-directory-layout-observed--2026-11-04)
+
+<a id="20i-private-sibling-folder-created-permissions-0700--2026-11-04"></a>
+
+- [20i private sibling folder created; permissions 0700 — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-private-sibling-folder-created-permissions-0700--2026-11-04)
+
+<a id="hosted-filesystem-probe-visibly-armed-public-isolation-check-pending--2026-11-04"></a>
+
+- [Hosted filesystem probe visibly armed; public isolation check pending — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-filesystem-probe-visibly-armed-public-isolation-check-pending--2026-11-04)
+
+<a id="private-storage-preliminary-url-check--2026-11-04"></a>
+
+- [Private storage preliminary URL check — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#private-storage-preliminary-url-check--2026-11-04)
+
+<a id="hosted-filesystem-probe-results-november-4-2026"></a>
+
+- [Hosted filesystem probe results, November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-filesystem-probe-results-november-4-2026)
+
+<a id="hosted-two-process-recovery-proof-source--2026-11-04"></a>
+
+- [Hosted two-process recovery proof source — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-two-process-recovery-proof-source--2026-11-04)
+
+<a id="ssh-option-confirmed-for-20i-miopagesorg--2026-11-04"></a>
+
+- [SSH option confirmed for 20i miopages.org — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#ssh-option-confirmed-for-20i-miopagesorg--2026-11-04)
+
+<a id="hosted-cli-recovery-script-syntax-validation--2026-11-04"></a>
+
+- [Hosted CLI recovery script syntax validation — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-cli-recovery-script-syntax-validation--2026-11-04)
+
+<a id="20i-wordpress-ssh-connection-succeeded--november-4-2026"></a>
+
+- [20i WordPress SSH connection succeeded — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-wordpress-ssh-connection-succeeded--november-4-2026)
+
+<a id="wordpress-20i-ssh-cli-runtime-and-private-directory-confirmed--november-4-2026"></a>
+
+- [WordPress 20i SSH CLI runtime and private directory confirmed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-20i-ssh-cli-runtime-and-private-directory-confirmed--november-4-2026)
+
+<a id="hosted-cli-test-script-ready--november-4-2026"></a>
+
+- [Hosted CLI test script ready — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-cli-test-script-ready--november-4-2026)
+
+<a id="hosted-concurrency-and-interrupted-write-proof-passed--november-4-2026"></a>
+
+- [Hosted concurrency and interrupted-write proof PASSED — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-concurrency-and-interrupted-write-proof-passed--november-4-2026)
+
+<a id="private-signed-release-staging-v005--synthetic-only-code-checkpoint-nov-4-2026"></a>
+
+- [Private signed-release staging v0.0.5 — synthetic-only code checkpoint (Nov 4, 2026)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#private-signed-release-staging-v005--synthetic-only-code-checkpoint-nov-4-2026)
+
+<a id="wordpress-private-signed-staging-v005-local-regression-pass--november-4-2026"></a>
+
+- [WordPress private signed staging v0.0.5 local regression PASS — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-private-signed-staging-v005-local-regression-pass--november-4-2026)
+
+<a id="hosted-wordpress-v005-disabled-staging-screen-confirmed--november-4-2026"></a>
+
+- [Hosted WordPress v0.0.5 disabled staging screen confirmed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-wordpress-v005-disabled-staging-screen-confirmed--november-4-2026)
+
+<a id="isolated-hosted-synthetic-staging-storage-verified--november-4-2026"></a>
+
+- [Isolated hosted synthetic staging storage verified — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#isolated-hosted-synthetic-staging-storage-verified--november-4-2026)
+
+<a id="synthetic-ed25519-issuer-generated-locally--november-4-2026"></a>
+
+- [Synthetic Ed25519 issuer generated locally — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#synthetic-ed25519-issuer-generated-locally--november-4-2026)
+
+<a id="synthetic-signing-key-consistency-check-passed--november-4-2026"></a>
+
+- [Synthetic signing key consistency check PASSED — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#synthetic-signing-key-consistency-check-passed--november-4-2026)
+
+<a id="protected-wp-config-backup-confirmed--november-4-2026"></a>
+
+- [Protected wp-config backup confirmed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#protected-wp-config-backup-confirmed--november-4-2026)
+
+<a id="synthetic-public-verification-key-present-on-20i-enrollment-proposed--november-4-2026"></a>
+
+- [Synthetic public verification key present on 20i; enrollment proposed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#synthetic-public-verification-key-present-on-20i-enrollment-proposed--november-4-2026)
+
+<a id="hosted-synthetic-enrollment-confirmed-local-test-envelope-generator-prepared--nov-4-2026"></a>
+
+- [Hosted synthetic enrollment confirmed; local test-envelope generator prepared — Nov 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-enrollment-confirmed-local-test-envelope-generator-prepared--nov-4-2026)
+
+<a id="local-signed-synthetic-release-envelope-generated-and-self-verified--november-4-2026"></a>
+
+- [Local signed synthetic release envelope generated and self-verified — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#local-signed-synthetic-release-envelope-generated-and-self-verified--november-4-2026)
+
+<a id="hosted-synthetic-private-staging-completed--november-4-2026"></a>
+
+- [Hosted synthetic private staging completed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-private-staging-completed--november-4-2026)
+
+<a id="hosted-synthetic-storage-permissions-confirmed--november-4-2026"></a>
+
+- [Hosted synthetic storage permissions confirmed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-storage-permissions-confirmed--november-4-2026)
+
+<a id="lock-permission-hardening-local-regressions-passed--november-4-2026"></a>
+
+- [Lock permission hardening local regressions passed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#lock-permission-hardening-local-regressions-passed--november-4-2026)
+
+<a id="dedicated-lock-file-permission-regression-added--november-4-2026"></a>
+
+- [Dedicated lock-file permission regression added — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#dedicated-lock-file-permission-regression-added--november-4-2026)
+
+<a id="local-windows-isolated-lock-file-test-passed--november-4-2026"></a>
+
+- [Local Windows isolated lock-file test passed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#local-windows-isolated-lock-file-test-passed--november-4-2026)
+
+<a id="20i-linux-lock-file-hardening-pass--november-4-2026"></a>
+
+- [20i Linux lock-file hardening PASS — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-linux-lock-file-hardening-pass--november-4-2026)
+
+<a id="v006-local-regression-suites-passed--november-4-2026"></a>
+
+- [v0.0.6 local regression suites passed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#v006-local-regression-suites-passed--november-4-2026)
+
+<a id="hosted-staging-guard-remains-unchanged-after-attempted-plugin-upgrade--november-4-2026"></a>
+
+- [Hosted staging guard remains unchanged after attempted plugin upgrade — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-staging-guard-remains-unchanged-after-attempted-plugin-upgrade--november-4-2026)
+
+<a id="installed-plugin-v006-confirmed--storage-hardening-milestone-closed--november-4-2026"></a>
+
+- [Installed plugin v0.0.6 confirmed — storage hardening milestone closed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#installed-plugin-v006-confirmed--storage-hardening-milestone-closed--november-4-2026)
+
+<a id="development-efficiency-policy-for-remaining-wordpress-delivery-work--november-4-2026"></a>
+
+- [Development efficiency policy for remaining WordPress delivery work — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#development-efficiency-policy-for-remaining-wordpress-delivery-work--november-4-2026)
+
+<a id="streamlined-batch-1-implementation-kickoff--november-4-2026"></a>
+
+- [Streamlined Batch 1 implementation kickoff — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#streamlined-batch-1-implementation-kickoff--november-4-2026)
+
+<a id="github-actions-ci-failure-diagnosed-and-corrected--november-4-2026"></a>
+
+- [GitHub Actions CI failure diagnosed and corrected — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#github-actions-ci-failure-diagnosed-and-corrected--november-4-2026)
+
+<a id="batch-1-synthetic-core-entitlement-and-authenticated-pull-rehearsal--november-4-2026"></a>
+
+- [Batch 1 synthetic Core entitlement and authenticated pull rehearsal — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#batch-1-synthetic-core-entitlement-and-authenticated-pull-rehearsal--november-4-2026)
+
+<a id="latest-batch-1-automated-gate-pass--november-4-2026"></a>
+
+- [Latest Batch 1 automated gate PASS — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#latest-batch-1-automated-gate-pass--november-4-2026)
+
+<a id="batch-1-private-delivery-integration-checkpoint--november-4-2026"></a>
+
+- [Batch 1 private delivery integration checkpoint — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#batch-1-private-delivery-integration-checkpoint--november-4-2026)
+
+<a id="protected-core-authority-and-wordpress-rehearsal-checkpoint--november-4-2026"></a>
+
+- [Protected Core authority and WordPress rehearsal checkpoint — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#protected-core-authority-and-wordpress-rehearsal-checkpoint--november-4-2026)
+
+<a id="isolated-https-rehearsal-preflight--november-4-2026"></a>
+
+- [Isolated HTTPS rehearsal preflight — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#isolated-https-rehearsal-preflight--november-4-2026)
+
+<a id="rehearsal-scope-refinement"></a>
+
+- [Rehearsal scope refinement](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#rehearsal-scope-refinement)
+
+<a id="shared-inventory-accepted-and-bounded-rehearsal-fixture-prepared--november-5-2026"></a>
+
+- [Shared inventory accepted and bounded rehearsal fixture prepared — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#shared-inventory-accepted-and-bounded-rehearsal-fixture-prepared--november-5-2026)
+
+<a id="database-only-rehearsal-rollout-approved--november-5-2026"></a>
+
+- [Database-only rehearsal rollout approved — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#database-only-rehearsal-rollout-approved--november-5-2026)
+
+<a id="database-only-execution-access-checkpoint--november-5-2026"></a>
+
+- [Database-only execution access checkpoint — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#database-only-execution-access-checkpoint--november-5-2026)
+
+<a id="ssh-restored-rehearsal-credential-source-required--november-5-2026"></a>
+
+- [SSH restored; rehearsal credential source required — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#ssh-restored-rehearsal-credential-source-required--november-5-2026)
+
+<a id="consolidated-interactive-database-launcher-prepared--november-5-2026"></a>
+
+- [Consolidated interactive database launcher prepared — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#consolidated-interactive-database-launcher-prepared--november-5-2026)
+
+<a id="recovery-separated-from-resumable-database-setup--november-5-2026"></a>
+
+- [Recovery separated from resumable database setup — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#recovery-separated-from-resumable-database-setup--november-5-2026)
+
+<a id="hosted-native-recovery-failure-diagnosed-without-retry--november-5-2026"></a>
+
+- [Hosted native recovery failure diagnosed without retry — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-native-recovery-failure-diagnosed-without-retry--november-5-2026)
+
+<a id="hosted-pg17-recovery-checkpoint-independently-verified--november-5-2026"></a>
+
+- [Hosted PG17 recovery checkpoint independently verified — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-pg17-recovery-checkpoint-independently-verified--november-5-2026)
+
+<a id="hosted-wordpress-database-only-rollout-complete--november-5-2026"></a>
+
+- [Hosted WordPress database-only rollout complete — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-wordpress-database-only-rollout-complete--november-5-2026)
+
+<a id="protected-https-rehearsal-authorized-read-only-preflight-checkpoint--november-5-2026"></a>
+
+- [Protected HTTPS rehearsal authorized; read-only preflight checkpoint — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#protected-https-rehearsal-authorized-read-only-preflight-checkpoint--november-5-2026)
+
+<a id="separate-self-service-rehearsal-package-plan--november-5-2026"></a>
+
+- [Separate self-service rehearsal package plan — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#separate-self-service-rehearsal-package-plan--november-5-2026)
+
+<a id="approved-isolated-package-implementation--build-preparation"></a>
+
+- [Approved isolated package implementation — build preparation](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#approved-isolated-package-implementation--build-preparation)
+
+<a id="isolated-linux-build-stopped-before-hosted-changes--november-5-2026"></a>
+
+- [Isolated Linux build stopped before hosted changes — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#isolated-linux-build-stopped-before-hosted-changes--november-5-2026)
+
+<a id="bounded-dependency-and-renderer-correction--local-gates-passed-linux-gates-pending"></a>
+
+- [Bounded dependency and renderer correction — local gates passed, Linux gates pending](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#bounded-dependency-and-renderer-correction--local-gates-passed-linux-gates-pending)
+
+<a id="independent-read-only-public-runtime-assessment-and-prepared-security-candidate"></a>
+
+- [Independent read-only public-runtime assessment and prepared security candidate](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#independent-read-only-public-runtime-assessment-and-prepared-security-candidate)
+
+<a id="final-corrective-linux-and-artifact-gates--pass"></a>
+
+- [Final corrective Linux and artifact gates — PASS](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#final-corrective-linux-and-artifact-gates--pass)
+
+<a id="approved-public-security-update-attempted-verified-rollback--november-6-2026-utc"></a>
+
+- [Approved public security update attempted; verified rollback — November 6, 2026 UTC](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#approved-public-security-update-attempted-verified-rollback--november-6-2026-utc)
+
+<a id="verified-build-contract-mismatch-and-prepared-next-decision"></a>
+
+- [Verified build-contract mismatch and prepared next decision](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#verified-build-contract-mismatch-and-prepared-next-decision)
+
+<a id="authorized-webpack-loopback-diagnostic--pass-november-6-2026"></a>
+
+- [Authorized Webpack loopback diagnostic — PASS, November 6, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#authorized-webpack-loopback-diagnostic--pass-november-6-2026)
+
+<a id="return-path-full-miopages-commercial-v1"></a>
+
+- [Return path: full MioPages Commercial V1](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#return-path-full-miopages-commercial-v1)
+
+<a id="original-evidence-cycle-retained-responses-and-actual-wordpress-review"></a>
+
+- [Original-evidence cycle: retained responses and actual WordPress review](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#original-evidence-cycle-retained-responses-and-actual-wordpress-review)
+
+</details>

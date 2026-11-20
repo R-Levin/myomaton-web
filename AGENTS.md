@@ -1,3 +1,16 @@
+## MioPages development recovery
+
+Read `docs/development-control.md` and the existing local
+`runtime-content/chat-recovery.md` before substantive work. Verify the active
+branch/worktree and latest owner decisions; an older root checkout or `main`
+is not the latest implementation checkpoint. Preserve uncommitted work.
+Update the local note during material work, before a Git checkpoint or
+interruption, with decisions, progress, failures, pending operations and the next
+safe action. Keep credentials and protected customer text out of recovery notes.
+Use the canonical service contracts for product direction; C0 tests and temporary
+launch arrangements do not redefine the complete growth service. Reuse suitable
+existing components throughout development. These rules grant no external authority.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

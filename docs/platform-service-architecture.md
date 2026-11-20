@@ -19,6 +19,10 @@ ownership explicit while leaving provider procedures to later integration runboo
 
 ## Architectural principles
 
+- MioPages is a managed Web Presence growth service. Apply reuse of valuable,
+  suitable components across the entire development effort; Creation/Ongoing
+  sharing is one example. Inspect existing behavior/contracts before adding a
+  parallel mechanism, and record why a genuine extension or replacement is needed.
 - Deliver a managed service with bounded customization, not bespoke site-building;
   preserve the [service model](web-presence-service-model.md) and customer ownership.
 - PostgreSQL remains the database architecture. Launch for 100+ customers uses
@@ -316,6 +320,15 @@ remain the intended baseline; optional external engines follow the
 [onboarding/content contract](onboarding-optimization.md#native-articles-and-optional-external-engines).
 
 ### WordPress delivery and designer adoption
+
+**November 20 clarification:** the delivery proofs do not establish complete
+WordPress-to-Core knowledge/content synchronization, portal coordination or
+plugin/Admin-only portability. The current four-area review/status is in the
+[delivery contract](wordpress-delivery-feasibility.md#coordination-media-and-adoption-review--november-20).
+No decision has been made to limit launch to 20i. Such a launch boundary would be
+transitional, not a change to Core's provider-neutral domain or the retained
+existing-site/off-host market. Hosting choice does not grant control over a
+customer's theme, builder, forms or unmanaged content.
 
 WordPress is a committed integration direction. Initially, independently hosted
 WordPress installations connect over authenticated HTTPS to one shared Core and

@@ -3,6 +3,33 @@
 Status: **Committed integration direction. Bounded private delivery acceptance closed.** Production migration and publication retain separate approval gates.
 Scope: alternate Managed Site delivery adapter using standard WordPress sites, initially 20i Reseller; existing Next.js delivery and hosted synthetic C0 preserved.
 
+## Coordination, media and adoption review — November 20
+
+The owner reaffirmed these as important service requirements, with implementation
+sequencing still to be decided. This is a source/evidence review, not fresh hosted
+verification or authorization to change an installation.
+
+| Area | Existing work to preserve | Boundary still open |
+| --- | --- | --- |
+| Core → WordPress | Exact Page/site authorization, signed HTTPS delivery, native private drafts, stable Page identities, application receipts, retry, revision/high-water history and rollback. | Private delivery does not establish complete public operation or every host's compatibility. |
+| WordPress → Core | Existing inbound-proposal design/prototype and native-writer drift refusal; Core proposal/knowledge confirmation machinery. | Capture supported content/presentation/additions as scoped versioned changes, classify their meaning, reconcile conflicts and preserve accepted refinements. A WordPress save is not automatic canonical business-knowledge promotion. |
+| Portals and account coordination | Core Customer/Operator surfaces, My Business, review/draft state and scoped APIs. | One consistent account/work/review history with actual permissions and resumable feedback. Do not require customer WordPress accounts or duplicate approvals/status in separate systems. |
+| Media | Asset/AssetUsage and intake/rights machinery; signed optimized private copies, attachment mapping, placement and rollback proofs. | Complete production master/copy ownership, replacement, withdrawal, deletion, cache/retention and customer-exit policy; governed WordPress-origin media intake. Media transport success does not decide these policies. |
+| Existing site/theme | Explicit managed-scope and theme/builder ownership contracts; delivery is separable from Core. | Adopt useful existing content/design and coordinate Actions/forms/measurement without requiring our theme or taking over unmanaged content. Every builder cannot be presumed supported. |
+| Off-host, plugin/Admin-only | Host-independent signed transport and capability diagnostic. | Private storage, scheduling, authentication, receipt/drift and recovery under ordinary plugin/WordPress Admin access. The SSH/CLI-assisted 20i proof does not prove this operating condition. |
+
+WordPress changes need classification: business facts, editorial content,
+presentation decisions and installation configuration have different authority
+and persistence needs. Use the existing governed proposal/confirmation routes
+rather than treating every WP setting as client business knowledge. First-party
+measurement records observation/coverage, not assumed business outcomes.
+
+A 20i-only launch may simplify initial operation but remains an undecided,
+transitional commercial option. It does not remove the existing-site/off-host
+requirements or make infrastructure identity part of Core. Prioritize these gaps
+against the first actual supported customers; do not restart accepted delivery
+proofs or let connector engineering replace the complete growth-service goal.
+
 ## Decision and boundaries
 
 The operator approved proceeding under the WordPress Delivery Feasibility Specification v0.1 and subsequent clarifications:
@@ -250,8 +277,9 @@ establish canonical authority. Preserve customer-controlled media on connected
 sites and respect the [usable exit contract](web-presence-service-model.md#customer-ownership-and-understandable-exit).
 
 Production storage, attachment synchronization and inbound editorial scope
-remain pending. This decision review leaves the existing text-only WordPress
-staging gate in place.
+remain pending. **Historical boundary of this earlier decision review:** staging
+was then text-only. The later signed private-media implementation below supersedes
+that transport limitation, without deciding the complete production lifecycle.
 
 ## Chosen reference fixture: accepted service-led v3 C0
 

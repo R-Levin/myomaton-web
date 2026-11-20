@@ -25,6 +25,30 @@ The [growth loop](content-growth-loop.md) and
 contracts. This is planned operating direction unless expressly identified as
 implemented; it adds no runtime, staffing system, service guarantee or customer state.
 
+## Transitional launch arrangements
+
+**Owner clarification, November 20, 2026.** Keep the intended complete service,
+the C0 Core-generation evaluation and practical launch arrangements distinct:
+
+- An early usable public MioPages site may support credibility and genuine
+  measurement before full automation. Its content can reuse valuable approved
+  work. Manual editorial preparation does not prove Core generated it; public
+  readiness and publication still require their own actual decisions.
+- Operators may temporarily cover functions intended for Core to enable an
+  earlier deliverable service. Record the actual manual responsibility, shared
+  account/work history, limitation and replacement need. Do not create a second
+  operating system or let temporary labor redefine the ultimate product.
+- Human judgment, customer confirmation and consequential approvals remain
+  intentional parts of the service. They are not all automation gaps.
+- A 20i-only initial launch is an **undecided option**, with market impact not
+  established. Existing-site adoption, alternate themes and off-host integration
+  remain intended requirements even if initial commercial scope is narrower.
+
+These are launch-planning distinctions, not approval of a launch date, reduced
+product scope, public promise, new staffing structure or hosted operation. Core
+should record which service work is actual, operator-assisted, simulated or still
+unavailable. Keep factual provenance and customer/publication gates intact.
+
 ## Standard Launch
 
 Most businesses/organizations should fit Standard. Absorb normal customer-to-customer

@@ -9,7 +9,9 @@ Commercial/payment terms require separate validation; Review auto-delivery and a
 operator network remain future hypotheses. See P11–P14 and P26 in the
 [architecture register](deferred-architecture.md).
 
-## Current functional map — November 18, 2026
+<a id="current-functional-map--november-18-2026"></a>
+
+## Current functional map — November 20, 2026
 
 This reconciles the complete approved service with current development evidence.
 It refines dated statuses below without replacing the architecture register or
@@ -17,25 +19,31 @@ declaring Commercial V1 complete. The November 13 local handoff assessment remai
 historical. C0 is development evidence, not a different product. There are no
 customers yet using the new service.
 
+The November 20 reconciliation checked canonical contracts, source boundaries,
+the existing operational-cycle implementation/tests and dated hosted handoffs.
+It made no fresh hosted-health test or provider dispatch. The owner-approved
+product remains the complete growth service, with reuse across all development
+and delivery/provider independence. See the [service principles](web-presence-service-model.md#governing-product-principles).
+
 | Service stage | Functioning evidence to preserve | Connection still needed for ordinary service |
 | --- | --- | --- |
 | Free Review / Direct Start | Shared versioned intake, progress/submissions and Review synthesis; distinct generated journey pages at [4473](http://127.0.0.1:4473/). | Public intake, reliable private Review delivery and commercial handoff. Current candidate links do not submit requests. |
 | Research / adaptive interview | Real API-generated C0, C2 and startup reasoning; answer-dependent assessment and isolated persistence. Complete original text and actual peer pixels reached the genuine original-evidence run. | Integrate useful questioning and source reuse into ordinary onboarding. Transmission/retention alone does not establish high-quality research or intelligence. |
 | Living business understanding | Retained answers/provenance, report review/corrections, canonical Knowledge/Offering writers and immutable revisions. | Seamless Customer/Operator My Business correction/confirmation and independent versioned proposal storage. Generated findings and the ten retained answers do not become confirmed facts automatically. |
 | Assessment / Presence Direction | Genuine hosted report/Direction and source-bound strategy plans. | Consistently useful intelligence, explained consequences and normal customer confirmation; generation success is not acceptance. |
-| Complete site creation | Eight genuinely generated/revised C0 Pages, original brand and two reviewed stock Assets/usages in actual native WordPress at [4474](http://127.0.0.1:4474/); earlier five-page/4473 candidate retained. Nested blocks and exact local rollback verified. | Stronger external intelligence, visual variety, substantive writing, purposeful media and repeatable quality. Preserve v3 and both rejected candidates. The real new candidate still has commercial defects; local Operator cuts are explicitly journaled and not yet a durable Core review/edit flow. No product acceptance is claimed. |
+| Complete site creation | Genuine retained research/report/Direction/Page outputs and source-bound Core review. Current local source97 has six Pages, improved theme0.1.2 layout and no photo placements at [the exact Home preview](http://127.0.0.1:4474/?page_id=203&preview=true). Paid three-Page revision106 was recovered/validated without regeneration, not applied. Earlier eight-Page/two-photo source75 and other candidates remain retained. | Consistently useful business intelligence, full growth-service explanation, original design/purposeful media and ordinary resumable editorial operation. Neither technical tests nor recovered106 establish owner acceptance. Do not overwrite earlier work or blindly regenerate. |
 | Review / private delivery | Exact Page/site governance, signed HTTPS pull, scoped principals, stable WordPress IDs, application receipts, monotonic revisions and rollback; protected revision 6 retained. | Carry a good candidate through resumable Customer/Operator review. Local visual critique is not signed approval. New component version 2 remains local-only. |
 | Account / Launch / operations | Hosted protected owner login; customer binding, activation, roles/permissions and readiness foundations. Legacy HostShop remains separate. | Ordinary customer account/recovery, payment/commercial reconciliation, Launch readiness and delivery operations. No complete automated signup/billing or public launch is claimed. |
 | Contact / leads / outcomes | Canonical Contact acceptance; a restricted hosted synthetic inquiry with revision lineage and improvement recommendation. | Genuine submissions, abuse/privacy/retention, notification/delivery, customer-confirmed qualification and outcomes. Synthetic inquiries are not leads. |
 | First-party measurement / reporting | Durable local scoped page/Action events, deduplication, accepted-Contact reconciliation and Performance Snapshot/recommendation fixtures. | Installation-bound collection, coverage/consent/internal/bot treatment and useful real reports. No claimed traffic/conversion/revenue. Google integrations remain optional enrichment. |
 | Ongoing improvement / growth | Recommendation → Operator change → signed private revision/receipt/restore exercised with synthetic inputs; shared generation supports revisions. | Actual observation and confirmed outcomes driving prioritization, Articles, approval, delivery and remeasurement. Ongoing remains core scope, not maintenance-only or optional future work. |
 
-**Current coordinated increment.** Repair source intake, visual research, original
-composition and media in the existing Creation/Ongoing engine, then evaluate their
-effect in one genuine C0 cycle. Each Action retains its destination and operational
-readiness. Reuse the inquiry/measurement loop while showing missing notifications,
-collection and outcomes. After a useful site, connect real consented Action/Contact
-evidence to the same revision workflow.
+**Current coordinated increment:** reconcile active steering assets and verify
+interruption recovery under the November 20 owner decision. Source/schema repairs
+and paid-output recovery have already progressed; do not repeat them merely because
+an old handoff says they are pending. No new model dispatch, public-site work or
+hosted write is part of this review. The next product increment should be selected
+after the findings, retaining the whole lifecycle and explicit launch distinctions.
 
 The [service model](web-presence-service-model.md), [progressive onboarding](progressive-onboarding-and-launch-readiness.md),
 [knowledge transfer](paid-onboarding-knowledge-transfer-contract.md), [measurement](measurement-and-analytics.md),
@@ -44,6 +52,92 @@ and [active gates](deferred-architecture.md) retain the full requirements.
 Publication, consequential customer decisions, protected writes, spending and
 merges retain their existing authority. A fresh hosted-health audit was not
 performed in this local increment; cited hosted results are retained evidence.
+
+### Service-process framework: existing foundations and missing connections
+
+The requested framework is **partly implemented**, not absent and not commercially
+complete. Reuse these actual components rather than start a new framework project:
+
+| Existing component | What the source establishes | What it does not establish |
+| --- | --- | --- |
+| Shared intake and protected Core | [Intake service](../lib/platform/intake/service.ts), [hosted request boundary](../lib/platform/intake/hosted-core.ts), [Customer/Operator journey](../scripts/intake/c0-site-journey-client.tsx) and [My Business](../lib/platform/intake/my-business.ts) hold scoped progress, evidence, review and corrections. | A fully usable ordinary-customer signup/interview/account/support lifecycle or owner acceptance of the earlier scripted interview. |
+| Core generation orchestration | [Shared workflow](../lib/platform/intake/presence-workflow.ts) and [case/worker composition](../lib/platform/intake/protected-presence-workflow.ts) retain research, report, Direction, plan, Pages, review, failures and no-provider recovery. Real API outputs exist. | Consistent commercial intelligence/design quality, a complete autonomous service or authority to dispatch under expired/consumed grants. |
+| Proposal and delivery | Existing canonical proposals, approval/release controls and [workflow projection](../lib/platform/intake/presence-workflow-delivery.ts) connect to signed native WordPress staging/receipts/rollback. | Complete WP-origin knowledge/design synchronization, media policy or plugin/Admin-only portability. See the [WP review](wordpress-delivery-feasibility.md#coordination-media-and-adoption-review--november-20). |
+| Inquiry and feedback | Canonical Contact acceptance, [protected inquiry](../lib/platform/contact/protected-inquiry.ts) and [cycle readback](../lib/platform/wordpress-delivery/cycle-measurement.ts) connect a labeled synthetic observation to a revision-linked recommendation. | Real notifications, qualified leads, customer-confirmed outcomes or proven commercial performance. |
+| Measurement and Ongoing | [First-party ledger/snapshot](../lib/platform/measurement/first-party.ts) and [connected cycle evidence](c0-integration-spine-phase-b-2026-11-10.md#first-connected-operational-cycle) establish scoped/deduplicated signals and a fixture-backed improvement/revision sequence. | Live collection coverage, mature analysis/reporting, opportunity-driven Article/content operations and remeasurement as one ordinary service. The fixed synthetic recommendation is a beacon, not actual AI analysis of customer demand. |
+
+The evidence supports both reuse and further integration. A missing connection is
+not proof that the component must be rebuilt; a fixture is not proof that the
+corresponding product function is finished. Customer/Operator permissions and
+approval history remain distinct from simulated role perspectives. Early public
+site work and manual operator coverage are tracked as transitional launch work,
+not replacement definitions of this framework or the whole product.
+
+### November 20 reconciliation findings and limits
+
+The canonical service, content-growth, conversion, opportunity and architecture
+contracts substantially preserve the complete service. The review did not find
+grounds to replace them wholesale. Demonstrated steering/continuity drift was:
+
+- The recovery index had become a large C0/hosting execution chronology with
+  competing historical Current/next-step labels. The new front page restores
+  service purpose, current state, contract ownership and a safe next action;
+  original details and old incoming anchors remain linked to immutable history.
+- The owner-critical index linked a shared Creation/Ongoing architecture, P0-22/23
+  assignment and stage-appropriate access policy that existed on `main` but were
+  absent from this implementation branch. Restored the existing records/policy
+  with source/status provenance, without merging or changing application grants.
+  Reconciled a shared-architecture sentence that wrongly grouped reuse of owned
+  R3 material with prohibited copying of third-party designs; useful authorized
+  owned work may be retained/improved while outside originality/rights rules stand.
+- The local Markdown recovery note stopped at November 1 and was absent from
+  the active worktree. It now records current owner decisions and uncommitted
+  progress, with a root-checkout pointer and preserved original note. Its
+  pre-commit readback is a process check, not automatic capture of unwritten chat.
+- README/agent entry guidance and the capability map needed current product
+  identity, correct branch/local-note recovery and honest C0 state. Old eight-Page
+  and current six-Page candidates are retained rather than conflated.
+- The earlier WordPress media discussion still said text-only staging while a
+  later section described signed native media. That sentence is now explicitly
+  historical. Inbound knowledge/design sync, portal consistency, complete media
+  policy and off-host/plugin-only behavior remain open, not silently completed.
+- Temporary public-site urgency, manual operator coverage and a possible20i-only
+  launch now have explicit separate status in the operations/architecture contracts.
+  None is a permanent reduction of the complete service or a new launch decision.
+
+The provider/marketing source boundaries were inspected: processing instructions,
+approved Knowledge, editorial reference, analytical material and unconfirmed
+answers are distinct; the genuine Core workflow and no-provider recovery exist.
+This does not establish consistently good research/design output. It does not
+erase documented earlier source/schema/judgment failures or approve106. No frozen
+proposal/grant/source hash, stored context, model ledger or deployed worker was
+rewritten to match the documentation. Archived source-pack hashes still identify
+their original approved bytes; do not update an old manifest to authorize new text.
+
+This is a bounded review of active steering assets and source/evidence, not a
+forensic reading of every ChatGPT turn or proof that every historical influence
+has been eliminated from all software. Current `main`/other worktrees were not
+merged or rewritten. The exact active-branch/Issue handoff governs this correction.
+Application behavior and hosted operation have not changed. Choose the next
+coordinated product increment after owner review of these findings.
+
+**Verification of this correction:** 20 existing focused source/authority/reasoning/
+synthetic-cycle tests passed,0 failed/0 skipped, with no provider calls. The existing
+documentation checker validated local links/anchors. A separate disk/Git-only
+readback started at the older root checkout, followed the repaired local note,
+recovered all 12 pending source files and their exact hashes **before commit**, and
+verified all 147 historical recovery anchors remain available. The original local
+note and full old recovery index were retained byte-for-byte. No background chat
+recorder, new permissions system or second service framework was built.
+
+**Remaining owner decisions:** the first supported launch scope (20i-only or a
+broader supported subset), the separate public-site/measurement launch path, and
+which manual responsibilities can credibly bridge an early service. These do not
+decide the ultimate product boundaries. The next coordinated product increment
+should connect the largest useful remaining service gap using existing components;
+do not automatically resume a C0 generation loop or create another framework.
+The owner should receive a concise product-level discussion, with detailed
+engineering performed under its eventual bounded implementation scope.
 
 ## Purpose
 

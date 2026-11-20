@@ -5,6 +5,33 @@ connects the free Review, paid Launch and Ongoing as one continuous service. It 
 approval checkpoints and business-change handling, not new runtime capabilities,
 final payment terms or a public service commitment.
 
+## Governing product principles
+
+**Owner reaffirmed November 20, 2026:** MioPages is the complete managed Web Presence
+**growth service**. A website is an important service surface and C0 is a development
+case; neither site generation nor its technical tests are the whole product.
+Discovery, credible communication, useful inquiries, measurement, reporting and
+continuing content/optimization work remain connected customer outcomes.
+
+Reuse valuable, suitable functional components throughout **all development**.
+Check existing contracts and implementations before building another mechanism;
+extend or improve them where appropriate. Creation and Ongoing sharing research,
+reasoning, content/media, review, approval, delivery and feedback is one example.
+Reuse does not require preserving a weak implementation or creating a speculative
+universal framework. Any necessary new mechanism should explain why existing work
+cannot meet the need and how it connects to the service.
+
+Core governs knowledge, workflow, decisions, revisions and authority. Delivery and
+external providers implement defined responsibilities without becoming the service
+model. Logical separation does not require separate infrastructure for every role.
+See the [architecture](platform-service-architecture.md#architectural-principles).
+
+The early public C0 website and operator-assisted launch are distinct transitional
+arrangements under the [operations contract](service-operations-model.md#transitional-launch-arrangements).
+They do not reduce the permanent product requirements, establish an AI-generation
+success, or independently authorize deployment, spending or publication. Detailed
+engineering remains necessary even when owner discussion is deliberately high-level.
+
 ## Core service
 
 The Web Presence service captures what an organization knows about its business
