@@ -6,22 +6,35 @@ const surfaces = ["none", "light", "brand", "tonal", "strong"] as const;
 const sizes = ["none", "small", "medium", "large"] as const;
 const alignments = ["start", "center", "end", "stretch"] as const;
 const nullableText = { type: ["string", "null"] };
-const shape = (properties: Record<string, unknown>) => ({ type: "object", properties,
+const shape = <P extends Record<string, unknown>>(properties: P) => ({ type: "object", properties,
   required: Object.keys(properties), additionalProperties: false });
 const options = (values: readonly string[]) => ({ type: "string", enum: values });
 
+const layoutFields = { gap: options(sizes), inset: options(sizes), surface: options(surfaces), align: options(alignments),
+  measure: options(["narrow", "reading", "wide", "full"]), typeScale: options(["small", "body", "lead", "display"]),
+  span: { type: "integer", minimum: 1, maximum: 12 }, mobileOrder: { type: "integer", enum: [0] },
+  border: { type: "boolean" }, rounded: { type: "boolean" } };
+/** The wire enforces kind-specific structure, rather than inviting output the compiler must reject. */
 export const nativeComponentSchema = {
   ...shape({ version: { type: "integer", enum: [2] }, name: { type: "string" }, purpose: { type: "string" },
     mode: options(["supplement", "section"]), root: { $ref: "#/$defs/nativeNode" } }),
-  $defs: { nativeNode: shape({
-    kind: options(kinds), text: nullableText, level: { type: ["integer", "null"] },
-    items: { type: "array", items: { type: "string" } }, ordered: { type: "boolean" },
-    reference: nullableText,
-    layout: shape({ arrangement: options(arrangements), columns: { type: "array", items: { type: "number" } },
-      gap: options(sizes), inset: options(sizes), surface: options(surfaces), align: options(alignments),
-      measure: options(["narrow", "reading", "wide", "full"]), typeScale: options(["small", "body", "lead", "display"]), span: { type: "integer" }, mobileOrder: { type: "integer" }, border: { type: "boolean" }, rounded: { type: "boolean" } }),
-    children: { type: "array", items: { $ref: "#/$defs/nativeNode" } },
-  }) },
+  $defs: {
+    nativeLayout: { anyOf: [
+      shape({ arrangement: options(["flow", "row"]), columns: { type: "array", items: { type: "number" }, maxItems: 0 }, ...layoutFields }),
+      shape({ arrangement: options(["columns"]), columns: { type: "array", items: { type: "number", exclusiveMinimum: 0, maximum: 12 }, minItems: 2, maxItems: 12 }, ...layoutFields }),
+    ] },
+    nativeNode: { anyOf: kinds.map(kind => shape({
+      kind: options([kind]),
+      text: ["heading", "paragraph", "details"].includes(kind) ? { type: "string" }
+        : ["action", "image", "list"].includes(kind) ? nullableText : { type: "null" },
+      level: kind === "heading" ? { type: "integer", enum: [1, 2, 3, 4, 5, 6] } : { type: "null" },
+      items: { type: "array", items: { type: "string" }, ...(kind === "list" ? { minItems: 1 } : { maxItems: 0 }) },
+      ordered: { type: "boolean" },
+      reference: ["image", "action"].includes(kind) ? { type: "string", pattern: kind === "image" ? "^section-(0|[1-9][0-9]*)$" : "^action-(0|[1-9][0-9]*)$" } : { type: "null" },
+      layout: { $ref: "#/$defs/nativeLayout" },
+      children: { type: "array", items: { $ref: "#/$defs/nativeNode" }, ...(["group", "details"].includes(kind) ? { minItems: 1 } : { maxItems: 0 }) },
+    })) },
+  },
 };
 
 export type NativeNode = {
@@ -117,6 +130,21 @@ export function bindNativeActionLabels(value: unknown, actions: unknown): unknow
       node.text=action.label;
     }
     if(Array.isArray(node.children))node.children.forEach(child=>visit(child,depth+1));
+  }
+  visit((result as {root?:unknown}).root);
+  return result;
+}
+
+/** Keep an empty disclosure's exact visible text, without manufacturing an answer or empty interactive control. */
+export function recoverProviderNativeComponent(value:unknown,actions:unknown):unknown {
+  const result=bindNativeActionLabels(value,actions);
+  if(!result||typeof result!=="object"||(result as {version?:unknown}).version!==2)return result;
+  function visit(value:unknown,depth=0) {
+    if(!value||typeof value!=="object"||depth>24)return;
+    const n=value as {kind?:unknown;text?:unknown;level?:unknown;reference?:unknown;items?:unknown;children?:unknown};
+    if(n.kind==="details"&&Array.isArray(n.children)&&n.children.length===0&&Array.isArray(n.items)&&n.items.length===0&&
+       n.level===null&&n.reference===null&&typeof n.text==="string"&&n.text.trim())n.kind="paragraph";
+    if(Array.isArray(n.children))n.children.forEach(child=>visit(child,depth+1));
   }
   visit((result as {root?:unknown}).root);
   return result;

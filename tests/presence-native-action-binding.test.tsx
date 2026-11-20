@@ -30,3 +30,23 @@ test("unknown/external/negative references, empty labels and markup remain refus
  const bound=bindNativeActionLabels(raw.sections[0].block,raw.actions) as typeof raw.sections[0]["block"];
  assert.equal(bound.root.children[1].text,"Explicit unchanged label");
 });
+
+test("an empty provider disclosure retains its exact visible statement without inventing expansion content or relaxing canonical structure",async()=>{
+ const{recoverProviderNativeComponent,nativeComponentSchema}=await import("../lib/platform/intake/presence-native-component");
+ const raw=fixture();raw.sections[0].block.root.children.push(node("details",{text:"An exact retained visible statement"}));
+ const before=structuredClone(raw);
+ assert.throws(()=>readNativeComponent(raw.sections[0].block));
+ const parsed=readPage(raw,"/",["/","/service"],["offer"],{},true,true,true);
+ assert.deepEqual(raw,before);
+ const block=parsed.sections[0].block!;if(block.version!==2)throw Error("Native fixture");
+ assert.equal(block.root.children.at(-1)!.kind,"paragraph");
+ assert.equal(block.root.children.at(-1)!.text,"An exact retained visible statement");
+ assert.deepEqual(block.root.children.at(-1)!.children,[]);
+ const wire=nativeComponentSchema.$defs.nativeNode.anyOf;
+ const detail=wire.find(schema=>schema.properties.kind.enum[0]==="details")!;
+ assert.equal((detail.properties.children as {minItems?:number}).minItems,1,"New provider responses cannot produce empty disclosures");
+ const paragraph=wire.find(schema=>schema.properties.kind.enum[0]==="paragraph")!;
+ assert.equal((paragraph.properties.children as {maxItems?:number}).maxItems,0);
+ const bad=fixture();bad.sections[0].block.root.children.push(node("details",{text:"<script>unsafe</script>"}));
+ assert.throws(()=>readNativeComponent(recoverProviderNativeComponent(bad.sections[0].block,bad.actions)));
+});

@@ -2905,3 +2905,33 @@ case. Home81 saved; supporting-Page WORK may be active. Inspect event/ledger,
 never duplicate pending work or regenerate Home. Source/resource amendments
 already applied. Complete all6 proposed Pages, then actual local WordPress and
 desktop/mobile whole-site critique/correction; retain raw outputs and all history.
+
+### Wire structure corrected; How-it-works recovered without regeneration
+
+After Home81 and Service83, completed How-it-works was retained/refused85.
+Exact parser diagnostics found one details node with its visible statement but
+zero expanded children. The provider schema previously allowed invalid
+kind/field combinations that the native compiler correctly refused.
+
+The recursive wire now expresses node-specific text/level/reference/list/child
+requirements and valid layout alternatives directly (documented Structured
+Outputs anyOf/minItems/maxItems; no unsupported conditional keywords).
+Canonical validation remains strict. Provider-only recovery converts an empty
+disclosure with exact existing visible text and otherwise valid empty fields
+into a paragraph: no invented expanded answer, content deletion or arbitrary
+layout guess. Actual retained response6ec1b76b now parses5sections/2Actions;
+normal recover85→86 PASS, no replacement generation.
+
+Linux75pass/0fail/0skip/0provider; TypeScript/lint and focused19tests pass.
+Worker7db54f7977fc94300f53361473490caf643802fc897408835cd6da493c502a4d,
+proof75f418796f4e4e31e4016b14779a5edbc53af754d4445e2166a6a2896052be51
+active only in existing private CLI runtime; previous files retained.
+At85 usage$7.553845/conservative debit$7.914017,31generations/61requests,
+zero pending before resumed FAQ. Same approved13-dollar aggregate ceiling,
+existing grantf024b799, sources/expiry/permissions and protected state unchanged.
+This is recovery of genuine model work, not manually authored website copy.
+
+**RECOVERY / RESUME HERE:**How-it-works86 saved, current WORK may be active on
+FAQ then Free Review/Direct Start. Inspect event/ledger, never duplicate an
+in-flight generation. Complete all6 Pages, then actual local WordPress capture,
+full-site commercial/visual critique and bounded corrections before owner review.

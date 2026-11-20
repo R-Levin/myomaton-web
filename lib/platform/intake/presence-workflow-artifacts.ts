@@ -2,7 +2,7 @@ import { choice, object, text } from "../canonical/model";
 import { canonicalPagePath } from "../managed-sites/paths";
 import { decisionBriefSchema, readDecisionBrief } from "./presence-decision-brief";
 import { readSemanticBlock, semanticBlockSchema } from "./presence-semantic-block";
-import { assertNativeSection, nativeComponentSchema, bindNativeActionLabels } from "./presence-native-component";
+import { assertNativeSection, nativeComponentSchema, recoverProviderNativeComponent } from "./presence-native-component";
 
 export const evidenceKinds = ["owner-confirmed", "earlier-review-answer", "earlier-review-assessment", "website-observation", "customer-unconfirmed", "historical-discovery", "service-direction", "public-research"] as const;
 export type PresenceEvidence = { id: string; kind: typeof evidenceKinds[number]; label: string; reference: string; date: string | null; content: string; rawDigest?: string; discoveredFrom?: string; captureStatus?: "incomplete" };
@@ -152,7 +152,7 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
     const role = composition ? choice(section.role, sectionRoles) : undefined;
     const visual = object(section.visual, ["purpose", "brief", "altIntent", "status"]);
     const block = section.block == null ? undefined : readSemanticBlock(
-      normalizeProviderReferences && semanticBlocks ? bindNativeActionLabels(section.block,page.actions) : section.block,
+      normalizeProviderReferences && semanticBlocks ? recoverProviderNativeComponent(section.block,page.actions) : section.block,
       normalizeProviderReferences && semanticBlocks);
     if (block?.version === 2) assertNativeSection(block, copy(section.heading), role ?? "intro");
     return { heading: copy(section.heading), body: copy(section.body), sourceIds: citedSources(section.sourceIds, ids, normalizeProviderReferences),
