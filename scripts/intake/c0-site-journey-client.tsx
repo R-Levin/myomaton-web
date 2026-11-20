@@ -20,7 +20,7 @@ import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-p
 import type { reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
 
 type Operations = Awaited<ReturnType<typeof import("../../lib/platform/contact/protected-inquiry").protectedInquiry>>;
-type JourneyView = IntakeView & { portal?: IntakePortalWorkspace; myBusiness?: MyBusinessView; accountWork?: AccountWorkView; accountWorkUnavailable?: true; accountActivity?: PerformanceSnapshot; accountActivityUnavailable?: true; inquiryOutcomes?: InquiryOutcomeView; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
+type JourneyView = IntakeView & { portal?: IntakePortalWorkspace; myBusiness?: MyBusinessView; accountWork?: AccountWorkView; accountWorkUnavailable?: true; accountActivity?: PerformanceSnapshot; accountActivityUnavailable?: true; inquiryOutcomes?: InquiryOutcomeView; inquiryOutcomesUnavailable?: true; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
   sitePlanningReview?: ReturnType<typeof reviewedSitePlanning> & { current: boolean } };
 async function request(endpoint: string, operation?: object, signal?: AbortSignal): Promise<JourneyView | null> {
   const response = await fetch(endpoint, {
@@ -254,6 +254,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           activity={view.accountActivity} activityUnavailable={activityUnavailable || view.accountActivityUnavailable}
           observe={view.accountActivity ? () => observeReview("action-selected", "open-current-work") : undefined}
           canCorrect={!hosted || workspace?.understandingCorrectionsAvailable === true} />}
+        {view.inquiryOutcomesUnavailable && <p role="alert">Core could not read inquiry outcomes. Their current status is unknown; no absence of inquiries or business result is implied.</p>}
         {view.inquiryOutcomes && <AccountInquiriesPanel view={view.inquiryOutcomes} busy={busy} run={run} />}
         {view.myBusiness && <MyBusinessPanel business={view.myBusiness} corrections={view.workflow?.corrections} />}
         <PresenceWorkflowPanel hosted={hosted} workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run}

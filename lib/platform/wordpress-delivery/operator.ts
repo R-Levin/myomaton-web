@@ -4,7 +4,8 @@ import type { Scope } from "../content-editing/authority";
 import { object, text } from "../canonical/model";
 import type { Actor, CustomerAuthority, Permission, ProposalAuthority } from "../content-editing/proposal";
 
-type Operation = Permission | "review-private-stage" | "authorize-native-draft" | "enroll" | "rotate" | "revoke" | "issue";
+type Operation = Permission | "review-private-stage" | "authorize-native-draft" | "enroll" | "rotate" | "revoke" | "issue"
+  | "confirm-business-information" | "inspect-inquiry-outcomes" | "record-inquiry-outcome";
 type Grant = Actor & { customer?: CustomerAuthority };
 
 export function customerMandate(value: unknown): CustomerAuthority {
@@ -65,6 +66,7 @@ export class ProtectedOperator implements ProposalAuthority {
     [identity.digest, scope.webPresenceId, scope.managedSiteId, permission, identity.operatorId ?? null])).rows[0];
     if (!row) throw Error("Operator authorization refused");
     return { operatorId: row.operator_id, authorityReference: row.id,
-      ...(permission === "approve-site-proposal" ? { customer: customerMandate(row.customer) } : {}) };
+      ...(["approve-site-proposal","confirm-business-information","record-inquiry-outcome"].includes(permission)
+        ? { customer: customerMandate(row.customer) } : {}) };
   }
 }

@@ -4,7 +4,7 @@ import type { Pool } from "pg";
 import { fingerprint } from "../canonical/model";
 import { requireEvaluationContext } from "./presence-evaluation";
 import { stockReviewMatchesPages } from "./presence-stock-placement";
-import type { WorkflowContext, WorkflowRun } from "./presence-workflow";
+import type { WorkflowContext, WorkflowRun, PresenceWorkflowOperations } from "./presence-workflow";
 import { IntakeError, normalizeAnswers } from "./model";
 import { adaptiveOnboardingVersion, type PreparedUnderstanding } from "./adaptive";
 import { c0DisclosureManifest, addC0WorkflowKnowledge } from "./c0-workflow-knowledge";
@@ -32,6 +32,7 @@ import {approvedSuppliedEvidence,type SuppliedPlacement,type SuppliedLineage} fr
 import {readManagedObject} from "../assets/local-storage";
 import {eligibleStock} from "../acquisition/stock";
 import {createHash} from "node:crypto";
+import { protectedAccountPool } from "./protected-account";
 
 export const protectedWorkflowRole = "miopages_core_development";
 type Workspace = { root: string; grantFile: string; ledgerDirectory: string; referenceDirectory?: string; visualDirectory?: string };
@@ -54,12 +55,14 @@ export async function verifyDirectory(path: string) {
 export async function protectedWorkflowWorkspace(requireEvidence = true): Promise<Workspace> {
   const home = await realpath(process.env.HOME ?? "");
   const root = join(home, "miopages-private-acceptance");
-  const ledgerDirectory = join(root, "core-usage");
+  const account = process.env.MIOPAGES_PROTECTED_ACCOUNT === "enabled";
+  const ledgerDirectory = join(root, account ? "core-account-cycle-usage" : "core-usage");
   const referenceDirectory = join(root, "presence-workflow-evidence");
   await verifyDirectory(root);
   await verifyDirectory(ledgerDirectory);
   if (requireEvidence) await verifyDirectory(referenceDirectory);
-  return { root, ledgerDirectory, referenceDirectory, visualDirectory: join(root, "presence-workflow-media"), grantFile: join(root, "presence-workflow-grant.json") };
+  return { root, ledgerDirectory, referenceDirectory, visualDirectory: join(root, "presence-workflow-media"),
+    grantFile: join(root, account ? "account-cycle-workflow-grant.json" : "presence-workflow-grant.json") };
 }
 
 type ProtectedInput = { webPresenceId: string; managedSiteId: string; draftToken: string; answers: unknown;
@@ -76,7 +79,8 @@ export async function openProtectedPresenceWorkspace(requireEvidence = true, con
       Object.keys(answers).some(key => input.provenance[key]?.confirmation !== "unconfirmed")) throw Error("Protected C0 intake evidence refused");
   const ca = connection?.ca ?? process.env.MIOPAGES_WP_DATABASE_CA;
   if (!ca) throw Error("Pinned CA required");
-  const pool = protectedPool(connection?.url ?? process.env.MIOPAGES_PROTECTED_CORE_DB_URL ?? "", protectedWorkflowRole, ca);
+  const rawPool = protectedPool(connection?.url ?? process.env.MIOPAGES_PROTECTED_CORE_DB_URL ?? "", protectedWorkflowRole, ca);
+  const pool = process.env.MIOPAGES_PROTECTED_ACCOUNT === "enabled" ? protectedAccountPool(rawPool) : rawPool;
   const intake = new IntakeService(pool, selection, { database: "postgres", answers, provenance: input.provenance, prepared: input.prepared, step: input.step,
     async protectedScope(db) {
       await protectedConnection(db, protectedWorkflowRole, "postgres");
@@ -91,18 +95,27 @@ export async function openProtectedPresenceWorkspace(requireEvidence = true, con
 type PresenceCapability = { kind: "review" } | { kind: "blueprint-recovery"; repair: (output: unknown, run: WorkflowRun, bytes: Buffer) => unknown } | { kind: "research-replay" } | { kind: "worker"; apiKey: string; resumeMarketResearch?: boolean; reportHold?: ReportReservation; peerCapture?: PublicPeerCapture } |
   { kind: "offline-test"; transport: ResponsesTransport; fetchPage: typeof fetch; readGrant: () => Promise<PresenceWorkflowGrant>; rates: ResponsesRates; imageProvider?: ImageProvider };
 
-export function composePresenceCase(pool: Pool, intake: IntakeService, token: string, workspace: Workspace, capability: PresenceCapability) {
+export function c0WorkflowGrantMatches(current: WorkflowContext, grant: PresenceWorkflowGrant) {
+  const manifest=c0DisclosureManifest(current), additions=grant.approvedKnowledgeSources??[];
+  if(additions.length && (!grant.approvedKnowledgeReassessments?.length || new Set(additions).size!==additions.length ||
+    additions.some(digest=>!/^[a-f0-9]{64}$/u.test(digest) || !grant.approvedSources.includes(digest)))) return false;
+  // Added canonical evidence is checked against the exact reassessment again by
+  // the provider before count/dispatch. Do not confuse it with an unknown original
+  // source, or silently remove any original approved business material.
+  return !grant.ledger.carryForward && grant.contextDigest===manifest.contextDigest &&
+    manifest.approvedSourceCandidates.every(source=>grant.approvedSources.includes(source.digest)) &&
+    grant.approvedSources.every(digest=>manifest.approvedSourceCandidates.some(source=>source.digest===digest) || additions.includes(digest));
+}
+
+export function composePresenceCase(pool: Pool, intake: IntakeService, token: string, workspace: Workspace, capability: PresenceCapability,
+  knowledgeConfirmation?: PresenceWorkflowOperations["knowledgeConfirmation"]) {
   async function context() {
     if (fingerprint(intake.selection) !== fingerprint(protectedOwnerScope) && capability.kind !== "offline-test") {
       throw Error("Protected workflow site refused");
     }
     return addC0WorkflowKnowledge(await intake.workflowContext(token), workspace.referenceDirectory, capability.kind !== "offline-test");
   }
-  return composeBoundPresenceCase(pool, context, workspace, capability, "protected", (current, grant) => {
-    const manifest = c0DisclosureManifest(current);
-    return !grant.ledger.carryForward && grant.contextDigest === manifest.contextDigest &&
-      grant.approvedSources.every(digest => manifest.approvedSourceCandidates.some(source => source.digest === digest));
-  });
+  return composeBoundPresenceCase(pool, context, workspace, capability, "protected", c0WorkflowGrantMatches, knowledgeConfirmation);
 }
 
 export function composeIsolatedPresenceEvaluation(pool: Pool, intake: IntakeService, token: string, bound: WorkflowContext,
@@ -141,7 +154,8 @@ export function composeIsolatedPresenceEvaluation(pool: Pool, intake: IntakeServ
 }
 
 function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowContext>, workspace: Workspace,
-  capability: PresenceCapability, boundary: "disposable" | "protected", permitted: (current: WorkflowContext, grant: PresenceWorkflowGrant) => boolean) {
+  capability: PresenceCapability, boundary: "disposable" | "protected", permitted: (current: WorkflowContext, grant: PresenceWorkflowGrant) => boolean,
+  knowledgeConfirmation?: PresenceWorkflowOperations["knowledgeConfirmation"]) {
   if (capability.kind === "offline-test" && process.env.NODE_ENV === "production") throw Error("Fixture transport refused");
   const readGrant = capability.kind === "offline-test" ? capability.readGrant : () => privateWorkflowFile<PresenceWorkflowGrant>(workspace.grantFile, workspace.root);
   return {
@@ -293,7 +307,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
           },
         };
       }
-      const scoped = { ...operations, visuals };
+      const scoped = { ...operations, visuals, ...(knowledgeConfirmation && { knowledgeConfirmation }) };
       return new PresenceWorkflow(pool, capability.kind === "review" ? { ...scoped, run: noOutbound } : scoped,
         boundary === "disposable" ? grant.previewActionDestinations ?? {} : {}, Date.now, boundary);
     },

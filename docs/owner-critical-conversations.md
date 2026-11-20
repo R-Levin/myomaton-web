@@ -794,3 +794,14 @@ fixture walkthrough as product acceptance. Governed session authority remains th
 direction; development egress pins are not permanent per-answer approval. The
 later transport-disconnect message is a continuity incident, not cancellation or
 permission to restart a paid operation.
+
+### November 20 — hosted account-cycle preparation begins
+
+After the completed local checkpoint and proposed next step, the owner said
+“OK we can start on that.” Proceed with read-only actual account/case/permission
+discovery and local protected-composition, policy and Linux preparation. Bring
+one consolidated, concrete hosted/model-data/spending request when ready. This
+is not authority to restart/deploy Core, write hosted SQL, promote C0 knowledge,
+transmit new provider inputs, change credentials/infrastructure, apply WordPress,
+merge or publish. Missing login capability is an implementation/authorization
+fact, not evidence that the owner must retain another temporary credential.

@@ -119,6 +119,71 @@ require their applicable concrete authority. Protected41/WordPress6, local97,
 isolated106 and prior ledgers were not touched. This is a first working connection,
 not completion of the six-step service cycle or a new spending grant.
 
+### Connected account cycle — protected preparation and actual host findings
+
+**November 20, 2026; preparation only.** The owner said to start the hosted
+integration preparation. Read-only encrypted SSH and verified-TLS PostgreSQL
+sessions found the original C0 organization/presence/site are **inactive**, bound
+to their original activation case. Intake28 and workflow41 remain current. There
+is one existing public-use Knowledge record (one fact, version1). The restricted
+Core role has no direct canonical table privileges; the owner login has inspect/
+prepare proposal grants, with no customer mandate. No activation, reparenting,
+canonical promotion or new credentials may be inferred from those grants.
+
+The local [composition](../lib/platform/intake/protected-account.ts) and
+[prepared policy](../lib/platform/intake/protected-account-policy.sql) therefore
+reuse the existing **inactive** canonical writers. Internal onboarding stays
+internal-only; the existing approved-public path still requires one confirmed
+public fact. Active-account behavior is unchanged. The protected owner must have
+an actual separately scoped business-confirmation grant and business-representative
+mandate; proposal authority and simulated role switches do not suffice. The same
+opaque authenticated session reaches that check, and every borrowed database
+connection establishes the restricted boundary. No broad public-table grants.
+
+[Outcome policy](../lib/platform/intake/protected-account-outcomes.sql) provides
+metadata-only inquiry readback and development-only append-only outcomes, using
+the existing Contact journal. Ordinary Contact correctly refuses an inactive
+site. The protected proof may use only the existing labeled rehearsal intake;
+this does **not** establish ordinary hosted visitor acceptance, notification,
+revision attribution or commercial performance. Outcome reads that fail display
+unknown status. Full inquiry text is excluded from this view and AI projection.
+
+**Actual outage, distinct from code readiness:** `/core` and `/core/` both return
+502; loopback8081 refuses connections. The existing acceptance-account PM2 still
+contains exactly `miopages-protected-core`, stopped, PID0, restart count10. Its
+170 checksummed deployed files match source `4df15c1`; the saved PM2 dump is older
+and empty, so it is not evidence that the actual registration disappeared. No
+cause or stop time is established. Preparation did not restart, rediscover or
+change it. Restore only this existing process during authorized deployment, and
+persist only the independently verified acceptance-account list. No new hostname,
+package, ports, public-runtime or WordPress change is proposed.
+
+**Verified locally:** restricted-role canonical update/history, rollback, stale
+and foreign binding refusal, immutable history, customer-mandate/opaque-session
+checks, revocation and development-only outcome RLS run against real disposable
+PostgreSQL and original migrations/activation guards. The original inactive
+Contact refusal remains intact. Existing contrast/reassessment and ordinary
+active-account Contact tests remain separate. Controlled reasoning is not a new
+live intelligence result. Full TypeScript, focused lint, routing and regression
+checks pass. Fresh Linux verification for this preparation is recorded at the
+next pushed checkpoint; the previous `6da668d` Linux build passed already.
+
+The [SQL composition](../scripts/db/protected-account-policy.ts) hashes the exact
+forward/rollback sources. Rollback withdraws new access and restores the old grant
+view, retaining facts/history/outcomes/audit rows rather than deleting evidence.
+The additive permission vocabulary alone grants nothing. Actual enrollment and
+any hosted SQL/build replacement remain unexecuted and require the consolidated
+scope approval. Original41/WP6, local97, isolated106, protected inputs, credentials
+and usage records have not changed; no model request or spending occurred.
+
+This prepares a bounded account-cycle rollout, not a claim that the complete
+service now works. Independent versioned proposal storage, Offering editing,
+explicit original/evaluation association, WP inbound reconciliation, actual
+visitor collection/notification and recurring evidence-led operations remain open.
+Do not generate another whole C0 website merely to test storage or login. A live
+reassessment needs a meaningful reviewed business correction and fresh exact
+egress pins; do not reuse an old grant or silently restrict available knowledge.
+
 ### Connected account cycle — confirmed understanding and outcomes
 
 **November 20, 2026; local implementation after the owner's explicit go-ahead.**

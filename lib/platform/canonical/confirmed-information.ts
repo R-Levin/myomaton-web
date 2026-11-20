@@ -1,6 +1,6 @@
 import type { PoolClient } from "pg";
 import { fingerprint, normalizeKnowledge, object, text, uuid } from "./model";
-import { inspectCanonical, writeCanonical } from "./writes";
+import { inspectCanonical, writeCanonical, writeOnboardingCanonical, writeApprovedInactiveKnowledge, type OnboardingOwner } from "./writes";
 import { canonicalWritePool } from "./transaction";
 import type { CustomerAuthority } from "../content-editing/proposal";
 import type { DeploymentSelection } from "../managed-sites/deployment";
@@ -46,8 +46,17 @@ export async function knowledgeTargets(db: PoolClient, selection: DeploymentSele
  * of the body. Existing classification stays fixed; no new public-use eligibility
  * or publication is silently granted while confirming a correction. */
 export async function confirmKnowledge(db: PoolClient, selection: DeploymentSelection, input: KnowledgeConfirmationInput,
-  actor: { id: string; authorityReference: string; customer: CustomerAuthority }, source: unknown, at: string): Promise<KnowledgeConfirmation> {
-  const owned = await db.query(`SELECT m.id FROM managed_sites m JOIN web_presences w ON w.id=m.web_presence_id
+  actor: { id: string; authorityReference: string; customer: CustomerAuthority }, source: unknown, at: string,
+  foundation?: OnboardingOwner): Promise<KnowledgeConfirmation> {
+  if (foundation && (foundation.webPresenceId !== selection.webPresenceId || foundation.managedSiteId !== selection.managedSiteId)) {
+    throw new KnowledgeConfirmationError("authority");
+  }
+  const owned = foundation ? await db.query(`SELECT m.id FROM managed_sites m JOIN web_presences w ON w.id=m.web_presence_id
+    JOIN organizations o ON o.id=w.organization_id JOIN activation_customer_bindings b
+      ON (b.organization_id,b.web_presence_id,b.managed_site_id)=(o.id,w.id,m.id)
+    WHERE m.id=$1 AND w.id=$2 AND o.id=$3 AND b.case_id=$4
+      AND o.status='inactive' AND w.status='inactive' AND m.status='inactive'`,
+  [selection.managedSiteId,selection.webPresenceId,foundation.organizationId,foundation.caseId]) : await db.query(`SELECT m.id FROM managed_sites m JOIN web_presences w ON w.id=m.web_presence_id
     WHERE m.id=$1 AND w.id=$2 AND m.status='active' AND w.status='active'`, [selection.managedSiteId, selection.webPresenceId]);
   if (owned.rowCount !== 1) throw new KnowledgeConfirmationError("authority");
   const current = await inspectCanonical(db, "knowledge", selection.webPresenceId, input.target.id);
@@ -61,9 +70,13 @@ export async function confirmKnowledge(db: PoolClient, selection: DeploymentSele
     confirmedBy: actor.customer.subjectId, confirmedAt: at };
   const payload = { ...previous, entries: previous.entries.map(item => item.key !== entry.key ? item : { ...entry, value: input.value, evidence }),
     approval: { ...previous.approval, by: actor.id, at } };
-  const result = await writeCanonical(canonicalWritePool(db), { domain: "knowledge", id: input.target.id,
+  const write = { domain: "knowledge" as const, id: input.target.id,
     webPresenceId: selection.webPresenceId, expectedVersion: input.target.version, expectedFingerprint: input.target.fingerprint,
-    payload, responsibleIdentity: actor.id, changeReason: `Confirmed business correction ${input.correctionId}; ${input.reference}` });
+    payload, responsibleIdentity: actor.id, changeReason: `Confirmed business correction ${input.correctionId}; ${input.reference}` };
+  const pool = canonicalWritePool(db);
+  const result = foundation
+    ? await (payload.approval.scope === "internal" ? writeOnboardingCanonical : writeApprovedInactiveKnowledge)(pool, write, foundation)
+    : await writeCanonical(pool, write);
   const after = await inspectCanonical(db, "knowledge", selection.webPresenceId, input.target.id);
   if (!after || result.version !== after.row.version) throw new KnowledgeConfirmationError("stale");
   return { requestId: input.requestId, inputDigest: fingerprint(input), correctionId: input.correctionId,

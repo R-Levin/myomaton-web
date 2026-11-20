@@ -83,6 +83,11 @@ jobs:
             export PG_BIN_DIR=/usr/lib/postgresql/17/bin
           fi
           node --import tsx --test --test-concurrency=1 tests/integration/presence-evaluation-linux.test.ts tests/integration/presence-evaluation.test.ts
+      - name: Verify protected account policy and connected local cycle on Linux
+        run: |
+          export PG_BIN_DIR=/usr/lib/postgresql/17/bin
+          if test -x /usr/lib/postgresql/18/bin/initdb; then export PG_BIN_DIR=/usr/lib/postgresql/18/bin; fi
+          node --import tsx --test --test-concurrency=1 tests/integration/protected-account.test.ts tests/integration/knowledge-reassessment.test.ts tests/integration/inquiry-outcomes.test.ts
       - name: Verify portable artifact dependency boundary
         run: node --test tests/wordpress-artifact-links.test.mjs
       - name: Verify raw routing boundary and sanitized diagnostics

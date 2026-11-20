@@ -111,6 +111,7 @@ export interface PresenceWorkflowOperations {
   /** Trusted composition capability; never inferred from site-proposal permissions. */
   readonly knowledgeConfirmation?: { authorize(actor: Actor, context: WorkflowContext): Promise<{
     operatorId: string; authorityReference: string; customer: CustomerAuthority;
+    foundation?: import("../canonical/writes").OnboardingOwner;
   }> };
   readonly visuals?: PresenceVisualOperations;
   preflight?(run: WorkflowRun): Promise<void>;
@@ -493,7 +494,7 @@ export class PresenceWorkflow {
         if (!note || note.confirmation || note.withdrawn || state.work || state.visuals?.some(visual => visual.state === "running")) throw new IntakeError("workflow_not_ready", 409);
         const confirmation = await confirmKnowledge(client, context.scope, input, authority,
           { intakeId: context.intakeId, sourceId: note.sourceId, sourceDigest: note.sourceDigest, proposedCorrectionDigest: fingerprint(note) },
-          new Date(this.clock()).toISOString());
+          new Date(this.clock()).toISOString(), grant.foundation);
         return this.view(context, await store.append(context, version, { ...state,
           understandingCorrections: state.understandingCorrections!.map(item => item.id === note.id ? { ...item, confirmation } : item),
         }));

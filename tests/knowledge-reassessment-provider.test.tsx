@@ -11,6 +11,7 @@ import { createResponsesPresenceWorkflow, projectKnowledgeReassessment, type Pre
 import type { WorkflowContext, WorkflowInput, WorkflowRun } from "../lib/platform/intake/presence-workflow";
 import { readBlueprint } from "../lib/platform/intake/presence-workflow-artifacts";
 import { bindCompleteAuthoringKnowledge, marketingCitationIds, marketingProjection } from "../lib/platform/intake/presence-marketing-authority";
+import { c0WorkflowGrantMatches } from "../lib/platform/intake/protected-presence-workflow";
 
 function sample(publicUse = true) {
   const context: WorkflowContext = { scope: { webPresenceId: randomUUID(), managedSiteId: randomUUID() }, intakeId: randomUUID(), entry: "DIRECT_START",
@@ -58,14 +59,22 @@ test("reassessment uses the existing metered provider, exact fresh authorization
     });
     await assert.rejects(provider(grant).run(run, async () => {}), /Exact knowledge reassessment authorization/);
     assert.deepEqual(paths, []);
-    const fresh = { ...grant, approvedSources: input.evidence.map(fingerprint), approvedKnowledgeReassessments: [fingerprint(fixture.knowledgeReassessment)] };
+    const fresh = { ...grant, approvedSources: input.evidence.map(fingerprint), approvedKnowledgeReassessments: [fingerprint(fixture.knowledgeReassessment)],
+      approvedKnowledgeSources:fixture.addition.map(fingerprint) };
+    assert.equal(c0WorkflowGrantMatches(context,grant),true);
+    assert.equal(c0WorkflowGrantMatches(context,{...fresh,approvedKnowledgeSources:[]}),false);
+    assert.equal(c0WorkflowGrantMatches(context,fresh),true);
+    assert.equal(c0WorkflowGrantMatches(context,{...fresh,approvedSources:fresh.approvedKnowledgeSources}),false);
+    assert.equal(c0WorkflowGrantMatches(context,{...fresh,approvedSources:[...fresh.approvedSources,fingerprint('unknown source')]}),false);
+    await assert.rejects(provider({...fresh,approvedKnowledgeSources:[fingerprint('wrong canonical source')]}).run(run,async()=>{}),/Exact knowledge source authorization/);
+    assert.equal(paths.length,0);
     const engine = provider(fresh); let retained: Buffer | undefined;
     const result = await engine.run(run, async bytes => { retained = bytes; });
     assert.equal(readBlueprint(result, input.evidence.map(source => source.id), false, false, true).pages[0].change, "add");
     assert.ok(retained); assert.equal(paths.length, 2);
     assert.deepEqual(await engine.recover(run, retained), result); assert.equal(paths.length, 2);
     const changed = { ...input, knowledgeReassessment: { ...fixture.knowledgeReassessment, confirmations: fixture.knowledgeReassessment.confirmations.map(item => ({ ...item, value: "Expanded unauthorized data" })) } };
-    await assert.rejects(engine.run({ ...run, input: changed, work: { ...run.work, inputDigest: fingerprint(changed), attempt: randomUUID() } }, async () => {}), /Exact knowledge reassessment authorization/);
+    await assert.rejects(engine.run({ ...run, input: changed, work: { ...run.work, inputDigest: fingerprint(changed), attempt: randomUUID() } }, async () => {}), /Exact knowledge source authorization/);
     assert.equal(paths.length, 2);
   } finally { assert.ok(directory.startsWith(join(tmpdir(), "miopages-reassessment-"))); await rm(directory, { recursive: true, force: true }); }
 });

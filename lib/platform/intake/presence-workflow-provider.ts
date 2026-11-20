@@ -32,6 +32,8 @@ export type PresenceWorkflowGrant = {
   approvedCorrections: readonly string[];
   /** Development egress pins, not a permanent per-answer approval requirement. */
   approvedKnowledgeReassessments?: readonly string[];
+  /** Exact added evidence pins, separately distinguished from original context. */
+  approvedKnowledgeSources?: readonly string[];
   approvedHomeFeedback?: readonly string[];
   approvedRevisionFeedback?: readonly string[];
   previewActionDestinations?: Readonly<Partial<Record<"request-review" | "start-onboarding", string>>>;
@@ -185,6 +187,10 @@ function approvedProjection(run: WorkflowRun, grant: PresenceWorkflowGrant) {
   const selected = evidence.filter(source => grant.approvedSources.includes(fingerprint(source)));
   const reassessment = run.input.knowledgeReassessment;
   const confirmed = reassessment && confirmedKnowledgeEvidence(reassessment.confirmations);
+  if (reassessment && grant.approvedKnowledgeSources &&
+    fingerprint([...grant.approvedKnowledgeSources].sort())!==fingerprint(confirmed!.map(fingerprint).sort())) {
+    throw new WorkflowBlocked("Exact knowledge source authorization required");
+  }
   if (reassessment && (!grant.approvedKnowledgeReassessments?.includes(fingerprint(reassessment)) ||
       confirmed!.some(source => !grant.approvedSources.includes(fingerprint(source))))) throw new WorkflowBlocked("Exact knowledge reassessment authorization required");
   const fictional = run.context.evaluation?.scenario === "c2" && selected.length > 0 && selected.every(source =>

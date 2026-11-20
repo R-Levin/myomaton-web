@@ -24,6 +24,9 @@ import { compactSitePlanningVersion, prepareSitePlanning, type SitePlanningEvide
 import { projectInterviewHistory, type AnswerScope } from "./answer-projection";
 import { composePresenceCase, protectedWorkflowWorkspace, reviewWorkflowChange } from "./protected-presence-workflow";
 import { accountWork } from "./account-work";
+import { protectedAccountBoundary, protectedAccountConfirmation, protectedAccountPool } from "./protected-account";
+import { InquiryOutcomes } from "../contact/outcomes";
+import { ContactError } from "../contact/model";
 
 export const coreCookie = "__Host-miopages_core";
 type Config = {
@@ -71,7 +74,8 @@ async function openCore() {
   const ca = process.env.MIOPAGES_WP_DATABASE_CA;
   if (!ca) throw Error("Protected Core CA required");
   const role = "miopages_core_development";
-  const pool = protectedPool(process.env.MIOPAGES_PROTECTED_CORE_DB_URL ?? "", role, ca);
+  const rawPool = protectedPool(process.env.MIOPAGES_PROTECTED_CORE_DB_URL ?? "", role, ca);
+  const pool = process.env.MIOPAGES_PROTECTED_ACCOUNT === "enabled" ? protectedAccountPool(rawPool) : rawPool;
   const operators = new ProtectedOperator(pool, db => protectedConnection(db, role, "postgres"), true);
   const answers = normalizeAnswers(cfg.answers, adaptiveOnboardingVersion);
   if (fingerprint(answers) !== fingerprint(cfg.answers) ||
@@ -79,6 +83,7 @@ async function openCore() {
   async function fixtureScope(db: Parameters<typeof protectedConnection>[0]) {
     await protectedConnection(db, role, "postgres");
     await db.query("SET search_path TO miopages_core_guard, miopages_wp, public");
+    if (process.env.MIOPAGES_PROTECTED_ACCOUNT === "enabled") await protectedAccountBoundary(db);
     const rows = (await db.query(`SELECT 1 FROM miopages_wp.core_development_scope WHERE managed_site_id=$1 AND web_presence_id=$2`,
       [selection.managedSiteId, selection.webPresenceId])).rows;
     if (rows.length !== 1) throw new IntakeError("unavailable", 404);
@@ -193,8 +198,15 @@ async function openCore() {
     }
   }
   const presenceCase = process.env.MIOPAGES_PROTECTED_WORKFLOW === "review"
-    ? async () => composePresenceCase(pool, intake, cfg.draftToken, await protectedWorkflowWorkspace(), { kind: "review" }) : undefined;
-  return { operators, selection, intake, interview, inquiry, sitePlanning, sitePlanningEnabled, presenceCase, draftToken: cfg.draftToken };
+    ? async (authenticated: unknown) => {
+      const grant=process.env.MIOPAGES_PROTECTED_ACCOUNT === "enabled"
+        ? await operators.authorize(authenticated,"confirm-business-information",selection).catch(()=>null) : null;
+      const available=grant?.operatorId === protectedOwnerId && grant.customer?.kind === "business-representative" && grant.customer.subjectId === protectedOwnerId;
+      return composePresenceCase(pool, intake, cfg.draftToken, await protectedWorkflowWorkspace(), { kind: "review" },
+        available ? protectedAccountConfirmation(pool,operators,authenticated) : undefined);
+    } : undefined;
+  const outcomes=process.env.MIOPAGES_PROTECTED_ACCOUNT === "enabled" ? new InquiryOutcomes(pool,operators,"development") : undefined;
+  return { operators, selection, intake, interview, inquiry, sitePlanning, sitePlanningEnabled, presenceCase, outcomes, draftToken: cfg.draftToken };
 }
 let core: ReturnType<typeof openCore> | undefined;
 const sessions = new Map<string, { credential: string; expires: number; origin: string; owner: boolean }>();
@@ -243,8 +255,11 @@ export async function hostedCoreRequest(request: Request) {
     const includeOperations = async (view: Awaited<ReturnType<IntakeService["resume"]>>,
       context: NonNullable<Awaited<ReturnType<typeof authenticate>>>) => {
       const proposal = view.sitePlanning?.proposal;
+      const canSeeOutcomes=app.outcomes && await app.operators.authorize(context,"inspect-inquiry-outcomes",app.selection).catch(()=>null);
+      const outcomeView=canSeeOutcomes ? await app.outcomes!.inspect(context,app.selection)
+        .then(inquiryOutcomes=>({inquiryOutcomes})).catch(()=>({inquiryOutcomesUnavailable:true as const})) : {};
       // A pending or invalid workflow grant must not interrupt the prior protected owner review.
-      const workflowReview = app.presenceCase && await app.presenceCase()
+      const workflowReview = app.presenceCase && await app.presenceCase(context)
         .then(async scope => {
           const current = await scope.context(), workflow = await (await scope.open()).review(current);
           return { workflowAvailable: true, workflow, ...(workflow && { accountWork: accountWork(current, workflow) }) };
@@ -263,6 +278,7 @@ export async function hostedCoreRequest(request: Request) {
         interviewEnabled: Boolean(app.interview), operations: await app.inquiry().catch(() => null),
         sitePlanningEnabled: app.sitePlanningEnabled,
         ...workflowReview,
+        ...outcomeView,
         ...(proposal && { sitePlanningReview: { ...reviewedSitePlanning(proposal), current: proposal.basis === sitePlanningBasis(view) } }),
       };
     };
@@ -273,7 +289,7 @@ export async function hostedCoreRequest(request: Request) {
         const image = request.headers.get("x-miopages-workflow-image");
         if (image !== null) {
           if (!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/u.test(image) || !app.presenceCase) return reply({ error: "unavailable" }, 404);
-          const scope = await app.presenceCase();
+          const scope = await app.presenceCase(context);
           const bytes = await (await scope.open()).visualImage(await scope.context(), image);
           return new Response(new Uint8Array(bytes), { headers: { ...headers, "Content-Type": "image/png" } });
         }
@@ -321,6 +337,18 @@ export async function hostedCoreRequest(request: Request) {
       }
       const context = await authenticate(credential, active?.owner);
       if (!context) { refusal = reply({ error: "sign_in_required" }, 401); return null; }
+      if(value.operation === "record-inquiry-outcome" && app.outcomes) {
+        if(Object.keys(value).some(key=>!["operation","outcome"].includes(key))) { refusal=reply({error:"invalid_request"},400);return null; }
+        const permitted=await app.operators.authorize(context,"record-inquiry-outcome",app.selection).catch(()=>null);
+        if(!permitted) { refusal=reply({error:"authorization_required"},403);return null; }
+        try {
+          await app.outcomes.record(context,app.selection,value.outcome);
+          return await includeOperations(await app.intake.resume(app.draftToken),context);
+        } catch(error) {
+          if(!(error instanceof ContactError)) throw error;
+          refusal=reply({error:error.code},error.status);return null;
+        }
+      }
       let actor;
       try { actor = await app.operators.authorize(context, ["workflow-visual-decide", "workflow-quality-review"].includes(String(value.operation)) ? "review-private-stage" : "prepare-site-proposal", app.selection); }
       catch { refusal = reply({ error: "authorization_required" }, 403); return null; }
@@ -328,7 +356,7 @@ export async function hostedCoreRequest(request: Request) {
         const view = async (result: ReturnType<IntakeService["resume"]>) => includeOperations(await result, context);
         const version = Number(value.version);
         if (typeof value.operation === "string" && value.operation.startsWith("workflow-") && app.presenceCase) {
-          const scope = await app.presenceCase();
+          const scope = await app.presenceCase(context);
           await reviewWorkflowChange(await scope.open(), await scope.context(), value.operation, version,
             { id: actor.operatorId, role: "operator", simulated: false,
               ...((value.operation.startsWith("workflow-visual-") || value.operation === "workflow-editorial-decision" || value.operation === "workflow-quality-review" || value.operation === "workflow-commercial-replan") &&

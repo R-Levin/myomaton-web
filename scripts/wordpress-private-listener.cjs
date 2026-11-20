@@ -66,9 +66,19 @@ function coreEnvironment(value) {
   let workflowConfigured = false;
   try { privateFile(PRIVATE + '/presence-workflow-grant.json'); workflowConfigured = true; }
   catch (error) { if (error.code !== 'ENOENT') throw error; }
+  let accountConfigured = false;
+  try {
+    const scope = JSON.parse(privateFile(PRIVATE + '/account-cycle-scope.json'));
+    assert.deepEqual(scope, { schema: 'protected-account-cycle/1',
+      ownerId: 'f2cd3fe8-58b3-4dfa-9125-fd8f1bd35f8e',
+      webPresenceId: '819d007a-595d-4374-a2f0-96b900d46559',
+      managedSiteId: '1d92a248-416f-4e22-baaf-d2f1fca70352' });
+    accountConfigured = true;
+  } catch (error) { if (error.code !== 'ENOENT') throw error; }
   return { PATH: '/usr/bin:/bin', HOME, LANG: 'C.UTF-8', NODE_ENV: 'production', NEXT_TELEMETRY_DISABLED: '1',
     MIOPAGES_ROUTING_MODE: 'shared-hostnames', MIOPAGES_PROTECTED_CORE: 'enabled', MIOPAGES_PROTECTED_CORE_ORIGIN: ORIGIN,
     ...(workflowConfigured && { MIOPAGES_PROTECTED_WORKFLOW: 'review' }),
+    ...(accountConfigured && { MIOPAGES_PROTECTED_ACCOUNT: 'enabled' }),
     MIOPAGES_PROTECTED_CORE_DB_URL: value.databaseUrl, MIOPAGES_WP_DATABASE_CA: value.ca,
     MIOPAGES_PROTECTED_CORE_INPUT: PRIVATE + '/core-input.json',
     ...(inquiryConfigured && { MIOPAGES_PROTECTED_CORE_INQUIRY_SCOPE: inquiry }),

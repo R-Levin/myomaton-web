@@ -54,7 +54,15 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
-**Current task: confirmed understanding, reassessment and inquiry outcomes.**
+**Current task: protected account-cycle preparation (not execution).**
+The owner asked to start this preparation. [Actual hosted findings and prepared
+connection](platform-capabilities.md#connected-account-cycle--protected-preparation-and-actual-host-findings)
+record inactive C0, unchanged28/41, missing confirmation mandate and the stopped
+Core process/502. Local code/policies are being verified; no hosted action or
+provider use is authorized by the go-ahead. Restore access within the eventual
+consolidated rollout, not by changing infrastructure.
+
+**Previous completed task: confirmed understanding, reassessment and inquiry outcomes.**
 Following the scope/next-step discussion, the owner asked Codex to act next; local
 engineering is underway. The
 [proposal and business acceptance](service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle)
