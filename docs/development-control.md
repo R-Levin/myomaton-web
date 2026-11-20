@@ -55,28 +55,54 @@ identify the missing machine-local work instead of assuming it never existed.
 ## Current authorized work and result
 
 **Current task: approved protected account-cycle activation; SQL compatibility correction.**
-Owner approved the [original exact scope](account-cycle-hosted-activation.json)
-with “Yes”; [authorization record](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7052496871).
-Original manifest bytes remain immutable. Code/SQL packages were staged, with a
-complete21498-file rollback archive verified. The hosted SQL attempt refused23514
-before commit and independently rolled back: no new schema/grants, original
-intake28/workflow41/Knowledgev1 and credential unchanged. The actual adapter's
-customer CHECK was missing from the hand-built test fixture. A
-[separate exact SQL amendment](account-cycle-mandate-amendment.json) is proposed,
-not applied/authorized. It preserves existing approval requirements and permits
-only the already approved confirmation/outcome mandate-bearing grants.
+The owner approved the [original exact scope](account-cycle-hosted-activation.json)
+with “Yes”; see the [authorization record](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7052496871).
+The original manifest is unchanged. A complete 21,498-file rollback archive was
+verified. The database installer failed with code `23514` before commit. Independent
+readback confirms no new schema or grants, and unchanged intake 28, workflow 41,
+Knowledge v1 and owner credential. The earlier test fixture omitted the actual
+adapter's customer-mandate CHECK. The [tested SQL amendment](account-cycle-mandate-amendment.json)
+is proposed, not approved or applied; it preserves existing approval requirements
+and supports only the already approved confirmation/outcome permissions.
 
-Core restoration is ongoing: the previous4df15c1 build is restored and serves200.
-A new-build attempt hit the unchanged512MiB reserve guard (own RSS below384MiB);
-no memory safeguard was relaxed. A prior false SSR sign-in-text assertion also
-caused an unnecessary rollback; actual browser sign-in-screen checks replace it.
-The tested local correction defers research-browser initialization during ordinary
-review, saving about44MB in a local import comparison. Verify its Linux artifact
-and hosted stability before calling the new rollout complete. Preserve both
-failed candidates, diagnostics, rollback and original Core41/WordPress6/local97/
-isolated106. No model call/spending, knowledge confirmation, WordPress change,
-new credential/infrastructure or publication occurred. The $3/72h grant has not
-been activated; no meaningful correction has been invented or sent.
+**Core restored:** source `4058a74f5b88c5392563b236dab8258107c66d81` is deployed
+at [protected Core](https://wp-acceptance.miopages.com/core). Linux
+[run 44838020904](https://github.com/R-Levin/myomaton-web/actions/runs/44838020904)
+passed. All 205 artifact file hashes were independently checked; archive SHA-256:
+`0630236ad669e7f3555d560af940a00a1df61faae90f3e9c727d92685011db70`.
+Actual external Edge checks at 1440 and 390 pixels passed for the sign-in screen
+and assets. Password login/logout was not exercised. Process PID 403587 and
+restart count 10 stayed stable during repeated probes; sampled available memory
+remained above 512 MiB. Protected input/configuration, old grant/ledger hashes and
+public HTTPS digests match their predeployment baselines.
+
+Both failed earlier rollout attempts and their matching rollback evidence remain
+preserved. One probe incorrectly expected client-rendered sign-in text in initial
+HTML; the other correctly stopped at the memory reserve. Neither the 384 MiB
+process limit nor the 512 MiB reserve was relaxed. Lazy research-browser loading
+corrected the idle footprint. A test-only NODE_ENV type error was fixed before
+the successful Linux run; failed checks are retained as failures.
+
+**Remaining authorization:** automatic approval review rejected uploading/staging
+the revised installer as a hosted write outside the original SQL package. It was
+not transferred or executed by another route. The local-only package SHA-256 is
+`5cdfc379fbb569aee89a64a431dee17a8735f3e42ee4cb409b4992058acda29a`.
+Its amendment manifest is `4bc2cd008b1a2ba729cfb950f2f5bc6e6248c5dc1021a6d3016b41b4776892c5`;
+combined forward SQL is `a126f6851329fb3889d2746a080ccebea68465f7fabf39985d8401b4ef0e7799`.
+Next: obtain one explicit approval covering the amendment and encrypted package
+transfer, staging and execution in the original Cloud account at
+`~/miopages-account-cycle-mandate-4bc2cd00`. Then use the new checksummed launcher
+with the existing migration-password prompt. Never rerun or reset the failed
+original installer. This adds no principal, permission beyond the approved three,
+credential, infrastructure or AI budget. Rollback withdraws access and revokes only
+receipt-bound grants while retaining mandate-bearing audit rows and history.
+
+New account functions remain disabled. No model request, spending, meaningful
+business correction, WordPress change, publication or merge occurred. The $3 / 72-hour
+processing window has not started. Original Core 41, WordPress 6, local 97 and
+isolated 106 remain preserved. Worker concurrency and the complete account cycle
+are not established by sign-in-screen verification; the same resource gates apply
+before paid work. Do not invent a business correction to activate processing.
 
 **Previous completed task: confirmed understanding, reassessment and inquiry outcomes.**
 Following the scope/next-step discussion, the owner asked Codex to act next; local

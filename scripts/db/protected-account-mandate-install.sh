@@ -16,8 +16,6 @@ read -r -p 'To authorize and apply this exact SQL amendment, type APPLY-MANDATE-
 [[ "$consent" == APPLY-MANDATE-AMENDMENT ]]
 read -r -s -p 'Existing miopages_migration password (blank stops): ' password </dev/tty
 printf '\n' >/dev/tty
-read -r -s -p 'Existing Core owner password for HTTPS login/logout verification (blank skips): ' owner_password </dev/tty
-printf '\n' >/dev/tty
-trap 'unset password owner_password consent' EXIT
+trap 'unset password consent' EXIT
 [[ -n "$password" ]]
-printf '%s\n%s\n' "$password" "$owner_password" | env -i HOME="$home" PATH=/usr/bin:/bin NODE_PATH="$home/miopages-wp-rehearsal/node_modules" node install.cjs APPLY-PROTECTED-ACCOUNT-MANDATE
+printf '%s\n' "$password" | env -i HOME="$home" PATH=/usr/bin:/bin NODE_PATH="$home/miopages-wp-rehearsal/node_modules" node install.cjs APPLY-PROTECTED-ACCOUNT-MANDATE

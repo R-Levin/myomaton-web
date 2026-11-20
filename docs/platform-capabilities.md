@@ -220,8 +220,8 @@ egress pins; do not reuse an old grant or silently restrict available knowledge.
 
 ### Protected activation — refused enrollment and runtime correction
 
-**November20,2026; actual hosted evidence, incomplete activation.** The owner
-approved the preceding exact scope. The privileged installer refused23514 at
+**November 20, 2026; actual hosted evidence, incomplete activation.** The owner
+approved the preceding exact scope. The privileged installer refused code 23514 at
 `install-and-enroll`, before commit. Independent readback confirms no new
 `miopages_core_account` schema and only the two original owner grants. The actual
 adapter CHECK says customer data is non-null **only** for Page approval, while
@@ -230,7 +230,7 @@ manual local grant-table fixture omitted this CHECK; passing tests therefore
 missed a real integration requirement. This was a test/preflight coverage failure,
 not wrong owner credentials or a reason to broaden ordinary proposal authority.
 
-Tests now use the original0017/0018 authority DDL, including CHECK, FK/unique and
+Tests now use the original 0017/0018 authority DDL, including CHECK, FK/unique and
 credential requirements. They reproduce the hosted refusal with the original SQL,
 prove complete rollback, and exercise the proposed amendment's required/forbidden
 mandate matrix. The [separate compatibility proposal](account-cycle-mandate-amendment.json)
@@ -239,9 +239,9 @@ forward SQL/manifest bytes remain unchanged; the amended SQL is not applied.
 Rollback withdraws new access and revokes only receipt-bound grants, retaining
 additive constraint/vocabulary and audit rows rather than stripping their mandates.
 
-The rollback archive verifies all21498 regular application/dependency/config
+The rollback archive verifies all 21,498 regular application/dependency/config
 files. Old off-webroot secrets remain in place with matching hashes, not copied to
-new credential locations. The approved6a728ea artifact also needed its newly
+new credential locations. The approved 6a728ea artifact also needed its newly
 introduced, pure-JavaScript `playwright-core@1.63.0`: a full lockfile comparison
 showed **only** that addition/root metadata change. Its npm archive matched the
 exact approved SHA512 integrity, with no postinstall/transitive dependencies,
@@ -249,16 +249,55 @@ and Linux import passed. No npm/build operation ran on the hosted server.
 
 Two rollout problems were preserved and diagnosed. A check incorrectly required
 client-rendered sign-in text in initial HTML, triggering an unnecessary rollback;
-real Edge1440/390 now verifies the sign-in screen/assets instead. A subsequent
-attempt actually crossed the512MiB global reserve while its own RSS stayed below
+real Edge at 1440/390 pixels now verifies the sign-in screen/assets instead. A subsequent
+attempt actually crossed the 512 MiB global reserve while its own RSS stayed below
 384MiB. The previous build was restored; neither safeguard was relaxed. Research
 browser code was unnecessarily initialized during ordinary Core review. Lazy
 loading preserves actual research capability while the local import comparison
-falls from215.5MB to171.9MB RSS (not a hosted measurement or performance promise).
-A fresh Linux build and hosted stability check are required for that correction.
+falls from 215.5 MB to 171.9 MB RSS (not a hosted measurement or performance promise).
+That correction required the fresh Linux build and hosted stability verification completed below.
 
-Previous Core4df15c1 currently serves200; owner-password verification is not
-claimed by the anonymous browser check. C0 intake28/workflow41/Knowledgev1,
+**Current verified deployment:** purpose-bound correction
+`4058a74f5b88c5392563b236dab8258107c66d81` passed Linux
+[run 44838020904](https://github.com/R-Levin/myomaton-web/actions/runs/44838020904)
+and replaced only the protected Core. Its 205 file hashes match archive
+`0630236ad669e7f3555d560af940a00a1df61faae90f3e9c727d92685011db70`.
+Actual external Edge at 1440/390 pixels renders the owner sign-in form, with no page errors,
+failed assets or horizontal overflow. The process remained PID 403587 / restart count 10
+through independent repeated checks; sampled minimum available memory of 563424 KiB exceeds
+the unchanged 512 MiB reserve. The 384 MiB process limit also remains enforced. No unexplained
+restart or resource-gate exit occurred in that verified observation window.
+Matching previous archive, both failed 6a candidates/diagnostics and rollback
+readback are retained; the successful correction itself needed no rollback.
+Public HTML digests and original protected input/config/old-grant/ledger hashes match.
+
+The Linux check also passes the real 0017/0018 mandate CHECK matrix and rollback
+coverage. One earlier CI run for 49a failed TypeScript because a new test omitted the
+Next-required NODE_ENV property; fixed explicitly before 4058 passed. The owner
+HTTPS checker now reuses the original setup contract (secure cookie, exact
+readback and X-Core-Operation logout), with successful/failed-read cleanup tests;
+this does not run credential setup/rotation or bypass authentication.
+
+The new account capability/processing grant files do not exist, and no new SQL
+schema or grants remain. The tested amended installer is **local only**: package
+SHA256 `5cdfc379fbb569aee89a64a431dee17a8735f3e42ee4cb409b4992058acda29a`;
+installer `e05a48d0f594a5bde44a18a7325361cf4f015276584c36a6f41e0ac898cc49ec`.
+Automatic approval review rejected uploading/staging it because that is a hosted
+write beyond the original pinned SQL package; the revised package was not
+transferred by another route. One exact amendment + encrypted staging/execution
+authorization is required. A fresh protected folder/receipt preserves the failed
+installer; its shell displays the exact SQL hash and requires explicit terminal
+consent before the existing hidden migration-password prompt. That is a single
+reviewable continuation, not new principals, broader rights or another budget.
+
+Core is accessible at https://wp-acceptance.miopages.com/core; password login/logout
+has not been independently exercised in this run. Worker concurrency/paid
+reassessment and complete account-cycle acceptance also remain unverified; the
+restored login screen is not that milestone. New functions remain disabled
+pending SQL authorization/installation. The $3 processing window has not started.
+
+Historical 4df15c1 rollback browser evidence is retained; owner-password verification is not
+claimed by the anonymous browser check. C0 intake 28 / workflow 41 / Knowledge v1,
 credentials, old grant/usage hashes and public HTTPS digests remain unchanged.
 No provider spending/dispatch, confirmation, WordPress/publication/infra change
 or merge. New grants and the processing window remain inactive. Do not equate a

@@ -235,7 +235,7 @@ def resume_stage():
                       'dependencyIntegrityVerified': True, 'linuxImport': 'PASS'}), flush=True)
 
 
-def deploy(account=True, corrected_probe=False):
+def deploy(account=True, corrected_probe=False, label=None):
     global phase
     assert (RUN / 'stage-evidence.json').is_file() and not (RUN / 'deployment-evidence.json').exists()
     before = json.loads((RUN / 'before.json').read_bytes())
@@ -287,7 +287,7 @@ def deploy(account=True, corrected_probe=False):
         print(json.dumps(result), flush=True)
     except Exception:
         phase_before_rollback = phase
-        save(RUN / ('failure-evidence-corrected-probe.json' if corrected_probe else 'failure-evidence.json'),
+        save(RUN / (f'failure-evidence-{label}.json' if label else 'failure-evidence-corrected-probe.json' if corrected_probe else 'failure-evidence.json'),
              {'phase': phase_before_rollback, 'application': application(), 'protectedStateMatches': private_state() == before['private']})
         phase = 'restore-matching-previous-build'
         if swapped:
@@ -302,7 +302,8 @@ def deploy(account=True, corrected_probe=False):
         time.sleep(4)
         probe()
         assert private_state() == before['private'] and public() == before['public']
-        save(RUN / 'rollback-evidence.json', {'status': 'PASS', 'sourceCommit': OLD, 'failedPhase': phase_before_rollback})
+        save(RUN / (f'rollback-evidence-{label}.json' if label else 'rollback-evidence.json'), {'status': 'PASS', 'sourceCommit': OLD, 'failedPhase': phase_before_rollback})
+        phase = phase_before_rollback
         raise
 
 
@@ -325,14 +326,52 @@ def corrected_probe_deploy():
     deploy(False, True)
 
 
+def lazy_research_correction():
+    """Tested purpose-bound code correction under the approved scope. Preserve
+    original artifacts/failures and both resource thresholds unchanged."""
+    global NEW, CANDIDATE
+    assert not (RUN / 'lazy-research-attempt.json').exists()
+    before = json.loads((RUN / 'before.json').read_bytes())
+    verify_files(WEB, OLD)
+    assert application('online')['restarts'] == before['application']['restarts']
+    assert private_state() == before['private'] and public() == before['public']
+    assert digest(RUN / 'rollback-4df15c1.tar.gz') == json.loads((RUN / 'rollback-verification.json').read_bytes())['sha256']
+    archive = RUN / 'protected-core-4058a74-linux-x64.tar.gz'
+    assert digest(archive) == '0630236ad669e7f3555d560af940a00a1df61faae90f3e9c727d92685011db70'
+    NEW = '4058a74f5b88c5392563b236dab8258107c66d81'
+    CANDIDATE = RUN / 'candidate-4058a74'
+    assert not CANDIDATE.exists() and not PREVIOUS.exists()
+    resources()
+    CANDIDATE.mkdir(mode=0o700)
+    with tarfile.open(archive, 'r:gz') as t:
+        for item in t.getmembers():
+            assert not item.name.startswith('/') and '..' not in pathlib.PurePosixPath(item.name).parts
+            assert item.isfile() or item.isdir()
+        t.extractall(CANDIDATE)
+    os.chmod(CANDIDATE, 0o700)
+    previous_candidate = RUN / 'failed-candidate'
+    for name in ['package.json', 'package-lock.json']:
+        assert digest(CANDIDATE / name) == digest(previous_candidate / name)
+    shutil.copytree(previous_candidate / 'node_modules', CANDIDATE / 'node_modules', symlinks=True)
+    for name in ['.env', 'ecosystem.config.js']:
+        shutil.copy2(WEB / name, CANDIDATE / name)
+    verify_files(CANDIDATE, NEW)
+    save(RUN / 'lazy-research-attempt.json', {'baseApprovalSha256': APPROVAL, 'sourceCommit': NEW,
+        'artifactSha256': digest(archive), 'linuxRun': 44838020904, 'reason': 'Defer research-browser initialization during Core review',
+        'memoryThresholdsUnchanged': True, 'priorFailurePreserved': True})
+    pm2('stop', '0')
+    assert application('stopped') == before['application']
+    deploy(False, True, 'lazy-research')
+
+
 if __name__ == '__main__':
     try:
         assert sys.platform == 'linux' and pathlib.Path.home().resolve() == HOME
         for directory in [PRIVATE, RUN, WEB]:
             assert directory.resolve() == directory and directory.stat().st_uid == os.getuid() and stat.S_IMODE(directory.stat().st_mode) == 0o700
-        assert len(sys.argv) == 2 and sys.argv[1] in ['STAGE', 'RESUME-STAGE', 'DEPLOY', 'RESTORE-REVIEW', 'CORRECTED-PROBE-DEPLOY']
+        assert len(sys.argv) == 2 and sys.argv[1] in ['STAGE', 'RESUME-STAGE', 'DEPLOY', 'RESTORE-REVIEW', 'CORRECTED-PROBE-DEPLOY', 'LAZY-RESEARCH-CORRECTION']
         {'STAGE': stage, 'RESUME-STAGE': resume_stage, 'DEPLOY': deploy, 'RESTORE-REVIEW': lambda: deploy(False),
-         'CORRECTED-PROBE-DEPLOY': corrected_probe_deploy}[sys.argv[1]]()
+         'CORRECTED-PROBE-DEPLOY': corrected_probe_deploy, 'LAZY-RESEARCH-CORRECTION': lazy_research_correction}[sys.argv[1]]()
     except Exception as error:
         import traceback
         location = traceback.extract_tb(error.__traceback__)[-1]
