@@ -3064,3 +3064,174 @@ queued100 without duplicating it, and recover validated retained output through
 the no-dispatch path if needed. Preserve41/6/75/97, original sources, old candidates,
 grant/counters/expiry and rollback. Do not silently apply unknown later output.
 Morning review is informal product feedback, not customer acceptance/publication.
+
+## Whole-site comparison and recommended direction — November 20
+
+### Authority and verified starting point
+
+The owner acknowledged the improved execution, while correctly distinguishing it
+from a new creative direction, finished content or a working commercial service.
+The owner accepted a controlled whole-site improvement pass: recover already-paid
+work, compare the entire earlier site and retained knowledge, then recommend
+consequential creative changes before further paid generation. The reported
+OpenAI account balance is **$17.58**. That is owner-reported available credit,
+not a new grant, an invoice reconciliation or permission to resume dispatch.
+
+Branch/HEAD were clean at `31381ad`, matching the fetched remote. No merge or
+other worktree change. This assessment makes no model calls or hosted writes.
+Existing SSH authentication still fails; the Windows OpenSSH agent is stopped.
+The owner was given the existing-key loading procedure while local work continued.
+The queued100 correction and final ledger therefore remain unverified until access
+returns. Do not infer that they failed or that the old balance is current.
+
+### Actual comparison, not another reconstruction of discovery
+
+Read all seven earlier R3 Pages, the complete accepted business snapshot (29
+Knowledge entries and Offering), all six current native Page trees/Actions,
+the service/content-growth/conversion contracts and the accepted service-led v3
+design record. Inspected retained desktop Home/Review compositions and the current
+WordPress Home. Compared the actual two retained stock images as possible assets,
+not as selected new placements. No external search, download or AI dispatch.
+
+Source files remain exact:
+
+- `scripts/customer-previews/miopages-c0-accepted.json`:
+  `d21790402f63ce7096429708225e7a8609516c0aa22648f3ad1ca80879232530`.
+- `scripts/customer-previews/miopages-editorial-r3.json`:
+  `0163b59c7e5d3bc866439bd266679c50d09c7011a4e43ea224138cd43510281d`.
+- Current `site-97.json` bytes:
+  `2271cb2618a3feb76ed81505c03571c441f5f86df39f2db88cca30d96b8dd270`.
+
+Native readback still matches
+`2f31bd9ab9b896adfa9fa9b3b7b854d0e0c876e3ecd083318476e5821f2870a9`;
+the old202 posts still match
+`6ad9ca038ebd73c9150eb1ed404a873c5435c53fb8c2e0c23dac7922192dc514`.
+No Page, Asset, metadata, source, grant or ledger was changed by this comparison.
+
+**The principal regression is loss of commercial substance and visual explanation,
+not simply bad alignment or too few words.** R3 explained qualified discovery,
+useful site/blog content, inquiry generation, understandable reporting and
+continuing improvement, including an explicitly hypothetical training-company
+example. The approved Offering records those same outcomes. Current copy mentions
+content/refinements but seldom explains how that work helps the customer.
+
+Across the six current native trees, there are 38 occurrences of the word
+"scope" and no occurrences of "search", "blog" or "growth". This is a reproducible
+symptom, **not a keyword requirement or quality score**: synonyms or inserting
+those words would not repair the missing explanation. The issue is the repeated
+responsibility/eligibility narrative replacing tangible customer value and examples.
+The current six-Page candidate has 29 Sections and no image placements.
+
+The accepted v3 direction had an integrated service illustration, connected
+Launch/Ongoing fields, an illustrative Review artifact and a graphic footer.
+Those visual ideas are implemented in `components/managed-sites/focus-visual.tsx`
+and related rendering, and survive in the reference captures. The current native
+trees instead compose text panels. The CSS pass improves their execution; it
+does not restore those explanatory assets or creative hierarchy.
+
+There is also a genuine visitor-journey gap. Direct Start has only links back to
+the process, Review, service and FAQ. It does not start onboarding. The Review
+submission remains unresolved/disabled. Accurate preview refusal is necessary,
+but the unfinished action must not become the definition of the marketed service.
+
+### What is proven about the generation system, and what is not
+
+The earlier source-registry and schema defects were real and have been repaired;
+do not relabel them as still unresolved without inspecting the active case.
+The complete owned-source projection exists and is checksum-bound. Current
+`marketingProjection` carries separate business Knowledge, editorial, analytical,
+report, Direction and blueprint evidence. Its instructions already tell the model
+to use the staffed offer directly and keep development-readiness out of buyer copy.
+**Repeating that instruction alone is not a credible corrective plan.**
+
+The exact current Page/revision instruction for a terminal entry Page says to
+explain expectations without implying a working form. That explains a preview
+constraint; it does not justify permanently removing the visitor's intended action.
+Likewise the native-composition instruction retains the conceptual Hero but says
+to use native blocks for abstract relationships and not request unavailable new
+illustrations. There is no automatic conversion of the existing React-authored
+SVG/Review composition into a WordPress Asset or native block. Merely supplying
+their screenshots as design references does not perform that integration.
+
+The retained response and report/Direction/blueprint for queued100 still need
+readback. Until then, the precise weighting that produced the later copy is not
+independently established. The verified downstream failure is that a complete,
+technically valid site was allowed through with repeated policy language, little
+growth-service explanation and zero explanatory media. A citation/shape check
+does not evaluate those product requirements. This is an implementation and
+editorial-judgment failure, not evidence that the owner supplied insufficient facts.
+
+### Recommended creative direction — proposed, not approved site copy
+
+**Lead with the value of a coordinated growth-oriented Web Presence.** Explain
+how the service helps appropriate prospects discover the business, understand and
+trust it, make a useful inquiry, and benefit from continuing content/improvement
+work. Reduced administration supports that value; it should not consume the pitch.
+Use existing confirmed facts without turning intended outcomes into guarantees or
+pretending the new service has a proven customer record.
+
+**Restore the explanatory strength of the accepted brand.** Preserve the current
+logo, Source Sans, purple/paper/lavender/apricot palette and corrected responsive
+spacing. Rework the owned conceptual illustration and illustrative Review artifact
+for the WordPress path, preserving their example status and accessible labels.
+Use the earlier design as a benchmark, not a requirement to copy its entire layout.
+Alternate purposeful visual explanation and readable copy; another row of generic
+cards is not a new concept. Any historical FPO/rights status remains explicit.
+
+**Use photographs selectively.** The retained shop-owner portrait and laptop
+photo are generic supporting options; neither explains the service as well as an
+original process/Review illustration. Do not insert them solely to claim that
+images exist, imply they depict customers, or treat old evaluation permission as
+production publication rights. No further image search/download is needed for
+this direction decision. Review exact placement/rights before any reuse.
+
+**Give each existing Page a distinct job.** The following is a revision brief,
+not a fixed six-Page product architecture, new public text or an instruction to
+delete earlier Pages. Recover useful paid output before choosing the actual diff.
+
+| Existing Page | Concrete change to request from Core | Existing basis / preserve |
+| --- | --- | --- |
+| Home203 | Explain the complete customer outcome; show the service visually and use one clear worked example. Remove the second full responsibility discussion. | R3 Home's discovery/content/conversion/improvement story, approved Offering, both current entry paths and clear managed positioning. |
+| Service215 | Make the deliverable tangible: business understanding, purposeful site/content, discovery, inquiry path, practical reporting and reviewed improvements. Give Launch and Ongoing distinct substance without repeating the Home. | R3 What You Get, service-model Launch/Ongoing, current continuity and existing-systems guidance. Keep unconfirmed prices and delivery promises out. |
+| How-it-works216 | Show what the customer supplies, sees, corrects and approves through the real sequence; explain continuing work with one useful example. Consolidate repeated scope/authority clauses. | R3 Getting Started, progressive onboarding and source-confirmation contracts. Preserve the optional Review and direct-start convergence. |
+| FAQ217 | Answer actual buying questions about content, changes, discovery, reporting, existing systems, ownership and AI. Remove internal proof-policy or defensive copy from the explanation of trust. | R3's fifteen substantive answers and current approved facts; no invented results, integrations or guarantees. |
+| Free Review218 | Make the output understandable through a clearly illustrative report, explain useful assessment/priorities/fit, and distinguish the service invitation from a still-disabled preview control. | Accepted Review artifact, R3 Review, existing free-versus-paid boundary. Never show invented customer findings as real. |
+| Direct Start219 | Explain the ready-to-proceed journey and the shared onboarding destination. Track the missing functional handoff as engineering work, not an invitation to send the visitor in circles. | Existing shared intake architecture, direct-start approval and retained customer knowledge; no new account or submission implied. |
+
+No new testimonial, client screenshot, price or exact operational promise can be
+invented to fill a trust gap. Existing historical experience can be stated only
+within its confirmed contribution/permission scope. A worked example remains
+explicitly hypothetical, not newly acquired performance evidence.
+
+### Resource control and next executable action
+
+No new provider request, API credential read, deployment or WordPress rewrite for
+this assessment. Codex resource use is separate and is not claimed to be zero.
+The account balance cannot establish the cost of a particular run. Last verified
+pre-queued100 figures remain $9.695933 estimated / $10.056105 conservative,37
+generations/73requests; current totals await read-only ledger reconciliation.
+
+Owner-readable local comparison:
+`runtime-content/c0-presentation-20261119/morning-review-20261120.html`, SHA-256
+`068e8d6a4642ad510bd8caa282b37a4cc269579db73efd7a38179a8dbe9b8ea6`.
+It uses three real retained local screenshots, links their full originals and the
+existing WordPress candidate, and shows the proposed six-Page revision jobs.
+Verified that all images resolve locally, there are no scripts or external
+resources, and the artifact is Git-ignored. This is a review report, not an
+implemented new design, generated copy or a second product interface. Source
+hashes, native readback and `git diff --check` pass; no application code changed,
+so the previous application tests were not rerun or claimed as a new quality pass.
+
+First restore existing SSH-agent access, inspect actual event/output/usage and
+recover validated paid output without invoking WORK or changing source bindings.
+Evaluate it against the whole-site brief above, not just the three revised Pages.
+Then show the owner the concrete retained/revised choices and only request new
+Core generation for specific remaining gaps, with a fresh exact cost cap if needed.
+The $17.58 credit report does not authorize that dispatch. Do not begin a new run.
+
+**RECOVERY / RESUME HERE:** this subsection is the current no-dispatch comparison
+checkpoint. Source97 and all earlier WordPress content remain unchanged. Retain
+the evening layout improvement. Queued100 is unknown pending existing-key access;
+no retry, counter reset or spend. The local review artifact described in the Issue
+handoff compares existing work and proposed direction; it is not a newly generated
+website or owner acceptance. Protected41/6 and every prior candidate/ledger remain.

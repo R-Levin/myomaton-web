@@ -630,3 +630,24 @@ Display source97 unchanged in content, with local theme0.1.2 layout correction.
 Later queued100 work is unverified because SSH authentication is unavailable.
 Do not lose or rebuy it. Actual layout checks passing do NOT mean the commercial
 site, Core service or overall product is accepted. See the evening P0-17 handoff.
+
+### November 20 — owner sees execution progress; controlled whole-site improvement
+
+The owner reports the design execution is much improved, while noting its limited
+creative change, absent images and unfinished content/service experience. This is
+positive informal feedback on execution, **not site/design/customer acceptance**.
+The owner approved the proposed next step: recover the already-paid correction,
+compare the entire earlier website and retained business material, recommend a
+concrete creative/content direction before further generation, and preserve the
+working presentation. Do not reduce this to Home alone, another new run or a
+request to repeat onboarding. Source R3 copy, accepted v3 visuals and canonical
+business Knowledge remain distinct complementary references, not one page.
+
+The owner reports $17.58 available API credit. This is not a new dollar ceiling,
+dispatch authorization or invoice evidence. Current work makes no provider call.
+Read [the actual whole-site comparison and proposed revision jobs](c0-creation-quality-p0-17.md#whole-site-comparison-and-recommended-direction--november-20).
+The earlier queued100 output/final cost still require existing SSH-agent access;
+do not regenerate, reset counters or silently replace source97. The supplied local
+review artifact compares actual retained captures and proposed direction only.
+Core remains responsible for actual generated public content; Codex's assessment
+and revision brief do not become customer facts or an AI-produced website.

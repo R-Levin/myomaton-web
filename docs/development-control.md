@@ -7,7 +7,20 @@ This file is the first-read **navigation and operational handoff** when merged t
 
 At every new or interrupted MioPages session, first read [current main development control](https://github.com/R-Levin/myomaton-web/blob/main/docs/development-control.md), then the full [owner-critical conversation index](https://github.com/R-Levin/myomaton-web/blob/main/docs/owner-critical-conversations.md). Follow the exact linked owner decisions and Issues #12 and #10, then reconcile with the current development branch, working tree and grants. Main maintains the critical-conversation index. This branch maintains its implementation checkpoint. Apply later owner decisions and record important conversations there during the work, with their authority and supersession. Product development remains the overall priority. [Continuity and priority decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6898063682)
 
-**Current evening recovery — November 19: local presentation pass complete; no further generation.**
+**Current recovery — November 20: whole-site comparison complete; no new generation.**
+Read [the comparison, concrete recommendation and recovery boundary](c0-creation-quality-p0-17.md#whole-site-comparison-and-recommended-direction--november-20).
+The owner sees real layout progress but has not accepted content/design or commercial operation.
+The complete earlier R3 copy, 29 Knowledge entries/Offering and accepted v3 visual evidence
+support a fuller discovery/content/inquiry/improvement story than source97 currently presents.
+The recommended direction restores that substance and explanatory visuals while preserving
+the improved layout. It is a proposal, not newly generated site content or a new budget.
+Owner-reported API credit: $17.58; no new spending authorization inferred. Existing SSH agent
+is stopped; loading the existing key is the only requested access action. Queued100 output
+and final costs remain unverified. Do not invoke WORK, regenerate or overwrite the current site.
+Local comparison artifact: `runtime-content/c0-presentation-20261119/morning-review-20261120.html`.
+It links actual retained reference/current captures; it is not a parallel product demo.
+
+**November 19 evening state, still preserved:** local presentation pass complete.
 Open the existing six-page WordPress candidate at http://127.0.0.1:4474/?page_id=203&preview=true.
 Read [the exact evening handoff](c0-creation-quality-p0-17.md#evening-local-presentation-pass--november-19).
 Displayed candidate: source97, Home203/Service215/How-it-works216/FAQ217/Free Review218/Direct Start219,
