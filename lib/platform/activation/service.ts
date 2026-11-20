@@ -8,6 +8,7 @@ import { approvedReview, type ApprovedReviewSource } from "./review-source";
 import { assessment, commercial, digest, initialAssessment, same, scope, source, type Authority, type CaseState, type CreateCase, type Operation, type OperatorAuthority, type ReviewBinding, type Scope, type Source } from "./model";
 import { confirmedIdentity, type CanonicalBinding, type CanonicalRequest } from "./canonical";
 import { inspectCanonical, writeOnboardingCanonical, type OnboardingOwner } from "../canonical/writes";
+import { canonicalWritePool } from "../canonical/transaction";
 import { confirmedAssessment, confirmedInformationSource, informationFields, informationRequest, informationRevision, prepareInformationWrite, type InformationConfirmation, type InformationRequest } from "./information";
 
 export type CaseIdentity = { id: string; scope: Scope; source: Source; review: ReviewBinding | null; createdAt: string; createdBy: string; authorityReference: string };
@@ -196,7 +197,7 @@ export class ActivationService {
       if(previousField&&(previousField.recordId!==input.record.id||previousField.key!==input.fact.key))throw Error("Existing confirmed field requires its exact canonical target");
       for(const link of current.state.assessment.flatMap(a=>a.confirmations??[]))if(link.recordId===input.record.id&&link.key===input.fact.key&&link.field!==input.fact.field)throw Error("Canonical key already confirms another information field");
       const write=await prepareInformationWrite(c,id,input,actor,source);
-      const transactional={connect:async()=>({release(){},query:async(sql:string,values?:unknown[])=>c.query(sql==="BEGIN"?"SAVEPOINT onboarding_information":sql==="COMMIT"?"RELEASE SAVEPOINT onboarding_information":sql==="ROLLBACK"?"ROLLBACK TO SAVEPOINT onboarding_information":sql,values)})} as unknown as Pool;
+      const transactional = canonicalWritePool(c);
       const written=await writeOnboardingCanonical(transactional,write,bound),after=await inspectCanonical(c as unknown as Pool,write.domain,bound.webPresenceId,write.id);
       if(!after)throw Error("Canonical confirmation result missing");
       const confirmation:InformationConfirmation={requestId:input.requestId,field:input.fact.field,key:input.fact.key,domain:write.domain,recordId:write.id,previousVersion:input.record.expectedVersion,previousFingerprint:input.record.expectedFingerprint,revision:written.version,revisionFingerprint:after.fingerprint,source,confirmation:{by:actor.operatorId,reference:input.confirmation.reference,at:input.confirmation.at}};

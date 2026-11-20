@@ -244,7 +244,7 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run, c
         <li>Page observations {snapshot.counts["page-observed"] ?? "not measured"}</li>
         <li>Action selections {snapshot.counts["action-selected"] ?? "not measured"}</li>
         <li>Accepted Contacts {snapshot.counts["contact-accepted"] ?? "not measured"}</li>
-        <li>Notification, qualified leads and customer outcomes are not measured.</li>
+        <li>This event collector does not establish notification delivery, lead quality or customer outcomes. Keep separately confirmed outcomes distinct from these counts.</li>
       </ul>
       {snapshot.recommendation && <details><summary>Suggested check and how to measure it</summary>
         <p>{snapshot.recommendation.observation} {snapshot.recommendation.next}</p>

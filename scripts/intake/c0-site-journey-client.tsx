@@ -12,13 +12,15 @@ import { isPresenceWorkflowWorking, PresenceWorkflowPanel } from "./presence-wor
 import type { MyBusinessView } from "../../lib/platform/intake/my-business";
 import type { AccountWorkView } from "../../lib/platform/intake/account-work";
 import { AccountWorkPanel } from "./account-work-panel";
+import type { InquiryOutcomeView } from "../../lib/platform/contact/outcomes";
+import { AccountInquiriesPanel } from "./account-inquiries-panel";
 import { MyBusinessPanel } from "./my-business-panel";
 import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
 import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-party";
 import type { reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
 
 type Operations = Awaited<ReturnType<typeof import("../../lib/platform/contact/protected-inquiry").protectedInquiry>>;
-type JourneyView = IntakeView & { portal?: IntakePortalWorkspace; myBusiness?: MyBusinessView; accountWork?: AccountWorkView; accountWorkUnavailable?: true; accountActivity?: PerformanceSnapshot; accountActivityUnavailable?: true; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
+type JourneyView = IntakeView & { portal?: IntakePortalWorkspace; myBusiness?: MyBusinessView; accountWork?: AccountWorkView; accountWorkUnavailable?: true; accountActivity?: PerformanceSnapshot; accountActivityUnavailable?: true; inquiryOutcomes?: InquiryOutcomeView; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
   sitePlanningReview?: ReturnType<typeof reviewedSitePlanning> & { current: boolean } };
 async function request(endpoint: string, operation?: object, signal?: AbortSignal): Promise<JourneyView | null> {
   const response = await fetch(endpoint, {
@@ -166,6 +168,12 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
       }
       setMessage("operation" in operation && operation.operation === "workflow-understanding-correct"
         ? "Proposed correction saved. The original sources and existing work are retained."
+        : "operation" in operation && operation.operation === "workflow-understanding-confirm"
+          ? "Exact business fact confirmed. Existing work is retained and awaits reassessment."
+        : "operation" in operation && operation.operation === "workflow-understanding-reassess"
+          ? "Reassessment queued. Previous work remains available for comparison."
+        : "operation" in operation && operation.operation === "record-inquiry-outcome"
+          ? "Reported outcome saved with its source and history."
         : "operation" in operation && operation.operation === "workflow-understanding-withdraw"
           ? "Correction withdrawn. Its history is retained."
         : next.interview?.failure && "operation" in operation && operation.operation === "interview-next"
@@ -221,6 +229,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         {workspace.environment === "local-rehearsal" && <p>Local rehearsal with simulated customer and Operator decisions.</p>}
         {view?.workflowAvailable && <nav aria-label="Workspace">
           {view.accountWork && <><a href="#account-work">Understanding and current work</a>{" "}</>}
+          {view.inquiryOutcomes && <><a href="#account-inquiries">Inquiries and outcomes</a>{" "}</>}
           {view.myBusiness && <><a href="#my-business">My Business</a>{" "}</>}
           <a href="#business-report-and-website">Business report and website</a>
           {view.workflow?.blueprint && <>{" "}<a href="#proposed-website">Proposed website</a></>}
@@ -245,6 +254,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           activity={view.accountActivity} activityUnavailable={activityUnavailable || view.accountActivityUnavailable}
           observe={view.accountActivity ? () => observeReview("action-selected", "open-current-work") : undefined}
           canCorrect={!hosted || workspace?.understandingCorrectionsAvailable === true} />}
+        {view.inquiryOutcomes && <AccountInquiriesPanel view={view.inquiryOutcomes} busy={busy} run={run} />}
         {view.myBusiness && <MyBusinessPanel business={view.myBusiness} corrections={view.workflow?.corrections} />}
         <PresenceWorkflowPanel hosted={hosted} workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run}
           canTriage={workspace?.role === "operator" && workspace.editorialDecisionsAvailable === true} />

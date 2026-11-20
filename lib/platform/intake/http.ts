@@ -8,12 +8,13 @@ import type { PresenceWorkflow } from "./presence-workflow";
 import type { PerformanceSnapshot } from "../measurement/first-party";
 import type { MyBusinessView } from "./my-business";
 import { accountWork } from "./account-work";
+import type { InquiryOutcomeView } from "../contact/outcomes";
 
 export const intakeCookie = "miopages_intake";
 
 async function updateLocalWorkflow(workflow: PresenceWorkflow, context: Awaited<ReturnType<IntakeService["workflowContext"]>>, input: Record<string, unknown>) {
   const keys = input.operation === "workflow-start" ? ["operation"] :
-    ["workflow-understanding-correct", "workflow-understanding-withdraw"].includes(String(input.operation)) ? ["operation", "version", "correction"] :
+    ["workflow-understanding-correct", "workflow-understanding-withdraw", "workflow-understanding-confirm", "workflow-understanding-reassess"].includes(String(input.operation)) ? ["operation", "version", "correction"] :
     input.operation === "workflow-correct" ? ["operation", "version", "finding", "correction"] : ["operation", "version"];
   if (Object.keys(input).some(key => !keys.includes(key))) throw new IntakeError("invalid_request");
   if (input.operation === "workflow-start") return workflow.start(context);
@@ -21,6 +22,8 @@ async function updateLocalWorkflow(workflow: PresenceWorkflow, context: Awaited<
   if (typeof version !== "number" || !Number.isSafeInteger(version) || version < 1) throw new IntakeError("invalid_request");
   const customer = { id: "local-customer", role: "customer", simulated: true } as const;
   switch (input.operation) {
+    case "workflow-understanding-confirm": return workflow.confirmUnderstanding(context, version, input.correction, customer);
+    case "workflow-understanding-reassess": return workflow.reassessUnderstanding(context, version, input.correction, customer);
     case "workflow-understanding-correct": return workflow.correctUnderstanding(context, version, input.correction, customer);
     case "workflow-understanding-withdraw": return workflow.withdrawUnderstandingCorrection(context, version, input.correction, customer);
     case "workflow-next": return workflow.advance(context, version);
@@ -56,6 +59,7 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
   workflow?: PresenceWorkflow, workspace?: {
     snapshot?: () => Promise<PerformanceSnapshot>; business?: (webPresenceId: string) => Promise<MyBusinessView>;
     reviewActivity?: (context: Awaited<ReturnType<IntakeService["workflowContext"]>>, current: NonNullable<Awaited<ReturnType<PresenceWorkflow["review"]>>>, event?: unknown) => Promise<PerformanceSnapshot>;
+    inquiries?: { read(): Promise<InquiryOutcomeView>; record(value: unknown): Promise<InquiryOutcomeView> };
   }) {
   // Loopback cookies are shared across ports. This disposable workflow must
   // never adopt the resume cookie of an earlier local intake.
@@ -76,6 +80,7 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
     return { ...view, workflowAvailable: true, workflow: current,
       ...(current && { accountWork: accountWork(context, current) }),
       ...(activity && { accountActivity: activity }), ...(activity === null && { accountActivityUnavailable: true }),
+      ...(workspace?.inquiries && { inquiryOutcomes: await workspace.inquiries.read() }),
       portal: { role: "customer", identity: "Customer rehearsal participant", account: "MioPages C0 rehearsal",
         site: "Disposable draft", environment: "local-rehearsal" } satisfies IntakePortalWorkspace,
       ...(workspace?.snapshot && { firstParty: await workspace.snapshot() }),
@@ -92,6 +97,11 @@ export async function intakeHttp(request: Request, service: IntakeService, abuse
       try {
         if (!value || typeof value !== "object" || Array.isArray(value)) throw new IntakeError("invalid_request");
         const input = value as Record<string, unknown>;
+        if (input.operation === "record-inquiry-outcome") {
+          if (Object.keys(input).some(key => !["operation", "outcome"].includes(key)) || !token || !workspace?.inquiries) throw new IntakeError("invalid_request");
+          await workspace.inquiries.record(input.outcome);
+          return withWorkflow(await service.resume(token));
+        }
         if (input.operation === "review-activity") {
           if (Object.keys(input).some(key => !["operation", "event"].includes(key)) || input.event === undefined || !workflow || !token || !workspace?.reviewActivity) throw new IntakeError("invalid_request");
           const context = await service.workflowContext(token), current = await workflow.review(context);

@@ -2,6 +2,7 @@ import { fingerprint, object, text } from "../canonical/model";
 import type { WorkflowRun } from "./presence-workflow";
 import { readBlueprint, type PresenceEvidence, type WorkflowPage } from "./presence-workflow-artifacts";
 import { checkStrategyScope, compilePageDecision, strategyBasis, type StrategyScope } from "./presence-decision-brief";
+import { confirmedKnowledgeEvidence } from "./account-work";
 
 const uses = ["business-fact", "staffed-offer", "editorial", "analysis", "excluded"] as const;
 type EvidenceUse = typeof uses[number];
@@ -104,6 +105,12 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
   const { operation, path } = run.work;
   const { entry, evidence, research, corrections, report, direction, blueprint, pages, revisionRequest, replan, sourceRecovery } = run.input;
   const sources = marketingSources(authority, evidence);
+  const reassessment = run.input.knowledgeReassessment;
+  if (reassessment) {
+    const additions = confirmedKnowledgeEvidence(reassessment.confirmations);
+    for (const [index, source] of additions.entries()) if (!reassessment.confirmations[index].publicUse &&
+        sources.some(row => row.source.id === source.id && !["analysis", "excluded"].includes(row.use))) throw Error("Internal confirmed fact is not public copy authority");
+  }
   const expose = ({ id, kind, label, date, content }: PresenceEvidence) => ({ id, kind, label, date, content });
   const design = { digest: authority.brandDigest, brief: authority.brandBrief };
   const claims = sources.filter(({ use }) => use === "business-fact" || use === "staffed-offer");
@@ -111,8 +118,9 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
     .map(({ source, use }) => ({ ...expose(source), use }));
   const analysis = sources.filter(({ use }) => use === "analysis").map(({ source }) => expose(source));
   if (authority.projectionVersion === 2) {
-    validateMarketingAuthority(authority, fingerprint(run.context), run.context.evidence.map(fingerprint));
-    if (fingerprint(run.context.evidence) !== fingerprint(evidence)) throw Error("Source-aware knowledge scope changed");
+    const expectedEvidence = reassessment ? [...run.context.evidence, ...confirmedKnowledgeEvidence(reassessment.confirmations)] : run.context.evidence;
+    validateMarketingAuthority(authority, fingerprint(run.context), expectedEvidence.map(fingerprint));
+    if (fingerprint(expectedEvidence) !== fingerprint(evidence)) throw Error("Source-aware knowledge scope changed");
     if (authority.strategy && operation === "page" && blueprint?.strategyBasis !== strategyBasis(run.context, run.input)) {
       throw Error("Page brief is stale for the current report, Direction or market evidence");
     }

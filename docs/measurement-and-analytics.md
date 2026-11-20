@@ -1,5 +1,13 @@
 # Measurement and analytics architecture
 
+**November 20 local outcome connection:** [ordinary Contact acceptance and
+customer-reported outcomes](platform-capabilities.md#connected-account-cycle--confirmed-understanding-and-outcomes)
+now share scoped account readback and append-only correction history. Notification
+delivery, qualification and reported results retain separate meanings. Development
+records and internal review events are not visitor performance; unknown site-revision
+attribution stays unknown. No raw inquiry fields are projected to AI, and no hosted
+collector, outcome policy, reporting integration or notification provider was enabled.
+
 ## Decision and scope
 
 Commercial V1 prioritizes MioPages-owned first-party measurement:

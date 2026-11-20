@@ -780,3 +780,17 @@ WordPress application/publication. The owner need not log in or test another
 fixture rehearsal now. Bring verified progress and one concrete protected-run
 request when the necessary code, policies and inputs are ready. This records no
 new model or hosted-operation grant.
+
+### November 20 — correction to confirmed understanding authorized locally
+
+The owner explicitly said “OK, that's fine you can proceed” after the next local
+increment: knowledge confirmation, affected-work reassessment through Core's AI
+engine, retained earlier work, and inquiry/outcome handling. Local implementation
+and offline tests may proceed independently; data/spending/protected-write and
+publication boundaries remain unchanged. The [verified connection and remaining
+activation work](platform-capabilities.md#connected-account-cycle--confirmed-understanding-and-outcomes)
+distinguish actual functions from controlled reasoning tests. Do not request another
+fixture walkthrough as product acceptance. Governed session authority remains the
+direction; development egress pins are not permanent per-answer approval. The
+later transport-disconnect message is a continuity incident, not cancellation or
+permission to restart a paid operation.

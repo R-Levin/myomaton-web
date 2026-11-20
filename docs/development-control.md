@@ -54,24 +54,27 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
-**Current task: connected account cycle, first local implementation checkpoint.**
+**Current task: confirmed understanding, reassessment and inquiry outcomes.**
 Following the scope/next-step discussion, the owner asked Codex to act next; local
 engineering is underway. The
 [proposal and business acceptance](service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle)
 connect understanding/corrections, genuine intelligence and editable work, shared
 review, authorized WP delivery/inbound reconciliation and actual observation/next
-action. [Verified first checkpoint and remaining gaps](platform-capabilities.md#connected-account-cycle--first-local-implementation-checkpoint)
-now cover retained source corrections, citation links, preserved current work,
-safe retry/withdrawal, visible save failures and actual internal review activity.
-This is working local engineering with recorded reasoning fixtures, not new AI
-quality evidence or a deployed service. No owner login/testing is needed now.
+action. [Latest local functionality and evidence](platform-capabilities.md#connected-account-cycle--confirmed-understanding-and-outcomes)
+connect a correction to confirmed canonical Knowledge and the existing report/
+Direction/site engine, preserving prior work and explaining retain/revise/add Page
+decisions. Ordinary Contact acceptance and reported outcomes also connect locally.
+Reasoning tests use controlled responses; they are not new genuine AI-quality
+evidence or a hosted rollout. No owner fixture testing is needed.
 
-Next local work: connect the existing canonical confirmation/reassessment path and
-ordinary inquiry/outcome handling, then installation-bound site observations and
-governed WordPress return/delivery. Do not invent a new approval or workflow system.
-Bring one concrete protected-execution request after tested artifacts, policies and
-permitted model inputs/budget are ready. No new model dispatch, hosted write,
-credential operation, infrastructure change, merge or publication occurred.
+Next: prepare actual protected account/case and authority composition, verify its
+active/inactive binding, Linux artifact and scoped database policies, then one
+authorization for exact live inputs/model/budget and hosted execution. Proposal
+permission alone cannot confirm business facts; old model grants cannot transmit
+new corrections. Site observation and governed WP return/delivery remain in scope.
+No model dispatch, hosted write, credential or infrastructure change, merge or
+publication occurred. A chat transport disconnect happened during checkpoint
+preparation; local files/evidence survived and no external operation was in flight.
 
 **Prior owner clarification:** manual workload is not the launch constraint. The
 [critical-path assessment](platform-capabilities.md#indispensable-system-capabilities--critical-path-assessment)

@@ -12,10 +12,12 @@ export const workflowFixture: PresenceWorkflowOperations = {
 };
 
 function fixture({ input, work }: WorkflowRun) {
-  const source = input.evidence.find(source => source.kind === "owner-confirmed") ?? input.evidence[0];
+  const originalSource = input.evidence.find(source => source.kind === "owner-confirmed") ?? input.evidence[0];
+  const source = input.knowledgeReassessment ? input.evidence.find(source => source.reference.startsWith("canonical:knowledge/"))!
+    : input.evidence.find(source => source.kind === "owner-confirmed") ?? input.evidence[0];
   const sourceIds = [source.id];
   const correction = input.corrections.find(item => item.finding.id === "existing-website");
-  const visitorPriority = correction?.text ?? "Learn what the business offers and how to get in touch.";
+  const visitorPriority = input.knowledgeReassessment?.confirmations[0]?.value ?? correction?.text ?? "Learn what the business offers and how to get in touch.";
   const anchor = { label: "Discuss your project", kind: "request-contact", destination: null };
   const sitePages = ["/", "/project"];
   switch (work.operation) {
@@ -26,7 +28,7 @@ function fixture({ input, work }: WorkflowRun) {
       return { title: "Business understanding", summary: "This local example uses the saved business brief to make two findings available for correction.",
         findings: [
           { id: "business-offer", heading: "What the business offers", body: "Launch establishes a managed site. Ongoing keeps it useful as the business changes.",
-            status: source.kind === "owner-confirmed" ? "established" : "proposed", sourceIds },
+            status: source.kind === "owner-confirmed" ? "established" : "proposed", sourceIds: [originalSource.id] },
           { id: "existing-website", heading: "What the next visitor should do", body: visitorPriority, status: "proposed", sourceIds },
         ] };
     case "direction":
@@ -34,8 +36,10 @@ function fixture({ input, work }: WorkflowRun) {
         visitorDecisions: ["Understand the managed offer", "Decide whether to discuss a project"], sourceIds };
     case "blueprint":
       return {
-        pages: [{ path: "/", label: "Home", purpose: "Explain the offer", sourceIds },
-          { path: "/project", label: "Project conversation", purpose: "Prepare the first conversation", sourceIds }],
+        pages: [{ path: "/", label: "Home", purpose: "Explain the offer", sourceIds,
+          ...(input.knowledgeReassessment && { change: "retain", changeReason: "Recorded fixture decision: retain the existing Home verbatim." }) },
+          { path: "/project", label: "Project conversation", purpose: "Prepare the first conversation", sourceIds,
+            ...(input.knowledgeReassessment && { change: "revise", changeReason: "Recorded fixture decision: revise the conversation Page using the confirmed correction." }) }],
         navigation: sitePages,
         articles: [{ title: "What to have ready", question: "What helps a first website conversation?", target: "/project", sourceIds }],
       };

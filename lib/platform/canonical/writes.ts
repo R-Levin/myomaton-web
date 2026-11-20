@@ -11,7 +11,7 @@ async function snapshotCanonical(client: Pick<Pool,"query">, domain: CanonicalDo
   return {...row,relatedAssetUsages};
 }
 // Local operator/service boundary only. No HTTP endpoint or claim of authentication.
-export async function inspectCanonical(pool: Pool, domain: CanonicalDomain, webPresenceId: string, id: string) {
+export async function inspectCanonical(pool: Pick<Pool, "query">, domain: CanonicalDomain, webPresenceId: string, id: string) {
   choice(domain,["knowledge","offering"]); const table = domain === "knowledge" ? "business_knowledge" : "offerings";
   const row = (await pool.query(`SELECT * FROM ${table} WHERE web_presence_id=$1 AND id=$2`,[uuid(webPresenceId),uuid(id)])).rows[0];
   return row ? { row, fingerprint: fingerprint(await snapshotCanonical(pool,domain,row)) } : null;

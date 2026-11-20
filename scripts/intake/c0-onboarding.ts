@@ -20,6 +20,7 @@ import { PresenceWorkflow } from "../../lib/platform/intake/presence-workflow";
 import { workflowFixture } from "./presence-workflow-fixture";
 import { FirstPartyMeasurement, type MeasurementSource } from "../../lib/platform/measurement/first-party";
 import { accountReviewActivity } from "../../lib/platform/measurement/account-review";
+import { InquiryOutcomes } from "../../lib/platform/contact/outcomes";
 import { fingerprint } from "../../lib/platform/canonical/model";
 
 const host = "127.0.0.1", port = 4320;
@@ -61,7 +62,6 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
   try {
     await migrateWithBootstrapCompatibility(pool);
     if (runWorkflow) await pool.query(await readFile(new URL("../../lib/platform/intake/presence-workflow.sql", import.meta.url), "utf8"));
-    const workflow = runWorkflow ? new PresenceWorkflow(pool, workflowFixture) : undefined;
     async function scope(name: string) {
       const organization = randomUUID(), webPresenceId = randomUUID(), managedSiteId = randomUUID();
       await pool.query("INSERT INTO organizations(id,name,status) VALUES($1,$2,'active')", [organization, name]);
@@ -71,9 +71,27 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
     }
     const database = new URL(cluster.url).pathname.slice(1);
     const selection = await scope("C0 onboarding rehearsal");
+    const workflow = runWorkflow ? new PresenceWorkflow(pool, { ...workflowFixture, knowledgeConfirmation: {
+      async authorize(actor, context) {
+        if (!actor.simulated || actor.id !== "local-customer" || actor.role !== "customer" || fingerprint(context.scope) !== fingerprint(selection)) throw Error("Simulated customer confirmation scope refused");
+        return { operatorId: actor.id, authorityReference: "Isolated local confirmation only", customer: {
+          kind: "business-representative", subjectId: actor.id, authorityReference: "Simulated C0 representative; no real customer approval",
+        } };
+      },
+    } }) : undefined;
     let localSnapshot: (() => ReturnType<FirstPartyMeasurement["snapshot"]>) | undefined;
     let reviewActivity: ReturnType<typeof accountReviewActivity> | undefined;
+    let inquiries: { read: () => ReturnType<InquiryOutcomes["inspect"]>; record: (value: unknown) => ReturnType<InquiryOutcomes["record"]> } | undefined;
     if (runWorkflow) {
+      await pool.query(await readFile(new URL("../../lib/platform/contact/outcomes.sql", import.meta.url), "utf8"));
+      const outcomeContext = Object.freeze({});
+      const outcomes = new InquiryOutcomes(pool, { async authorize(context, _operation, selected) {
+        if (context !== outcomeContext || fingerprint(selection) !== fingerprint(selected)) throw Error("Local outcome scope refused");
+        return { operatorId: "local-customer", authorityReference: "Isolated development outcome review", customer: {
+          kind: "business-representative", subjectId: "local-customer", authorityReference: "Simulated customer; not genuine commercial activity",
+        } };
+      } }, "development");
+      inquiries = { read: () => outcomes.inspect(outcomeContext, selection), record: value => outcomes.record(outcomeContext, selection, value) };
       await pool.query(await readFile(new URL("../../lib/platform/measurement/first-party.sql", import.meta.url), "utf8"));
       const current = reviewed.after.business_knowledge.find(row => row.web_presence_id === reviewed.target.webPresenceId)!;
       const offer = reviewed.after.offerings.find(row => row.web_presence_id === reviewed.target.webPresenceId)!;
@@ -135,7 +153,7 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
               return send(401, "application/json", '{"error":"local_access_required"}');
             }
             const response = await intakeHttp(request, intake, abuse, true, false, workflow, {
-              snapshot: localSnapshot, reviewActivity, ...(workflow && { business: (id: string) => readMyBusiness(pool, id) }),
+              snapshot: localSnapshot, reviewActivity, inquiries, ...(workflow && { business: (id: string) => readMyBusiness(pool, id) }),
             });
             const body = await response.text();
             res.writeHead(response.status, { ...headers, ...Object.fromEntries(response.headers) }).end(body);

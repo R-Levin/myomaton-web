@@ -62,6 +62,11 @@ export const creativePageSchema = {
 export const strategyBlueprintSchema = shape({ ...artifactSchemas.blueprint.properties,
   pages: array(shape({ path: string, label: string, purpose: string, ...cited, decisionBrief: decisionBriefSchema })) });
 
+export function reassessmentBlueprintSchema<T extends typeof artifactSchemas.blueprint | typeof strategyBlueprintSchema>(base: T) {
+  return shape({ ...base.properties, pages: array(shape({ ...base.properties.pages.items.properties,
+    change: options(["retain", "revise", "add"]), changeReason: string })) });
+}
+
 export type ArtifactIssue = "citation" | "page-binding" | "action-destination" | "shape-or-content";
 
 export class ArtifactValidationError extends Error {
@@ -116,12 +121,13 @@ function citedSources(value: unknown, ids: readonly string[], normalizeProviderR
   return references(normalizeProviderReferences && Array.isArray(value) ? [...new Set(value)] : value, ids, true, "citation");
 }
 
-export function readBlueprint(value: unknown, ids: readonly string[], normalizeProviderReferences = false, withStrategy = false) {
+export function readBlueprint(value: unknown, ids: readonly string[], normalizeProviderReferences = false, withStrategy = false, reassessment = false) {
   const blueprint = object(value, ["pages", "navigation", "articles"]);
   const pages = list(blueprint.pages, value => {
-    const page = object(value, ["path", "label", "purpose", "sourceIds", ...(withStrategy ? ["decisionBrief"] : [])]);
+    const page = object(value, ["path", "label", "purpose", "sourceIds", ...(withStrategy ? ["decisionBrief"] : []), ...(reassessment ? ["change", "changeReason"] : [])]);
     return { path: path(page.path), label: copy(page.label), purpose: copy(page.purpose), sourceIds: citedSources(page.sourceIds, ids, normalizeProviderReferences),
-      ...(page.decisionBrief !== undefined && { decisionBrief: readDecisionBrief(page.decisionBrief) }) };
+      ...(page.decisionBrief !== undefined && { decisionBrief: readDecisionBrief(page.decisionBrief) }),
+      ...(reassessment && { change: choice(page.change, ["retain", "revise", "add"]), changeReason: copy(page.changeReason) }) };
   });
   const paths = pages.map(page => page.path);
   unique(paths);

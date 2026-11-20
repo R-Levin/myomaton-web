@@ -109,7 +109,7 @@ ignored runtime-content/runtime-assets from application compilation. Tracked app
 library, script and test sources remain included; no customer artifact was removed
 or compiler error suppressed. Disposable PostgreSQL/listeners/browser were stopped.
 
-**Remaining:** source-aware canonical confirmation/reassessment, explicit permitted
+**Remaining at that earlier checkpoint:** source-aware canonical confirmation/reassessment, explicit permitted
 original/evaluation case association, genuinely useful live AI work, ordinary
 inquiries/notifications/confirmed outcomes, installation-bound WordPress collection,
 inbound edit reconciliation and account-level applied receipt/readback. Existing
@@ -118,6 +118,76 @@ new provider use, protected policies/deployment/application and publication stil
 require their applicable concrete authority. Protected41/WordPress6, local97,
 isolated106 and prior ledgers were not touched. This is a first working connection,
 not completion of the six-step service cycle or a new spending grant.
+
+### Connected account cycle — confirmed understanding and outcomes
+
+**November 20, 2026; local implementation after the owner's explicit go-ahead.**
+This extends the same account cycle, canonical writers, workflow and Contact;
+there is no second intake, approval system, generation engine or demo framework.
+
+- The [canonical correction service](../lib/platform/canonical/confirmed-information.ts)
+  requires an independently resolved existing `CustomerAuthority` contract and
+  explicit confirmation of an owned Knowledge entry. A proposed note cannot
+  approve itself. Record/fact classification stays fixed: public-use evidence
+  needs explicit attestation, internal evidence cannot be promoted by this path,
+  and neither authorizes publication. Unrelated entries retain exact evidence.
+  Existing inactive onboarding authority is unchanged; both reuse the nested
+  canonical transaction adapter.
+- The [existing workflow](../lib/platform/intake/presence-workflow.ts) commits
+  Knowledge and its confirmation receipt atomically, rejects stale/foreign/forged
+  inputs and makes exact retry idempotent. Confirmation retains current work;
+  separate reassessment archives full prior report/Direction/plan/Pages and keeps
+  consumed revision/replan allowances. Old approval/quality targets do not transfer.
+- The existing generation stages require an explained **retain/revise/add** decision
+  for every Page after a knowledge change. Retained Pages remain exact; only
+  revised/new Pages need drafting. No fixed Page count or default whole-site rewrite.
+  Core shows before/after findings, approach and Pages; later canonical drift stops
+  dispatch. Controlled response tests verify this connection, not AI intelligence.
+- The [existing provider](../lib/platform/intake/presence-workflow-provider.ts)
+  requires fresh exact development egress pins plus added canonical evidence;
+  old authority cannot transmit new corrections. Reasoning inputs omit customer/
+  Operator authority metadata. Complete approved original knowledge remains
+  available; stage projection avoids repeating derived candidates: planning sees
+  the complete prior site, drafting its prior Page, editorial the changed prior
+  Pages. Revisions meter as revisions. Internal facts are analysis, not copy
+  authority. These development pins do **not** establish permanent per-answer owner
+  approval; governed session authorization remains the intended service direction.
+- [Inquiry outcomes](../lib/platform/contact/outcomes.ts) and their
+  [local append-only journal](../lib/platform/contact/outcomes.sql) reuse ordinary
+  Contact acceptance. Scoped explicit customer confirmation records qualification,
+  outcomes and corrections with history/retry. Actual notification state remains
+  separate; unknown stays unknown. Reporting does not copy inquiry fields into AI.
+  Development/live classification is server-controlled; site-revision attribution
+  remains unconnected. Expiry prevents new outcomes and inquiry retention can
+  cascade its journal. No email provider, CRM or business performance is invented.
+
+**Verified:**49 tests pass:36 focused provider/source/authority/review/transport/cycle
+tests,4 actual disposable PostgreSQL/HTTP integrations and9 existing inactive-
+onboarding confirmation tests. Forced canonical-history, workflow-receipt and
+outcome failures roll back completely. Contrasting recorded responses change the
+relevant finding, approach and Page while preserving unrelated offering text,
+exact Home and fictional C2 records. Consumed allowances persist. Controlled
+Responses transport exercises real metering/custody code, egress refusal and
+no-request recovery; it makes no provider call.
+
+Actual headless Edge at 1440/390 verifies confirmation, reload, before/after,
+retained/revised Pages, ordinary Contact acceptance and reported-outcome reload:
+no overflow/page errors/external requests. Private screenshots/receipt are in
+ignored `runtime-content/confirmation-reassessment-browser-20261120`. Legacy-suite
+setup initially lacked its required bootstrapped owner fixture; the disposable
+runner was corrected without weakening checks or modifying canonical migrations.
+All9 then passed. Test-only source-ID/typing errors were corrected before final
+verification, not hidden or counted as passing results.
+
+**Before protected activation:** compose actual account/case and confirmation
+authority, verify the protected account's active/inactive binding and appropriate
+existing writer, Linux artifact and restricted policies, then authorize fresh live
+inputs/model/budget. No capability/grant/outcome table was installed on the host.
+New active correction supports existing Knowledge fields; active Offering editing,
+inquiry-detail/notification handling, WordPress visitor attribution/inbound edits
+and account-level delivery receipts remain incomplete. Fixtures do not establish
+commercial quality. Original Core41/WP6/local97/isolated106 and all ledgers remain
+untouched; no provider spending, hosted writes, WP application, merge or publication.
 
 ### Service-process framework: existing foundations and missing connections
 

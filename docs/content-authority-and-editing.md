@@ -1,5 +1,12 @@
 # Content authority and bounded text drafts
 
+**November 20 local update:** [connected knowledge/reassessment](platform-capabilities.md#connected-account-cycle--confirmed-understanding-and-outcomes)
+uses the canonical writer and separately resolved business-representative/accepted-
+authority proof for exact existing active-account Knowledge entries. A source note
+alone grants no confirmation authority. Classification and unrelated evidence stay
+intact; prior proposals/revisions remain available. This does not install hosted
+permissions, replace inactive onboarding, approve a site or authorize publication.
+
 ## Implemented boundary
 
 The runtime text descriptor and local operator draft service are implemented without
