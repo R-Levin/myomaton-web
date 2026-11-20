@@ -588,3 +588,16 @@ usage are separate; “no new API calls” does not mean Codex work is free.
 See [implemented source repair and actual hosted-write hold](c0-creation-quality-p0-17.md#prepared-binding-retained-exact-hosted-write-held-by-automatic-review).
 These are operating instructions, not customer business knowledge or new
 financial/deployment/publication authority.
+
+### November 19 — explicit hosted source-binding approval executed
+
+The owner approves the exact pending correction: private worker
+9e8a7042f7e75112b915339032a306d63f6213a390e41ffc4f3524adee4706be and
+manifest5494e0a789be91cd905f5c7f4eda0f2f96a2b640e81c5b2f12cd1cb753b4d93a,
+isolated C0 revision70→71 and22→27evidence records, analysis only.
+Preserve history/rollback, public-claim authority, permissions,$8 cap,
+counters and expiry. No model calls, publication or public Core/WordPress
+changes. The correction and independent readback passed; see
+[verified actual result and next boundary](c0-creation-quality-p0-17.md#approved-source-binding-correction-applied-and-independently-verified).
+This resolves that exact hosted-write hold, not the separate future model/
+iteration/publication gates.

@@ -2719,3 +2719,68 @@ ledgerb9d13677 first, then targeted CLI replacement/apply and independent
 readback. Do not rerun original source-only installer or preparation merely
 because another session resumed. If denied or changed, retain everything;
 do not bypass automatic review. No new model dispatch is included.
+
+### Approved source-binding correction applied and independently verified
+
+The owner explicitly approves worker9e8a7042 and manifest5494e0a7 after the
+automatic hosted-write rejection. That direct approval supersedes the pending
+consent hold for this exact operation only; it authorizes no model call,
+publication, public Core or WordPress change.
+
+**Executed:** verified exact plan, installer1188fe7b, worker9e8a7042 and
+Linux proof15d662d5 before changing anything. Matching prior private worker/
+proof/activation are retained under before-source-evidence-5494. Activated
+only this private CLI worker, then the prepared APPLY-SOURCE-EVIDENCE
+operation passed, appending revision71. No migrations, role changes,
+credential rotation, source downloads or provider calls.
+
+**Independent verification (separate read-only queries and file comparison):**
+- Normal active-worker inspect opens the actual258,615byte context and returns
+  version71 / next report. The larger-reader correction is exercised on host.
+- Exactly27 evidence records: the old22 unchanged, plus the exact five
+  authorized originals as analysis. Full content/hash/status match retained
+  original bytes. Historical and intended-service statuses remain intact.
+- Public claim classifications and selected passages unchanged. Intake token,
+  roles, reviewer expiry, model/research configuration, retries, financial
+  ledger, generation/request limits and editorial/replan allowances unchanged.
+- All saved binding files match the prepared after-state byte for byte.
+- Prior70 digest ea386343f505b635f5d8bdc04c498c4359aade5755f970f52c495e50c4f4718e
+  and its report/Direction/plan/Home remain preserved. History has71events;
+  prior research and replan state are unchanged; consumed editorial ordinal4
+  retained. Stale derived state/confirmation cleared for reassessment.
+- Previous contextual stock review is archived, not silently approved for a
+  future placement. Source bytes/assets/history remain. Repair lock removed
+  only after successful commit and independent readback; recovery bundle/
+  receipt and prior runtime files retained.
+- Local WordPress Home70/203 native digest remains38f0145d; all earlier202posts
+  remain6ad9ca03, matching the exact baseline. No protected41/6/75/public
+  Core/WordPress mutation was performed.
+
+Protected operation evidence:
+same-case source-evidence-repair-
+5494e0a789be91cd905f5c7f4eda0f2f96a2b640e81c5b2f12cd1cb753b4d93a/receipt.json.
+Full independent verification returns PASS; only counts/digests/flags were
+exported, not source bodies, generated private records or credentials.
+
+**Result:** the source-binding defect is now corrected in the active isolated
+case, not left as a local proposal. Existing approvals and old generated
+versions remain evidence. This does NOT establish improved AI reasoning,
+writing or commercial website quality: no new generation occurred.
+
+**Cost unchanged:**25generations/49requests,$5.652224 usage-estimated settled,
+0pending,$2.347776 of$8 remaining. No added API charge for this correction.
+Codex allowance/credit consumption is separate and not measured by this ledger.
+Original32generation/65request/2replan/4editorial limits and November22
+15:58:31UTC expiry are unchanged.
+
+**RECOVERY / RESUME HERE:**current71 is idle at report with active worker
+9e8a7042/proof15d662d5 and context7892fd3e. Do NOT rerun prepare/apply/v1
+source repair, re-enroll principals or regenerate old work. Preserve all
+backup/receipt files. Next product work must reassess from the corrected
+evidence, not patch the same Home against a narrowed old report. Complete
+remaining review/prompt-steering corrections before a fresh bounded live
+cycle. A full upstream site cycle needs more than7remaining generation
+slots; the latest approval expressly excludes model calls, so obtain one
+informed consolidated model/iteration authorization when ready. Do not
+silently increase$8, reset counters or present this technical success as
+founder acceptance.
