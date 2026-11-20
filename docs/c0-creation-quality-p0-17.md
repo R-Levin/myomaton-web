@@ -2842,3 +2842,36 @@ Use the current authenticated private source custody; never export raw source or
 model bodies to Git/logs. No protected Core/WordPress/publication/infra change.
 Do not reapply5494, re-enroll, reset counters, or manually write replacement copy.
 This checkpoint is engineering readiness, not an improved-site quality claim.
+
+### Continuation activated and genuine upstream work resumed
+
+Exact private worker30ea8afa/proofc3b9cba0 activated with matching before-files.
+Resource-only APPLY c6d7749e passed71 and independently verified next grantf024b799:
+ONLY the enumerated resources/sequence differ; sources, roles, expiry, model,
+request sizes, claims and original ledger prefix are unchanged. Receipt and
+before-grant/binding retained; apply locks removed after success.
+
+A launch initially lacked the already-installed playwright dependency path and
+failed on import before main. Automatic review refused immediate retry until
+read-only evidence proved71, original grant/binding/ledger, no receipt/locks/
+before-files. Correcting NODE_PATH after that proof succeeded; no uncertain write
+was blindly retried. Normal inspect export now hits a pre-existing immutable71
+filename because grant-dependent view changed; preserve it. Normal WORK opened
+the same case successfully. Use actual event/usage metadata until that export
+filename is made representation-specific; this collision must not become a
+new model request or an authentication/production failure claim.
+
+Core saved report73 with9findings, citing complete-owned-site-and-knowledge and
+canonical continuing-growth alongside other retained business and market evidence.
+Development-only continuation74 retained the source statuses; no customer
+confirmation or public claims promoted. Direction76 retained. At the last
+read-only checkpoint77, blueprint generation is pending;28generations/55requests,
+$6.128899 settled usage estimate, one pending. Cost/reservation totals must be
+re-read after completion; NEVER duplicate this pending operation.
+
+**RECOVERY / RESUME HERE:**same private runtime/current worker30ea8afa, grantf024b799.
+Wait/inspect current event and ledger, then continue existing WORK toward all
+declared Pages and actual local WordPress editorial render. Source repair5494
+and resource continuationc6d7 are ALREADY APPLIED. Do not reinstall/re-enroll/reset.
+This is genuine API work, not a generated-site quality claim. Protected41/6/75
+and old local native hash38f0145d still unchanged before materialization.
