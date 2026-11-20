@@ -755,3 +755,15 @@ restart or scripted recommendation. Operators can initiate/refine/judge; Core mu
 provide persistent intelligence, coordination and evidence. The site is one output.
 This agrees the direction for implementation scoping; no new coding, model budget,
 protected application, public collection or publication was dispatched by “agreed.”
+
+### November 20 — connected account-cycle implementation scoping requested
+
+The owner requested: “OK, let's scope that out so we can proceed.” Prepare the
+[bounded proposal and business acceptance](service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle)
+using the completed review and actual source interfaces. This is scoping, not an
+instruction to dispatch new generation or change application/hosted state. The
+proposal connects one account's knowledge, intelligence, review, WP change/return
+path and observation/next action; it does not redefine the whole service or make
+an early public-site launch part of Core intelligence acceptance. Existing manual-
+effort tolerance, all-project reuse, delivery independence and approval boundaries
+remain intact. Owner review of the detailed implementation scope is next.

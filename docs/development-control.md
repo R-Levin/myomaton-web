@@ -54,16 +54,27 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
-**Latest owner discussion:** manual workload is not the launch constraint. The
+**Current task: bounded implementation scope prepared for review.** The owner
+asked to scope the agreed connected account cycle. The
+[proposal and business acceptance](service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle)
+connect understanding/corrections, genuine intelligence and editable work, shared
+review, authorized WP delivery/inbound reconciliation and actual observation/next
+action. It reuses existing components and identifies actual account/case,
+confirmation, collector and inbound gaps. No code, model dispatch or hosted change
+is part of this checkpoint. Next: owner scope review, then local implementation if
+approved. Bring one concrete protected-execution request after tested artifacts
+and policies are ready.
+
+**Prior owner clarification:** manual workload is not the launch constraint. The
 [critical-path assessment](platform-capabilities.md#indispensable-system-capabilities--critical-path-assessment)
 identifies indispensable system contributions and missing connections using the
-completed review. This continuation is assessment/sequencing only, not authority
-to start implementation, a model round, measurement activation or site application.
+completed review. That assessment was sequencing only, not authority to start
+implementation, a model round, measurement activation or site application.
 
 The [first connected account-cycle shape](service-operations-model.md#first-connected-account-cycle--agreed-shape-november-20)
-is now agreed as the direction for scoping. It is not a new execution/provider or
-protected-write authorization. Prepare the bounded implementation from existing
-components after discussion; do not restart C0 or reduce the goal to a website.
+is agreed and the detailed scope is now prepared. Neither is an execution/provider
+or protected-write authorization. Review the proposed implementation using existing
+components; do not restart C0 or reduce the goal to a website.
 
 Owner authorized a bounded **local review and correction of active guidance and
 interruption recovery**, including project-wide reuse, delivery independence,

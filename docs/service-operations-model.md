@@ -87,6 +87,103 @@ supply real observations without redefining this development cycle. No fixed Pag
 count or whole-site rewrite follows. The deliverable is an operating relationship:
 understanding → purposeful work → reviewed change → observed result → next action.
 
+### Proposed implementation scope — one connected account cycle
+
+**November 20, 2026; prepared for owner review.** The direction above is agreed;
+this detailed scope is a proposal, not a dispatched implementation/provider grant.
+One coordinated product increment reuses the [existing components](platform-capabilities.md#service-process-framework-existing-foundations-and-missing-connections),
+without a new workflow framework or a claim to complete Commercial V1.
+
+**Business result:** in existing protected Core, follow one account from retained
+understanding and a genuine need through a useful, editable proposal, authorized
+private site change and an honestly measured next action. Use C0's known full-
+growth-service communication gap as the first issue; do not script the answer,
+restart discovery or default to a whole-site rewrite. The proposed work follows
+evidence, not a fixed Page/Section count.
+
+| Connected work | Minimum functional result and reuse |
+| --- | --- |
+| Understanding and active work | Extend existing intake/case/review with explicit account → source version → active case → candidate → delivery/observation references. Distinguish confirmed facts, historical material, research, unconfirmed answers and corrections. Save a meaningful correction once; use canonical confirmation/history at its actual authority. Show consequences for the relevant assessment/proposal and flag stale work. |
+| Useful AI and proposed work | Reuse research, report/Direction, generation/revision, source authority, custody and metering. Core/API AI investigates the need and prepares substantive editable content, visitor journeys and purposeful visual/media changes where justified. Weigh valuable owned work and permitted research. Retain source-grounded claims and unresolved requirements. Genuine model output is required for intelligence acceptance; recorded responses remain engineering tests. |
+| Shared review | Customer and Operator see the same candidate/feedback history in the existing portal, with actual scoped read/comment/edit/decision permissions appropriate to each perspective. The founder can exercise different roles; switching views cannot grant authority. Record pending/resolved feedback, source/base versions and exact reviewed work. Knowledge confirmation, proposal approval, draft application and publication stay distinct. Reuse current authentication/session and approval mechanisms, without broad team administration. |
+| WordPress round trip | Reuse signed native writing, logical Page identities, Asset/AssetUsage, receipts, monotonic history, retry and restore. Add inbound reconciliation for supported managed editorial refinements, beginning with heading/paragraph text: capture the actual change against its Core base, propose reconciliation and review it through existing proposal contracts. Surface conflicts, foreign edits and unsupported blocks. Never silently overwrite them or promote page edits to business truth. |
+| Observation and next action | Bind a real first-party collector to installation/source/revision and existing ledger, deduplication, Contact and snapshot machinery. Record coverage/start and distinguish internal preview/development from public visitors and synthetic tests. Connect an actual development inquiry and manually confirmed outcome with their test provenance. Show actual notification/delivery state. Core combines evidence and uncertainty into a useful next action, or explains insufficient evidence; no scripted improvement or invented commercial results. |
+
+**Source-verified integration gaps:** hosted review configuration binds a particular
+intake; retained isolated evaluation106 has a different scope. No fresh hosted
+health inspection was performed for scoping. Implement explicit
+permitted associations, not silent reparenting, canonical promotion or broader
+tenant grants. Preserve original Core41/WordPress6, evaluation106, prior candidates,
+grants and usage history. The original record remains historical even if newer
+work is selected. Do not apply106 merely to establish the account connection.
+
+The existing [activation service](../lib/platform/activation/service.ts) supplies
+scoped business-information confirmation, canonical writes, history, stale checks
+and retry. [My Business](../lib/platform/intake/my-business.ts) currently reads
+confirmed public knowledge; it is not the full correction interface. Reuse both;
+proposal preparation permission does not authorize business confirmation.
+The [measurement ledger](../lib/platform/measurement/first-party.ts) currently
+trusts its caller's source and distinguishes only synthetic/live; the collector
+must establish source binding and honest internal-activity treatment.
+The [protected inquiry](../lib/platform/contact/protected-inquiry.ts) is one fixed
+synthetic inquiry, not a general inquiry service. A WordPress inbound editorial
+handler is not implemented; outbound receipts do not establish that return path.
+
+**Work order without serial approval pauses:** connect account/source/review state;
+develop intelligence/proposals and actual collection/Contact in parallel; exercise
+delivery, inbound reconciliation and next action when specifically authorized.
+Use the existing protected Core and WordPress development installation. Local
+tests verify engineering; they are not a replacement owner-facing environment.
+Operators may initiate work, select sources, refine content, judge quality, confirm
+outcomes and trigger delivery. Core retains the connections; the owner must not
+reconstruct account history from chat or terminal receipts.
+
+**Business acceptance:**
+
+1. Reopen the account and find understanding, sources, unresolved matters, active
+   work and next action. Correct once, reload, and confirm only through appropriate
+   authority. Unrelated knowledge stays unchanged; stale work is identified.
+2. Genuine Core/API reasoning produces a useful explained proposal addressing the
+   actual need. Evidence/corrections visibly affect Direction, content or visitor
+   actions. Edit, reject and revise it. A narrow paraphrase, fixed recommendation
+   or valid-but-poor generation does not pass.
+3. Customer and Operator perspectives share the candidate/history with genuinely
+   different permitted actions. Simulated role switching cannot record approval.
+4. After exact application approval, browse actual private WordPress Pages with
+   working navigation, intended media and visitor actions. Core shows the matching
+   receipt. A supported WP refinement returns for review; conflict is refused.
+   Verify restoration with stable Page identities and preserved history.
+5. Perform a labeled development visit, Action selection and accepted inquiry.
+   Core shows actual counts, source/revision, coverage, delivery/outcome status and
+   limitations. Internal/test activity never becomes commercial performance.
+6. Carry a justified next action into the same review/change path. If no meaningful
+   outcome is observable, say so and retain the follow-up need; never manufacture
+   uplift or force a revision. Reload/resume without losing decisions/outputs,
+   repeating paid generation or claiming unverified delivery.
+
+Focused tenant, stale-state, permission, recovery and regression tests support
+these criteria; they do not replace commercial/content/visual judgment.
+
+**Boundaries:** this does not complete paid signup/billing, all onboarding gaps,
+public launch, broad scheduling/triage or a full lead CRM. Reuse current media
+contracts/copies; complete media master-storage/exit policy, arbitrary Gutenberg
+reconciliation, existing-theme/form adoption and plugin/Admin-only off-host support
+remain required work, not incidental decisions here. Independent versioned proposal
+storage remains a Commercial V1 requirement; compressed intake storage is not a
+permanent size limit. Any necessary persistence extension must reuse contracts
+with an exact migration, scoped policy and recovery, not another storage system.
+
+**Authority/cost:** review this scope next; after approval perform local engineering
+and debugging without routine technical approvals. When ready, prepare one concrete
+protected-execution package: tested builds/rollback, minimal database/case/collector
+policy, actual role needs, permitted C0 inputs/research, model and metered spending/
+request/expiry limits, and exact private WordPress application/recovery/review-
+retention scope. Calculate the budget from representative payloads and useful
+revision allowance, not account credit, a guessed fee or old remaining authority.
+This proposal authorizes no model dispatch, protected transfer/write, credential or
+infrastructure change, merge or publication. Early public-site launch stays a
+separate business decision and may later supply observations to the same machinery.
+
 ## Standard Launch
 
 Most businesses/organizations should fit Standard. Absorb normal customer-to-customer

@@ -38,12 +38,13 @@ and delivery/provider independence. See the [service principles](web-presence-se
 | First-party measurement / reporting | Durable local scoped page/Action events, deduplication, accepted-Contact reconciliation and Performance Snapshot/recommendation fixtures. | Installation-bound collection, coverage/consent/internal/bot treatment and useful real reports. No claimed traffic/conversion/revenue. Google integrations remain optional enrichment. |
 | Ongoing improvement / growth | Recommendation → Operator change → signed private revision/receipt/restore exercised with synthetic inputs; shared generation supports revisions. | Actual observation and confirmed outcomes driving prioritization, Articles, approval, delivery and remeasurement. Ongoing remains core scope, not maintenance-only or optional future work. |
 
-**Current coordinated increment:** reconcile active steering assets and verify
-interruption recovery under the November 20 owner decision. Source/schema repairs
-and paid-output recovery have already progressed; do not repeat them merely because
-an old handoff says they are pending. No new model dispatch, public-site work or
-hosted write is part of this review. The next product increment should be selected
-after the findings, retaining the whole lifecycle and explicit launch distinctions.
+**Current coordinated increment:** guidance/recovery reconciliation and the
+critical-path review are complete. The owner agreed the account-cycle direction
+and requested [a bounded implementation scope](service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle).
+It connects understanding, useful AI work, shared review, authorized delivery/
+inbound reconciliation and actual observation/next action. Implementation awaits
+scope review; no new model dispatch, public-site work or hosted write occurred.
+Preserve completed repairs/proofs and the explicit launch distinctions.
 
 The [service model](web-presence-service-model.md), [progressive onboarding](progressive-onboarding-and-launch-readiness.md),
 [knowledge transfer](paid-onboarding-knowledge-transfer-contract.md), [measurement](measurement-and-analytics.md),
@@ -106,7 +107,8 @@ Operator initiation can bridge scheduling and manual review can bridge immature
 automation, with the actual responsibility recorded. Do not create another demo
 architecture or replace the work with a wholesale website rerun.
 
-Select exact implementation scope after discussing this assessment. Public C0
+The [implementation scope prepared for review](service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle)
+uses these findings; the proposal is not an execution grant. Public C0
 publication/measurement activation, provider use and protected WP application
 retain separate concrete authority. 20i-only versus broader adoption and early
 public-site decisions remain open; manual-effort tolerance does not decide them.
