@@ -49,6 +49,14 @@ product scope, public promise, new staffing structure or hosted operation. Core
 should record which service work is actual, operator-assisted, simulated or still
 unavailable. Keep factual provenance and customer/publication gates intact.
 
+**Further owner clarification, November 20:** the amount of manual effort is not
+the launch constraint. Identify indispensable system capabilities and their missing
+connections first. Operators may perform substantial supported work, but must not
+substitute for durable shared account knowledge, useful genuine AI, trustworthy
+observation/learning or consistent governed execution. Manual operation is recorded
+honestly and does not prove automation. The [critical-path assessment](platform-capabilities.md#indispensable-system-capabilities--critical-path-assessment)
+uses existing evidence; it does not authorize implementation or a launch.
+
 ## Standard Launch
 
 Most businesses/organizations should fit Standard. Absorb normal customer-to-customer

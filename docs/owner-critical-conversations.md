@@ -725,3 +725,20 @@ thoughts or a guarantee against every crash. Capture material decisions early.
 20 entry is resolved; see [the exact no-dispatch evidence](c0-creation-quality-p0-17.md#paid-correction-recovery-and-cost-reconciliation--november-20).
 No source97/106 site approval or new grant follows. New product execution is selected
 after this review; a remaining old grant balance or available API credit is not consent.
+
+### November 20 — manual effort is not the launch constraint
+
+The owner clarified: “There's no issue with the amount of manual effort that
+might be needed. I think the bigger challenge is to deliver the elements a human
+can not.” The owner agreed the next focus is the indispensable system capabilities:
+durable connected business understanding, useful genuine AI intelligence,
+trustworthy observation/learning and consistent governed execution. Substantial
+Operator work may bridge steps; it must not replace those capabilities with the
+owner's memory, manual integration or invented measurement, or be mislabeled as
+automation. Human judgment and approvals remain intentional service functions.
+
+Use the completed review to identify actual capabilities, missing connections and
+business acceptance; do not repeat another broad audit or infer a new coding/run
+grant. [Critical-path assessment](platform-capabilities.md#indispensable-system-capabilities--critical-path-assessment)
+is assessment/sequencing only. Overall growth-service scope, project-wide reuse,
+delivery independence and the separate temporary launch arrangements remain intact.

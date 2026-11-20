@@ -73,6 +73,44 @@ approval history remain distinct from simulated role perspectives. Early public
 site work and manual operator coverage are tracked as transitional launch work,
 not replacement definitions of this framework or the whole product.
 
+### Indispensable system capabilities — critical-path assessment
+
+**Owner clarification, November 20:** substantial manual effort is acceptable
+during early operation. The constraint is delivery of the system contributions
+that a human cannot reasonably supply through memory, manual reconstruction or
+invented observations. This is an assessment using the completed review, not a
+new product definition, framework, implementation assignment or external grant.
+
+| System contribution | Actual position from the review | Missing functional connection / business acceptance |
+| --- | --- | --- |
+| Durable connected understanding | Scoped intake, sources/corrections, canonical Knowledge/Offering, My Business and revisioned workflow storage exist. | An authorized correction is retained once, confirmed at the proper authority, and visibly affects the relevant assessment/proposal and account views without re-interviewing the customer or promoting unconfirmed facts. Reload/resume and stale-change handling work through ordinary supported actions. |
+| Useful genuine AI intelligence | Actual adaptive questions, research, report/Direction and site generation have run. Output custody, metering and source-aware revisions exist. | Intelligence consistently improves business understanding, content/design and decisions. Current C0 commercial quality has not passed; valid citations/API connection alone are insufficient. The system must retain and recover useful output, explain consequences and avoid repeating paid work. Human editing may improve a deliverable but cannot be claimed as proof of Core intelligence. |
+| Trustworthy observation and learning | First-party ledger/deduplication/snapshot and canonical Contact acceptance exist; existing connected-cycle inputs/recommendations are partly synthetic. | Collect real scoped activity with explicit start/coverage, distinguish zero from unmeasured, and connect accepted inquiries and manually confirmed outcomes to the relevant site revision. Reports must explain evidence/uncertainty and support a justified next action, not manufacture performance. |
+| Coordinated governed execution | Shared case progression/recovery, review/proposals, exact approval, signed WP drafts, receipts and rollback exist. | A real account work item carries purpose, source/base revision, proposed change, actual review/decision, delivery result and follow-up across Core/portal/WP. A manual Operator can initiate or perform a step, but completion/state/history cannot live only in chat, terminal memory or disconnected documents. |
+
+**Dependency judgment:** the existing account/case/review state is the connecting
+structure to extend. Intelligence quality and real observation are both necessary
+workstreams; neither should wait for a perfect website or be replaced by a beacon
+when claiming real service. Reuse the existing delivery path instead of rebuilding
+it to solve a knowledge or measurement problem. Customer confirmation, judgments
+and consequential approvals remain human responsibilities within that structure.
+
+**Recommended next bounded increment for discussion:** connect one existing
+customer account from retained understanding or a documented change/opportunity
+through an editable evidence-bound proposal, real private site review/delivery
+where authorized, and a retained result/next action in the same account. In
+parallel, connect actual first-party collection/reporting to that account through
+the existing measurement machinery. A small explicit observation can be genuine;
+there is no need to invent traffic or claim business impact before it exists.
+Operator initiation can bridge scheduling and manual review can bridge immature
+automation, with the actual responsibility recorded. Do not create another demo
+architecture or replace the work with a wholesale website rerun.
+
+Select exact implementation scope after discussing this assessment. Public C0
+publication/measurement activation, provider use and protected WP application
+retain separate concrete authority. 20i-only versus broader adoption and early
+public-site decisions remain open; manual-effort tolerance does not decide them.
+
 ### November 20 reconciliation findings and limits
 
 The canonical service, content-growth, conversion, opportunity and architecture

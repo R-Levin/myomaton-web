@@ -54,6 +54,12 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
+**Latest owner discussion:** manual workload is not the launch constraint. The
+[critical-path assessment](platform-capabilities.md#indispensable-system-capabilities--critical-path-assessment)
+identifies indispensable system contributions and missing connections using the
+completed review. This continuation is assessment/sequencing only, not authority
+to start implementation, a model round, measurement activation or site application.
+
 Owner authorized a bounded **local review and correction of active guidance and
 interruption recovery**, including project-wide reuse, delivery independence,
 transitional-launch separation and WordPress gap inventory. The conversation-only
