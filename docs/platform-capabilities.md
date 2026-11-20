@@ -165,15 +165,49 @@ PostgreSQL and original migrations/activation guards. The original inactive
 Contact refusal remains intact. Existing contrast/reassessment and ordinary
 active-account Contact tests remain separate. Controlled reasoning is not a new
 live intelligence result. Full TypeScript, focused lint, routing and regression
-checks pass. Fresh Linux verification for this preparation is recorded at the
-next pushed checkpoint; the previous `6da668d` Linux build passed already.
+checks pass. Linux build/smoke for code
+`6a728ea6066fa30592815bf5b9fea45dac0bf268` passed in
+[run44817305273](https://github.com/R-Levin/myomaton-web/actions/runs/44817305273),
+including the actual PostgreSQL policy tests, production dependency audit, exact
+approved rendering and isolated runtime. Independent local archive verification
+matched all205 file hashes; no protected inputs/credentials were packaged.
+Archive SHA256: `cf0f2f3bd28c731da25ce6b049f843c8775bb6b32d90d6032937c02a6f727e6a`.
+The separate WordPress offline check also passed; no WordPress installation ran.
 
 The [SQL composition](../scripts/db/protected-account-policy.ts) hashes the exact
 forward/rollback sources. Rollback withdraws new access and restores the old grant
 view, retaining facts/history/outcomes/audit rows rather than deleting evidence.
 The additive permission vocabulary alone grants nothing. Actual enrollment and
 any hosted SQL/build replacement remain unexecuted and require the consolidated
-scope approval. Original41/WP6, local97, isolated106, protected inputs, credentials
+[exact activation proposal](account-cycle-hosted-activation.json). Its SQL forward
+SHA256 is `83373a2a46674fdf0fc24cd5525d549de899a257cb55a3da5424412f0944e162`;
+rollback SHA256 is `e5156d589ae1802c6884b014a2871ec140734fa4716e7a87e1c371bb841eaf9b`.
+Exact proposed manifest SHA256: `d0aa1d64b2ca934a115b83448b9d75124966461057220835628fd77a2c852460`.
+Fresh public HTTPS checks returned200 for runtime.miopages.com and miopages.com;
+their recorded hashes are activation baselines, not a claimed historical byte
+comparison. Preparation did not modify either application.
+
+The proposal requests restoring only the existing protected Core, those restricted
+policies/three owner permissions, and a fresh **$3 maximum /72-hour** C0
+reassessment session using `gpt-5.4-2026-03-05`. This is a proposed spending ceiling,
+not authority already granted. Current [official model/rates](https://developers.openai.com/api/docs/models/gpt-5.4)
+were verified November20; rates are $2.50 input/$0.25 cached/$15 output per million.
+The illustrative eight-generation cycle at35k input/8k output averages $1.66;
+exact future tokens are unknown. Each worst-case96k/16384 reservation is $0.485760;
+the existing meter must refuse any reservation exceeding the $3 remainder.
+There is no arbitrary Page count or whole-site regeneration requirement.
+
+A meaningful owner-confirmed correction is not known yet. The proposal explicitly
+authorizes only that exact account/record and existing source set, then fresh
+server-verified reassessment/source pins after UI confirmation. It does not
+pretend unknown future text was inspected or ask for one technical authorization
+per answer. Do not invent a correction or promote the ten retained unconfirmed
+answers to spend this budget. If additional sources or a broader correction are
+needed, stop the dependent action. The old20-source protected context and the
+separate full-original/evaluation106 context are not interchangeable: do not
+silently import/reparent106 or describe this bounded connection as a newly
+completed C0 commercial website. Old ledgers/grants remain intact; fresh meter
+namespace uses the existing ledger format with historical references. Original41/WP6, local97, isolated106, protected inputs, credentials
 and usage records have not changed; no model request or spending occurred.
 
 This prepares a bounded account-cycle rollout, not a claim that the complete

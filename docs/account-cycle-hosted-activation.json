@@ -1,0 +1,169 @@
+{
+  "schema": "miopages-account-cycle-activation/1",
+  "status": "PROPOSED_NOT_AUTHORIZED",
+  "objective": "Restore existing protected Core and connect one meaningful owner-confirmed C0 Knowledge correction to retained-work reassessment and resumable proposed site review; expose accurately labeled development inquiry outcomes.",
+  "implementationCommit": "6a728ea6066fa30592815bf5b9fea45dac0bf268",
+  "linux": {
+    "runId": 44817305273,
+    "status": "PASS",
+    "artifactSha256": "cf0f2f3bd28c731da25ce6b049f843c8775bb6b32d90d6032937c02a6f727e6a",
+    "artifactId": 14669399509,
+    "archiveZipSha256": "de17b286b7240785973b1ecbbb57070e69dd1567fa59733da0c10703c6f9183f",
+    "fileChecksumsIndependentlyVerified": 205,
+    "symlinksIndependentlyVerified": 0,
+    "runUrl": "https://github.com/R-Levin/myomaton-web/actions/runs/44817305273"
+  },
+  "hosting": {
+    "account": "wp-acceptance.miopages.com",
+    "home": "/home/virtual/vps-bef564/e/e494602172",
+    "origin": "https://wp-acceptance.miopages.com",
+    "application": "miopages-protected-core",
+    "listener": "127.0.0.1:8081",
+    "observedState": "stopped",
+    "observedRestartCount": 10,
+    "observedDeployedCommit": "4df15c1693a0b49edeee9f18fb2fd6379c9f3f7b",
+    "deployedChecksumFilesVerified": 170,
+    "change": "Replace only this protected build using complete matching rollback; start only the existing exact PM2 entry and save only the verified acceptance-account list. Stop if any additional application/identity or changed prerequisite appears.",
+    "publicReadOnlyBaselines": [
+      {
+        "url": "https://runtime.miopages.com/",
+        "status": 200,
+        "sha256": "03b866d3ce564011e8d80036ea60812d39feb0ecd943a39a28112e5018e9729f"
+      },
+      {
+        "url": "https://miopages.com/",
+        "status": 200,
+        "sha256": "e0b94e1c9a609534dc77424da70297858e88bf4516282acf8724c1e388b949ea"
+      }
+    ],
+    "publicBaselineCaveat": "Fresh read-only baselines for eventual before/after checks; not an independently established historical byte-for-byte comparison."
+  },
+  "scope": {
+    "organizationId": "b3b46645-0364-4329-83c7-86a6ea9e56c4",
+    "activationCaseId": "e3e75949-f2af-4d58-9b31-d91e43862b4f",
+    "webPresenceId": "819d007a-595d-4374-a2f0-96b900d46559",
+    "managedSiteId": "1d92a248-416f-4e22-baaf-d2f1fca70352",
+    "intakeId": "91733e9a-70d5-4799-92c7-d045422f0e5b",
+    "intakeVersion": 28,
+    "historicalWorkflowRevision": 41,
+    "statusMustRemain": "inactive",
+    "knowledgeId": "52f23cfc-b690-447e-9475-0c3d8324d929",
+    "knowledgeVersionBeforeActivation": 1,
+    "knowledgePayloadMd5BeforeActivation": "f35b000b896839265956ef293b8fafad",
+    "knowledgeFingerprintBeforeActivation": "39b61a6ed33835b70af3631830940221f405d147ca354476a41679fe1d080768",
+    "knowledgePayloadFingerprintBeforeActivation": "3d1e915d7918778cbf1bd7226ae136b52590fc59d060de4671de5db26a5f8e3a"
+  },
+  "database": {
+    "role": "miopages_core_development",
+    "ownerProcedure": "Existing migration role through owner-entered hidden prompt; no new credential or password retention. Verify database/TLS, exact inactive binding, installed guard/constraint/grant metadata and lock availability before one guarded transaction. Save recovery definition/ACLs and enrollment receipt privately before changing anything.",
+    "forwardSha256": "83373a2a46674fdf0fc24cd5525d549de899a257cb55a3da5424412f0944e162",
+    "rollbackSha256": "e5156d589ae1802c6884b014a2871ec140734fa4716e7a87e1c371bb841eaf9b",
+    "composition": "scripts/db/protected-account-policy.ts",
+    "publicTablePrivileges": false,
+    "rollback": "Withdraw new access and restore matching old build/view; revoke only newly enrolled grants by receipt. Retain canonical/history/outcome/grant audit rows. Never erase or rewind facts/history.",
+    "permissionConstraintFingerprintBeforeActivation": "6a4e84fd7f4efbe00af57bb1bfdbe5d45f1ac6504a107fdb7bef6dcba93c9d44"
+  },
+  "identity": {
+    "reuseOwnerId": "f2cd3fe8-58b3-4dfa-9125-fd8f1bd35f8e",
+    "username": "owner",
+    "newCredentials": false,
+    "newScopedPermissions": [
+      "confirm-business-information",
+      "inspect-inquiry-outcomes",
+      "record-inquiry-outcome"
+    ],
+    "customerMandate": {
+      "kind": "business-representative",
+      "subjectId": "f2cd3fe8-58b3-4dfa-9125-fd8f1bd35f8e",
+      "authorityReference": "Owner approval of this exact account-cycle scope"
+    },
+    "limits": "Only the existing C0 inactive binding/Knowledge record and development outcomes. Confirmation requires explicit UI attestation and exact current version/fingerprint. No automatic confirmation of retained ten answers; no customer acceptance/publication permission.",
+    "permissionLifetime": "Existing owner credential lifetime, exact C0 scope, revocable; no extra login. The 72-hour limit applies to AI execution, not forced expiry of owner review access."
+  },
+  "data": {
+    "retainedCoreInputSha256": "deec4f52ddf038776b511276929db7151b26c5f7a64355be3642ed43a0963041",
+    "retainedContextDigest": "3eb8ab4ce60605d9094d741c0cee663b0fcc90d3d670398031650dd4573302f2",
+    "historicalGrantSha256ReferenceOnly": "16d0d1645ef38c995314717d9dc1d28bc6dad5f75abbb61197c09ee65eddad5c",
+    "approvedOriginalSourceDigests": [
+      "d92b1890389f973c135095740f1ce84971ccbb0b14b32b218e793433c09bf237",
+      "62c4a46dc0f3dd6546564cb3f6340315ad569f1b97c8024f6f574399b911df02",
+      "8ae7d236106b0d72579bbbb7580f918ea21aac72a3ba91854751cc59d84dd32e",
+      "3548b06255141d7e7c28fe5044a6ecede98aa78e4f9b074d43bcdc5f0bc8dda4",
+      "5ea9e9ecd431e2cdd5dda372d353bbe65482a2abd4e57872a65ace5a2f3d74f1",
+      "7a73a38c9a2216338421822f3633dc4ac1e8ba74a4c964b33f59ffc80700dd12",
+      "65b52745d20adb02396aa5f2ed8b2a20151dcc490eecbc83081060cc86406284",
+      "b790d9e06afe8c116d79a00f3b849b961b541c23a1af3a3a45b21f84f14f6c1c",
+      "4ce10942cf4620c7be9cb384ce8eac21d4b9447b4415c2dca3a1c8345d1010db",
+      "abe53dacf6dad0f28ed47eb5d108387b260877a259046850557ff94624b12990",
+      "67a45b9b0358b8d727beb32828ecfcf9f9e856c57dd2f8eaf2468ba507a00e10",
+      "743c941aafb993cbdffeb54dc8885bc445d0f057d41b73510b141d2fc2186819",
+      "b5b3115d3ee67b43da9bb830363d26abc09be2f1a061b2373c10954ec5c8ee4a",
+      "d4e8c20bb2acf44e2c47eee6addb7c119e73b54828265d3257fcf36afbbe6066",
+      "b18fe5e33b79b58af70d6fc9d5c677ab3be5ae86599d3e6b55ee2a28ab1f9689",
+      "1776301e240ff90efd2d0a8fc1a915fc2955643f26458875146b5303358a99ab",
+      "3dd0070a40778fba5c85c0e49ceedf9ecd2d627865f26b446abc12d01a1e8982",
+      "5a8deb458fb1ad4112978fc10ed41f7b461c6b1c31fe7f47d65a543132d7be0b",
+      "e73c1c72d585b2e45697670e75d7c617d0098ad1bf8261978d953a31d4d12b87",
+      "a97d55b0480ed74dbeedcc5b57057090d6f1d0fe0262824d23a67c7646a8edbb"
+    ],
+    "newInputRule": "Only one meaningful correction explicitly confirmed by the existing owner in Core to the exact existing Knowledge record, preserving classification, plus its server-derived prior report/Direction/plan/Pages and source relationships. Immediately before dispatch, validate the stored canonical receipt and bind exact reassessment and added-evidence hashes in a fresh private grant. Those exact bytes are not known at proposal time. This is a scoped session authorization proposal, not a claim that unknown text was already inspected. No invented correction merely to trigger AI.",
+    "excluded": [
+      "raw unrelated/private interview records",
+      "unconfirmed answer promotion",
+      "inquiry fields/contact details",
+      "operator/customer authority metadata in model projection",
+      "fictional C2",
+      "isolated106 reparenting or implicit import",
+      "credentials"
+    ],
+    "trustBoundary": "Existing Core account only. No new protected input transfer to another account. Keep full approved originals; do not narrow silently. Stop if the meaningful correction requires an unlisted source or broader authority."
+  },
+  "provider": {
+    "provider": "OpenAI Responses",
+    "model": "gpt-5.4-2026-03-05",
+    "store": false,
+    "maximumAdditionalUsd": 3,
+    "maximumGenerations": 12,
+    "maximumRequestsIncludingCounts": 24,
+    "maximumDurationHoursFromVerifiedActivation": 72,
+    "maxInputTokensPerRequest": 96000,
+    "maxOutputTokensPerRequest": 16384,
+    "automaticRetries": 0,
+    "paidSearchOrImageCalls": 0,
+    "research": "Reuse retained permitted evidence; no new paid tools, image acquisition or expanded external research.",
+    "ratesUsdPerMillion": {
+      "input": 2.5,
+      "cachedInput": 0.25,
+      "output": 15
+    },
+    "ratesSource": "https://developers.openai.com/api/docs/models/gpt-5.4",
+    "ratesVerifiedOn": "2026-11-20",
+    "budgetRationale": "Representative targeted correction cycle of report, Direction, full-site plan, affected Page drafts and editorial review: 8 generations at illustrative 35k input + 8k output average cost $1.66. This is an estimate, not measured future usage. Worst per-dispatch input/output reservation is $0.485760. Existing meter must reserve within $3 before any generation and refuse if insufficient; budget may halt a larger revision. No Page-count cap or truncation to fit a demo. Recover retained output before considering any further paid request.",
+    "ledger": "New existing-format core-account-cycle-usage directory and account-cycle-workflow-grant.json, with historical ledger/hash references preserved. No old ledger reset, grant reuse or transfer of old approvals.",
+    "ordinaryCorrections": "Tested purpose-bound code/config fixes may proceed within this exact scope with checksums/evidence and unchanged aggregate ceiling; broader data, spending, authority or protected WordPress application requires its own decision.",
+    "maxInputBytesPerRequest": 1000000,
+    "countRequestFeeUsd": 0
+  },
+  "acceptance": [
+    "Authenticated external Core sign-in/read/logout using existing owner access; existing drafts remain available.",
+    "Actual owner-confirmed correction and canonical/workflow receipts survive reload; unrelated knowledge remains unchanged.",
+    "Real model output explains the business consequence, retains useful prior work and produces editable affected site work with before/after evidence. No fixture or technical validity claim as commercial acceptance.",
+    "Retained response recovery, metering and visible refusal work without blind regeneration.",
+    "Development outcomes remain labeled, notifications/visitor collection/revision attribution remain unknown unless implemented and verified. No fabricated business performance."
+  ],
+  "notAuthorized": [
+    "public publication",
+    "WordPress plugin/theme/content/application change",
+    "public port8080 runtime change",
+    "hostname/DNS/SSL/port/package changes",
+    "account activation or destructive reset",
+    "credential rotation/additional identities",
+    "merge",
+    "unrelated protected data transfer"
+  ],
+  "remainingGaps": [
+    "This prepares a bounded account connection; independent versioned proposal storage and full Offering editing remain open.",
+    "Explicit association of the separate isolated evaluation106, ordinary active-site inquiry/notification, installation-bound visitor measurement and WP inbound reconciliation remain separate unfinished work.",
+    "No new whole-site creative/design-quality acceptance or new WordPress candidate is claimed."
+  ]
+}

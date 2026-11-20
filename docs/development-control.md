@@ -58,9 +58,14 @@ identify the missing machine-local work instead of assuming it never existed.
 The owner asked to start this preparation. [Actual hosted findings and prepared
 connection](platform-capabilities.md#connected-account-cycle--protected-preparation-and-actual-host-findings)
 record inactive C0, unchanged28/41, missing confirmation mandate and the stopped
-Core process/502. Local code/policies are being verified; no hosted action or
-provider use is authorized by the go-ahead. Restore access within the eventual
-consolidated rollout, not by changing infrastructure.
+Core process/502. Code/policies and the exact Linux
+artifact are verified at `6a728ea`; [activation proposal](account-cycle-hosted-activation.json)
+is awaiting owner approval. It requests restoring only existing protected Core,
+scoped owner confirmation/outcomes, and a fresh $3/72-hour real reassessment after
+a meaningful correction is explicitly confirmed. No hosted action/provider use
+is authorized by the preparation go-ahead. No infrastructure change is needed.
+The current502 is explained by the existing stopped listener; the reason it was
+stopped remains unknown. Intake28/workflow41/Knowledgev1 were verified read-only.
 
 **Previous completed task: confirmed understanding, reassessment and inquiry outcomes.**
 Following the scope/next-step discussion, the owner asked Codex to act next; local
@@ -75,9 +80,11 @@ decisions. Ordinary Contact acceptance and reported outcomes also connect locall
 Reasoning tests use controlled responses; they are not new genuine AI-quality
 evidence or a hosted rollout. No owner fixture testing is needed.
 
-Next: prepare actual protected account/case and authority composition, verify its
-active/inactive binding, Linux artifact and scoped database policies, then one
-authorization for exact live inputs/model/budget and hosted execution. Proposal
+That preparation is now complete as linked above. Next is owner review of the
+single exact activation scope, then verified targeted restoration/deployment and
+restricted policy/enrollment using the existing protected procedure. A live
+reassessment requires a meaningful correction and exact derived egress binding,
+not another fabricated fixture answer or automatic whole-site rewrite. Proposal
 permission alone cannot confirm business facts; old model grants cannot transmit
 new corrections. Site observation and governed WP return/delivery remain in scope.
 No model dispatch, hosted write, credential or infrastructure change, merge or
