@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import {verifyProtectedOwner} from "../../lib/platform/intake/protected-owner-verification";
 import { lstat, readFile, realpath } from "node:fs/promises";
 import { join } from "node:path";
 import { protectedOwnerId, protectedOwnerScope, protectedOwnerToken, protectedOwnerVerifier } from "../../lib/platform/intake/protected-owner";
@@ -6,32 +7,11 @@ import { protectedConnection, protectedPool } from "../../lib/platform/wordpress
 
 const home = "/home/virtual/vps-bef564/5/53b4381d42";
 const role = "miopages_migration";
-const origin = "https://wp-acceptance.miopages.com";
 const previousExpiry = "2026-11-14T17:15:51.194Z";
 let stage = "credential-input";
 let writeState = "unchanged";
 
-async function checkDraft(password: string) {
-  const headers = { Origin: origin, "X-Intake-Request": "1", "Content-Type": "application/json" };
-  const endpoint = origin + "/api/protected-core";
-  const login = await fetch(endpoint, { method: "POST", headers, redirect: "error", signal: AbortSignal.timeout(15_000),
-    body: JSON.stringify({ operation: "sign-in", username: "owner", password }) });
-  assert.equal(login.status, 200);
-  const issued = login.headers.get("set-cookie");
-  assert.ok(issued && issued.startsWith("__Host-miopages_core=") && issued.includes("HttpOnly") && issued.includes("Secure") && issued.includes("SameSite=Strict") && issued.includes("Max-Age=28800"));
-  const cookie = issued.split(";")[0];
-  try {
-    const response = await fetch(endpoint, { headers: { ...headers, Cookie: cookie }, redirect: "error", signal: AbortSignal.timeout(15_000) });
-    assert.equal(response.status, 200);
-    const view = await response.json();
-    assert.ok(view.prepared?.scenario === "c0" && view.sitePlanning?.proposal && view.sitePlanningReview?.current);
-    assert.ok(Number.isSafeInteger(view.version) && view.version >= 28);
-  } finally {
-    const logout = await fetch(endpoint, { method: "POST", headers: { ...headers, Cookie: cookie, "X-Core-Operation": "logout" },
-      redirect: "error", signal: AbortSignal.timeout(15_000) });
-    assert.equal(logout.status, 200);
-  }
-}
+const checkDraft=verifyProtectedOwner;
 
 async function main() {
   assert.equal(await realpath(process.env.HOME ?? ""), home);

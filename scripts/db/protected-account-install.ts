@@ -5,8 +5,10 @@ import { join } from "node:path";
 import type { PoolClient } from "pg";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { protectedPool,protectedConnection } from "../../lib/platform/wordpress-delivery/protected-connection";
+import { verifyProtectedOwner } from "../../lib/platform/intake/protected-owner-verification";
 
 const approved="d0aa1d64b2ca934a115b83448b9d75124966461057220835628fd77a2c852460";
+const proposedAmendment="4bc2cd008b1a2ba729cfb950f2f5bc6e6248c5dc1021a6d3016b41b4776892c5";
 const home="/home/virtual/vps-bef564/5/53b4381d42",migration="miopages_migration";
 const permissions=["confirm-business-information","inspect-inquiry-outcomes","record-inquiry-outcome"];
 const sha=(v:string|Buffer)=>createHash("sha256").update(v).digest("hex");
@@ -83,19 +85,22 @@ async function privateBytes(file:string) {
 }
 let stage="configuration",commitStarted=false;
 async function main() {
- assert.equal(process.argv.length,3);assert.equal(process.argv[2],"APPLY-PROTECTED-ACCOUNT-CYCLE");
+ assert.equal(process.argv.length,3);const correcting=process.argv[2]==="APPLY-PROTECTED-ACCOUNT-MANDATE";
+ assert.ok(correcting||process.argv[2]==="APPLY-PROTECTED-ACCOUNT-CYCLE");
  assert.equal(await realpath(process.env.HOME??""),home);
- const root=join(home,"miopages-account-cycle-d0aa1d64"),meta=await lstat(root);
+ const root=join(home,correcting?"miopages-account-cycle-mandate-4bc2cd00":"miopages-account-cycle-d0aa1d64"),meta=await lstat(root);
  assert.ok(meta.isDirectory()&&meta.uid===process.getuid?.()&&(meta.mode&0o777)===0o700&&await realpath(root)===root);
  const bytes=await privateBytes(join(root,"manifest.json"));assert.equal(sha(bytes),approved);
  const plan=JSON.parse(bytes.toString("utf8"));
+ const amendment=correcting?await privateBytes(join(root,"amendment.json")):undefined;
+ if(amendment){assert.equal(sha(amendment),proposedAmendment);assert.equal(JSON.parse(amendment.toString("utf8")).baseApprovedManifestSha256,approved);}
  const forward=await privateBytes(join(root,"forward.sql")),rollback=await privateBytes(join(root,"rollback.sql"));
- assert.equal(sha(forward),plan.database.forwardSha256);assert.equal(sha(rollback),plan.database.rollbackSha256);
+ assert.equal(sha(forward),amendment?JSON.parse(amendment.toString("utf8")).combinedForwardSha256:plan.database.forwardSha256);assert.equal(sha(rollback),plan.database.rollbackSha256);
  const saved=JSON.parse((await privateBytes(join(home,"miopages-wp-db-20261105T181534Z/wordpress-role-credentials.json"))).toString("utf8"));
  const url=new URL(saved.operator.url);assert.match(decodeURIComponent(url.username),/^miopages_wp_operator\.[a-z0-9]+$/);
  assert.equal(url.hostname,"aws-0-us-east-1.pooler.supabase.com");assert.equal(url.port,"5432");assert.equal(url.pathname,"/postgres");
  assert.equal(url.search,"?sslmode=verify-full");
- const password=(await readFile("/dev/stdin","utf8")).replace(/\n$/u,"");assert.ok(password);
+ const secrets=(await readFile("/dev/stdin","utf8")).split("\n"),password=secrets[0],ownerPassword=secrets[1];assert.ok(password);
  url.username=decodeURIComponent(url.username).replace(/^miopages_wp_operator\./u,migration+".");url.password=encodeURIComponent(password);
  const ca=await readFile(join(home,"supabase-ca.crt"),"utf8");
  const custody=JSON.parse((await privateBytes(join(home,"miopages-protected-core-custody.json"))).toString("utf8"));
@@ -123,10 +128,10 @@ async function main() {
    constraintFingerprint:plan.database.permissionConstraintFingerprintBeforeActivation};
   const before=await accountInstallSnapshot(db,expected),grantIds=permissions.map(()=>randomUUID());
   // Exclusive create prevents automatic retry after uncertain commit/custody.
-  await writeFile(join(root,"before-install.json"),JSON.stringify({manifestSha256:approved,grantIds,before})+"\n",{mode:0o600,flag:"wx",flush:true});
+  await writeFile(join(root,"before-install.json"),JSON.stringify({manifestSha256:approved,amendmentSha256:correcting?proposedAmendment:null,grantIds,before})+"\n",{mode:0o600,flag:"wx",flush:true});
   stage="install-and-enroll";const result=await installAccountPolicy(db,forward.toString("utf8"),expected,grantIds);
   assert.equal(result.schemaOwner,migration);
-  await writeFile(join(root,"prepared-recovery.json"),JSON.stringify({manifestSha256:approved,...result})+"\n",{mode:0o600,flag:"wx",flush:true});
+  await writeFile(join(root,"prepared-recovery.json"),JSON.stringify({manifestSha256:approved,amendmentSha256:correcting?proposedAmendment:null,...result})+"\n",{mode:0o600,flag:"wx",flush:true});
   stage="commit";commitStarted=true;await db.query("COMMIT");
   stage="durable-readback";const durable=await accountInstallSnapshot(db,expected);
   assert.deepEqual(durable.originalGrants.map(g=>g.id).sort(),[...before.originalGrants.map(g=>g.id),...grantIds].sort());
@@ -135,7 +140,11 @@ async function main() {
   const receipt={status:"PASS",operation:"protected-account-cycle",manifestSha256:approved,grants:3,identityUnchanged:true,
    canonicalUnchanged:true,draftVersion:plan.scope.intakeVersion,workflowRevision:workflow.version,publicTablePrivileges:false,recoveryRetained:true};
   await writeFile(join(root,"installation-evidence.json"),JSON.stringify(receipt)+"\n",{mode:0o600,flag:"wx",flush:true});
-  console.log(JSON.stringify(receipt));
+  stage="owner-https-verification";const ownerHttpsVerified=ownerPassword?Boolean(await verifyProtectedOwner(ownerPassword,
+   {draftVersion:plan.scope.intakeVersion,workflowRevision:plan.scope.historicalWorkflowRevision})):false;
+  const finished={...receipt,amendmentSha256:correcting?proposedAmendment:null,ownerHttpsVerified};
+  await writeFile(join(root,"completion-evidence.json"),JSON.stringify(finished)+"\n",{mode:0o600,flag:"wx",flush:true});
+  console.log(JSON.stringify(finished));
  }catch(error){if(!commitStarted)await db.query("ROLLBACK");throw error;}
  finally{db.release();await pool.end();await corePool.end();}
 }
