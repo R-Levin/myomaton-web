@@ -100,3 +100,24 @@ export function readNativeComponent(value: unknown, normalizeProviderName = fals
   }
   return { version: 2, name, purpose: plain(component.purpose), mode: choice(component.mode, ["supplement", "section"] as const), root: node(component.root, 0) };
 }
+
+/** Provider Page recovery: Action text duplicates the already supplied Page Action.
+ * Bind only absent text to its exact index; never infer a destination or rewrite copy. */
+export function bindNativeActionLabels(value: unknown, actions: unknown): unknown {
+  if (!value || typeof value !== "object" || (value as {version?:unknown}).version !== 2) return value;
+  const result = structuredClone(value);
+  function visit(value:unknown,depth=0) {
+    if (!value || typeof value !== "object" || depth>24) return;
+    const node=value as {kind?:unknown;text?:unknown;reference?:unknown;children?:unknown};
+    if(node.kind==="action"&&node.text===null){
+      if(typeof node.reference!=="string"||!/^action-(0|[1-9][0-9]*)$/.test(node.reference)||!Array.isArray(actions))
+        throw Error("Native Action label requires an exact Page Action");
+      const action=actions[Number(node.reference.slice(7))];
+      if(!action||typeof action.label!=="string"||!action.label.trim())throw Error("Native Action label requires an exact Page Action");
+      node.text=action.label;
+    }
+    if(Array.isArray(node.children))node.children.forEach(child=>visit(child,depth+1));
+  }
+  visit((result as {root?:unknown}).root);
+  return result;
+}

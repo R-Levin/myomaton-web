@@ -2875,3 +2875,33 @@ declared Pages and actual local WordPress editorial render. Source repair5494
 and resource continuationc6d7 are ALREADY APPLIED. Do not reinstall/re-enroll/reset.
 This is genuine API work, not a generated-site quality claim. Protected41/6/75
 and old local native hash38f0145d still unchanged before materialization.
+
+### Exact Action-label recovery; complete site drafting resumed
+
+At80 the completed Home was retained but refused shape-or-content. Read-only
+diagnostics identified our wire/compiler contract mismatch: seven native Action
+nodes had exact action-N references and null text, while the Page Actions already
+contained their labels. The wire schema permits nullable node text; the compiler
+required redundant text. This did not require buying another Home.
+
+Provider-only recovery now copies absent node text from that exact same-Page
+Action index. It never invents labels/destinations, shifts disabled Actions,
+rewrites existing text, drops nodes, mutates retained raw output or relaxes
+markup/unknown-reference/canonical guards. Actual retained Home digest2692707e
+parses4sections/7Actions. Original response and source bytes remain private.
+
+Focused28tests/TypeScript/lint pass; actual Linux74pass/0fail/0skip/0provider.
+Worker835c0be3a86ddafaf4d6c17eeff4e4692473ab2b023ef841e3155ccb8653f9b0,
+proof6a5f1cf8cc9d3e7e6efeab556c5777d911e55c96ae8aacf49c51be4dfdcc4db3
+activated in PRIVATE CLI runtime with matching previous files retained.
+Normal recover80→81 PASS; no new Home generation. Normal WORK resumed supporting
+Pages. At80 estimated usage$6.834622/conservative debit$7.194794,
+29generations/57requests/zero pending before the next Page. Same approved$13
+TOTAL/44generations/89requests/expiry. No protected Core/WordPress/publication
+change or website quality claim.
+
+**RECOVERY / RESUME HERE:**worker835c0be3/proof6a5f1cf8/grantf024b799, same27-source
+case. Home81 saved; supporting-Page WORK may be active. Inspect event/ledger,
+never duplicate pending work or regenerate Home. Source/resource amendments
+already applied. Complete all6 proposed Pages, then actual local WordPress and
+desktop/mobile whole-site critique/correction; retain raw outputs and all history.
