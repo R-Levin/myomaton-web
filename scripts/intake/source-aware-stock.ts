@@ -15,6 +15,7 @@ import{createIntakeFixture,intakeSchema}from"./disposable";
 import{enableDisposableSuppliedMedia}from"../acquisition/supplied-disposable";
 import{verifyDirectory}from"../../lib/platform/intake/protected-presence-workflow";
 import type{WorkflowRun}from"../../lib/platform/intake/presence-workflow";
+import{privateStockPlacements}from"../../lib/platform/intake/presence-stock-placement";
 const proposal="f560374969b7abdff53fa33917c9b84f7053f5f9b092b0dccf9a505bcc8f9ddd";
 const sha=(b:Buffer)=>createHash("sha256").update(b).digest("hex");
 async function privateJson(file:string){const m=await lstat(file);assert.ok(m.isFile()&&!m.isSymbolicLink()&&m.uid===process.getuid?.()&&(m.mode&0o777)===0o600);return JSON.parse(await readFile(file,"utf8"));}
@@ -78,17 +79,11 @@ async function main(){
   const state=event.payload as WorkflowRun["input"]&{contextDigest:string};
   assert.equal(state.contextDigest,fingerprint(context));
   const selection=await privateJson(join(root,"media/stock-selection.json"));assert.equal(selection.contextDigest,state.contextDigest);assert.equal(selection.entries.length,2);
-  const placements=selection.entries.map((entry:{hit:{sourceId:string}})=>{
-   const candidates=state.pages.flatMap(page=>page.sections.flatMap((section,index)=>section.visual.status==="rights-review"&&section.visual.brief.includes("sourceId "+entry.hit.sourceId)?[{page,section,index}]:[]));
-   assert.equal(candidates.length,1,"Exact unique Core-proposed stock placement required");
-   const target=candidates[0];assert.ok(["intro","cta"].includes(target.section.role??""));
-   const page=packet.candidate.pages.find((p:{path:string})=>p.path===target.page.path);assert.ok(page);
-   assert.equal(page.sections[target.index].type,target.section.role);
-   assert.equal(page.sections[target.index].content.heading,target.section.heading);
-   assert.equal(page.sections[target.index].content.text,target.section.body);
-   return{entry,page,section:page.sections[target.index],sourcePage:target.page};
-  });
-  assert.equal(new Set(placements.map((x:{section:{id:string}})=>x.section.id)).size,2);
+  const placements=privateStockPlacements<typeof selection.entries[number],typeof packet.candidate.pages[number]>(state.pages,packet.candidate,selection.entries);
+  if(!placements.length){
+   await save(join(root,stage+"-"+version+"-media.json"),{...packet,images:[]});
+   console.log(JSON.stringify({status:"PASS",operation:"exact-private-stock-placement",version,images:0,reason:"No suitable Core-proposed placement",publicCanonicalUnchanged:true,providerCalls:0}));return;
+  }
   assert.ok(["5467838","593371"].every(id=>selection.entries.some((e:{hit:{sourceId:string}})=>e.hit.sourceId===id)));
   const checkpoint=join(root,"media/stock-intake-"+stage+"-"+version+".json");await assert.rejects(lstat(checkpoint),{code:"ENOENT"});
   operationStage="disposable-existing-contract-fixture";
@@ -140,7 +135,7 @@ async function main(){
    const prepared=await readManagedObject(managed,target.webPresenceId,asset.source_reference);assert.equal(sha(prepared),candidate.bytes_digest);
    const file=stage+"-"+version+"-"+target.sectionId+".png";await writeFile(join(root,file),prepared,{flag:"wx",mode:0o600});
    const image={sectionId:target.sectionId,width:candidate.width,height:candidate.height,digest:candidate.bytes_digest,alt,file,assetId:asset.id,usageId:usageId!};
-   images.push(image);records.push({target,sourceId:entry.hit.sourceId,sourceUrl:entry.hit.sourceUrl,creator:entry.hit.creator,assetId:asset.id,lineage:asset.metadata.acquisition,image,publicUseApproved:false});
+   images.push(image);records.push({target,pagePath:p.sourcePage.path,sourceId:entry.hit.sourceId,sourceUrl:entry.hit.sourceUrl,creator:entry.hit.creator,assetId:asset.id,lineage:asset.metadata.acquisition,image,publicUseApproved:false});
    await save(join(root,"media/stock-record-"+version+"-"+entry.hit.sourceId+".json"),records.at(-1));
   }
   operationStage="independent-usage-readback";
@@ -150,7 +145,8 @@ async function main(){
    digest:fingerprint({candidate:packet.candidate,images,records,source:packet.digest})};
   await verifySourceAwareStock(f.pool,root,{context},packetWithMedia);
   await save(join(root,stage+"-"+version+"-media.json"),packetWithMedia);
-  const reviewedContext={contextDigest:state.contextDigest,schema:f.schema,homeDigest:fingerprint(state.pages.find(p=>p.path==="/")),records};
+  const reviewedContext={contextDigest:state.contextDigest,schema:f.schema,
+   pageDigests:Object.fromEntries(placements.map(p=>[p.sourcePage.path,fingerprint(p.sourcePage)])),records};
   await save(join(root,"media/reviewed-stock-context-"+version+".json"),reviewedContext);
   await currentStockContext(root,version,reviewedContext);
   console.log(JSON.stringify({status:"PASS",operation:"exact-private-stock-placement",version,images:images.length,schema:f.schema,publicCanonicalUnchanged:true,publicUseApproved:false,providerCalls:0}));

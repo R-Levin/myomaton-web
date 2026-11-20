@@ -2784,3 +2784,61 @@ slots; the latest approval expressly excludes model calls, so obtain one
 informed consolidated model/iteration authorization when ready. Do not
 silently increase$8, reset counters or present this technical success as
 founder acceptance.
+
+## Approved whole-site continuation ready — November 19
+
+The owner asked why work stopped again, then explicitly approved the consolidated
+continuation in Codex: complete the whole website rather than another isolated
+Home. [Approval record](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7026703017).
+[Exact continuation](c0-whole-site-continuation.json), SHA256
+`c6d7749e92e0128fd766e0ec2ae801838740e34768ca463046d2058d2ec23eae`.
+
+Implemented: explicit source-aware disposable **site-first** sequence. It creates
+all Core-declared Pages before whole-site render/critique without inventing a
+Home approval. Historical grants and protected workflows retain their existing
+sequence. Final editorial, exact Operator/quality review, customer acceptance
+and publication boundaries remain separate. Optional stock follows Core's actual
+zero/one/two suitable placements; each selected Page is independently fingerprinted.
+A changed Service page cannot inherit a Home-only contextual image review.
+Early critique separates real copy/design defects from inactive preview controls
+and undrafted supporting pages. It still flags broken links between actual Pages.
+
+Windows focused regression:53 pass,0fail,1 expected Linux-only skip; TypeScript
+and targeted ESLint pass. Final actual Linux:72pass,0fail,0skip,0provider calls.
+Initial harness failures (missing compiled-launcher environment and package
+resolution) retained and fixed; no production dependency/configuration change.
+Initial continuation preflight also retained: existing research uses conservative
+completed reservations in the shared meter. Corrected accounting preserves that
+higher debit; no ledger rewrite or spending increase beyond the owner's$13 total.
+
+Worker `30ea8afafefafcda033a4fc6ce0e117fbc5c039723d7672fec1bc905985806f2`;
+installer `4087865c3c9b219dd034bddb893067203932afd65135d8e3921f2d7106914d44`;
+Linux proof `c3b9cba01c30a8c400b138add27a015a9fe949a0139b520ea5d61a05a20b133b`.
+Protected code custody: existing private runtime / correction-10.
+Corrected actual-case PREFLIGHT passed71, old grant64bc695b→next f024b799,
+unchanged context7892fd3e/statec24cfd40/ledgerb9d13677; no API dispatch.
+
+**Authorized totals:**13,000,000micros (+5,000,000 to prior8,000,000),
+44generations/89requests/7editorial rounds/3commercial replans. Existing25/49,
+four consumed editorial/two replans and all old receipts/history remain.
+Same GPT5.4-2026-03-05/medium, per-request token/byte ceilings, source set,
+November22 15:58:31.154UTC expiry, manual retry allowance; zero automatic retries.
+Official [model/rates](https://developers.openai.com/api/docs/models/gpt-5.4)
+rechecked:input$2.50/M,cache$0.25/M,output$15/M. No paid research/media expansion.
+
+**Cost correction:**current estimated usage$5.652224; existing conservative meter
+debit$6.012396 (difference$0.360172 in completed research reservations, not a new
+request or independently established invoice charge). Zero pending. Maximum
+future spend under$13 is$6.987604, not$7.347776. Prior lineage debit$11.881103
+remains separate; conservative accounted sum$17.893499, cap$24.881103.
+Codex allowance/cost and owner time are not measured here.
+
+**RECOVERY / RESUME HERE:**activate only tested private CLI worker/proof with
+matching before-files retained, apply the exact continuation once using the
+prepared installer, independently verify grant f024b799 and unchanged71/ledger.
+Then Core report→development continuation→Direction→variable page plan→ALL drafts,
+existing local WordPress→actual desktop/mobile critique→substantive corrections.
+Use the current authenticated private source custody; never export raw source or
+model bodies to Git/logs. No protected Core/WordPress/publication/infra change.
+Do not reapply5494, re-enroll, reset counters, or manually write replacement copy.
+This checkpoint is engineering readiness, not an improved-site quality claim.

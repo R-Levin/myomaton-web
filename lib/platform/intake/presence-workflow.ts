@@ -93,6 +93,8 @@ export interface PresenceWorkflowOperations {
   readonly requiresResearch?: boolean;
   readonly maxEditorialRevisions?: number;
   readonly maxCommercialReplans?: number;
+  /** Explicit disposable-evaluation sequencing; never an approval or publication grant. */
+  readonly reviewSequence?: "site-first";
   readonly sourceRepair?: SourceRepairAuthorization;
   readonly visuals?: PresenceVisualOperations;
   preflight?(run: WorkflowRun): Promise<void>;
@@ -198,7 +200,7 @@ function conceptQualityTarget(context: WorkflowContext, state: State, authority:
     report: state.report, confirmation: state.confirmation, corrections: state.corrections, research: state.research });
 }
 
-function nextTask(state: State): Task | null {
+function nextTask(state: State, siteFirst = false): Task | null {
   if (!state.research) return { operation: "research" };
   if (!state.report) return { operation: "report" };
   if (!state.confirmation) return null;
@@ -206,7 +208,7 @@ function nextTask(state: State): Task | null {
   if (!state.blueprint) return { operation: "blueprint" };
   const drafted = new Set(state.pages.map(page => page.path));
   if (!drafted.has("/") && state.blueprint.pages.some(page => page.path === "/")) return { operation: "page", path: "/" };
-  if (state.evaluation && !state.homeReview) return null;
+  if (state.evaluation && !state.homeReview && !siteFirst) return null;
   if (state.evaluation && state.revisionRequest?.batch === "pending") return { operation: "page" };
   const missing = state.blueprint.pages.find(page => !drafted.has(page.path));
   if (missing) return { operation: "page", path: missing.path };
@@ -245,6 +247,10 @@ export class PresenceWorkflow {
 
   constructor(pool: Pool, private operations: PresenceWorkflowOperations,
     private destinations: Parameters<typeof readPage>[4] = {}, private clock = Date.now, private boundary: "disposable" | "protected" = "disposable") {
+    if (operations.reviewSequence !== undefined && (operations.reviewSequence !== "site-first" ||
+        boundary !== "disposable" || operations.marketingAuthority?.projectionVersion !== 2)) {
+      throw new IntakeError("unavailable", 403);
+    }
     this.store = new WorkflowStore(pool, boundary);
   }
 
@@ -258,14 +264,15 @@ export class PresenceWorkflow {
     const current = state.contextDigest === fingerprint(context) &&
       state.marketingAuthorityDigest === (authority && fingerprint(authority));
     const editorial = editorialProgress(state);
-    const concept = current && state.evaluation && !state.homeReview ? homeConceptDigest(context, state) : undefined;
+    const siteFirst = this.operations.reviewSequence === "site-first" && Boolean(context.evaluation);
+    const concept = current && state.evaluation && !state.homeReview && !siteFirst ? homeConceptDigest(context, state) : undefined;
     const canRenderForEditorial = current && this.boundary === "disposable" && Boolean(authority?.earlyConceptReview) &&
-      !state.work && !state.failure && nextTask(state)?.operation === "editorial";
+      !state.work && !state.failure && nextTask(state, siteFirst)?.operation === "editorial";
     const canQueueEditorialRevision = current && Boolean(state.editorial) && !state.work && !state.operatorReview &&
       (state.revisionRequest?.ordinal ?? 0) < (this.operations.maxEditorialRevisions ?? 1) &&
       Boolean(state.editorial?.concerns.length || editorial.assigned.length);
     const next = !current ? "evidence-changed" : state.failure ? "recover" : state.work ? "in-progress" :
-      nextTask(state)?.operation ?? (concept ? "home-concept" : !state.confirmation ? "customer-review" :
+      nextTask(state, siteFirst)?.operation ?? (concept ? "home-concept" : !state.confirmation ? "customer-review" :
         state.editorial && (state.editorial.concerns.length || editorial.open) ? "editorial-review" :
           !state.operatorReview ? "operator-review" : "review-complete");
     const reviewedVisuals = (state.visuals ?? []).filter(visual => visual.placement.candidateDigest === state.operatorReview?.target);
@@ -274,7 +281,7 @@ export class PresenceWorkflow {
       ? fingerprint({ candidate: state.operatorReview.target, context: state.contextDigest, authority, visuals: reviewedVisuals }) : undefined;
     const deliveryHistory = (state.qualityReviews ?? []).filter(review => !review.phase);
     const lastQualityReview = deliveryHistory.at(-1);
-    const conceptTarget = conceptQualityTarget(context, state, authority, this.boundary === "disposable");
+    const conceptTarget = !siteFirst ? conceptQualityTarget(context, state, authority, this.boundary === "disposable") : undefined;
     const conceptHistory = (state.qualityReviews ?? []).filter(review => review.phase === "home-concept");
     const lastConceptReview = conceptHistory.at(-1);
     const conceptQuality = conceptTarget ? {
@@ -386,7 +393,7 @@ export class PresenceWorkflow {
 
   async advance(context: WorkflowContext, version: number) {
     const state = await this.current(context, version);
-    const task = nextTask(state);
+    const task = nextTask(state, this.operations.reviewSequence === "site-first" && Boolean(context.evaluation));
     if (!task || state.work) throw new IntakeError("workflow_not_ready", 409);
     return this.executeTask(context, state, task);
   }

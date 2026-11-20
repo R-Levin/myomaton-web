@@ -88,7 +88,7 @@ for (const includeOriginals of [false,true]) test("actual metered request carrie
  const rates:ResponsesRates={model:includeOriginals?"gpt-5.4-2026-03-05":"offline-model",verifiedOn:"2026-11-19",inputPerMillion:750000,cachedPerMillion:75000,outputPerMillion:4500000,cacheWritePerMillion:0,countMicros:0};
  await initializeResponsesUsageLedger(root,rates);
  const grant:PresenceWorkflowGrant={contextDigest:fingerprint(context),approvedSources:sources,approvedCorrections:[],marketingAuthority:authority,
-  researchSources:[{id:"research:offline",url:"https://example.org/",label:"Never fetched"}],researchResponseBytes:10000,expiresAt:Date.now()+60000,maxOutputTokens:1000,
+  researchSources:[{id:"research:offline",url:"https://example.org/",label:"Never fetched"}],researchResponseBytes:10000,expiresAt:Date.now()+60000,maxOutputTokens:1000,nativeComponents:2,
   ledger:{id:fingerprint("source-aware-fixture"),startingLedger:createHash("sha256").update(await readFile(join(root,"onboarding-usage.json"))).digest("hex"),
    baselineAttempts:0,requests:2,generations:1,inputTokens:2000,inputBytes:100000,capMicros:20000}};
  const originalBytes=Buffer.from(launch+"\n\n"+ongoing);
@@ -111,6 +111,8 @@ for (const includeOriginals of [false,true]) test("actual metered request carrie
    assert.match(request.instructions,/third-party expression/);
    assert.match(request.instructions,/Retain strong accurate content or wording/);
    assert.match(request.instructions,/not disposable inspiration/);
+   assert.match(request.instructions,/optional selection pool/);
+   assert.doesNotMatch(request.instructions,/requires both selected photographs/);
    if(Array.isArray(request.input))assert.match(JSON.parse(request.input[0].content[0].text!).interpretation,/permitted customer-owned brand assets/);
    const encoded=JSON.stringify(request.text.format.schema);
    assert.ok(encoded.includes("complete-approved-brief"));

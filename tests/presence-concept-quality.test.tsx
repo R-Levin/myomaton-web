@@ -11,7 +11,7 @@ import { readPage } from "../lib/platform/intake/presence-workflow-artifacts";
 const author: WorkflowActor = { id: "generating-operator", role: "operator", simulated: false, authority: "offline preparation only" };
 const reviewer: WorkflowActor = { id: "reviewing-operator", role: "operator", simulated: false, authority: "offline scoped review only" };
 
-function setup(options: { enabled?: boolean; limit?: number; uncertain?: boolean; boundary?: "disposable" | "protected"; repair?: boolean; consumed?: number } = {}) {
+function setup(options: { enabled?: boolean; limit?: number; uncertain?: boolean; boundary?: "disposable" | "protected"; repair?: boolean; consumed?: number; siteFirst?: boolean } = {}) {
   const context: WorkflowContext = { scope: { webPresenceId: randomUUID(), managedSiteId: randomUUID() }, intakeId: randomUUID(),
     entry: "DIRECT_START", evidence: [{ id: "offer", kind: "owner-confirmed", label: "Fixture offer", reference: "Offline fixture", date: null,
       content: "The fixture business provides a managed service." }], limitations: [], conflicts: [],
@@ -44,10 +44,19 @@ function setup(options: { enabled?: boolean; limit?: number; uncertain?: boolean
   const critique = { summary: "Offline critic double: reconsider the proposition before whole-site expansion.",
     concerns: [{ path: "/", concern: "The concept lacks a distinctive grounded reason to choose the service." }] };
   const workflow = new PresenceWorkflow(null as unknown as Pool, { mode: "provider", marketingAuthority: authority, maxRetries: 0,
+    ...(options.siteFirst && {reviewSequence:"site-first" as const}),
     maxCommercialReplans: options.limit ?? 1,
     ...(options.repair && {sourceRepair:{authorization:fingerprint("owner-authorized source repair"),baseVersion:initial.version,previousStateDigest:fingerprint(initial),materialsDigest:fingerprint("exact repaired materials")}}),
     async run(run, retain) {
       runs.push(structuredClone(run));
+      if(options.siteFirst && run.work.operation === "page") {
+        const output={...structuredClone(page),path:run.work.path!,actions:[{label:"Home",kind:"navigate",destination:"/",sectionIndex:0}],internalLinks:[]};
+        await retain(Buffer.from(JSON.stringify(output)));return output;
+      }
+      if(options.siteFirst && run.work.operation === "editorial") {
+        const output={summary:"Offline whole-site critic double, not product acceptance.",concerns:[]};
+        await retain(Buffer.from(JSON.stringify(output)));return output;
+      }
       await retain(Buffer.from(JSON.stringify(critique)));
       if (options.uncertain) throw Error("Offline simulated post-response interruption");
       return critique;
@@ -229,6 +238,8 @@ test("the normal metered concept critique requires actual scoped image inputs an
         calls++; assert.ok(request);
         const value = body as { instructions: string; input: { content: { type: string; text?: string }[] }[] };
         assert.match(value.instructions, /early Home-concept critique/);
+        assert.match(value.instructions, /Review only the supplied Home/);
+        assert.doesNotMatch(value.instructions, /Critically review the complete candidate/);
         assert.match(value.instructions, /Challenge the underlying positioning/);
         assert.match(value.instructions, /do not demand public publication rights before a permitted non-public preview/);
         const content = value.input[0].content;
@@ -412,4 +423,30 @@ test("source repair retains consumed replan/editorial allowances and does not tu
  f.mutate(s=>{Object.assign(s,{report:before.report,confirmation:before.confirmation,direction:before.direction,blueprint:before.blueprint,pages:before.pages})});
  const restored=(await f.workflow.review(f.context))!;
  await assert.rejects(f.workflow.reviseHomeConcept(f.context,view.version,author,composeHomeConcept(f.context,restored).digest,"Another correction"),{code:"workflow_not_ready"});
+});
+
+test("explicit site-first development builds every declared Page before actual whole-site review without manufacturing Home approval",async()=>{
+ const f=setup({siteFirst:true});
+ let view=(await f.workflow.review(f.context))!;
+ assert.equal(view.next,"page");assert.equal(view.homeConcept,undefined);assert.equal(view.conceptQuality,undefined);
+ assert.equal(view.homeReview,undefined);
+ await assert.rejects(f.workflow.reviewCandidate(f.context,view.version,author),{code:"workflow_not_ready"});
+ await assert.rejects(f.workflow.critiqueHomeConcept(f.context,view.version,author),{code:"workflow_not_ready"});
+ while(view.next==="page"){view=(await f.workflow.advance(f.context,view.version))!;assert.equal(view.failure,null,JSON.stringify(view.failure));}
+ assert.equal(view.pages.length,4);assert.equal(view.next,"editorial");assert.ok(view.canRenderForEditorial);
+ assert.equal(f.runs.length,3);assert.ok(f.runs.every(run=>run.work.operation==="page"));
+ const input=await f.workflow.editorialCritiqueInput(f.context,view.version,author);
+ assert.equal(input.input.pages.length,4);assert.equal(input.work.reviewStage,undefined);
+ const {workflowLocalDraftInput,workflowDeliveryInput}=await import("../lib/platform/intake/presence-workflow-delivery");
+ const packet=workflowLocalDraftInput(f.context,view);assert.equal(packet.pages.length,4);
+ assert.throws(()=>workflowDeliveryInput(f.context,view,null,[]));
+ view=(await f.workflow.critiqueSite(f.context,view.version,author))!;
+ assert.equal(view.next,"operator-review");assert.equal(view.deliveryQuality?.passed,false);
+ view=(await f.workflow.reviewCandidate(f.context,view.version,author))!;
+ assert.equal(view.next,"review-complete");assert.equal(view.deliveryQuality?.passed,false);
+ assert.throws(()=>workflowDeliveryInput(f.context,view,null,[]),/quality/);
+ assert.equal(f.snapshot().homeReview,null,"No synthetic Home approval is recorded");
+ assert.equal(f.snapshot().confirmation.decision,"development-continuation");
+ assert.throws(()=>setup({siteFirst:true,boundary:"protected"}));
+ assert.throws(()=>setup({siteFirst:true,enabled:false,boundary:"protected"}));
 });

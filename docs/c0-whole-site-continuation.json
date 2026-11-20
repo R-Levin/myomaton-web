@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "status": "OWNER APPROVED in Codex continuation; not activated",
+  "purpose": "Complete the existing source-corrected C0 site as one coherent local WordPress candidate; preserve useful former site and business knowledge.",
+  "caseId": "41a83e7e-1765-4517-941a-b2b151bb7c4a",
+  "scope": {
+    "webPresenceId": "2a08e054-902c-400b-9b96-3c2274bcadc2",
+    "managedSiteId": "2c0d637d-4ded-4597-ac8b-661519aba358"
+  },
+  "baseVersion": 71,
+  "stateDigest": "c24cfd40e4385c04a765dbb41abf81ca6977250d0bd3d465c8cbafb5df5b7ab7",
+  "contextDigest": "7892fd3ecaac5408f85b18df7219e59072d734b0c6559d9156735a16a4592cfa",
+  "previousGrant": "64bc695bcf66dbe95e7660601faee84f743058ed00a5cb57b6e037cec654a68c",
+  "ledgerSha256": "b9d13677964a4c63a9011c8ec61243baba164f156ffeb529ea180b5d98721ef2",
+  "usage": {
+    "generations": 25,
+    "requests": 49,
+    "settledMicros": 5652224,
+    "pending": 0,
+    "heldMicros": 6012396
+  },
+  "previous": {
+    "capMicros": 8000000,
+    "generations": 32,
+    "requests": 65,
+    "editorialRounds": 4,
+    "commercialReplans": 2
+  },
+  "next": {
+    "capMicros": 13000000,
+    "generations": 44,
+    "requests": 89,
+    "editorialRounds": 7,
+    "commercialReplans": 3,
+    "reviewSequence": "site-first"
+  },
+  "financialMeaning": {
+    "increaseToExistingRunCeilingMicros": 5000000,
+    "maximumFutureSpendFromPinnedLedgerMicros": 6987604,
+    "cumulativeAccountedCeilingMicros": 24881103,
+    "priorLineageDebitMicros": 11881103,
+    "notAnInvoice": true,
+    "researchConservativeAccountingAboveUsageEstimateMicros": 360172
+  },
+  "expiresAt": "2026-11-22T15:58:31.154Z",
+  "model": "gpt-5.4-2026-03-05",
+  "reasoning": "medium",
+  "automaticRetries": 0,
+  "workflow": [
+    "Reuse retained research without new paid search",
+    "Regenerate report, Presence Direction and variable page architecture from corrected27-source binding",
+    "Core AI drafts the full declared site, not a Home-only approval treadmill",
+    "Materialize in the existing disposable local WordPress; maintain stable owned identities and rollback",
+    "Inspect actual desktop/mobile pages and acquire no new images; retain only useful reviewed stock placements",
+    "Core editorial critique; bounded substantive corrections, final full-site commercial/visual judgment and owner review"
+  ],
+  "sources": "Exactly the existing source-evidence-repair5494e0a7 context and full original-material custody. No new protected source, peer, credential or external destination.",
+  "limits": "Stage model, per-request input/output/byte limits, all source/public-claim authorities, tokens, roles, retry maximum, existing expiry and ledger prefix remain unchanged. Stage aggregate ceilings rise only with the approved total cap; shared accounting remains enforced.",
+  "exclusions": [
+    "No public/protected Core deployment",
+    "No protected WordPress write or publication",
+    "No new hosted environment, DNS or port",
+    "No new paid search, stock download, image generation or credentials",
+    "No counter reset, expiry extension or discarded evidence",
+    "No claim that local tests establish product quality"
+  ],
+  "budgetBasis": "19 remaining generation slots after amendment:3 upstream, variable full-site drafts, whole-site critique/recritique and substantive revisions. Recent uncached requests cost about$0.28–$0.40; whole-site visual critique may cost more. Reserve$6.987604 rather than spend the old$1.987604 on another incomplete Home. Stop at actual budget/request limits; no artificial page quota, no guaranteed quality claim.",
+  "ratesSource": "https://developers.openai.com/api/docs/models/gpt-5.4",
+  "ratesVerifiedOn": "2026-11-19",
+  "approvalRecord": "https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7026703017"
+}

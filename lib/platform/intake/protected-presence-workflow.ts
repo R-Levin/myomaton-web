@@ -3,6 +3,7 @@ import { basename, join } from "node:path";
 import type { Pool } from "pg";
 import { fingerprint } from "../canonical/model";
 import { requireEvaluationContext } from "./presence-evaluation";
+import { stockReviewMatchesPages } from "./presence-stock-placement";
 import type { WorkflowContext, WorkflowRun } from "./presence-workflow";
 import { IntakeError, normalizeAnswers } from "./model";
 import { adaptiveOnboardingVersion, type PreparedUnderstanding } from "./adaptive";
@@ -350,13 +351,12 @@ export async function reviewWorkflowChange(workflow: PresenceWorkflow,
 }
 
 export async function reviewedStockForWorkflow(pool:Pool,root:string,run:WorkflowRun,supplied:{entries:{hit:{sourceId:string}}[]}) {
-            let reviewed:{contextDigest:string;schema:string;homeDigest:string;records:{target:SuppliedPlacement;assetId:string;lineage:SuppliedLineage;sourceId:string;image:{usageId:string;digest:string;width:number;height:number;alt:string}}[]}|undefined;
+            let reviewed:{contextDigest:string;schema:string;homeDigest?:string;pageDigests?:Record<string,string>;records:{pagePath?:string;target:SuppliedPlacement;assetId:string;lineage:SuppliedLineage;sourceId:string;image:{usageId:string;digest:string;width:number;height:number;alt:string}}[]}|undefined;
             try{reviewed=await privateWorkflowFile(join(root,"media/reviewed-stock-context.json"),root)}
             catch(error){if((error as NodeJS.ErrnoException).code!=="ENOENT")throw error}
             if(!reviewed)return {state:"downloaded-awaiting-contextual-permission-review",entries:supplied.entries};
-            const home=run.input.pages.find(page=>page.path==="/");
-            if(!home||reviewed.homeDigest!==fingerprint(home))return {state:"new-contextual-placement-review-required",entries:supplied.entries};
-            if(reviewed.contextDigest!==fingerprint(run.context)||!/^canonical_test_[a-f0-9]{32}_intake$/.test(reviewed.schema)||reviewed.records.length!==2)throw Error("Private stock review scope differs");
+            if(!stockReviewMatchesPages(reviewed,run.input.pages))return {state:"new-contextual-placement-review-required",entries:supplied.entries};
+            if(reviewed.contextDigest!==fingerprint(run.context)||!/^canonical_test_[a-f0-9]{32}_intake$/.test(reviewed.schema)||(!reviewed.records.length||reviewed.records.length>supplied.entries.length||reviewed.records.length>2||new Set(reviewed.records.map(record=>record.sourceId)).size!==reviewed.records.length))throw Error("Private stock review scope differs");
             const db=await pool.connect();
             try{await db.query("BEGIN");await db.query("SELECT set_config('search_path',$1,true)",[reviewed.schema]);
               for(const record of reviewed.records){

@@ -601,3 +601,17 @@ changes. The correction and independent readback passed; see
 [verified actual result and next boundary](c0-creation-quality-p0-17.md#approved-source-binding-correction-applied-and-independently-verified).
 This resolves that exact hosted-write hold, not the separate future model/
 iteration/publication gates.
+
+### November 19 — Whole-site continuation, sustainability and actual budget
+
+Owner: “Yes, that is approved. This amount of time, trouble and cost won't be
+sustainable in the longer run, but we have to get to something we can look at
+to have any idea of what comes next.” This authorizes the described$13 TOTAL
+same-run ceiling (+$5), full-site-first development sequencing and sufficient
+request/revision capacity, with unchanged data/model/expiry/protected boundaries.
+It is not acceptance of Home70 or permission to invent customer facts or publish.
+See c0-whole-site-continuation.json and the current P0-17 recovery checkpoint.
+A preflight exposed older research-reservation accounting understated in summaries:
+retain$6.012396 conservative debit versus$5.652224 usage estimate, not a new charge.
+Core must generate a complete credible inspectable site; another technical proof
+or Home-only polishing cycle does not satisfy the owner.
