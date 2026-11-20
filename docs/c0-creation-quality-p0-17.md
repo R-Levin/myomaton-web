@@ -2935,3 +2935,132 @@ This is recovery of genuine model work, not manually authored website copy.
 FAQ then Free Review/Direct Start. Inspect event/ledger, never duplicate an
 in-flight generation. Complete all6 Pages, then actual local WordPress capture,
 full-site commercial/visual critique and bounded corrections before owner review.
+
+## Evening local presentation pass — November 19
+
+### Owner direction and actual scope
+
+After two interruptions and poor results, the owner explicitly challenged Codex's
+resource use and basic layout quality. The agreed next step was local presentation
+correction using existing content, no additional generation, preservation/recovery
+of already-paid work where access allows, and a candid morning checkpoint.
+The owner authorized completion while away for the evening. This supersedes
+automatic continuation of additional quality-generation loops; it does not create
+another budget, role, approval framework or product direction.
+
+### What is actually viewable
+
+The existing disposable local WordPress now serves the complete source97 candidate:
+Home203, Service215, How-it-works216, FAQ217, Free Review218 and Direct Start219.
+Primary URL: http://127.0.0.1:4474/?page_id=203&preview=true.
+The pages are genuine retained Core/API output, not new Codex-written marketing.
+Source97 contains the first Service correction. The later three-Page correction
+queued at100 has NOT been substituted into this local candidate.
+
+The reset had stopped the old local listener. Restarted only the existing
+127.0.0.1:4474 PHP preview using originals-router.php (router.php belongs to4473).
+An initial wrong-router launch was corrected by verifying/stopping ONLY that new
+owned process. Final listener is loopback-only and retains GET/HEAD, scoped-draft,
+no-store and noindex restrictions. It is running hidden, without owner action.
+No new environment, port, hostname, hosted service or public/protected state.
+
+### Actual rendering defects and correction
+
+The native theme mixed WordPress automatic flow margins with authored grid/flex
+gaps. Later cards and button wrappers gained20px top offsets. A separate theme
+rule forcibly centered ALL Hero column groups, overriding their authored stretch/
+start setting and producing large empty areas above titles. Stronger legacy
+selectors also defeated native title and button sizing: desktop H1s computed68px,
+ordinary small text14px, and some button labels15.2px.
+
+Local theme0.1.2 corrects the shared rendering layer: reset native group child
+margins (including WordPress button wrappers), use consistent spacing/gutters,
+respect column alignment, give Hero panels natural height, bound headline scale,
+raise readable copy/control text to at least16px, and stack columns at tablet
+widths. Header/footer wordmarks share the same content alignment. Existing palette,
+wordmark, section order, visitor copy, Actions and destinations remain unchanged.
+Local preview uses a versioned stylesheet, preventing stale CSS from masquerading
+as the corrected view. Nothing installed on miopages.org or protected Core.
+
+Preserved earlier local capture/rollback edits: optional installed Edge fallback
+with browser sandbox retained; rollback accepts the legitimate non-media packet
+filename as well as the existing media form, retaining its other scope guards.
+No missing screenshot or failed validation was labeled a pass. Initial review-
+helper serialization failures were fixed before the measured results below.
+
+### Verification, evidence and rollback
+
+Actual browser review:6 Pages ×1440/768/390px =18 views, all HTTP200, no horizontal
+overflow; all visible body/control copy at least16px and buttons at least47.59px.
+All desktop Hero column tops align within1px. Six fitting button pairs share a
+baseline. Home Hero1130→847px; Service1157→1015px; smaller headings and consistent
+margins improve presentation, but the Service Hero remains content-heavy.
+Wordmark alignment and links into all5 supporting Pages were checked separately.
+Generated page text digests match BEFORE styling at all18 views.
+
+Native readback BEFORE/AFTER is EXACT:
+2f31bd9ab9b896adfa9fa9b3b7b854d0e0c876e3ecd083318476e5821f2870a9.
+Earlier202posts digest remains:
+6ad9ca038ebd73c9150eb1ed404a873c5435c53fb8c2e0c23dac7922192dc514.
+No Page rewrites, new Page identities, customer facts, signed approvals or forms
+were introduced. The source97→92→97 content/metadata/routing round trip passed
+before the interruption, with the same6 IDs/slugs; this pass does not repeat it.
+
+TypeScript, targeted ESLint and PHP rollback syntax pass. Native-component
+regressions:5pass/0fail/1 explicit opt-in WordPress-test skip; actual6-Page browser
+verification above was performed separately. No Linux production build was needed
+or claimed for this CSS/footer/local-tooling change; prior Linux75 proof is for
+the private worker, not a commercial-quality verdict.
+
+Private, Git-ignored artifacts:
+runtime-content/c0-presentation-20261119/before-layout,
+after-layout-final, verified-summary.json, style.before.css and footer.before.html.
+Other intermediate review attempts remain preserved. Restore those exact two
+before-files to the existing local theme if presentation rollback is needed.
+No source bodies, retained AI responses, credentials or screenshot bytes committed.
+Reproducible read-only review helper: scripts/intake/review-local-presentation.ts.
+Its after-review checks compare against the preserved before-layout receipt.
+
+### What this does NOT fix — Codex assessment, not owner acceptance
+
+- Messaging still spends too much attention on administration, responsibility,
+  authority and scope. It under-sells the full customer value of the managed
+  growth service and its content/discovery/conversion/improvement work.
+- The site remains visually generic and text/card-heavy. Better alignment does
+  not establish a distinctive commercial creative concept or purposeful imagery.
+- Service and process explanations still repeat. Some important explanations
+  need clearer concrete customer journeys, using retained knowledge rather than
+  asking the owner again.
+- Free Review submission is disabled; Direct Start is explanatory rather than a
+  functioning hosted intake. Unverified account/help destinations must not be
+  guessed or activated. This private review does not prove lead/measurement/
+  Ongoing integration or completion of Commercial V1.
+
+Next product judgment should compare the WHOLE candidate with the stronger owned
+site/design and complete approved business direction. Do not treat this pass as
+permission for another blind whole-site rerun or a new Home-only proof.
+
+### Costs, outstanding recovery and exact next step
+
+Provider requests initiated FOR THIS LOCAL PASS:0; no API key loaded, provider
+budget amended or hosted database written. Codex time/credits are not measured
+as zero. Last VERIFIED pre-cutoff model ledger (before queued100 correction):
+37generations/73requests, $9.695933 usage estimate, $10.056105 conservative debit
+against$13 TOTAL; delta from the source-corrected continuation baseline$4.043709.
+The queued Home/Service/How-it-works revision may have continued on the host.
+Its completion and final charge are UNVERIFIED. Never report that old balance
+as current, that already-paid output was lost, or that another call is needed.
+
+One existing SSH access probe failed public-key authentication after the reset.
+No passphrase guessed, key replaced, credential read from unrelated config or
+further login requested while owner is away. Already-paid recovery remains
+pending that access prerequisite; it did not block the local layout work.
+
+**RECOVERY / RESUME HERE:**current branch and this evening checkpoint; local
+candidate source97 is available at the exact URL above. Do not call worker work
+or any provider endpoint. When existing SSH agent authentication is available,
+read case41a83e7e-1765-4517-941a-b2b151bb7c4a event/output/ledger first, reconcile
+queued100 without duplicating it, and recover validated retained output through
+the no-dispatch path if needed. Preserve41/6/75/97, original sources, old candidates,
+grant/counters/expiry and rollback. Do not silently apply unknown later output.
+Morning review is informal product feedback, not customer acceptance/publication.

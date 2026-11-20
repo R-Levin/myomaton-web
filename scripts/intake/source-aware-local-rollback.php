@@ -4,7 +4,7 @@ declare(strict_types=1);
 if(PHP_SAPI!=='cli'||count($argv)!==3||!extension_loaded('pdo_sqlite'))exit(1);
 $root=realpath($argv[1]);$name=$argv[2];
 if(!$root||basename($root)!=='p022-wp-validation'||str_contains(str_replace('\\','/',$root),'/public_html/')||
- !preg_match('/^source-aware-before-(home|site)-[1-9][0-9]*-media\\.json$/D',$name))exit(2);
+ !preg_match('/^source-aware-before-(home|site)-[1-9][0-9]*(?:-media)?\\.json$/D',$name))exit(2);
 $sourceAwareCase='41a83e7e-1765-4517-941a-b2b151bb7c4a';$keys=['_miopages_source_aware_case','_miopages_source_candidate_digest','_miopages_draft_brand'];
 $file=$root.'/'.$name;if(!is_file($file)||is_link($file))exit(3);
 $baseline=json_decode(file_get_contents($file),true,512,JSON_THROW_ON_ERROR);

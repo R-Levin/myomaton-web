@@ -615,3 +615,18 @@ A preflight exposed older research-reservation accounting understated in summari
 retain$6.012396 conservative debit versus$5.652224 usage estimate, not a new charge.
 Core must generate a complete credible inspectable site; another technical proof
 or Home-only polishing cycle does not satisfy the owner.
+
+### November 19 evening — resource control and local presentation only
+
+The owner rejects further costly churn and weak output, specifically including
+basic alignment. Codex proposed: stop additional generation, preserve the current
+site/already-paid correction, correct shared presentation locally with existing
+content, and return a candid whole-site review checkpoint. Owner accepted and
+asked to complete as much of that bounded work as possible while away overnight.
+This is not permission to spend remaining provider budget, start a fresh run or
+replace protected state. No further routine owner input was requested tonight.
+
+Display source97 unchanged in content, with local theme0.1.2 layout correction.
+Later queued100 work is unverified because SSH authentication is unavailable.
+Do not lose or rebuy it. Actual layout checks passing do NOT mean the commercial
+site, Core service or overall product is accepted. See the evening P0-17 handoff.

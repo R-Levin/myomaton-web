@@ -1,7 +1,7 @@
 /*
 Theme Name: MioPages Managed Site
 Description: Reusable block presentation for Core-managed Web Presence sites.
-Version: 0.1.1
+Version: 0.1.2
 Requires at least: 6.6
 Requires PHP: 8.0
 Text Domain: miopages-managed-site
@@ -176,21 +176,24 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
   padding-block: .35rem;
 }
 .miopages-draft-creative .miopages-draft-related { border-block-start: 1px solid var(--miopages-border); }
-/* Versioned component trees keep their authored hierarchy and mobile order. */
-.miopages-native-component .miopages-node { min-width: 0; grid-column: span var(--mp-span, 1); }
+/* Native layout owns its spacing. Gutenberg's flow margins must not offset
+   later grid cells or button wrappers inside an authored row. */
+.miopages-native-component { font-size: max(1rem, var(--miopages-body-size, 1rem)); }
+.miopages-native-component .miopages-node { box-sizing: border-box; min-width: 0; max-inline-size: 100%; grid-column: span var(--mp-span, 1); }
+.miopages-native-component .wp-block-group.miopages-node > * { margin-block: 0; }
 .miopages-native-component .miopages-node > :first-child { margin-block-start: 0; }
 .miopages-native-component .miopages-node > :last-child { margin-block-end: 0; }
 .miopages-native-component .miopages-node-flow { display: block; }
 .miopages-native-component .miopages-node-row { display: flex; flex-wrap: wrap; }
 .miopages-native-component .miopages-node-columns { display: grid; grid-template-columns: var(--mp-columns); }
 .miopages-native-component .miopages-node-gap-none { gap: 0; }
-.miopages-native-component .miopages-node-gap-small { gap: .65rem; }
-.miopages-native-component .miopages-node-gap-medium { gap: clamp(1rem, 2vw, 2rem); }
-.miopages-native-component .miopages-node-gap-large { gap: clamp(1.5rem, 4vw, 4rem); }
+.miopages-native-component .miopages-node-gap-small { gap: .75rem; }
+.miopages-native-component .miopages-node-gap-medium { gap: 1.25rem; }
+.miopages-native-component .miopages-node-gap-large { gap: clamp(1.5rem, 2.5vw, 2.5rem); }
 .miopages-native-component .miopages-node-inset-none { padding: 0; }
 .miopages-native-component .miopages-node-inset-small { padding: .75rem; }
-.miopages-native-component .miopages-node-inset-medium { padding: clamp(1rem, 2.5vw, 2rem); }
-.miopages-native-component .miopages-node-inset-large { padding: clamp(1.5rem, 4vw, 4rem); }
+.miopages-native-component .miopages-node-inset-medium { padding: clamp(1rem, 2vw, 1.75rem); }
+.miopages-native-component .miopages-node-inset-large { padding: clamp(1.25rem, 3vw, 3rem); }
 .miopages-native-component .miopages-node-surface-light { background: var(--wp--preset--color--surface); color: var(--wp--preset--color--ink); }
 .miopages-native-component .miopages-node-surface-brand { background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand); }
 .miopages-native-component .miopages-node-surface-tonal { background: var(--wp--preset--color--support); color: var(--miopages-tonal-ink); }
@@ -206,14 +209,17 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
 .miopages-native-component .miopages-node-measure-narrow { max-width: 28ch; }
 .miopages-native-component .miopages-node-measure-reading { max-width: 61ch; }
 .miopages-native-component .miopages-node-measure-wide { max-width: 82ch; }
-.miopages-native-component .miopages-node-type-small { font-size: .875rem; line-height: 1.5; }
-.miopages-native-component .miopages-node-type-body { font-size: 1rem; line-height: 1.55; }
-.miopages-native-component .miopages-node-type-lead { font-size: clamp(1.1rem, 2vw, 1.55rem); line-height: 1.4; }
-.miopages-native-component .miopages-node-type-display { font-size: clamp(2rem, 4.5vw, 4.8rem); line-height: 1.06; letter-spacing: -.035em; }
+.miopages-native-component .miopages-node-type-small { font-size: max(1rem, calc(var(--miopages-body-size, 1rem) * .9)); line-height: 1.6; }
+.miopages-native-component .miopages-node-type-body { font-size: max(1rem, var(--miopages-body-size, 1rem)); line-height: 1.6; }
+.miopages-native-component .miopages-node-type-lead { font-size: clamp(1.125rem, 1.5vw, 1.3rem); line-height: 1.5; }
+.miopages-native-component .miopages-node-type-display { font-size: clamp(2rem, 3.5vw, 3.5rem); line-height: 1.12; letter-spacing: -.025em; }
+.miopages-branded-draft .miopages-authored-section .miopages-native-component h1.miopages-node { font-size: clamp(2rem, 3.5vw, 3.5rem); line-height: 1.12; max-width: 24ch; text-wrap: balance; }
+.miopages-branded-draft .miopages-authored-section .miopages-native-component h2.miopages-node { font-size: clamp(1.5rem, 2.5vw, 2.25rem); line-height: 1.2; letter-spacing: -.02em; }
+.miopages-native-component h3.miopages-node { font-size: 1.125rem; line-height: 1.35; }
 .miopages-branded-draft .miopages-draft-creative .miopages-authored-section { padding: 0; background: transparent; border: 0; color: inherit; }
 .miopages-native-component figure { margin: 0; }
 .miopages-native-component img { display: block; max-width: 100%; height: auto; }
-@media (max-width: 680px) {
+@media (max-width: 900px) {
   .miopages-native-component .miopages-node-columns { grid-template-columns: minmax(0, 1fr); }
   .miopages-native-component .miopages-node { grid-column: auto; }
 }
@@ -233,9 +239,16 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
 .miopages-branded-draft .miopages-draft-creative .miopages-authored-section .miopages-native-component :is(h1,h2,h3,h4,h5,h6) { color: inherit; }
 .miopages-native-component .wp-block-group.miopages-node-measure-wide { max-width: 100%; }
 .miopages-native-component .wp-block-group.miopages-node-flow { display: flex; flex-direction: column; }
-.miopages-native-component .wp-block-group.miopages-node-flow > * { margin-block: 0; }
+.miopages-authored-section { margin-block: 0; }
+.miopages-authored-section > .miopages-native-component > .wp-block-group.miopages-node {
+  padding: clamp(1.5rem, 3vw, 3rem) clamp(1.25rem, 3vw, 3rem);
+}
+/* Hero side panels keep their natural height; they are not empty equal-height cards. */
+.miopages-authored-section.miopages-draft-hero > .miopages-native-component > .miopages-node-columns > .wp-block-group { align-self: start; }
+.miopages-native-component .wp-block-list { padding-inline-start: 1.25rem; }
+.miopages-native-component .wp-block-list > li + li { margin-block-start: .35rem; }
 .miopages-native-component .miopages-pending-media,
-.miopages-native-component .miopages-pending-action { padding: .75rem; border: 1px dashed currentColor; font-size: .875rem; }
+.miopages-native-component .miopages-pending-action { padding: .75rem; border: 1px dashed currentColor; font-size: 1rem; }
 
 /* A native Action has one visible button, even when its authored node carries
    surface/inset tokens. Context defaults keep it legible on a brand surface. */
@@ -243,15 +256,15 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
 .miopages-native-component .miopages-node-surface-brand { --mp-action-bg: var(--wp--preset--color--on-brand); --mp-action-ink: var(--wp--preset--color--brand); }
 .miopages-native-component :is(.miopages-node-surface-light,.miopages-node-surface-tonal) { --mp-action-bg: var(--wp--preset--color--brand); --mp-action-ink: var(--wp--preset--color--on-brand); }
 .miopages-native-component .wp-block-button.miopages-node { background: transparent; color: inherit; border: 0; padding: 0; border-radius: 0; }
-.miopages-native-component .wp-block-button__link { background: var(--mp-action-bg); color: var(--mp-action-ink); border: 1px solid currentColor; }
+.miopages-native-component .wp-block-button__link { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 44px; max-width: 100%; padding: .75rem 1rem; font-size: 1rem; line-height: 1.35; background: var(--mp-action-bg); color: var(--mp-action-ink); border: 1px solid currentColor; }
+.miopages-authored-section .miopages-native-component .wp-block-button.miopages-node > .wp-block-button__link { padding: .75rem 1rem; font-size: 1rem; line-height: 1.35; }
 .miopages-native-component .wp-block-button.miopages-node-surface-brand > a { background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand); }
 .miopages-native-component .wp-block-button.miopages-node-surface-light > a { background: var(--wp--preset--color--surface); color: var(--wp--preset--color--ink); }
-.miopages-authored-section.miopages-draft-hero .miopages-node-columns { align-items: center; }
 .miopages-authored-section.miopages-draft-hero .miopages-native-component .wp-block-list {
-  list-style: none; padding-inline-start: 0; display: grid; gap: .8rem;
+  list-style: none; padding-inline-start: 0; display: grid; gap: .5rem;
 }
 .miopages-authored-section.miopages-draft-hero .miopages-native-component .wp-block-list > li {
-  padding-block: .65rem; border-block-end: 1px solid currentColor;
+  margin: 0; padding-block: .35rem; border-block-end: 1px solid currentColor;
 }
 
 /* Nested comparisons respond to their actual column, not only the viewport. */
@@ -265,3 +278,22 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
 /* Authored columns inside an align-start flow still fill the available measure.
    Otherwise inline-size containment can shrink a comparison to its padding. */
 .miopages-native-component .miopages-node-columns { inline-size: 100%; }
+
+/* Native draft navigation stays readable and comfortably tappable on small screens. */
+@media (max-width: 680px) {
+  .miopages-branded-draft .miopages-draft-nav {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .5rem; padding-block: .75rem;
+  }
+  .miopages-branded-draft .miopages-draft-nav a,
+  .miopages-branded-draft .miopages-draft-nav > [aria-current] {
+    display: flex; align-items: center; box-sizing: border-box; min-height: 44px;
+    padding: .65rem .75rem; font-size: 1rem; line-height: 1.35;
+    border: 1px solid var(--miopages-border); border-radius: .3rem;
+    text-decoration: none;
+  }
+  .miopages-branded-draft .miopages-draft-nav [aria-current] {
+    background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand);
+  }
+  .miopages-branded-draft .miopages-draft-nav a:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}

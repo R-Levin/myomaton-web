@@ -7,7 +7,24 @@ This file is the first-read **navigation and operational handoff** when merged t
 
 At every new or interrupted MioPages session, first read [current main development control](https://github.com/R-Levin/myomaton-web/blob/main/docs/development-control.md), then the full [owner-critical conversation index](https://github.com/R-Levin/myomaton-web/blob/main/docs/owner-critical-conversations.md). Follow the exact linked owner decisions and Issues #12 and #10, then reconcile with the current development branch, working tree and grants. Main maintains the critical-conversation index. This branch maintains its implementation checkpoint. Apply later owner decisions and record important conversations there during the work, with their authority and supersession. Product development remains the overall priority. [Continuity and priority decision](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6898063682)
 
-**Current: Home81/Service83/How-it-works86 retained; remaining three Pages drafting.** Read [wire correction and exact recovery](c0-creation-quality-p0-17.md#wire-structure-corrected-how-it-works-recovered-without-regeneration). Empty disclosure retained exact visible text as a paragraph; no invented answer or repeat generation. Native wire now enforces kind-specific structure before generation; canonical guards unchanged. Linux75/TypeScript/lint pass. Private worker7db54f79/proof75f41879 active, same grantf024b799/$13 TOTAL/expiry. Normal WORK may be on FAQ; inspect event/ledger first. Still no completed-site visual quality claim or protected WordPress write. Prior checkpoint follows.
+**Current evening recovery — November 19: local presentation pass complete; no further generation.**
+Open the existing six-page WordPress candidate at http://127.0.0.1:4474/?page_id=203&preview=true.
+Read [the exact evening handoff](c0-creation-quality-p0-17.md#evening-local-presentation-pass--november-19).
+Displayed candidate: source97, Home203/Service215/How-it-works216/FAQ217/Free Review218/Direct Start219,
+local theme0.1.2. Layout corrections passed18 actual browser views and unchanged-copy/native checks.
+This is NOT commercial acceptance. No provider requests were initiated for this local pass.
+The earlier three-Page correction queued100 was not read back or applied: existing SSH key
+authentication is unavailable. Last verified PRE-correction usage:37generations/73requests,
+$9.695933 estimated/$10.056105 conservative; current final balance UNKNOWN, not assumed unchanged.
+Preserve retained outputs/ledger. Do not dispatch, regenerate, reset budgets or assume failure.
+Owner approved local presentation work after rejecting further resource churn. Recover already-paid
+work read-only when existing SSH access returns; no new model round is implied. No protected
+Core/WordPress deployment, publication, credential or infrastructure change.
+
+**All earlier checkpoint paragraphs below are historical.** Their former “Current” labels describe
+past checkpoints; do not execute those recovery instructions over this record.
+
+**Historical: Home81/Service83/How-it-works86 retained; remaining three Pages drafting.** Read [wire correction and exact recovery](c0-creation-quality-p0-17.md#wire-structure-corrected-how-it-works-recovered-without-regeneration). Empty disclosure retained exact visible text as a paragraph; no invented answer or repeat generation. Native wire now enforces kind-specific structure before generation; canonical guards unchanged. Linux75/TypeScript/lint pass. Private worker7db54f79/proof75f41879 active, same grantf024b799/$13 TOTAL/expiry. Normal WORK may be on FAQ; inspect event/ledger first. Still no completed-site visual quality claim or protected WordPress write. Prior checkpoint follows.
 
 **Historical: Home81 recovered WITHOUT another generation; five supporting Pages drafting.** Read [exact mismatch, lossless recovery and next action](c0-creation-quality-p0-17.md#exact-action-label-recovery-complete-site-drafting-resumed). Native Action nodes referenced exact Page Actions but omitted redundant labels allowed by wire schema; provider recovery binds only that label, preserving raw response/destinations/guards. Actual Home parses; Linux74tests/TypeScript/lint pass. Private worker835c0be3/proof6a5f1cf8 active; grantf024b799 unchanged. Same6-route blueprint78, report73/Direction76, $13 TOTAL/44gen/89requests/expiry. WORK may be pending; inspect before duplicating. No website quality claim or protected WordPress change. Prior checkpoint follows.
 

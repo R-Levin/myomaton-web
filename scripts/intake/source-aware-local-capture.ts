@@ -15,7 +15,8 @@ async function main(){
  const before=readback();
  const binding:RenderedCandidateBinding={contextDigest:receipt.contextDigest,inputDigest:receipt.inputDigest,representationDigest:fingerprint({packet:packet.digest,brand:render.brandDigest}),
   nativeReadbackDigest:before.digest,variant:name.endsWith("-media.json")?"operator-proposed-preview":"core-candidate",origin:"http://127.0.0.1:4474",pages:Object.entries(render.pages).map(([path,wordpressPageId])=>({path,wordpressPageId:wordpressPageId as number}))};
- const browser=await chromium.launch({executablePath:"C:/Program Files/Google/Chrome/Application/chrome.exe",headless:true,chromiumSandbox:true,
+ const selectedBrowser=process.env.MIOPAGES_CAPTURE_BROWSER??"chrome";assert.ok(["chrome","edge"].includes(selectedBrowser));
+ const browser=await chromium.launch({executablePath:selectedBrowser==="edge"?"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe":"C:/Program Files/Google/Chrome/Application/chrome.exe",headless:true,chromiumSandbox:true,
   args:["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"]});
  let result;
  try{result=await captureRenderedIntent(browser,envelope.intent,async()=>{
