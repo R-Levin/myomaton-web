@@ -742,3 +742,16 @@ business acceptance; do not repeat another broad audit or infer a new coding/run
 grant. [Critical-path assessment](platform-capabilities.md#indispensable-system-capabilities--critical-path-assessment)
 is assessment/sequencing only. Overall growth-service scope, project-wide reuse,
 delivery independence and the separate temporary launch arrangements remain intact.
+
+### November 20 — first connected account-cycle shape agreed
+
+The owner accepted the proposed [six-step account cycle](service-operations-model.md#first-connected-account-cycle--agreed-shape-november-20):
+retained/correctable understanding → Core investigation of a genuine need →
+substantive editable Core/API proposal → shared Customer/Operator review/history
+→ separately authorized actual private WP delivery/reconciliation → actual
+observation and an informed next action. C0 reuses existing knowledge, beginning
+with the known full-growth-service communication problem, not another onboarding
+restart or scripted recommendation. Operators can initiate/refine/judge; Core must
+provide persistent intelligence, coordination and evidence. The site is one output.
+This agrees the direction for implementation scoping; no new coding, model budget,
+protected application, public collection or publication was dispatched by “agreed.”

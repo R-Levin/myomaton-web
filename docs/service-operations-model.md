@@ -57,6 +57,36 @@ observation/learning or consistent governed execution. Manual operation is recor
 honestly and does not prove automation. The [critical-path assessment](platform-capabilities.md#indispensable-system-capabilities--critical-path-assessment)
 uses existing evidence; it does not authorize implementation or a launch.
 
+## First connected account cycle — agreed shape, November 20
+
+The owner agreed this next-cycle definition during the high-level discussion.
+It is a business acceptance direction to scope, not a dispatched implementation,
+provider grant, protected write or public-launch approval.
+
+1. Core presents retained business understanding with sources, uncertainties and
+   confirmation state; meaningful correction is retained without repeating intake.
+2. Core investigates and explains a real service need. For C0, the established
+   starting issue is inadequate communication of the complete growth service;
+   the recommendation must be genuine reasoning rather than a scripted answer.
+3. Core/API AI prepares justified, substantive, editable proposed work, including
+   content, visuals or visitor-journey changes appropriate to that need.
+4. Customer and Operator review the same versioned work, with feedback and
+   revisions in one account history. Review, approval and application are distinct;
+   the founder's sequential perspectives do not bypass actual permissions.
+5. Separately authorized changes reach the actual private WordPress site with
+   reconciled application state and recovery. Supported WP refinements return
+   through governed review; unsupported drift is surfaced, not silently discarded.
+6. Actual observation/coverage informs an explained next action or an honest
+   finding of insufficient evidence. Internal testing is labeled separately from
+   real visitor activity and customer outcomes.
+
+Use existing components and retained C0 knowledge. Operators may initiate steps,
+refine work and provide judgment; Core supplies persistent intelligence,
+coordination and evidence. The separately authorized public-site effort can later
+supply real observations without redefining this development cycle. No fixed Page
+count or whole-site rewrite follows. The deliverable is an operating relationship:
+understanding → purposeful work → reviewed change → observed result → next action.
+
 ## Standard Launch
 
 Most businesses/organizations should fit Standard. Absorb normal customer-to-customer

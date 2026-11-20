@@ -60,6 +60,11 @@ identifies indispensable system contributions and missing connections using the
 completed review. This continuation is assessment/sequencing only, not authority
 to start implementation, a model round, measurement activation or site application.
 
+The [first connected account-cycle shape](service-operations-model.md#first-connected-account-cycle--agreed-shape-november-20)
+is now agreed as the direction for scoping. It is not a new execution/provider or
+protected-write authorization. Prepare the bounded implementation from existing
+components after discussion; do not restart C0 or reduce the goal to a website.
+
 Owner authorized a bounded **local review and correction of active guidance and
 interruption recovery**, including project-wide reuse, delivery independence,
 transitional-launch separation and WordPress gap inventory. The conversation-only
