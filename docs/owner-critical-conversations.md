@@ -805,3 +805,19 @@ is not authority to restart/deploy Core, write hosted SQL, promote C0 knowledge,
 transmit new provider inputs, change credentials/infrastructure, apply WordPress,
 merge or publish. Missing login capability is an implementation/authorization
 fact, not evidence that the owner must retain another temporary credential.
+
+### November 20 — protected account activation approved
+
+The owner replied “Yes” to the exact [consolidated activation scope](account-cycle-hosted-activation.json)
+at fcdf635, SHA256 d0aa1d64b2ca934a115b83448b9d75124966461057220835628fd77a2c852460.
+Authorization is recorded in [Issue12 comment7052496871](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7052496871).
+Restore/update only existing protected Core, install the exact scoped policy and
+three permissions on the same persistent owner identity, then a fresh $3/72-hour
+C0 processing session under the stated limits. A meaningful owner-confirmed
+correction and exact derived egress pins are prerequisites to any model request.
+No new credential/identity, infrastructure, WordPress application, merge or
+publication is authorized. Tested purpose-bound code/config corrections may
+proceed within those bounds; materially changed protected SQL still needs its
+exact checksum authorization. The owner later returned BLOCKED23514 from the
+installer, commitStarted=false. Preserve that failed package and recovery file;
+no automatic retry/reset. The transaction independently read back as rolled back.

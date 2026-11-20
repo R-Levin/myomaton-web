@@ -14,11 +14,12 @@ import { confirmKnowledge,knowledgeTargets } from "../../lib/platform/canonical/
 import { protectedAccountBoundary,protectedAccountFoundation,protectedAccountConfirmation } from "../../lib/platform/intake/protected-account";
 import { protectedOwnerId,protectedOwnerToken,protectedOwnerVerifier } from "../../lib/platform/intake/protected-owner";
 import { ProtectedOperator } from "../../lib/platform/wordpress-delivery/operator";
-import { protectedAccountSql } from "../../scripts/db/protected-account-policy";
+import { protectedAccountSql,protectedAccountCorrectedSql } from "../../scripts/db/protected-account-policy";
 import { InquiryOutcomes } from "../../lib/platform/contact/outcomes";
 import { acceptContactSubmission } from "../../lib/platform/contact/submissions";
 import { protectedInquiry } from "../../lib/platform/contact/protected-inquiry";
 import { protectedDevelopmentDraft } from "../../lib/platform/wordpress-delivery/cycle-measurement";
+import { installAccountPolicy } from "../../scripts/db/protected-account-install";
 
 test("protected inactive C0 account: existing canonical writer, exact grants, no broad table rights, rollback and history",async () => {
  const cluster=await disposableCluster(process.env.PG_BIN_DIR??"C:/Program Files/PostgreSQL/18/bin");
@@ -31,9 +32,12 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
   await migrateWithBootstrapCompatibility(admin);
   await admin.query("CREATE SCHEMA miopages_wp");
   await admin.query(`CREATE ROLE miopages_core_development LOGIN NOINHERIT PASSWORD '${password}'`);
-  await admin.query(`CREATE TABLE miopages_wp.wordpress_operator_credentials(id uuid,token_sha256 text,expires_at timestamptz,revoked_at timestamptz);
-   CREATE TABLE miopages_wp.wordpress_operator_grants(id uuid,operator_id uuid,web_presence_id uuid,managed_site_id uuid,permission text,
-    customer jsonb,revoked_at timestamptz,CONSTRAINT wordpress_operator_grants_permission_check CHECK(permission IN ('inspect-site-proposal','prepare-site-proposal')))`);
+  // Use the ACTUAL adapter DDL, including customer CHECK, FK/unique constraints.
+  // The earlier hand-built fixture omitted the customer CHECK and missed23514.
+  const authority=(await readFile("lib/platform/wordpress-delivery/0017_private_stage_authority.sql","utf8")).split("CREATE TABLE wordpress_proposal_approvals")[0];
+  const native=(await readFile("lib/platform/wordpress-delivery/0018_native_draft_authority.sql","utf8")).split("CREATE TABLE wordpress_native_draft_authorizations")[0];
+  await admin.query("SET search_path TO miopages_wp,public");await admin.query(authority);await admin.query(native);
+  await admin.query("SET search_path TO public");
   await admin.query("INSERT INTO organizations(id,name) VALUES($1,$2)",[owner.organizationId,label]);
   await admin.query("INSERT INTO web_presences(id,organization_id,name) VALUES($1,$2,$3)",[scope.webPresenceId,owner.organizationId,label]);
   await admin.query("INSERT INTO managed_sites(id,web_presence_id,name) VALUES($1,$2,$3)",[scope.managedSiteId,scope.webPresenceId,label]);
@@ -62,11 +66,38 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
   const payload={entries:[{key:"purpose",kind:"goal",value:"Fixture original business purpose",evidence:{sourceKind:"customer",sourceReference:label,confirmation:"confirmed",visibility:"public",confirmedBy:protectedOwnerId,confirmedAt:at}}],identityEvidence:[],approval:{by:protectedOwnerId,at,scope:"public"}};
   await writeApprovedInactiveKnowledge(admin,{domain:"knowledge",id:recordId,webPresenceId:scope.webPresenceId,expectedVersion:null,expectedFingerprint:null,payload,responsibleIdentity:protectedOwnerId,changeReason:label},owner);
   await admin.query(await readFile("lib/platform/intake/protected-core-policy.sql","utf8"));
+  const verifier=protectedOwnerVerifier(await protectedOwnerToken("Synthetic only password for policy test"));
+  await admin.query("INSERT INTO miopages_wp.wordpress_operator_credentials VALUES($1,$2,'infinity',NULL)",[protectedOwnerId,verifier]);
+  for(const permission of ["inspect-site-proposal","prepare-site-proposal"]){await admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,$5,NULL,NULL)",[randomUUID(),protectedOwnerId,scope.webPresenceId,scope.managedSiteId,permission]);}
   // Only the fixture case UUID differs; actual migration/activation guards,
   // exact C0 scope, record restriction and policy statements are unchanged.
-  const sql=await protectedAccountSql();
+  const originalSql=await protectedAccountSql(),sql=await protectedAccountCorrectedSql();
   const installer=await admin.connect();
-  try { await installer.query("BEGIN");await installer.query(sql.forward.replaceAll(protectedAccountFoundation.caseId,owner.caseId));await installer.query("COMMIT"); }
+  try {
+   const initial=(await installer.query("SELECT * FROM public.business_knowledge WHERE id=$1",[recordId])).rows[0];
+   const constraint=(await installer.query("SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='miopages_wp.wordpress_operator_grants'::regclass AND conname='wordpress_operator_grants_permission_check'")).rows[0];
+   const expected={
+    ownerId:protectedOwnerId,scope:{...scope,organizationId:owner.organizationId,activationCaseId:owner.caseId,knowledgeId:recordId,
+     knowledgeVersionBeforeActivation:1,knowledgeFingerprintBeforeActivation:fingerprint(initial)},constraintFingerprint:fingerprint(constraint.definition),
+    customer:{kind:'business-representative',subjectId:protectedOwnerId,authorityReference:label}};
+   await installer.query("BEGIN");
+   await installer.query(originalSql.forward.replaceAll(protectedAccountFoundation.caseId,owner.caseId));
+   await assert.rejects(installer.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,'confirm-business-information',$5,NULL)",
+    [randomUUID(),protectedOwnerId,scope.webPresenceId,scope.managedSiteId,expected.customer]),
+    (error:unknown)=>Boolean(error&&typeof error==='object'&&'code' in error&&error.code==='23514'));
+   await installer.query("ROLLBACK");
+   assert.equal((await installer.query("SELECT to_regnamespace('miopages_core_account') AS existing")).rows[0].existing,null);
+   assert.equal((await installer.query("SELECT count(*)::int n FROM miopages_wp.wordpress_operator_grants")).rows[0].n,2);
+   await installer.query("BEGIN");
+   await assert.rejects(installAccountPolicy(installer,originalSql.forward.replaceAll(protectedAccountFoundation.caseId,owner.caseId),expected),
+    (error:unknown)=>Boolean(error&&typeof error==='object'&&'code' in error&&error.code==='CUSTOMER_MANDATE_COMPATIBILITY_REQUIRED'));
+   await installer.query("ROLLBACK");await installer.query("BEGIN");
+   const trial=await installAccountPolicy(installer,sql.forward.replaceAll(protectedAccountFoundation.caseId,owner.caseId),expected);
+   assert.equal(trial.grantIds.length,3);await installer.query("ROLLBACK");
+   assert.equal((await installer.query("SELECT to_regnamespace('miopages_core_account') AS existing")).rows[0].existing,null);
+   assert.equal((await installer.query("SELECT count(*)::int n FROM miopages_wp.wordpress_operator_grants")).rows[0].n,2);
+   await installer.query("BEGIN");await installer.query(sql.forward.replaceAll(protectedAccountFoundation.caseId,owner.caseId));await installer.query("COMMIT");
+  }
   catch(e){await installer.query("ROLLBACK");throw e;}finally{installer.release();}
   const first=await inspectCanonical(admin,"knowledge",scope.webPresenceId,recordId);assert.ok(first);
   const mandate={kind:"business-representative" as const,subjectId:protectedOwnerId,authorityReference:label};
@@ -94,14 +125,17 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
    assert.equal((await admin.query("SELECT count(*)::int n FROM business_knowledge_revisions WHERE knowledge_id=$1",[recordId])).rows[0].n,2);
    await assert.rejects(confirmKnowledge(c,scope,request,proof,{},new Date().toISOString(),owner),/stale/);
   }finally{c.release();}
-  const verifier=protectedOwnerVerifier(await protectedOwnerToken("Synthetic only password for policy test"));
-  await admin.query("INSERT INTO miopages_wp.wordpress_operator_credentials VALUES($1,$2,'infinity',NULL)",[protectedOwnerId,verifier]);
-  for(const permission of ["inspect-site-proposal","prepare-site-proposal"]){await admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,$5,NULL,NULL)",[randomUUID(),protectedOwnerId,scope.webPresenceId,scope.managedSiteId,permission]);}
   const operators=new ProtectedOperator(role,async c=>{await protectedAccountBoundary(c,owner);},true),session=await operators.authenticateDevelopmentOwner(verifier,protectedOwnerId);
   const capability=protectedAccountConfirmation(role,operators,session,owner);
   const context={scope} as Parameters<typeof capability.authorize>[1],workflowActor={id:protectedOwnerId,role:"operator" as const,simulated:false};
   await assert.rejects(capability.authorize(workflowActor,context));
   const grant=randomUUID();await admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,'confirm-business-information',$5,NULL)",[grant,protectedOwnerId,scope.webPresenceId,scope.managedSiteId,mandate]);
+  for(const permission of ['approve-site-proposal','confirm-business-information','record-inquiry-outcome']){
+   await assert.rejects(admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,$5,NULL,NULL)",[randomUUID(),protectedOwnerId,scope.webPresenceId,scope.managedSiteId,permission]),/wordpress_operator_grants_check/);
+  }
+  for(const permission of ['prepare-site-proposal','inspect-site-proposal','inspect-inquiry-outcomes']){
+   await assert.rejects(admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,$5,$6,NULL)",[randomUUID(),protectedOwnerId,scope.webPresenceId,scope.managedSiteId,permission,mandate]),/wordpress_operator_grants_check/);
+  }
   assert.deepEqual((await capability.authorize(workflowActor,context)).foundation,owner);
   await assert.rejects(protectedAccountConfirmation(role,operators,{}).authorize(workflowActor,context));
   await assert.rejects(capability.authorize({...workflowActor,simulated:true},context));

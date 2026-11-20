@@ -218,6 +218,52 @@ Do not generate another whole C0 website merely to test storage or login. A live
 reassessment needs a meaningful reviewed business correction and fresh exact
 egress pins; do not reuse an old grant or silently restrict available knowledge.
 
+### Protected activation — refused enrollment and runtime correction
+
+**November20,2026; actual hosted evidence, incomplete activation.** The owner
+approved the preceding exact scope. The privileged installer refused23514 at
+`install-and-enroll`, before commit. Independent readback confirms no new
+`miopages_core_account` schema and only the two original owner grants. The actual
+adapter CHECK says customer data is non-null **only** for Page approval, while
+the approved new confirmation/outcome permissions need customer mandates. The
+manual local grant-table fixture omitted this CHECK; passing tests therefore
+missed a real integration requirement. This was a test/preflight coverage failure,
+not wrong owner credentials or a reason to broaden ordinary proposal authority.
+
+Tests now use the original0017/0018 authority DDL, including CHECK, FK/unique and
+credential requirements. They reproduce the hosted refusal with the original SQL,
+prove complete rollback, and exercise the proposed amendment's required/forbidden
+mandate matrix. The [separate compatibility proposal](account-cycle-mandate-amendment.json)
+preserves original semantics and the same three scoped permissions. Original
+forward SQL/manifest bytes remain unchanged; the amended SQL is not applied.
+Rollback withdraws new access and revokes only receipt-bound grants, retaining
+additive constraint/vocabulary and audit rows rather than stripping their mandates.
+
+The rollback archive verifies all21498 regular application/dependency/config
+files. Old off-webroot secrets remain in place with matching hashes, not copied to
+new credential locations. The approved6a728ea artifact also needed its newly
+introduced, pure-JavaScript `playwright-core@1.63.0`: a full lockfile comparison
+showed **only** that addition/root metadata change. Its npm archive matched the
+exact approved SHA512 integrity, with no postinstall/transitive dependencies,
+and Linux import passed. No npm/build operation ran on the hosted server.
+
+Two rollout problems were preserved and diagnosed. A check incorrectly required
+client-rendered sign-in text in initial HTML, triggering an unnecessary rollback;
+real Edge1440/390 now verifies the sign-in screen/assets instead. A subsequent
+attempt actually crossed the512MiB global reserve while its own RSS stayed below
+384MiB. The previous build was restored; neither safeguard was relaxed. Research
+browser code was unnecessarily initialized during ordinary Core review. Lazy
+loading preserves actual research capability while the local import comparison
+falls from215.5MB to171.9MB RSS (not a hosted measurement or performance promise).
+A fresh Linux build and hosted stability check are required for that correction.
+
+Previous Core4df15c1 currently serves200; owner-password verification is not
+claimed by the anonymous browser check. C0 intake28/workflow41/Knowledgev1,
+credentials, old grant/usage hashes and public HTTPS digests remain unchanged.
+No provider spending/dispatch, confirmation, WordPress/publication/infra change
+or merge. New grants and the processing window remain inactive. Do not equate a
+login screen, technical tests or fixture outcomes with completed service acceptance.
+
 ### Connected account cycle — confirmed understanding and outcomes
 
 **November 20, 2026; local implementation after the owner's explicit go-ahead.**

@@ -16,3 +16,13 @@ export async function protectedAccountSql() {
   return {forward,rollback,forwardSha256:hash(forward),rollbackSha256:hash(rollback),
     sources:files.map(file=>({path:file.path,sha256:hash(file.bytes)}))};
 }
+
+/** Separate proposed SQL identity. Never silently replace the approved bytes. */
+export async function protectedAccountCorrectedSql() {
+  const original=await protectedAccountSql(),path="lib/platform/intake/protected-account-customer-mandate.sql";
+  const amendment=await readFile(path),forward=original.forward+"\n"+amendment.toString("utf8");
+  return {...original,forward,originalForwardSha256:original.forwardSha256,
+    forwardSha256:createHash("sha256").update(forward).digest("hex"),
+    amendmentSha256:createHash("sha256").update(amendment).digest("hex"),
+    sources:[...original.sources,{path,sha256:createHash("sha256").update(amendment).digest("hex")}]};
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "miopages-account-mandate-amendment/1",
+  "status": "PROPOSED_NOT_AUTHORIZED",
+  "baseApprovedManifestSha256": "d0aa1d64b2ca934a115b83448b9d75124966461057220835628fd77a2c852460",
+  "reason": "The actual adapter CHECK permits a customer mandate only for approve-site-proposal; enrollment of the already approved confirm-business-information/record-inquiry-outcome permissions therefore failed23514. The entire hosted transaction rolled back. The initial local hand-built fixture had omitted this CHECK.",
+  "exactChange": "Preserve the original customer requirement for every existing permission. Require a non-null customer mandate for approve-site-proposal, confirm-business-information and record-inquiry-outcome; forbid one for all other permissions. No new permission, principal or authority beyond the base approved three grants.",
+  "originalForwardSha256": "83373a2a46674fdf0fc24cd5525d549de899a257cb55a3da5424412f0944e162",
+  "amendmentFile": "lib/platform/intake/protected-account-customer-mandate.sql",
+  "amendmentSha256": "6478233f2cbb58e20b469f5ad7e289feb5e1e9eb48c1495ec5743ba84e7f0f56",
+  "combinedForwardSha256": "a126f6851329fb3889d2746a080ccebea68465f7fabf39985d8401b4ef0e7799",
+  "rollbackSha256": "e5156d589ae1802c6884b014a2871ec140734fa4716e7a87e1c371bb841eaf9b",
+  "composition": "scripts/db/protected-account-policy.ts:protectedAccountCorrectedSql",
+  "rollback": "Withdraw schema access and restore the prior grant view; revoke only newly enrolled IDs using the receipt. Retain canonical history, outcomes and revoked grant/customer audit rows. The additive permission vocabulary AND mandate compatibility CHECK stay so preserved audit rows remain valid; neither grants authority by itself.",
+  "verification": "Use actual0017/0018 adapter authority DDL with its customer CHECK, FK, uniqueness and credential constraints. Reproduce23514 with original forward SQL and verify rollback/no schema/two baseline grants; verify corrected enrollment, missing/forbidden mandate matrix, opaque sessions, revocation, canonical rollback/stale/foreign safeguards and data-preserving access withdrawal.",
+  "execution": "New checksummed protected launcher and fresh recovery receipt; never rerun/reset the failed package or overwrite before-install.json. Existing migration password only at hidden prompt; discarded after command. Verify actual database, both CHECK definitions, exact original binding/intake28/workflow41/Knowledgev1, credential fingerprint and complete recovery before one guarded transaction.",
+  "unchanged": {
+    "ownerId": "f2cd3fe8-58b3-4dfa-9125-fd8f1bd35f8e",
+    "webPresenceId": "819d007a-595d-4374-a2f0-96b900d46559",
+    "managedSiteId": "1d92a248-416f-4e22-baaf-d2f1fca70352",
+    "permissions": [
+      "confirm-business-information",
+      "inspect-inquiry-outcomes",
+      "record-inquiry-outcome"
+    ],
+    "status": "inactive",
+    "additionalAiCapUsd": 3,
+    "aiDurationHoursFromVerifiedActivation": 72,
+    "aiDispatchRequiresMeaningfulConfirmedCorrection": true,
+    "newCredential": false,
+    "wordpressChange": false,
+    "publication": false,
+    "infrastructureChange": false,
+    "merge": false
+  }
+}

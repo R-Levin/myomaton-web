@@ -54,18 +54,29 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
-**Current task: protected account-cycle preparation (not execution).**
-The owner asked to start this preparation. [Actual hosted findings and prepared
-connection](platform-capabilities.md#connected-account-cycle--protected-preparation-and-actual-host-findings)
-record inactive C0, unchanged28/41, missing confirmation mandate and the stopped
-Core process/502. Code/policies and the exact Linux
-artifact are verified at `6a728ea`; [activation proposal](account-cycle-hosted-activation.json)
-is awaiting owner approval. It requests restoring only existing protected Core,
-scoped owner confirmation/outcomes, and a fresh $3/72-hour real reassessment after
-a meaningful correction is explicitly confirmed. No hosted action/provider use
-is authorized by the preparation go-ahead. No infrastructure change is needed.
-The current502 is explained by the existing stopped listener; the reason it was
-stopped remains unknown. Intake28/workflow41/Knowledgev1 were verified read-only.
+**Current task: approved protected account-cycle activation; SQL compatibility correction.**
+Owner approved the [original exact scope](account-cycle-hosted-activation.json)
+with “Yes”; [authorization record](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7052496871).
+Original manifest bytes remain immutable. Code/SQL packages were staged, with a
+complete21498-file rollback archive verified. The hosted SQL attempt refused23514
+before commit and independently rolled back: no new schema/grants, original
+intake28/workflow41/Knowledgev1 and credential unchanged. The actual adapter's
+customer CHECK was missing from the hand-built test fixture. A
+[separate exact SQL amendment](account-cycle-mandate-amendment.json) is proposed,
+not applied/authorized. It preserves existing approval requirements and permits
+only the already approved confirmation/outcome mandate-bearing grants.
+
+Core restoration is ongoing: the previous4df15c1 build is restored and serves200.
+A new-build attempt hit the unchanged512MiB reserve guard (own RSS below384MiB);
+no memory safeguard was relaxed. A prior false SSR sign-in-text assertion also
+caused an unnecessary rollback; actual browser sign-in-screen checks replace it.
+The tested local correction defers research-browser initialization during ordinary
+review, saving about44MB in a local import comparison. Verify its Linux artifact
+and hosted stability before calling the new rollout complete. Preserve both
+failed candidates, diagnostics, rollback and original Core41/WordPress6/local97/
+isolated106. No model call/spending, knowledge confirmation, WordPress change,
+new credential/infrastructure or publication occurred. The $3/72h grant has not
+been activated; no meaningful correction has been invented or sent.
 
 **Previous completed task: confirmed understanding, reassessment and inquiry outcomes.**
 Following the scope/next-step discussion, the owner asked Codex to act next; local
@@ -80,9 +91,9 @@ decisions. Ordinary Contact acceptance and reported outcomes also connect locall
 Reasoning tests use controlled responses; they are not new genuine AI-quality
 evidence or a hosted rollout. No owner fixture testing is needed.
 
-That preparation is now complete as linked above. Next is owner review of the
-single exact activation scope, then verified targeted restoration/deployment and
-restricted policy/enrollment using the existing protected procedure. A live
+The original activation scope is now approved as linked above. Complete the
+verified targeted Core correction and the exact SQL amendment review; do not
+rerun the failed installer or substitute unapproved SQL. A live
 reassessment requires a meaningful correction and exact derived egress binding,
 not another fabricated fixture answer or automatic whole-site rewrite. Proposal
 permission alone cannot confirm business facts; old model grants cannot transmit

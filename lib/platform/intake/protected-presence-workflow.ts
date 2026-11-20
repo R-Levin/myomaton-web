@@ -25,7 +25,6 @@ import type { OriginalMaterial } from "./presence-source-material";
 import { readRenderedCandidateCustody } from "./presence-original-custody";
 import { researchMaterialCustody } from "./presence-research-material";
 import { capturePublicPeer } from "./presence-peer-browser";
-import { chromium } from "playwright-core";
 import type {PublicPeerCapture} from "./presence-public-capture-bridge";
 import {retainedResearchFetch} from "./presence-research-cache";
 import {approvedSuppliedEvidence,type SuppliedPlacement,type SuppliedLineage} from "../acquisition/supplied-evidence";
@@ -187,6 +186,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
       const renderPeer = delegatedCapture ? delegatedCapture.capture : originals?.publicResearch?.screenshots && (capability.kind === "worker" || capability.kind === "research-replay")
         ? async (source: { id: string; url: string; label: string }, html: Buffer) => {
           if (!process.env.MIOPAGES_RESEARCH_CHROMIUM) throw Error("Configured Core research browser is unavailable");
+          const { chromium } = await import("playwright-core");
           const browser = await chromium.launch({ executablePath: process.env.MIOPAGES_RESEARCH_CHROMIUM, headless: true,
             chromiumSandbox: process.platform === "linux", args: ["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"] });
           try {
@@ -205,6 +205,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
           if (delegatedCapture) return delegatedCapture.verify();
           if (capability.kind !== "worker" || !process.env.MIOPAGES_RESEARCH_CHROMIUM) throw new WorkflowBlocked("Configured research browser required");
           await access(process.env.MIOPAGES_RESEARCH_CHROMIUM);
+          const { chromium } = await import("playwright-core");
           const browser = await chromium.launch({ executablePath: process.env.MIOPAGES_RESEARCH_CHROMIUM, headless: true,
             chromiumSandbox: process.platform === "linux", args: ["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"] });
           await browser.close();
