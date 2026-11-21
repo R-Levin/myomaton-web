@@ -115,16 +115,24 @@ Current run estimate$11.201192/conservative debit$11.561364 against13; remaining
 $1.438636,3generations/8requests, same November22 15:58:31UTC expiry. Grant unchanged.
 Do not dispatch again blindly; preserve the earlier125 attempts and this126th record.
 
-**Precise remaining blocker:** automatic approval review refused returning the new
-private editorial text to this Codex session, despite existing delegated review
-scope; no such text was disclosed. It accepted metadata/counters and the existing
-manifest-authorized local visitor-packet/capture transfer after scope evidence.
-Do not bypass the text refusal through screenshots, another path or derived export.
-Ask once for explicit private Codex inspection of the new critique/current proposal
-for the same correction task; no new source-answer export, spending, publication,
-credential change or WordPress application is implied. After that, inspect meaning
-before queuing a bounded meaningful revision; do not blindly apply five findings or
-present annotation/access work as a commercially improved website.
+**Private inspection approved, November21:** owner explicitly authorized reading
+review108 and the related proposal, including subsequent revisions within this same
+correction scope, privately in Codex. No credentials/raw interview records or private
+review text may be exposed in Git/public logs. This resolves the earlier automatic
+text-inspection refusal; do not request it again or treat it as new spend/publication
+permission.
+
+The five findings were inspected. Two are selected for this bounded correction:
+Service value articulation and Direct Start's own conversion Action. Three remaining
+commercial/visual concerns are explicitly deferred, with original108 preserved. The
+model's comparative praise is opinion, not owner acceptance. The temporary engineering
+annotation is intentional and must not be removed merely because the model notices it.
+The existing declared worker is running one two-Page editorial revision under unchanged
+limits; it has not yet been claimed successful. Do not dispatch a duplicate after an
+interruption: inspect private `review-guides-1202d63/queue-two-page-correction-process.json`
+and `core-two-page-correction-process.json`, current case and ledger. Core is deliberately
+paused during the bounded worker, with same-app restoration in the controller's finally.
+
 
 
 **November 21 owner clarification:** Codex is development tooling only and must not
