@@ -252,20 +252,34 @@ export function exposesInternalCopy(output: unknown, evidence: readonly Presence
 
 // These are deterministic refusals for an unpriced development offer. Claims
 // still need source review, including wording this check cannot recognize.
-function anyVisitorCopy(output: unknown, check: (copy: string) => boolean) {
+function anyVisitorCopy(output: unknown, check: (copy: string, excludedList:boolean) => boolean) {
   const fields = new Set(["heading", "title", "body", "searchTitle", "searchDescription", "label", "items"]);
-  function walk(value: unknown, field = ""): boolean {
-    if (typeof value === "string") return fields.has(field) && check(value);
+  function walk(value: unknown, field = "", excludedList=false): boolean {
+    if (typeof value === "string") return fields.has(field) && check(value,field==="items"&&excludedList);
     if (!value || typeof value !== "object") return false;
-    if (Array.isArray(value)) return value.some(item => walk(item, field));
-    return Object.entries(value).some(([key, child]) => walk(child, key));
+    if (Array.isArray(value)) return value.some(item => walk(item, field,excludedList));
+    const node=value as {kind?:unknown;children?:{kind?:unknown;text?:unknown}[]};
+    // A noun phrase under an explicit exclusion heading is not a sales promise.
+    // Keep scope inside that immediate native group; other groups reset it.
+    if(node.kind==="group"&&Array.isArray(node.children)){
+      let localScope=false;
+      if(Object.entries(value).some(([key,child])=>key!=="children"&&walk(child,key,false)))return true;
+      return node.children.some(child=>{
+        if(child&&typeof child==="object"&&child.kind==="heading")localScope=typeof child.text==="string"&&
+          /^(?:not\s+(?:promised|included|offered|provided|covered|guaranteed)|no\s+(?:promises|guarantees))\b|^what\b[^.!?]*\b(?:is|are)\s+not\b/iu.test(child.text.trim());
+        return walk(child,"",localScope);
+      });
+    }
+    return Object.entries(value).some(([key, child]) => walk(child, key,excludedList));
   }
   return walk(output);
 }
 
 export function unsupportedCommercialCopy(output: unknown) {
-  const explicitClaim = /(?:[$€£]\s*\d|\b\d[\d,.]*\s*(?:USD|dollars)\b|\b(?:guaranteed|guarantee)\b[^.!?]{0,30}\b(?:rankings|sales|profits|revenue|leads|traffic|results)\b|\b\d(?:\.\d+)?\s*(?:\/\s*5|stars)\b|\b(?:customers?|clients?)\s+(?:say|said|reported)\b)/iu;
-  return anyVisitorCopy(output, copy => explicitClaim.test(copy));
+  const explicitClaim = /(?:[$€£]\s*\d|\b\d[\d,.]*\s*(?:USD|dollars)\b|\b\d(?:\.\d+)?\s*(?:\/\s*5|stars)\b|\b(?:customers?|clients?)\s+(?:say|said|reported)\b)/iu;
+  const guaranteedOutcome=/\b(?:guaranteed|guarantee)\b[^.!?]{0,30}\b(?:rankings|sales|profits|revenue|leads|traffic|results)\b/iu;
+  return anyVisitorCopy(output, (copy,excludedList) => explicitClaim.test(copy)||guaranteedOutcome.test(copy)&&
+    !(excludedList&&/^guaranteed\b/iu.test(copy.trim())&&!/\b(?:but|yet|however|we|you|our)\b/iu.test(copy)));
 }
 
 export function repeatsPeerObservation(output: unknown, peers: readonly PresenceEvidence[]) {

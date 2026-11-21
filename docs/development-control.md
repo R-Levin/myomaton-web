@@ -56,6 +56,22 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ### Active owner-approved whole-site correction round — November21
 
+**Actual generation progress / retained recovery:** critique115 completed, six
+justified Pages queued116. Home/Service/process revisions saved; FAQ provider
+response completed but was refused at124. Ledger133, all current calls completed;
+new-round estimate$1.849804. No repeat generation. Integrity-checked diagnosis
+proved valid Page structure/citations and a commercial-policy false positive:
+a guaranteed-outcome noun phrase under an explicit exclusion heading was treated
+as a promise. The correction confines that negative scope to the immediate native
+group and resets it at the next heading/group; affirmative promises, mixed clauses,
+prices and customer proof still refuse. Actual Linux22tests passed, including
+exclusion/non-exclusion boundaries and existing source/resume/metering safeguards.
+Retained FAQ passes corrected policy without rewriting its bytes. Continue via
+existing deterministic recovery, then remaining Review/DirectStart generations;
+do not regenerate the completed FAQ. Core/public state restored and original
+protected Core41/WordPress6 unchanged. Native visitor-text diagnostics stay private;
+only structural/policy booleans were exported. Commercial judgment remains required.
+
 **LATEST AUTHORITY / ACTIVE RUN:** owner approved installingdf5 AND subsequent
 tested, purpose-bound private-worker corrections needed to finish this same round.
 Do not ask for consent per rebuilt artifact. Record each checksum/test result,
