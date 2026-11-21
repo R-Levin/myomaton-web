@@ -19,10 +19,13 @@ async function main() {
   try {
     await assert.rejects(reader.read("different-owner"));
     const review = await reader.read(retainedCoreAssociation.ownerId);
-    assert.equal(review.revision, 106); assert.equal(review.baselineRevision, 97);
+    assert.equal(review.revision, 113); assert.equal(review.baselineRevision, 97);
     assert.equal(review.needsUnderstandingRefresh, false);
     assert.ok(review.report && review.direction && review.pages.length > 0);
-    assert.deepEqual(review.changes.map(page => page.path).sort(), ["/", "/how-it-works", "/service"]);
+    assert.deepEqual(review.changes.map(page => page.path).sort(), ["/", "/direct-start", "/how-it-works", "/service"]);
+    assert.equal(review.lastCritique?.version, 108);
+    assert.equal(review.lastCritique?.editorial.concerns.length, 5);
+    assert.deepEqual(review.lastCritique?.changedPaths.sort(), ["/direct-start", "/service"]);
     assert.ok(review.wordpress && review.wordpress.revision === 6 && review.wordpress.pages.length === 13);
     const rendered = [];
     for (const page of review.pages) {

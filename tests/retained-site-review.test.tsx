@@ -56,6 +56,17 @@ test("foreign context, swapped authority and a same-version comparison are refus
   assert.throws(() => projectRetainedSite(context, current, previous, { ...authority, contextDigest: "other-context" }, history));
   assert.throws(() => projectRetainedSite(context, current, { ...previous, version: 106 }, authority, history));
 });
+test("revising a Page retains the earlier critique without silently resolving it", () => {
+  const editorial = { summary: "Controlled earlier critique", concerns: [{ path: "/", concern: "Controlled concern still needs recheck" }] };
+  const critique = { version: 97, contextDigest: fingerprint(context), editorial, pages: previous.pages };
+  const review = projectRetainedSite(context, current, previous, authority, history, critique);
+  assert.deepEqual(review.lastCritique?.editorial, editorial);
+  assert.deepEqual(review.lastCritique?.changedPaths, ["/"]);
+  assert.equal(review.lastCritique?.version, 97);
+  assert.equal(review.editorial, null);
+  assert.throws(() => projectRetainedSite(context, current, previous, authority, history, { ...critique, contextDigest: "foreign" }));
+  assert.throws(() => projectRetainedSite(context, current, previous, authority, history, { ...critique, version: 107 }));
+});
 test("current review is a readable business/site journey without fake generation or approval controls", async () => {
   const result = await build({ entryPoints: ["scripts/intake/current-site-review-panel.tsx"], bundle: true, write: false,
     platform: "node", format: "cjs", jsx: "automatic", packages: "external", loader: { ".module.css": "empty" } });

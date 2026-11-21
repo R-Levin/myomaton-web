@@ -4,6 +4,7 @@ import type { WorkflowContext, PresenceWorkflowView } from "./presence-workflow"
 import type { WordPressReviewObservation } from "./wordpress-review-observation";
 
 export type ArtifactHistoryRow = { version: number; context: string; report: string | null; direction: string | null; blueprint: string | null };
+export type RetainedCritique = { version: number; contextDigest: string; editorial: NonNullable<PresenceWorkflowView["editorial"]>; pages: PresenceWorkflowView["pages"] };
 
 /** Derive freshness from saved events, rather than treating an updated global
  * context hash as proof that all earlier intellectual work was regenerated. */
@@ -21,11 +22,16 @@ export function artifactLineage(history: readonly ArtifactHistoryRow[]) {
 }
 
 export function projectRetainedSite(context: WorkflowContext, current: PresenceWorkflowView, previous: PresenceWorkflowView,
-  authority: MarketingAuthority, history: readonly ArtifactHistoryRow[]) {
+  authority: MarketingAuthority, history: readonly ArtifactHistoryRow[], critique?: RetainedCritique) {
   if (current.contextDigest !== fingerprint(context) || authority.contextDigest !== current.contextDigest ||
       previous.contextDigest !== current.contextDigest || current.version <= previous.version) throw Error("Retained site comparison binding refused");
   const sources = marketingSources(authority, context.evidence);
   const lineage = artifactLineage(history);
+  if (critique && (critique.contextDigest !== current.contextDigest || !Number.isSafeInteger(critique.version) ||
+      critique.version < 1 || critique.version > current.version)) throw Error("Retained critique binding refused");
+  const lastCritique = critique ? { version: critique.version, editorial: critique.editorial,
+    changedPaths: critique.pages.filter(page => fingerprint(page) !== fingerprint(current.pages.find(item => item.path === page.path) ?? null)).map(page => page.path) }
+    : current.editorial ? { version: current.version, editorial: current.editorial, changedPaths: [] as string[] } : null;
   const changes = current.pages.flatMap(page => {
     const before = previous.pages.find(item => item.path === page.path);
     if (before && fingerprint(before) === fingerprint(page)) return [];
@@ -43,6 +49,7 @@ export function projectRetainedSite(context: WorkflowContext, current: PresenceW
     references: sources.map(({ source, use }) => ({ ...source, use })),
     report: current.report, direction: current.direction, blueprint: current.blueprint, pages: current.pages,
     editorial: current.editorial, editorialFindings: current.editorialFindings ?? [],
+    lastCritique,
     previousPages: previous.pages, changes,
     needsUnderstandingRefresh: lineage.report.predatesEvidence || lineage.direction.predatesEvidence,
     unresolved: current.pages.flatMap(page => [

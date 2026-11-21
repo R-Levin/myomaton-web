@@ -74,12 +74,19 @@ export async function protectedRetainedSiteReader() {
         // historical number beside different content. No mutation API is exposed.
         const latest = { version: history.at(-1)?.version ?? 0 };
         assert.ok(latest.version >= 106);
+        const critiqueRow = (await db.query(`SELECT version,payload,digest FROM public.presence_workflow_events
+          WHERE intake_id=$1 AND version<=$2 AND payload->>'contextDigest'=$3 AND jsonb_typeof(payload->'editorial')='object'
+          ORDER BY version DESC LIMIT 1`, [caseId, latest.version, grant.contextDigest])).rows[0];
+        if (critiqueRow) assert.equal(fingerprint(critiqueRow.payload), critiqueRow.digest);
         db.release(); released = true;
         const workflow = new PresenceWorkflow(pool, operations, grant.previewActionDestinations, Date.now, "disposable");
         const current = await workflow.review(context); assert.ok(current); assert.equal(current.version, latest.version);
         const previous = { ...current, ...rows[0].payload, version: 97 };
         last = { context, current, previous };
-        const review = projectRetainedSite(context, current, previous, grant.marketingAuthority, history);
+        const review = projectRetainedSite(context, current, previous, grant.marketingAuthority, history, critiqueRow && {
+          version: critiqueRow.version, contextDigest: critiqueRow.payload.contextDigest,
+          editorial: critiqueRow.payload.editorial, pages: critiqueRow.payload.pages,
+        });
         review.referenceImages = (grant.originalMaterials?.records ?? []).filter(source => source.mime === "image/png" && source.purpose === "editorial-reference")
           .map(source => ({ id: source.id, label: ["home", "service", "experience", "review"].find(label => source.id.includes(label)) ?? "Earlier website reference" }));
         try {

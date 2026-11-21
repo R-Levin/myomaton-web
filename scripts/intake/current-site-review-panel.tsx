@@ -144,7 +144,17 @@ export function CurrentSiteReviewPanel({ review, preview, reference }: { review:
       </aside>
       {review.needsUnderstandingRefresh && <article className={styles.knowledgeCard}><h3>Revisit the understanding before further copy changes</h3>
         <p>The report or Presence Direction predates newly connected business material. Rewriting individual pages from that earlier strategy is not enough to resolve the gap.</p></article>}
-      {review.editorial && <><p>{review.editorial.summary}</p><ul>{review.editorial.concerns.map((item, i) => <li key={i}>{item.concern}</li>)}</ul></>}
+      {review.lastCritique && <section aria-label="Retained Core critique">
+        <h3>{review.lastCritique.changedPaths.length ? "Earlier Core critique · revised pages await recheck" : "Latest saved Core critique"}</h3>
+        <p className={styles.hint}>Recorded at version {review.lastCritique.version}. A revised page does not automatically resolve a finding.</p>
+        <p>{review.lastCritique.editorial.summary}</p>
+        {review.lastCritique.editorial.concerns.map((item, i) => <article className={styles.knowledgeCard} key={i}>
+          <h4>{review.blueprint?.pages.find(page => page.path === item.path)?.label ?? item.path}</h4>
+          <p>{item.concern}</p>
+          <p className={styles.hint}>{review.lastCritique!.changedPaths.includes(item.path) ? "Page revised since this critique; finding awaits recheck." : "Page unchanged since this critique; concern remains open."}</p>
+          <button type="button" onClick={() => navigate(item.path)}>Inspect this page</button>
+        </article>)}
+      </section>}
       {review.editorialFindings.map(item => <p key={item.id}>{item.concern}</p>)}
       {review.unresolved.length > 0 && <details><summary>Unverified visitor destinations</summary><ul>{review.unresolved.map((item, i) => <li key={i}>{item.label} — {item.reason}</li>)}</ul></details>}
       <aside className={styles.reviewNotice}><h3>Connection to the ongoing service</h3>

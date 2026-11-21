@@ -24,7 +24,10 @@ const review = { kind: "retained-site-review/1", scope: { webPresenceId: "fixtur
   direction: null, blueprint: { navigation: ["/", "/service"], pages: pages.map(page => ({ path: page.path, label: page.heading, purpose: "Controlled navigation test" })), articles: [] },
   pages, previousPages: pages, changes: pages.map(page => ({ path: page.path, label: page.heading,
     before: { ...page, sections: [{ ...page.sections[0], body: "Earlier controlled wording" }] }, after: page })),
-  needsUnderstandingRefresh: false, editorial: { summary: "Controlled test concerns", concerns: [] }, editorialFindings: [], unresolved: [] };
+  needsUnderstandingRefresh: false, editorial: null,
+  lastCritique: { version: 1, changedPaths: ["/service"], editorial: { summary: "Controlled earlier critique, not genuine AI evidence", concerns: [
+    { path: "/", concern: "Controlled unchanged Page concern" }, { path: "/service", concern: "Controlled revised Page concern" }] } },
+  editorialFindings: [], unresolved: [] };
 const view = { prepared: { scenario: "c0", sources: [] }, state: "draft", version: 28, answers: {},
   portal: { role: "operator", identity: "Fixture Operator", account: "Controlled fixture", site: "Controlled fixture", environment: "local-rehearsal" }, currentSiteReview: review };
 let refusePreview = false, expire = false, reads = 0;
@@ -70,6 +73,13 @@ try {
   await page.getByRole("button", { name: "Open original account records", exact: true }).click();
   await page.getByRole("button", { name: "Return to the current website work", exact: true }).click();
   await page.getByRole("heading", { name: "Your business and website work" }).waitFor();
+  await page.getByRole("button", { name: "Changes and open decisions", exact: true }).click();
+  const critique = page.getByRole("region", { name: "Retained Core critique" });
+  assert.match(await critique.innerText(), /Page revised since this critique; finding awaits recheck/);
+  assert.match(await critique.innerText(), /Page unchanged since this critique; concern remains open/);
+  await critique.getByRole("button", { name: "Inspect this page", exact: true }).last().click();
+  await page.frameLocator("iframe").getByRole("heading", { name: "Proposed Service" }).waitFor();
+  await page.getByLabel("Page", { exact: true }).selectOption("/");
   await page.getByRole("button", { name: "Website proposal", exact: true }).click();
   await page.frameLocator("iframe").getByRole("heading", { name: "Proposed Home" }).waitFor();
   await page.frameLocator("iframe").getByRole("link", { name: "Service", exact: true }).click();
