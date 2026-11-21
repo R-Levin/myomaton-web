@@ -56,6 +56,23 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ### Active owner-approved whole-site correction round — November21
 
+**CURRENT STOP / RESUME:** pushed implementation `0ec0b6615c2f219fe56b50baab95883d45a24573`.
+Final tested worker SHA256
+`df5abe85879d26ca71e28ec6d9aec7d4ce5735d6e986c3c774f39bbe4b6bf994`
+is staged, not installed. Automatic review refused replacement because approval
+named the earlier5c3 artifact. No bypass/retry. Request one explicit bounded
+replacement authority for this artifact and subsequent tested purpose-bound
+corrections in the SAME private runtime/round, each checksum/tests recorded,
+matching rollback retained, only artifact/proof activation hashes rebound.
+No grant/source/role/credential/budget/expiry/Core app/WordPress expansion.
+Worker82f remains installed; Core HTTPS200, ledger128/hash0109303e unchanged,
+no case/ledger locks. Failed operations produced no new model requests.
+After consent: retain82f/proof/activation as a matching set, installdf5/proof,
+run actual zero-dispatch saved-state preflight. Then critique113 once using
+retained exact captures; first normal immutable claim audits the already-approved
+processing continuation. Continue whole-site correction/rendering within the same
+new-round$5 cap/Nov22expiry. Do not reapply allowance, re-enroll or deploy Core.
+
 **Complete resume-path correction:** worker82f installed and constructor preflight
 passed, but critique still refused before dispatch. The actual workflow also
 compares its saved authority fingerprint. The earlier check covered provider
