@@ -4,6 +4,7 @@ import { sourceAwareC0ProposalSha256, SourceAwareRunValidation } from "../../lib
 import plan from "../../docs/c0-source-aware-run-proposal.json";
 import { evaluationCommand } from "./presence-evaluation-worker";
 import { WorkflowMediaUnavailable } from "../../lib/platform/intake/presence-workflow-provider";
+import {IntakeError} from "../../lib/platform/intake/model";
 
 const [operation, value, ...extra] = process.argv.slice(2);
 const operations = ["activate", "preflight", "work", "inspect", "continue", "local-home", "local-site", "concept-review-input", "editorial-review-input", "critique-home", "critique-site",
@@ -28,6 +29,7 @@ async function main() {
 main().catch((error: Error & { code?: string }) => {
   const known = error instanceof SourceAwareRunValidation;
   const media = error instanceof WorkflowMediaUnavailable;
+  const state = error instanceof IntakeError && /^[a-z_]+$/u.test(error.code);
   const configuration = ["Workflow budget refused", "Workflow request breakdown refused", "Exact workflow stage required",
     "Stored commercial activation differs", "Local evaluation grant or token differs", "Workflow grant expiry refused"].includes(error.message);
   const sourceHistory = ["Processing continuation source history differs", "Processing continuation source history unavailable",
@@ -36,8 +38,8 @@ main().catch((error: Error & { code?: string }) => {
     "Required original source is unavailable", "Rendered review input changed",
     "Rendered review index binding changed", "Complete matching desktop and mobile Page review required"].includes(error.message);
   console.error(JSON.stringify({ miopagesRunResult: 1, status: "BLOCKED", operation: operations.includes(operation) ? operation : "unrecognized",
-    stage: known ? error.stage : media ? "media-context-preflight" : sourceHistory ? "source-authority-history" : configuration ? "provider-configuration" : rendered ? "rendered-review-preflight" : operationStage,
-    category: error.code && /^[A-Z0-9_]+$/u.test(error.code) ? error.code : rendered ? "RENDERED_EVIDENCE_NOT_READY" : "FRESH_RUN_VALIDATION_FAILED",
-    detail: known || media || rendered || configuration || sourceHistory ? error.message : "Stop and retain private activation, source and usage evidence; inspect this stage. No automatic retry." }));
+    stage: known ? error.stage : media ? "media-context-preflight" : state ? "workflow-state" : sourceHistory ? "source-authority-history" : configuration ? "provider-configuration" : rendered ? "rendered-review-preflight" : operationStage,
+    category: state ? error.code!.toUpperCase() : error.code && /^[A-Z0-9_]+$/u.test(error.code) ? error.code : rendered ? "RENDERED_EVIDENCE_NOT_READY" : "FRESH_RUN_VALIDATION_FAILED",
+    detail: known || media || rendered || configuration || sourceHistory || state ? error.message : "Stop and retain private activation, source and usage evidence; inspect this stage. No automatic retry." }));
   process.exitCode = 1;
 });

@@ -15,7 +15,7 @@ import {
   type WorkflowBlueprint, type WorkflowDirection, type WorkflowEditorial, type WorkflowPage, type WorkflowReport,
 } from "./presence-workflow-artifacts";
 
-import { commercialRevisionGuidance, qualityPass, readQualityReview, verifyCommercialJourneys, type MarketingAuthority, type QualityReview } from "./presence-marketing-authority";
+import { commercialRevisionGuidance, qualityPass, readQualityReview, verifyCommercialJourneys, sourceTransitionAuthorityMatches, type MarketingAuthority, type QualityReview } from "./presence-marketing-authority";
 import type { ResolvePrivateVisuals } from "../content-editing/proposal-media";
 import { confirmedKnowledgeEvidence, pendingUnderstanding, type UnderstandingCorrection } from "./account-work";
 import { confirmKnowledge, knowledgeConfirmationInput, KnowledgeConfirmationError, knowledgeTargets, type KnowledgeConfirmation } from "../canonical/confirmed-information";
@@ -65,6 +65,7 @@ type State = {
   contextDigest: string;
   sourceSnapshot: Pick<WorkflowContext, "evidence" | "limitations" | "conflicts" | "entry">;
   marketingAuthorityDigest?: string;
+  processingContinuations?: {authorization:string;from:string;to:string;fromVersion:number;at:string}[];
   evaluation?: EvaluationBinding;
   homeReview?: { digest: string; reference: string; actor: Actor; at: string } | null;
   mode: "fixture" | "provider";
@@ -102,6 +103,8 @@ export interface PresenceWorkflowOperations {
   readonly mode: State["mode"];
   readonly maxRetries?: number;
   readonly marketingAuthority?: MarketingAuthority;
+  /** Verified private amendment receipt, supplied only by the composition root. */
+  readonly processingContinuation?: {authority:MarketingAuthority;authorization:string;baseVersion:number};
   readonly requiresResearch?: boolean;
   readonly maxEditorialRevisions?: number;
   readonly maxCommercialReplans?: number;
@@ -297,6 +300,16 @@ function readResearch(value: unknown, ids: readonly string[]): PresenceEvidence[
 export class PresenceWorkflow {
   private store: WorkflowStore;
 
+  private authorityCurrent(state:State) {
+    const authority=this.operations.marketingAuthority;
+    if(state.marketingAuthorityDigest===(authority&&fingerprint(authority)))return true;
+    const receipt=this.operations.processingContinuation;
+    return Boolean(this.boundary==="disposable"&&state.evaluation&&state.mode==="provider"&&receipt&&authority&&
+      /^[a-f0-9]{64}$/u.test(receipt.authorization)&&state.version>=receipt.baseVersion&&
+      state.marketingAuthorityDigest===fingerprint(receipt.authority)&&
+      sourceTransitionAuthorityMatches(authority,state.marketingAuthorityDigest,receipt.authority));
+  }
+
   constructor(private pool: Pool, private operations: PresenceWorkflowOperations,
     private destinations: Parameters<typeof readPage>[4] = {}, private clock = Date.now, private boundary: "disposable" | "protected" = "disposable") {
     if (operations.reviewSequence !== undefined && (operations.reviewSequence !== "site-first" ||
@@ -332,8 +345,7 @@ export class PresenceWorkflow {
   private view(context: WorkflowContext, state: State | null, canonicalCurrent = true) {
     if (!state) return null;
     const authority = this.operations.marketingAuthority;
-    const current = canonicalCurrent && state.contextDigest === fingerprint(context) &&
-      state.marketingAuthorityDigest === (authority && fingerprint(authority));
+    const current = canonicalCurrent && state.contextDigest === fingerprint(context) && this.authorityCurrent(state);
     const knowledgePending = pendingUnderstanding(state.understandingCorrections).length > 0;
     const reassessmentPending = unassessedKnowledge(state).length > 0;
     const editorial = editorialProgress(state);
@@ -410,7 +422,7 @@ export class PresenceWorkflow {
   private async current(context: WorkflowContext, version: number, understandingReview = false) {
     const state = await this.store.read(context);
     if (!state || state.version !== version || state.contextDigest !== fingerprint(context) || state.mode !== this.operations.mode ||
-        state.marketingAuthorityDigest !== (this.operations.marketingAuthority && fingerprint(this.operations.marketingAuthority))) {
+        !this.authorityCurrent(state)) {
       throw new IntakeError("draft_changed", 409);
     }
     if (!await this.confirmedKnowledgeCurrent(context, state)) throw new IntakeError("draft_changed", 409);
@@ -418,6 +430,13 @@ export class PresenceWorkflow {
       throw new IntakeError("workflow_not_ready", 409);
     }
     return state;
+  }
+
+  async verifyResumeState(context:WorkflowContext) {
+    const state=await this.store.read(context);
+    if(!state)throw new IntakeError("workflow_not_ready",409);
+    await this.current(context,state.version,true);
+    return state.version;
   }
 
   async correctUnderstanding(context: WorkflowContext, version: number, value: unknown, actor: Actor) {
@@ -637,7 +656,12 @@ export class PresenceWorkflow {
       ...(state.retry?.previous && { retryOf: state.retry.previous }) };
     const run = { context, input, work };
     await this.operations.preflight?.(run);
-    const claimed = await this.store.append(context, state.version, { ...state, work });
+    const receipt=this.operations.processingContinuation,authority=this.operations.marketingAuthority;
+    const continuation=receipt&&authority&&state.marketingAuthorityDigest!==fingerprint(authority)?{
+      marketingAuthorityDigest:fingerprint(authority),processingContinuations:[...state.processingContinuations??[],{
+        authorization:receipt.authorization,from:state.marketingAuthorityDigest!,to:fingerprint(authority),
+        fromVersion:state.version,at:new Date(this.clock()).toISOString()}]}:{};
+    const claimed = await this.store.append(context, state.version, { ...state, ...continuation, work });
     let output: unknown;
     try {
       output = await this.operations.run(run, bytes => this.store.retain(context, work, bytes));

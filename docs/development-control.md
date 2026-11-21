@@ -56,6 +56,21 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ### Active owner-approved whole-site correction round — November21
 
+**Complete resume-path correction:** worker82f installed and constructor preflight
+passed, but critique still refused before dispatch. The actual workflow also
+compares its saved authority fingerprint. The earlier check covered provider
+construction, not that resume guard. Ledger remains128; no paid retry occurred.
+The verified private continuation receipt now supplies narrowly constrained
+historical processing authority to both layers. Only appended instructions qualify;
+source/brand/role changes still refuse and protected-boundary fallback is forbidden.
+The next ordinary immutable work claim records the old/new authority and existing
+amendment reference; original events and content remain unchanged. No separate
+manual migration, grant rebinding or invented identity is needed. No-dispatch
+preflight now verifies actual saved resume state as well as configuration, and
+safe workflow-state refusals retain their real category. Actual Linux20tests passed,
+including resume/claim/history/foreign-context/protected-boundary checks with mocked
+provider output. This is tested recovery engineering, not a site improvement yet.
+
 **Latest diagnosis supersedes the budget-only attribution below:** the owner approved
 exact worker5c3 replacement. Its real no-dispatch check failed; matching previous
 worker/proof/activation were restored. Exception-location-only diagnosis identified

@@ -40,25 +40,28 @@ type Workspace = { root: string; grantFile: string; ledgerDirectory: string; ref
 /** Read existing continuation custody; never rewrite a historical source event.
  * Receipt pins both full grants. Only appended instructions may differ in the
  * historical authority; source classifications, selected passages and roles stay exact. */
-export async function readSourceTransitionHistory(root: string, grant: PresenceWorkflowGrant): Promise<MarketingAuthority | undefined> {
+export async function readSourceTransitionHistory(root: string, grant: PresenceWorkflowGrant): Promise<{
+  authority:MarketingAuthority; authorization:string; baseVersion:number
+} | undefined> {
   const expected = grant.sourceRepair?.contextTransition?.nextAuthorityDigest;
   if (!expected || !grant.marketingAuthority || fingerprint(grant.marketingAuthority) === expected) return undefined;
-  let history: MarketingAuthority | undefined;
+  let history: {authority:MarketingAuthority;authorization:string;baseVersion:number} | undefined;
   for (const name of await readdir(root)) {
     const match = /^whole-site-continuation-([a-f0-9]{8})\.receipt\.json$/u.exec(name);
     if (!match) continue;
     const receipt = await privateWorkflowFile<{authorization:string; beforeGrant:string; nextGrant:string; caseUnchanged:boolean;
-      providerCalls:number; expiresAt:string}>(join(root,name),root);
+      providerCalls:number; expiresAt:string;version:number}>(join(root,name),root);
     if (receipt.nextGrant !== fingerprint(grant)) continue;
     const previous = await privateWorkflowFile<PresenceWorkflowGrant>(join(root,"grant.json.before-whole-site-"+match[1]),root);
     if (history || !/^[a-f0-9]{64}$/u.test(receipt.authorization) || !receipt.authorization.startsWith(match[1]) ||
         receipt.beforeGrant !== fingerprint(previous) || receipt.caseUnchanged !== true || receipt.providerCalls !== 0 ||
+        !Number.isSafeInteger(receipt.version) || receipt.version<1 ||
         receipt.expiresAt !== new Date(grant.expiresAt).toISOString() ||
         fingerprint(previous.sourceRepair) !== fingerprint(grant.sourceRepair) || previous.contextDigest !== grant.contextDigest ||
         !sourceTransitionAuthorityMatches(grant.marketingAuthority,expected,previous.marketingAuthority)) {
       throw Error("Processing continuation source history differs");
     }
-    history = previous.marketingAuthority;
+    history = {authority:previous.marketingAuthority!,authorization:receipt.authorization,baseVersion:receipt.version};
   }
   if (!history) throw Error("Processing continuation source history unavailable");
   return history;
@@ -225,9 +228,9 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
         } : undefined;
       const researchOriginals = originals?.publicResearch && (capability.kind === "worker" || capability.kind === "research-replay")
         ? researchMaterialCustody(join(workspace.root, "originals"), originals, recheckResearch, renderPeer) : undefined;
-      const sourceTransitionAuthority = boundary === "disposable" && capability.kind !== "offline-test"
+      const processingContinuation = boundary === "disposable" && capability.kind !== "offline-test"
         ? await readSourceTransitionHistory(workspace.root,grant) : undefined;
-      const operations = createResponsesPresenceWorkflow({ grant, sourceTransitionAuthority, readGrant, readContext: context, ledgerDirectory: workspace.ledgerDirectory, rates, transport, fetchPage, reportHold,
+      const operations = createResponsesPresenceWorkflow({ grant, sourceTransitionAuthority:processingContinuation?.authority, readGrant, readContext: context, ledgerDirectory: workspace.ledgerDirectory, rates, transport, fetchPage, reportHold,
         resumeMarketResearch: isolatedCommercialWorker || (boundary === "disposable" && capability.kind === "research-replay"),
         marketResearchReplayOnly: capability.kind === "research-replay",
         researchOriginals,
@@ -338,7 +341,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
           },
         };
       }
-      const scoped = { ...operations, visuals, ...(knowledgeConfirmation && { knowledgeConfirmation }) };
+      const scoped = { ...operations, visuals, ...(processingContinuation && {processingContinuation}), ...(knowledgeConfirmation && { knowledgeConfirmation }) };
       return new PresenceWorkflow(pool, capability.kind === "review" ? { ...scoped, run: noOutbound } : scoped,
         boundary === "disposable" ? grant.previewActionDestinations ?? {} : {}, Date.now, boundary);
     },

@@ -206,7 +206,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
     const { workflow, context, root } = await instance.openCase(
       operation === "preflight" || operation === "work" || operation === "critique-home" || operation === "critique-site" || (operation==="recover" && (approval===originalEvidenceApproval || approval===sourceAwareC0ProposalSha256)) || replaceReport || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay, operation === "recover");
     const prior = await workflow.review(context);
-    if(operation==="preflight")return{version:prior?.version,providerCalls:0,configurationVerified:true};
+    if(operation==="preflight")return{version:await workflow.verifyResumeState(context),providerCalls:0,configurationVerified:true};
     if (completeResearch) {
       if (!prior) throw Error("Retained research required");
       const completed = await workflow.completeMarketResearch(context, prior.version);
