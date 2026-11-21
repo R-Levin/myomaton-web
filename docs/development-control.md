@@ -85,8 +85,8 @@ review; preserve the installation/content. Core's optional observation is privat
 dated and explicitly not live monitoring or a receipt for proposal106. Actual
 installed-draft links retain existing WordPress protection.
 
-**Next genuine Core review is in progress.** No additional data authority, budget
-or expiry was created. Remaining active run allowed4 generations/10requests and
+**Genuine Core review completed, not site improvement/acceptance.** No additional
+data authority, budget or expiry was created. Remaining active run allowed4 generations/10requests and
 $1.816224 conservative headroom before this continuation. The approved source-aware
 manifest explicitly includes the existing disposable Windows WordPress and encrypted
 visitor-packet/capture transfers; automatic transfer review initially refused, then
@@ -102,10 +102,29 @@ Worker continuation initially failed because the packaged generic entrypoint was
 used instead of the declared private `p0-source-aware-c0-runtime/worker.cjs` required
 by activation custody. Guards were not weakened. Read-only preparation then passed
 through the declared worker. Exact current review input is `e18cf495fe161a735ae8ba134b0342eb3f3f0a2a2d66e84ee7e4465250e26687`.
-The existing Core app is deliberately paused only while the resource-bounded worker
-runs; its controller restores the same app in `finally`. Do not start a second worker
-or repeat a provider call after interruption; inspect retained process/results and
-usage first. The one critique is not yet claimed successful at this checkpoint.
+The declared worker completed exactly one critique and retained it as workflow108:
+5 substantive concerns, with the full response and input preserved privately.
+Editorial object SHA256 `b3f313ffa7a10140ea00eb3e375f5a262aad6a34754013f330aa4ef432c2842c`.
+Core restored and stable (observed PID438947/start80648053). Existing proposal content
+is unchanged; no critique recommendation has been applied or accepted. Temporary
+local WordPress review annotation is also removable and outside Page content.
+
+This call used GPT-5.4 `gpt-5.4-2026-03-05`,121869input/4861output tokens. Ledger-priced
+increment$0.377588 (not independent provider billing),1generation/2requests.
+Current run estimate$11.201192/conservative debit$11.561364 against13; remaining
+$1.438636,3generations/8requests, same November22 15:58:31UTC expiry. Grant unchanged.
+Do not dispatch again blindly; preserve the earlier125 attempts and this126th record.
+
+**Precise remaining blocker:** automatic approval review refused returning the new
+private editorial text to this Codex session, despite existing delegated review
+scope; no such text was disclosed. It accepted metadata/counters and the existing
+manifest-authorized local visitor-packet/capture transfer after scope evidence.
+Do not bypass the text refusal through screenshots, another path or derived export.
+Ask once for explicit private Codex inspection of the new critique/current proposal
+for the same correction task; no new source-answer export, spending, publication,
+credential change or WordPress application is implied. After that, inspect meaning
+before queuing a bounded meaningful revision; do not blindly apply five findings or
+present annotation/access work as a commercially improved website.
 
 
 **November 21 owner clarification:** Codex is development tooling only and must not
