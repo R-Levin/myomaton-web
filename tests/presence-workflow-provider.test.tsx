@@ -280,10 +280,10 @@ test("independent request ceilings remain enforced when earlier work does not re
   const transport={async send(path:string){calls++;if(path.endsWith("/input_tokens"))return{body:{input_tokens:100}};
    const body={id:"resp_offline_independent",model:rates.model,status:"completed",service_tier:"default",usage:{input_tokens:100,output_tokens:20,total_tokens:120,input_tokens_details:{cached_tokens:0},output_tokens_details:{reasoning_tokens:0}},output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify({fixture:true})}]}]};return{body,rawBody:Buffer.from(JSON.stringify(body))};}};
   const run=meteredPresenceWorkflow(directory,rates,transport,scope,100);
-  const request={model:rates.model,input:"Offline only",text:{format:{type:"json_object"}}};
+  const request={model:rates.model,input:"Offline only",instructions:"Offline transport fixture; no provider access.",text:{format:{type:"json_object"}}};
   await run({ownerDigest:fingerprint("owner"),workDigest:fingerprint("first")},request,async()=>{},async()=>{});
   assert.equal(calls,2);
-  await assert.rejects(run({ownerDigest:fingerprint("owner"),workDigest:fingerprint("second")},request,async()=>{},async()=>{}),/Workflow budget exhausted/);
+  await assert.rejects(run({ownerDigest:fingerprint("owner"),workDigest:fingerprint("second")},request,async()=>{},async()=>{}),/usage ledger or budget/);
   assert.equal(calls,2,"The stricter request ceiling refuses before another count or generation");
   const ledger=JSON.parse(await readFile(join(directory,"onboarding-usage.json"),"utf8"));assert.equal(ledger.attempts.length,1);
  }finally{await rm(directory,{recursive:true,force:true})}
