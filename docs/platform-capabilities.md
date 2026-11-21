@@ -1070,9 +1070,32 @@ Local controlled browser regression covers desktop/mobile, in-console links, bef
 reload selection, refused read, expiry/logout and access to the original account view. Pure
 projection checks retain exact wording, distinguish source status and reject foreign bindings.
 Actual source chronology disproves stale report/Direction:71→73/76/78. No new AI-quality result
-is claimed. Linux and hosted verification are pending at this source checkpoint.
+is claimed. Linux and hosted verification subsequently passed as recorded below.
 
 Source: `lib/platform/intake/retained-site-review.ts`, `protected-retained-site.ts`,
 `retained-native-preview.ts`, `scripts/intake/current-site-review-panel.tsx`,
 `scripts/core-native-preview.php`, `tests/retained-site-review.test.tsx`,
 `tests/browser/current-site-review.ts`.
+
+
+### Hosted current-work verification and remaining business gap
+
+Core source9460b4b is deployed on the existing protected account. Actual read-only
+projection/native rendering of106 and its97 comparison passed with unchanged private
+state, four verified earlier references and no model/DB writes. External browser
+sign-in/assets/mobile and anonymous refusal pass; owner-password login was not performed.
+The original account view remains separate and its permissions are unchanged.
+
+First rollout crossed the existing global reserve and restored4058; independent rollback
+readback passed. Fresh-process continuation with lightweight procfs stability checks passed,
+without changing the384MiB/512MiB safeguards. Runtime417500 remained stable. No public
+services, protected WordPress, canonical knowledge, original case or provider ledger changed.
+The matching full rollback archive is retained with21647 regular-file checks. See recovery
+index for exact Linux/artifact/recovery hashes and evidence paths.
+
+This repairs access to the correct retained work, not the deficient commercial outcome.
+The saved copy still gives too much weight to scope/process and too little concrete
+explanation of content, customer inquiries, reporting and continued growth work. No newly
+researched/generated improvement, actual customer outcome or owner acceptance is claimed.
+Remaining work must address that substantive gap through Core with the existing authentic
+knowledge, rather than inventing another correction for the owner to supply.

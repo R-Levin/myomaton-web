@@ -1,6 +1,6 @@
 # MioPages development control and continuity
 
-**Current review checkpoint: November 20, 2026.** This is the recovery/navigation
+**Current review checkpoint: November 21, 2026.** This is the recovery/navigation
 index. Canonical contracts own product requirements; verified records own runtime
 truth; the owner retains consequential authority. A dated checkpoint is not an
 instruction to repeat the operation. Current branch:
@@ -55,40 +55,74 @@ identify the missing machine-local work instead of assuming it never existed.
 ## Current authorized work and result
 
 
-### November 21 — current Core review repair in progress
+### November 21 — current retained work connected to online Core
 
-The owner rejected the confusing handoff and directed continued, frugal execution.
-The new local implementation opens the actual retained source-aware case106 as an
-explicit, read-only association for the existing C0 owner, with business understanding,
-whole-site navigation, exact WordPress-rendered previews, saved97/106 comparisons and
-retained earlier design captures. Original account tools remain separately accessible.
-It neither reparents the case nor exercises signing, review, confirmation or publication
-authority. Existing authentication and original scoped inspection are still required.
+**Deployed:** source `9460b4bf200573ac055c4cb493178f34de0fead2` at
+https://wp-acceptance.miopages.com/core. Same persistent owner identity/password,
+same package/app/port. The new business/site/changes view opens the actual retained
+source-aware106 case with its97 baseline, using an explicit read-only association.
+It does not reparent/import the case or authorize mutation, approval or publication.
+Original account knowledge/inquiry tools remain separately accessible.
 
-**Not yet a hosted result or improved AI generation.** Controlled browser checks,
-projection/approval compatibility and the actual PHP renderer pass locally. Linux run
-44872834234 passed source9460b4b, including dependency audit, PostgreSQL integration,
-production build, private routing and the actual packaged PHP escaping/path refusals.
-Artifact SHA256 `945cf6842940e1e5209303631528638d9f61ffd70d509fc3159592da45111e82`,
-210 verified files. The current public Core remains source4058a74 pending exact hosted
-readback and the targeted same-app rollout. Prior failed Linux runs are retained: the
-new image component exposed a missing browser environment in the old JSDOM harness;
-the harness was corrected and all38 affected regressions passed before the green run.
-No provider requests/spending, credential changes, WordPress writes or new infrastructure.
+The owner can browse the actual saved proposal with the native WordPress renderer,
+inspect the saved changes and inactive unresolved destinations, and open the earlier
+retained design references. This is retained paid output, not new AI generation or
+an applied WordPress revision. It does NOT establish commercial acceptance or fix
+the known full-growth-service content gap. Do not ask the owner to reconstruct it.
 
-The suspected stale-report cause was independently disproved: restored source context71
-was followed by report73, Direction76 and blueprint78. Do not attribute the poor result
-to those artifacts predating the restored sources. The remaining commercial-quality gap
-is real; the new screen does not claim to solve it. Saved106 is a modest copy revision,
-not a replacement for the complete managed Web Presence growth-service requirement.
+**Verified:** Linux run44872834234, source9460b4b, artifact SHA256
+`945cf6842940e1e5209303631528638d9f61ffd70d509fc3159592da45111e82`;
+210 application-file checksums. Dependency audit, PostgreSQL integration, production
+build/private routing and actual packaged native PHP escaping/path refusals pass.
+All38 affected review/provider/recovery regressions and six exact projection/approval
+checks pass. Controlled UI browser tests cover navigation, before/after, reload,
+mobile, refused read, session expiry/logout and original-account return.
 
-**RECOVERY / RESUME HERE:** verify branch/tree and ignored recovery note. Complete Linux
-artifact verification, then the smallest same-account Core update with matching rollback,
-read-only exact-case/config binding and no model dispatch. Open actual output through Core;
-do not repeat provisioning, manufacture a business correction or ask for fixture acceptance.
+Actual hosted readcheck opened106, verified all proposed-page renderings, three exact
+97/106 comparisons and four retained design references, refusing a foreign owner/path.
+Peak readcheck RSS182136832 bytes; provider requests0, database writes0; original
+context/grant/usage hashes unchanged. External Edge1440/390 verifies real sign-in,
+assets, no overflow/page errors and anonymous-preview401/no-store. **No real owner
+password was used, and authenticated-owner browser readback is not claimed.**
+Windows UI helper failed to initialize; that drive/environment was left untouched.
+The first external browser wait for generic network idle timed out; actual hydration/
+sign-in assertions subsequently passed. Do not hide either verification limit.
 
+**Failure and recovery preserved:** first rollout passed actual-case readback but
+crossed the unchanged512MiB global memory reserve during stability checks. Complete
+previous4058 build was restored and independently verified. The continuation reused
+that same checked candidate and rollback in a fresh lightweight process, verifying
+owned process identity through procfs instead of repeatedly starting Node PM2 CLIs.
+Both384MiB process and512MiB global thresholds remain unchanged. The new process
+417500/start77001660 stayed stable; minimum available543184KiB during continuation,
+569876KiB at later readback. Initial PM2-title argument validation was corrected before
+writes: PM2 rewrites the visible title, so exact `--core` arguments are checked in its
+preserved definition. No registration, DNS/SSL, package, port or public service changed.
 
-**Current task: approved account-cycle SQL installed; protected account review enabled.**
+Matching rollback4058 archive SHA256
+`4929fe08b63a1b7a666fb2d02297dc3851cf8f9c5cf262ac2fccddf45a47222d`
+was independently checked against21647 regular files. Existing private inputs, both
+ledgers/grants and both public HTTPS digests match. Original Core41/WordPress6 and
+local WordPress97 are preserved. Direct provider spending for this repair: **$0**;
+this is not a claim about Codex subscription/credit charges.
+
+**Diagnosis correction:** restored source context71 was followed by report73,
+Direction76 and blueprint78. Actual metadata disproves the stale-artifact hypothesis;
+do not use it to explain the weak commercial result. Retained106 remains a modest
+copy revision. Source freshness, citations and successful rendering do not prove
+substantive understanding or useful commercial work.
+
+**RECOVERY / RESUME HERE:** verify this branch/HEAD and the ignored recovery note.
+Hosted evidence is in existing acceptance `miopages-private-acceptance/current-review-9460b4b`:
+`actual-readcheck.json`, `failure.json`, `rollback-independent.json`, matching archive/
+verification, and `resource-continuation-result.json`. Do not replay rollout or SQL.
+Use `#view=website&page=%2F&before=0&size=desktop` to open the current proposal after
+normal owner sign-in. Preserve original account authority and inactive processing
+scope. Continue substantive full-service understanding/site work; do not manufacture
+canonical confirmation or use an expired/differently scoped model grant. New spend
+and WordPress application retain their existing exact boundaries.
+
+**Earlier completed task: approved account-cycle SQL installed; protected account review enabled.**
 The owner approved the original [activation scope](account-cycle-hosted-activation.json)
 and then explicitly approved the [exact amendment](account-cycle-mandate-amendment.json)
 and encrypted installer transfer/staging/execution at `05af37b`. See the

@@ -867,3 +867,16 @@ turn the need for a future attestation into another request for arbitrary custom
 input now. Surface a concrete consequential decision only when its exact scope is
 known. Record progress by owner-visible understanding, useful changed work and a
 coherent review journey; technical tests remain supporting evidence.
+
+
+## November 21 — continued execution and resource discipline
+
+The owner directed autonomous continuation, frugal resource use and a tangible result;
+no further routine questions while they are away. The previous confusing Core handoff
+remains rejected. Technical recovery must not be represented as new business insight,
+commercial-quality site improvement or completed service acceptance. Preserve the full
+managed Web Presence growth-service objective, existing work and authority boundaries.
+
+The immediate repair now opens the actual retained current proposal and comparisons in
+Core, preserving original account tools and evidence. It incurred no new provider calls.
+The broader substantive site outcome remains unfinished and must be described that way.
