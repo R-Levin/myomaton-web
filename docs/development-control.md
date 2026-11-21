@@ -63,7 +63,61 @@ No hostname/infrastructure expansion. Reuse existing access; ask only for an
 actual authority/data/spending gap. Communicate approved steps in a few plain
 bullets and distinguish functional repair from commercial improvement.
 
-**Verified review-clarity checkpoint:** source `1202d6358eeea265731e49c43cdec31a7b1282ff`
+### Latest verified result — Core proposal113 and retained critique, November21
+
+**Actual deployed Core source:** `7f0f4dc3b41bb7bd79c3648c76ae84602fd521ce`.
+Linux44925449245 passed build/security/PG/routing; artifact SHA256
+`a7ca413b74062b4572730df6e4722729d472cbd7bc7705a079a80db6e75267a2`.
+All211 files and the same128MiB launcher/bounded recovery were verified. Complete
+matching previous1202 app, dependencies and build remain private in
+`review-guides-7f0f4dc`; rollback not used. Actual case113 readcheck verified all6
+native previews,97comparison,4references and retained108critique with5concerns/
+2changed Page objects. Same-process60second verification passed, minimum733544KiB
+available. Existing auth/credentials/configuration/public outputs unchanged. External
+Edge1440/390 sign-in/guide/assets/no-overflow passed; no fresh owner-password login
+claim. Protected WordPress6 independently read back unchanged after this work.
+
+**Real generated changes:** exactly2 GPT-5.4 page revisions changed Service and
+Direct Start;4other Page objects/rendered texts stayed exact. Existing disposable
+WordPress materialized113 on stable IDs/slugs, preserving202 older records. Native
+readback plus12actual desktop/mobile frames passed; Service-to-Direct-Start navigation
+and explicit inactive Action/no submission form were checked at1440/390. Recoverable
+106snapshot SHA256 `3b8a5f05c3721ad47ec31053f0e6b723fd36d4769f7f50d3b191a628d91060c6`
+retained; no restoration executed today and no new protected WordPress application.
+All12frames are also retained in the existing Cloud private capture custody with
+input `bccbdc5dbc609b5a8fd62521d2aa6bb02eed5e245ef8ffeb67e57eca87031701`.
+No source interviews/credentials exported; no photograph acquisition claimed.
+
+**Product judgment:** the service explanation is materially broader. Direct Start
+now has its own proposed Action, intentionally inactive in this private candidate.
+Copy remains process-heavy/verbose, the alternative Review receives too much visual
+emphasis on that Page, and the Home visual/report-example/FAQ concerns remain open.
+No commercially finished website, owner acceptance, new research contribution or
+full operating-cycle proof is claimed. The API performed the revisions; Codex did
+not replace them with manually authored marketing. The earlier critique is visible
+as earlier evidence, with changed Pages awaiting recheck rather than automatically
+resolved. Remaining concerns have not been silently discarded.
+
+**Actual usage:** critique108$0.377588 + two revisions$0.772830 = increment$1.150418
+at ledger rates. Two revisions after inspection approval used$0.772830. Run estimate
+$11.974022, conservative debit$12.334194 of13;128total attempts retains85historical
++43current generations. Remaining$0.665806/1generation/4requests, same Nov22
+15:58:31UTC expiry. Final editorial reservation$0.720000 does not fit, so NO further
+count/generation was dispatched and no grant, input/output limit or ledger was reset.
+This is metered estimation, not independent provider billing. Three requests reported
+zero cached tokens; efficiency needs further work without losing business coverage.
+
+**RECOVERY / RESUME HERE:** no worker active. Normal owner access:
+`https://wp-acceptance.miopages.com/core#view=website&page=%2Fservice&before=0&size=desktop`
+(or change Page to Direct Start). Changes and open decisions retains critique108.
+Read this latest checkpoint before historical records below. Do not replay enrollment,
+SQL, deployments, models or protected WordPress staging. Inspection consent is already
+approved for this correction scope. Further paid work needs a genuinely affordable,
+authorized envelope; protected WordPress application/publication gates remain separate.
+Current sequential worker/portal execution is a temporary small-host development
+arrangement, not a product requirement or proof of concurrent commercial reliability.
+
+**Earlier review-clarity checkpoint (superseded by the source above):** source `1202d6358eeea265731e49c43cdec31a7b1282ff`
 is deployed to the same protected Core app. Linux run44920374799 passed; artifact
 SHA256 `8dd877c63b00bae0a4441c9bb616dcc5e4c1b9fa90df69d01dbc7851241d3e6b`.
 All211 build files and the unchanged128MiB launcher were verified. The complete
@@ -140,10 +194,9 @@ revised Pages. Exact case/context/event integrity is checked; changed Page objec
 identified without declaring findings resolved. UI distinguishes unchanged concerns from
 revised Pages awaiting recheck and links directly to each Page. This reuses existing
 append-only evidence; no new task/approval system or data mutation. Tests cover foreign
-context/future-version refusal and real browser navigation/status labels. Linux verification
-and same-app rollout remain pending at this source checkpoint. Actual WordPress rendering
-and independent product-quality review of113 are also pending; do not claim them from
-provider success or tests.
+context/future-version refusal and real browser navigation/status labels. At that source checkpoint Linux/rollout/rendering were pending; the latest verified
+checkpoint above supersedes those pending operations. Their results remain distinct
+from commercial acceptance.
 
 
 
@@ -156,7 +209,7 @@ Core; the access repair and downloadable assessment do not complete that outcome
 
 
 
-### Owner-reported502 — corrected and bounded recovery verified, November21
+### Historical502 repair — preserved evidence, not the current deployment
 
 Core remains at the existing HTTPS origin. Base application9460b4b is preserved;
 only its launcher has verified runtime correction653e0b1. The build manifest explicitly
