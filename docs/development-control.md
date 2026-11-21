@@ -67,9 +67,35 @@ independent and enforces all at actual dispatch; it does not increase any ceilin
 A regression proves a stricter request cap refuses the next call before transport.
 Amendment preflight now constructs the real dispatcher without calling transport.
 The private worker gains fixed no-dispatch configuration preflight and scoped,
-nonsecret diagnostics. Linux verification/corrective worker replacement are pending;
-no blind API retry or grant/ledger reset. Hosted Core2809543 remains compatible;
-only the private worker needs this correction, with unchanged activation expiry.
+nonsecret diagnostics. Verified source `7f5424568e6baf788d1abafada3d465e6219f7a7`;
+actual Linux12tests passed, no failures/provider calls. Corrected worker SHA256
+`5c3c82aff0f763d9deb126f39314cdc409a54c82da03a645ee54206faf7ab826`.
+
+**Actual hosted state:** Core2809543 deployment passed; the exact new7df grant
+was activated. The failed critique did not dispatch. Independent readback still
+shows113/128attempts, unchanged expiry and original worker7db54f79. The correction
+has NOT replaced it. No protected WordPress application or new provider spending.
+
+**Tool approval blocker:** automatic review rejected the proposed private worker
+replacement and proof/activation hash rebinding as hosted protected execution
+changes beyond code-transfer/test authority. Read-only evidence distinguished
+that private runtime from the unchanged web application, but review also refused
+preparing the replacement script as a retry. No bypass, indirect execution or
+further replacement attempt. The smallest outstanding consent is exact worker
+replacement using the Linux-tested bytes above, retaining the matching previous
+worker/proof/activation, and changing only artifact/proof hash fields in existing
+activation. Identity, reviewer verifier, permissions, sources, grant/ledger, budget
+and expiry must remain exact. Then run its no-dispatch configuration preflight.
+This is a development-tool approval boundary, not evidence of a customer-data
+failure or a required production microapproval design.
+
+**RECOVERY / RESUME HERE:** do not repeat allowance APPLY, deploy Core again or
+dispatch the old worker. Private `customer-facing-59fdf5c9` holds the corrected
+worker, two passing compiled test suites and `corrected-worker-tests.json`.
+After explicit replacement consent, preserve matching rollback, bind only verified
+artifact/proof hashes and verify actual configuration/state without transport.
+Then resume the already-authorized whole-site critique/revision round from113,
+using its retained WordPress captures. No extra ceiling or new expiry is implied.
 
 
 Owner approved a$3 correction round, then said a few more dollars do not matter
@@ -92,11 +118,12 @@ Existing continuation compiler now has a narrowly distinguished ready-candidate 
 keeping the old empty-upstream mode unchanged. Local4tests and actual Linux4tests /
 read-only preflight passed, no provider call or ledger mutation. Next exact grant
 fingerprint7dfd5973dfaa3efeb89dca1fbbb3decc733ca35df4e2b45eeaa7c1e70c4a9935.
-Core's read-only review is being made compatible with that exact approved grant before
-activation; not a general authority relaxation. Whole-site critique113 is already
-captured. Next: Linux artifact, same-app compatibility rollout, exact amendment APPLY,
-then real Core critique/revisions/WordPress review under the new cap. No model dispatched
-under the old exhausted reservation. Do not repeat the prior two-Page round.
+Core's read-only review now accepts that exact approved grant; not a general authority
+relaxation. The verified Linux artifact, same-app compatibility rollout and exact
+amendment APPLY passed. Actual WordPress113 captures are retained. Next is the narrow
+worker replacement gate above, then real Core critique/revisions/WordPress review
+under the new cap. No model dispatched under the old exhausted reservation. Do not
+repeat the prior two-Page round.
 
 
 **Current owner-approved increment (November 21):** proceed with Core-led,
@@ -108,7 +135,7 @@ No hostname/infrastructure expansion. Reuse existing access; ask only for an
 actual authority/data/spending gap. Communicate approved steps in a few plain
 bullets and distinguish functional repair from commercial improvement.
 
-### Latest verified result — Core proposal113 and retained critique, November21
+### Prior baseline result — Core proposal113 and retained critique, November21
 
 **Actual deployed Core source:** `7f0f4dc3b41bb7bd79c3648c76ae84602fd521ce`.
 Linux44925449245 passed build/security/PG/routing; artifact SHA256
