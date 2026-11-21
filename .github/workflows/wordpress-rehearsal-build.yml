@@ -97,7 +97,9 @@ jobs:
       - name: Verify portable artifact dependency boundary
         run: node --test tests/wordpress-artifact-links.test.mjs
       - name: Verify raw routing boundary and sanitized diagnostics
-        run: node --test tests/wordpress-private-server.test.mjs
+        run: |
+          node --test tests/wordpress-private-server.test.mjs
+          node --import tsx --test tests/wordpress-private-launcher.test.tsx
       - name: Build without hosted credentials
         run: npm run build -- --webpack
         env:

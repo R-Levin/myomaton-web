@@ -100,6 +100,13 @@ function resourceGate(rss, available) {
   return rss <= RSS_LIMIT && available >= MIN_AVAILABLE;
 }
 
+function runtimeOptions(core) {
+  assert.equal(typeof core, 'boolean');
+  // Leave headroom for native password hashing and private PHP previews on
+  // this small managed server. The independent safety thresholds stay intact.
+  return core ? ['--max-old-space-size=128', '--max-semi-space-size=4'] : ['--max-old-space-size=256'];
+}
+
 function ownedMembers(members, group, uid, known) {
   return members.length > 0 && members.every(p => p.group === group && p.session === group && p.uid === uid)
     && members.some(p => known.get(p.pid) === p.started);
@@ -147,7 +154,7 @@ async function main() {
   const env = core ? coreEnvironment(JSON.parse(privateFile(PRIVATE + '/core-config.json')))
     : childEnvironment(JSON.parse(privateFile(PRIVATE + '/pull-config.json')));
   assert.ok(resourceGate(process.memoryUsage().rss, availableMemory()));
-  const child = spawn('/usr/bin/node', ['--max-old-space-size=256', WEB + '/.rehearsal/private-server.cjs'],
+  const child = spawn('/usr/bin/node', [...runtimeOptions(core), WEB + '/.rehearsal/private-server.cjs'],
     { cwd: WEB, env, detached: true, stdio: 'ignore' });
   const known = new Map();
   try { const first = procStat(fs.readFileSync('/proc/' + child.pid + '/stat', 'utf8')); known.set(child.pid, first.started); } catch { /* No broad signal without verified identity. */ }
@@ -213,5 +220,5 @@ async function runWorkflow(args) {
   });
 }
 
-module.exports = { configuration, childEnvironment, procStat, resourceGate, ownedMembers, HOME, WEB, PRIVATE };
+module.exports = { configuration, childEnvironment, procStat, resourceGate, runtimeOptions, ownedMembers, HOME, WEB, PRIVATE };
 if (require.main === module) main().catch(() => { console.error('Private listener configuration refused; inspect before retry.'); process.exitCode = 1; });

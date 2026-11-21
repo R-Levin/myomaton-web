@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
 const require = createRequire(import.meta.url);
-const { configuration, childEnvironment, procStat, resourceGate, ownedMembers } = require("../scripts/wordpress-private-listener.cjs");
+const { configuration, childEnvironment, procStat, resourceGate, runtimeOptions, ownedMembers } = require("../scripts/wordpress-private-listener.cjs");
 const { safeProbeFailure } = require("../scripts/wordpress-private-pull-probe.cjs");
 
 test("read-only probe diagnostics identify connection refusal without exporting nested error secrets", () => {
@@ -44,6 +44,14 @@ test("resource gates fail closed at the accepted private-process limits", () => 
   assert.equal(resourceGate(384 * 1024 ** 2 + 1, 512 * 1024 ** 2), false);
   assert.equal(resourceGate(100, 512 * 1024 ** 2 - 1), false);
   for (const values of [[NaN, 1], [1, Infinity], [-1, 1]]) assert.throws(() => resourceGate(...values));
+});
+
+test("Core bounds its V8 heap while preserving pull-service settings and safety limits", () => {
+  assert.deepEqual(runtimeOptions(true), ["--max-old-space-size=128", "--max-semi-space-size=4"]);
+  assert.deepEqual(runtimeOptions(false), ["--max-old-space-size=256"]);
+  assert.throws(() => runtimeOptions("core"));
+  assert.equal(resourceGate(384 * 1024 ** 2 + 1, 600 * 1024 ** 2), false);
+  assert.equal(resourceGate(128 * 1024 ** 2, 512 * 1024 ** 2 - 1), false);
 });
 
 test("proc identity tolerates parentheses in names and process signals require known non-reused private identities", () => {

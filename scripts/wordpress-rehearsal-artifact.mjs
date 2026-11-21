@@ -7,6 +7,7 @@ import { cp, lstat, mkdir, readdir, readFile, readlink, rm, symlink, unlink, wri
 import path from "node:path";
 import { portableDependencyLink } from "./wordpress-artifact-links.mjs";
 import { request, routingSmoke } from "./wordpress-routing-smoke.mjs";
+import launcher from "./wordpress-private-listener.cjs";
 
 assert.equal(process.platform, "linux", "Build the rehearsal artifact on Linux, never on the hosted server");
 assert.equal(process.arch, "x64");
@@ -21,7 +22,7 @@ async function smoke(directory) {
 const compiled = JSON.parse(await readFile(path.join(directory, '.next/required-server-files.json'), 'utf8')).config;
 assert.equal(compiled.skipTrailingSlashRedirect, true);
 assert.equal(compiled.skipProxyUrlNormalize, true);
-const child = spawn(process.execPath, ["--max-old-space-size=256", path.join(directory, '.rehearsal/private-server.cjs')], {
+const child = spawn(process.execPath, [...launcher.runtimeOptions(core), path.join(directory, '.rehearsal/private-server.cjs')], {
   cwd: directory,
   env: { PATH: process.env.PATH, HOME: process.env.HOME, NODE_ENV: "production", NEXT_TELEMETRY_DISABLED: "1",
     MIOPAGES_ROUTING_MODE: "shared-hostnames",

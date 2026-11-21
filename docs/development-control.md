@@ -55,6 +55,24 @@ identify the missing machine-local work instead of assuming it never existed.
 ## Current authorized work and result
 
 
+### Active repair — owner-reported502, November21
+
+The owner received502 after the prior handoff. Actual logs confirm the supervisor
+stopped the app on its global reserve: minimum536576000 bytes,288KiB below512MiB;
+combined peak RSS275763200 bytes was below the384MiB application limit. This was
+not a Linux OOM kill or evidence of a memory leak. The failure leaves no upstream.
+A single targeted restart restored HTTPS200; no credential/data/config change.
+
+The setup is too fragile for owner access. Host-visible usable RAM1748484KiB;
+account-owned Next/supervisor, PM2 and retained test PostgreSQL all consume memory.
+Do not claim this is an empty server or attribute all global use to Core. A Core-only
+V8 working-heap correction128MiB/4MiB semi-space is being tested; pull mode stays256MiB,
+and the384MiB/512MiB process/global thresholds are unchanged. Linux artifact smoke now
+uses the same runtime flags as deployment. Verify actual login-hash allocation and
+sustained service before calling this repaired. No model/WordPress/database changes.
+
+
+
 ### November 21 — current retained work connected to online Core
 
 **Deployed:** source `9460b4bf200573ac055c4cb493178f34de0fead2` at
