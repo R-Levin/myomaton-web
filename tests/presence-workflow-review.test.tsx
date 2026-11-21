@@ -85,7 +85,7 @@ test("the signed-in browser follows a saved development continuation to the webs
       createRoot(document.querySelector("#root")).render(createElement(Journey, { hosted: true }));`,
       resolveDir: process.cwd(), loader: "tsx" },
     bundle: true, write: false, platform: "browser", format: "iife", jsx: "automatic",
-    define: { "process.env.NODE_ENV": '"production"' }, loader: { ".module.css": "empty" },
+    define: { "process.env.NODE_ENV": '"production"', "process.env.__NEXT_IMAGE_OPTS": "undefined", "process.env": "{}" }, loader: { ".module.css": "empty" },
   });
   const dom = new JSDOM('<div id="root"></div>', { pretendToBeVisual: true, runScripts: "outside-only",
     url: "https://core.example.test/core" });
