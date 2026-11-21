@@ -54,169 +54,87 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
-### Active owner-approved whole-site correction round — November21
+### Latest result — genuine whole-site correction, November21
 
-**Actual generation progress / retained recovery:** critique115 completed, six
-justified Pages queued116. Home/Service/process revisions saved; FAQ provider
-response completed but was refused at124. Ledger133, all current calls completed;
-new-round estimate$1.849804. No repeat generation. Integrity-checked diagnosis
-proved valid Page structure/citations and a commercial-policy false positive:
-a guaranteed-outcome noun phrase under an explicit exclusion heading was treated
-as a promise. The correction confines that negative scope to the immediate native
-group and resets it at the next heading/group; affirmative promises, mixed clauses,
-prices and customer proof still refuse. Actual Linux22tests passed, including
-exclusion/non-exclusion boundaries and existing source/resume/metering safeguards.
-Retained FAQ passes corrected policy without rewriting its bytes. Continue via
-existing deterministic recovery, then remaining Review/DirectStart generations;
-do not regenerate the completed FAQ. Core/public state restored and original
-protected Core41/WordPress6 unchanged. Native visitor-text diagnostics stay private;
-only structural/policy booleans were exported. Commercial judgment remains required.
+**Review now:** [current Core proposal](https://wp-acceptance.miopages.com/core#view=website&page=%2F&before=0&size=desktop),
+normal existing owner login; [actual local WordPress candidate](http://127.0.0.1:4474/?page_id=203&preview=true).
+Core review131 retains the exact Page content rendered at129. Home203, Service215,
+process216, FAQ217, Review218 and DirectStart219 are stable local WordPress IDs.
+These are distinct from protected WordPress revision6; temporary guides explain this.
 
-**LATEST AUTHORITY / ACTIVE RUN:** owner approved installingdf5 AND subsequent
-tested, purpose-bound private-worker corrections needed to finish this same round.
-Do not ask for consent per rebuilt artifact. Record each checksum/test result,
-retain matching rollback, confine replacement to the same private worker/proof and
-activation artifact/proof hashes. Source rights, credentials, grants, budget,
-expiry, Core app and protected WordPress boundaries remain unchanged. Checksums
-identify/verify artifacts; they are not a new product decision for each routine fix.
+**What genuinely changed:** Core/OpenAI produced six substantive Page revisions
+from retained approved evidence and the saved whole-site critique115. Home replaces
+its unavailable-image panel with an original native relationship composition.
+Review has a visible, explicitly illustrative report example. DirectStart leads
+with a clearer next step and its own inactive preview Action. FAQ exposes answers;
+Service/process have revised structure and explanation. No Codex-authored marketing
+replacement, fresh research, new image download or acquired photograph is claimed.
 
-Installed workerdf5, actual saved-state/configuration preflight PASS113/128,
-providerCalls0, authority/state unchanged, matching82f rollback retained. The
-already-authorized critique113 is now running once; inspect its result and ledger
-before any retry. Previous stop notices below are historical, not current gates.
+**Actual verification:** existing disposable WordPress7.1.4/Managed Site theme,
+same IDs/slugs, unrelated posts unchanged; twelve exact native desktop/mobile
+frames (3,847,240bytes), all200/no overflow, retained in private Cloud custody with
+input3543f68f40d09b3c517bc80d3289c2dd3defa30853818b2f51173d701c3c3fcf.
+Independent visual inspection covered all twelve frames. Actual1440/390 browser
+checks passed singleH1, local mapped links, no broken images/forms, disabled terminal
+Actions, keyboard details, Home→DirectStart→Review→Home, unchanged native readback.
 
-**CURRENT STOP / RESUME:** pushed implementation `0ec0b6615c2f219fe56b50baab95883d45a24573`.
-Final tested worker SHA256
-`df5abe85879d26ca71e28ec6d9aec7d4ce5735d6e986c3c774f39bbe4b6bf994`
-is staged, not installed. Automatic review refused replacement because approval
-named the earlier5c3 artifact. No bypass/retry. Request one explicit bounded
-replacement authority for this artifact and subsequent tested purpose-bound
-corrections in the SAME private runtime/round, each checksum/tests recorded,
-matching rollback retained, only artifact/proof activation hashes rebound.
-No grant/source/role/credential/budget/expiry/Core app/WordPress expansion.
-Worker82f remains installed; Core HTTPS200, ledger128/hash0109303e unchanged,
-no case/ledger locks. Failed operations produced no new model requests.
-After consent: retain82f/proof/activation as a matching set, installdf5/proof,
-run actual zero-dispatch saved-state preflight. Then critique113 once using
-retained exact captures; first normal immutable claim audits the already-approved
-processing continuation. Continue whole-site correction/rendering within the same
-new-round$5 cap/Nov22expiry. Do not reapply allowance, re-enroll or deploy Core.
+**Quality judgment and remaining gaps:** this is improved, reviewable work, not a
+commercially finished website or owner acceptance. Copy remains long/process-heavy,
+with repeated scope/authority language and some unnecessary proof-policy commentary.
+Mobile layouts remain tall. No photographs were placed. Core's final genuine
+critique131 retains six concerns; do not silently resolve them. No search-description
+meta tags were observed in this local draft preview. End-to-end search metadata
+delivery is not established by this round. Submissions remain deliberately inactive;
+no public lead capture, publication, customer approval or real performance is claimed.
+Full Entry/MyBusiness/inquiry/measurement/reporting/Ongoing remains required.
 
-**Complete resume-path correction:** worker82f installed and constructor preflight
-passed, but critique still refused before dispatch. The actual workflow also
-compares its saved authority fingerprint. The earlier check covered provider
-construction, not that resume guard. Ledger remains128; no paid retry occurred.
-The verified private continuation receipt now supplies narrowly constrained
-historical processing authority to both layers. Only appended instructions qualify;
-source/brand/role changes still refuse and protected-boundary fallback is forbidden.
-The next ordinary immutable work claim records the old/new authority and existing
-amendment reference; original events and content remain unchanged. No separate
-manual migration, grant rebinding or invented identity is needed. No-dispatch
-preflight now verifies actual saved resume state as well as configuration, and
-safe workflow-state refusals retain their real category. Actual Linux20tests passed,
-including resume/claim/history/foreign-context/protected-boundary checks with mocked
-provider output. This is tested recovery engineering, not a site improvement yet.
+**Core comparison defect:** current native previews render, but the deployed older-
+version comparison inherited the latest view's readiness and refused an earlier
+complete draft after a later critique. A read-only snapshot projection repair is
+implemented/tested locally and against real private131/97 data with the existing PHP
+renderer: six current previews, historical comparisons, four references and foreign-
+owner/path refusals passed, unchanged state. That comparison fix is NOT deployed;
+Core application remains28095434d719b173d31293a2674f4c0464f56ae2. No new Core
+application deployment is implied by private-worker maintenance authority. Use the
+current view or actual WordPress candidate; preserve the known comparison limitation.
 
-**Latest diagnosis supersedes the budget-only attribution below:** the owner approved
-exact worker5c3 replacement. Its real no-dispatch check failed; matching previous
-worker/proof/activation were restored. Exception-location-only diagnosis identified
-the source-transition guard: new authorized processing instructions changed the
-current authority fingerprint, while the historical source event correctly retains
-its earlier fingerprint. This guard runs before dispatcher construction. The budget
-coupling was a real additional defect, not a complete explanation of the live stop.
+**Spending:** this round used8generations/16requests, all completed, estimated
+$2.936304 from provider usage at retained rates (787,443input/0cached/64,513output
+including26,153reasoning tokens). The$5 TOTAL NEW ceiling was not stacked with old
+allowance. Current-case estimate$14.910326/conservative debit$15.270498 of17.334194;
+51generation/101request limits are now used. No further dispatch under this grant.
+Ledger136/SHA2565e5a88fd6aea9aa86cc78a35fdb09c5dd4ddc23ea9f7a4f142319e283d858c62.
+Original Nov22 15:58:31UTC expiry remains unchanged. Unused money is not retry authority.
+Zero cache hits are measured; their cause needs inspection, not speculation.
 
-The bounded correction reads the existing private continuation receipt and previous
-grant, verifies both complete grant fingerprints and unchanged source transition,
-then accepts only appended processing instructions against historical authority.
-Sources/classifications/passages, tenant, brand, reviewer and prior instructions
-remain exact. No event, grant, credential, ledger or Core app rewrite is required.
-Actual Linux19tests/0failures/0skips and read-only actual-grant construction passed;
-providerCalls0. Candidate worker SHA256
-`82f5b2ad2bd0e031e29ec3ceb8b05557a22ab64a531208710e200c83fa0e7d78`.
-The restored old worker remains installed pending verified corrective replacement.
-The existing new-round$5 total-new cap and Nov22 expiry are unchanged.
+**Recovery engineering:** initial failures were uncharged. Independent resource
+ceilings/full saved-state preflight now avoid the configuration coupling. Existing
+private continuation receipts verify appended processing instructions without changing
+historical source rights; the next immutable claim records the transition. FAQ124
+was a completed response refused by a false commercial-claim alarm under an explicit
+exclusions heading. Corrected contextual scope recovered it to125 without another
+provider call. Affirmative promises/prices/customer proof remain refused. Linux22
+focused tests passed; later comparison/claim tests10passed and TypeScript passed.
 
-Owner requested a proportionate security/interaction review after this round.
-Record that pending work; do not weaken current guards or let it delay the site.
+**Authority/integrity:** owner explicitly approved tested purpose-bound worker
+corrections for this SAME round. Record build hashes/tests and matching rollback;
+do not turn each rebuild into a founder approval request. Scope remains the existing
+private worker/proof and activation artifact/proof hashes. Installed workerf55b97b7,
+source3d51e5c; complete prior matching sets retained in customer-facing-59fdf5c9.
+No credential/grant/source-rights/expiry/publication expansion. Original Core41,
+protected WordPress6/digest42c70605, both public outputs and original private state
+remain unchanged; protected WordPress was independently read back after the round.
+Core was finally restored; no paid job remains active. Owner-password login was not
+retested by Codex; no session was fabricated or credential replaced.
 
-**Earlier partial diagnosis before any provider dispatch:** allowance APPLY
-succeeded, case113/ledger128 stayed unchanged. The old dispatcher constructor
-required every maximum generation slot to be funded by two request slots, despite
-the earlier one-request research path. Our next ceilings51/101 hit that coupling.
-The amendment preflight had not exercised actual dispatcher construction.
-
-Corrective engineering keeps the exact authorized request/generation/money limits
-independent and enforces all at actual dispatch; it does not increase any ceiling.
-A regression proves a stricter request cap refuses the next call before transport.
-Amendment preflight now constructs the real dispatcher without calling transport.
-The private worker gains fixed no-dispatch configuration preflight and scoped,
-nonsecret diagnostics. Verified source `7f5424568e6baf788d1abafada3d465e6219f7a7`;
-actual Linux12tests passed, no failures/provider calls. Corrected worker SHA256
-`5c3c82aff0f763d9deb126f39314cdc409a54c82da03a645ee54206faf7ab826`.
-
-**Actual hosted state:** Core2809543 deployment passed; the exact new7df grant
-was activated. The failed critique did not dispatch. Independent readback still
-shows113/128attempts, unchanged expiry and original worker7db54f79. The correction
-has NOT replaced it. No protected WordPress application or new provider spending.
-
-**Tool approval blocker:** automatic review rejected the proposed private worker
-replacement and proof/activation hash rebinding as hosted protected execution
-changes beyond code-transfer/test authority. Read-only evidence distinguished
-that private runtime from the unchanged web application, but review also refused
-preparing the replacement script as a retry. No bypass, indirect execution or
-further replacement attempt. The smallest outstanding consent is exact worker
-replacement using the Linux-tested bytes above, retaining the matching previous
-worker/proof/activation, and changing only artifact/proof hash fields in existing
-activation. Identity, reviewer verifier, permissions, sources, grant/ledger, budget
-and expiry must remain exact. Then run its no-dispatch configuration preflight.
-This is a development-tool approval boundary, not evidence of a customer-data
-failure or a required production microapproval design.
-
-**RECOVERY / RESUME HERE:** do not repeat allowance APPLY, deploy Core again or
-dispatch the old worker. Private `customer-facing-59fdf5c9` holds the corrected
-worker, two passing compiled test suites and `corrected-worker-tests.json`.
-After explicit replacement consent, preserve matching rollback, bind only verified
-artifact/proof hashes and verify actual configuration/state without transport.
-Then resume the already-authorized whole-site critique/revision round from113,
-using its retained WordPress captures. No extra ceiling or new expiry is implied.
-
-
-Owner approved a$3 correction round, then said a few more dollars do not matter
-and asked for completion while AFK. Bounded implementation interpretation is
-**$5 maximum TOTAL NEW spending**, not$3+$5 and not the unused prior allowance.
-The owner's question about repeated Home focus is not a change to product direction:
-this is a whole-site round. Home is one priority alongside Direct Start, the Review
-offer, connected visitor journeys and the complete managed growth-service proposition.
-
-Exact plan: `docs/c0-customer-facing-round.json`, SHA256
-`59fdf5c92fa60ab3179cb88f021e79951ddb4a887f18a037cc0ef0c6ad8bcf07`.
-Base113/state/ledger/context are pinned. New conservative run cap$17.334194 equals
-existing debit$12.334194+$5; no allowance stacking. Up to8future generations/16requests,
-up to3bounded editorial rounds, no automatic retries/new paid research/image provider,
-same GPT-5.4/sources/privacy/expiry (Nov22 15:58:31UTC). Editorial context capacity may
-use the existing global240k-token envelope; output/bytes/source permissions unchanged.
-No new credentials, customer acceptance, protected WordPress application or publication.
-
-Existing continuation compiler now has a narrowly distinguished ready-candidate mode,
-keeping the old empty-upstream mode unchanged. Local4tests and actual Linux4tests /
-read-only preflight passed, no provider call or ledger mutation. Next exact grant
-fingerprint7dfd5973dfaa3efeb89dca1fbbb3decc733ca35df4e2b45eeaa7c1e70c4a9935.
-Core's read-only review now accepts that exact approved grant; not a general authority
-relaxation. The verified Linux artifact, same-app compatibility rollout and exact
-amendment APPLY passed. Actual WordPress113 captures are retained. Next is the narrow
-worker replacement gate above, then real Core critique/revisions/WordPress review
-under the new cap. No model dispatched under the old exhausted reservation. Do not
-repeat the prior two-Page round.
-
-
-**Current owner-approved increment (November 21):** proceed with Core-led,
-whole-site improvement and actual hosted WordPress review. Temporarily identify
-what each workspace, proposed page, earlier reference and installed draft is and
-why it is shown. These removable guides are development review scaffolding,
-not new product content, a publication decision or a claim of site improvement.
-No hostname/infrastructure expansion. Reuse existing access; ask only for an
-actual authority/data/spending gap. Communicate approved steps in a few plain
-bullets and distinguish functional repair from commercial improvement.
+**RECOVERY / RESUME HERE:** read active ignored chat-recovery.md, this index and the
+final Issue12 handoff. Do not replay enrollment/SQL/allowance APPLY/models or restore
+an old site over129. Retain the viewable candidate, all response/history/rollback and
+exact captures. Next: owner review of this actual result; proportionate security/
+interaction review already requested after the round. Include full-workflow preflight,
+bounded maintenance authority, recoverable output, clearer diagnostics, context/cost
+reuse and the tested comparison repair. Preserve the managed growth-service scope;
+no new spending, Core rollout or protected WordPress application follows automatically.
 
 ### Prior baseline result — Core proposal113 and retained critique, November21
 

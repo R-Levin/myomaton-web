@@ -5,7 +5,8 @@ import { build } from "esbuild";
 import { createElement, type ComponentType } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { fingerprint } from "../lib/platform/canonical/model";
-import { artifactLineage, projectRetainedSite, type RetainedSiteReview } from "../lib/platform/intake/retained-site-review";
+import { artifactLineage, projectRetainedSite, historicalRetainedReview, type RetainedSiteReview } from "../lib/platform/intake/retained-site-review";
+import {workflowLocalDraftInput} from "../lib/platform/intake/presence-workflow-delivery";
 import type { WorkflowContext, PresenceWorkflowView } from "../lib/platform/intake/presence-workflow";
 import type { MarketingAuthority } from "../lib/platform/intake/presence-marketing-authority";
 import { validateWordPressReviewObservation, wordpressDraftReviewUrl } from "../lib/platform/intake/wordpress-review-observation";
@@ -19,6 +20,26 @@ const page = { path: "/", heading: "Managed presence", sections: [{ heading: "A 
 const previous = { version: 97, contextDigest: fingerprint(context), pages: [page], blueprint: { pages: [{ path: "/", label: "Home", purpose: "Explain the managed service" }], navigation: ["/"], articles: [] },
   report: { title: "Business understanding", summary: "A retained AI assessment.", findings: [] }, direction: null, editorial: null } as unknown as PresenceWorkflowView;
 const current = { ...previous, version: 106, pages: [{ ...page, sections: [{ ...page.sections[0], body: "Revised wording" }] }] } as unknown as PresenceWorkflowView;
+
+test("historical complete drafts remain previewable after the current candidate receives a critique",()=>{
+ const evaluationContext={...context,intakeId:"33333333-3333-4333-8333-333333333333",
+  scope:{webPresenceId:"11111111-1111-4111-8111-111111111111",managedSiteId:"22222222-2222-4222-8222-222222222222"},
+  evaluation:{scenario:"c0" as const,basis:fingerprint("isolated preview")}};
+ const digest=fingerprint(evaluationContext),snapshot={...previous,contextDigest:digest,work:null,failure:null};
+ const latest={...current,contextDigest:digest,version:131,next:"editorial-review" as const,canRenderForEditorial:undefined,
+  editorial:{summary:"Latest critique",concerns:[]}};
+ const before=fingerprint({snapshot,latest}),view=historicalRetainedReview(latest,snapshot);
+ assert.equal(view.version,97);assert.equal(view.next,"editorial");assert.equal(view.canRenderForEditorial,true);
+ assert.equal(view.canQueueEditorialRevision,false);assert.equal(view.deliveryQuality,undefined);
+ const copy=workflowLocalDraftInput(evaluationContext,view).pages[0].sections[0].text;
+ assert.ok(copy?.kind==="editorial");assert.equal(copy.text,"Earlier wording");
+ assert.equal(fingerprint({snapshot,latest}),before);
+ for(const changed of [{...snapshot,pages:[]},{...snapshot,work:{operation:"page"}},{...snapshot,failure:"output-invalid" as const}]){
+  const refused=historicalRetainedReview(latest,changed);assert.equal(refused.canRenderForEditorial,undefined);
+  assert.throws(()=>workflowLocalDraftInput(evaluationContext,refused));
+ }
+ assert.throws(()=>historicalRetainedReview(latest,{...snapshot,contextDigest:fingerprint("foreign")}));
+});
 
 test("actual source-refresh chronology does not falsely label regenerated report and Direction stale", () => {
   const result = artifactLineage([

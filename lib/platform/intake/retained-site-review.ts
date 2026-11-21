@@ -6,6 +6,19 @@ import type { WordPressReviewObservation } from "./wordpress-review-observation"
 export type ArtifactHistoryRow = { version: number; context: string; report: string | null; direction: string | null; blueprint: string | null };
 export type RetainedCritique = { version: number; contextDigest: string; editorial: NonNullable<PresenceWorkflowView["editorial"]>; pages: PresenceWorkflowView["pages"] };
 
+/** Historical preview readiness belongs to that saved snapshot. Inheriting the
+ * latest view's readiness makes a formerly renderable draft disappear after a
+ * later critique. This projection confers no editing, delivery or approval grant. */
+export function historicalRetainedReview(current:PresenceWorkflowView, snapshot:PresenceWorkflowView&{work?:unknown}) {
+  if(snapshot.contextDigest!==current.contextDigest||snapshot.version>=current.version)throw Error("Historical preview scope differs");
+  const complete=Boolean(snapshot.blueprint&&snapshot.pages.length===snapshot.blueprint.pages.length&&
+    snapshot.blueprint.pages.every(page=>snapshot.pages.some(draft=>draft.path===page.path))&&!snapshot.work&&!snapshot.failure);
+  const beforeCritique=complete&&!snapshot.editorial;
+  return {...current,...snapshot,next:(snapshot.editorial?"editorial-review":beforeCritique?"editorial":"recover") as PresenceWorkflowView["next"],
+    canRenderForEditorial:beforeCritique?true as const:undefined,canQueueEditorialRevision:false,
+    deliveryQuality:undefined,conceptQuality:undefined,candidateReviewTarget:undefined};
+}
+
 /** Derive freshness from saved events, rather than treating an updated global
  * context hash as proof that all earlier intellectual work was regenerated. */
 export function artifactLineage(history: readonly ArtifactHistoryRow[]) {

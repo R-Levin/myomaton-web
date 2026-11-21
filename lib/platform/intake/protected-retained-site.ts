@@ -7,7 +7,7 @@ import { fingerprint } from "../canonical/model";
 import { PresenceWorkflow, type WorkflowContext } from "./presence-workflow";
 import type { PresenceWorkflowGrant } from "./presence-workflow-provider";
 import { protectedOwnerId, protectedOwnerScope } from "./protected-owner";
-import { projectRetainedSite, type ArtifactHistoryRow } from "./retained-site-review";
+import { projectRetainedSite, historicalRetainedReview, type ArtifactHistoryRow } from "./retained-site-review";
 import { workflowNativeReviewCandidate } from "./presence-workflow-delivery";
 
 const caseId = "41a83e7e-1765-4517-941a-b2b151bb7c4a";
@@ -86,7 +86,7 @@ export async function protectedRetainedSiteReader() {
         db.release(); released = true;
         const workflow = new PresenceWorkflow(pool, operations, grant.previewActionDestinations, Date.now, "disposable");
         const current = await workflow.review(context); assert.ok(current); assert.equal(current.version, latest.version);
-        const previous = { ...current, ...rows[0].payload, version: 97 };
+        const previous = historicalRetainedReview(current,{...rows[0].payload,version:97});
         last = { context, current, previous };
         const review = projectRetainedSite(context, current, previous, grant.marketingAuthority, history, critiqueRow && {
           version: critiqueRow.version, contextDigest: critiqueRow.payload.contextDigest,
