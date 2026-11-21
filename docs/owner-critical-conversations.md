@@ -821,3 +821,49 @@ proceed within those bounds; materially changed protected SQL still needs its
 exact checksum authorization. The owner later returned BLOCKED23514 from the
 installer, commitStarted=false. Preserve that failed package and recovery file;
 no automatic retry/reset. The transaction independently read back as rolled back.
+
+### November 20 — owner rejects unusable Core handoff and invisible site progress
+
+**Owner feedback and governing direction:** after account activation at `be1d3a6`,
+the owner found the same confusing earlier interface, could not determine what had
+changed or where to begin, and said there was no metric for assessing progress.
+The owner expected work to continue improving the proposed site through actual
+insight. This is failed product/UX acceptance, not an approval to move on because
+SQL, permissions and backend smoke checks passed. The complete managed Web
+Presence growth service remains the objective; the site is one connected result.
+
+**Rationale:** the handoff exposed historical Core 41 (12 Page drafts), while the
+visible local WordPress candidate is source 97 (six Pages) and the paid three-Page
+correction at isolated 106 is recovered but unapplied. Its documented modest
+refinement is not proof of the substantive creative advance still needed.
+The repair enabled account functions but did not redesign the review experience
+or demonstrate a new insight-driven improvement to the visible website. Asking
+the owner to find a new correction merely to exercise plumbing was an inadequate
+product handoff. The known full-growth-service communication gap already supplies
+a real business need; do not ask the owner to reconstruct retained information.
+
+**Implementation/status:** the approved SQL/three grants and protected account
+scope are genuinely installed. Original evidence/candidates and technical results
+remain valid. Owner acceptance of the interface, meaningful intelligence and the
+resulting site improvement has NOT occurred. No new generation, candidate
+application or improved site quality is established by activation.
+
+**Next internal work:** reconcile current versus historical work and its existing
+scope; use the current whole-site comparison and retained C0 knowledge to connect
+the known business need to reviewable proposed changes. Repair the existing review
+experience so the owner sees the relevant candidate, why it changes, before/after
+evidence and one clear next decision. Reuse the current Core/site/delivery path.
+The next product handoff should demonstrate a visible, justified improvement and
+state remaining deficiencies in business terms. Existing business acceptance in
+[operations](service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle)
+remains authoritative; do not create another dashboard or scoring framework.
+
+**Authority and unresolved questions:** this feedback grants no additional paid
+provider request, protected source transfer, case reparenting, WordPress application,
+publication or merge. The approved session still requires a genuine explicit
+canonical confirmation and exact derived source pins before model dispatch.
+Local reconciliation/UX engineering may proceed within existing authority; do not
+turn the need for a future attestation into another request for arbitrary customer
+input now. Surface a concrete consequential decision only when its exact scope is
+known. Record progress by owner-visible understanding, useful changed work and a
+coherent review journey; technical tests remain supporting evidence.

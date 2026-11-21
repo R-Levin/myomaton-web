@@ -94,7 +94,19 @@ gates, peaking at 161996800 bytes RSS with minimum 600904 KiB available; the app
 was restored and independently probed afterward. This is retained C0 work, not
 new AI generation, founder acceptance or a new WordPress application.
 
-**Next executable action:** the owner can use **Your understanding and current work**
+**Current product finding: owner rejected this handoff.** The same earlier Core
+interface remains confusing; the owner cannot ascertain progress and expected an
+insight-driven improvement to the proposed site. SQL/account activation does not
+satisfy that outcome. [Exact finding and next internal work](owner-critical-conversations.md#november-20--owner-rejects-unusable-core-handoff-and-invisible-site-progress).
+Reconcile visible local 97, retained correction 106 and historical hosted 41 with
+honest scope/status labels; connect the known full-service communication gap to
+reviewable proposed changes and a coherent existing-portal journey. Do not ask the
+owner to reconstruct prior information or supply a correction merely for an
+engineering exercise. No new model, protected transfer or candidate application
+is authorized by this finding.
+
+**Conditional AI continuation, after the usability/context repair:** the owner can
+use **Your understanding and current work**
 in authenticated Core to review retained sources and propose a meaningful business
 correction, then explicitly confirm it against the canonical target. Saving a
 proposal makes no model call. Do not invent a correction or silently confirm the

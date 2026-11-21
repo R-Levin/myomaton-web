@@ -54,6 +54,20 @@ Publication, consequential customer decisions, protected writes, spending and
 merges retain their existing authority. A fresh hosted-health audit was not
 performed in this local increment; cited hosted results are retained evidence.
 
+### Owner-visible product status after account activation
+
+**November 20; owner rejection after `be1d3a6`.** The repaired hosted account is
+technically available, but its unchanged earlier interface failed owner usability
+and progress comprehension. No new insight-driven website improvement was
+demonstrated by that repair. Historical hosted 41 (12 drafts), visible local 97
+(six Pages) and retained/unapplied three-Page correction 106 are different work.
+Do not describe them as one current candidate or ask the owner to reconstruct the
+relationships. Technical activation remains valid; useful current-case selection,
+clear evidence-to-change review and substantive site improvement remain unfinished.
+The [owner-critical finding](owner-critical-conversations.md#november-20--owner-rejects-unusable-core-handoff-and-invisible-site-progress)
+records the next internal work and unchanged authority. No additional model calls,
+site application or new quality acceptance occurred in this finding/reconciliation.
+
 ### Connected account cycle — first local implementation checkpoint
 
 **November 20, 2026.** The owner asked Codex to act on the scoped next step. This
