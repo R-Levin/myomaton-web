@@ -25,6 +25,19 @@ export type MarketingAuthority = {
 const publicUses: ReadonlySet<EvidenceUse> = new Set(["business-fact", "staffed-offer", "editorial"]);
 const sha256 = /^[a-f0-9]{64}$/u;
 
+/** A source transition records the authority at that historical event. Later
+ * authorized processing instructions may append without changing source rights.
+ * The composition root must separately verify the private continuation receipt. */
+export function sourceTransitionAuthorityMatches(current: MarketingAuthority, historicalDigest: string,
+  historical?: MarketingAuthority) {
+  if (fingerprint(current) === historicalDigest) return true;
+  if (!historical || fingerprint(historical) !== historicalDigest) return false;
+  const { processingInstructions: previous = [], ...before } = historical;
+  const { processingInstructions: next = [], ...after } = current;
+  return fingerprint(before) === fingerprint(after) && next.length > previous.length &&
+    fingerprint(next.slice(0, previous.length)) === fingerprint(previous);
+}
+
 export function validateMarketingAuthority(authority: MarketingAuthority, contextDigest: string, sources: readonly string[]) {
   if (authority.strategy) checkStrategyScope(authority.strategy);
   const declared = authority.sources.map(source => source.digest);

@@ -9,7 +9,7 @@ import { WorkflowBlocked, type PresenceWorkflowOperations, type WorkflowContext,
 import { editorialPatchSchema } from "./presence-editorial-patch";
 
 import {confirmUndispatchedPlanningRequest} from "./intelligent-responses";
-import { exposesInternalCopy, marketingCitationIds, marketingProjection, repeatsPeerObservation, unsupportedCommercialCopy, validateMarketingAuthority, validateStrategyBlueprint, type MarketingAuthority } from "./presence-marketing-authority";
+import { exposesInternalCopy, marketingCitationIds, marketingProjection, repeatsPeerObservation, unsupportedCommercialCopy, validateMarketingAuthority, validateStrategyBlueprint, sourceTransitionAuthorityMatches, type MarketingAuthority } from "./presence-marketing-authority";
 import type { PresenceImageGrant } from "./presence-workflow-visual";
 import { originalMaterialInput, validateOriginalGrant, type OriginalMaterialGrant, type OriginalMaterialReader } from "./presence-source-material";
 import { existingWorkAuthoringInstructions } from "./presence-existing-work";
@@ -237,6 +237,7 @@ function approvedProjection(run: WorkflowRun, grant: PresenceWorkflowGrant) {
 // loader and does not enable external access in the local or hosted UI.
 export function createResponsesPresenceWorkflow(config: {
   grant: PresenceWorkflowGrant;
+  sourceTransitionAuthority?: import("./presence-marketing-authority").MarketingAuthority;
   readGrant: () => Promise<PresenceWorkflowGrant>;
   readContext: () => Promise<WorkflowContext>;
   ledgerDirectory: string;
@@ -278,7 +279,7 @@ export function createResponsesPresenceWorkflow(config: {
     const transition=grant.sourceRepair.contextTransition;
     if(!transition.addedEvidenceDigests.length||new Set(transition.addedEvidenceDigests).size!==transition.addedEvidenceDigests.length||
       ![transition.previousContextDigest,transition.previousAuthorityDigest,transition.nextContextDigest,transition.nextAuthorityDigest,...transition.addedEvidenceDigests].every(value=>/^[a-f0-9]{64}$/u.test(value))||
-      transition.nextContextDigest!==grant.contextDigest||transition.nextAuthorityDigest!==fingerprint(grant.marketingAuthority)||
+      transition.nextContextDigest!==grant.contextDigest||!sourceTransitionAuthorityMatches(grant.marketingAuthority!,transition.nextAuthorityDigest,config.sourceTransitionAuthority)||
       transition.addedEvidenceDigests.some(digest=>!grant.approvedSources.includes(digest)||
         !grant.marketingAuthority?.sources.some(row=>row.digest===digest&&row.use==="analysis"))) throw Error("Exact reasoning source transition required");
   }

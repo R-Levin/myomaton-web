@@ -4,6 +4,7 @@ import { fingerprint } from "../canonical/model";
 import { validateWorkflowStagePlan, meteredPresenceWorkflow } from "./intelligent-responses";
 import type {PresenceWorkflowGrant} from "./presence-workflow-provider";
 import type {WorkflowContext} from "./presence-workflow";
+import {sourceTransitionAuthorityMatches} from "./presence-marketing-authority";
 
 export type WholeSiteContinuation = {
  version:1|2; caseId:string; scope:WorkflowContext["scope"]; baseVersion:number; stateDigest:string;
@@ -81,6 +82,8 @@ export function compileWholeSiteContinuation(grant:PresenceWorkflowGrant, contex
  if(plan.version===2){
   next.marketingAuthority!.processingInstructions=[...next.marketingAuthority!.processingInstructions??[],...structuredClone(plan.correction!.instructions)];
   next.ledger.stages.editorial.requestInputTokens=plan.correction!.editorialInputTokens;
+  if(next.sourceRepair?.contextTransition)assert.ok(sourceTransitionAuthorityMatches(next.marketingAuthority!,
+   next.sourceRepair.contextTransition.nextAuthorityDigest,grant.marketingAuthority),"Historical source authority must remain exact");
  }
  validateWorkflowStagePlan(next.ledger.stages,next.ledger,next.marketSearch?.maxToolCalls);
  // Exercise the real dispatcher configuration without invoking its transport.

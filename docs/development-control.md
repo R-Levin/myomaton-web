@@ -56,7 +56,29 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ### Active owner-approved whole-site correction round — November21
 
-**Continuation fault diagnosed before any provider dispatch:** allowance APPLY
+**Latest diagnosis supersedes the budget-only attribution below:** the owner approved
+exact worker5c3 replacement. Its real no-dispatch check failed; matching previous
+worker/proof/activation were restored. Exception-location-only diagnosis identified
+the source-transition guard: new authorized processing instructions changed the
+current authority fingerprint, while the historical source event correctly retains
+its earlier fingerprint. This guard runs before dispatcher construction. The budget
+coupling was a real additional defect, not a complete explanation of the live stop.
+
+The bounded correction reads the existing private continuation receipt and previous
+grant, verifies both complete grant fingerprints and unchanged source transition,
+then accepts only appended processing instructions against historical authority.
+Sources/classifications/passages, tenant, brand, reviewer and prior instructions
+remain exact. No event, grant, credential, ledger or Core app rewrite is required.
+Actual Linux19tests/0failures/0skips and read-only actual-grant construction passed;
+providerCalls0. Candidate worker SHA256
+`82f5b2ad2bd0e031e29ec3ceb8b05557a22ab64a531208710e200c83fa0e7d78`.
+The restored old worker remains installed pending verified corrective replacement.
+The existing new-round$5 total-new cap and Nov22 expiry are unchanged.
+
+Owner requested a proportionate security/interaction review after this round.
+Record that pending work; do not weaken current guards or let it delay the site.
+
+**Earlier partial diagnosis before any provider dispatch:** allowance APPLY
 succeeded, case113/ledger128 stayed unchanged. The old dispatcher constructor
 required every maximum generation slot to be funded by two request slots, despite
 the earlier one-request research path. Our next ceilings51/101 hit that coupling.

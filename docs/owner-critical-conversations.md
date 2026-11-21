@@ -892,3 +892,19 @@ human Operator/Customer judgment and approvals. The current development still ne
 to prove routine service without engineering rescue. No purchase, SLA, provider
 spending or publication follows from accepting the estimates. Return the discussion
 to the substantive current product outcome after supplying the document.
+
+## November 21 — Proportionate security and interaction review requested
+
+**Owner direction:** after completing the current website correction, review why
+routine operation needs repeated intervention and right-size controls for a usable
+online service. The owner asked what the controls actually protect and requested
+continued completion while AFK. This is a pending engineering/product review,
+not permission to remove existing controls during the active run.
+
+Keep credential protection, customer privacy, tenant isolation, bounded spending,
+recoverability and consequential approval authority. Evaluate whether development
+artifact approvals, coupled configuration assumptions and manual recovery deliver
+proportionate protection or unnecessary friction. Distinguish Codex tool review
+from Core runtime authorization. Preserve the managed growth-service objective;
+ordinary maintenance must not become the service's main workflow. No new spending,
+credential, publication or protected WordPress authority is created by this record.
