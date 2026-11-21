@@ -1178,3 +1178,58 @@ architecture and measure the connected workload instead of buying capacity specu
 real previews; use a persistent-service recovery policy instead of a rehearsal stop;
 keep worker concurrency bounded. No provider spending, upgrade, new infrastructure,
 hosted benchmark or customer-state change occurred for this assessment.
+
+
+### Reliability and preliminary operating economics — owner clarification
+
+The owner asks whether the system being built can support50–100 customers when
+adequately provisioned, and wants reliability/cost rather than another sizing caveat.
+**Engineering assessment: yes, the shared-runtime/PostgreSQL/separable-delivery
+architecture is appropriate for that scale; no fundamental redesign is currently
+indicated. The current implementation is not yet a dependable unattended commercial
+service, and extra RAM does not complete its missing operational behavior.**
+
+Required reliability proof is ordinary concurrent tenant isolation, interrupted jobs
+resuming without lost results/double charges, and observable recovery without routine
+developer intervention. Existing scoped authority, receipts, recovery custody and
+rollback are foundations to preserve. Human Operator judgment remains intentional.
+A single server remains a failure point; a contractual availability promise needs
+separate failover/recovery costing and verification.
+
+**Planning estimates, USD/month; not quoted prices or owner authorization.** Assume
+modest business sites, shared Core, pooled delivery hosting, shared external PostgreSQL,
+bounded heavy-job concurrency and selective weekly/monthly Ongoing work. Exclude
+Operator labor, development/Codex spending, taxes, payment fees and customer-specific
+third-party purchases/high-volume campaigns. Existing hosting subscriptions can offset
+incremental cash costs; their actual package allowances have not been checked here.
+
+| Cost |50 customers |100 customers |
+| --- | ---: | ---: |
+| Shared platform/delivery hosting, database, storage, backups and monitoring allowance |$200–500 |$200–500 |
+| AI/research/image processing allowance at$5–20 per active customer/month |$250–1,000 |$500–2,000 |
+| Estimated recurring machine/service total |$450–1,500 |$700–2,500 |
+| Equivalent per customer |$9–30 |$7–25 |
+
+The fixed-cost allowance is an engineering budget, not a claim that a single package
+includes all those services or a highly available deployment. Current public benchmarks
+checkedNovember21:20i lists4GB/2core at$43.99 and8GB/4core at$87.99 monthly;
+Supabase Pro starts$25 for one project, with compute/storage usage affecting the bill.
+Sources: [20i managed Cloud](https://www.20i.com/us/managed-cloud-servers),
+[Supabase pricing](https://supabase.com/pricing).
+
+At the currently used GPT-5.4 rates,100,000 uncached input tokens plus20,000 output
+tokens cost$0.55 before search/images. Ten such reasoning/drafting passes are$5.50.
+Source: [official model pricing](https://developers.openai.com/api/docs/models/gpt-5.4).
+The$5–20 recurring allowance is a workload assumption, not a measured service unit
+cost or a new product/spending cap. Heavy acquisition, many revisions or video cost
+more. Ongoing should reuse business knowledge/research and revise selectively rather
+than repeat full Creation unnecessarily; this preserves the existing shared-capability
+principle and quality goal.
+
+For initial research/creation, a provisional$10–40 AI allowance per new customer is
+more defensible for planning than promising the unproved sub-$1 useful-site target.
+The latest source-aware C0 run's$10.823604 estimate did not yield owner-accepted work;
+it must not be advertised as the cost of a successful commercial site. No accepted
+unit-cost benchmark exists yet. Measure actual accepted outcomes and Operator effort
+before committing prices/margins; avoid recurring engineering rescue as an operating
+model. These estimates add no SLA, purchase, paid dispatch or public claim authority.
