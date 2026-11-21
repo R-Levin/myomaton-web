@@ -108,6 +108,23 @@ if (core) {
     await cp(source, path.join(staging, relative));
     hashes[relative] = createHash('sha256').update(await readFile(source)).digest('hex');
   }
+  const previewInput = { candidate: { pages: [
+    { path: '/', title: 'Controlled Home', sections: [{ type: 'intro', content: { heading: '<script>escaped</script>', text: 'Controlled renderer check' } }] },
+    { path: '/service', title: 'Controlled Service', sections: [{ type: 'intro', content: { heading: 'Service', text: 'Controlled renderer check' } }] },
+  ], navigation: ['/', '/service'], actions: [{ from: '/', destination: '/service', type: 'page', label: 'Explore service' }] }, unresolvedActions: [], path: '/' };
+  const nativePreview = input => spawnSync('php', [path.resolve(staging, '.rehearsal/core-native-preview.php')], {
+    input: JSON.stringify(input), encoding: 'utf8', timeout: 10_000,
+    env: { PATH: process.env.PATH, LANG: 'C.UTF-8' },
+  });
+  const rendered = nativePreview(previewInput);
+  assert.equal(rendered.status, 0, 'Packaged native PHP renderer must run on Linux');
+  assert.match(rendered.stdout, /&lt;script&gt;escaped&lt;\/script&gt;/u);
+  assert.match(rendered.stdout, /page_id=2&amp;preview=true/u);
+  for (const refused of [{ ...previewInput, path: '/foreign' }, { ...previewInput, extra: true }]) {
+    const result = nativePreview(refused);
+    assert.equal(result.status, 2); assert.equal(result.stdout, '');
+    assert.equal(result.stderr, 'Native preview validation failed.');
+  }
   for (const [source, executable] of [
     ["scripts/intake/protected-presence-worker.ts", "protected-presence-worker.cjs"],
     ["scripts/wordpress-private-operator.ts", "wordpress-private-operator.cjs"],
@@ -152,7 +169,7 @@ assert.match(sourceCommit, /^[a-f0-9]{40}$/);
 const manifest = { sourceCommit, node: process.version, platform: process.platform, arch: process.arch,
   isolatedRuntimeSmoke: "PASS", normalCoreDatabaseCredential: false, privateRoutingBuild: true,
   entrypoint: '.rehearsal/private-server.cjs', routingSmoke: routingSmokeResult, files: hashes, symlinks: links,
-  ...(core && { protectedCommands, unconfiguredCommandsRefused: true }) };
+  ...(core && { protectedCommands, unconfiguredCommandsRefused: true, nativePreviewSmoke: 'PASS' }) };
 await writeFile(path.join(staging, "rehearsal-build.json"), JSON.stringify(manifest, null, 2) + "\n");
 const archive = path.join(output, core ? "protected-core-linux-x64.tar.gz" : "wordpress-rehearsal-linux-x64.tar.gz");
 execFileSync("tar", ["--exclude=./.next/cache", "-czf", archive, "-C", staging, "."]);
