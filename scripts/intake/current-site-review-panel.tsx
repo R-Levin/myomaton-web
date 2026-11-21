@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import type { RetainedSiteReview } from "../../lib/platform/intake/retained-site-review";
 import styles from "../../components/intake/interview.module.css";
+import { TemporaryReviewLabel } from "./temporary-review-label";
+import { wordpressDraftReviewUrl } from "../../lib/platform/intake/wordpress-review-observation";
 
 type Tab = "business" | "website" | "changes";
 const sourceLabel = { "business-fact": "Source-backed business information", "staffed-offer": "Recorded service direction" };
@@ -66,6 +68,11 @@ export function CurrentSiteReviewPanel({ review, preview, reference }: { review:
       <p>Read the business information already retained, browse the saved proposal, and inspect the changes made to it.</p>
     </div>
     <p className={styles.hint}>Saved AI proposal · needs substantive review · latest changes not applied to WordPress.</p>
+    <TemporaryReviewLabel title={{ business: "Business understanding · retained sources and AI interpretation", website: "Website proposal · review the saved candidate", changes: "Changes and open decisions · compare the retained work" }[tab]}>
+      {{ business: "Shown so you can see the business information behind the proposed site. Source records, AI interpretations and unconfirmed ideas remain distinct.",
+        website: "Shown to assess the proposed content and composition. This uses WordPress’s content renderer inside Core, rather than loading the installed WordPress site.",
+        changes: "Shown to identify actual saved changes and unresolved concerns. A saved change is not proof that the website improved." }[tab]}
+    </TemporaryReviewLabel>
     <nav className={styles.workspaceTabs} aria-label="Your work">
       {([['business', 'Business understanding'], ['website', 'Website proposal'], ['changes', 'Changes and open decisions']] as const).map(([id, label]) =>
         <button type="button" key={id} aria-current={tab === id ? "page" : undefined} onClick={() => setTab(id)}>{label}</button>)}
@@ -103,6 +110,14 @@ export function CurrentSiteReviewPanel({ review, preview, reference }: { review:
       </div>
       {decision && <details className={styles.reviewDisclosure}><summary>Why this page was proposed</summary><p>{decision.purpose}</p></details>}
       <p className={styles.hint}>Core preview uses the WordPress content renderer. Links between proposed pages work here; unverified destinations remain inactive.</p>
+      <details className={styles.reviewDisclosure}><summary>Open the actual installed WordPress candidate</summary>
+        {review.wordpress ? <>
+          <p>Read-only inspection on {new Date(review.wordpress.observedAt).toLocaleString()} found a different, earlier candidate installed as WordPress draft revision {review.wordpress.revision}. This is an observed snapshot, not live monitoring or a receipt for the proposal above.</p>
+          <p>Open it to inspect the actual WordPress theme and draft Pages. Existing site protection and WordPress sign-in are required.</p>
+          <ul>{review.wordpress.pages.map(page => <li key={page.postId}><a href={wordpressDraftReviewUrl(page.postId)} target="_blank" rel="noreferrer">Installed WordPress {page.path === "/" ? "Home" : page.path} · Page {page.postId}</a></li>)}</ul>
+          <p className={styles.hint}>Delivery {review.wordpress.pluginVersion}; Managed Site theme {review.wordpress.themeVersion}. Opening these links does not apply the Core proposal.</p>
+        </> : <p>No verified WordPress inspection is available in this workspace. Delivery status is unknown here; no application is implied.</p>}
+      </details>
       {failed ? <p role="alert">Core could not render this saved page. The proposal is retained. No generation or application was attempted.</p>
         : !html ? <p role="status">Opening the saved page…</p>
           : <div className={mobile ? styles.mobilePreview : styles.desktopPreview}><iframe ref={frame} title={(before ? "Earlier " : "Proposed ") + (selected?.heading ?? "page")}
@@ -156,7 +171,9 @@ function EarlierDesignReferences({ images, read }: { images: RetainedSiteReview[
   }, [open, selected, read]);
   return <details className={styles.reviewDisclosure} onToggle={event => { setOpen(event.currentTarget.open); if (!event.currentTarget.open) setReply(null); }}>
     <summary>Compare with the earlier retained website direction</summary>
-    <p>Your earlier work is retained as an editorial reference. This is its saved capture, not a new proposal or a replacement for the current site.</p>
+    <TemporaryReviewLabel title="Earlier website direction · historical reference">
+      This is a retained capture of your earlier whole-site work, shown for comparison. It is neither the current proposal nor the installed WordPress site.
+    </TemporaryReviewLabel>
     <label>Earlier reference<select value={selected} onChange={event => setSelected(event.target.value)}>{images.map(image => <option key={image.id} value={image.id}>{image.label}</option>)}</select></label>
     {open && (failed ? <p role="alert">The retained reference could not be read. Nothing was regenerated.</p> : url ?
       <Image unoptimized className={styles.referenceCapture} src={url} width={reply?.width ?? 1} height={reply?.height ?? 1}

@@ -1,6 +1,7 @@
 import { fingerprint } from "../canonical/model";
 import { marketingSources, type MarketingAuthority } from "./presence-marketing-authority";
 import type { WorkflowContext, PresenceWorkflowView } from "./presence-workflow";
+import type { WordPressReviewObservation } from "./wordpress-review-observation";
 
 export type ArtifactHistoryRow = { version: number; context: string; report: string | null; direction: string | null; blueprint: string | null };
 
@@ -36,6 +37,7 @@ export function projectRetainedSite(context: WorkflowContext, current: PresenceW
     revision: current.version, baselineRevision: previous.version, candidateDigest: fingerprint(current.pages),
     origin: "retained-core-ai" as const, readonly: true as const, lineage,
     referenceImages: [] as { id: string; label: string }[],
+    wordpress: null as WordPressReviewObservation | null,
     understanding: sources.filter(item => item.use === "business-fact" || item.use === "staffed-offer")
       .map(({ source, use }) => ({ ...source, use })),
     references: sources.map(({ source, use }) => ({ ...source, use })),

@@ -82,6 +82,13 @@ export async function protectedRetainedSiteReader() {
         const review = projectRetainedSite(context, current, previous, grant.marketingAuthority, history);
         review.referenceImages = (grant.originalMaterials?.records ?? []).filter(source => source.mime === "image/png" && source.purpose === "editorial-reference")
           .map(source => ({ id: source.id, label: ["home", "service", "experience", "review"].find(label => source.id.includes(label)) ?? "Earlier website reference" }));
+        try {
+          const { validateWordPressReviewObservation } = await import("./wordpress-review-observation");
+          review.wordpress = validateWordPressReviewObservation(JSON.parse((await privateBytes(join(parent, "current-wordpress-review.json"))).toString("utf8")));
+        } catch {
+          // Do not substitute a successful delivery status when inspection is unavailable.
+          review.wordpress = null;
+        }
         return review;
       } finally { if (!released) db.release(); }
     }
@@ -92,7 +99,7 @@ export async function protectedRetainedSiteReader() {
       const view = before ? last.previous : last.current;
       assert.ok(view.pages.some(page => page.path === path));
       const input = workflowNativeReviewCandidate(last.context, view);
-      return { ...input, path };
+      return { ...input, path, reviewLabel: { revision: view.version, before } };
     },
     async reference(ownerId: string, id: string) {
       const review = await read(ownerId);

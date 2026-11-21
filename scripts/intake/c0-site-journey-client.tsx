@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { TemporaryReviewLabel } from "./temporary-review-label";
 import styles from "../../components/intake/interview.module.css";
 import { prospectPriorities } from "../../lib/platform/intake/adaptive";
 import { prospectDirection, prospectPlanSeed } from "../../lib/platform/intake/prospect-direction";
@@ -224,6 +225,11 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
   const editorDraft = plan ?? (hosted && authored && view ? prospectPlanSeed(view.answers) : null);
   const workspace = !locked ? view?.portal : undefined;
   return <div className={styles.shell}>
+    {hosted && <TemporaryReviewLabel title={view?.originalAccountRecords ? "Core · original account records" : "Core · Operator workspace"}>
+      {locked || !view ? "You are opening the protected online workspace to review retained business understanding and proposed website work. This is not the customer website."
+        : view.originalAccountRecords ? "You are viewing the original C0 intake, knowledge and operations evidence. The separate website evaluation remains available through Return to the current website work."
+          : "You are reviewing saved business understanding and a proposed website. The website shown inside Core has not been installed as the current WordPress site."}
+    </TemporaryReviewLabel>}
     <header><strong>MioPages</strong><span>{workspace ? (workspace.role === "operator" ? "Operator workspace" : "Customer rehearsal") : hosted ? "Protected Core" : "Private local development"}</span>
       {hosted && view && <button type="button" disabled={busy} onClick={async () => {
         setBusy(true);

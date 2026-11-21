@@ -8,6 +8,7 @@ import { fingerprint } from "../lib/platform/canonical/model";
 import { artifactLineage, projectRetainedSite, type RetainedSiteReview } from "../lib/platform/intake/retained-site-review";
 import type { WorkflowContext, PresenceWorkflowView } from "../lib/platform/intake/presence-workflow";
 import type { MarketingAuthority } from "../lib/platform/intake/presence-marketing-authority";
+import { validateWordPressReviewObservation, wordpressDraftReviewUrl } from "../lib/platform/intake/wordpress-review-observation";
 
 const context: WorkflowContext = { scope: { webPresenceId: "owned-presence", managedSiteId: "owned-site" }, intakeId: "owned-intake", entry: "DIRECT_START",
   evidence: [{ id: "offer", kind: "owner-confirmed", label: "The managed service", reference: "Owner record", date: null, content: "Useful Launch and Ongoing service." },
@@ -66,4 +67,18 @@ test("current review is a readable business/site journey without fake generation
   assert.match(html, /A retained AI assessment/); assert.match(html, /latest changes not applied to WordPress/);
   assert.doesNotMatch(html, /proposed pages drafted|Record Operator site review|Confirm this report|Queue reassessment/);
   assert.match(html, /Saved AI proposal/);
+  assert.match(html, /Temporary review guide/);
+  assert.match(html, /Source records, AI interpretations and unconfirmed ideas remain distinct/);
+});
+
+test("WordPress observation cannot redirect review to another origin or imply live delivery", () => {
+  const observation = { kind: "wordpress-review-observation/1", observedAt: "2026-11-21T17:00:00Z",
+    installationId: "d84ebc69-46d5-4c64-adc6-ac7b87468f89", revision: 6, candidateDigest: "a".repeat(64),
+    pluginVersion: "0.0.12", themeVersion: "0.1.0", pages: [{ path: "/", postId: 13 }] };
+  assert.deepEqual(validateWordPressReviewObservation(observation), observation);
+  assert.equal(wordpressDraftReviewUrl(13), "https://miopages.org/?page_id=13&preview=true");
+  for (const invalid of [{ ...observation, installationId: "foreign" }, { ...observation, candidateDigest: "wrong" },
+    { ...observation, pages: [{ path: "//other.example", postId: 13 }] }, { ...observation, pages: [observation.pages[0], observation.pages[0]] },
+    { ...observation, pages: [{ path: "/", postId: -1 }] }]) assert.throws(() => validateWordPressReviewObservation(invalid));
+  assert.throws(() => wordpressDraftReviewUrl(NaN));
 });

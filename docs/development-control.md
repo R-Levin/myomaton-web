@@ -54,6 +54,25 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
+**Current owner-approved increment (November 21):** proceed with Core-led,
+whole-site improvement and actual hosted WordPress review. Temporarily identify
+what each workspace, proposed page, earlier reference and installed draft is and
+why it is shown. These removable guides are development review scaffolding,
+not new product content, a publication decision or a claim of site improvement.
+No hostname/infrastructure expansion. Reuse existing access; ask only for an
+actual authority/data/spending gap. Communicate approved steps in a few plain
+bullets and distinguish functional repair from commercial improvement.
+
+Implementation checkpoint: temporary Core guides and an owner-only, read-only
+WordPress observation are ready for Linux verification. Actual read-only WordPress
+verification still passes: draft revision 6, 13 Pages, 2 images, Delivery 0.0.12,
+Managed Site theme 0.1.0. Core's later proposal 106 is a separate candidate and
+has not been applied there. Optional observation timestamps are not live monitoring
+or application receipts. The temporary WordPress guide checks actual Page content
+against its installed revision; it annotates authenticated draft previews outside
+signed content, with drift explicitly identified. Not deployed at this checkpoint.
+
+
 **November 21 owner clarification:** Codex is development tooling only and must not
 be required for normal service operation. Core/API AI and authorized human roles
 perform the service. [Canonical boundary](service-operations-model.md#development-tooling-and-normal-operation).

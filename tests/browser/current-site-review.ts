@@ -63,6 +63,7 @@ try {
   await page.route("**/*", route => new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
   const signIn = async () => { await page.getByLabel("Password", { exact: true }).fill("browser-test-password-only"); await page.getByRole("button", { name: "Sign in", exact: true }).click(); await page.getByRole("heading", { name: "Your business and website work" }).waitFor(); };
   await page.goto(origin + "/core"); await signIn();
+  assert.match(await page.getByLabel("Temporary review guide").first().innerText(), /Core · Operator workspace/);
   assert.ok(!(await page.locator("body").innerText()).includes("HIDDEN_SOURCE_MARKER"));
   await page.screenshot({ path: join(directory, "business-desktop.png"), fullPage: true });
   await page.getByText("Original account records and tools", { exact: true }).click();
