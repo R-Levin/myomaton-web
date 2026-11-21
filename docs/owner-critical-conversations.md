@@ -880,3 +880,15 @@ managed Web Presence growth-service objective, existing work and authority bound
 The immediate repair now opens the actual retained current proposal and comparisons in
 Core, preserving original account tools and evidence. It incurred no new provider calls.
 The broader substantive site outcome remains unfinished and must be described that way.
+
+
+## November 21 — Codex is development tooling only
+
+The owner accepted the capacity/cost discussion as planning information, requested
+a downloadable human-readable document, and explicitly confirmed: "Codex will not
+be a part of normal operation, only development." Record service model/API spending
+as operating cost and Codex engineering as development cost. Preserve intentional
+human Operator/Customer judgment and approvals. The current development still needs
+to prove routine service without engineering rescue. No purchase, SLA, provider
+spending or publication follows from accepting the estimates. Return the discussion
+to the substantive current product outcome after supplying the document.

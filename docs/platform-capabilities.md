@@ -1233,3 +1233,13 @@ it must not be advertised as the cost of a successful commercial site. No accept
 unit-cost benchmark exists yet. Measure actual accepted outcomes and Operator effort
 before committing prices/margins; avoid recurring engineering rescue as an operating
 model. These estimates add no SLA, purchase, paid dispatch or public claim authority.
+
+
+### Owner confirmed development tooling boundary
+
+On November 21 the owner clarified: "Codex will not be a part of normal operation,
+only development." The canonical [operations boundary](service-operations-model.md#development-tooling-and-normal-operation)
+records the approved direction and current implementation gap. Normal Core/API usage
+is an operating cost; Codex usage is development cost. Existing human roles remain.
+The preceding capacity/economic ranges are accepted as planning information, not
+measured unit costs, an SLA, a purchase or a provider-dispatch authorization.

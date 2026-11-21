@@ -694,6 +694,25 @@ approval where explicitly established. Do not infer delegation from an account
 assignment or an admin role. Broad automation policy cannot override protected facts,
 pricing approval or initial human publication review. AI has no independent responsibility.
 
+### Development tooling and normal operation
+
+**Owner-confirmed direction, November 21, 2026:** Codex is used for software
+engineering and verification only. It is not a runtime component, staffing role or
+required step in normal customer service. Core and its authorized API integrations
+must perform the service workflow, with the existing human Operator and Customer
+responsibilities and approval boundaries.
+
+Core model/API usage belongs in service operating costs. Codex development usage
+belongs in development costs. Routine service must not require a Codex chat, manual
+code changes or repeated engineering recovery to finish ordinary work. Developer
+maintenance of the product remains normal software development, not a customer
+workflow. Human Operator work remains intentional and is not prohibited by this rule.
+
+**Rationale:** reliability and unit economics must describe the actual managed Web
+Presence service. **Implementation status:** current development cases still involve
+engineering intervention; ordinary unattended commercial operation is not complete.
+This clarification authorizes no new spending, staffing, deployment or publication.
+
 ## Operator and team model
 
 The initial service may have one operator. Single-operator operation is the simplest

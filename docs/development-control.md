@@ -54,6 +54,14 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
+**November 21 owner clarification:** Codex is development tooling only and must not
+be required for normal service operation. Core/API AI and authorized human roles
+perform the service. [Canonical boundary](service-operations-model.md#development-tooling-and-normal-operation).
+The capacity/cost discussion remains preliminary planning evidence. The current
+product task is substantive full-service understanding/site improvement through
+Core; the access repair and downloadable assessment do not complete that outcome.
+
+
 
 ### Owner-reported502 — corrected and bounded recovery verified, November21
 
