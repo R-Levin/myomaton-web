@@ -14,13 +14,14 @@ const sha=(b:Buffer)=>createHash("sha256").update(b).digest("hex");
 let stage="arguments";
 async function save(file:string,bytes:Buffer){const f=await open(file,"wx",0o600);try{await f.writeFile(bytes);await f.sync()}finally{await f.close()}}
 /** Same existing case; only explicit resource/sequence fields. No provider, DB mutation, token or expiry change. */
-export async function wholeSiteContinuation(mode:string,authorization:string){
+export async function wholeSiteContinuation(mode:string,authorization:string,round?:string){
  assert.ok(process.platform==="linux"&&process.env.NODE_ENV!=="production"&&["PREFLIGHT","APPLY"].includes(mode)&&/^[a-f0-9]{64}$/.test(authorization));
+ assert.ok(round===undefined||round==="customer-facing");
  const home=await realpath(process.env.HOME??""),parent=join(home,"miopages-private-acceptance");
- const runtime=join(parent,"p0-source-aware-c0-runtime"),code=join(runtime,"correction-10");
+ const runtime=join(parent,"p0-source-aware-c0-runtime"),code=join(runtime,round?"customer-facing-"+authorization.slice(0,8):"correction-10");
  const root=join(parent,"presence-evaluation",original.destination.intakeId);
  for(const dir of [parent,runtime,code,root,join(root,"usage")])await verifyDirectory(dir);
- const manifest=await privateWorkflowBytes(join(code,"docs/c0-whole-site-continuation.json"),code);
+ const manifest=await privateWorkflowBytes(join(code,round?"docs/c0-customer-facing-round.json":"docs/c0-whole-site-continuation.json"),code);
  assert.equal(sha(manifest),authorization);
  const plan=JSON.parse(manifest.toString()) as WholeSiteContinuation;
  assert.equal(plan.caseId,original.destination.intakeId);assert.deepEqual(plan.scope,original.destination.scope);
@@ -84,8 +85,8 @@ export async function wholeSiteContinuation(mode:string,authorization:string){
  }
 }
 if(process.argv[1]&&/source-aware-continuation\.(ts|cjs)$/.test(process.argv[1])){
- const[mode,authorization,...extra]=process.argv.slice(2);
- (extra.length?Promise.reject(Error("Exact operation required")):wholeSiteContinuation(mode,authorization)).then(result=>console.log(JSON.stringify(result))).catch(()=>{
+ const[mode,authorization,round,...extra]=process.argv.slice(2);
+ (extra.length?Promise.reject(Error("Exact operation required")):wholeSiteContinuation(mode,authorization,round)).then(result=>console.log(JSON.stringify(result))).catch(()=>{
   console.error(JSON.stringify({status:"BLOCKED",operation:"whole-site-continuation",stage,requirement:"Preserve locks, original grant, ledger and before/after files. Inspect before retry; no provider dispatch."}));process.exitCode=1;
  });
 }

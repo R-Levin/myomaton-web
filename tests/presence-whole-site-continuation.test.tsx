@@ -31,6 +31,45 @@ function fixture(){
  next:{capMicros:13000000,generations:44,requests:89,editorialRounds:7,commercialReplans:3,reviewSequence:"site-first"}};
  return{grant,context,state,ledger,plan};
 }
+
+function correctionFixture(){
+ const f=fixture();
+ f.state.report={retained:true} as never;f.state.direction={retained:true} as never;f.state.blueprint={retained:true} as never;
+ f.state.pages=[{path:"/",retained:true}] as never;
+ const plan:WholeSiteContinuation={...f.plan,version:2,stateDigest:fp(f.state),next:{...f.plan.next,
+  capMicros:f.plan.usage.heldMicros+5_000_000,generations:f.plan.usage.generations+8,requests:f.plan.usage.requests+16,
+  editorialRounds:f.plan.previous.editorialRounds+3,commercialReplans:f.plan.previous.commercialReplans},
+  correction:{pagesDigest:fp(f.state.pages),maximumNewSpendMicros:5_000_000,previousInstructionsDigest:fp([]),editorialInputTokens:240000,
+   instructions:[{text:"Evaluate the whole existing candidate; preserve source authority.",basis:"implementation-choice",reference:"Offline owner-approved-round fixture"}]}};
+ return{...f,plan};
+}
+
+test("candidate correction enforces the incremental ceiling and preserves all source/identity authority",()=>{
+ const f=correctionFixture(),before=structuredClone(f.grant),state=structuredClone(f.state),bytes=Buffer.from(f.ledger);
+ const next=compileWholeSiteContinuation(f.grant,f.context,f.state,f.ledger,f.plan);
+ assert.equal(next.ledger.capMicros-f.plan.usage.heldMicros,5_000_000);
+ assert.deepEqual(next.approvedSources,before.approvedSources);assert.deepEqual(next.originalMaterials,before.originalMaterials);
+ assert.equal(next.expiresAt,before.expiresAt);assert.equal(next.maxRetries,before.maxRetries);
+ assert.deepEqual(next.marketingAuthority?.sources,before.marketingAuthority?.sources);
+ assert.equal(next.marketingAuthority?.processingInstructions?.length,1);
+ assert.equal(next.ledger.stages!.editorial.requestInputTokens,240000);
+ assert.equal(next.ledger.inputTokens,before.ledger.inputTokens);
+ assert.deepEqual(f.grant,before);assert.deepEqual(f.state,state);assert.deepEqual(f.ledger,bytes);
+});
+
+test("candidate correction refuses leftover stacking, authority drift, excess calls, context expansion and stale work",()=>{
+ const mutations:((f:ReturnType<typeof correctionFixture>)=>void)[]=[];
+ mutations.push(f=>{f.plan.next.capMicros=f.grant.ledger.capMicros+5_000_000});
+ mutations.push(f=>{f.plan.correction!.maximumNewSpendMicros=6_000_000});
+ mutations.push(f=>{f.plan.next.generations=f.plan.usage.generations+9});
+ mutations.push(f=>{f.plan.next.requests=f.plan.usage.requests+17});
+ mutations.push(f=>{f.plan.next.commercialReplans++});
+ mutations.push(f=>{f.plan.correction!.editorialInputTokens=240001});
+ mutations.push(f=>{f.plan.correction!.previousInstructionsDigest=fp("different")});
+ mutations.push(f=>{f.state.pages=[];f.plan.stateDigest=fp(f.state)});
+ mutations.push(f=>{f.state.work={running:true} as never;f.plan.stateDigest=fp(f.state)});
+ for(const mutate of mutations){const f=correctionFixture();mutate(f);assert.throws(()=>compileWholeSiteContinuation(f.grant,f.context,f.state,f.ledger,f.plan))}
+});
 test("resource amendment preserves existing custody, permissions, expiry, request sizes, spent ledger and historical counters",()=>{
  const f=fixture(),before=structuredClone(f.grant),bytes=Buffer.from(f.ledger);
  const next=compileWholeSiteContinuation(f.grant,f.context,f.state,f.ledger,f.plan);

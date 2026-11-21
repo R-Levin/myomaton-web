@@ -49,7 +49,12 @@ export async function protectedRetainedSiteReader() {
       }
       const contextFile = JSON.parse((await privateBytes(join(root, "context.json"))).toString("utf8")) as { context: WorkflowContext };
       const grant = JSON.parse((await privateBytes(join(root, "grant.json"))).toString("utf8")) as PresenceWorkflowGrant;
-      assert.equal(fingerprint(grant), "f024b7997144524a4194cf93a6d7e9ca78783db1d0473d73fa16163102d48995");
+      // Exact original grant and the owner-approved same-case correction amendment.
+      // Context/source/public-claim/credential boundaries remain independently checked.
+      assert.ok([
+        "f024b7997144524a4194cf93a6d7e9ca78783db1d0473d73fa16163102d48995",
+        "7dfd5973dfaa3efeb89dca1fbbb3decc733ca35df4e2b45eeaa7c1e70c4a9935",
+      ].includes(fingerprint(grant)), "Retained review grant is not an approved binding");
       const context = contextFile.context;
       assert.equal(context.intakeId, caseId); assert.deepEqual(context.scope, sourceScope);
       assert.equal(context.evaluation?.basis, proposal); assert.equal(fingerprint(context), grant.contextDigest);

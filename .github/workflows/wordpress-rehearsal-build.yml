@@ -76,7 +76,7 @@ jobs:
       - name: Verify temporary WordPress review guide scope
         run: php tests/test-wordpress-temporary-review-guide.php
       - name: Verify metered planning and private recovery on Linux
-        run: npx tsx --test tests/site-planning.test.tsx tests/site-planning-recovery.test.tsx tests/presence-workflow-provider.test.tsx tests/presence-workflow-review.test.tsx tests/protected-workflow-footprint.test.tsx tests/protected-owner-verification.test.tsx tests/retained-site-review.test.tsx
+        run: npx tsx --test tests/site-planning.test.tsx tests/site-planning-recovery.test.tsx tests/presence-workflow-provider.test.tsx tests/presence-workflow-review.test.tsx tests/protected-workflow-footprint.test.tsx tests/protected-owner-verification.test.tsx tests/retained-site-review.test.tsx tests/presence-whole-site-continuation.test.tsx
       - name: Verify isolated evaluation worker on Linux PostgreSQL
         run: |
           for candidate in /usr/lib/postgresql/17/bin /usr/lib/postgresql/18/bin; do

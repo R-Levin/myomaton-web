@@ -54,6 +54,35 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
+### Active owner-approved whole-site correction round — November21
+
+Owner approved a$3 correction round, then said a few more dollars do not matter
+and asked for completion while AFK. Bounded implementation interpretation is
+**$5 maximum TOTAL NEW spending**, not$3+$5 and not the unused prior allowance.
+The owner's question about repeated Home focus is not a change to product direction:
+this is a whole-site round. Home is one priority alongside Direct Start, the Review
+offer, connected visitor journeys and the complete managed growth-service proposition.
+
+Exact plan: `docs/c0-customer-facing-round.json`, SHA256
+`59fdf5c92fa60ab3179cb88f021e79951ddb4a887f18a037cc0ef0c6ad8bcf07`.
+Base113/state/ledger/context are pinned. New conservative run cap$17.334194 equals
+existing debit$12.334194+$5; no allowance stacking. Up to8future generations/16requests,
+up to3bounded editorial rounds, no automatic retries/new paid research/image provider,
+same GPT-5.4/sources/privacy/expiry (Nov22 15:58:31UTC). Editorial context capacity may
+use the existing global240k-token envelope; output/bytes/source permissions unchanged.
+No new credentials, customer acceptance, protected WordPress application or publication.
+
+Existing continuation compiler now has a narrowly distinguished ready-candidate mode,
+keeping the old empty-upstream mode unchanged. Local4tests and actual Linux4tests /
+read-only preflight passed, no provider call or ledger mutation. Next exact grant
+fingerprint7dfd5973dfaa3efeb89dca1fbbb3decc733ca35df4e2b45eeaa7c1e70c4a9935.
+Core's read-only review is being made compatible with that exact approved grant before
+activation; not a general authority relaxation. Whole-site critique113 is already
+captured. Next: Linux artifact, same-app compatibility rollout, exact amendment APPLY,
+then real Core critique/revisions/WordPress review under the new cap. No model dispatched
+under the old exhausted reservation. Do not repeat the prior two-Page round.
+
+
 **Current owner-approved increment (November 21):** proceed with Core-led,
 whole-site improvement and actual hosted WordPress review. Temporarily identify
 what each workspace, proposed page, earlier reference and installed draft is and

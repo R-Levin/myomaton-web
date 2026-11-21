@@ -1,0 +1,96 @@
+{
+  "caseId": "41a83e7e-1765-4517-941a-b2b151bb7c4a",
+  "scope": {
+    "webPresenceId": "2a08e054-902c-400b-9b96-3c2274bcadc2",
+    "managedSiteId": "2c0d637d-4ded-4597-ac8b-661519aba358"
+  },
+  "baseVersion": 113,
+  "stateDigest": "c4cabefb9557df114c2686d4fe38e95949cc2bdea00d403b0bdceea30ea8347e",
+  "contextDigest": "7892fd3ecaac5408f85b18df7219e59072d734b0c6559d9156735a16a4592cfa",
+  "previousGrant": "f024b7997144524a4194cf93a6d7e9ca78783db1d0473d73fa16163102d48995",
+  "ledgerSha256": "0109303e430f3ca57f69e663a445f3ba104cb026f34beec42f7b47b84d687dee",
+  "expiresAt": "2026-11-22T15:58:31.154Z",
+  "model": "gpt-5.4-2026-03-05",
+  "usage": {
+    "generations": 43,
+    "requests": 85,
+    "settledMicros": 11974022,
+    "heldMicros": 12334194,
+    "pending": 0
+  },
+  "previous": {
+    "capMicros": 13000000,
+    "generations": 44,
+    "requests": 89,
+    "editorialRounds": 7,
+    "commercialReplans": 3
+  },
+  "version": 2,
+  "status": "OWNER APPROVED: $3 plus a few more dollars; bounded implementation ceiling $5 total new spending",
+  "purpose": "Correct the whole current website: three priority Pages, linked visitor journeys, then full-site visual/editorial evaluation and necessary bounded corrections.",
+  "next": {
+    "capMicros": 17334194,
+    "generations": 51,
+    "requests": 101,
+    "editorialRounds": 10,
+    "commercialReplans": 3,
+    "reviewSequence": "site-first"
+  },
+  "correction": {
+    "pagesDigest": "c1cf721e99ff3c502f95ee59abfcca22460d65a5b5990f12fe16553c3f299309",
+    "maximumNewSpendMicros": 5000000,
+    "previousInstructionsDigest": "d3d50474e637dd5b7e32c778b465049da32beb1777df03b1109aad2b5959b53d",
+    "editorialInputTokens": 240000,
+    "instructions": [
+      {
+        "text": "Treat this as a coherent whole-site correction of the existing candidate. Preserve the complete managed Web Presence growth service, existing useful Pages, business evidence and the distinct Free Review and Direct Start journeys. Evaluate all Pages and navigation. Home is one priority, not the product objective.",
+        "basis": "owner-direction",
+        "reference": "Owner-approved November21 customer-facing correction round; scope covers the whole site, not a Home approval treadmill."
+      },
+      {
+        "text": "For Home, replace the unavailable conceptual-image placeholder with an original, meaningful native WordPress composition using existing brand and approved service knowledge. Explain the service visually through native relationships, sequence, typography or comparison. Do not request an unacquired image, invent an Asset, or imitate a peer design.",
+        "basis": "implementation-choice",
+        "reference": "Owner-approved November21 customer-facing correction round; scope covers the whole site, not a Home approval treadmill."
+      },
+      {
+        "text": "For Direct Start, lead with customer value and a clear useful next step rather than internal scope-confirmation terminology. Make its own start Action visually primary; the Free Review is an alternative. Preserve the inactive private-preview Action and do not invent a destination or enable submissions.",
+        "basis": "implementation-choice",
+        "reference": "Owner-approved November21 customer-facing correction round; scope covers the whole site, not a Home approval treadmill."
+      },
+      {
+        "text": "For the Free Review, show a concrete, clearly labelled illustrative report-style example consistent with the supported offer. Distinguish illustrative observations from an actual assessment or customer evidence. Do not invent customer proof, scores, results or operational capabilities.",
+        "basis": "implementation-choice",
+        "reference": "Owner-approved November21 customer-facing correction round; scope covers the whole site, not a Home approval treadmill."
+      },
+      {
+        "text": "During whole-site critique and correction, challenge repetitive process-led wording and the prominence of the intended primary visitor Action on each Page. Preserve unresolved concerns and identify what remains uncertain. Temporary engineering review guides are not visitor content or a reason to remove the owner-requested annotations.",
+        "basis": "implementation-choice",
+        "reference": "Owner-approved November21 customer-facing correction round; scope covers the whole site, not a Home approval treadmill."
+      }
+    ]
+  },
+  "workflow": [
+    "Reuse retained research/context and exact candidate113",
+    "Core whole-site critique using retained actual WordPress113 captures",
+    "Core revises the justified priority Pages",
+    "Render the actual revised candidate in the same disposable WordPress and inspect every Page on desktop/mobile",
+    "Whole-site critique and necessary bounded corrections within the same ceiling; preserve all earlier work"
+  ],
+  "automaticRetries": 0,
+  "sourceBoundary": "Same existing27-source binding, original materials and generated candidate/review. No new source answers, external research, stock download, image provider or credentials.",
+  "exclusions": [
+    "Protected WordPress application or publication",
+    "Hosted infrastructure/hostname/port changes",
+    "Customer acceptance or promotion of unconfirmed information",
+    "New expiry window or credential extension",
+    "Ledger reset, discarded reservations or spending above the new $5 ceiling"
+  ],
+  "ratesVerification": {
+    "source": "https://developers.openai.com/api/docs/models/gpt-5.4",
+    "checkedOn": "2026-11-21",
+    "inputPerMillionUSD": 2.5,
+    "cachedPerMillionUSD": 0.25,
+    "outputPerMillionUSD": 15,
+    "storedRateCardUnchanged": true
+  }
+}

@@ -6,18 +6,20 @@ import type {PresenceWorkflowGrant} from "./presence-workflow-provider";
 import type {WorkflowContext} from "./presence-workflow";
 
 export type WholeSiteContinuation = {
- version:1; caseId:string; scope:WorkflowContext["scope"]; baseVersion:number; stateDigest:string;
+ version:1|2; caseId:string; scope:WorkflowContext["scope"]; baseVersion:number; stateDigest:string;
  contextDigest:string; previousGrant:string; ledgerSha256:string; expiresAt:string; model:string;
  usage:{generations:number;requests:number;settledMicros:number;heldMicros:number;pending:number};
  previous:{capMicros:number;generations:number;requests:number;editorialRounds:number;commercialReplans:number};
  next:{capMicros:number;generations:number;requests:number;editorialRounds:number;commercialReplans:number;reviewSequence:"site-first"};
+ correction?: { pagesDigest:string; maximumNewSpendMicros:number; previousInstructionsDigest:string;
+  editorialInputTokens:number; instructions:NonNullable<NonNullable<PresenceWorkflowGrant["marketingAuthority"]>["processingInstructions"]> };
 };
 type Baseline = { version:number; contextDigest:string; work:unknown; failure:unknown; operatorReview:unknown;
  report:unknown; direction:unknown; blueprint:unknown; pages:unknown[] };
 /** Resource/sequence-only proposal. This never writes or authorizes a provider request. */
 export function compileWholeSiteContinuation(grant:PresenceWorkflowGrant, context:WorkflowContext,
  state:Baseline, ledger:Buffer, plan:WholeSiteContinuation, now=Date.now()) {
- assert.equal(plan.version,1);
+ assert.ok(plan.version===1||plan.version===2);
  for(const hash of [plan.previousGrant,plan.contextDigest,plan.stateDigest,plan.ledgerSha256])assert.match(hash,/^[a-f0-9]{64}$/);
  assert.equal(fingerprint(grant),plan.previousGrant,"Current grant differs");
  assert.equal(fingerprint(context),plan.contextDigest);assert.equal(context.intakeId,plan.caseId);
@@ -26,8 +28,25 @@ export function compileWholeSiteContinuation(grant:PresenceWorkflowGrant, contex
  assert.equal(grant.marketingAuthority?.earlyConceptReview,true);
  assert.equal(state.version,plan.baseVersion);assert.equal(fingerprint(state),plan.stateDigest,"Current event differs");
  assert.equal(state.contextDigest,plan.contextDigest);
- for(const value of [state.work,state.failure,state.operatorReview,state.report,state.direction,state.blueprint])assert.equal(value,null,"Idle upstream recovery required");
- assert.equal(state.pages.length,0);
+ for(const value of [state.work,state.failure,state.operatorReview])assert.equal(value,null,"Idle case required");
+ if(plan.version===1){
+  for(const value of [state.report,state.direction,state.blueprint])assert.equal(value,null,"Idle upstream recovery required");
+  assert.equal(state.pages.length,0);assert.equal(plan.correction,undefined);
+ }else{
+  assert.ok(state.report&&state.direction&&state.blueprint&&state.pages.length>0,"Retained complete candidate required");
+  const correction=plan.correction;assert.ok(correction);
+  assert.equal(fingerprint(state.pages),correction.pagesDigest);
+  assert.equal(correction.maximumNewSpendMicros,5_000_000,"Owner-approved new-round ceiling required");
+  assert.equal(plan.next.capMicros,plan.usage.heldMicros+correction.maximumNewSpendMicros,"Unused prior allowance cannot be stacked");
+  assert.ok(plan.next.generations<=plan.usage.generations+8&&plan.next.requests<=plan.usage.requests+16);
+  assert.ok(plan.next.editorialRounds<=plan.previous.editorialRounds+3);
+  assert.equal(plan.next.commercialReplans,plan.previous.commercialReplans);
+  assert.equal(fingerprint(grant.marketingAuthority!.processingInstructions??[]),correction.previousInstructionsDigest);
+  assert.ok(correction.instructions.length>0&&correction.instructions.every(rule=>rule.text.trim()&&rule.reference.trim()&&
+   ["owner-direction","implementation-choice"].includes(rule.basis)));
+  assert.ok(Number.isSafeInteger(correction.editorialInputTokens)&&correction.editorialInputTokens>=grant.ledger.stages!.editorial.requestInputTokens&&
+   correction.editorialInputTokens<=grant.ledger.inputTokens,"Existing global context envelope required");
+ }
  assert.equal(createHash("sha256").update(ledger).digest("hex"),plan.ledgerSha256,"Usage ledger differs");
  const actual=JSON.parse(ledger.toString()) as {attempts:{status:string;countDispatched?:boolean;generationDispatched?:boolean;estimatedMicros?:number;webSearchCalls?:number;reservedMicros?:number}[]};
  assert.ok(actual.attempts.length>=grant.ledger.baselineAttempts);
@@ -58,6 +77,10 @@ export function compileWholeSiteContinuation(grant:PresenceWorkflowGrant, contex
   assert.deepEqual(stage.rates,{model:plan.model,verifiedOn:"2026-11-19",inputPerMillion:2500000,cachedPerMillion:250000,
    outputPerMillion:15000000,cacheWritePerMillion:0,countMicros:0},"Approved rate card differs");
   stage.capMicros+=delta;
+ }
+ if(plan.version===2){
+  next.marketingAuthority!.processingInstructions=[...next.marketingAuthority!.processingInstructions??[],...structuredClone(plan.correction!.instructions)];
+  next.ledger.stages.editorial.requestInputTokens=plan.correction!.editorialInputTokens;
  }
  validateWorkflowStagePlan(next.ledger.stages,next.ledger,next.marketSearch?.maxToolCalls);
  return next;
