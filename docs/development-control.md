@@ -55,23 +55,55 @@ identify the missing machine-local work instead of assuming it never existed.
 ## Current authorized work and result
 
 
-### Active repair — owner-reported502, November21
+### Owner-reported502 — corrected and bounded recovery verified, November21
 
-The owner received502 after the prior handoff. Actual logs confirm the supervisor
-stopped the app on its global reserve: minimum536576000 bytes,288KiB below512MiB;
-combined peak RSS275763200 bytes was below the384MiB application limit. This was
-not a Linux OOM kill or evidence of a memory leak. The failure leaves no upstream.
-A single targeted restart restored HTTPS200; no credential/data/config change.
+Core remains at the existing HTTPS origin. Base application9460b4b is preserved;
+only its launcher has verified runtime correction653e0b1. The build manifest explicitly
+records that layer and prior-manifest hash; do not claim the entire653 build was installed.
+Launcher SHA256 `367acb49f4fd8a3d167a3c82f806b89248eb94e112d3c195c3d497bb8f7a86a4`.
+Linux44911215993 passed the same128MiB old-space/4MiB semi-space settings, production
+build/routing, dependency audit, PostgreSQL and six launcher safeguards. Pull mode
+stays256MiB;384MiB process and512MiB global limits are unchanged. Full Linux artifact
+SHA256 `497302dc0e9e8c49f3ca7e3eba8c5370a8adc4b52bef9540bc6ce09c902e0fb1`.
 
-The setup is too fragile for owner access. Host-visible usable RAM1748484KiB;
-account-owned Next/supervisor, PM2 and retained test PostgreSQL all consume memory.
-Do not claim this is an empty server or attribute all global use to Core. A Core-only
-V8 working-heap correction128MiB/4MiB semi-space is being tested; pull mode stays256MiB,
-and the384MiB/512MiB process/global thresholds are unchanged. Linux artifact smoke now
-uses the same runtime flags as deployment. Verify actual login-hash allocation and
-sustained service before calling this repaired. No model/WordPress/database changes.
+**Actual cause:** supervisor log minimum536576000 bytes crossed its512MiB reserve
+by288KiB while app peakRSS275763200 was under384MiB. This was not a Linux OOM kill
+or proof of a memory leak. The inherited rehearsal setup also had `autorestart:false`,
+leaving the persistent portal offline after that stop. The prior short idle verification
+was insufficient. A single targeted restart initially restored access; no credentials
+or customer state were changed.
 
+**Correction and proof:** Core now has the smaller working heap and delayed, bounded
+process recovery on the same sole PM2 app: autorestart true, restart_delay15000ms,
+min_uptime60000ms, max_restarts3. No manager-wide policy, extra app or AI/work retry.
+The exact ecosystem edit, former launcher, manifest and saved PM2 definition are retained
+under existing private `core-memory-653e0b1`, with rollback code. The same app was
+terminated once by verified identity to test recovery; exactly one automatic recovery
+occurred and60seconds of subsequent HTTPS/process verification passed. Process433833 /
+start79920548 was the final observed identity. Repeated unstable exits are bounded;
+this is not evidence of long-duration reliability or maximum commercial throughput.
 
+One synthetic invalid-password request exercised real password hashing and returned401
+without a session;120seconds of availability passed, min528372KiB available. The real
+owner password was not used or changed. External Edge sign-in/assets/mobile passed;
+existing owner must sign in normally after the restarts. Private config/input/context/
+grants/ledgers and both public output digests match. No provider call/spending, database
+mutation, WordPress write, publication, infrastructure purchase or merge.
+
+**Capacity:** owner requested a concise50–100-customer assessment. See
+[measured capacity and smallest validation path](platform-capabilities.md#core-capacity-assessment--50100-customers-november21).
+The shared-runtime architecture remains credible; current1CPU/about1.67GiB visible RAM
+with no swap is not commercially capacity-proven. A4–8GB/2–4vCPU shared-Core test range
+is planning judgment, not a purchase instruction or guarantee. Account count is not
+process count; separately budget public delivery, queued jobs and event traffic.
+
+**RECOVERY / RESUME HERE:** do not repeat either installer or force another restart.
+The private folder retains `result.json`, `recovery-policy-result.json`, before/backup/
+rollback files and exact code/proof; local `runtime-content/core-memory-653e0b1/` mirrors
+sanitized results/browser evidence. Read this index, capability assessment and latest
+Issue12 handoff. Preserve base9460 + runtime653 provenance and the bounded recovery
+policy on any later deployment. Continue substantive site/service work after reconvening;
+this access repair does not establish a commercially satisfactory site or complete service.
 
 ### November 21 — current retained work connected to online Core
 

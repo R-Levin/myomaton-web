@@ -1099,3 +1099,82 @@ explanation of content, customer inquiries, reporting and continued growth work.
 researched/generated improvement, actual customer outcome or owner acceptance is claimed.
 Remaining work must address that substantive gap through Core with the existing authentic
 knowledge, rather than inventing another correction for the owner to supply.
+
+
+## Core capacity assessment — 50–100 customers, November21
+
+**Conclusion:** the approved shared-service architecture can credibly target50–100
+customers; this development deployment has not demonstrated that capacity. Do not
+commit the current1CPU/2GB package to commercial operation on the basis of C0. The
+current502 was a brittle shutdown/recovery configuration, not evidence that one
+customer consumes the server or that100 customers require100 application processes.
+
+### Measured facts and boundaries
+
+- Hosting was described as1CPU/2GB. Linux currently exposes one logical CPU and
+  1748484KiB usable RAM (about1.67GiB), with no swap. No cgroup limits were visible
+  at the examined v2-root paths; do not infer a hidden allowance from that absence.
+- Observed Core supervisor/Next combined RSS is roughly250–300MiB depending on
+  initialization/password verification. RSS includes shared pages; this is neither
+  a per-customer charge nor a proven steady-state ceiling. Account-owned PM2 and
+  retained test PostgreSQL also consume memory. Other managed services/hosting
+  workloads share the host; their complete attribution was not measured here.
+- The outage was an enforced512MiB global reserve crossing while app RSS remained
+  below384MiB, compounded by disabled process recovery. Those findings do not prove
+  a leak or genuine RAM exhaustion. A working HTTP200/short idle watch was inadequate.
+- Canonical architecture already specifies many hostnames/request-scoped tenants,
+  one shared runtime or small pool, and shared PostgreSQL. With WordPress delivery,
+  site rendering runs at the chosen WordPress host; external OpenAI/Supabase perform
+  their remote work. Core-native public delivery remains supported architecture and
+  must include its visitor load if colocated. No new architecture is selected here.
+
+| Deployment/workload | Assessment |
+| --- | --- |
+| Current development box, one founder | Suitable for continued development after the targeted repair; insufficient evidence for a commercial capacity commitment. |
+|50–100 accounts, shared Core/control plane, external PostgreSQL and separately provisioned delivery | Plausible on a modest shared service. Concurrent users, jobs, visitors/events and media processing determine capacity; account count alone does not. |
+|50–100 WordPress installations plus Core/workers/database/services on this same2GB/1CPU box | Do not approve this configuration for that combined workload. Hosting50–100 sites is a different capacity question from operating their shared control plane. |
+
+### Smallest credible launch capacity path
+
+Use4–8GB RAM and2–4vCPU as a **planning range for the shared-Core capacity test**,
+with external PostgreSQL and separable site delivery. This is engineering sizing
+judgment, not a vendor specification, a purchase recommendation or proof that a
+particular package supports100 customers. A4GB/2vCPU test is the lean starting point;
+8GB provides more room for coincident jobs/optimization. No upgrade is authorized.
+Current code and actual concurrency must decide whether any upgrade is needed.
+
+Reuse existing orchestration and isolate costly work with a bounded queue: initially
+one heavy research/generation/image job, increasing only with measured headroom.
+Use shared bounded database pools and on-demand tenant state, not a process/pool or
+all proposals/images resident for every customer. Preserve independent, versioned
+proposal/media storage work; compression is not the long-term capacity strategy.
+Batch/minimize first-party observations with disclosed retention and separate provider
+spending from VM capacity. The existing service already separates these responsibilities.
+
+Before accepting50–100 customers, perform **one bounded representative load exercise**
+through the actual ordinary multi-tenant path when that path is ready: representative
+50/100 scoped account datasets, about10 simultaneous portal sessions as an explicit
+initial test workload, one active background job, substantial proposal/preview reads,
+and a separately declared inquiry/event burst. Use provider substitutes only for
+provider latency/cost and label them; exercise actual persistence and rendering.
+Do not benchmark cloned C0 fixtures and call it commercial proof. Add a larger spike
+only if the initial profile has headroom. No paid calls or hosted load test is started
+by this assessment.
+
+Business acceptance: no OOM, unexpected restart, lost/duplicate job or tenant leak;
+responsive ordinary reads (initial target p95 under1second, excluding long AI jobs);
+measured RAM/CPU/DB headroom at peak rather than an idle200; visible queued work and
+bounded recovery. Test what happens to inquiries and observations while Core is down,
+reusing existing receipt/ledger/retry mechanisms rather than inventing a second queue.
+Independent delivered sites should continue serving; do not promise their lead/outcome
+path is outage-safe without verifying it.
+
+The present protected C0 portal is deliberately scoped, not the complete commercial
+multi-tenant application. Current onboarding/auth, workflow, measurement and operations
+limits above remain relevant; more RAM alone does not complete them. Preserve the
+architecture and measure the connected workload instead of buying capacity speculatively.
+
+**Lessons applied now:** budget the whole host; exercise login/native allocation and
+real previews; use a persistent-service recovery policy instead of a rehearsal stop;
+keep worker concurrency bounded. No provider spending, upgrade, new infrastructure,
+hosted benchmark or customer-state change occurred for this assessment.
