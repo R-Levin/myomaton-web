@@ -15,17 +15,19 @@ import { AccountWorkPanel } from "./account-work-panel";
 import type { InquiryOutcomeView } from "../../lib/platform/contact/outcomes";
 import { AccountInquiriesPanel } from "./account-inquiries-panel";
 import { MyBusinessPanel } from "./my-business-panel";
+import { CurrentSiteReviewPanel } from "./current-site-review-panel";
+import type { RetainedSiteReview } from "../../lib/platform/intake/retained-site-review";
 import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
 import type { PerformanceSnapshot } from "../../lib/platform/measurement/first-party";
 import type { reviewedSitePlanning } from "../../lib/platform/intake/protected-site-planning";
 
 type Operations = Awaited<ReturnType<typeof import("../../lib/platform/contact/protected-inquiry").protectedInquiry>>;
-type JourneyView = IntakeView & { portal?: IntakePortalWorkspace; myBusiness?: MyBusinessView; accountWork?: AccountWorkView; accountWorkUnavailable?: true; accountActivity?: PerformanceSnapshot; accountActivityUnavailable?: true; inquiryOutcomes?: InquiryOutcomeView; inquiryOutcomesUnavailable?: true; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
+type JourneyView = IntakeView & { originalAccountRecords?: true; currentSiteReview?: RetainedSiteReview; currentSiteReviewUnavailable?: true; portal?: IntakePortalWorkspace; myBusiness?: MyBusinessView; accountWork?: AccountWorkView; accountWorkUnavailable?: true; accountActivity?: PerformanceSnapshot; accountActivityUnavailable?: true; inquiryOutcomes?: InquiryOutcomeView; inquiryOutcomesUnavailable?: true; firstParty?: PerformanceSnapshot; workflowAvailable?: boolean; workflow?: PresenceWorkflowView | null; interviewEnabled?: boolean; operations?: Operations | null; sitePlanningEnabled?: boolean;
   sitePlanningReview?: ReturnType<typeof reviewedSitePlanning> & { current: boolean } };
-async function request(endpoint: string, operation?: object, signal?: AbortSignal): Promise<JourneyView | null> {
+async function request(endpoint: string, operation?: object, signal?: AbortSignal, originalRecords = false): Promise<JourneyView | null> {
   const response = await fetch(endpoint, {
     method: operation ? "POST" : "GET", cache: "no-store", signal,
-    headers: { "X-Intake-Request": "1", ...(operation && { "Content-Type": "application/json" }) },
+    headers: { "X-Intake-Request": "1", ...(originalRecords && { "X-Core-Original-Records": "1" }), ...(operation && { "Content-Type": "application/json" }) },
     ...(operation && { body: JSON.stringify(operation) }),
   });
   if (response.status === 401) throw Error("local_access_required");
@@ -49,12 +51,27 @@ async function request(endpoint: string, operation?: object, signal?: AbortSigna
 export function Journey({ hosted = false }: { hosted?: boolean }) {
   const endpoint = hosted ? "/api/protected-core" : "/api/onboarding";
   const [view, setView] = useState<JourneyView | null>(null);
-  const [priority, setPriority] = useState("");
-  const [busy, setBusy] = useState(true);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState(false);
   const [locked, setLocked] = useState(false);
   const [code, setCode] = useState("");
+  const readRetainedReference = useCallback(async (id: string) => {
+    const response = await fetch(endpoint, { cache: "no-store", headers: { "X-Intake-Request": "1", "X-Core-Review-Reference": id } });
+    if (response.status === 401) { setView(null); setCode(""); setLocked(true); setMessage("Your session expired. Sign in again to reopen the saved work."); throw Error("Session expired"); }
+    if (!response.ok || !response.headers.get("content-type")?.startsWith("image/png")) throw Error("Reference unavailable");
+    const width = Number(response.headers.get("x-image-width")), height = Number(response.headers.get("x-image-height"));
+    if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width < 1 || height < 1) throw Error("Reference dimensions unavailable");
+    return { blob: await response.blob(), width, height };
+  }, [endpoint]);
+  const previewRetained = useCallback(async (path: string, before: boolean) => {
+    const response = await fetch(endpoint, { cache: "no-store", headers: { "X-Intake-Request": "1",
+      "X-Core-Review-Page": path, "X-Core-Review-Before": before ? "1" : "0" } });
+    if (response.status === 401) { setView(null); setCode(""); setLocked(true); setMessage("Your session expired. Sign in again to reopen the saved work."); throw Error("Session expired"); }
+    if (!response.ok || !response.headers.get("content-type")?.startsWith("text/html")) throw Error("Saved preview unavailable");
+    return response.text();
+  }, [endpoint]);
+  const [priority, setPriority] = useState("");
+  const [busy, setBusy] = useState(true);
+  const [error, setError] = useState(false);
   const [page, setPage] = useState<"home" | "service">("home");
   const [answer, setAnswer] = useState("");
   const [correcting, setCorrecting] = useState(false);
@@ -153,7 +170,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
     setError(false);
     setMessage("");
     try {
-      const next = await request(endpoint, operation);
+      const next = await request(endpoint, operation, undefined, view?.originalAccountRecords === true);
       if (!next) throw Error("No saved draft was returned.");
       if (view) setPrior(direction);
       adopt(next);
@@ -219,7 +236,7 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
       }}>Sign out</button>}
     </header>
     <main className={styles.card} aria-busy={busy}>
-      <h1>Review your Web Presence</h1>
+      {!view?.currentSiteReview && <h1>{hosted ? "Your MioPages workspace" : "Review your Web Presence"}</h1>}
       {workspace && <aside className={styles.portalContext} aria-label="Signed-in workspace">
         <dl>
           <div><dt>Signed in as</dt><dd>{workspace.identity}</dd></div>
@@ -237,6 +254,12 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         </nav>}
       </aside>}
       {view?.accountWorkUnavailable && <p role="alert">Core could not read the saved account workflow. Earlier intake is still available; no new account or site result is implied.</p>}
+      {!locked && (view?.currentSiteReview || view?.currentSiteReviewUnavailable || view?.originalAccountRecords) && <details className={styles.reviewDisclosure}>
+        <summary>Original account records and tools</summary>
+        <p>The original intake, knowledge corrections and inquiry tools are preserved separately from the current website evaluation. Opening them does not merge or regenerate either case.</p>
+        <button type="button" disabled={busy} onClick={async () => { setBusy(true); try { adopt(await request(endpoint, undefined, undefined, !view.originalAccountRecords)); } catch (reason) { failed(reason); } finally { setBusy(false); } }}>
+          {view.originalAccountRecords ? "Return to the current website work" : "Open original account records"}</button>
+      </details>}
       {message && <p role={error ? "alert" : "status"}>{message}</p>}
       {locked ? <form onSubmit={event => { event.preventDefault(); void unlock(); }}>
         {hosted && <div className={styles.field}><label htmlFor="owner-username">Username</label>
@@ -249,7 +272,11 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
       </form> : !view ? <>
         <p>Continue with the business information you already provided.</p>
         <button disabled={busy || error} onClick={() => void run({ operation: "begin" })}>Resume retained onboarding</button>
-      </> : view.workflowAvailable ? <>
+      </> : view.currentSiteReview ? <CurrentSiteReviewPanel review={view.currentSiteReview} preview={previewRetained} reference={readRetainedReference} />
+        : view.currentSiteReviewUnavailable ? <section aria-label="Current work unavailable"><h2>Your saved work could not be opened</h2>
+          <p>The current case could not be verified. Core has kept your work and has not substituted an older candidate or generated anything again.</p>
+          <button type="button" disabled={busy} onClick={() => window.location.reload()}>Try reading the saved work again</button></section>
+        : view.workflowAvailable ? <>
         {view.accountWork && <AccountWorkPanel key={view.accountWork.intakeId} account={view.accountWork} busy={busy} run={run}
           activity={view.accountActivity} activityUnavailable={activityUnavailable || view.accountActivityUnavailable}
           observe={view.accountActivity ? () => observeReview("action-selected", "open-current-work") : undefined}

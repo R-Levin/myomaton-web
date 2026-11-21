@@ -98,6 +98,16 @@ if (core) {
   const launcher = '.rehearsal/private-listener.cjs';
   await cp('scripts/wordpress-private-listener.cjs', path.join(staging, launcher));
   hashes[launcher] = createHash('sha256').update(await readFile(path.join(staging, launcher))).digest('hex');
+  for (const [source, target] of [
+    ['scripts/core-native-preview.php', 'core-native-preview.php'],
+    ['wordpress/miopages-delivery/includes/class-miopages-native-component.php', 'class-miopages-native-component.php'],
+    ['wordpress/miopages-delivery/includes/class-miopages-native-draft-content.php', 'class-miopages-native-draft-content.php'],
+    ['wordpress/miopages-managed-site/style.css', 'managed-site.css'],
+  ]) {
+    const relative = path.join('.rehearsal', target);
+    await cp(source, path.join(staging, relative));
+    hashes[relative] = createHash('sha256').update(await readFile(source)).digest('hex');
+  }
   for (const [source, executable] of [
     ["scripts/intake/protected-presence-worker.ts", "protected-presence-worker.cjs"],
     ["scripts/wordpress-private-operator.ts", "wordpress-private-operator.cjs"],

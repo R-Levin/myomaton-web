@@ -1049,3 +1049,30 @@ General media/evidence-led Heroes, permission-aware visual evidence, portfolio a
 media grammars remain near-term V1 requirements. Technical detail/specifications/
 comparisons and technical recipe remain a separate V1 range slice; see the
 [roadmap](deferred-architecture.md#evidence-led-commercial-presentation-range).
+
+
+## Current retained-work review repair — November 21
+
+The actual source-aware106 case is separate from original hosted41 and the local WordPress97
+rendering. The new Core projection preserves that association, every source status, current
+report/Direction/pages/editorial findings, inactive unresolved links and exact changed-page
+comparisons. It grants no mutation or approval. The existing original-account tools remain
+available through an explicit separate view; data and permissions are not merged.
+
+The Core page preview reuses the existing native WordPress content/component PHP classes,
+actual Managed Site CSS and verified original wordmark. PHP is invoked as a fixed, no-secret,
+time-bounded renderer without WordPress bootstrap, writes, provider access or active forms.
+The owner-only authenticated GET returns no-store content; preview navigation stays inside
+Core, with no scripts in the frame. Retained earlier design captures load only when requested.
+This is a readable view of existing paid output, not another generated or applied website.
+
+Local controlled browser regression covers desktop/mobile, in-console links, before/after,
+reload selection, refused read, expiry/logout and access to the original account view. Pure
+projection checks retain exact wording, distinguish source status and reject foreign bindings.
+Actual source chronology disproves stale report/Direction:71→73/76/78. No new AI-quality result
+is claimed. Linux and hosted verification are pending at this source checkpoint.
+
+Source: `lib/platform/intake/retained-site-review.ts`, `protected-retained-site.ts`,
+`retained-native-preview.ts`, `scripts/intake/current-site-review-panel.tsx`,
+`scripts/core-native-preview.php`, `tests/retained-site-review.test.tsx`,
+`tests/browser/current-site-review.ts`.

@@ -1,0 +1,62 @@
+{
+  "brand": {
+    "digest": "0a63db5001f438f4a9e8dda46f9a61dd31eabc763a39aa2369b2eb752518a849",
+    "projection": {
+      "version": 1,
+      "scope": {
+        "webPresenceId": "2a08e054-902c-400b-9b96-3c2274bcadc2",
+        "managedSiteId": "2c0d637d-4ded-4597-ac8b-661519aba358"
+      },
+      "logo": {
+        "assetId": "cd7d9a9f-76a1-4615-957a-0ebaa8e6427d",
+        "usageId": "bf7fbc72-50ef-461f-974b-f4dbcc7a62df",
+        "sha256": "09b1d3c6e189ce74538d75be63386116be0dee464d6b70d86577430963d91b5e",
+        "alt": "MioPages"
+      },
+      "design": {
+        "palette": {
+          "light": {
+            "background": "#fbf7ef",
+            "text": "#26212d"
+          },
+          "strong": {
+            "background": "#e9ba8e",
+            "text": "#26212d"
+          },
+          "tonal": {
+            "background": "#e8e2f2",
+            "text": "#322f7e"
+          },
+          "brand": {
+            "background": "#322f7e",
+            "text": "#fbf7ef"
+          },
+          "supporting": {
+            "background": "#555ccc",
+            "text": "#ffffff"
+          },
+          "contrast": {
+            "background": "#241d35",
+            "text": "#fbf7ef"
+          },
+          "border": "#9b8ea7",
+          "muted": "#62586a"
+        },
+        "typography": {
+          "bodyFont": "sans",
+          "headingFont": "sans",
+          "baseSize": 18,
+          "headingScale": 2.5,
+          "lineHeight": 1.55
+        },
+        "grammar": "service-led",
+        "version": 3,
+        "motion": "off"
+      }
+    }
+  },
+  "logoSource": {
+    "sha256": "09b1d3c6e189ce74538d75be63386116be0dee464d6b70d86577430963d91b5e",
+    "mime": "image/png"
+  }
+}

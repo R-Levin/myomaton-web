@@ -27,6 +27,7 @@ import { accountWork } from "./account-work";
 import { protectedAccountBoundary, protectedAccountConfirmation, protectedAccountPool } from "./protected-account";
 import { InquiryOutcomes } from "../contact/outcomes";
 import { ContactError } from "../contact/model";
+import { protectedRetainedSiteReader } from "./protected-retained-site";
 
 export const coreCookie = "__Host-miopages_core";
 type Config = {
@@ -206,7 +207,8 @@ async function openCore() {
         available ? protectedAccountConfirmation(pool,operators,authenticated) : undefined);
     } : undefined;
   const outcomes=process.env.MIOPAGES_PROTECTED_ACCOUNT === "enabled" ? new InquiryOutcomes(pool,operators,"development") : undefined;
-  return { operators, selection, intake, interview, inquiry, sitePlanning, sitePlanningEnabled, presenceCase, outcomes, draftToken: cfg.draftToken };
+  const retainedReview = await protectedRetainedSiteReader();
+  return { operators, selection, intake, interview, inquiry, sitePlanning, sitePlanningEnabled, presenceCase, outcomes, retainedReview, draftToken: cfg.draftToken };
 }
 let core: ReturnType<typeof openCore> | undefined;
 const sessions = new Map<string, { credential: string; expires: number; origin: string; owner: boolean }>();
@@ -255,6 +257,15 @@ export async function hostedCoreRequest(request: Request) {
     const includeOperations = async (view: Awaited<ReturnType<IntakeService["resume"]>>,
       context: NonNullable<Awaited<ReturnType<typeof authenticate>>>) => {
       const proposal = view.sitePlanning?.proposal;
+      if (app.retainedReview && request.headers.get("x-core-original-records") !== "1") {
+        const authorized = await app.operators.authorize(context, "inspect-site-proposal", app.selection);
+        if (authorized.operatorId === protectedOwnerId) {
+          const portal: IntakePortalWorkspace = { role: "operator", identity: "MioPages owner", account: "MioPages",
+            site: "Retained website proposal", environment: "protected-development" };
+          try { return { ...view, portal, currentSiteReview: await app.retainedReview.read(authorized.operatorId) }; }
+          catch { return { ...view, portal, currentSiteReviewUnavailable: true as const }; }
+        }
+      }
       const canSeeOutcomes=app.outcomes && await app.operators.authorize(context,"inspect-inquiry-outcomes",app.selection).catch(()=>null);
       const outcomeView=canSeeOutcomes ? await app.outcomes!.inspect(context,app.selection)
         .then(inquiryOutcomes=>({inquiryOutcomes})).catch(()=>({inquiryOutcomesUnavailable:true as const})) : {};
@@ -271,6 +282,7 @@ export async function hostedCoreRequest(request: Request) {
         await app.operators.authorize(context, "prepare-site-proposal", app.selection).then(() => true, () => false);
       return {
         ...view,
+        ...(app.retainedReview && { originalAccountRecords: true as const }),
         portal: { role: "operator", identity: active?.owner ? "MioPages owner" : "Authorized Operator",
           account: "MioPages", site: "C0 development site", environment: "protected-development",
           ...(canTriage && { editorialDecisionsAvailable: true }),
@@ -286,6 +298,25 @@ export async function hostedCoreRequest(request: Request) {
       const context = await authenticate(credential, active?.owner);
       if (!context) return reply({ error: "sign_in_required" }, 401);
       try {
+        const referenceImage = request.headers.get("x-core-review-reference");
+        if (referenceImage !== null) {
+          if (!app.retainedReview) return reply({ error: "unavailable" }, 404);
+          const authorized = await app.operators.authorize(context, "inspect-site-proposal", app.selection);
+          if (authorized.operatorId !== protectedOwnerId) return reply({ error: "unavailable" }, 403);
+          const image = await app.retainedReview.reference(authorized.operatorId, referenceImage);
+          return new Response(new Uint8Array(image.bytes), { headers: { ...headers, "Content-Type": "image/png",
+            "X-Image-Width": String(image.width), "X-Image-Height": String(image.height) } });
+        }
+        const retainedPage = request.headers.get("x-core-review-page");
+        if (retainedPage !== null) {
+          const before = request.headers.get("x-core-review-before");
+          if (!app.retainedReview || !["0", "1"].includes(before ?? "")) return reply({ error: "unavailable" }, 404);
+          const authorized = await app.operators.authorize(context, "inspect-site-proposal", app.selection);
+          if (authorized.operatorId !== protectedOwnerId) return reply({ error: "unavailable" }, 403);
+          const input = await app.retainedReview.preview(authorized.operatorId, retainedPage, before === "1");
+          const { renderRetainedNativePreview } = await import("./retained-native-preview");
+          return new Response(await renderRetainedNativePreview(input), { headers: { ...headers, "Content-Type": "text/html; charset=utf-8" } });
+        }
         const image = request.headers.get("x-miopages-workflow-image");
         if (image !== null) {
           if (!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/u.test(image) || !app.presenceCase) return reply({ error: "unavailable" }, 404);

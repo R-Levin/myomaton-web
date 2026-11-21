@@ -58,3 +58,30 @@
 .card .portalContext p { margin: .4rem 0; font-size: .9rem; }
 .portalContext nav { display: flex; flex-wrap: wrap; gap: .4rem 1rem; }
 @media (max-width: 480px) { .field { margin-bottom: 1.5rem; } .actions { margin-top: 1.5rem; } .shell header { font-size: .9rem; } }
+.card:has(.currentWorkspace) { max-width: 86rem; }
+.currentIntro { max-width: 46rem; margin-bottom: 1.5rem; }
+.businessSummary { max-width: 60rem; padding: .5rem 1.3rem; margin-bottom: 2rem; background: #f3edf9; border-radius: .5rem; }
+.card .eyebrow { margin-bottom: .5rem; font-size: .85rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #655579; }
+.reviewNotice { max-width: 65rem; margin-block: 1rem 1.5rem; padding: 1.1rem 1.3rem; border-left: 4px solid #97702a; background: #fbf4e6; }
+.card .reviewNotice p { margin: .6rem 0 0; }
+.workspaceTabs { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 1rem 2rem; padding-bottom: .8rem; border-bottom: 1px solid #d8cde9; }
+.card .workspaceTabs button { background: transparent; color: #4b2ba6; border-color: transparent; }
+.card .workspaceTabs button[aria-current=page] { background: #4b2ba6; color: white; }
+.knowledgeGrid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,25rem),1fr)); gap: 1rem; }
+.knowledgeCard { min-width: 0; padding: 1.2rem; border: 1px solid #ded4e9; border-radius: .5rem; background: #fff; }
+.knowledgeCard h3 { margin: .3rem 0 1rem; font-size: 1.2rem; }
+.card .sourceBadge { font-size: .8rem; color: #675776; font-weight: 700; margin: 0; }
+.reviewDisclosure { margin-block: 1.1rem; padding: 1rem 0; border-top: 1px solid #ded4e9; }
+.reviewDisclosure summary { cursor: pointer; font-weight: 600; }
+.reviewDisclosure[open] summary { margin-bottom: 1rem; }
+.previewToolbar { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: end; padding: 1rem; background: #f3edf9; border-radius: .5rem; }
+.previewToolbar label { display: grid; gap: .5rem; font-weight: 600; }
+.previewToolbar select { max-width: 100%; min-height: 2.75rem; font: inherit; padding: .5rem; }
+.previewToolbar label:has(input[type=checkbox]) { display: block; }
+.desktopPreview, .mobilePreview { margin: 1.3rem auto; border: 1px solid #c8b8db; border-radius: .4rem; overflow: hidden; background: #fff; }
+.desktopPreview { width: 100%; }
+.mobilePreview { width: min(390px,100%); }
+.desktopPreview iframe, .mobilePreview iframe { display: block; width: 100%; min-height: 700px; border: 0; }
+.changeColumns { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.referenceCapture { display: block; width: 100%; height: auto; margin-block: 1rem; border: 1px solid #ded4e9; }
+@media (max-width: 650px) { .changeColumns { grid-template-columns: 1fr; } .workspaceTabs { display: grid; } }

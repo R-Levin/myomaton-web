@@ -54,6 +54,34 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
+
+### November 21 — current Core review repair in progress
+
+The owner rejected the confusing handoff and directed continued, frugal execution.
+The new local implementation opens the actual retained source-aware case106 as an
+explicit, read-only association for the existing C0 owner, with business understanding,
+whole-site navigation, exact WordPress-rendered previews, saved97/106 comparisons and
+retained earlier design captures. Original account tools remain separately accessible.
+It neither reparents the case nor exercises signing, review, confirmation or publication
+authority. Existing authentication and original scoped inspection are still required.
+
+**Not yet a hosted result or improved AI generation.** Controlled browser checks,
+projection/approval compatibility and the actual PHP renderer pass locally. Linux build
+and exact hosted readback remain next. The current public Core remains source4058a74.
+No provider requests/spending, credential changes, WordPress writes or new infrastructure.
+
+The suspected stale-report cause was independently disproved: restored source context71
+was followed by report73, Direction76 and blueprint78. Do not attribute the poor result
+to those artifacts predating the restored sources. The remaining commercial-quality gap
+is real; the new screen does not claim to solve it. Saved106 is a modest copy revision,
+not a replacement for the complete managed Web Presence growth-service requirement.
+
+**RECOVERY / RESUME HERE:** verify branch/tree and ignored recovery note. Complete Linux
+artifact verification, then the smallest same-account Core update with matching rollback,
+read-only exact-case/config binding and no model dispatch. Open actual output through Core;
+do not repeat provisioning, manufacture a business correction or ask for fixture acceptance.
+
+
 **Current task: approved account-cycle SQL installed; protected account review enabled.**
 The owner approved the original [activation scope](account-cycle-hosted-activation.json)
 and then explicitly approved the [exact amendment](account-cycle-mandate-amendment.json)

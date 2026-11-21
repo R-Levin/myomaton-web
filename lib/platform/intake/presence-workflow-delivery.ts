@@ -43,6 +43,23 @@ export function workflowLocalDraftInput(context: WorkflowContext, view: Presence
   return projectWorkflowPreview(context, { ...view, blueprint }, target, null, [], "Unapproved isolated draft " + target, true);
 }
 
+/** Shared data projection for Core's visual review and native WordPress drafts.
+ * This is representation only, with no approval, installation or publication. */
+export function workflowNativeReviewCandidate(context: WorkflowContext, view: PresenceWorkflowView) {
+  const input = workflowLocalDraftInput(context, view);
+  const pages = input.pages.map(page => ({ id: page.pageId, path: page.slug,
+    title: page.title.kind === "editorial" ? page.title.text : "", composition: page.composition,
+    navigationLabel: page.navigationLabel,
+    sections: page.sections.map((section, index) => ({ id: section.id, type: section.type,
+      content: { heading: section.heading?.kind === "editorial" ? section.heading.text : "",
+        text: section.text?.kind === "editorial" ? section.text.text : "" },
+      ...(view.pages.find(item => item.path === page.slug)?.sections[index].block &&
+        { block: view.pages.find(item => item.path === page.slug)!.sections[index].block }),
+    })),
+  }));
+  return { candidate: { pages, navigation: input.navigation, actions: input.actions }, unresolvedActions: input.unresolvedActions };
+}
+
 function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflowView & { blueprint: NonNullable<PresenceWorkflowView["blueprint"]> }, target: string,
   prior: unknown, canonical: readonly { id: string; slug: string }[], rationale = "Protected evidence-linked website review " + target, authoredActions = false) {
   const baseline = prior === null ? [] : nativeDraftBaseline(prior);
