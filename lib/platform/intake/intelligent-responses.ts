@@ -592,7 +592,9 @@ export function meteredPresenceWorkflow(directory: string, rates: Rates, transpo
   }
   if (![scope.id, scope.startingLedger, ...(retainedReservation ? [retainedReservation] : [])].every(value => /^[a-f0-9]{64}$/u.test(value)) ||
       fields.some(value => !Number.isSafeInteger(value) || value < 0) ||
-      scope.requests < 2 || scope.generations < 1 || (mix ? mix.text * 2 + mix.images : scope.generations * 2) > scope.requests ||
+      // Ceilings are independent: research may use one request, text uses two.
+      // Actual requests, generations and money are each enforced at dispatch.
+      scope.requests < 2 || scope.generations < 1 ||
       scope.capMicros < 1 || scope.inputTokens < 1 || scope.inputBytes < 1 || outputLimit < 16) throw Error("Workflow budget refused");
   if (scope.stages) validateWorkflowStagePlan(scope.stages, scope, scope.breakdown?.searchCalls);
   if (Boolean(scope.stages) !== Boolean(stageName) || (stageName && researchCalls !== undefined && stageName !== "research")) {

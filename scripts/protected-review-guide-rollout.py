@@ -17,9 +17,9 @@ spec = importlib.util.spec_from_file_location('prior', ROOT / 'protected-account
 prior = importlib.util.module_from_spec(spec); spec.loader.exec_module(prior)
 HOME, PRIVATE, WEB = prior.HOME, prior.PRIVATE, prior.WEB
 prior.RUN = ROOT
-OLD = '1202d6358eeea265731e49c43cdec31a7b1282ff'
-NEW = '7f0f4dc3b41bb7bd79c3648c76ae84602fd521ce'
-ARCHIVE = 'a7ca413b74062b4572730df6e4722729d472cbd7bc7705a079a80db6e75267a2'
+OLD = '7f0f4dc3b41bb7bd79c3648c76ae84602fd521ce'
+NEW = '28095434d719b173d31293a2674f4c0464f56ae2'
+ARCHIVE = '5654a187ee4531da406f399558f89f2f5fa191d5ba4493f8eee14af1b95fe943'
 LAUNCHER = '367acb49f4fd8a3d167a3c82f806b89248eb94e112d3c195c3d497bb8f7a86a4'
 phase = 'preflight'
 
@@ -67,7 +67,7 @@ def main():
     global phase
     assert sys.argv[1:] == ['DEPLOY-TEMPORARY-REVIEW-GUIDES']
     assert sys.platform == 'linux' and Path.home().resolve() == HOME
-    assert ROOT == PRIVATE / 'review-guides-7f0f4dc'
+    assert ROOT == PRIVATE / 'review-guides-2809543'
     for directory in [PRIVATE, ROOT, WEB]:
         assert directory.resolve() == directory and directory.stat().st_uid == os.getuid() and directory.stat().st_mode & 0o777 == 0o700
     assert not (ROOT / 'before.json').exists(), 'Inspect previous attempt before continuing'

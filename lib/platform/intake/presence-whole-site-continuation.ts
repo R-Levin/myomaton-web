@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { fingerprint } from "../canonical/model";
-import { validateWorkflowStagePlan } from "./intelligent-responses";
+import { validateWorkflowStagePlan, meteredPresenceWorkflow } from "./intelligent-responses";
 import type {PresenceWorkflowGrant} from "./presence-workflow-provider";
 import type {WorkflowContext} from "./presence-workflow";
 
@@ -83,5 +83,9 @@ export function compileWholeSiteContinuation(grant:PresenceWorkflowGrant, contex
   next.ledger.stages.editorial.requestInputTokens=plan.correction!.editorialInputTokens;
  }
  validateWorkflowStagePlan(next.ledger.stages,next.ledger,next.marketSearch?.maxToolCalls);
+ // Exercise the real dispatcher configuration without invoking its transport.
+ meteredPresenceWorkflow("unused-preflight-directory",next.ledger.stages.editorial.rates,
+  {send:async()=>{throw Error("Configuration preflight forbids provider dispatch")}},next.ledger,
+  next.maxOutputTokens,next.retainedReservation,undefined,"editorial");
  return next;
 }

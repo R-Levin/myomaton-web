@@ -56,6 +56,22 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ### Active owner-approved whole-site correction round — November21
 
+**Continuation fault diagnosed before any provider dispatch:** allowance APPLY
+succeeded, case113/ledger128 stayed unchanged. The old dispatcher constructor
+required every maximum generation slot to be funded by two request slots, despite
+the earlier one-request research path. Our next ceilings51/101 hit that coupling.
+The amendment preflight had not exercised actual dispatcher construction.
+
+Corrective engineering keeps the exact authorized request/generation/money limits
+independent and enforces all at actual dispatch; it does not increase any ceiling.
+A regression proves a stricter request cap refuses the next call before transport.
+Amendment preflight now constructs the real dispatcher without calling transport.
+The private worker gains fixed no-dispatch configuration preflight and scoped,
+nonsecret diagnostics. Linux verification/corrective worker replacement are pending;
+no blind API retry or grant/ledger reset. Hosted Core2809543 remains compatible;
+only the private worker needs this correction, with unchanged activation expiry.
+
+
 Owner approved a$3 correction round, then said a few more dollars do not matter
 and asked for completion while AFK. Bounded implementation interpretation is
 **$5 maximum TOTAL NEW spending**, not$3+$5 and not the unused prior allowance.

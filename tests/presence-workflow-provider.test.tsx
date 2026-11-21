@@ -267,3 +267,24 @@ test("provider artifact settlement retains editorial suggestions as advice and r
   assert.throws(() => readDirection({ ...direction, sourceIds: ["main", "foreign", "foreign"] }, ["main"], true),
     error => error instanceof ArtifactValidationError && error.issue === "citation");
 });
+
+
+test("independent request ceilings remain enforced when earlier work does not require two requests per generation", async () => {
+ const directory=await mkdtemp(join(tmpdir(),"miopages-independent-caps-"));
+ try{
+  const rates:ResponsesRates={model:"test-model",verifiedOn:"2026-11-21",inputPerMillion:1000000,cachedPerMillion:0,cacheWritePerMillion:0,outputPerMillion:1000000,countMicros:0};
+  await initializeResponsesUsageLedger(directory,rates);
+  const scope={id:fingerprint("independent-caps"),baselineAttempts:0,startingLedger:createHash("sha256").update(await readFile(join(directory,"onboarding-usage.json"))).digest("hex"),
+   requests:3,generations:2,capMicros:10000,inputTokens:1000,inputBytes:10000};
+  let calls=0;
+  const transport={async send(path:string){calls++;if(path.endsWith("/input_tokens"))return{body:{input_tokens:100}};
+   const body={id:"resp_offline_independent",model:rates.model,status:"completed",service_tier:"default",usage:{input_tokens:100,output_tokens:20,total_tokens:120,input_tokens_details:{cached_tokens:0},output_tokens_details:{reasoning_tokens:0}},output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify({fixture:true})}]}]};return{body,rawBody:Buffer.from(JSON.stringify(body))};}};
+  const run=meteredPresenceWorkflow(directory,rates,transport,scope,100);
+  const request={model:rates.model,input:"Offline only",text:{format:{type:"json_object"}}};
+  await run({ownerDigest:fingerprint("owner"),workDigest:fingerprint("first")},request,async()=>{},async()=>{});
+  assert.equal(calls,2);
+  await assert.rejects(run({ownerDigest:fingerprint("owner"),workDigest:fingerprint("second")},request,async()=>{},async()=>{}),/Workflow budget exhausted/);
+  assert.equal(calls,2,"The stricter request ceiling refuses before another count or generation");
+  const ledger=JSON.parse(await readFile(join(directory,"onboarding-usage.json"),"utf8"));assert.equal(ledger.attempts.length,1);
+ }finally{await rm(directory,{recursive:true,force:true})}
+});

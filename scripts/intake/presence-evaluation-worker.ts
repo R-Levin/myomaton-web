@@ -196,7 +196,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const researchReplay = operation === "replay-research";
   const completeResearch = (operation === "complete-research" || researchReplay) && approval === commercialApproval;
   if ((scenario !== "c0" && scenario !== "c2") || !approval || extra.length ||
-      !(readOnly || editing || operation === "activate" || operation === "work" || completeResearch || replaceReport) || (editing ? !value : Boolean(value))) {
+      !(readOnly || editing || operation === "activate" || operation === "work" || operation === "preflight" || completeResearch || replaceReport) || (editing ? !value : Boolean(value))) {
     throw Error("Evaluation command refused");
   }
   const instance = await openEvaluationWorker({ scenario, approval, databaseUrl: env.MIOPAGES_EVALUATION_DATABASE_URL ?? "",
@@ -204,8 +204,9 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   try {
     if (operation === "activate") return await instance.activate();
     const { workflow, context, root } = await instance.openCase(
-      operation === "work" || operation === "critique-home" || operation === "critique-site" || (operation==="recover" && (approval===originalEvidenceApproval || approval===sourceAwareC0ProposalSha256)) || replaceReport || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay, operation === "recover");
+      operation === "preflight" || operation === "work" || operation === "critique-home" || operation === "critique-site" || (operation==="recover" && (approval===originalEvidenceApproval || approval===sourceAwareC0ProposalSha256)) || replaceReport || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay, operation === "recover");
     const prior = await workflow.review(context);
+    if(operation==="preflight")return{version:prior?.version,providerCalls:0,configurationVerified:true};
     if (completeResearch) {
       if (!prior) throw Error("Retained research required");
       const completed = await workflow.completeMarketResearch(context, prior.version);
