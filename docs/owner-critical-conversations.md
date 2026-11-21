@@ -908,3 +908,12 @@ proportionate protection or unnecessary friction. Distinguish Codex tool review
 from Core runtime authorization. Preserve the managed growth-service objective;
 ordinary maintenance must not become the service's main workflow. No new spending,
 credential, publication or protected WordPress authority is created by this record.
+
+**Subsequent immediate clarification:** the owner approved tested workerdf5 and
+bounded, tested purpose-bound follow-up replacements to complete the SAME C0
+round. Routine artifact changes should not cause serial founder approvals. Keep
+checksums for artifact identity, recorded tests and rollback verification. This
+scope covers only the existing private worker/proof and activation artifact/proof
+hashes; source rights, identities, grants, credentials, model/spending/expiry,
+Core deployment and protected WordPress remain unchanged. This is bounded
+maintenance authority, not permission to remove integrity verification.
