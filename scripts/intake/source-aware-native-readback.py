@@ -2,11 +2,11 @@
 import hashlib,json,pathlib,sqlite3,sys
 root=pathlib.Path(sys.argv[1]).resolve()
 assert root.name=="p022-wp-validation" and (root/"c0.sqlite").is_file()
-render=json.loads((root/"source-aware-render.json").read_text())
+render=json.loads((root/"source-aware-render.json").read_text(encoding="utf-8"))
 assert render["case"]=="41a83e7e-1765-4517-941a-b2b151bb7c4a"
 packet=root/"source-aware-incoming"/render["packet"]
 assert hashlib.sha256(packet.read_bytes()).hexdigest()==render["packetSha256"]
-data=json.loads(packet.read_text())
+data=json.loads(packet.read_text(encoding="utf-8"))
 ids=sorted(render["pages"].values())
 assert len(ids)==len(set(ids)) and all(isinstance(x,int) and x>202 for x in ids)
 with sqlite3.connect((root/"c0.sqlite").as_uri()+"?mode=ro",uri=True) as db:

@@ -43,7 +43,7 @@ def main():
     assert hashlib.sha256(data).hexdigest() == sys.argv[1]
     assert 'wp_body_open();' in (WEB / 'wp-includes/template-canvas.php').read_text()
     before = readback()
-    with (ROOT / 'before.json').open('x') as file:
+    with (ROOT / 'before-2.json').open('x') as file:
         os.chmod(file.name, 0o600); json.dump(before, file)
     temporary = TARGET.with_suffix('.pending')
     try:
@@ -58,7 +58,7 @@ def main():
 if (is_string($state)) $state = json_decode($state, true, 48, JSON_THROW_ON_ERROR);
 $ids = array_values(array_map(static fn($r) => $r['ID'], $state['current']['posts']));
 foreach ($ids as $id) {
-    $GLOBALS['wp_query']->is_preview = true; $GLOBALS['wp_query']->queried_object_id = $id;
+    $GLOBALS['wp_query']->is_preview = true; $GLOBALS['wp_query']->queried_object = get_post($id); $GLOBALS['wp_query']->queried_object_id = $id;
     ob_start(); do_action('wp_body_open'); $html = ob_get_clean();
     if (!str_contains($html, 'Actual WordPress draft') || !str_contains($html, 'revision 6')) throw new Exception('Guide refused');
 }
@@ -83,7 +83,10 @@ echo wp_json_encode(['status'=>'PASS','pages'=>count($ids),'writes'=>false]);'''
 if __name__ == '__main__':
     try:
         main()
-    except Exception:
+    except Exception as error:
+        import traceback
+        location = traceback.extract_tb(error.__traceback__)[-1]
         print(json.dumps({'status': 'BLOCKED', 'operation': 'temporary-wordpress-review-guide',
+                          'type': type(error).__name__, 'line': location.lineno,
                           'requirement': 'Inspect preserved receipt; do not retry automatically.'}))
         sys.exit(1)

@@ -63,14 +63,49 @@ No hostname/infrastructure expansion. Reuse existing access; ask only for an
 actual authority/data/spending gap. Communicate approved steps in a few plain
 bullets and distinguish functional repair from commercial improvement.
 
-Implementation checkpoint: temporary Core guides and an owner-only, read-only
-WordPress observation are ready for Linux verification. Actual read-only WordPress
-verification still passes: draft revision 6, 13 Pages, 2 images, Delivery 0.0.12,
-Managed Site theme 0.1.0. Core's later proposal 106 is a separate candidate and
-has not been applied there. Optional observation timestamps are not live monitoring
-or application receipts. The temporary WordPress guide checks actual Page content
-against its installed revision; it annotates authenticated draft previews outside
-signed content, with drift explicitly identified. Not deployed at this checkpoint.
+**Verified review-clarity checkpoint:** source `1202d6358eeea265731e49c43cdec31a7b1282ff`
+is deployed to the same protected Core app. Linux run44920374799 passed; artifact
+SHA256 `8dd877c63b00bae0a4441c9bb616dcc5e4c1b9fa90df69d01dbc7851241d3e6b`.
+All211 build files and the unchanged128MiB launcher were verified. The complete
+matching previous app/dependencies/build are retained in private `review-guides-1202d63`;
+no rollback was needed. Bounded PM2 recovery/ecosystem, credentials, cases, grants,
+ledgers and public outputs were preserved. Actual-case readcheck and60seconds
+stable HTTPS/process verification passed (minimum588228KiB available), plus
+external Edge1440/390 sign-in-shell/guide/no-overflow verification. Existing owner
+password was not used or changed; this is not a fresh owner-login claim.
+
+Actual WordPress draft6 remains13 Pages/2media attachments/35Actions, Delivery0.0.12,
+theme0.1.0. The temporary MU annotation is installed outside signed content and
+verified on all13 Page body hooks through existing authenticated CLI context.
+First annotation attempt rolled itself back: its CLI query lacked `queried_object`;
+read-only diagnosis proved that cause, corrected check passed. No Page/DB mutation.
+This is not a new authenticated external WordPress browser-login claim. Removal:
+delete only `wp-content/mu-plugins/miopages-temporary-review-guide.php` after this
+review; preserve the installation/content. Core's optional observation is private,
+dated and explicitly not live monitoring or a receipt for proposal106. Actual
+installed-draft links retain existing WordPress protection.
+
+**Next genuine Core review is in progress.** No additional data authority, budget
+or expiry was created. Remaining active run allowed4 generations/10requests and
+$1.816224 conservative headroom before this continuation. The approved source-aware
+manifest explicitly includes the existing disposable Windows WordPress and encrypted
+visitor-packet/capture transfers; automatic transfer review initially refused, then
+accepted that existing written authority. No protected source originals/credentials
+were copied. Proposal106 materialized on the existing local draft IDs, preserving
+all202 older records;12 exact desktop/mobile frames passed without overflow. Those
+are6 Pages,0placed photographs; browser image counts include branding and do not
+prove media acquisition. Native readback exposed Windows cp1252 decoding one UTF-8
+title incorrectly; explicit UTF-8 fixed verification without changing Page content.
+Do not claim new commercial improvement from labels, captures or this repair.
+
+Worker continuation initially failed because the packaged generic entrypoint was
+used instead of the declared private `p0-source-aware-c0-runtime/worker.cjs` required
+by activation custody. Guards were not weakened. Read-only preparation then passed
+through the declared worker. Exact current review input is `e18cf495fe161a735ae8ba134b0342eb3f3f0a2a2d66e84ee7e4465250e26687`.
+The existing Core app is deliberately paused only while the resource-bounded worker
+runs; its controller restores the same app in `finally`. Do not start a second worker
+or repeat a provider call after interruption; inspect retained process/results and
+usage first. The one critique is not yet claimed successful at this checkpoint.
 
 
 **November 21 owner clarification:** Codex is development tooling only and must not

@@ -23,11 +23,13 @@ async function main() {
     assert.equal(review.needsUnderstandingRefresh, false);
     assert.ok(review.report && review.direction && review.pages.length > 0);
     assert.deepEqual(review.changes.map(page => page.path).sort(), ["/", "/how-it-works", "/service"]);
+    assert.ok(review.wordpress && review.wordpress.revision === 6 && review.wordpress.pages.length === 13);
     const rendered = [];
     for (const page of review.pages) {
       const input = await reader.preview(retainedCoreAssociation.ownerId, page.path, false);
       const html = await renderRetainedNativePreview(input);
       assert.ok(html.includes("default-src 'none'") && !/<script\b/iu.test(html));
+      assert.ok(html.includes('aria-label="Temporary review guide"') && html.includes('not the installed WordPress site'));
       rendered.push({ path: page.path, sha256: createHash("sha256").update(html).digest("hex"), bytes: Buffer.byteLength(html) });
     }
     for (const change of review.changes) {
