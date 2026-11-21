@@ -364,14 +364,144 @@ def lazy_research_correction():
     deploy(False, True, 'lazy-research')
 
 
+def account_review_documents(plan, legacy_ledger, research_sources, now_ms):
+    """Configure review using the existing ledger/provider contract. Dispatch
+    stays revoked until a real confirmed correction has exact derived pins."""
+    assert plan['provider']['maximumAdditionalUsd'] == 3
+    assert plan['provider']['maximumGenerations'] == 12
+    assert plan['provider']['maximumRequestsIncludingCounts'] == 24
+    rates = dict(legacy_ledger['rateCard'])
+    assert rates['model'] == 'gpt-5.4-mini-2026-03-17'
+    assert [rates[k] for k in ['inputPerMillion', 'cachedPerMillion', 'outputPerMillion', 'countMicros']] == [750000, 75000, 4500000, 0]
+    stable = lambda value: json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode()
+    fingerprint = lambda value: hashlib.sha256(stable(value)).hexdigest()
+    # Preserve the existing JS canonical rate-card digest: Python's key ordering
+    # differs from localeCompare for camelCase keys. Never re-hash it differently.
+    ledger = {'ratesDigest': legacy_ledger['ratesDigest'], 'rateCard': rates,
+              'adapterVersion': 'onboarding-responses/1', 'model': rates['model'], 'tier': 'default', 'attempts': []}
+    ledger_bytes = json.dumps(ledger, ensure_ascii=False, separators=(',', ':')).encode() + b'\n'
+    actual_rates = {'model': plan['provider']['model'], 'verifiedOn': plan['provider']['ratesVerifiedOn'],
+                    'inputPerMillion': 2500000, 'cachedPerMillion': 250000, 'cacheWritePerMillion': 0,
+                    'outputPerMillion': 15000000, 'countMicros': 0}
+    assert actual_rates['model'] == 'gpt-5.4-2026-03-05'
+    stage = {'rates': actual_rates, 'requestInputTokens': 96000, 'requestOutputTokens': 16384,
+             'cumulativeInputTokens': 1152000, 'cumulativeOutputTokens': 196608, 'capMicros': 3000000}
+    grant = {'contextDigest': plan['data']['retainedContextDigest'],
+             'approvedSources': plan['data']['approvedOriginalSourceDigests'], 'approvedCorrections': [],
+             'researchSources': research_sources, 'researchResponseBytes': 1000000,
+             'maxRetries': 0, 'maxEditorialRevisions': 12, 'maxCommercialReplans': 12,
+             'maxOutputTokens': 16384, 'expiresAt': now_ms - 1, 'revoked': True,
+             'ledger': {'id': fingerprint({'approval': APPROVAL, 'purpose': 'account-cycle-review'}),
+                        'startingLedger': hashlib.sha256(ledger_bytes).hexdigest(), 'baselineAttempts': 0,
+                        'requests': 24, 'generations': 12, 'capMicros': 3000000,
+                        'inputTokens': 96000, 'inputBytes': 1000000, 'stageSpendingPolicy': 'shared-aggregate',
+                        'stages': {name: dict(stage) for name in ['research', 'report', 'direction', 'blueprint', 'page', 'revision', 'editorial']}}}
+    scope = {'schema': 'protected-account-cycle/1', 'ownerId': plan['identity']['reuseOwnerId'],
+             'webPresenceId': plan['scope']['webPresenceId'], 'managedSiteId': plan['scope']['managedSiteId']}
+    return scope, grant, ledger_bytes
+
+
+def enable_account_review():
+    """Enable only the approved account scope on the verified existing build.
+    Preserve the original grant/ledger and restore review configuration on failure."""
+    global phase
+    phase = 'account-review-preflight'
+    assert not (RUN / 'account-review-before.json').exists()
+    assert verify_files(WEB, '4058a74f5b88c5392563b236dab8258107c66d81') == 205
+    current = application('online')
+    assert current['restarts'] == 10
+    before = json.loads((RUN / 'before.json').read_bytes())
+    assert private_state() == before['private'] and public() == before['public']
+    assert digest(RUN / 'rollback-4df15c1.tar.gz') == json.loads((RUN / 'rollback-verification.json').read_bytes())['sha256']
+    assert digest(RUN / 'manifest.json') == APPROVAL
+    plan = json.loads((RUN / 'manifest.json').read_bytes())
+    readback_file = RUN / 'account-database-verification.json'
+    assert readback_file.resolve() == readback_file and readback_file.stat().st_uid == os.getuid() and stat.S_IMODE(readback_file.stat().st_mode) == 0o600
+    readback = json.loads(readback_file.read_bytes())
+    assert readback['operation'] == 'independent-protected-account-readback' and readback['status'] == 'PASS'
+    assert readback['newGrants'] == 3 and readback['draftVersion'] == 28 and readback['workflowRevision'] == 41
+    assert all(readback[k] for k in ['tlsCertificateValidated', 'identityAndCredentialUnchanged', 'knowledgeUnchanged', 'guardUnchanged', 'noRawPublicTablePrivileges', 'forcedRls'])
+    legacy = json.loads((PRIVATE / 'presence-workflow-grant.json').read_bytes())
+    assert legacy['contextDigest'] == plan['data']['retainedContextDigest']
+    assert sorted(legacy['approvedSources']) == sorted(plan['data']['approvedOriginalSourceDigests'])
+    names = ['account-cycle-scope.json', 'account-cycle-workflow-grant.json', 'core-account-cycle-usage']
+    assert all(not (PRIVATE / name).exists() and not (PRIVATE / name).is_symlink() for name in names)
+    resources()
+    save(RUN / 'account-review-before.json', {'application': current, 'private': private_state(),
+         'public': before['public'], 'sqlIndependentReadbackRequired': True, 'ownerAuthorizationIssueComment': 7054044894})
+    stopped = False
+    try:
+        phase = 'account-review-stop-existing-entry'
+        pm2('stop', '0')
+        stopped = True
+        assert application('stopped')['restarts'] == current['restarts']
+        legacy_ledger = json.loads((PRIVATE / 'core-usage/onboarding-usage.json').read_bytes())
+        scope, grant, ledger = account_review_documents(plan, legacy_ledger, legacy['researchSources'], int(time.time() * 1000))
+        directory = PRIVATE / 'core-account-cycle-usage'
+        directory.mkdir(mode=0o700)
+        with (directory / 'onboarding-usage.json').open('xb') as f:
+            os.chmod(f.fileno(), 0o600)
+            f.write(ledger)
+            f.flush()
+            os.fsync(f.fileno())
+        save(PRIVATE / 'account-cycle-workflow-grant.json', grant)
+        save(PRIVATE / 'account-cycle-scope.json', scope)
+        phase = 'account-review-start-existing-entry'
+        pm2('restart', '0')
+        for attempt in range(20):
+            try:
+                probe()
+                break
+            except Exception:
+                if attempt == 19:
+                    raise
+                time.sleep(2)
+        online = application('online')
+        assert online['restarts'] in [current['restarts'], current['restarts'] + 1]
+        for _ in range(3):
+            time.sleep(5)
+            assert application('online') == online
+            resources()
+            probe()
+        assert private_state() == before['private'] and public() == before['public']
+        assert verify_files(WEB, '4058a74f5b88c5392563b236dab8258107c66d81') == 205
+        pm2('save', '--force')
+        saved = json.loads((HOME / '.pm2/dump.pm2').read_bytes())
+        assert len(saved) == 1 and saved[0]['name'] == 'miopages-protected-core'
+        result = {'status': 'PASS', 'operation': 'enable-protected-account-review', 'application': online,
+                  'sourceCommit': '4058a74f5b88c5392563b236dab8258107c66d81',
+                  'accountCapabilityEnabled': True, 'providerDispatchRevoked': True,
+                  'aiWindowStarted': False, 'privateStateMatches': True, 'publicDigestsMatch': True}
+        save(RUN / 'account-review-evidence.json', result)
+        print(json.dumps(result), flush=True)
+    except Exception:
+        failed_phase = phase
+        save(RUN / 'account-review-failure.json', {'phase': failed_phase, 'application': application()})
+        if stopped:
+            pm2('stop', '0')
+            for name in names:
+                p = PRIVATE / name
+                if p.exists():
+                    p.rename(RUN / ('failed-account-review-' + name))
+            pm2('restart', '0')
+            time.sleep(4)
+            probe()
+            assert private_state() == before['private'] and public() == before['public']
+            save(RUN / 'account-review-rollback.json', {'status': 'PASS', 'failedPhase': failed_phase,
+                 'providerDispatchRevoked': True, 'databaseHistoryPreserved': True})
+        phase = failed_phase
+        raise
+
+
 if __name__ == '__main__':
     try:
         assert sys.platform == 'linux' and pathlib.Path.home().resolve() == HOME
         for directory in [PRIVATE, RUN, WEB]:
             assert directory.resolve() == directory and directory.stat().st_uid == os.getuid() and stat.S_IMODE(directory.stat().st_mode) == 0o700
-        assert len(sys.argv) == 2 and sys.argv[1] in ['STAGE', 'RESUME-STAGE', 'DEPLOY', 'RESTORE-REVIEW', 'CORRECTED-PROBE-DEPLOY', 'LAZY-RESEARCH-CORRECTION']
+        assert len(sys.argv) == 2 and sys.argv[1] in ['STAGE', 'RESUME-STAGE', 'DEPLOY', 'RESTORE-REVIEW', 'CORRECTED-PROBE-DEPLOY', 'LAZY-RESEARCH-CORRECTION', 'ENABLE-ACCOUNT-REVIEW']
         {'STAGE': stage, 'RESUME-STAGE': resume_stage, 'DEPLOY': deploy, 'RESTORE-REVIEW': lambda: deploy(False),
-         'CORRECTED-PROBE-DEPLOY': corrected_probe_deploy, 'LAZY-RESEARCH-CORRECTION': lazy_research_correction}[sys.argv[1]]()
+         'CORRECTED-PROBE-DEPLOY': corrected_probe_deploy, 'LAZY-RESEARCH-CORRECTION': lazy_research_correction,
+         'ENABLE-ACCOUNT-REVIEW': enable_account_review}[sys.argv[1]]()
     except Exception as error:
         import traceback
         location = traceback.extract_tb(error.__traceback__)[-1]

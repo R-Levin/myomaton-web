@@ -54,55 +54,66 @@ identify the missing machine-local work instead of assuming it never existed.
 
 ## Current authorized work and result
 
-**Current task: approved protected account-cycle activation; SQL compatibility correction.**
-The owner approved the [original exact scope](account-cycle-hosted-activation.json)
-with “Yes”; see the [authorization record](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7052496871).
-The original manifest is unchanged. A complete 21,498-file rollback archive was
-verified. The database installer failed with code `23514` before commit. Independent
-readback confirms no new schema or grants, and unchanged intake 28, workflow 41,
-Knowledge v1 and owner credential. The earlier test fixture omitted the actual
-adapter's customer-mandate CHECK. The [tested SQL amendment](account-cycle-mandate-amendment.json)
-is proposed, not approved or applied; it preserves existing approval requirements
-and supports only the already approved confirmation/outcome permissions.
+**Current task: approved account-cycle SQL installed; protected account review enabled.**
+The owner approved the original [activation scope](account-cycle-hosted-activation.json)
+and then explicitly approved the [exact amendment](account-cycle-mandate-amendment.json)
+and encrypted installer transfer/staging/execution at `05af37b`. See the
+[amendment authorization](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7054044894).
+Original manifest bytes remain unchanged. The earlier automatic-review gate is
+satisfied for this exact operation; do not request that approval again.
 
-**Core restored:** source `4058a74f5b88c5392563b236dab8258107c66d81` is deployed
-at [protected Core](https://wp-acceptance.miopages.com/core). Linux
-[run 44838020904](https://github.com/R-Levin/myomaton-web/actions/runs/44838020904)
-passed. All 205 artifact file hashes were independently checked; archive SHA-256:
-`0630236ad669e7f3555d560af940a00a1df61faae90f3e9c727d92685011db70`.
-Actual external Edge checks at 1440 and 390 pixels passed for the sign-in screen
-and assets. Password login/logout was not exercised. Process PID 403587 and
-restart count 10 stayed stable during repeated probes; sampled available memory
-remained above 512 MiB. Protected input/configuration, old grant/ledger hashes and
-public HTTPS digests match their predeployment baselines.
+**Database PASS, independently verified:** the corrected installer committed the
+reviewed combined SQL `a126f6851329fb3889d2746a080ccebea68465f7fabf39985d8401b4ef0e7799`
+and three scoped grants on the same persistent owner identity. Independent
+certificate-validated TLS / restricted-role readback confirms the original grants,
+credential, inactive C0 binding, Knowledge v1, intake 28, all 41 workflow events,
+intake guard and raw-table privilege restrictions remain unchanged. Outcome history
+has forced RLS and zero records. Recovery definitions and the failed original
+installer remain protected. No rollback was required for the successful amendment.
 
-Both failed earlier rollout attempts and their matching rollback evidence remain
-preserved. One probe incorrectly expected client-rendered sign-in text in initial
-HTML; the other correctly stopped at the memory reserve. Neither the 384 MiB
-process limit nor the 512 MiB reserve was relaxed. Lazy research-browser loading
-corrected the idle footprint. A test-only NODE_ENV type error was fixed before
-the successful Linux run; failed checks are retained as failures.
+**Protected Core is online with the account scope enabled:**
+[open Core](https://wp-acceptance.miopages.com/core), existing username `owner`
+and existing saved password. Source `4058a74f5b88c5392563b236dab8258107c66d81`,
+all 205 build hashes, old protected input/configuration/grant/ledger hashes and
+both public HTTPS digests still match. The only app restarted was the existing
+`miopages-protected-core`; final PID 406236 / restart count 10 remained stable.
+Actual external Edge at 1440/390 pixels verifies the sign-in screen and assets.
+Password sign-in/logout was not exercised by Codex; no credential was replaced
+and no authenticated-owner test is claimed.
+A single generated invalid-password request correctly returned 401 without a
+session; the same process stayed stable afterward. No real password was used.
+TypeScript, focused lint, the actual provider/stage-meter offline checks and
+checkpoint-document checks pass.
 
-**Remaining authorization:** automatic approval review rejected uploading/staging
-the revised installer as a hosted write outside the original SQL package. It was
-not transferred or executed by another route. The local-only package SHA-256 is
-`5cdfc379fbb569aee89a64a431dee17a8735f3e42ee4cb409b4992058acda29a`.
-Its amendment manifest is `4bc2cd008b1a2ba729cfb950f2f5bc6e6248c5dc1021a6d3016b41b4776892c5`;
-combined forward SQL is `a126f6851329fb3889d2746a080ccebea68465f7fabf39985d8401b4ef0e7799`.
-Next: obtain one explicit approval covering the amendment and encrypted package
-transfer, staging and execution in the original Cloud account at
-`~/miopages-account-cycle-mandate-4bc2cd00`. Then use the new checksummed launcher
-with the existing migration-password prompt. Never rerun or reset the failed
-original installer. This adds no principal, permission beyond the approved three,
-credential, infrastructure or AI budget. Rollback withdraws access and revokes only
-receipt-bound grants while retaining mandate-bearing audit rows and history.
+The genuine Core composition opened the retained report, Presence Direction and
+12 of 12 existing Page drafts at workflow 41, with one canonical knowledge target,
+no pending corrections and no outcome records. Its next state is editorial review.
+The read-only smoke left workflow history unchanged and made no provider request.
+It ran with the protected app briefly stopped to preserve the existing resource
+gates, peaking at 161996800 bytes RSS with minimum 600904 KiB available; the app
+was restored and independently probed afterward. This is retained C0 work, not
+new AI generation, founder acceptance or a new WordPress application.
 
-New account functions remain disabled. No model request, spending, meaningful
-business correction, WordPress change, publication or merge occurred. The $3 / 72-hour
-processing window has not started. Original Core 41, WordPress 6, local 97 and
-isolated 106 remain preserved. Worker concurrency and the complete account cycle
-are not established by sign-in-screen verification; the same resource gates apply
-before paid work. Do not invent a business correction to activate processing.
+**Next executable action:** the owner can use **Your understanding and current work**
+in authenticated Core to review retained sources and propose a meaningful business
+correction, then explicitly confirm it against the canonical target. Saving a
+proposal makes no model call. Do not invent a correction or silently confirm the
+ten retained answers. After a genuine confirmation, bind its exact derived source/
+reassessment pins and activate the already-approved session through existing
+metering. The review configuration's grant is deliberately revoked/expired and
+its fresh ledger has zero attempts; the $3 / 72-hour processing window has NOT
+started. All actual generation stages are pinned to approved GPT-5.4; the existing
+mini header is retained only for ledger-format compatibility, with no model use.
+Concurrent paid-worker execution still requires the unchanged resource checks.
+
+Local and hosted evidence: `runtime-content/account-cycle-mandate-hosted-stage.json`,
+`account-cycle-mandate-independent-readback.json`, `account-cycle-review-activation.json`,
+`account-cycle-hosted-case-smoke.json`, and `hosted-core-login-browser-account-enabled/`.
+The scoped original Cloud installer folder retains installation/completion/independent
+readback receipts; the existing protected Core update folder retains configuration,
+smoke, process and recovery receipts. No API spending, business confirmation,
+WordPress change, publication, infrastructure change or merge occurred. Original
+Core 41, WordPress 6, local 97 and isolated 106 remain preserved.
 
 **Previous completed task: confirmed understanding, reassessment and inquiry outcomes.**
 Following the scope/next-step discussion, the owner asked Codex to act next; local
