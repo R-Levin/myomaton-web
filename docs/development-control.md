@@ -55,7 +55,7 @@ identify the missing machine-local work instead of assuming it never existed.
 ## Current authorized work and result
 
 
-### November 21 — current Core review repair in progress
+### November 21 â€” current Core review repair in progress
 
 The owner rejected the confusing handoff and directed continued, frugal execution.
 The new local implementation opens the actual retained source-aware case106 as an
@@ -66,8 +66,14 @@ It neither reparents the case nor exercises signing, review, confirmation or pub
 authority. Existing authentication and original scoped inspection are still required.
 
 **Not yet a hosted result or improved AI generation.** Controlled browser checks,
-projection/approval compatibility and the actual PHP renderer pass locally. Linux build
-and exact hosted readback remain next. The current public Core remains source4058a74.
+projection/approval compatibility and the actual PHP renderer pass locally. Linux run
+44872834234 passed source9460b4b, including dependency audit, PostgreSQL integration,
+production build, private routing and the actual packaged PHP escaping/path refusals.
+Artifact SHA256 `945cf6842940e1e5209303631528638d9f61ffd70d509fc3159592da45111e82`,
+210 verified files. The current public Core remains source4058a74 pending exact hosted
+readback and the targeted same-app rollout. Prior failed Linux runs are retained: the
+new image component exposed a missing browser environment in the old JSDOM harness;
+the harness was corrected and all38 affected regressions passed before the green run.
 No provider requests/spending, credential changes, WordPress writes or new infrastructure.
 
 The suspected stale-report cause was independently disproved: restored source context71
@@ -306,7 +312,7 @@ intermediate progress; refresh the note with pushed SHA and Issue link afterward
 Never replay provisioning, migrations, grants, WORK or model calls to recover context.
 No generic hook, automation service or second documentation framework is introduced.
 
-## Outcome-first execution and proportional controls — owner decision, 2026-11-14
+## Outcome-first execution and proportional controls â€” owner decision, 2026-11-14
 
 Deliver customer/Operator outcomes through existing architecture. Tests establish
 bounded technical evidence, not product acceptance. Preserve valuable components;
@@ -344,7 +350,7 @@ section anchors for incoming references without making their old commands curren
 
 <a id="working-delivery-targets--november-19-2026"></a>
 
-- [Working delivery targets — November 19, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#working-delivery-targets--november-19-2026)
+- [Working delivery targets â€” November 19, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#working-delivery-targets--november-19-2026)
 
 <a id="november-7-customer-account-operations-clarification"></a>
 
@@ -352,7 +358,7 @@ section anchors for incoming references without making their old commands curren
 
 <a id="november-47-deferred-decision-recovery"></a>
 
-- [November 4–7 deferred decision recovery](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#november-47-deferred-decision-recovery)
+- [November 4â€“7 deferred decision recovery](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#november-47-deferred-decision-recovery)
 
 <a id="human-centered-operator-orchestration-direction"></a>
 
@@ -380,27 +386,27 @@ section anchors for incoming references without making their old commands curren
 
 <a id="c0-owner-walkthrough--full-interview-not-accepted"></a>
 
-- [C0 owner walkthrough — full interview NOT accepted](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#c0-owner-walkthrough--full-interview-not-accepted)
+- [C0 owner walkthrough â€” full interview NOT accepted](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#c0-owner-walkthrough--full-interview-not-accepted)
 
 <a id="issue-10--reviewed-c0-interview-design"></a>
 
-- [Issue #10 · reviewed C0 interview design](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-10--reviewed-c0-interview-design)
+- [Issue #10 Â· reviewed C0 interview design](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-10--reviewed-c0-interview-design)
 
 <a id="issue-10--historical-adaptive-intake-rehearsal"></a>
 
-- [Issue #10 · historical adaptive intake rehearsal](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-10--historical-adaptive-intake-rehearsal)
+- [Issue #10 Â· historical adaptive intake rehearsal](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-10--historical-adaptive-intake-rehearsal)
 
 <a id="issue-10--shared-intelligent-onboarding-offline-proof"></a>
 
-- [Issue #10 · shared intelligent onboarding offline proof](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-10--shared-intelligent-onboarding-offline-proof)
+- [Issue #10 Â· shared intelligent onboarding offline proof](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-10--shared-intelligent-onboarding-offline-proof)
 
 <a id="issue-9--first-local-signup-and-onboarding-slice"></a>
 
-- [Issue #9 · first local signup and onboarding slice](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-9--first-local-signup-and-onboarding-slice)
+- [Issue #9 Â· first local signup and onboarding slice](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#issue-9--first-local-signup-and-onboarding-slice)
 
 <a id="parallel-c0-integration-spine--issue-12"></a>
 
-- [Parallel C0 integration spine · Issue #12](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#parallel-c0-integration-spine--issue-12)
+- [Parallel C0 integration spine Â· Issue #12](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#parallel-c0-integration-spine--issue-12)
 
 <a id="next-proving-focus-authentic-c0-interview-to-wordpress-rebuild"></a>
 
@@ -468,71 +474,71 @@ section anchors for incoming references without making their old commands curren
 
 <a id="bounded-stability-and-actual-private-https-refusals--pass-transfer-later-approved-above"></a>
 
-- [Bounded stability and actual private HTTPS refusals — PASS (transfer later approved above)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#bounded-stability-and-actual-private-https-refusals--pass-transfer-later-approved-above)
+- [Bounded stability and actual private HTTPS refusals â€” PASS (transfer later approved above)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#bounded-stability-and-actual-private-https-refusals--pass-transfer-later-approved-above)
 
 <a id="existing-acceptance-app-identified-read-only-refreshed-wordpress-baseline--pass-hold-superseded-above"></a>
 
-- [Existing acceptance app identified read-only; refreshed WordPress baseline — PASS (hold superseded above)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#existing-acceptance-app-identified-read-only-refreshed-wordpress-baseline--pass-hold-superseded-above)
+- [Existing acceptance app identified read-only; refreshed WordPress baseline â€” PASS (hold superseded above)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#existing-acceptance-app-identified-read-only-refreshed-wordpress-baseline--pass-hold-superseded-above)
 
 <a id="corrected-linux-artifact-and-hosted-loopback-smoke--pass-historical-registration-pending-state"></a>
 
-- [Corrected Linux artifact and hosted loopback smoke — PASS; historical registration-pending state](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#corrected-linux-artifact-and-hosted-loopback-smoke--pass-historical-registration-pending-state)
+- [Corrected Linux artifact and hosted loopback smoke â€” PASS; historical registration-pending state](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#corrected-linux-artifact-and-hosted-loopback-smoke--pass-historical-registration-pending-state)
 
 <a id="approved-private-routing-correction--preparation-record-linux-gate-now-passed-above"></a>
 
-- [Approved private routing correction — preparation record (Linux gate now passed above)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#approved-private-routing-correction--preparation-record-linux-gate-now-passed-above)
+- [Approved private routing correction â€” preparation record (Linux gate now passed above)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#approved-private-routing-correction--preparation-record-linux-gate-now-passed-above)
 
 <a id="outbound-correction-verified-loopback-smoke-stopped-at-routing-gate--november-6-2026"></a>
 
-- [Outbound correction verified; loopback smoke stopped at routing gate — November 6, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#outbound-correction-verified-loopback-smoke-stopped-at-routing-gate--november-6-2026)
+- [Outbound correction verified; loopback smoke stopped at routing gate â€” November 6, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#outbound-correction-verified-loopback-smoke-stopped-at-routing-gate--november-6-2026)
 
 <a id="authenticated-my20i-inspection-complete--privileged-network-rule-inspection-required-historical-now-resolved"></a>
 
-- [Authenticated My20i inspection complete — privileged network-rule inspection required (historical, now resolved)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#authenticated-my20i-inspection-complete--privileged-network-rule-inspection-required-historical-now-resolved)
+- [Authenticated My20i inspection complete â€” privileged network-rule inspection required (historical, now resolved)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#authenticated-my20i-inspection-complete--privileged-network-rule-inspection-required-historical-now-resolved)
 
 <a id="read-only-account-network-comparison--november-6-2026-historical-pending-check-state"></a>
 
-- [Read-only account network comparison — November 6, 2026; historical pending-check state](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#read-only-account-network-comparison--november-6-2026-historical-pending-check-state)
+- [Read-only account network comparison â€” November 6, 2026; historical pending-check state](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#read-only-account-network-comparison--november-6-2026-historical-pending-check-state)
 
 <a id="current-stop-gate--new-accounts-session-pooler-tcp-refusal"></a>
 
-- [Current stop gate — new account's Session Pooler TCP refusal](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#current-stop-gate--new-accounts-session-pooler-tcp-refusal)
+- [Current stop gate â€” new account's Session Pooler TCP refusal](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#current-stop-gate--new-accounts-session-pooler-tcp-refusal)
 
 <a id="temporary-account-isolation-and-https-package-routing--pass-listener-preparation"></a>
 
-- [Temporary account isolation and HTTPS package routing — PASS; listener preparation](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#temporary-account-isolation-and-https-package-routing--pass-listener-preparation)
+- [Temporary account isolation and HTTPS package routing â€” PASS; listener preparation](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#temporary-account-isolation-and-https-package-routing--pass-listener-preparation)
 
 <a id="hosted-continuation-exact-core-approval-independent-technical-review-and-enrollment--pass"></a>
 
-- [Hosted continuation, exact Core approval, independent technical review and enrollment — PASS](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-continuation-exact-core-approval-independent-technical-review-and-enrollment--pass)
+- [Hosted continuation, exact Core approval, independent technical review and enrollment â€” PASS](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-continuation-exact-core-approval-independent-technical-review-and-enrollment--pass)
 
 <a id="path-normalization-correction-approved-and-tested--no-rekey-retry"></a>
 
-- [Path-normalization correction approved and tested — no rekey retry](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#path-normalization-correction-approved-and-tested--no-rekey-retry)
+- [Path-normalization correction approved and tested â€” no rekey retry](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#path-normalization-correction-approved-and-tested--no-rekey-retry)
 
 <a id="bounded-continuation-explicitly-approved--fixed-holder-tested-protected-handoff-pending"></a>
 
-- [Bounded continuation explicitly approved — fixed holder tested, protected handoff pending](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#bounded-continuation-explicitly-approved--fixed-holder-tested-protected-handoff-pending)
+- [Bounded continuation explicitly approved â€” fixed holder tested, protected handoff pending](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#bounded-continuation-explicitly-approved--fixed-holder-tested-protected-handoff-pending)
 
 <a id="owner-exact-approval-received--core-recording-blocked-on-reviewed-credential-continuation"></a>
 
-- [Owner exact approval received — Core recording blocked on reviewed credential continuation](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#owner-exact-approval-received--core-recording-blocked-on-reviewed-credential-continuation)
+- [Owner exact approval received â€” Core recording blocked on reviewed credential continuation](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#owner-exact-approval-received--core-recording-blocked-on-reviewed-credential-continuation)
 
 <a id="specific-credential-continuation-method-awaiting-separate-approval--not-applied"></a>
 
-- [Specific credential-continuation method awaiting separate approval — NOT APPLIED](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#specific-credential-continuation-method-awaiting-separate-approval--not-applied)
+- [Specific credential-continuation method awaiting separate approval â€” NOT APPLIED](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#specific-credential-continuation-method-awaiting-separate-approval--not-applied)
 
 <a id="latest-wordpress-checkpoint--independently-authenticated-durable-candidate-preview-ready-for-owner-review"></a>
 
-- [Latest WordPress checkpoint — independently authenticated, durable candidate preview ready for owner review](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#latest-wordpress-checkpoint--independently-authenticated-durable-candidate-preview-ready-for-owner-review)
+- [Latest WordPress checkpoint â€” independently authenticated, durable candidate preview ready for owner review](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#latest-wordpress-checkpoint--independently-authenticated-durable-candidate-preview-ready-for-owner-review)
 
 <a id="latest-verified-operational-checkpoint--public-security-deployment-pass-november-6-2026"></a>
 
-- [Latest verified operational checkpoint — public security deployment PASS, November 6, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#latest-verified-operational-checkpoint--public-security-deployment-pass-november-6-2026)
+- [Latest verified operational checkpoint â€” public security deployment PASS, November 6, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#latest-verified-operational-checkpoint--public-security-deployment-pass-november-6-2026)
 
 <a id="wordpress-resume--hidden-prompt-principal-enrollment-prepared-not-executed"></a>
 
-- [WordPress resume — hidden-prompt principal enrollment prepared, not executed](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-resume--hidden-prompt-principal-enrollment-prepared-not-executed)
+- [WordPress resume â€” hidden-prompt principal enrollment prepared, not executed](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-resume--hidden-prompt-principal-enrollment-prepared-not-executed)
 
 <a id="mandatory-start-of-chat-protocol"></a>
 
@@ -544,15 +550,15 @@ section anchors for incoming references without making their old commands curren
 
 <a id="hosted-synthetic-c0-proof--2026-11-01-reported-live-ssh-output"></a>
 
-- [Hosted synthetic C0 proof — 2026-11-01 (reported live SSH output)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-c0-proof--2026-11-01-reported-live-ssh-output)
+- [Hosted synthetic C0 proof â€” 2026-11-01 (reported live SSH output)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-c0-proof--2026-11-01-reported-live-ssh-output)
 
 <a id="hosted-c0-hostname-and-http-proof--2026-11-01-reported-live-ssh-output"></a>
 
-- [Hosted C0 hostname and HTTP proof — 2026-11-01 (reported live SSH output)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-c0-hostname-and-http-proof--2026-11-01-reported-live-ssh-output)
+- [Hosted C0 hostname and HTTP proof â€” 2026-11-01 (reported live SSH output)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-c0-hostname-and-http-proof--2026-11-01-reported-live-ssh-output)
 
 <a id="additional-hostname-routing-proof--november-1-2026"></a>
 
-- [Additional hostname routing proof — November 1, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#additional-hostname-routing-proof--november-1-2026)
+- [Additional hostname routing proof â€” November 1, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#additional-hostname-routing-proof--november-1-2026)
 
 <a id="guarded-next-hosted-sequence-historical-sequence-consult-latest-proof-above"></a>
 
@@ -564,115 +570,115 @@ section anchors for incoming references without making their old commands curren
 
 <a id="wordpress-delivery-feasibility-decision--2026-11-02"></a>
 
-- [WordPress delivery feasibility decision — 2026-11-02](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-delivery-feasibility-decision--2026-11-02)
+- [WordPress delivery feasibility decision â€” 2026-11-02](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-delivery-feasibility-decision--2026-11-02)
 
 <a id="wordpress-c0-v3-source-fixture-checkpoint--2026-11-02"></a>
 
-- [WordPress C0 v3 source fixture checkpoint — 2026-11-02](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-c0-v3-source-fixture-checkpoint--2026-11-02)
+- [WordPress C0 v3 source fixture checkpoint â€” 2026-11-02](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-c0-v3-source-fixture-checkpoint--2026-11-02)
 
 <a id="wordpress-operator-editor-inbound-proposal-track--2026-11-03"></a>
 
-- [WordPress operator-editor inbound proposal track — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-operator-editor-inbound-proposal-track--2026-11-03)
+- [WordPress operator-editor inbound proposal track â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-operator-editor-inbound-proposal-track--2026-11-03)
 
 <a id="active-development-handoff--wordpress-two-way-deliveryeditorial--20i-service-adapter-2026-11-03"></a>
 
-- [Active development handoff — WordPress two-way delivery/editorial + 20i service adapter (2026-11-03)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#active-development-handoff--wordpress-two-way-deliveryeditorial--20i-service-adapter-2026-11-03)
+- [Active development handoff â€” WordPress two-way delivery/editorial + 20i service adapter (2026-11-03)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#active-development-handoff--wordpress-two-way-deliveryeditorial--20i-service-adapter-2026-11-03)
 
 <a id="first-wordpress-plugin-source-checkpoint--2026-11-03"></a>
 
-- [First WordPress plugin source checkpoint — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#first-wordpress-plugin-source-checkpoint--2026-11-03)
+- [First WordPress plugin source checkpoint â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#first-wordpress-plugin-source-checkpoint--2026-11-03)
 
 <a id="wordpress-hosted-private-preview-field-result--2026-11-03"></a>
 
-- [WordPress hosted private-preview field result — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-hosted-private-preview-field-result--2026-11-03)
+- [WordPress hosted private-preview field result â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-hosted-private-preview-field-result--2026-11-03)
 
 <a id="wordpress-visual-preview-v002-source-checkpoint--2026-11-03"></a>
 
-- [WordPress visual-preview v0.0.2 source checkpoint — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-visual-preview-v002-source-checkpoint--2026-11-03)
+- [WordPress visual-preview v0.0.2 source checkpoint â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-visual-preview-v002-source-checkpoint--2026-11-03)
 
 <a id="visual-preview-v002-local-validation-report--2026-11-03"></a>
 
-- [Visual-preview v0.0.2 local validation report — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#visual-preview-v002-local-validation-report--2026-11-03)
+- [Visual-preview v0.0.2 local validation report â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#visual-preview-v002-local-validation-report--2026-11-03)
 
 <a id="wordpress-v002-visual-preview-acceptance-observation--2026-11-03"></a>
 
-- [WordPress v0.0.2 visual preview acceptance observation — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-v002-visual-preview-acceptance-observation--2026-11-03)
+- [WordPress v0.0.2 visual preview acceptance observation â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-v002-visual-preview-acceptance-observation--2026-11-03)
 
 <a id="signed-release-contract-v01-and-offline-validator--2026-11-03"></a>
 
-- [Signed release contract v0.1 and offline validator — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#signed-release-contract-v01-and-offline-validator--2026-11-03)
+- [Signed release contract v0.1 and offline validator â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#signed-release-contract-v01-and-offline-validator--2026-11-03)
 
 <a id="release-contract-offline-test-blocker--2026-11-03"></a>
 
-- [Release-contract offline test blocker — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#release-contract-offline-test-blocker--2026-11-03)
+- [Release-contract offline test blocker â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#release-contract-offline-test-blocker--2026-11-03)
 
 <a id="release-contract-v01-offline-security-validation-passed--2026-11-03"></a>
 
-- [Release Contract v0.1 offline security validation PASSED — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#release-contract-v01-offline-security-validation-passed--2026-11-03)
+- [Release Contract v0.1 offline security validation PASSED â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#release-contract-v01-offline-security-validation-passed--2026-11-03)
 
 <a id="offline-release-staging-and-activation-first-slice--2026-11-03"></a>
 
-- [Offline release staging and activation first slice — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-release-staging-and-activation-first-slice--2026-11-03)
+- [Offline release staging and activation first slice â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-release-staging-and-activation-first-slice--2026-11-03)
 
 <a id="offline-stagingrecovery-local-test-pass--2026-11-03"></a>
 
-- [Offline staging/recovery local test PASS — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-stagingrecovery-local-test-pass--2026-11-03)
+- [Offline staging/recovery local test PASS â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-stagingrecovery-local-test-pass--2026-11-03)
 
 <a id="offline-staging-failurerecovery-hardening--source-checkpoint-2026-11-03"></a>
 
-- [Offline staging failure/recovery hardening — source checkpoint 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-staging-failurerecovery-hardening--source-checkpoint-2026-11-03)
+- [Offline staging failure/recovery hardening â€” source checkpoint 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-staging-failurerecovery-hardening--source-checkpoint-2026-11-03)
 
 <a id="offline-release-hardening-regression-checks-passed--2026-11-03"></a>
 
-- [Offline release hardening regression checks PASSED — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-release-hardening-regression-checks-passed--2026-11-03)
+- [Offline release hardening regression checks PASSED â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#offline-release-hardening-regression-checks-passed--2026-11-03)
 
 <a id="hosted-wordpress-environment-readiness-diagnostic-v003--2026-11-03"></a>
 
-- [Hosted WordPress environment-readiness diagnostic v0.0.3 — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-wordpress-environment-readiness-diagnostic-v003--2026-11-03)
+- [Hosted WordPress environment-readiness diagnostic v0.0.3 â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-wordpress-environment-readiness-diagnostic-v003--2026-11-03)
 
 <a id="wordpress-environment-diagnostic-path-classification-fix--2026-11-03"></a>
 
-- [WordPress environment diagnostic path classification fix — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-environment-diagnostic-path-classification-fix--2026-11-03)
+- [WordPress environment diagnostic path classification fix â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-environment-diagnostic-path-classification-fix--2026-11-03)
 
 <a id="environment-classification-repair-verified-locally--2026-11-03"></a>
 
-- [Environment-classification repair verified locally — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#environment-classification-repair-verified-locally--2026-11-03)
+- [Environment-classification repair verified locally â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#environment-classification-repair-verified-locally--2026-11-03)
 
 <a id="20i-wordpress-hosted-diagnostic-observed--2026-11-03"></a>
 
-- [20i WordPress hosted diagnostic observed — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-wordpress-hosted-diagnostic-observed--2026-11-03)
+- [20i WordPress hosted diagnostic observed â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-wordpress-hosted-diagnostic-observed--2026-11-03)
 
 <a id="gated-one-shot-private-filesystem-test-v004--code-checkpoint-2026-11-03"></a>
 
-- [Gated one-shot private filesystem test v0.0.4 — code checkpoint 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#gated-one-shot-private-filesystem-test-v004--code-checkpoint-2026-11-03)
+- [Gated one-shot private filesystem test v0.0.4 â€” code checkpoint 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#gated-one-shot-private-filesystem-test-v004--code-checkpoint-2026-11-03)
 
 <a id="filesystem-probe-v004-local-checks--partial-user-results-2026-11-03"></a>
 
-- [Filesystem probe v0.0.4 local checks — partial user results, 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#filesystem-probe-v004-local-checks--partial-user-results-2026-11-03)
+- [Filesystem probe v0.0.4 local checks â€” partial user results, 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#filesystem-probe-v004-local-checks--partial-user-results-2026-11-03)
 
 <a id="filesystem-probe-v004-local-test-gate-cleared--2026-11-03"></a>
 
-- [Filesystem probe v0.0.4 local test gate CLEARED — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#filesystem-probe-v004-local-test-gate-cleared--2026-11-03)
+- [Filesystem probe v0.0.4 local test gate CLEARED â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#filesystem-probe-v004-local-test-gate-cleared--2026-11-03)
 
 <a id="hosted-v004-filesystem-probe-safe-default-confirmed--2026-11-03"></a>
 
-- [Hosted v0.0.4 filesystem probe safe default confirmed — 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-v004-filesystem-probe-safe-default-confirmed--2026-11-03)
+- [Hosted v0.0.4 filesystem probe safe default confirmed â€” 2026-11-03](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-v004-filesystem-probe-safe-default-confirmed--2026-11-03)
 
 <a id="20i-package-directory-layout-observed--2026-11-04"></a>
 
-- [20i package directory layout observed — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-package-directory-layout-observed--2026-11-04)
+- [20i package directory layout observed â€” 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-package-directory-layout-observed--2026-11-04)
 
 <a id="20i-private-sibling-folder-created-permissions-0700--2026-11-04"></a>
 
-- [20i private sibling folder created; permissions 0700 — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-private-sibling-folder-created-permissions-0700--2026-11-04)
+- [20i private sibling folder created; permissions 0700 â€” 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-private-sibling-folder-created-permissions-0700--2026-11-04)
 
 <a id="hosted-filesystem-probe-visibly-armed-public-isolation-check-pending--2026-11-04"></a>
 
-- [Hosted filesystem probe visibly armed; public isolation check pending — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-filesystem-probe-visibly-armed-public-isolation-check-pending--2026-11-04)
+- [Hosted filesystem probe visibly armed; public isolation check pending â€” 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-filesystem-probe-visibly-armed-public-isolation-check-pending--2026-11-04)
 
 <a id="private-storage-preliminary-url-check--2026-11-04"></a>
 
-- [Private storage preliminary URL check — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#private-storage-preliminary-url-check--2026-11-04)
+- [Private storage preliminary URL check â€” 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#private-storage-preliminary-url-check--2026-11-04)
 
 <a id="hosted-filesystem-probe-results-november-4-2026"></a>
 
@@ -680,139 +686,139 @@ section anchors for incoming references without making their old commands curren
 
 <a id="hosted-two-process-recovery-proof-source--2026-11-04"></a>
 
-- [Hosted two-process recovery proof source — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-two-process-recovery-proof-source--2026-11-04)
+- [Hosted two-process recovery proof source â€” 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-two-process-recovery-proof-source--2026-11-04)
 
 <a id="ssh-option-confirmed-for-20i-miopagesorg--2026-11-04"></a>
 
-- [SSH option confirmed for 20i miopages.org — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#ssh-option-confirmed-for-20i-miopagesorg--2026-11-04)
+- [SSH option confirmed for 20i miopages.org â€” 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#ssh-option-confirmed-for-20i-miopagesorg--2026-11-04)
 
 <a id="hosted-cli-recovery-script-syntax-validation--2026-11-04"></a>
 
-- [Hosted CLI recovery script syntax validation — 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-cli-recovery-script-syntax-validation--2026-11-04)
+- [Hosted CLI recovery script syntax validation â€” 2026-11-04](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-cli-recovery-script-syntax-validation--2026-11-04)
 
 <a id="20i-wordpress-ssh-connection-succeeded--november-4-2026"></a>
 
-- [20i WordPress SSH connection succeeded — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-wordpress-ssh-connection-succeeded--november-4-2026)
+- [20i WordPress SSH connection succeeded â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-wordpress-ssh-connection-succeeded--november-4-2026)
 
 <a id="wordpress-20i-ssh-cli-runtime-and-private-directory-confirmed--november-4-2026"></a>
 
-- [WordPress 20i SSH CLI runtime and private directory confirmed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-20i-ssh-cli-runtime-and-private-directory-confirmed--november-4-2026)
+- [WordPress 20i SSH CLI runtime and private directory confirmed â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-20i-ssh-cli-runtime-and-private-directory-confirmed--november-4-2026)
 
 <a id="hosted-cli-test-script-ready--november-4-2026"></a>
 
-- [Hosted CLI test script ready — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-cli-test-script-ready--november-4-2026)
+- [Hosted CLI test script ready â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-cli-test-script-ready--november-4-2026)
 
 <a id="hosted-concurrency-and-interrupted-write-proof-passed--november-4-2026"></a>
 
-- [Hosted concurrency and interrupted-write proof PASSED — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-concurrency-and-interrupted-write-proof-passed--november-4-2026)
+- [Hosted concurrency and interrupted-write proof PASSED â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-concurrency-and-interrupted-write-proof-passed--november-4-2026)
 
 <a id="private-signed-release-staging-v005--synthetic-only-code-checkpoint-nov-4-2026"></a>
 
-- [Private signed-release staging v0.0.5 — synthetic-only code checkpoint (Nov 4, 2026)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#private-signed-release-staging-v005--synthetic-only-code-checkpoint-nov-4-2026)
+- [Private signed-release staging v0.0.5 â€” synthetic-only code checkpoint (Nov 4, 2026)](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#private-signed-release-staging-v005--synthetic-only-code-checkpoint-nov-4-2026)
 
 <a id="wordpress-private-signed-staging-v005-local-regression-pass--november-4-2026"></a>
 
-- [WordPress private signed staging v0.0.5 local regression PASS — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-private-signed-staging-v005-local-regression-pass--november-4-2026)
+- [WordPress private signed staging v0.0.5 local regression PASS â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#wordpress-private-signed-staging-v005-local-regression-pass--november-4-2026)
 
 <a id="hosted-wordpress-v005-disabled-staging-screen-confirmed--november-4-2026"></a>
 
-- [Hosted WordPress v0.0.5 disabled staging screen confirmed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-wordpress-v005-disabled-staging-screen-confirmed--november-4-2026)
+- [Hosted WordPress v0.0.5 disabled staging screen confirmed â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-wordpress-v005-disabled-staging-screen-confirmed--november-4-2026)
 
 <a id="isolated-hosted-synthetic-staging-storage-verified--november-4-2026"></a>
 
-- [Isolated hosted synthetic staging storage verified — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#isolated-hosted-synthetic-staging-storage-verified--november-4-2026)
+- [Isolated hosted synthetic staging storage verified â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#isolated-hosted-synthetic-staging-storage-verified--november-4-2026)
 
 <a id="synthetic-ed25519-issuer-generated-locally--november-4-2026"></a>
 
-- [Synthetic Ed25519 issuer generated locally — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#synthetic-ed25519-issuer-generated-locally--november-4-2026)
+- [Synthetic Ed25519 issuer generated locally â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#synthetic-ed25519-issuer-generated-locally--november-4-2026)
 
 <a id="synthetic-signing-key-consistency-check-passed--november-4-2026"></a>
 
-- [Synthetic signing key consistency check PASSED — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#synthetic-signing-key-consistency-check-passed--november-4-2026)
+- [Synthetic signing key consistency check PASSED â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#synthetic-signing-key-consistency-check-passed--november-4-2026)
 
 <a id="protected-wp-config-backup-confirmed--november-4-2026"></a>
 
-- [Protected wp-config backup confirmed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#protected-wp-config-backup-confirmed--november-4-2026)
+- [Protected wp-config backup confirmed â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#protected-wp-config-backup-confirmed--november-4-2026)
 
 <a id="synthetic-public-verification-key-present-on-20i-enrollment-proposed--november-4-2026"></a>
 
-- [Synthetic public verification key present on 20i; enrollment proposed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#synthetic-public-verification-key-present-on-20i-enrollment-proposed--november-4-2026)
+- [Synthetic public verification key present on 20i; enrollment proposed â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#synthetic-public-verification-key-present-on-20i-enrollment-proposed--november-4-2026)
 
 <a id="hosted-synthetic-enrollment-confirmed-local-test-envelope-generator-prepared--nov-4-2026"></a>
 
-- [Hosted synthetic enrollment confirmed; local test-envelope generator prepared — Nov 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-enrollment-confirmed-local-test-envelope-generator-prepared--nov-4-2026)
+- [Hosted synthetic enrollment confirmed; local test-envelope generator prepared â€” Nov 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-enrollment-confirmed-local-test-envelope-generator-prepared--nov-4-2026)
 
 <a id="local-signed-synthetic-release-envelope-generated-and-self-verified--november-4-2026"></a>
 
-- [Local signed synthetic release envelope generated and self-verified — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#local-signed-synthetic-release-envelope-generated-and-self-verified--november-4-2026)
+- [Local signed synthetic release envelope generated and self-verified â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#local-signed-synthetic-release-envelope-generated-and-self-verified--november-4-2026)
 
 <a id="hosted-synthetic-private-staging-completed--november-4-2026"></a>
 
-- [Hosted synthetic private staging completed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-private-staging-completed--november-4-2026)
+- [Hosted synthetic private staging completed â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-private-staging-completed--november-4-2026)
 
 <a id="hosted-synthetic-storage-permissions-confirmed--november-4-2026"></a>
 
-- [Hosted synthetic storage permissions confirmed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-storage-permissions-confirmed--november-4-2026)
+- [Hosted synthetic storage permissions confirmed â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-synthetic-storage-permissions-confirmed--november-4-2026)
 
 <a id="lock-permission-hardening-local-regressions-passed--november-4-2026"></a>
 
-- [Lock permission hardening local regressions passed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#lock-permission-hardening-local-regressions-passed--november-4-2026)
+- [Lock permission hardening local regressions passed â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#lock-permission-hardening-local-regressions-passed--november-4-2026)
 
 <a id="dedicated-lock-file-permission-regression-added--november-4-2026"></a>
 
-- [Dedicated lock-file permission regression added — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#dedicated-lock-file-permission-regression-added--november-4-2026)
+- [Dedicated lock-file permission regression added â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#dedicated-lock-file-permission-regression-added--november-4-2026)
 
 <a id="local-windows-isolated-lock-file-test-passed--november-4-2026"></a>
 
-- [Local Windows isolated lock-file test passed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#local-windows-isolated-lock-file-test-passed--november-4-2026)
+- [Local Windows isolated lock-file test passed â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#local-windows-isolated-lock-file-test-passed--november-4-2026)
 
 <a id="20i-linux-lock-file-hardening-pass--november-4-2026"></a>
 
-- [20i Linux lock-file hardening PASS — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-linux-lock-file-hardening-pass--november-4-2026)
+- [20i Linux lock-file hardening PASS â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#20i-linux-lock-file-hardening-pass--november-4-2026)
 
 <a id="v006-local-regression-suites-passed--november-4-2026"></a>
 
-- [v0.0.6 local regression suites passed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#v006-local-regression-suites-passed--november-4-2026)
+- [v0.0.6 local regression suites passed â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#v006-local-regression-suites-passed--november-4-2026)
 
 <a id="hosted-staging-guard-remains-unchanged-after-attempted-plugin-upgrade--november-4-2026"></a>
 
-- [Hosted staging guard remains unchanged after attempted plugin upgrade — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-staging-guard-remains-unchanged-after-attempted-plugin-upgrade--november-4-2026)
+- [Hosted staging guard remains unchanged after attempted plugin upgrade â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-staging-guard-remains-unchanged-after-attempted-plugin-upgrade--november-4-2026)
 
 <a id="installed-plugin-v006-confirmed--storage-hardening-milestone-closed--november-4-2026"></a>
 
-- [Installed plugin v0.0.6 confirmed — storage hardening milestone closed — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#installed-plugin-v006-confirmed--storage-hardening-milestone-closed--november-4-2026)
+- [Installed plugin v0.0.6 confirmed â€” storage hardening milestone closed â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#installed-plugin-v006-confirmed--storage-hardening-milestone-closed--november-4-2026)
 
 <a id="development-efficiency-policy-for-remaining-wordpress-delivery-work--november-4-2026"></a>
 
-- [Development efficiency policy for remaining WordPress delivery work — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#development-efficiency-policy-for-remaining-wordpress-delivery-work--november-4-2026)
+- [Development efficiency policy for remaining WordPress delivery work â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#development-efficiency-policy-for-remaining-wordpress-delivery-work--november-4-2026)
 
 <a id="streamlined-batch-1-implementation-kickoff--november-4-2026"></a>
 
-- [Streamlined Batch 1 implementation kickoff — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#streamlined-batch-1-implementation-kickoff--november-4-2026)
+- [Streamlined Batch 1 implementation kickoff â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#streamlined-batch-1-implementation-kickoff--november-4-2026)
 
 <a id="github-actions-ci-failure-diagnosed-and-corrected--november-4-2026"></a>
 
-- [GitHub Actions CI failure diagnosed and corrected — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#github-actions-ci-failure-diagnosed-and-corrected--november-4-2026)
+- [GitHub Actions CI failure diagnosed and corrected â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#github-actions-ci-failure-diagnosed-and-corrected--november-4-2026)
 
 <a id="batch-1-synthetic-core-entitlement-and-authenticated-pull-rehearsal--november-4-2026"></a>
 
-- [Batch 1 synthetic Core entitlement and authenticated pull rehearsal — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#batch-1-synthetic-core-entitlement-and-authenticated-pull-rehearsal--november-4-2026)
+- [Batch 1 synthetic Core entitlement and authenticated pull rehearsal â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#batch-1-synthetic-core-entitlement-and-authenticated-pull-rehearsal--november-4-2026)
 
 <a id="latest-batch-1-automated-gate-pass--november-4-2026"></a>
 
-- [Latest Batch 1 automated gate PASS — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#latest-batch-1-automated-gate-pass--november-4-2026)
+- [Latest Batch 1 automated gate PASS â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#latest-batch-1-automated-gate-pass--november-4-2026)
 
 <a id="batch-1-private-delivery-integration-checkpoint--november-4-2026"></a>
 
-- [Batch 1 private delivery integration checkpoint — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#batch-1-private-delivery-integration-checkpoint--november-4-2026)
+- [Batch 1 private delivery integration checkpoint â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#batch-1-private-delivery-integration-checkpoint--november-4-2026)
 
 <a id="protected-core-authority-and-wordpress-rehearsal-checkpoint--november-4-2026"></a>
 
-- [Protected Core authority and WordPress rehearsal checkpoint — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#protected-core-authority-and-wordpress-rehearsal-checkpoint--november-4-2026)
+- [Protected Core authority and WordPress rehearsal checkpoint â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#protected-core-authority-and-wordpress-rehearsal-checkpoint--november-4-2026)
 
 <a id="isolated-https-rehearsal-preflight--november-4-2026"></a>
 
-- [Isolated HTTPS rehearsal preflight — November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#isolated-https-rehearsal-preflight--november-4-2026)
+- [Isolated HTTPS rehearsal preflight â€” November 4, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#isolated-https-rehearsal-preflight--november-4-2026)
 
 <a id="rehearsal-scope-refinement"></a>
 
@@ -820,59 +826,59 @@ section anchors for incoming references without making their old commands curren
 
 <a id="shared-inventory-accepted-and-bounded-rehearsal-fixture-prepared--november-5-2026"></a>
 
-- [Shared inventory accepted and bounded rehearsal fixture prepared — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#shared-inventory-accepted-and-bounded-rehearsal-fixture-prepared--november-5-2026)
+- [Shared inventory accepted and bounded rehearsal fixture prepared â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#shared-inventory-accepted-and-bounded-rehearsal-fixture-prepared--november-5-2026)
 
 <a id="database-only-rehearsal-rollout-approved--november-5-2026"></a>
 
-- [Database-only rehearsal rollout approved — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#database-only-rehearsal-rollout-approved--november-5-2026)
+- [Database-only rehearsal rollout approved â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#database-only-rehearsal-rollout-approved--november-5-2026)
 
 <a id="database-only-execution-access-checkpoint--november-5-2026"></a>
 
-- [Database-only execution access checkpoint — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#database-only-execution-access-checkpoint--november-5-2026)
+- [Database-only execution access checkpoint â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#database-only-execution-access-checkpoint--november-5-2026)
 
 <a id="ssh-restored-rehearsal-credential-source-required--november-5-2026"></a>
 
-- [SSH restored; rehearsal credential source required — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#ssh-restored-rehearsal-credential-source-required--november-5-2026)
+- [SSH restored; rehearsal credential source required â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#ssh-restored-rehearsal-credential-source-required--november-5-2026)
 
 <a id="consolidated-interactive-database-launcher-prepared--november-5-2026"></a>
 
-- [Consolidated interactive database launcher prepared — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#consolidated-interactive-database-launcher-prepared--november-5-2026)
+- [Consolidated interactive database launcher prepared â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#consolidated-interactive-database-launcher-prepared--november-5-2026)
 
 <a id="recovery-separated-from-resumable-database-setup--november-5-2026"></a>
 
-- [Recovery separated from resumable database setup — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#recovery-separated-from-resumable-database-setup--november-5-2026)
+- [Recovery separated from resumable database setup â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#recovery-separated-from-resumable-database-setup--november-5-2026)
 
 <a id="hosted-native-recovery-failure-diagnosed-without-retry--november-5-2026"></a>
 
-- [Hosted native recovery failure diagnosed without retry — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-native-recovery-failure-diagnosed-without-retry--november-5-2026)
+- [Hosted native recovery failure diagnosed without retry â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-native-recovery-failure-diagnosed-without-retry--november-5-2026)
 
 <a id="hosted-pg17-recovery-checkpoint-independently-verified--november-5-2026"></a>
 
-- [Hosted PG17 recovery checkpoint independently verified — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-pg17-recovery-checkpoint-independently-verified--november-5-2026)
+- [Hosted PG17 recovery checkpoint independently verified â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-pg17-recovery-checkpoint-independently-verified--november-5-2026)
 
 <a id="hosted-wordpress-database-only-rollout-complete--november-5-2026"></a>
 
-- [Hosted WordPress database-only rollout complete — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-wordpress-database-only-rollout-complete--november-5-2026)
+- [Hosted WordPress database-only rollout complete â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#hosted-wordpress-database-only-rollout-complete--november-5-2026)
 
 <a id="protected-https-rehearsal-authorized-read-only-preflight-checkpoint--november-5-2026"></a>
 
-- [Protected HTTPS rehearsal authorized; read-only preflight checkpoint — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#protected-https-rehearsal-authorized-read-only-preflight-checkpoint--november-5-2026)
+- [Protected HTTPS rehearsal authorized; read-only preflight checkpoint â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#protected-https-rehearsal-authorized-read-only-preflight-checkpoint--november-5-2026)
 
 <a id="separate-self-service-rehearsal-package-plan--november-5-2026"></a>
 
-- [Separate self-service rehearsal package plan — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#separate-self-service-rehearsal-package-plan--november-5-2026)
+- [Separate self-service rehearsal package plan â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#separate-self-service-rehearsal-package-plan--november-5-2026)
 
 <a id="approved-isolated-package-implementation--build-preparation"></a>
 
-- [Approved isolated package implementation — build preparation](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#approved-isolated-package-implementation--build-preparation)
+- [Approved isolated package implementation â€” build preparation](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#approved-isolated-package-implementation--build-preparation)
 
 <a id="isolated-linux-build-stopped-before-hosted-changes--november-5-2026"></a>
 
-- [Isolated Linux build stopped before hosted changes — November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#isolated-linux-build-stopped-before-hosted-changes--november-5-2026)
+- [Isolated Linux build stopped before hosted changes â€” November 5, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#isolated-linux-build-stopped-before-hosted-changes--november-5-2026)
 
 <a id="bounded-dependency-and-renderer-correction--local-gates-passed-linux-gates-pending"></a>
 
-- [Bounded dependency and renderer correction — local gates passed, Linux gates pending](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#bounded-dependency-and-renderer-correction--local-gates-passed-linux-gates-pending)
+- [Bounded dependency and renderer correction â€” local gates passed, Linux gates pending](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#bounded-dependency-and-renderer-correction--local-gates-passed-linux-gates-pending)
 
 <a id="independent-read-only-public-runtime-assessment-and-prepared-security-candidate"></a>
 
@@ -880,11 +886,11 @@ section anchors for incoming references without making their old commands curren
 
 <a id="final-corrective-linux-and-artifact-gates--pass"></a>
 
-- [Final corrective Linux and artifact gates — PASS](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#final-corrective-linux-and-artifact-gates--pass)
+- [Final corrective Linux and artifact gates â€” PASS](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#final-corrective-linux-and-artifact-gates--pass)
 
 <a id="approved-public-security-update-attempted-verified-rollback--november-6-2026-utc"></a>
 
-- [Approved public security update attempted; verified rollback — November 6, 2026 UTC](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#approved-public-security-update-attempted-verified-rollback--november-6-2026-utc)
+- [Approved public security update attempted; verified rollback â€” November 6, 2026 UTC](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#approved-public-security-update-attempted-verified-rollback--november-6-2026-utc)
 
 <a id="verified-build-contract-mismatch-and-prepared-next-decision"></a>
 
@@ -892,7 +898,7 @@ section anchors for incoming references without making their old commands curren
 
 <a id="authorized-webpack-loopback-diagnostic--pass-november-6-2026"></a>
 
-- [Authorized Webpack loopback diagnostic — PASS, November 6, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#authorized-webpack-loopback-diagnostic--pass-november-6-2026)
+- [Authorized Webpack loopback diagnostic â€” PASS, November 6, 2026](https://github.com/R-Levin/myomaton-web/blob/caa5dd8705347f49a511a9d299e26db50646d2cf/docs/development-control.md#authorized-webpack-loopback-diagnostic--pass-november-6-2026)
 
 <a id="return-path-full-miopages-commercial-v1"></a>
 
