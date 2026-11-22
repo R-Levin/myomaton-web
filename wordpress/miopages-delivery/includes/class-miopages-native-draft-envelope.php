@@ -21,7 +21,7 @@ final class MioPages_Native_Draft_Envelope
         $envelope = json_decode($wire, true, 48, JSON_THROW_ON_ERROR);
         if (!is_array($envelope) || count($envelope) !== 6
             || ($envelope['schema'] ?? null) !== 'miopages.wordpress.native-draft-envelope'
-            || !in_array($envelope['version'] ?? null, [1, 2, 3, 4, 5], true) || !is_string($identity['keyId'] ?? null)
+            || !in_array($envelope['version'] ?? null, [1, 2, 3, 4, 5, 6], true) || !is_string($identity['keyId'] ?? null)
             || ($envelope['keyId'] ?? null) !== $identity['keyId']) {
             throw new InvalidArgumentException('Native draft envelope refused.');
         }
@@ -37,7 +37,8 @@ final class MioPages_Native_Draft_Envelope
         $clock = $now ?? time();
         if (!is_array($payload) || count($payload) !== 8
             || ($payload['schema'] ?? null) !== 'miopages.wordpress.native-draft' || ($payload['version'] ?? null) !== $envelope['version']
-            || ($payload['purpose'] ?? null) !== 'non-public-draft-only'
+            // Version 6 is a review draft: private pages for Operator review (owner decision, Nov 22).
+            || ($payload['purpose'] ?? null) !== ($envelope['version'] === 6 ? 'operator-review-draft' : 'non-public-draft-only')
             || !in_array($payload['operation'] ?? null, ['apply', 'restore'], true)
             || !is_int($payload['issuedAt'] ?? null) || !is_int($payload['expiresAt'] ?? null)
             || $payload['issuedAt'] > $clock + 60 || $payload['expiresAt'] <= $clock
@@ -48,7 +49,7 @@ final class MioPages_Native_Draft_Envelope
         }
         $candidate = $payload['candidate'];
         $rollback = $candidate['rollback'] ?? null;
-        if (array_key_exists('brand', $candidate) !== ($payload['version'] === 5)
+        if (($payload['version'] < 6 && array_key_exists('brand', $candidate) !== ($payload['version'] === 5))
             || (array_key_exists('brand', $candidate) && !is_array($candidate['brand']))) {
             throw new InvalidArgumentException('Native draft brand version refused.');
         }
@@ -76,6 +77,9 @@ final class MioPages_Native_Draft_Envelope
             || $rollback['digest'] === ($candidate['previousDigest'] ?? null)))) {
             throw new InvalidArgumentException('Native draft rollback claim refused.');
         }
+        if ($payload['version'] === 6) {
+            self::review($candidate);
+        }
         foreach (['organizationId', 'webPresenceId', 'managedSiteId', 'installationId'] as $field) {
             $actual = $field === 'installationId' ? ($candidate[$field] ?? null) : ($candidate['scope'][$field] ?? null);
             if (!is_string($identity[$field] ?? null) || $actual !== $identity[$field]) {
@@ -86,6 +90,26 @@ final class MioPages_Native_Draft_Envelope
             MioPages_Native_Draft_Brand::bytes($candidate['brand'], $candidate['scope']);
         }
         return $payload;
+    }
+
+    /** A review draft names its Core source and lists Actions still to be connected. */
+    private static function review(array $candidate): void
+    {
+        $source = $candidate['source'] ?? null;
+        if (array_key_exists('approvals', $candidate) || !is_array($source) || count($source) !== 3
+            || !is_string($source['intakeId'] ?? null) || !preg_match('/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/D', $source['intakeId'])
+            || !is_int($source['workflowVersion'] ?? null) || $source['workflowVersion'] < 1
+            || !is_string($source['candidateDigest'] ?? null) || !preg_match('/^[a-f0-9]{64}$/D', $source['candidateDigest'])
+            || !is_array($candidate['unresolvedActions'] ?? null) || !array_is_list($candidate['unresolvedActions'])) {
+            throw new InvalidArgumentException('Review draft claim refused.');
+        }
+        foreach ($candidate['unresolvedActions'] as $pending) {
+            if (!is_array($pending) || count($pending) !== 3 || !is_string($pending['from'] ?? null)
+                || !is_string($pending['label'] ?? null) || trim($pending['label']) === '' || strlen($pending['label']) > 400
+                || !is_string($pending['reference'] ?? null) || !preg_match('/^action-[0-9]+$/D', $pending['reference'])) {
+                throw new InvalidArgumentException('Review draft pending Action refused.');
+            }
+        }
     }
 
     private static function baseline(array $candidate): void

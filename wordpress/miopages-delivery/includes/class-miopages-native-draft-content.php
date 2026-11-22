@@ -14,8 +14,12 @@ final class MioPages_Native_Draft_Content
      * Compose native Gutenberg content from the exact reviewed draft candidate
      * and IDs allocated by its materializer. The caller must authenticate the
      * candidate and verify the target posts before using these inputs.
+     *
+     * $reviewDraft: a private draft for Operator review (owner decision, Nov 22). It may
+     * carry Core's own page designs, marked FPO frames, "content needed" notices and
+     * not-yet-connected Actions. A release (false) carries none of these.
      */
-    public static function posts(array $candidate, array $postIds, array $attachments = [], bool $localSemanticBlocks = false, array $pendingActions = []): array
+    public static function posts(array $candidate, array $postIds, array $attachments = [], bool $reviewDraft = false, array $pendingActions = []): array
     {
         $pages = $candidate['pages'];
         $navigation = $candidate['navigation'];
@@ -37,7 +41,7 @@ final class MioPages_Native_Draft_Content
             }
         }
         foreach ($actions as $action) {
-            if (!$localSemanticBlocks && isset($action['componentReference'])) throw new InvalidArgumentException('Local component Action reference refused.');
+            if (!$reviewDraft && isset($action['componentReference'])) throw new InvalidArgumentException('Component Action reference belongs only in review drafts.');
             if ($action['type'] !== 'page'
                 || !isset($postIds[$action['from']], $postIds[$action['destination']])) {
                 throw new InvalidArgumentException('Native draft Action is unsupported.');
@@ -73,8 +77,8 @@ final class MioPages_Native_Draft_Content
         foreach ($pages as $page) {
             $path = $page['path'];
             foreach ($page['sections'] as $section) {
-                if (array_key_exists('block', $section) && (!$localSemanticBlocks || PHP_SAPI !== 'cli' || ($page['composition'] ?? null) !== 'managed-v1')) {
-                    throw new InvalidArgumentException('Semantic draft blocks are local-only.');
+                if (array_key_exists('block', $section) && (!$reviewDraft || ($page['composition'] ?? null) !== 'managed-v1')) {
+                    throw new InvalidArgumentException('Core-designed blocks belong only in review drafts.');
                 }
             }
             if (array_key_exists('composition', $page)) {
@@ -84,7 +88,7 @@ final class MioPages_Native_Draft_Content
                 $posts[$path] = [
                     'ID' => $postIds[$path], 'post_type' => 'page', 'post_status' => 'draft',
                     'post_title' => $page['title'],
-                    'post_content' => self::composed($page, $postIds, $navigation, $labels, $actions, $attachments, $localSemanticBlocks, $pendingActions),
+                    'post_content' => self::composed($page, $postIds, $navigation, $labels, $actions, $attachments, $reviewDraft, $pendingActions),
                 ];
                 continue;
             }
@@ -119,7 +123,7 @@ final class MioPages_Native_Draft_Content
         return $posts;
     }
 
-    private static function composed(array $page, array $postIds, array $navigation, array $titles, array $actions, array $attachments, bool $localComposition, array $pendingActions = []): string
+    private static function composed(array $page, array $postIds, array $navigation, array $titles, array $actions, array $attachments, bool $reviewDraft, array $pendingActions = []): string
     {
         $path = $page['path'];
         $links = [];
@@ -145,24 +149,24 @@ final class MioPages_Native_Draft_Content
         foreach ($page['sections'] as $index => $section) {
             if (isset($attachments[$section['id']])) $componentImages['section-' . $index] = $attachments[$section['id']];
             elseif (self::wantsFpo($section)) $componentImages['section-' . $index] = ['fpo'=>$section['visual']];
-            elseif ($localComposition && PHP_SAPI === 'cli') $componentImages['section-' . $index] = ['pendingLocal'=>true];
+            elseif ($reviewDraft) $componentImages['section-' . $index] = ['pending'=>true];
         }
         $componentActions = [];
-        if ($localComposition && PHP_SAPI === 'cli' && $actions === []) {
+        if ($reviewDraft && $actions === []) {
             foreach ($pendingActions as $index => $label) {
                 if (!is_string($label) || trim($label) === '') throw new InvalidArgumentException('Pending Action label required.');
-                $componentActions['action-' . $index] = ['pendingLocal'=>true];
+                $componentActions['action-' . $index] = ['pending'=>true];
             }
         }
         foreach (array_values(array_filter($actions, static fn($action) => $action['from'] === $path)) as $index => $action) {
-            $reference = $localComposition && isset($action['componentReference']) ? $action['componentReference'] : 'action-' . $index;
-            if (!is_string($reference) || !preg_match('/^(action-[0-9]+|related-[a-f0-9-]+)$/D',$reference)) throw new InvalidArgumentException('Local Action reference refused.');
+            $reference = $reviewDraft && isset($action['componentReference']) ? $action['componentReference'] : 'action-' . $index;
+            if (!is_string($reference) || !preg_match('/^(action-[0-9]+|related-[a-f0-9-]+)$/D',$reference)) throw new InvalidArgumentException('Action reference refused.');
             $componentActions[$reference] = $action;
         }
-        if ($localComposition && PHP_SAPI === 'cli') foreach($pendingActions as $pending) {
+        if ($reviewDraft) foreach($pendingActions as $pending) {
             if (is_array($pending) && ($pending['from']??null)===$path && preg_match('/^action-[0-9]+$/D',$pending['reference']??'')) {
-                if(isset($componentActions[$pending['reference']])) throw new InvalidArgumentException('Local pending Action conflicts with active binding.');
-                $componentActions[$pending['reference']]=['pendingLocal'=>true];
+                if(isset($componentActions[$pending['reference']])) throw new InvalidArgumentException('Pending Action conflicts with active binding.');
+                $componentActions[$pending['reference']]=['pending'=>true];
             }
         }
         foreach ($page['sections'] as $index => $section) {
@@ -224,7 +228,7 @@ final class MioPages_Native_Draft_Content
             $blocks[] = '<!-- wp:html --><nav class="miopages-draft-related" aria-label="Related pages">'
                 . implode('', $related) . '</nav><!-- /wp:html -->';
         }
-        $siteClass = 'miopages-composed' . ($localComposition && PHP_SAPI === 'cli' ? ' miopages-draft-creative' : '');
+        $siteClass = 'miopages-composed' . ($reviewDraft ? ' miopages-draft-creative' : '');
         return '<!-- wp:group {"className":"' . $siteClass . '"} --><div class="wp-block-group ' . $siteClass . '">'
             . implode("\n", $blocks) . '</div><!-- /wp:group -->';
     }

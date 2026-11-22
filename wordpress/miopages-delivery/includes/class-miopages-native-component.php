@@ -28,7 +28,7 @@ final class MioPages_Native_Component
             . '</aside><!-- /wp:html -->';
     }
 
-    public static function render(array $value, array $images, array $actions, array $postIds, bool $localPending = false): string
+    public static function render(array $value, array $images, array $actions, array $postIds, bool $reviewDraft = false): string
     {
         self::keys($value, ['version','name','purpose','mode','root']);
         if ($value['version'] !== 2 || !in_array($value['mode'], ['supplement','section'], true) || !is_string($value['name']) || strlen($value['name']) > 65
@@ -41,7 +41,7 @@ final class MioPages_Native_Component
         }
         $class = 'miopages-native-component miopages-component-' . $value['name'];
         return '<!-- wp:group ' . self::json(['metadata'=>['name'=>$value['name']],'className'=>$class]) . ' -->'
-            . '<div class="wp-block-group ' . $class . '">' . self::node($value['root'], $images, $actions, $postIds, 0, false, $localPending)
+            . '<div class="wp-block-group ' . $class . '">' . self::node($value['root'], $images, $actions, $postIds, 0, false, $reviewDraft)
             . '</div><!-- /wp:group -->';
     }
 
@@ -126,7 +126,7 @@ final class MioPages_Native_Component
         return json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
-    private static function node(mixed $node, array $images, array $actions, array $postIds, int $depth, bool $insideDetails = false, bool $localPending = false): string
+    private static function node(mixed $node, array $images, array $actions, array $postIds, int $depth, bool $insideDetails = false, bool $reviewDraft = false): string
     {
         if ($depth > 24) throw new InvalidArgumentException('Native component nesting refused.');
         self::keys($node, ['kind','text','level','items','ordered','reference','layout','children']);
@@ -193,7 +193,7 @@ final class MioPages_Native_Component
         $attrs = ' class="' . $class . '"';
         $block = self::json(['className'=>$class]);
         $children = '';
-        foreach ($node['children'] as $child) $children .= self::node($child, $images, $actions, $postIds, $depth + 1, $insideDetails || $kind === 'details', $localPending);
+        foreach ($node['children'] as $child) $children .= self::node($child, $images, $actions, $postIds, $depth + 1, $insideDetails || $kind === 'details', $reviewDraft);
         if ($kind === 'group') return '<!-- wp:group ' . $block . ' --><div' . $attrs . '>' . $children . '</div><!-- /wp:group -->';
         if ($kind === 'heading') {
             $tag = 'h' . $node['level'];
@@ -217,7 +217,7 @@ final class MioPages_Native_Component
         if ($kind === 'image') {
             $image = $images[$reference] ?? null;
             if (isset($image['fpo'])) return self::fpo($image['fpo'], $class);
-            if ($localPending && PHP_SAPI === 'cli' && ($image['pendingLocal'] ?? false) === true) {
+            if ($reviewDraft && ($image['pending'] ?? false) === true) {
                 return '<!-- wp:paragraph {"className":"miopages-pending-media"} --><p class="miopages-pending-media">Image placement awaiting asset review.</p><!-- /wp:paragraph -->';
             }
             if (!$image || !is_int($image['id']) || $image['id'] < 1) throw new InvalidArgumentException('Native component media is unbound.');
@@ -227,7 +227,7 @@ final class MioPages_Native_Component
                 . '" class="wp-image-' . $image['id'] . '"/></figure><!-- /wp:image -->';
         }
         $action = $actions[$reference] ?? null;
-        if ($localPending && PHP_SAPI === 'cli' && ($action['pendingLocal'] ?? false) === true) {
+        if ($reviewDraft && ($action['pending'] ?? false) === true) {
             return '<!-- wp:paragraph {"className":"miopages-pending-action"} --><p class="miopages-pending-action"><span aria-disabled="true">' . $copy . ' — preview only; submissions disabled</span></p><!-- /wp:paragraph -->';
         }
         if (!$action || !isset($postIds[$action['destination']])) throw new InvalidArgumentException('Native component Action is unbound.');

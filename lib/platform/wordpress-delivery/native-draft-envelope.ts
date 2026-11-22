@@ -3,23 +3,23 @@ import { fingerprint, object } from "../canonical/model";
 import { nativeDraftBaseline, nativeDraftRollback, verifyNativeMediaPlacements, type bindSiteDraft } from "./site-draft";
 import { readSignedDraftBrand } from "./draft-brand";
 import { readNativeDraftMedia } from "./native-draft-media";
+import { readReviewDraftCandidate, type bindReviewDraft } from "./review-draft";
 
 type Preview = ReturnType<typeof bindSiteDraft>;
+type ReviewDraft = ReturnType<typeof bindReviewDraft>;
 const domain = (version: number) => Buffer.from(`MioPages-WP-Native-Draft-v${version}\n`);
+const purposeFor = (version: number) => version === 6 ? "operator-review-draft" : "non-public-draft-only";
 
-// Only the protected operator service issues this envelope after revalidating
-// the durable exact draft authorization. It is distinct from release v1.
-export function nativeDraftEnvelope(preview: Preview, keyId: string, publicKeyBase64: string, key: KeyObject, operation: "apply" | "restore") {
+function signDraft(version: number, digest: string, candidate: unknown, keyId: string, publicKeyBase64: string, key: KeyObject,
+  operation: "apply" | "restore") {
   if (key.type !== "private" || key.asymmetricKeyType !== "ed25519" ||
       createPublicKey(key).export({ format: "jwk" }).x !== Buffer.from(publicKeyBase64, "base64").toString("base64url")) {
     throw Error("Native draft signer does not match installation");
   }
-  if (operation === "restore" && !preview.candidate.previousDigest) throw Error("Native draft has no predecessor to restore");
-  const version = preview.candidate.brand ? 5 : preview.candidate.baselinePages ? 4 : preview.candidate.media?.length ? 3 : preview.candidate.rollback ? 2 : 1;
   const now = Date.now();
   const payload = Buffer.from(JSON.stringify({ schema: "miopages.wordpress.native-draft", version, operation,
-    purpose: "non-public-draft-only", issuedAt: Math.floor(now / 1000), expiresAt: Math.floor(now / 1000) + 900,
-    digest: preview.digest, candidate: preview.candidate }), "utf8");
+    purpose: purposeFor(version), issuedAt: Math.floor(now / 1000), expiresAt: Math.floor(now / 1000) + 900,
+    digest, candidate }), "utf8");
   if (payload.length > 700_000) throw Error("Native draft payload too large");
   return {
     schema: "miopages.wordpress.native-draft-envelope", version, keyId,
@@ -29,9 +29,24 @@ export function nativeDraftEnvelope(preview: Preview, keyId: string, publicKeyBa
   };
 }
 
+// Only the protected operator service issues this envelope after revalidating
+// the durable exact draft authorization. It is distinct from release v1.
+export function nativeDraftEnvelope(preview: Preview, keyId: string, publicKeyBase64: string, key: KeyObject, operation: "apply" | "restore") {
+  if (operation === "restore" && !preview.candidate.previousDigest) throw Error("Native draft has no predecessor to restore");
+  const version = preview.candidate.brand ? 5 : preview.candidate.baselinePages ? 4 : preview.candidate.media?.length ? 3 : preview.candidate.rollback ? 2 : 1;
+  return signDraft(version, preview.digest, preview.candidate, keyId, publicKeyBase64, key, operation);
+}
+
+/** A private review draft for Operator WordPress (version 6). Same key and checks as
+ * every delivery; no per-page approval (owner decision, Nov 22). */
+export function reviewDraftEnvelope(draft: ReviewDraft, keyId: string, publicKeyBase64: string, key: KeyObject, operation: "apply" | "restore" = "apply") {
+  if (operation === "restore" && !draft.candidate.previousDigest) throw Error("Native draft has no predecessor to restore");
+  return signDraft(6, draft.digest, draft.candidate, keyId, publicKeyBase64, key, operation);
+}
+
 export function readNativeDraftEnvelope(wire: unknown, keyId: string, publicKeyBase64: string) {
   const envelope = object(wire, ["schema", "version", "keyId", "payloadBase64", "payloadSha256", "signatureBase64"]);
-  if (envelope.schema !== "miopages.wordpress.native-draft-envelope" || ![1, 2, 3, 4, 5].includes(Number(envelope.version)) || typeof envelope.version !== "number" || envelope.keyId !== keyId ||
+  if (envelope.schema !== "miopages.wordpress.native-draft-envelope" || ![1, 2, 3, 4, 5, 6].includes(Number(envelope.version)) || typeof envelope.version !== "number" || envelope.keyId !== keyId ||
       typeof envelope.payloadBase64 !== "string" || envelope.payloadBase64.length > 934_000 ||
       typeof envelope.signatureBase64 !== "string" || envelope.signatureBase64.length !== 88) throw Error("Native draft envelope refused");
   const bytes = Buffer.from(envelope.payloadBase64, "base64"), signature = Buffer.from(envelope.signatureBase64, "base64");
@@ -44,6 +59,14 @@ export function readNativeDraftEnvelope(wire: unknown, keyId: string, publicKeyB
   }
   const payload = JSON.parse(bytes.toString("utf8")) as Preview & { schema: string; version: number; purpose: string;
     operation: "apply" | "restore"; issuedAt: number; expiresAt: number };
+  if (payload.version === 6 && envelope.version === 6) {
+    if (payload.schema !== "miopages.wordpress.native-draft" || payload.purpose !== "operator-review-draft" ||
+        !["apply", "restore"].includes(payload.operation) || !Number.isSafeInteger(payload.issuedAt) ||
+        payload.issuedAt > Math.floor(Date.now() / 1000) + 60 || payload.expiresAt - payload.issuedAt !== 900 ||
+        payload.digest !== fingerprint(payload.candidate)) throw Error("Native draft envelope claim mismatch");
+    readReviewDraftCandidate(payload.candidate);
+    return payload;
+  }
   if (payload.schema !== "miopages.wordpress.native-draft" || payload.version !== envelope.version || payload.purpose !== "non-public-draft-only" ||
       !["apply", "restore"].includes(payload.operation) || !Number.isSafeInteger(payload.issuedAt) ||
       payload.issuedAt > Math.floor(Date.now() / 1000) + 60 || payload.expiresAt - payload.issuedAt !== 900 ||

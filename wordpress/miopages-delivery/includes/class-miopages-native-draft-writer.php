@@ -19,11 +19,12 @@ final class MioPages_Native_Draft_Writer
         $payload = MioPages_Native_Draft_Envelope::verify($wire, $identity);
         $candidate = $payload['candidate'];
         $digest = $payload['digest'];
+        $review = $payload['purpose'] === 'operator-review-draft';
         if ($payload['operation'] === 'restore') {
             return ['operation' => 'restore', 'installationId' => $candidate['installationId'],
                 'requestedDigest' => $digest, 'applied' => self::restore($candidate, $digest)];
         }
-        $applied = self::transaction($candidate['installationId'], function (?array $state) use ($candidate, $digest): array {
+        $applied = self::transaction($candidate['installationId'], function (?array $state) use ($candidate, $digest, $review): array {
             $current = $state['current'] ?? null;
             if ($current !== null && $current['siteProposalId'] !== $candidate['siteProposalId']) {
                 throw new RuntimeException('Native draft proposal scope changed.');
@@ -101,7 +102,9 @@ final class MioPages_Native_Draft_Writer
                 ]);
             }
             $attachments = MioPages_Native_Draft_Media::attach($candidate, $ids, $current['attachments'] ?? []);
-            $posts = MioPages_Native_Draft_Content::posts($candidate, $ids, $attachments);
+            // A review draft carries Core's own designs and its not-yet-connected Actions.
+            $posts = MioPages_Native_Draft_Content::posts($candidate, $ids, $attachments, $review,
+                $review ? $candidate['unresolvedActions'] : []);
             foreach ($posts as $path => &$post) {
                 $post['post_name'] = $priorPosts[$path]['post_name'] ?? self::newSlug($path, $post['ID']);
                 self::updateDraft($post, $priorPosts[$path] ?? null);
