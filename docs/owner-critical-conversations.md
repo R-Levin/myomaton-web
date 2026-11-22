@@ -980,3 +980,10 @@ Discussions and decisions made inline during work must be recorded in this file 
 they happen, not reconstructed later. Claude appends owner decisions here as they occur
 and commits them with the related work. `runtime-content/chat-recovery.md` remains the
 local interruption note; it does not replace this record.
+
+**Nov 22, later: first test priority.** "We just want to see the darned thing fly." The
+first real test should get Core's rebuilt site creation running end to end with minimal
+ceremony. No artificial limits: page count is Core's decision, internal counters (calls,
+retries, revision rounds) are set generously, and the spending ceiling is the only real
+limit (proposed $25, expected about $15; the owner is adding OpenAI credit first). The
+"three pages" mentioned earlier belonged only to Claude's simulated dry run.
