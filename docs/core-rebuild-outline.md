@@ -25,7 +25,10 @@ reuses everything listed under "Keep" in `docs/claude-service-inventory.md`.
    - layouts;
    - imagery style.
 
-   Only the MioPages logo and name are fixed (owner, Nov 22). The theme renders Core's
+   Nothing is fixed by rule, not even the logo or name. The customer's existing brand
+   assets are real inputs: Core uses them and never silently drops them (the logo once
+   vanished for no reason, P0-17). Core may *recommend* changing them, and the
+   owner or customer decides (owner, Nov 22). The theme renders Core's
    design choices as validated settings, so no raw code comes from the AI. New layout
    patterns can be added. A genuinely new block type is written up as a spec and
    reviewed by the developer before production (Part 1 #15).
