@@ -26,7 +26,8 @@ require_once WP_CONTENT_DIR.'/plugins/miopages-delivery/includes/class-miopages-
 require_once WP_CONTENT_DIR.'/plugins/miopages-delivery/includes/class-miopages-native-draft-content.php';
 $user=get_user_by('login','localreview');if(!$user)exit(7);wp_set_current_user($user->ID);
 $brand=json_decode(file_get_contents($root.'/source-aware-brand.json'),true,512,JSON_THROW_ON_ERROR);
-if(($brand['digest']??null)!==$receipt['brandDigest']||($brand['projection']['scope']??null)!==$plan['destination']['scope'])exit(18);
+// The rebuilt case inherits the same reviewed brand (matched by digest); its record names the earlier site.
+if(($brand['digest']??null)!==$receipt['brandDigest']||(!$rebuilt&&($brand['projection']['scope']??null)!==$plan['destination']['scope']))exit(18);
 $oldRender=json_decode(file_get_contents($root.'/originals-render.json'),true,512,JSON_THROW_ON_ERROR);
 $oldBrand=get_post_meta((int)$oldRender['pages']['/'],'_miopages_draft_brand',true);
 $logo=$oldBrand['logoAttachment']??null;$logoFile=is_int($logo)?get_attached_file($logo,true):false;
@@ -38,7 +39,8 @@ if(isset($packet['design'])){$d=$packet['design'];
  $projection['design']=$d;}
 $validationIds=array_combine(array_column($candidate['pages'],'path'),range(1,count($candidate['pages'])));
 MioPages_Native_Draft_Content::posts($candidate,$validationIds,[],true,$packet['unresolvedActions']??$packet['pendingActions']??[]);
-$track=$root.'/source-aware-ids.json';$ids=is_file($track)?json_decode(file_get_contents($track),true,512,JSON_THROW_ON_ERROR):[];
+// The rebuilt case gets its own draft pages; the earlier case's pages are left untouched.
+$track=$root.($rebuilt?'/source-aware-ids-rebuilt.json':'/source-aware-ids.json');$ids=is_file($track)?json_decode(file_get_contents($track),true,512,JSON_THROW_ON_ERROR):[];
 $existing=$wpdb->get_results("SELECT ID,post_type,post_status,post_name,post_title,post_content FROM {$wpdb->posts} ORDER BY ID",ARRAY_A);
 $owned=array_map('intval',array_values($ids));$before=[];$beforeMeta=[];
 foreach($ids as $route=>$id){$post=get_post($id,ARRAY_A);if(!$post||$post['post_status']!=='draft'||get_post_meta($id,'_miopages_source_aware_case',true)!==$sourceAwareCase)exit(8);
@@ -52,7 +54,7 @@ foreach($candidate['pages'] as $page){
  $route=$page['path'];if(!is_string($route)||!str_starts_with($route,'/')||str_contains($route,'..'))exit(9);
  if(isset($ids[$route]))$id=$ids[$route];
  else{
-  $id=wp_insert_post(['post_title'=>$page['title'],'post_type'=>'page','post_status'=>'draft','post_name'=>'mio-sa-'.($route==='/'?'home':sanitize_title($route))],true);
+  $id=wp_insert_post(['post_title'=>$page['title'],'post_type'=>'page','post_status'=>'draft','post_name'=>($rebuilt?'mio-rb-':'mio-sa-').($route==='/'?'home':sanitize_title($route))],true);
   if(is_wp_error($id)||$id<1)exit(10);update_post_meta($id,'_miopages_source_aware_case',$sourceAwareCase);
   $ids[$route]=$id;file_put_contents($track,json_encode($ids,JSON_THROW_ON_ERROR));
  }
