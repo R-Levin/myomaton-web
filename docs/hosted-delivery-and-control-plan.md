@@ -56,7 +56,7 @@ the development PC.
   per-version hand script.
 - **The development PC** builds and tests only.
 
-### How Core reaches WordPress (decision needed)
+### How Core reaches WordPress (decided: option A)
 
 | Option | How it works | Assessment |
 |---|---|---|
@@ -96,10 +96,7 @@ the development PC.
 **Then:** the owner reviews and annotates on miopages.org, Core reads back and revises,
 and the cleanup items follow.
 
-## Decisions for the owner
+## Decisions (owner, Nov 22)
 
-1. **How Core reaches WordPress:** option A is recommended.
-2. **Review drafts without per-page approval:** confirm that drafts sent to Operator
-   WordPress for review need no per-page approval first. Claude reads this as the
-   owner's Nov 22 method, but it changes a Codex-era control, so it is confirmed rather
-   than assumed.
+1. **How Core reaches WordPress:** option A, a secure web endpoint in the plugin.
+2. **Review drafts need no per-page approval.** Releases keep the approval path.

@@ -1045,3 +1045,12 @@ the work that lets Core's new design go through real delivery to miopages.org (l
 code and test work first). Alongside it, clean up the setup: the second server account
 (runtime.miopages.com) and "what is controlled from where", so control of delivery and
 read-back sits in Core rather than in leftover Codex-era places.
+
+**Nov 22, late: hosted delivery decisions.** The owner approved both recommendations in
+`docs/hosted-delivery-and-control-plan.md`:
+1. **Core reaches WordPress through a secure web endpoint in the MioPages plugin**
+   (option A): Core sends signed packages and reads back over HTTPS. No shell access
+   to customer hosting.
+2. **Review drafts need no per-page approval.** Drafts Core sends to Operator WordPress
+   for review are private and signed by Core, and need no per-page approval first.
+   Releases (anything public) keep the approval path.
