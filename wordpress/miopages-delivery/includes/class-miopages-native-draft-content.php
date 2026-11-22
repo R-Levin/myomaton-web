@@ -176,7 +176,10 @@ final class MioPages_Native_Draft_Content
             }
             $id = $section['id'];
             $tag = $type === 'hero' ? 'h1' : 'h2';
-            $attrs = $type === 'hero' ? ' {"level":1}' : '';
+            // In a review draft each text block names Core's text it came from (read-back).
+            $origin = $reviewDraft ? (string) $id : '';
+            $headingAttrs = ($type === 'hero' ? ['level' => 1] : []) + MioPages_Native_Component::origin($origin === '' ? '' : $origin . ':heading');
+            $attrs = $headingAttrs === [] ? '' : ' ' . json_encode($headingAttrs, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             $content = '<!-- wp:heading' . $attrs . ' --><' . $tag . ' class="wp-block-heading">'
                 . MioPages_Native_Component::text($section['content']['heading']) . '</' . $tag . '><!-- /wp:heading -->';
             if (($section['block']['version'] ?? null) === 2 && ($section['block']['mode'] ?? null) === 'section') {
@@ -190,7 +193,7 @@ final class MioPages_Native_Draft_Content
                     && $heading['text'] === $section['content']['heading']);
                 $h1 = count(array_filter($levels, static fn($heading) => $heading['level'] === 1));
                 if ($matched === [] || $h1 !== ($type === 'hero' ? 1 : 0)) throw new InvalidArgumentException('Authored Section heading differs.');
-                $authored = self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3, $componentImages, $componentActions, $postIds);
+                $authored = self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3, $componentImages, $componentActions, $postIds, $origin);
                 // Core requested an image for this section but authored no placement:
                 // place the acquired image, or its FPO frame, beside the authored content.
                 $aside = '';
@@ -204,7 +207,7 @@ final class MioPages_Native_Draft_Content
                     . '<section class="wp-block-group ' . $class . '">' . $authored . '</section><!-- /wp:group -->';
                 continue;
             }
-            $content .= self::paragraph(nl2br(MioPages_Native_Component::text($section['content']['text']), false));
+            $content .= self::paragraph(nl2br(MioPages_Native_Component::text($section['content']['text']), false), $origin === '' ? '' : $origin . ':text');
             if (!empty($placedActions[$id])) {
                 $buttons = [];
                 foreach ($placedActions[$id] as $action) {
@@ -214,7 +217,7 @@ final class MioPages_Native_Draft_Content
                 }
                 $content .= '<!-- wp:buttons --><div class="wp-block-buttons">' . implode('', $buttons) . '</div><!-- /wp:buttons -->';
             }
-            if (array_key_exists('block', $section)) $content .= self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3, $componentImages, $componentActions, $postIds);
+            if (array_key_exists('block', $section)) $content .= self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3, $componentImages, $componentActions, $postIds, $origin);
             $media = $attachments[$id] ?? null;
             $fpo = !$media && self::wantsFpo($section) && !(array_key_exists('block', $section) && MioPages_Native_Component::hasImage($section['block']['root'] ?? null));
             $style = $type === 'cta' && empty($placedActions[$id]) ? 'intro' : $type;
@@ -241,12 +244,12 @@ final class MioPages_Native_Draft_Content
         return MioPages_Native_Component::text($text);
     }
 
-    private static function semanticBlock(mixed $value, int $headingLevel, array $images = [], array $actions = [], array $postIds = []): string
+    private static function semanticBlock(mixed $value, int $headingLevel, array $images = [], array $actions = [], array $postIds = [], string $origin = ''): string
     {
         if (!is_array($value)) throw new InvalidArgumentException('Semantic draft specification required.');
         if (($value['version'] ?? null) === 2) {
             require_once __DIR__ . '/class-miopages-native-component.php';
-            return MioPages_Native_Component::render($value, $images, $actions, $postIds, true);
+            return MioPages_Native_Component::render($value, $images, $actions, $postIds, true, $origin);
         }
         $keys = array_keys($value);
         sort($keys);
@@ -303,9 +306,10 @@ final class MioPages_Native_Draft_Content
         return is_array($section['visual'] ?? null) && in_array($section['visual']['status'] ?? null, ['asset-needed','rights-review'], true);
     }
 
-    private static function paragraph(string $html): string
+    private static function paragraph(string $html, string $origin = ''): string
     {
-        return '<!-- wp:paragraph --><p>' . $html . '</p><!-- /wp:paragraph -->';
+        return '<!-- wp:paragraph' . ($origin === '' ? '' : ' ' . json_encode(MioPages_Native_Component::origin($origin), JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+            . ' --><p>' . $html . '</p><!-- /wp:paragraph -->';
     }
 
     private static function link(int $postId, string $label, string $class = ''): string

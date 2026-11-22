@@ -149,11 +149,12 @@ test("Core reads back the Operator's edits and Notes, each Note tied to its bloc
   const pull = { secretHex: secret.toString("hex"), identity: { installationId } };
   const first = draft(1, null);
   const wire = JSON.stringify(reviewDraftEnvelope(first, "fixture-key", publicKeyBase64, privateKey));
-  // The Operator rewrites one sentence and adds a Note to the opening paragraph (WordPress stores
-  // the Note's id in that block's metadata), plus a reply and a resolved Note.
+  // The Operator rewrites one sentence and adds a Note to the pending Action notice (WordPress
+  // stores the Note's id in that block's metadata, beside Core's own identifier), plus a reply
+  // and a resolved Note.
+  const startNotice = `"metadata":{"mio":"${startHero}:r.1"}`;
   const edits = { "/": ["What the fixture business does, said plainly.", "What we do, in one plain sentence."],
-    "/start": ["<!-- wp:paragraph {\"className\":\"miopages-pending-action\"} -->",
-      "<!-- wp:paragraph {\"metadata\":{\"noteId\":[41]},\"className\":\"miopages-pending-action\"} -->"] };
+    "/start": [startNotice, `"metadata":{"mio":"${startHero}:r.1","noteId":[41]}`] };
   const notes = [
     { id: 41, path: "/start", text: "Connect this to the real Direct Start form." },
     { id: 42, path: "/start", parent: 41, text: "Form is not built yet; keep the notice for now." },

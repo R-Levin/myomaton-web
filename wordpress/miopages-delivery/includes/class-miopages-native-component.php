@@ -28,7 +28,13 @@ final class MioPages_Native_Component
             . '</aside><!-- /wp:html -->';
     }
 
-    public static function render(array $value, array $images, array $actions, array $postIds, bool $reviewDraft = false): string
+    /**
+     * $origin: in a review draft, the Core section this component belongs to. Each text block
+     * then carries Core's identifier for its text (metadata.mio = "<section>:<node path>"),
+     * which WordPress keeps through edits, so Core's read-back can tell which of its texts
+     * the Operator changed.
+     */
+    public static function render(array $value, array $images, array $actions, array $postIds, bool $reviewDraft = false, string $origin = ''): string
     {
         self::keys($value, ['version','name','purpose','mode','root']);
         if ($value['version'] !== 2 || !in_array($value['mode'], ['supplement','section'], true) || !is_string($value['name']) || strlen($value['name']) > 65
@@ -41,7 +47,7 @@ final class MioPages_Native_Component
         }
         $class = 'miopages-native-component miopages-component-' . $value['name'];
         return '<!-- wp:group ' . self::json(['metadata'=>['name'=>$value['name']],'className'=>$class]) . ' -->'
-            . '<div class="wp-block-group ' . $class . '">' . self::node($value['root'], $images, $actions, $postIds, 0, false, $reviewDraft)
+            . '<div class="wp-block-group ' . $class . '">' . self::node($value['root'], $images, $actions, $postIds, 0, false, $reviewDraft, $reviewDraft && $origin !== '' ? $origin . ':r' : '')
             . '</div><!-- /wp:group -->';
     }
 
@@ -126,7 +132,13 @@ final class MioPages_Native_Component
         return json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
-    private static function node(mixed $node, array $images, array $actions, array $postIds, int $depth, bool $insideDetails = false, bool $reviewDraft = false): string
+    /** Block attributes naming Core's text, in the order WordPress itself writes them. */
+    public static function origin(string $id): array
+    {
+        return $id === '' ? [] : ['metadata' => ['mio' => $id]];
+    }
+
+    private static function node(mixed $node, array $images, array $actions, array $postIds, int $depth, bool $insideDetails = false, bool $reviewDraft = false, string $id = ''): string
     {
         if ($depth > 24) throw new InvalidArgumentException('Native component nesting refused.');
         self::keys($node, ['kind','text','level','items','ordered','reference','layout','children']);
@@ -192,24 +204,28 @@ final class MioPages_Native_Component
             . ' miopages-span-' . $layout['span'] . ($columns ? ' ' . self::COLUMNS_CLASS . implode('-', $columns) : '');
         $attrs = ' class="' . $class . '"';
         $block = self::json(['className'=>$class]);
+        $named = self::json(self::origin($id) + ['className'=>$class]);
         $children = '';
-        foreach ($node['children'] as $child) $children .= self::node($child, $images, $actions, $postIds, $depth + 1, $insideDetails || $kind === 'details', $reviewDraft);
+        foreach ($node['children'] as $index => $child) $children .= self::node($child, $images, $actions, $postIds, $depth + 1,
+            $insideDetails || $kind === 'details', $reviewDraft, $id === '' ? '' : $id . '.' . $index);
         if ($kind === 'group') return '<!-- wp:group ' . $block . ' --><div' . $attrs . '>' . $children . '</div><!-- /wp:group -->';
         if ($kind === 'heading') {
             $tag = 'h' . $node['level'];
-            return '<!-- wp:heading ' . self::json(($node['level'] === 2 ? [] : ['level'=>$node['level']]) + ['className'=>$class]) . ' --><' . $tag . $attrs . '>'
+            return '<!-- wp:heading ' . self::json(($node['level'] === 2 ? [] : ['level'=>$node['level']]) + self::origin($id) + ['className'=>$class]) . ' --><' . $tag . $attrs . '>'
                 . $copy . '</' . $tag . '><!-- /wp:heading -->';
         }
-        if ($kind === 'paragraph') return '<!-- wp:paragraph ' . $block . ' --><p' . $attrs . '>' . nl2br($copy, false) . '</p><!-- /wp:paragraph -->';
+        if ($kind === 'paragraph') return '<!-- wp:paragraph ' . $named . ' --><p' . $attrs . '>' . nl2br($copy, false) . '</p><!-- /wp:paragraph -->';
         if ($kind === 'list') {
             $tag = $node['ordered'] ? 'ol' : 'ul';
             $items = '';
-            foreach ($node['items'] as $item) $items .= '<!-- wp:list-item --><li>' . self::copy($item) . '</li><!-- /wp:list-item -->';
-            return ($node['text'] !== null ? '<!-- wp:paragraph --><p>' . self::copy($node['text']) . '</p><!-- /wp:paragraph -->' : '')
-                . '<!-- wp:list ' . self::json(($node['ordered'] ? ['ordered'=>true] : []) + ['className'=>$class]) . ' --><' . $tag . $attrs . '>' . $items
+            foreach ($node['items'] as $index => $item) $items .= '<!-- wp:list-item' . ($id === '' ? '' : ' ' . self::json(self::origin($id . '/i' . $index)))
+                . ' --><li>' . self::copy($item) . '</li><!-- /wp:list-item -->';
+            return ($node['text'] !== null ? '<!-- wp:paragraph' . ($id === '' ? '' : ' ' . self::json(self::origin($id . '/label')))
+                . ' --><p>' . self::copy($node['text']) . '</p><!-- /wp:paragraph -->' : '')
+                . '<!-- wp:list ' . self::json(($node['ordered'] ? ['ordered'=>true] : []) + self::origin($id) + ['className'=>$class]) . ' --><' . $tag . $attrs . '>' . $items
                 . '</' . $tag . '><!-- /wp:list -->';
         }
-        if ($kind === 'details') return '<!-- wp:details ' . $block . ' --><details' . $attrs . '><summary>' . $copy . '</summary>'
+        if ($kind === 'details') return '<!-- wp:details ' . $named . ' --><details' . $attrs . '><summary>' . $copy . '</summary>'
             . $children . '</details><!-- /wp:details -->';
         if ($kind === 'placeholder') return self::placeholder($node['reference'], $copy, $class);
         if ($kind === 'separator') return '<!-- wp:separator ' . $block . ' --><hr' . $attrs . '/><!-- /wp:separator -->';
@@ -228,10 +244,10 @@ final class MioPages_Native_Component
         }
         $action = $actions[$reference] ?? null;
         if ($reviewDraft && ($action['pending'] ?? false) === true) {
-            return '<!-- wp:paragraph {"className":"miopages-pending-action"} --><p class="miopages-pending-action"><span aria-disabled="true">' . $copy . ' — preview only; submissions disabled</span></p><!-- /wp:paragraph -->';
+            return '<!-- wp:paragraph ' . self::json(self::origin($id) + ['className'=>'miopages-pending-action']) . ' --><p class="miopages-pending-action"><span aria-disabled="true">' . $copy . ' — preview only; submissions disabled</span></p><!-- /wp:paragraph -->';
         }
         if (!$action || !isset($postIds[$action['destination']])) throw new InvalidArgumentException('Native component Action is unbound.');
-        return '<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button ' . $block . ' --><div' . $attrs
+        return '<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button ' . $named . ' --><div' . $attrs
             . '><a class="wp-block-button__link wp-element-button" href="'
             . self::href(home_url('/?page_id=' . $postIds[$action['destination']] . '&preview=true')) . '">' . $copy
             . '</a></div><!-- /wp:button --></div><!-- /wp:buttons -->';
