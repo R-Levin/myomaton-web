@@ -80,12 +80,17 @@ the development PC.
 ## Order of work
 
 **Local code and tests (no hosted changes; Claude proceeds):**
-1. Carry the design Core's AI chose in the signed delivery package.
-2. Let Core's own page designs through the renderer for review drafts.
-3. Add the review-draft delivery kind, signed by Core and never public.
-4. Add the plugin's web endpoint for delivery and read-back (option A), plus Core's
-   side of both.
-5. Build Core's read-back: edits kept, Notes turned into revision requests.
+1. ~~Carry the design Core's AI chose in the signed delivery package.~~ Done Nov 22.
+2. ~~Let Core's own page designs through the renderer for review drafts.~~ Done Nov 22.
+3. ~~Add the review-draft delivery kind, signed by Core and never public.~~ Done Nov 22.
+4. ~~Add the plugin's web endpoint for delivery, and Core's sender.~~ Done Nov 22
+   (plugin 0.1.0). Images still go through the command-line path; they move to the
+   endpoint when a case has images.
+5. Core's control: an Operator action in Core that builds, signs and sends a review
+   draft for a case, with the site's settings (address, gate login, keys) held in
+   Core's protected configuration.
+6. Read-back: the endpoint returns pages and Notes, and Core keeps edits and turns
+   Notes into revision requests.
 
 **Then one owner approval covering:**
 - deploying the current Core;
