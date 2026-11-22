@@ -1033,3 +1033,9 @@ They could not tell what is temporary and what is not, or how the pieces fit, an
 for a written picture. Answered in `docs/what-lives-where.md`. Key point recorded there:
 edits and Notes made in local WordPress are not safe until read-back into Core exists.
 The owner has not yet chosen whether read-back or the move to miopages.org comes first.
+
+**Nov 22, evening: work toward production; stay off the development PC.** The owner
+prefers to do everything with an eye toward production and to avoid temporary measures.
+Where it can be done, work should not depend on the developer's computer. Meaning: build
+the real path (Core → hosted Operator WordPress → read-back into Core) rather than
+extending local scaffolding. Local tooling remains acceptable for automated tests.
