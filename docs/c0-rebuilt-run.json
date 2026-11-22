@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "purpose": "First test of the rebuilt Core (rebuild 2026-11-22): a fresh C0 evaluation case from research through Direction with design, all pages, critique and revisions, reviewed on local WordPress. Not a site approval or publication.",
+  "owner": "Approved by the owner in conversation; see docs/owner-critical-conversations.md (Nov 22). This file records scope, not approval.",
+  "destination": {
+    "organizationId": "5f36c39e-92fd-4fb6-8af3-1aa50089e099",
+    "intakeId": "beb8de9c-e0b6-4f4d-8472-1675ec13d665",
+    "scope": {
+      "webPresenceId": "15f39243-ff57-4609-bc3b-9dd90622ef17",
+      "managedSiteId": "099f9bfa-1cb2-41bb-a360-81ade5dbd630"
+    },
+    "entry": "DIRECT_START"
+  },
+  "knowledgeFrom": {
+    "intakeId": "41a83e7e-1765-4517-941a-b2b151bb7c4a",
+    "meaning": "The previous source-aware case. Its complete knowledge context, source authority, original materials and media settings are inherited read-only. None of its report, Direction, plan or pages are carried over."
+  },
+  "budget": {
+    "capMicros": 25000000,
+    "expectedMicros": 15000000,
+    "meaning": "The spending ceiling is the only real limit. Counters below are set generously so they never cut the run short."
+  },
+  "limits": {
+    "hours": 72,
+    "textGenerations": 120,
+    "providerRequests": 260,
+    "webSearchCalls": 10,
+    "retries": 3,
+    "editorialRevisionRounds": 4,
+    "commercialReplans": 2
+  },
+  "provider": {
+    "model": "gpt-5.4-2026-03-05",
+    "store": false,
+    "rates": {
+      "model": "gpt-5.4-2026-03-05",
+      "verifiedOn": "2026-11-19",
+      "inputPerMillion": 2500000,
+      "cachedPerMillion": 250000,
+      "outputPerMillion": 15000000,
+      "cacheWritePerMillion": 0,
+      "countMicros": 0
+    },
+    "requestBytes": 36000000,
+    "stages": {
+      "research": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 4000,
+        "cumulativeInputTokens": 12000000,
+        "cumulativeOutputTokens": 1200000,
+        "capMicros": 25000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "report": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 24000,
+        "cumulativeInputTokens": 12000000,
+        "cumulativeOutputTokens": 1200000,
+        "capMicros": 25000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "direction": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 12000,
+        "cumulativeInputTokens": 12000000,
+        "cumulativeOutputTokens": 1200000,
+        "capMicros": 25000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "blueprint": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 12000,
+        "cumulativeInputTokens": 12000000,
+        "cumulativeOutputTokens": 1200000,
+        "capMicros": 25000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "page": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 24000,
+        "cumulativeInputTokens": 12000000,
+        "cumulativeOutputTokens": 1200000,
+        "capMicros": 25000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "revision": {
+        "requestInputTokens": 128000,
+        "requestOutputTokens": 24000,
+        "cumulativeInputTokens": 12000000,
+        "cumulativeOutputTokens": 1200000,
+        "capMicros": 25000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      },
+      "editorial": {
+        "requestInputTokens": 240000,
+        "requestOutputTokens": 8000,
+        "cumulativeInputTokens": 12000000,
+        "cumulativeOutputTokens": 1200000,
+        "capMicros": 25000000,
+        "rates": {
+          "model": "gpt-5.4-2026-03-05",
+          "verifiedOn": "2026-11-19",
+          "inputPerMillion": 2500000,
+          "cachedPerMillion": 250000,
+          "outputPerMillion": 15000000,
+          "cacheWritePerMillion": 0,
+          "countMicros": 0
+        }
+      }
+    }
+  },
+  "publicResearch": {
+    "roots": [
+      "https://www.b12.io/",
+      "https://sitecare.com/"
+    ],
+    "publicQuery": "managed web presence services for small businesses customer needs alternatives objections and ongoing growth",
+    "maximumRetrievedSources": 12,
+    "minimumIndependentNewOrigins": 3,
+    "maximumResponseBytes": 2000000,
+    "maximumMaterialRecords": 60,
+    "maximumMaterialBytes": 20000000
+  },
+  "review": {
+    "candidateImages": {
+      "operations": [
+        "editorial"
+      ],
+      "maximumRecords": 64,
+      "maximumBytes": 24000000,
+      "includeOperatorProjections": true
+    }
+  },
+  "media": "Same as the previous case: its retained stock selections only; no new stock purchases or AI image generation. Everything else is FPO."
+}

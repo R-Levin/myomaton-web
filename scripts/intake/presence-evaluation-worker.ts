@@ -24,6 +24,8 @@ import { p022RunProposalSha256 } from "../../lib/platform/intake/c0-p022-source-
 import {originalEvidenceApproval} from "./original-evidence-activation";
 import {sourceAwareC0ProposalSha256} from "../../lib/platform/intake/c0-source-aware-run";
 import {openSourceAwareActivation} from "./source-aware-evaluation-activation";
+import {openRebuiltActivation} from "./rebuilt-evaluation-activation";
+import {rebuiltRunApproval} from "../../lib/platform/intake/c0-rebuilt-run";
 import {prepareOriginalCustody} from "../../lib/platform/intake/presence-original-custody";
 import {publicCaptureBridge} from "../../lib/platform/intake/presence-public-capture-bridge";
 import { summarizePresenceWorkflowUsage } from "../../lib/platform/intake/intelligent-responses";
@@ -91,7 +93,8 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
   const p022 = options.approval === p022RunProposalSha256;
   const originals = options.approval === originalEvidenceApproval;
   const fresh = options.approval === sourceAwareC0ProposalSha256;
-  const isCommercial = options.approval === commercialApproval || p022 || originals || fresh;
+  const rebuilt = options.approval === rebuiltRunApproval;
+  const isCommercial = options.approval === commercialApproval || p022 || originals || fresh || rebuilt;
   if (isCommercial && options.scenario !== "c0") throw Error("Commercial C0 scope required");
   const parent = join(await realpath(options.home), "miopages-private-acceptance");
   if (parent.includes("/public_html/")) throw Error("Off-webroot evaluation workspace required");
@@ -99,7 +102,8 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
   const manifestBytes = await readFile(manifestFile);
   const plan = readEvaluationManifest(manifestBytes, isCommercial ? retainedManifestSha256 : options.approval,
     isCommercial || allowExpiredReview ? null : Date.now());
-  const commercial = fresh ? await openSourceAwareActivation(parent, options.databaseUrl, allowExpiredReview) :
+  const commercial = rebuilt ? await openRebuiltActivation(parent, options.databaseUrl) :
+    fresh ? await openSourceAwareActivation(parent, options.databaseUrl, allowExpiredReview) :
     isCommercial ? await openCommercialActivation(parent, allowExpiredReview, p022, originals) : null;
   const item = commercial?.item ?? plan.cases[options.scenario];
   const name = "migration_rehearsal_" + item.intakeId.replaceAll("-", "");
@@ -138,7 +142,7 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
       p022 && recovery ? { kind: "blueprint-recovery", repair: repairP022Blueprint } :
         researchReplay && commercial ? { kind: "research-replay" } :
         apiKey === undefined ? { kind: "review" } : { kind: "worker", apiKey, resumeMarketResearch: Boolean(commercial), reportHold: commercial?.reportHold,
-          ...((originals || fresh) && apiKey && process.env.MIOPAGES_PUBLIC_RESEARCH_BRIDGE==="1" && {peerCapture:peerCapture??=publicCaptureBridge(process.stdin,process.stdout)}) });
+          ...((originals || fresh || rebuilt) && apiKey && process.env.MIOPAGES_PUBLIC_RESEARCH_BRIDGE==="1" && {peerCapture:peerCapture??=publicCaptureBridge(process.stdin,process.stdout)}) });
     return { context: await bound.context(), workflow: await bound.open(), root };
   }
   function protectedConfig() {
@@ -189,7 +193,7 @@ export async function openEvaluationWorker(options: Options, allowExpiredReview 
 
 export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv = process.env) {
   const [operation, scenario, approval, value, ...extra] = args;
-  const localCommercial = approval === commercialApproval || approval === p022RunProposalSha256 || approval === originalEvidenceApproval || approval === sourceAwareC0ProposalSha256;
+  const localCommercial = approval === commercialApproval || approval === p022RunProposalSha256 || approval === originalEvidenceApproval || approval === sourceAwareC0ProposalSha256 || approval === rebuiltRunApproval;
   const readOnly = ["inspect", "home", "site", "concept-review-input", "editorial-review-input"].includes(operation) || (["local-site", "local-home"].includes(operation) && localCommercial);
   const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "resume-undispatched", "recover", "queue-image", "decide-image", "review-quality", "commercial-replan", "concept-review-input", "editorial-review-input", "critique-home", "critique-site", "repair-sources"].includes(operation) ||
     (["continue-local-home", "revise-local-page"].includes(operation) && localCommercial);
@@ -205,7 +209,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   try {
     if (operation === "activate") return await instance.activate();
     const { workflow, context, root } = await instance.openCase(
-      operation === "preflight" || operation === "work" || operation === "critique-home" || operation === "critique-site" || (operation==="recover" && (approval===originalEvidenceApproval || approval===sourceAwareC0ProposalSha256)) || replaceReport || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay, operation === "recover");
+      operation === "preflight" || operation === "work" || operation === "critique-home" || operation === "critique-site" || (operation==="recover" && (approval===originalEvidenceApproval || approval===sourceAwareC0ProposalSha256 || approval===rebuiltRunApproval)) || replaceReport || (completeResearch && !researchReplay) ? await instance.providerKey() : undefined, researchReplay, operation === "recover");
     const prior = await workflow.review(context);
     if(operation==="preflight")return{version:await workflow.verifyResumeState(context),providerCalls:0,configurationVerified:true};
     if (completeResearch) {

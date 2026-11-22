@@ -30,6 +30,12 @@ export async function publicResearchReply(browser:Browser,frame:Record<string,un
   captured:result.captured.map(row=>({...row,bytes:row.bytes.toString("base64"),sha256:digest(row.bytes)})),limitations:result.limitations};
 }
 export function publicResearchCommand(args:readonly string[]){
+ // First rebuilt-Core test (2026-11-22): the worker ships in the deployed Core bundle.
+ if(args[0]==="--rebuilt"){
+  const [operation,value,...rest]=args.slice(1);
+  if(rest.length||!["work","recover","critique-site"].includes(operation)||value!==undefined)throw Error("Controlled operation required");
+  return "cd ~/public_html && exec env NODE_ENV=development MIOPAGES_PUBLIC_RESEARCH_BRIDGE=1 node .rehearsal/rebuilt-evaluation-worker.cjs "+operation;
+ }
  const fresh=args[0]==="--source-aware";
  const [operation,value,...extra]=fresh?args.slice(1):args;
  if(extra.length||!["work","recover"].includes(operation)||operation==="work"&&value||
