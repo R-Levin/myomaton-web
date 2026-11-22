@@ -11,7 +11,12 @@ const PRIVATE = HOME + '/miopages-private-acceptance';
 const ORIGIN = 'https://wp-acceptance.miopages.com';
 const CREDENTIAL = '421ef5e7-06da-4485-830c-91b1611c7225';
 const RSS_LIMIT = 384 * 1024 * 1024;
-const MIN_AVAILABLE = 512 * 1024 * 1024;
+// Host-wide reserve kept free for the other tenants on this 1.7 GB, swapless server.
+// 512 MiB left Core unable to stay up (host free memory sits at 520-650 MB); Core's own
+// RSS_LIMIT stays the hard per-process bound.
+const MIN_AVAILABLE = 256 * 1024 * 1024;
+// Pause before exiting after a failure so the process manager cannot hot-loop restarts.
+const FAILURE_EXIT_DELAY_MS = 30000;
 
 function configuration(value) {
   assert.ok(value && typeof value === 'object' && !Array.isArray(value));
@@ -139,6 +144,11 @@ function groupMembers(group) {
   return members;
 }
 
+class StartRefused extends Error {}
+function exitAfter(failure) {
+  setTimeout(() => process.exit(failure ? 1 : 0), failure ? FAILURE_EXIT_DELAY_MS : 0);
+}
+
 async function main() {
   assert.equal(process.platform, 'linux'); assert.equal(process.getuid(), 3326411);
   assert.equal(fs.realpathSync(process.env.HOME), HOME);
@@ -153,7 +163,7 @@ async function main() {
   assert.deepEqual(fs.readdirSync(WEB).filter(name => name.startsWith('.env')), ['.env']);
   const env = core ? coreEnvironment(JSON.parse(privateFile(PRIVATE + '/core-config.json')))
     : childEnvironment(JSON.parse(privateFile(PRIVATE + '/pull-config.json')));
-  assert.ok(resourceGate(process.memoryUsage().rss, availableMemory()));
+  if (!resourceGate(process.memoryUsage().rss, availableMemory())) throw new StartRefused('Private listener start refused: host memory below the resource floor; will exit for a delayed retry.');
   const child = spawn('/usr/bin/node', [...runtimeOptions(core), WEB + '/.rehearsal/private-server.cjs'],
     { cwd: WEB, env, detached: true, stdio: 'ignore' });
   const known = new Map();
@@ -179,6 +189,9 @@ async function main() {
       event('private-listener-stopped', { reason, peakRssBytes: peak, minimumAvailableBytes: minimum, cleanupVerified: true });
     } catch { child.kill('SIGKILL'); failure = true; event('private-listener-cleanup-blocked'); }
     process.exitCode = failure ? 1 : 0;
+    // The process manager's IPC channel keeps the event loop alive, so exit explicitly;
+    // otherwise a stopped listener stays "online" without serving and is never restarted.
+    exitAfter(failure);
   };
   const monitor = setInterval(() => {
     try {
@@ -220,5 +233,9 @@ async function runWorkflow(args) {
   });
 }
 
-module.exports = { configuration, childEnvironment, procStat, resourceGate, runtimeOptions, ownedMembers, HOME, WEB, PRIVATE };
-if (require.main === module) main().catch(() => { console.error('Private listener configuration refused; inspect before retry.'); process.exitCode = 1; });
+module.exports = { MIN_AVAILABLE, RSS_LIMIT, configuration, childEnvironment, procStat, resourceGate, runtimeOptions, ownedMembers, HOME, WEB, PRIVATE };
+if (require.main === module) main().catch(error => {
+  // Never print assertion details: they can contain configuration values.
+  console.error(error instanceof StartRefused ? error.message : 'Private listener configuration refused; inspect before retry.');
+  process.exitCode = 1; exitAfter(true);
+});

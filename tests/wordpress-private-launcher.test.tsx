@@ -40,9 +40,9 @@ test("configuration refuses extra authority, transaction pooling, weak TLS and c
 });
 
 test("resource gates fail closed at the accepted private-process limits", () => {
-  assert.equal(resourceGate(384 * 1024 ** 2, 512 * 1024 ** 2), true);
-  assert.equal(resourceGate(384 * 1024 ** 2 + 1, 512 * 1024 ** 2), false);
-  assert.equal(resourceGate(100, 512 * 1024 ** 2 - 1), false);
+  assert.equal(resourceGate(384 * 1024 ** 2, 256 * 1024 ** 2), true);
+  assert.equal(resourceGate(384 * 1024 ** 2 + 1, 256 * 1024 ** 2), false);
+  assert.equal(resourceGate(100, 256 * 1024 ** 2 - 1), false);
   for (const values of [[NaN, 1], [1, Infinity], [-1, 1]]) assert.throws(() => resourceGate(...values));
 });
 
@@ -51,7 +51,7 @@ test("Core bounds its V8 heap while preserving pull-service settings and safety 
   assert.deepEqual(runtimeOptions(false), ["--max-old-space-size=256"]);
   assert.throws(() => runtimeOptions("core"));
   assert.equal(resourceGate(384 * 1024 ** 2 + 1, 600 * 1024 ** 2), false);
-  assert.equal(resourceGate(128 * 1024 ** 2, 512 * 1024 ** 2 - 1), false);
+  assert.equal(resourceGate(128 * 1024 ** 2, 256 * 1024 ** 2 - 1), false);
 });
 
 test("proc identity tolerates parentheses in names and process signals require known non-reused private identities", () => {

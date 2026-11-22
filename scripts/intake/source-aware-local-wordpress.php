@@ -1,7 +1,7 @@
 <?php
 /** Disposable CLI bridge over the existing native content projector; no signed approval. */
 declare(strict_types=1);
-if (PHP_SAPI!=='cli'||count($argv)!==3||!preg_match('/^(home|site)-[1-9][0-9]*(?:-media)?\.json$/D',$argv[2])) exit(1);
+if (PHP_SAPI!=='cli'||count($argv)!==3||!preg_match('/^(home|site)-[1-9][0-9]*(?:-media|-fpo)?\.json$/D',$argv[2])) exit(1);
 if(!extension_loaded('pdo_sqlite')){fwrite(STDERR,"BLOCKED: run with the existing WordPress SQLite PHP extension options.\n");exit(20);}
 $root=realpath($argv[1]);if(!$root||basename($root)!=='p022-wp-validation'||!is_file($root.'/wordpress/wp-load.php')||str_contains(str_replace('\\','/',$root),'/public_html/'))exit(2);
 $manifest=dirname(__DIR__,2).'/docs/c0-source-aware-run-proposal.json';
