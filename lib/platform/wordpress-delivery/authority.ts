@@ -7,8 +7,11 @@ import { readSemanticBlock, type SemanticBlock } from "../intake/presence-semant
 
 export type Site = { organizationId: string; webPresenceId: string; managedSiteId: string };
 type Page = { id: string; path: string; title: string; composition?: "managed-v1"; navigationLabel?: string; sections: {
-  id: string; type: string; content: { heading: string; text: string }; block?: SemanticBlock;
+  id: string; type: string; content: { heading: string; text: string }; block?: SemanticBlock; visual?: SectionVisual;
 }[] };
+/** Core's own per-section visual intent. "asset-needed"/"rights-review" without an
+ * approved acquired image renders as a clearly marked FPO frame in drafts only. */
+export type SectionVisual = { purpose: string; brief: string; altIntent: string; status: "text-only" | "asset-needed" | "rights-review" };
 export type ReviewedProjection = Site & {
   version: 1;
   publishable: true;
@@ -48,7 +51,10 @@ export function validatePages(pages: Page[], nativeDraft = false, localSemanticB
       page.sections.some(section => !["hero", "intro", "cta"].includes(section.type)))) throw Error("Composed Page sections refused");
     paths.add(page.path);
     pageIds.add(page.id);
-    for (const { id: sectionId, type, content, block, ...extra } of page.sections) {
+    for (const { id: sectionId, type, content, block, visual, ...extra } of page.sections) {
+      if (visual !== undefined && (!composed || !exact(visual, "altIntent,brief,purpose,status") ||
+        !["text-only", "asset-needed", "rights-review"].includes(visual.status) ||
+        !text(visual.purpose, 2000) || !text(visual.brief, 4000) || !text(visual.altIntent, 1000))) throw Error("Projection section visual refused");
       if (block !== undefined) {
         if (!composed || !localSemanticBlocks) throw Error("Projection semantic block requires the local draft renderer");
         const component = readSemanticBlock(block);

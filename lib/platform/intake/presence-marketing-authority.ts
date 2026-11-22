@@ -208,10 +208,22 @@ function strategyDecision(run: WorkflowRun, authority: MarketingAuthority, page:
   return brief;
 }
 
+export function assertPlanUsesResearch(pages: readonly { decisionBrief?: { influences: readonly { sourceIds: readonly string[] }[] } }[], researchIds: readonly string[]) {
+  const peers = new Set(researchIds);
+  if (!pages.some(page => page.decisionBrief?.influences.some(item => item.sourceIds.some(id => peers.has(id))))) {
+    throw Error("Site plan needs at least one Page decision informed by market research");
+  }
+}
+
 export function validateStrategyBlueprint(output: unknown, run: WorkflowRun, authority: MarketingAuthority,
   destinations?: Partial<Record<"request-review" | "start-onboarding", string>>) {
   const parsed = readBlueprint(output, marketingCitationIds(run, authority), true, true);
   for (const page of parsed.pages) strategyDecision(run, authority, page);
+  if (authority.projectionVersion === 2 && authority.strategy) {
+    // Research must change the plan somewhere (Part 1 #10), without forcing a
+    // competitor citation onto every Page.
+    assertPlanUsesResearch(parsed.pages, [...authority.strategy.peerIds, ...(run.input.research ?? []).map(source => source.id)]);
+  }
   const journeys = authority.strategy?.entryJourneys;
   if (journeys && !authority.strategy?.change) {
     const review = destinations?.["request-review"];
@@ -275,8 +287,13 @@ function anyVisitorCopy(output: unknown, check: (copy: string, excludedList:bool
   return walk(output);
 }
 
-export function unsupportedCommercialCopy(output: unknown) {
-  const explicitClaim = /(?:[$€£]\s*\d|\b\d[\d,.]*\s*(?:USD|dollars)\b|\b\d(?:\.\d+)?\s*(?:\/\s*5|stars)\b|\b(?:customers?|clients?)\s+(?:say|said|reported)\b)/iu;
+/** Testimony, ratings and guaranteed outcomes are always refused (Part 1 #14).
+ * Prices are refused only while the business has no approved prices
+ * (copyPolicy "unpriced-no-testimony"); "no-testimony" permits approved prices. */
+export function unsupportedCommercialCopy(output: unknown, options: { prices: boolean } = { prices: true }) {
+  const price = /(?:[$€£]\s*\d|\b\d[\d,.]*\s*(?:USD|dollars)\b)/iu;
+  const testimony = /(?:\b\d(?:\.\d+)?\s*(?:\/\s*5|stars)\b|\b(?:customers?|clients?)\s+(?:say|said|reported)\b)/iu;
+  const explicitClaim = { test: (copy: string) => testimony.test(copy) || (options.prices && price.test(copy)) };
   const guaranteedOutcome=/\b(?:guaranteed|guarantee)\b[^.!?]{0,30}\b(?:rankings|sales|profits|revenue|leads|traffic|results)\b/iu;
   return anyVisitorCopy(output, (copy,excludedList) => explicitClaim.test(copy)||guaranteedOutcome.test(copy)&&
     !(excludedList&&/^guaranteed\b/iu.test(copy.trim())&&!/\b(?:but|yet|however|we|you|our)\b/iu.test(copy)));

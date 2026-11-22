@@ -22,6 +22,32 @@ final class MioPages_Native_Component
             . '</div><!-- /wp:group -->';
     }
 
+    /**
+     * A clearly marked for-position-only frame carrying Core's own visual brief.
+     * Used only where Core requested an image and no approved acquired asset is
+     * bound. It is never an image file and never real customer or project media.
+     */
+    public static function fpo(mixed $visual, string $class = ''): string
+    {
+        self::keys($visual, ['purpose','brief','altIntent','status']);
+        if (!in_array($visual['status'], ['asset-needed','rights-review'], true)) throw new InvalidArgumentException('FPO requires an image request.');
+        $label = $visual['status'] === 'rights-review' ? 'Selected image awaiting rights review' : 'Image for position only. Final art pending';
+        $classes = trim('miopages-fpo ' . $class);
+        return '<!-- wp:html --><figure class="' . esc_attr($classes) . '" role="img" aria-label="' . esc_attr('For position only: ' . $visual['altIntent']) . '">'
+            . '<span class="miopages-fpo-badge" aria-hidden="true">FPO</span>'
+            . '<span class="miopages-fpo-label" aria-hidden="true">' . esc_html($label) . '</span>'
+            . '<span class="miopages-fpo-brief" aria-hidden="true">' . self::copy($visual['brief']) . '</span>'
+            . '</figure><!-- /wp:html -->';
+    }
+
+    public static function hasImage(mixed $node): bool
+    {
+        if (!is_array($node)) return false;
+        if (($node['kind'] ?? null) === 'image') return true;
+        foreach (($node['children'] ?? []) as $child) if (self::hasImage($child)) return true;
+        return false;
+    }
+
     private static function hasTitle(mixed $node): bool
     {
         if (!is_array($node)) return false;
@@ -136,6 +162,7 @@ final class MioPages_Native_Component
         $reference = $node['reference'];
         if ($kind === 'image') {
             $image = $images[$reference] ?? null;
+            if (isset($image['fpo'])) return self::fpo($image['fpo'], $class);
             if ($localPending && PHP_SAPI === 'cli' && ($image['pendingLocal'] ?? false) === true) {
                 return '<!-- wp:paragraph --><p class="miopages-pending-media" role="note">Image placement awaiting asset review.</p><!-- /wp:paragraph -->';
             }

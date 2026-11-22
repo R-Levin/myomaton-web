@@ -99,7 +99,7 @@ function inputs(authority: MarketingAuthority, context: WorkflowRun["context"], 
 
 for (const originals of [false, true]) test(originals
   ? "new source grants carry complete report, Direction, original and revision context into actual Page requests"
-  : "historical Page and revision requests retain their exact condensed privacy projection", async () => {
+  : "historical condensed Page projection is refused before any provider request", async () => {
   const pack = await readFile(packFile);
   const { context, authority } = p022CandidateInputs(pack, scope, [{ id: "private", kind: "customer-unconfirmed", label: "Excluded",
     reference: "custody-pointer", date: null, content: protectedText }]);
@@ -174,6 +174,13 @@ for (const originals of [false, true]) test(originals
         return { body: reply, rawBody: Buffer.from(JSON.stringify(reply)) };
       } },
     });
+    if (!originals) {
+      // P0-19: the condensed projection withheld report, Direction and research
+      // from the page writer. It is retired for new dispatches; nothing is sent.
+      await assert.rejects(provider.run(inputs(authority, context), async () => {}), /complete source-aware knowledge projection/);
+      assert.equal(recorded.length, 0);
+      return;
+    }
     const first = await provider.run(inputs(authority, context), async () => {});
     const second = await provider.run(inputs(authority, context, 2, true), async () => {});
     assert.equal(recorded.length, 2);
@@ -233,6 +240,14 @@ test("unpriced C0 draft refuses obvious price, rating and results claims outside
   assert.ok(unsupportedCommercialCopy({ sections: [{ block: { groups: [{ items: ["5 stars, every time"] }] } }] }));
   assert.ok(unsupportedCommercialCopy({ sections: [{ body: "We guarantee leads from the first month." }] }));
   assert.equal(unsupportedCommercialCopy({ sections: [{ body: "Agree the work in advance and review material changes." }] }), false);
+});
+
+test("approved-price policy permits prices but still refuses invented testimony, ratings and guarantees", () => {
+  const priced = { prices: false };
+  assert.equal(unsupportedCommercialCopy({ sections: [{ body: "Standard Launch is $1,099." }] }, priced), false);
+  assert.ok(unsupportedCommercialCopy({ sections: [{ body: "Clients say it doubled their enquiries." }] }, priced));
+  assert.ok(unsupportedCommercialCopy({ sections: [{ block: { groups: [{ items: ["Rated 4.9/5"] }] } }] }, priced));
+  assert.ok(unsupportedCommercialCopy({ sections: [{ body: "We guarantee more leads." }] }, priced));
 });
 
 test("semantic content is typed and remains unavailable to the protected WordPress validator", () => {

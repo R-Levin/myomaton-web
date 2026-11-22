@@ -22,6 +22,23 @@ function paragraph(body: string, start: string) {
   return matches[0];
 }
 
+/** An exact sentence run inside one paragraph, used where the paragraph's tail is
+ * a document cross-reference or implementation-status note rather than offer. */
+function span(body: string, start: string, end: string) {
+  const text = paragraph(body, start);
+  const stop = text.indexOf(end);
+  if (stop < 0 || text.indexOf(end, stop + 1) >= 0) throw Error("Exact canonical C0 passage required: " + end);
+  return text.slice(0, stop + end.length);
+}
+
+function within(body: string, start: string, end: string) {
+  const from = body.indexOf(start);
+  if (from < 0 || body.indexOf(start, from + 1) >= 0) throw Error("Exact canonical C0 passage required: " + start);
+  const stop = body.indexOf(end, from);
+  if (stop < 0) throw Error("Exact canonical C0 passage required: " + end);
+  return body.slice(from, stop + end.length);
+}
+
 /** A proposal for a NEW source-bound C0 run, not a modification of any case/grant.
  * Canonical intended service direction stays service-direction, not verified
  * current operations or final public promises. No visitor prose is authored here. */
@@ -56,11 +73,15 @@ export function proposeC0AuthoringKnowledge(context: WorkflowContext, authority:
     { key: "positioning-and-outcomes", file: "miopages-c0-product-model.md", title: "Positioning and intended outcome", body: position,
       passages: [paragraph(position, "Customers provide business knowledge"), paragraph(position, "The intended middle ground"), paragraph(position, "The presence should help")], document: documents.productModel },
     { key: "continuing-growth", file: "miopages-c0-product-model.md", title: "Continuing value after launch", body: continuing,
-      passages: [paragraph(continuing, "Launch starts the relationship.")], document: documents.productModel },
+      passages: [paragraph(continuing, "Launch starts the relationship."),
+        within(continuing, "MioPages\nshould prove that loop", "technical lock-in is not a retention strategy.")], document: documents.productModel },
     { key: "managed-service", file: "miopages-c0-product-model.md", title: "One primary managed service", body: primary,
       passages: [paragraph(primary, "MioPages sells one primary"), paragraph(primary, "The service should help")], document: documents.productModel },
     { key: "ongoing-value", file: "miopages-c0-product-model.md", title: "Ongoing: intended continuing value", body: ongoing,
-      passages: [paragraph(ongoing, "After Launch, service activities")], document: documents.productModel },
+      // The second paragraph states Ongoing's core value; its document links and
+      // implementation-status sentence stay out of the claim passage.
+      passages: [paragraph(ongoing, "After Launch, service activities"),
+        span(ongoing, "Ongoing is not primarily", "rather than lock-in.")], document: documents.productModel },
   ];
   const additions = records.map(record => ({
     id: "c0-canonical:" + record.key, kind: "service-direction" as const, label: record.title,

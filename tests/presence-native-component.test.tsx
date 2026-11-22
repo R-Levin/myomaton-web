@@ -167,3 +167,33 @@ test("nested comparisons keep readable columns inside an aligned native flow",as
   await page.close();
  }}finally{await browser.close()}
 });
+
+test("Core's requested images render as marked FPO frames where no approved asset is bound",async()=>{
+ const {validatePages}=await import("../lib/platform/wordpress-delivery/authority");
+ const visual={purpose:"Show the managed relationship",brief:"Abstract illustration: business knowledge becoming a reviewed site.",altIntent:"Diagram of the managed service",status:"asset-needed"};
+ const withImage=readNativeComponent({...component,mode:"section",root:node("group",{children:[
+  node("heading",{text:"Opening",level:1}),node("image",{reference:"section-0"})]})});
+ const withoutImage=readNativeComponent({...component,mode:"section",root:node("group",{children:[
+  node("heading",{text:"Support",level:2}),node("paragraph",{text:"Explanation."})]})});
+ const sections=[
+  {id:"hero",type:"hero",content:{heading:"Opening",text:"x"},block:withImage,visual},
+  {id:"support",type:"intro",content:{heading:"Support",text:"x"},block:withoutImage,visual:{...visual,status:"rights-review"}},
+  {id:"plain",type:"intro",content:{heading:"Plain",text:"Text only."},visual:{...visual,status:"text-only"}},
+  {id:"standard",type:"cta",content:{heading:"Standard",text:"Standard copy."},visual},
+ ];
+ const candidate={pages:[{id:"home",path:"/",title:"Home",composition:"managed-v1" as const,navigationLabel:"Home",sections}],navigation:["/"],actions:[]};
+ validatePages(candidate.pages,true,true);
+ assert.throws(()=>validatePages([{...candidate.pages[0],sections:[{...sections[0],visual:{...visual,status:"invented"}}]}],true,true),/visual refused/);
+ assert.throws(()=>validatePages([{...candidate.pages[0],sections:[{...sections[0],visual:{...visual,extra:1}}]}],true,true),/visual refused/);
+ const php=spawnSync(process.platform==="win32"?"C:/php/php.exe":"php",["wordpress/miopages-delivery/tests/native-component.php"],
+  {input:JSON.stringify({candidate,postIds:{"/":99}}),encoding:"utf8"});
+ assert.equal(php.status,0,php.stderr);
+ const frames=php.stdout.match(/<figure class="miopages-fpo[^"]*"/g)??[];
+ assert.equal(frames.length,3,"authored placement, authored section request and standard section request");
+ assert.match(php.stdout,/Selected image awaiting rights review/);
+ assert.match(php.stdout,/aria-label="For position only: Diagram of the managed service"/);
+ assert.ok(!/<img /.test(php.stdout),"FPO is never an image file");
+ assert.ok(!php.stdout.includes("Image placement awaiting asset review"));
+ const plain=php.stdout.slice(php.stdout.indexOf(">Plain<"),php.stdout.indexOf(">Standard<"));
+ assert.ok(!plain.includes("miopages-fpo"),"text-only sections stay text-only");
+});

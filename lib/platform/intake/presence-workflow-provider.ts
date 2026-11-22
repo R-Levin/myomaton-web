@@ -13,7 +13,7 @@ import { exposesInternalCopy, marketingCitationIds, marketingProjection, repeats
 import type { PresenceImageGrant } from "./presence-workflow-visual";
 import { originalMaterialInput, validateOriginalGrant, type OriginalMaterialGrant, type OriginalMaterialReader } from "./presence-source-material";
 import { existingWorkAuthoringInstructions } from "./presence-existing-work";
-import { editorialScopeInstructions, stockPlacementInstructions } from "./presence-review-instructions";
+import { editorialScopeInstructions, fpoImageInstructions, stockPlacementInstructions } from "./presence-review-instructions";
 
 export class WorkflowMediaUnavailable extends WorkflowBlocked {
   readonly code: "MEDIA_PERMISSION_EXPIRED" | "MEDIA_CONTEXT_UNAVAILABLE";
@@ -384,7 +384,7 @@ export function createResponsesPresenceWorkflow(config: {
     if (run.work.operation === "page" && peerIds && repeatsPeerObservation(output, run.input.evidence.filter(row => peerIds.includes(row.id)))) {
       return new ArtifactValidationError("shape-or-content", "Visitor copy directly repeats peer observations");
     }
-    if (run.work.operation === "page" && grant.marketingAuthority?.strategy?.copyPolicy === "unpriced-no-testimony" && unsupportedCommercialCopy(output)) {
+    if (run.work.operation === "page" && grant.marketingAuthority?.strategy?.copyPolicy && unsupportedCommercialCopy(output, { prices: grant.marketingAuthority.strategy.copyPolicy === "unpriced-no-testimony" })) {
       return new ArtifactValidationError("shape-or-content", "Unapproved price, result or customer proof");
     }
     if (grant.marketingAuthority && ["page", "blueprint"].includes(run.work.operation) && exposesInternalCopy(output, run.input.evidence, grant.marketingAuthority)) {
@@ -472,8 +472,15 @@ export function createResponsesPresenceWorkflow(config: {
       }
     },
     async run(run, retain) {
-      let input: unknown = await authorize(run);
       const operation = run.work.operation;
+      // The historical marketing projection withheld the report, Direction and
+      // research from the page writer (P0-19). New page dispatches must carry that
+      // context (source-aware projection or full original materials); retained
+      // responses still recover through recover() below.
+      if (operation === "page" && grant.marketingAuthority && grant.marketingAuthority.projectionVersion !== 2 && !grant.originalMaterials) {
+        throw new WorkflowBlocked("Page writing requires the complete source-aware knowledge projection");
+      }
+      let input: unknown = await authorize(run);
       if (grant.marketingAuthority?.projectionVersion === 2) {
         input = { ...input as object, ...(config.readAvailableMedia && { availableMedia: await availableMedia(run) }) };
       } else if (grant.originalMaterials) {
@@ -548,7 +555,7 @@ export function createResponsesPresenceWorkflow(config: {
         ? await originalMaterialInput(run, grant.originalMaterials, input, config.readOriginalMaterials!, grant.marketingAuthority?.projectionVersion === 2)
         : JSON.stringify(input);
       const creative = grant.nativeComponents === 2
-        ? " Conceive the site as a coherent original design. Describe the intended typography, hierarchy, image relationships, responsive behavior and visitor decisions in Direction. Compose new native components when useful using version 2 recursive nodes, asymmetric columns, grouped surfaces, typographic hierarchy, comparisons, sequences and accessible details. Use mode section to author the entire Section composition, or supplement to add a supporting component. A section-mode Hero must contain exactly one level-1 heading matching its Section heading; supporting sections must contain a matching level-2 heading and no level-1 heading. Section-mode replaces the usual heading/body/image layout, so put all intended visitor content and image/Action references into the tree. This allows genuinely different Hero and supporting compositions rather than variations on an automatic text-plus-image shell. Native image and Action references bind only to section-N (zero-based Section index within this Page) and action-N (zero-based index in this Page\'s complete Action list, including null destinations; a null destination stays disabled and never shifts another Action into its slot). Put explicit image nodes in an authored section that needs a placed image and explicit action nodes for its intended choices. An image reference is a placement request, not evidence that media has already been acquired. " + stockPlacementInstructions(grant.marketingAuthority?.projectionVersion === 2) + " Stock illustrates a business situation, never a customer, testimonial or endorsement. Keep the conceptual service-led Hero; use original native blocks for abstract relationships instead of requesting additional unavailable illustrations. Never invent acquired assets or fill the site with placeholder images. Keep mobile visual and DOM reading order identical (mobileOrder 0). Create an arrangement that fits the actual information and visitor need. Existing section roles describe semantic jobs, not a fixed layout. If a necessary idea cannot be expressed, state the specific limitation in the visual brief for Operator engineering rather than disguising a generic fallback. Preserve established brand identity; use source visuals to reason, never to reproduce distinctive designs. Treat self-contained reader answers as useful content when no article inventory exists. Critique the complete strategy and rendered design and make substantive changes where evidence warrants them."
+        ? " Conceive the site as a coherent original design. Describe the intended typography, hierarchy, image relationships, responsive behavior and visitor decisions in Direction. Compose new native components when useful using version 2 recursive nodes, asymmetric columns, grouped surfaces, typographic hierarchy, comparisons, sequences and accessible details. Use mode section to author the entire Section composition, or supplement to add a supporting component. A section-mode Hero must contain exactly one level-1 heading matching its Section heading; supporting sections must contain a matching level-2 heading and no level-1 heading. Section-mode replaces the usual heading/body/image layout, so put all intended visitor content and image/Action references into the tree. This allows genuinely different Hero and supporting compositions rather than variations on an automatic text-plus-image shell. Native image and Action references bind only to section-N (zero-based Section index within this Page) and action-N (zero-based index in this Page\'s complete Action list, including null destinations; a null destination stays disabled and never shifts another Action into its slot). Put explicit image nodes in an authored section that needs a placed image and explicit action nodes for its intended choices. An image reference is a placement request, not evidence that media has already been acquired. " + stockPlacementInstructions(grant.marketingAuthority?.projectionVersion === 2) + " Stock illustrates a business situation, never a customer, testimonial or endorsement. " + fpoImageInstructions + " Keep mobile visual and DOM reading order identical (mobileOrder 0). Create an arrangement that fits the actual information and visitor need. Existing section roles describe semantic jobs, not a fixed layout. If a necessary idea cannot be expressed, state the specific limitation in the visual brief for Operator engineering rather than disguising a generic fallback. Preserve established brand identity; use source visuals to reason, never to reproduce distinctive designs. Treat self-contained reader answers as useful content when no article inventory exists. Critique the complete strategy and rendered design and make substantive changes where evidence warrants them."
         : "";
       const request = {
         model, ...(grant.marketingAuthority?.projectionVersion === 2 && model === "gpt-5.4-2026-03-05" && { reasoning: { effort: "medium" as const } }), input: providerInput,

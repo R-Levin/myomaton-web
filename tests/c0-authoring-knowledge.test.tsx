@@ -33,7 +33,11 @@ test("actual canonical C0 growth proposition enters a new source-aware proposal 
   assert.equal(additions.length, result.coverage.length);
   const all = additions.map(source => source.content).join("\n");
   for (const phrase of ["find the business", "content recommendations", "conversion-path refinement", "plain-language progress/value reports",
-    "business-knowledge updates", "content/optimization work", "measurement", "human/customer approval"]) assert.ok(all.includes(phrase), phrase);
+    "business-knowledge updates", "content/optimization work", "measurement", "human/customer approval",
+    // Ongoing's core value statement and the growth-loop proof obligation (previously omitted).
+    "keeps helping your presence get better", "retention should come from useful progress", "commercial topics and lead-generation intent"]) assert.ok(all.includes(phrase), phrase);
+  // Cross-references and implementation-status notes remain outside claim passages.
+  assert.doesNotMatch(all, /remain subject to their implementation status|\]\(content-growth-loop\.md\)/);
   assert.ok(additions.every(source => source.kind === "service-direction"));
   assert.doesNotMatch(all, /\$1,095|\$249|already working|GA4|Search Console remains unrun|The optional early C0/);
   assert.ok(result.coverage.every(row => /^[a-f0-9]{64}$/.test(row.documentDigest!)));

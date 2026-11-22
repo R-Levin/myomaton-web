@@ -5,7 +5,7 @@ import { Pool } from "pg";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { validatePages } from "../../lib/platform/wordpress-delivery/authority";
 import { composeHomeConcept } from "../../lib/platform/intake/presence-home-concept";
-import { workflowEvaluationPreviewInput, workflowLocalDraftInput } from "../../lib/platform/intake/presence-workflow-delivery";
+import { sectionVisual, workflowEvaluationPreviewInput, workflowLocalDraftInput } from "../../lib/platform/intake/presence-workflow-delivery";
 import { bindFictionalEvaluation, bindOriginalEvaluation, evaluationGrant, readEvaluationManifest,
   type EvaluationManifest, type EvaluationScenario } from "../../lib/platform/intake/presence-evaluation-activation";
 import { initializeResponsesUsageLedger } from "../../lib/platform/intake/intelligent-responses";
@@ -263,7 +263,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
           composition: page.composition, navigationLabel: page.navigationLabel, sections: page.sections.map((section, index) => {
             const block = prior.pages.find(candidate => candidate.path === page.slug)?.sections[index].block;
             return { id: section.id, type: section.type, content: { heading: editorial(section.heading), text: editorial(section.text) },
-              ...(localDraft && block && { block }) };
+              ...(localDraft && block && { block }), ...(localDraft && page.composition && sectionVisual(prior, page.slug, index)) };
           }) }));
         validatePages(pages, true, localDraft);
         const images = await Promise.all(input.pages.flatMap(page => page.sections.flatMap(section => section.image ? [async () => {

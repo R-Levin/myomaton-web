@@ -161,7 +161,7 @@ test("strategic replanning retains the specific Core-generated concept critique 
  assert.deepEqual((run.input.replan as {conceptCritique:unknown}).conceptCritique,critique);
 });
 
-test("source-aware Page decisions can compose from authorized customer knowledge while retaining a real market influence",async()=>{
+test("source-aware Page decisions can compose from authorized customer knowledge; research must inform the site plan",async()=>{
  const {compilePageDecision}=await import("../lib/platform/intake/presence-decision-brief");
  const run=makeRun(),page=run.input.blueprint!.pages[0],base=page.decisionBrief!;
  base.influences=[
@@ -173,8 +173,14 @@ test("source-aware Page decisions can compose from authorized customer knowledge
  assert.equal(projection.decisionBrief.sourceTrace.find(x=>x.id==="complete-approved-brief")!.sourceKind,"service-direction");
  assert.equal(projection.decisionBrief.sourceTrace.find(x=>x.id==="peer")!.use,"market-influence");
  assert.throws(()=>compilePageDecision(run,base,page.path,authority.strategy!,context.evidence.slice(0,2),[context.evidence[3]],authority.contextDigest),/Page needs source-backed/,"Historical grants keep their exact peer-composition contract");
+ // One Page may rest on customer knowledge alone; research must still shape the plan somewhere.
+ {const original=structuredClone(base);base.influences=base.influences.filter(x=>!x.sourceIds.includes("peer"));
+  assert.doesNotThrow(()=>marketingProjection(run,authority));
+  const {assertPlanUsesResearch}=await import("../lib/platform/intake/presence-marketing-authority");
+  assert.throws(()=>assertPlanUsesResearch(run.input.blueprint!.pages,["peer"]),/informed by market research/);
+  assert.doesNotThrow(()=>assertPlanUsesResearch([...run.input.blueprint!.pages,{decisionBrief:{influences:[{sourceIds:["peer"]}]}}],["peer"]));
+  Object.assign(base,original);}
  for(const change of [
-  ()=>{base.influences=base.influences.filter(x=>!x.sourceIds.includes("peer"));},
   ()=>{base.influences.push({sourceIds:["foreign-source"],use:"journey",implication:"Refused foreign influence"});},
   ()=>{base.influences.push({sourceIds:["development"],use:"journey",implication:"Refused excluded processing source"});},
   ()=>{base.claimIds.push("unconfirmed");},

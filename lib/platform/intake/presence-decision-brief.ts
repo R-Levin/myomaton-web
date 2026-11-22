@@ -3,7 +3,7 @@ import { choice, fingerprint, object, text } from "../canonical/model";
 import type { WorkflowRun } from "./presence-workflow";
 import type { PresenceEvidence } from "./presence-workflow-artifacts";
 
-export type StrategyScope = { version: 1; peerIds: readonly string[]; copyPolicy?: "unpriced-no-testimony";
+export type StrategyScope = { version: 1; peerIds: readonly string[]; copyPolicy?: "unpriced-no-testimony" | "no-testimony";
   entryJourneys?: { reviewClaimId: string; directClaimId: string }; discoveredPeers?: true; change?:
   { baseline: string; paths: readonly string[]; reason: string; observationIds: readonly string[] } };
 const hash = /^[a-f0-9]{64}$/u;
@@ -48,7 +48,7 @@ export type DecisionBrief = ReturnType<typeof readDecisionBrief>;
 
 export function checkStrategyScope(scope: StrategyScope) {
   if (scope.version !== 1 || (scope.discoveredPeers ? !Array.isArray(scope.peerIds) || new Set(scope.peerIds).size !== scope.peerIds.length : ids(scope.peerIds).length < 2) || (scope.discoveredPeers !== undefined && scope.discoveredPeers !== true) ||
-      (scope.copyPolicy && scope.copyPolicy !== "unpriced-no-testimony")) {
+      (scope.copyPolicy && !["unpriced-no-testimony", "no-testimony"].includes(scope.copyPolicy))) {
     throw Error("Independent peer evidence and valid copy policy required");
   }
   if (scope.entryJourneys) ids([scope.entryJourneys.reviewClaimId, scope.entryJourneys.directClaimId]);
@@ -96,10 +96,12 @@ export function compilePageDecision(run: WorkflowRun, brief: DecisionBrief, path
   // Verified DOM text can support a proposed information composition. Missing
   // viewport captures stay explicitly incomplete; they are not invented pixels
   // or a completed visual-quality review.
-  // A source-aware Page must have a real market influence, but its original
-  // composition may come from authorized customer knowledge/brand rather than
-  // a competitor. Historical grants keep their peer-composition requirement.
-  const researchBasis = brief.influences.some(item => (sourceAware || item.use === "composition") && item.sourceIds.some(id => peerIds.has(id)));
+  // Source-aware Pages need a real cited influence, but not a competitor on every
+  // Page: research must visibly shape the plan as a whole (validateStrategyBlueprint),
+  // while an individual Page may rest on customer knowledge, brand or Direction.
+  // Historical grants keep their peer-composition requirement.
+  const researchBasis = sourceAware ? brief.influences.length > 0
+    : brief.influences.some(item => item.use === "composition" && item.sourceIds.some(id => peerIds.has(id)));
   if (!researchBasis || brief.influences.some(item => item.sourceIds.some(id => !observationIds.has(id)))) {
     throw Error(sourceAware ? "Page needs authorized source influence and market evidence" : "Page needs source-backed peer composition and market influence");
   }

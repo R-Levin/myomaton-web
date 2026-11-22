@@ -43,6 +43,13 @@ export function workflowLocalDraftInput(context: WorkflowContext, view: Presence
   return projectWorkflowPreview(context, { ...view, blueprint }, target, null, [], "Unapproved isolated draft " + target, true);
 }
 
+/** Core's own visual intent for a section, carried so drafts can place the image
+ * or a marked FPO frame instead of silently dropping it (baseline Part 1 #12). */
+export function sectionVisual(view: Pick<PresenceWorkflowView, "pages">, path: string, index: number) {
+  const visual = view.pages.find(item => item.path === path)?.sections[index]?.visual;
+  return visual ? { visual: { purpose: visual.purpose, brief: visual.brief, altIntent: visual.altIntent, status: visual.status } } : {};
+}
+
 /** Shared data projection for Core's visual review and native WordPress drafts.
  * This is representation only, with no approval, installation or publication. */
 export function workflowNativeReviewCandidate(context: WorkflowContext, view: PresenceWorkflowView) {
@@ -55,6 +62,7 @@ export function workflowNativeReviewCandidate(context: WorkflowContext, view: Pr
         text: section.text?.kind === "editorial" ? section.text.text : "" },
       ...(view.pages.find(item => item.path === page.slug)?.sections[index].block &&
         { block: view.pages.find(item => item.path === page.slug)!.sections[index].block }),
+      ...(page.composition && sectionVisual(view, page.slug, index)),
     })),
   }));
   return { candidate: { pages, navigation: input.navigation, actions: input.actions }, unresolvedActions: input.unresolvedActions };

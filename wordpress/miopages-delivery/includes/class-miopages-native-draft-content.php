@@ -149,8 +149,10 @@ final class MioPages_Native_Draft_Content
             }
         }
         $componentImages = [];
+        require_once __DIR__ . '/class-miopages-native-component.php';
         foreach ($page['sections'] as $index => $section) {
             if (isset($attachments[$section['id']])) $componentImages['section-' . $index] = $attachments[$section['id']];
+            elseif (self::wantsFpo($section)) $componentImages['section-' . $index] = ['fpo'=>$section['visual']];
             elseif ($localComposition && PHP_SAPI === 'cli') $componentImages['section-' . $index] = ['pendingLocal'=>true];
         }
         $componentActions = [];
@@ -193,7 +195,15 @@ final class MioPages_Native_Draft_Content
                 $h1 = count(array_filter($levels, static fn($heading) => $heading['level'] === 1));
                 if ($matched === [] || $h1 !== ($type === 'hero' ? 1 : 0)) throw new InvalidArgumentException('Authored Section heading differs.');
                 $authored = self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3, $componentImages, $componentActions, $postIds);
-                $class = 'miopages-draft-section miopages-draft-' . $type . ' miopages-authored-section';
+                // Core requested an image for this section but authored no placement:
+                // place the acquired image, or its FPO frame, beside the authored content.
+                $aside = '';
+                if (!MioPages_Native_Component::hasImage($section['block']['root'])) {
+                    if (isset($attachments[$id])) $aside = self::image($attachments[$id]);
+                    elseif (self::wantsFpo($section)) $aside = MioPages_Native_Component::fpo($section['visual']);
+                }
+                $class = 'miopages-draft-section miopages-draft-' . $type . ' miopages-authored-section' . ($aside !== '' ? ' miopages-draft-with-image' : '');
+                if ($aside !== '') $authored = '<!-- wp:group {"className":"miopages-draft-copy"} --><div class="wp-block-group miopages-draft-copy">' . $authored . '</div><!-- /wp:group -->' . $aside;
                 $blocks[] = '<!-- wp:group {"tagName":"section","className":"' . $class . '"} -->'
                     . '<section class="wp-block-group ' . $class . '">' . $authored . '</section><!-- /wp:group -->';
                 continue;
@@ -210,12 +220,13 @@ final class MioPages_Native_Draft_Content
             }
             if (array_key_exists('block', $section)) $content .= self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3, $componentImages, $componentActions, $postIds);
             $media = $attachments[$id] ?? null;
+            $fpo = !$media && self::wantsFpo($section) && !(array_key_exists('block', $section) && MioPages_Native_Component::hasImage($section['block']['root'] ?? null));
             $style = $type === 'cta' && empty($placedActions[$id]) ? 'intro' : $type;
-            $class = 'miopages-draft-section miopages-draft-' . $style . ($media ? ' miopages-draft-with-image' : '');
+            $class = 'miopages-draft-section miopages-draft-' . $style . ($media || $fpo ? ' miopages-draft-with-image' : '');
             $blocks[] = '<!-- wp:group {"tagName":"section","className":"' . $class . '"} -->'
                 . '<section class="wp-block-group ' . $class . '">'
                 . '<!-- wp:group {"className":"miopages-draft-copy"} --><div class="wp-block-group miopages-draft-copy">'
-                . $content . '</div><!-- /wp:group -->' . ($media ? self::image($media) : '') . '</section><!-- /wp:group -->';
+                . $content . '</div><!-- /wp:group -->' . ($media ? self::image($media) : ($fpo ? MioPages_Native_Component::fpo($section['visual']) : '')) . '</section><!-- /wp:group -->';
         }
         if ($related !== []) {
             $blocks[] = '<!-- wp:html --><nav class="miopages-draft-related" aria-label="Related pages">'
@@ -287,6 +298,12 @@ final class MioPages_Native_Draft_Content
             . '<img class="wp-image-' . $id . '" src="' . esc_url(MioPages_Native_Draft_Media::url($id))
             . '" alt="' . esc_attr($image['alt']) . '" width="' . $image['width'] . '" height="' . $image['height']
             . '" /></figure><!-- /wp:image -->';
+    }
+
+    /** Core asked for an image (asset-needed / rights-review) in its section visual. */
+    private static function wantsFpo(array $section): bool
+    {
+        return is_array($section['visual'] ?? null) && in_array($section['visual']['status'] ?? null, ['asset-needed','rights-review'], true);
     }
 
     private static function paragraph(string $html): string
