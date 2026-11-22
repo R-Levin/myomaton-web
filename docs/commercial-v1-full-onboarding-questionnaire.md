@@ -95,13 +95,13 @@ Only then generate the initial WordPress site through the controlled plugin/them
 
 The first local rehearsal now exercises the ten question groups, save/resume,
 and an immutable business-understanding submission. See the [Issue #9 local
-walkthrough and verification](development-control.md#issue-9--first-local-signup-and-onboarding-slice)
+walkthrough and verification](archive/development-control.md#issue-9--first-local-signup-and-onboarding-slice)
 for the URL, scope, known limits and review steps.
 
 - [Progressive onboarding, commercial gate and full interview](progressive-onboarding-and-launch-readiness.md#full-structured-commercial-v1-interview)
 - [Four approval checkpoints](customer-journey-and-change-management.md#four-approval-checkpoints)
 - [Original interview recovery](c0-discovery-question-recovery-audit.md)
-- [C0 complete WordPress rebuild exercise](c0-onboarding-wordpress-rebuild-rehearsal.md)
+- [C0 complete WordPress rebuild exercise](archive/c0-onboarding-wordpress-rebuild-rehearsal.md)
 - [Existing foundational intake source](../lib/platform/intake/model.ts)
 - [Service scope and customer standing-authorization principles](service-operations-model.md)
-- [Development implementation control](development-control.md)
+- [Development implementation control](archive/development-control.md)

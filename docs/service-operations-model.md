@@ -757,7 +757,7 @@ do not require customers to navigate the internal team structure.
 
 **Near-term implementation sequence and open policy.** Review the first C0 Operator view with the owner, then connect tenant-scoped real content proposal revisions and exact preview evidence in account detail. Improve evidence-led attention grouping and navigation, test scale using clearly labeled fixtures, then pilot bounded AI triage, contextual guidance/handoff and role-aware experiences. Integrate real page-context media work into this same surface. Determine future role-permission matrix, reassignment authority, workload/capacity cues, escalation/notification timing and AI budget thresholds from operating evidence. Nothing above authorizes hosted writes, external AI calls, new credentials or irreversible production actions.
 
-The [local console](development-control.md#persistent-identity-and-simulated-role-switching)
+The [local console](archive/development-control.md#persistent-identity-and-simulated-role-switching)
 demonstrates one identity switching between two example roles in a shared
 interface. Role changes affect emphasis and shortcuts. Recorded C0 evidence
 and access remain independent of the browser preference. C0 proposal status
@@ -1002,7 +1002,7 @@ when evidence suggests the account needs redirection. Consequential publishing,
 authoritative knowledge changes and other protected actions require their existing
 approvals regardless of urgency or recommendation.
 
-The [local Operator overview](development-control.md#local-operator-overview-and-c0-account-review)
+The [local Operator overview](archive/development-control.md#local-operator-overview-and-c0-account-review)
 applies this attention-first layout to the reviewed C0 snapshot. It groups a
 recorded evidence decision above the account directory and links to a page
 preview. Live attention routing and queue persistence remain planned.

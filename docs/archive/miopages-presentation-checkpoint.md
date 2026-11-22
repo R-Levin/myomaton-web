@@ -1,8 +1,8 @@
 # Expressive Web Presence checkpoint — 2026-10-08
 
 Human review accepted **A Business in Focus / service-led v3** as MioPages Customer
-#0's provisional direction to carry forward. The [acceptance record](miopages-business-focus.md)
-preserves the visual outcome; the [reusable process](visual-direction.md#visual-evidence-and-recommendation-process)
+#0's provisional direction to carry forward. The [acceptance record](../miopages-business-focus.md)
+preserves the visual outcome; the [reusable process](../visual-direction.md#visual-evidence-and-recommendation-process)
 preserves adequate visual inspection, descriptive DNA, confirmed interpretation,
 one recommendation, faithful rendering and human review. Historical expressiveness
 and bounded creativity are preserved rather than reduced to a default house style.
@@ -10,7 +10,7 @@ and bounded creativity are preserved rather than reduced to a default house styl
 FPO resolution remains a separately approved asset process. Required general
 media/evidence Heroes, permission-aware visual evidence, portfolio/image-forward
 grammar and technical detail/specification/comparison recipes remain in the
-[range roadmap](deferred-architecture.md#evidence-led-commercial-presentation-range).
+[range roadmap](../deferred-architecture.md#evidence-led-commercial-presentation-range).
 This checkpoint implements none of those deferred workflows.
 
 ## Working-tree review and ownership
@@ -22,9 +22,9 @@ fixtures/tests and explanatory architecture/history belong together. Myomaton
 reference v2, restrained-editorial v1 and service-led v1/v2 remain pinned. Rejected
 MioPages experiments remain useful architecture/regression evidence.
 
-Five [brand originals](../brand/miopages/README.md), three pinned WOFF2 faces and
-their [licenses/provenance](../public/fonts/README.md) are deliberate sources. The
-[historical PDF](../references/miopages-history/README.md) is deliberately retained
+Five [brand originals](../../brand/miopages/README.md), three pinned WOFF2 faces and
+their [licenses/provenance](../../public/fonts/README.md) are deliberate sources. The
+[historical PDF](../../references/miopages-history/README.md) is deliberately retained
 as repository-owned operator-supplied evidence, not production artwork permission.
 No Downloads/temp copy is included. No unrelated changed files remain.
 
@@ -54,8 +54,8 @@ data. The checkpoint uses explicit file staging, not `git add .`.
 
 Browser tools intentionally require local ignored evidence and disposable previews;
 they do not ship screenshots/schema IDs in Git. Normal rendering and test source
-assets are self-contained in the repository. See the [preview instructions](miopages-c0-preview.md)
-and [v3 reproduction](miopages-business-focus.md#reproduction-and-validation).
+assets are self-contained in the repository. See the [preview instructions](../miopages-c0-preview.md)
+and [v3 reproduction](../miopages-business-focus.md#reproduction-and-validation).
 
 ## Next boundary
 

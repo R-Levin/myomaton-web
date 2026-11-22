@@ -27,8 +27,8 @@ first-party measurement/reporting and continuing improvement.
 - 20i-only launch is undecided; existing-site/theme adoption and off-host WordPress
   remain intended scope. WordPress engineering serves the growth service.
 
-Exact owner clarification: [November 20 decision record](owner-critical-conversations.md#november-20--whole-service-direction-and-interruption-recovery-approved).
-The [service model](web-presence-service-model.md#governing-product-principles) owns
+Exact owner clarification: [November 20 decision record](../owner-critical-conversations.md#november-20--whole-service-direction-and-interruption-recovery-approved).
+The [service model](../web-presence-service-model.md#governing-product-principles) owns
 these principles, not the current C0 execution log.
 
 ## Owner-critical recovery sources
@@ -39,7 +39,7 @@ record, **also** this active branch's index and latest Issue #12/#10 handoff: ma
 the root checkout and the implementation branch may be at different checkpoints.
 Do not merge, reset or switch merely to make their numbers match.
 
-Read [owner-critical conversations](owner-critical-conversations.md) and the exact
+Read [owner-critical conversations](../owner-critical-conversations.md) and the exact
 linked decisions relevant to the operation. Preserve the owner's enduring decisions;
 old assistant suggestions, manifests and next-operation instructions do not renew
 expired authority. If a required source is missing/conflicting, continue safe
@@ -275,7 +275,7 @@ from commercial acceptance.
 
 **November 21 owner clarification:** Codex is development tooling only and must not
 be required for normal service operation. Core/API AI and authorized human roles
-perform the service. [Canonical boundary](service-operations-model.md#development-tooling-and-normal-operation).
+perform the service. [Canonical boundary](../service-operations-model.md#development-tooling-and-normal-operation).
 The capacity/cost discussion remains preliminary planning evidence. The current
 product task is substantive full-service understanding/site improvement through
 Core; the access repair and downloadable assessment do not complete that outcome.
@@ -318,7 +318,7 @@ grants/ledgers and both public output digests match. No provider call/spending, 
 mutation, WordPress write, publication, infrastructure purchase or merge.
 
 **Capacity:** owner requested a concise50–100-customer assessment. See
-[measured capacity and smallest validation path](platform-capabilities.md#core-capacity-assessment--50100-customers-november21).
+[measured capacity and smallest validation path](../platform-capabilities.md#core-capacity-assessment--50100-customers-november21).
 The shared-runtime architecture remains credible; current1CPU/about1.67GiB visible RAM
 with no swap is not commercially capacity-proven. A4–8GB/2–4vCPU shared-Core test range
 is planning judgment, not a purchase instruction or guarantee. Account count is not
@@ -442,7 +442,7 @@ new AI generation, founder acceptance or a new WordPress application.
 **Current product finding: owner rejected this handoff.** The same earlier Core
 interface remains confusing; the owner cannot ascertain progress and expected an
 insight-driven improvement to the proposed site. SQL/account activation does not
-satisfy that outcome. [Exact finding and next internal work](owner-critical-conversations.md#november-20--owner-rejects-unusable-core-handoff-and-invisible-site-progress).
+satisfy that outcome. [Exact finding and next internal work](../owner-critical-conversations.md#november-20--owner-rejects-unusable-core-handoff-and-invisible-site-progress).
 Reconcile visible local 97, retained correction 106 and historical hosted 41 with
 honest scope/status labels; connect the known full-service communication gap to
 reviewable proposed changes and a coherent existing-portal journey. Do not ask the
@@ -475,10 +475,10 @@ Core 41, WordPress 6, local 97 and isolated 106 remain preserved.
 **Previous completed task: confirmed understanding, reassessment and inquiry outcomes.**
 Following the scope/next-step discussion, the owner asked Codex to act next; local
 engineering is underway. The
-[proposal and business acceptance](service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle)
+[proposal and business acceptance](../service-operations-model.md#proposed-implementation-scope--one-connected-account-cycle)
 connect understanding/corrections, genuine intelligence and editable work, shared
 review, authorized WP delivery/inbound reconciliation and actual observation/next
-action. [Latest local functionality and evidence](platform-capabilities.md#connected-account-cycle--confirmed-understanding-and-outcomes)
+action. [Latest local functionality and evidence](../platform-capabilities.md#connected-account-cycle--confirmed-understanding-and-outcomes)
 connect a correction to confirmed canonical Knowledge and the existing report/
 Direction/site engine, preserving prior work and explaining retain/revise/add Page
 decisions. Ordinary Contact acceptance and reported outcomes also connect locally.
@@ -497,12 +497,12 @@ publication occurred. A chat transport disconnect happened during checkpoint
 preparation; local files/evidence survived and no external operation was in flight.
 
 **Prior owner clarification:** manual workload is not the launch constraint. The
-[critical-path assessment](platform-capabilities.md#indispensable-system-capabilities--critical-path-assessment)
+[critical-path assessment](../platform-capabilities.md#indispensable-system-capabilities--critical-path-assessment)
 identifies indispensable system contributions and missing connections using the
 completed review. That assessment was sequencing only, not authority to start
 implementation, a model round, measurement activation or site application.
 
-The [first connected account-cycle shape](service-operations-model.md#first-connected-account-cycle--agreed-shape-november-20)
+The [first connected account-cycle shape](../service-operations-model.md#first-connected-account-cycle--agreed-shape-november-20)
 is agreed and local implementation has started. This does not grant external
 provider use or protected writes. Reuse existing components; do not restart C0 or
 reduce the goal to a website.
@@ -513,7 +513,7 @@ transitional-launch separation and WordPress gap inventory. The conversation-onl
 pause was explicitly lifted. No new API dispatch, hosted change, infrastructure,
 credential, merge, public-site publication or new WordPress application is authorized.
 
-The [current capability map and service-framework inventory](platform-capabilities.md#current-functional-map--november-20-2026)
+The [current capability map and service-framework inventory](../platform-capabilities.md#current-functional-map--november-20-2026)
 distinguish working foundations from missing ordinary-service connections. The
 framework is partly built: reuse the Core workflow/review, canonical data, signed
 WordPress delivery, Contact and first-party ledger. A complete usable recurring
@@ -521,7 +521,7 @@ service is not established; synthetic inquiry/recommendation and measurement
 fixtures are not real performance. The November 13 local archive assessment is
 historical, not an instruction to rebuild its superseded components.
 
-The [WordPress coordination review](wordpress-delivery-feasibility.md#coordination-media-and-adoption-review--november-20)
+The [WordPress coordination review](../wordpress-delivery-feasibility.md#coordination-media-and-adoption-review--november-20)
 covers WP-origin changes/knowledge, portal consistency, media lifecycle, existing
 themes/forms and plugin/Admin-only off-host operation. Signed outbound proofs are
 preserved; they do not prove every inbound/editing/host capability.
@@ -558,16 +558,16 @@ findings, verification limits and remaining decisions are in the capability map.
 
 | Question | Existing governing record |
 | --- | --- |
-| Service purpose and customer value | [Service model](web-presence-service-model.md) |
-| Architecture, reuse and provider/delivery ownership | [Architecture](platform-service-architecture.md) |
-| Capability/implementation versus beacons | [Capability catalog](platform-capabilities.md) |
-| Launch, Ongoing, Operator/Customer workflow and temporary launch | [Operations](service-operations-model.md) |
-| Entry, knowledge authority and customer confirmation | [Customer journey](customer-journey-and-change-management.md), [onboarding](paid-onboarding-knowledge-transfer-contract.md), [content authority](content-authority-and-editing.md) |
-| Research, content, recommendations and recurring growth | [Content-growth loop](content-growth-loop.md), [opportunity model](opportunity-and-optimization-model.md) |
-| Existing shared Creation/Ongoing interfaces | [Shared intelligence contract](shared-intelligence-creation-ongoing-architecture.md), restored from main; proposed interfaces, not proof of completed modules |
-| Evidence, outcomes and measurement coverage | [Measurement](measurement-and-analytics.md), [conversion](conversion-architecture.md) |
-| WordPress, inbound edits, media and adoption | [Delivery contract](wordpress-delivery-feasibility.md), [Assets](assets.md), [acquisition](media-acquisition.md) |
-| Authority, privacy, release and launch readiness | [Security](security-operations.md), [readiness](progressive-onboarding-and-launch-readiness.md), [active gates](deferred-architecture.md) |
+| Service purpose and customer value | [Service model](../web-presence-service-model.md) |
+| Architecture, reuse and provider/delivery ownership | [Architecture](../platform-service-architecture.md) |
+| Capability/implementation versus beacons | [Capability catalog](../platform-capabilities.md) |
+| Launch, Ongoing, Operator/Customer workflow and temporary launch | [Operations](../service-operations-model.md) |
+| Entry, knowledge authority and customer confirmation | [Customer journey](../customer-journey-and-change-management.md), [onboarding](../paid-onboarding-knowledge-transfer-contract.md), [content authority](../content-authority-and-editing.md) |
+| Research, content, recommendations and recurring growth | [Content-growth loop](../content-growth-loop.md), [opportunity model](../opportunity-and-optimization-model.md) |
+| Existing shared Creation/Ongoing interfaces | [Shared intelligence contract](../shared-intelligence-creation-ongoing-architecture.md), restored from main; proposed interfaces, not proof of completed modules |
+| Evidence, outcomes and measurement coverage | [Measurement](../measurement-and-analytics.md), [conversion](../conversion-architecture.md) |
+| WordPress, inbound edits, media and adoption | [Delivery contract](../wordpress-delivery-feasibility.md), [Assets](../assets.md), [acquisition](../media-acquisition.md) |
+| Authority, privacy, release and launch readiness | [Security](../security-operations.md), [readiness](../progressive-onboarding-and-launch-readiness.md), [active gates](../deferred-architecture.md) |
 | Exact development history/proofs | [Issue #12 handoff](https://github.com/R-Levin/myomaton-web/issues/12), [Issue #10](https://github.com/R-Levin/myomaton-web/issues/10), [integration history](c0-integration-spine-phase-b-2026-11-10.md), [C0 quality history](c0-creation-quality-p0-17.md) |
 
 ## Continuous decision documentation
@@ -631,7 +631,7 @@ diagnose ordinary local failures and retry within authorization. Stop for concre
 security, privacy, authority, budget or uncertain-state failures, not arbitrary
 page/question counts or harmless implementation details. New constraints need a
 real risk and a proportionate mitigation. Do not starve quality to save pennies or
-spend to a ceiling simply because it exists. See the [owner-critical record](owner-critical-conversations.md).
+spend to a ceiling simply because it exists. See the [owner-critical record](../owner-critical-conversations.md).
 
 ### Running cost of active tasks (required in existing Git handoffs; no parallel ledger)
 

@@ -9,7 +9,7 @@ unless explicitly superseded.
 
 **Status:** Active, owner-directed canonical continuity index. **Priority: P0 development-process reliability.**
 **Created:** 2026-11-15 following repeated harmful loss of strategic context at ChatGPT conversation boundaries.
-**Repository:** `R-Levin/myomaton-web`. **Companion first read:** [development-control.md](development-control.md). **Live execution ledger:** [Issue #12](https://github.com/R-Levin/myomaton-web/issues/12); [adaptive onboarding acceptance #10](https://github.com/R-Levin/myomaton-web/issues/10).
+**Repository:** `R-Levin/myomaton-web`. **Companion first read:** [development-control.md](archive/development-control.md). **Live execution ledger:** [Issue #12](https://github.com/R-Levin/myomaton-web/issues/12); [adaptive onboarding acceptance #10](https://github.com/R-Levin/myomaton-web/issues/10).
 **Purpose:** Preserve the owner's **explicitly designated important ChatGPT conversations**, their detailed substantive decisions and exact source pointers. Make continuity **a mandatory retrieval-and-reconciliation operation** rather than a memory-dependent courtesy.
 
 > **Owner correction, 2026-11-15:** Losing the architectural discussion whenever a chat reaches its length limit is a serious development failure. It wastes founder time and produces decisions detached from the product. Correcting this failure is a top development priority. Do not respond to a new conversation as though these decisions were never made. Do not require the owner to re-explain recorded product philosophy.
@@ -369,7 +369,7 @@ Technical success (retained 12 Pages, 63 Sections, ten source-bound editorial fi
 **Definitive detailed source-backed analysis and executable corrective requirements:** [Issue #12 comment 6956927890](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6956927890). Earlier [owner rejection](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6956680116). Read the detailed comment **in full**, not its title or a compressed one-line restatement, before delegating site-generation corrections.
 
 **Findings established by Git source inspection:**
-- Existing [approved provisional C0 brief](miopages-c0-business-brief.md), [human-reviewed R3 editorial record](miopages-editorial-r3.md), [retained accepted C0 content](miopages-c0-checkpoint.md), [prior owner-accepted C0 visual direction](miopages-c0-preview.md) and five [actual MioPages brand originals](../brand/miopages/README.md) were available and should have materially governed the output. The accepted service-led C0 visual iteration used original horizontal wordmark, purple/warm-neutral palette and deliberate compositions; it was not a blank-slate teal/mauve brief.
+- Existing [approved provisional C0 brief](miopages-c0-business-brief.md), [human-reviewed R3 editorial record](miopages-editorial-r3.md), [retained accepted C0 content](archive/miopages-c0-checkpoint.md), [prior owner-accepted C0 visual direction](miopages-c0-preview.md) and five [actual MioPages brand originals](../brand/miopages/README.md) were available and should have materially governed the output. The accepted service-led C0 visual iteration used original horizontal wordmark, purple/warm-neutral palette and deliberate compositions; it was not a blank-slate teal/mauve brief.
 - [Live evaluation manifest on the development branch](https://github.com/R-Levin/myomaton-web/blob/46fb0c53c9cd1e522e06c862dc4efe2fb517f89c/docs/presence-evaluation-activation.json) specified 20 C0 source hashes, one generic market query, six initial public roots, max four search calls/12 discovered sources, GPT-5.4 mini, 24 allowed C0 text generations, up to four image prompts that themselves request muted teal/cream, and a $4.75 C0 budget. There was no explicit approved C0 brand/logo/copy authority binding in the run inputs.
 - [Actual provider projection and editorial prompt](https://github.com/R-Levin/myomaton-web/blob/46fb0c53c9cd1e522e06c862dc4efe2fb517f89c/lib/platform/intake/presence-workflow-provider.ts) pass source evidence largely flat across stages; final recheck looks narrowly for material private-review blockers. [Research retriever](https://github.com/R-Levin/myomaton-web/blob/46fb0c53c9cd1e522e06c862dc4efe2fb517f89c/lib/platform/intake/presence-workflow-research.ts) primarily fetches plain text and discards visual styling/brand context. The [actual WP theme JSON](https://github.com/R-Levin/myomaton-web/blob/46fb0c53c9cd1e522e06c862dc4efe2fb517f89c/wordpress/miopages-managed-site/theme.json) hardcodes a different generic palette/system typography and the [WP header](https://github.com/R-Levin/myomaton-web/blob/46fb0c53c9cd1e522e06c862dc4efe2fb517f89c/wordpress/miopages-managed-site/parts/header.html) displays text title instead of retained original logo. Technical browser QA did not check brand or marketing quality.
 - [C0 ledger summary](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6951333889): 23 text generations, 22 token counts, 3 images, one billed market search; estimated $0.297486 text/search plus $1.50 conservative image reservation = $1.797486 accounted, not provider invoice. Low mini prices **do not themselves prove insufficient model work**; the root problem is constrained/misdirected research, absence of approved content/brand authority binding, uncritical editorial/UX acceptance, and ChatGPT's task framing. Owner time and opportunity cost materially outweigh small API savings, though not quantified here.
@@ -448,7 +448,7 @@ Technical success (retained 12 Pages, 63 Sections, ten source-bound editorial fi
 
 **Owner explicit next decision:** “Let's proceed with another round of generation based on what we've discussed and developed. I understand there may be setbacks. I just want to avoid massive oversights. Hopefully stronger dialog here can help with that. Make sure all continuity is captured as well, we don't know when this chat will be terminated.” The owner wants visible original site progress and competent **ChatGPT-led critical engineering/product oversight**, not ceremonial process, excuses, repeated owner reconstruction of past work or tiny prompts. Accept setbacks where genuine, prevent architectural oversights by actually examining the right evidence **before** generation.
 
-**Source-linked handoff:** [`docs/c0-generation-p0-22.md`](c0-generation-p0-22.md) (commit [`36023d4`](https://github.com/R-Levin/myomaton-web/commit/36023d4b20909991321ee16c92d834a4905b80bb)); existing Issue #12 [P0-22 exact continuation](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6981796749). Integrate prior binding source corrections [P0-19 root-cause/assignment](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6969275043), [P0-20 real peers, original new blocks, nonbinding accepted layout](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6980515900) and [P0-21 shared Creation/Ongoing intelligence](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6981341710), and current business/visual/offer authority. Latest observed development branch `f3795a547e9e435d13307ca3075dca8e7fafb487`; main diverged, actual local worktrees/credentials not visible to ChatGPT.
+**Source-linked handoff:** [`docs/c0-generation-p0-22.md`](archive/c0-generation-p0-22.md) (commit [`36023d4`](https://github.com/R-Levin/myomaton-web/commit/36023d4b20909991321ee16c92d834a4905b80bb)); existing Issue #12 [P0-22 exact continuation](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6981796749). Integrate prior binding source corrections [P0-19 root-cause/assignment](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6969275043), [P0-20 real peers, original new blocks, nonbinding accepted layout](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6980515900) and [P0-21 shared Creation/Ongoing intelligence](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6981341710), and current business/visual/offer authority. Latest observed development branch `f3795a547e9e435d13307ca3075dca8e7fafb487`; main diverged, actual local worktrees/credentials not visible to ChatGPT.
 
 **Next milestone definition:** One genuinely AI-generated and improved C0 local WordPress site, grounded in complete approved knowledge and usable research decisions, multiple independent peer website terminology and **visual** inspections, fresh original creative site/Section/Asset architecture and new reusable **blocks where justified**, supported claims, preserved purple wordmark and real Free Review/Direct Start journeys. The previously owner-accepted design is evidence of sufficient earlier quality, **not layout/template authority**. Fix all three discovered implementation faults in reusable Core: insufficient approved knowledge projection; lost research/Presence Direction→Page/Revision handoff; restrictive native renderer. Include real, independent three-pass QA and a trace from source to actual rendered content. Do not show another technically functional yet commercial D/F candidate as accepted. Protect real C0, fictional C2 and Myomaton separation and keep Ongoing shared boundaries compatible.
 
@@ -462,7 +462,7 @@ Technical success (retained 12 Pages, 63 Sections, ten source-bound editorial fi
 
 **Binding product/engineering implication:** Stop relying on ChatGPT prohibitions and review checklists as a surrogate for product architecture. Implement source/authority/knowledge-coverage enforcement, actual intelligence-to-Page/Revision contract, safe generative component implementation and source→decision→render trace **at their real interfaces**. Preserve working code, approved brand/identity, no internal/customer claims leakage and access/rollback gates. Keep a **single linked end-to-end local development cycle**, with replaceable, explicitly synthetic **beacons at unfinished interfaces**: optional Review OR Direct Start → research/AI business understanding → assessment/Direction → actual original WP site → synthetic inquiry → synthetic first-party measurement/snapshot → suggested improvement → Operator review → privately staged revision → remeasurement. Reuse existing components; don't build a parallel demo or pretend beacons are live customer outcomes. Advance interviewing, creation, portals, leads/measurement and Ongoing in **parallel**. Do not let one website/technical-proof blockage dominate the whole product. Technical tests are built into each Codex engineering increment, **not separate user-facing product milestones or owner approvals**. The owner reviews working commercial functionality and makes consequential decisions, not trivial test gates.
 
-**Full existing task correction:** [Issue #12 P0-23](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6982137262); [C0 P0-22 brief — P0-23 correction](c0-generation-p0-22.md#p0-23-correction--systemic-product-behavior-and-continuously-connected-operating-cycle); [shared Creation/Ongoing — P0-23](shared-intelligence-creation-ongoing-architecture.md#p0-23--real-connected-operating-cycle-with-explicit-interface-beacons-not-a-collection-of-proofs). These **refine, not supersede** P0-19/20/21/22; preserve all earlier gains, protected Core 41/WP6+rollback, source/cost boundary and C0/C2/Myomaton separation. This is a captured owner decision/documentation, **not implemented source code or a Codex dispatch**.
+**Full existing task correction:** [Issue #12 P0-23](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-6982137262); [C0 P0-22 brief — P0-23 correction](archive/c0-generation-p0-22.md#p0-23-correction--systemic-product-behavior-and-continuously-connected-operating-cycle); [shared Creation/Ongoing — P0-23](shared-intelligence-creation-ongoing-architecture.md#p0-23--real-connected-operating-cycle-with-explicit-interface-beacons-not-a-collection-of-proofs). These **refine, not supersede** P0-19/20/21/22; preserve all earlier gains, protected Core 41/WP6+rollback, source/cost boundary and C0/C2/Myomaton separation. This is a captured owner decision/documentation, **not implemented source code or a Codex dispatch**.
 
 ---
 
@@ -572,7 +572,7 @@ not attribute assistant implementation constraints to owner direction, infer
 malice, or claim a general ChatGPT quality decline without evidence. Continue
 authorized engineering while answering; founder attention and actual money
 are material costs. See [verified diagnosis, local corrections and remaining
-work](c0-creation-quality-p0-17.md#retained-reasoning-inspection-causal-defects-not-another-paid-attempt).
+work](archive/c0-creation-quality-p0-17.md#retained-reasoning-inspection-causal-defects-not-another-paid-attempt).
 This records the discussion; it does not expand live source, financial,
 credential, deployment or publication authority.
 
@@ -592,7 +592,7 @@ path worked. Do not claim verified account exhaustion or recommend purchasing
 credits based solely on that service error. Codex allowance and MioPages API
 usage are separate; “no new API calls” does not mean Codex work is free.
 
-See [implemented source repair and actual hosted-write hold](c0-creation-quality-p0-17.md#prepared-binding-retained-exact-hosted-write-held-by-automatic-review).
+See [implemented source repair and actual hosted-write hold](archive/c0-creation-quality-p0-17.md#prepared-binding-retained-exact-hosted-write-held-by-automatic-review).
 These are operating instructions, not customer business knowledge or new
 financial/deployment/publication authority.
 
@@ -605,7 +605,7 @@ isolated C0 revision70→71 and22→27evidence records, analysis only.
 Preserve history/rollback, public-claim authority, permissions,$8 cap,
 counters and expiry. No model calls, publication or public Core/WordPress
 changes. The correction and independent readback passed; see
-[verified actual result and next boundary](c0-creation-quality-p0-17.md#approved-source-binding-correction-applied-and-independently-verified).
+[verified actual result and next boundary](archive/c0-creation-quality-p0-17.md#approved-source-binding-correction-applied-and-independently-verified).
 This resolves that exact hosted-write hold, not the separate future model/
 iteration/publication gates.
 
@@ -652,7 +652,7 @@ business Knowledge remain distinct complementary references, not one page.
 
 The owner reports $17.58 available API credit. This is not a new dollar ceiling,
 dispatch authorization or invoice evidence. Current work makes no provider call.
-Read [the actual whole-site comparison and proposed revision jobs](c0-creation-quality-p0-17.md#whole-site-comparison-and-recommended-direction--november-20).
+Read [the actual whole-site comparison and proposed revision jobs](archive/c0-creation-quality-p0-17.md#whole-site-comparison-and-recommended-direction--november-20).
 The earlier queued100 output/final cost still require existing SSH-agent access;
 do not regenerate, reset counters or silently replace source97. The supplied local
 review artifact compares actual retained captures and proposed direction only.
@@ -722,7 +722,7 @@ This is an actively maintained checkpoint, not an automatic recording of unsaved
 thoughts or a guarantee against every crash. Capture material decisions early.
 
 **State reconciliation:** paid106 recovery/cost uncertainty in the earlier November
-20 entry is resolved; see [the exact no-dispatch evidence](c0-creation-quality-p0-17.md#paid-correction-recovery-and-cost-reconciliation--november-20).
+20 entry is resolved; see [the exact no-dispatch evidence](archive/c0-creation-quality-p0-17.md#paid-correction-recovery-and-cost-reconciliation--november-20).
 No source97/106 site approval or new grant follows. New product execution is selected
 after this review; a remaining old grant balance or available API credit is not consent.
 
@@ -808,7 +808,7 @@ fact, not evidence that the owner must retain another temporary credential.
 
 ### November 20 — protected account activation approved
 
-The owner replied “Yes” to the exact [consolidated activation scope](account-cycle-hosted-activation.json)
+The owner replied “Yes” to the exact [consolidated activation scope](archive/account-cycle-hosted-activation.json)
 at fcdf635, SHA256 d0aa1d64b2ca934a115b83448b9d75124966461057220835628fd77a2c852460.
 Authorization is recorded in [Issue12 comment7052496871](https://github.com/R-Levin/myomaton-web/issues/12#issuecomment-7052496871).
 Restore/update only existing protected Core, install the exact scoped policy and

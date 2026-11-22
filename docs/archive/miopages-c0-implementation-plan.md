@@ -3,7 +3,7 @@
 ## Status and authority
 
 **READY TO BEGIN C0 IMPLEMENTATION.** This is the approved development handoff
-from [C0 discovery](miopages-c0-business-brief.md) into implementation. It preserves
+from [C0 discovery](../miopages-c0-business-brief.md) into implementation. It preserves
 the IA, customer journeys, content model, capability mapping, conversion model,
 Review/onboarding contracts, Visual Direction inputs, gaps and phased roadmap.
 
@@ -13,8 +13,8 @@ or authorize Phase 1 implementation. Discovery remains closed unless a genuine
 contradiction or missing business fact is exposed.
 
 Implementation findings reflect repository checkpoint `277c094`. The
-[capability catalog](platform-capabilities.md) and
-[deferred register](deferred-architecture.md) own detailed capability and gate
+[capability catalog](../platform-capabilities.md) and
+[deferred register](../deferred-architecture.md) own detailed capability and gate
 contracts; this handoff does not close those gates.
 
 ## Proposed public information architecture
@@ -101,8 +101,8 @@ Existing finite semantic compositions are `asymmetric-field`, `editorial-row`,
 `statement-break`, `image-evidence`, `grouped-field` and `conversion-band`.
 Statement meaning requires explicit semantic selection. Manual reviewed Page
 assembly can precede automatic recipes; conceptual archetypes do not imply an
-implemented archetype engine. See [Sections](sections.md) and
-[Visual Direction](visual-direction.md).
+implemented archetype engine. See [Sections](../sections.md) and
+[Visual Direction](../visual-direction.md).
 
 ## Action and conversion model
 
@@ -151,7 +151,7 @@ questions, synthesis versions, corrections, responsible identities and approval
 records. Keep bounded decision provenance, not an unlimited transcript archive.
 Do not require a fixed number of synthesis passes. Progressive enrichment asks
 only for the highest-value missing information. See
-[onboarding](onboarding-optimization.md).
+[onboarding](../onboarding-optimization.md).
 
 ## Visual Direction input requirements
 
@@ -183,13 +183,13 @@ Some areas have an implemented foundation and a separate missing completion.
 
 GA4 and Search Console are **optional near-term proof spikes**, P24/P25, not
 implemented integrations. They must not block independent first-party measurement.
-See [measurement architecture](measurement-and-analytics.md).
+See [measurement architecture](../measurement-and-analytics.md).
 
 Automatic Page recipes are not implemented, but reviewed assembly with existing
 Sections can proceed. Operator roles need minimum production authorization before
 management is exposed; elaborate team administration can wait. Native Article
 publication and the growth loop are planned core, not public IA blockers. See
-[content growth](content-growth-loop.md).
+[content growth](../content-growth-loop.md).
 
 Relevant gates remain P1–P7 for writers, state, provenance, retention, ownership,
 export and access; P9/P10 for routing/SEO; P11–P14 for intake, measurement,
@@ -198,12 +198,12 @@ for canonical native content and approved publishing. Apply each at its trigger.
 
 ## Phased development roadmap
 
-The separately authorized [first canonical C0 slice](miopages-c0-canonical-state.md)
+The separately authorized [first canonical C0 slice](../miopages-c0-canonical-state.md)
 records the reviewed customer graph and provisional IA. This does not authorize
 final copy, visual selection, operational workflows or commercial publication.
 
 Phase 1's reusable contracts are now implemented in the
-[canonical foundation](canonical-foundation.md). The roadmap below preserves the
+[canonical foundation](../canonical-foundation.md). The roadmap below preserves the
 approved scope; it does not claim dataset creation, final visual selection or production readiness.
 
 ### Phase 1 — Canonical C0 content foundation
@@ -268,8 +268,8 @@ it make MioPages **and the next customer** work? Customer-specific hacks are a
 warning sign. Complexity may scale; customization does not.
 
 Every phase follows **Discuss → Decide → Implement → Analyze → Adjust**.
-Use [service operations](service-operations-model.md) for operating responsibilities
-and [the service model](web-presence-service-model.md) for reusable offer boundaries.
+Use [service operations](../service-operations-model.md) for operating responsibilities
+and [the service model](../web-presence-service-model.md) for reusable offer boundaries.
 
 ## Business fact gaps and readiness
 

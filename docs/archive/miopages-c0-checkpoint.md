@@ -4,7 +4,7 @@
 
 The operator accepted the isolated C0 revamp for this stage, with one correction:
 **Help the right people find you online. Make contacting you a breeze.**
-The [curated accepted content](../scripts/customer-previews/miopages-c0-accepted.json)
+The [curated accepted content](../../scripts/customer-previews/miopages-c0-accepted.json)
 matches the accepted structured draft's content, configuration and destinations
 exactly, except for this required Home Hero correction. Local comparison evidence
 is ignored under `runtime-content/miopages-finalization/`. This is stage acceptance,
@@ -22,7 +22,7 @@ commercial agreement, deeper paid onboarding, approved direction, build/review,
 launch and Ongoing. How It Works remains explanation. Support remains subordinate.
 No Review persistence, prospect records, intake, payment, accounts, onboarding or
 operator-assistance workflow is implemented. The progressive information-reuse
-requirement remains documented in the [conversion-surface learning](miopages-conversion-surfaces.md).
+requirement remains documented in the [conversion-surface learning](../miopages-conversion-surfaces.md).
 
 ## One reproducible execution path
 
@@ -34,16 +34,16 @@ npm run build
 node --env-file=.env.local --import tsx scripts/preview-miopages-c0.ts
 ```
 
-The [builder](../scripts/customer-previews/miopages-c0.ts) consumes curated content,
+The [builder](../../scripts/customer-previews/miopages-c0.ts) consumes curated content,
 stable customer identities/configuration and the current canonical baseline. It
 does not depend on earlier preview scripts, running servers, Word files, receipts
 or generated state. The source manifest is intentionally not a database dump:
 it excludes versions, run timestamps, applied-state receipts, logs and transient
 metadata. Business Knowledge/Offering payloads retain their accepted evidence.
-The [human R3 copy authority](../scripts/customer-previews/miopages-editorial-r3.json)
+The [human R3 copy authority](../../scripts/customer-previews/miopages-editorial-r3.json)
 is retained for provenance and the fifteen-answer FAQ regression.
 
-The [fixture](../scripts/customer-previews/miopages-c0-fixture.ts) snapshots all real
+The [fixture](../../scripts/customer-previews/miopages-c0-fixture.ts) snapshots all real
 customers/migrations read-only, verifies current canonical MioPages matches its
 committed baseline, creates a random isolated `_preview` schema and copies only
 MioPages into it. All draft writes and canonical business reconciliation occur
@@ -52,7 +52,7 @@ Navigation items remain inactive history. Disposable-only obsolete Sections and
 unused label variants are not recreated. Assets are copied into a temporary
 media root and real bytes are verified unchanged.
 
-The [runner](../scripts/preview-miopages-c0.ts) starts a read-only production server
+The [runner](../../scripts/preview-miopages-c0.ts) starts a read-only production server
 with the existing explicit preview gate, validates exact structured rendering,
 Navigation, CTAs, legacy refusal and workflow/media refusal, and prints its URL.
 It writes only ignored local evidence to `runtime-content/miopages-c0/`.
@@ -63,13 +63,13 @@ application mode. Existing earlier preview owners/evidence are not dependencies.
 
 Four existing source files retain bounded generic capabilities:
 
-- [Presentation plan](../lib/platform/presentation/plan.ts): explicit overview
+- [Presentation plan](../../lib/platform/presentation/plan.ts): explicit overview
   recipe restricted to service-led v3; older recipes stay pinned.
-- [Focus stylesheet](../app/focus-presentation.css): recipe-scoped readable overview
+- [Focus stylesheet](../../app/focus-presentation.css): recipe-scoped readable overview
   typography, responsive two/three-column collections and existing spacing/palette.
-- [Focus renderer](../components/managed-sites/focus-page.tsx): overview collection
+- [Focus renderer](../../components/managed-sites/focus-page.tsx): overview collection
   columns and disabled prototype controls behind the explicit disposable gate.
-- [Section normalizer](../lib/platform/managed-sites/sections.ts): bounded Hero/CTA
+- [Section normalizer](../../lib/platform/managed-sites/sections.ts): bounded Hero/CTA
   prototype-control label; ordinary production omits these controls.
 
 No MioPages route, customer ID or copy is embedded in generic runtime code.
@@ -96,8 +96,8 @@ C0 establishment tests remain untouched; final revamp tests have distinct names.
 
 Five final source/test files plus the curated JSON and this document replace the
 25 obsolete paths. Focused final tests are
-[unit/rendering tests](../tests/miopages-c0-revamp.test.tsx) and
-[PostgreSQL/production tests](../tests/integration/miopages-c0-revamp.test.ts).
+[unit/rendering tests](../../tests/miopages-c0-revamp.test.tsx) and
+[PostgreSQL/production tests](../../tests/integration/miopages-c0-revamp.test.ts).
 They retain meaningful identity, copy, FAQ, layout-version, safety-gate, CTA,
 cross-customer asset and real-state preservation coverage instead of assertions
 about superseded editorial variants.

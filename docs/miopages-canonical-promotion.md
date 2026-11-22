@@ -135,7 +135,7 @@ HEAD. Immediate next boundary: design the acquisition/provider/provenance and ap
 pipeline, then separately authorize implementation and approved media rendering.
 
 The initial [customer establishment](miopages-c0-canonical-state.md) and
-[repository checkpoint](miopages-presentation-checkpoint.md) remain historical evidence.
+[repository checkpoint](archive/miopages-presentation-checkpoint.md) remain historical evidence.
 The [content authority contract](content-authority-and-editing.md) documents draft,
 review, reconciliation and proofreading boundaries. The immediate high-priority next
 slice is [media acquisition and external intelligence](deferred-architecture.md#media-acquisition-and-external-intelligence-pipeline).

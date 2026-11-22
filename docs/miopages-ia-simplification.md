@@ -1,4 +1,4 @@
-> Historical checkpoint. Current execution and accepted-state authority: [final C0 checkpoint](miopages-c0-checkpoint.md). Earlier commands, URLs and fingerprints below describe that stage only. Source links now point to retained successor tooling.
+> Historical checkpoint. Current execution and accepted-state authority: [final C0 checkpoint](archive/miopages-c0-checkpoint.md). Earlier commands, URLs and fingerprints below describe that stage only. Source links now point to retained successor tooling.
 
 # MioPages isolated IA and conversion simplification
 

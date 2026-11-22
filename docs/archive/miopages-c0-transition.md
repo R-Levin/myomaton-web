@@ -14,17 +14,17 @@ All nine migration rows and five managed Asset objects were read and verified.
 
 ## Authority and mechanism
 
-The [specific transition](../scripts/customer-updates/miopages-c0-revamp.ts) consumes
-the [consolidated accepted builder](../scripts/customer-previews/miopages-c0.ts) and
-pins the [accepted manifest](../scripts/customer-previews/miopages-c0-accepted.json)
+The [specific transition](../../scripts/customer-updates/miopages-c0-revamp.ts) consumes
+the [consolidated accepted builder](../../scripts/customer-previews/miopages-c0.ts) and
+pins the [accepted manifest](../../scripts/customer-previews/miopages-c0-accepted.json)
 fingerprint. It never reconstructs historical intermediate preview scripts.
 The old graph is the committed canonical promotion's exact `after` graph.
 Other-customer/migration state is pinned to that promotion's preservation digest.
 The entire complete old customer state must match the known baseline; only the
 exact resulting MioPages graph with that same preserved remainder is a retry.
 
-This follows the established [Myomaton v2](../scripts/customer-updates/myomaton-visual-direction-v2.ts)
-and [MioPages promotion](../scripts/customer-updates/miopages-focus.ts) pattern:
+This follows the established [Myomaton v2](../../scripts/customer-updates/myomaton-visual-direction-v2.ts)
+and [MioPages promotion](../../scripts/customer-updates/miopages-focus.ts) pattern:
 one transaction, bounded table/column allowlists, locks covering row drift and
 phantoms, UTC, lock/statement timeouts, parameterized typed rows, exact predecessor
 row predicates, complete postcondition, rollback on any failure. Unexpected old,
@@ -36,14 +36,14 @@ approved evidence and approval identities. Knowledge and integrated Offering eac
 advance from version 1 to 2 with an immutable revision; original revision 1 remains
 exact. This bounded frozen transition writes deterministic current/revision pairs
 directly, rather than use the ordinary writer's random execution-time audit values.
-Revision snapshots follow [canonical writes](../lib/platform/canonical/writes.ts),
+Revision snapshots follow [canonical writes](../../lib/platform/canonical/writes.ts),
 including normalized dates and Offering related AssetUsage. The ordinary canonical
 writer's exact retry validates both resulting pairs in PostgreSQL tests. The fixed
 `preparedAt` is a transition preparation timestamp, not a claimed application or
 new customer approval timestamp. No applied-state receipt is added to customer data.
 
-The [dry-run runner](../scripts/prepare-miopages-c0-transition.ts) has **no real apply
-flag**. Its [fixture](../scripts/customer-previews/miopages-c0-transition-fixture.ts)
+The [dry-run runner](../../scripts/prepare-miopages-c0-transition.ts) has **no real apply
+flag**. Its [fixture](../../scripts/customer-previews/miopages-c0-transition-fixture.ts)
 always creates a fresh random schema, clones both customers and a private copy of
 all migration rows, copies all managed bytes into a temporary root, and redirects
 every transition query/lock to that schema. The real source pool is read-only.
@@ -124,9 +124,9 @@ onboarding, assistance workflow or customer publication is implemented.
 
 ## Verification
 
-Focused [unit tests](../tests/miopages-c0-transition.test.tsx) cover bounded identity
+Focused [unit tests](../../tests/miopages-c0-transition.test.tsx) cover bounded identity
 preservation, deterministic source equivalence and refusal of incomplete graphs.
-The [PostgreSQL test](../tests/integration/miopages-c0-transition.test.ts) checks:
+The [PostgreSQL test](../../tests/integration/miopages-c0-transition.test.ts) checks:
 first/final-write rollback including immutable revisions; unexpected baseline and
 post-state refusal; foreign collision refusal; exact old-to-new application; zero
 write retry; canonical writer compatibility; other customer/migration/AssetUsage
@@ -343,8 +343,8 @@ exact endpoint it began with. Its returned baseline uses PostgreSQL row order so
 unchanged-row comparisons do not mistake ordering for a state change.
 
 Two existing fixture files also require bounded continuity updates:
-[accepted C0 fixture](../scripts/customer-previews/miopages-c0-fixture.ts) and
-[historical disposable fixture](../scripts/customer-previews/disposable.ts).
+[accepted C0 fixture](../../scripts/customer-previews/miopages-c0-fixture.ts) and
+[historical disposable fixture](../../scripts/customer-previews/disposable.ts).
 They recognize the exact new graph through the unchanged real transition guard,
 then reproduce their pinned historical sources only in self-created schemas.
 They do not reset, repair or weaken guards on real state. This preserves original
@@ -353,8 +353,8 @@ without returning that scaffolding to canonical content.
 
 The two historical preview regressions now compare disposable business rows with
 their pinned historical source rather than live post-transition rows:
-[business-focus regression](../tests/integration/business-focus-preview.test.ts)
-and [original-preview regression](../tests/integration/miopages-preview.test.ts).
+[business-focus regression](../../tests/integration/business-focus-preview.test.ts)
+and [original-preview regression](../../tests/integration/miopages-preview.test.ts).
 Their independent checks that real state remains unchanged are retained.
 
 The final source boundary is the six preparation files listed above plus these
@@ -396,15 +396,15 @@ wrong receipt hash representation and was corrected without modifying data.
 Exact checkpoint inventory:
 
 - [Transition documentation](miopages-c0-transition.md)
-- [Guarded transition](../scripts/customer-updates/miopages-c0-revamp.ts)
-- [Transition fixture](../scripts/customer-previews/miopages-c0-transition-fixture.ts)
-- [Preparation runner](../scripts/prepare-miopages-c0-transition.ts)
-- [Focused tests](../tests/miopages-c0-transition.test.tsx)
-- [PostgreSQL transition tests](../tests/integration/miopages-c0-transition.test.ts)
-- [Accepted C0 fixture](../scripts/customer-previews/miopages-c0-fixture.ts)
-- [Historical disposable fixture](../scripts/customer-previews/disposable.ts)
-- [Business-focus preview regression](../tests/integration/business-focus-preview.test.ts)
-- [Original preview regression](../tests/integration/miopages-preview.test.ts)
+- [Guarded transition](../../scripts/customer-updates/miopages-c0-revamp.ts)
+- [Transition fixture](../../scripts/customer-previews/miopages-c0-transition-fixture.ts)
+- [Preparation runner](../../scripts/prepare-miopages-c0-transition.ts)
+- [Focused tests](../../tests/miopages-c0-transition.test.tsx)
+- [PostgreSQL transition tests](../../tests/integration/miopages-c0-transition.test.ts)
+- [Accepted C0 fixture](../../scripts/customer-previews/miopages-c0-fixture.ts)
+- [Historical disposable fixture](../../scripts/customer-previews/disposable.ts)
+- [Business-focus preview regression](../../tests/integration/business-focus-preview.test.ts)
+- [Original preview regression](../../tests/integration/miopages-preview.test.ts)
 
 ### Deferred boundaries
 

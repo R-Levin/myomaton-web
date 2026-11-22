@@ -15,7 +15,7 @@ rather than resets it.
 ## Authority and application status
 
 The approved [business brief](miopages-c0-business-brief.md) supplies business truth;
-the [implementation plan](miopages-c0-implementation-plan.md) supplies the IA.
+the [implementation plan](archive/miopages-c0-implementation-plan.md) supplies the IA.
 This first customer transition was applied and verified in the real development
 database after full disposable validation under separate explicit authorization.
 It is not final public copy,

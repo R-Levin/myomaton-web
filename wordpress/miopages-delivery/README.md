@@ -37,7 +37,7 @@ The smoke test covers the 4/23 inventory, nonpublishable preview gate, rejection
 - Implement a separately authenticated and idempotent **inbound WordPress editorial proposal adapter** with review workflows and central authority in MioPages.
 - Integrate optional **20i service adapter** strictly for provisioning and operations, beginning with read-only inventory.
 
-Refer to `docs/wordpress-delivery-feasibility.md` and `docs/development-control.md` before extending scope.
+Refer to `docs/wordpress-delivery-feasibility.md` and `docs/claude-service-inventory.md` before extending scope.
 
 ## Upgrade from private-preview v0.0.1 to visual-preview v0.0.2
 

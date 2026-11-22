@@ -11,7 +11,7 @@ Use the existing MioPages business as the customer. Preserve all accepted histor
 ## Starting source, provenance and limits
 
 - `docs/miopages-c0-business-brief.md` is the **approved provisional C0 three-pass discovery synthesis**, marked READY FOR IA / CONTENT MODEL. Treat it as authentic customer discovery evidence, not an invented or developer-supplied fixture. It is not final marketing copy, final commercial terms or publication approval.
-- The original three-pass discovery **is partially recoverable**: prior October 5 conversation context yields some exact question prompts and responses, and preserved first-/second-pass syntheses include explicit follow-up question lists. A **complete verbatim, source-audited transcript has not yet been verified**. See [the question recovery audit](c0-discovery-question-recovery-audit.md). Do not invent missing responses or confuse the October 14 Free Review Q&A with the earlier discovery. The interface should distinguish **recovered original Q&A**, **synthesis-only follow-up questions**, the **approved interview/discovery summary**, and **new customer responses**, with provenance attached to each.
+- The original three-pass discovery **is partially recoverable**: prior October 5 conversation context yields some exact question prompts and responses, and preserved first-/second-pass syntheses include explicit follow-up question lists. A **complete verbatim, source-audited transcript has not yet been verified**. See [the question recovery audit](../c0-discovery-question-recovery-audit.md). Do not invent missing responses or confuse the October 14 Free Review Q&A with the earlier discovery. The interface should distinguish **recovered original Q&A**, **synthesis-only follow-up questions**, the **approved interview/discovery summary**, and **new customer responses**, with provenance attached to each.
 - `docs/miopages-c0-canonical-state.md`, `docs/miopages-canonical-promotion.md`, approved service-led v3 previews and existing C0 runtime state remain references, **not automatic inputs to the new initial build**. A baseline comparison may explain improvements, but the new design should emerge from the approved interview knowledge and normal system recommendations and approvals.
 - Reuse the same existing progressive onboarding, knowledge/proposal, content authority, site model and WordPress adapter concepts. Do not construct a parallel C0-only system. The normal rules for confirmed vs inferred vs unresolved facts, sourcing, approval and requested corrections apply.
 - This is a **direct-start/onboarding exercise**: a previous optional Free Review must not be retroactively asserted, and the initial interview should not be repeated solely to drive a UI.
@@ -44,7 +44,7 @@ unresolved commercial/payment gate can only be exercised as an
 explicit **rehearsal surrogate**, never represented as paid/verified
 production activation.
 
-Use [the detailed questionnaire and customer-journey specification](commercial-v1-full-onboarding-questionnaire.md)
+Use [the detailed questionnaire and customer-journey specification](../commercial-v1-full-onboarding-questionnaire.md)
 for provisional customer-facing questions, branches, records, UI
 principles, acceptance checks and the first implementation task.
 Once the full interview/resume is genuinely working, proceed with
@@ -77,10 +77,10 @@ remains a reference, not the product workflow under test.
 
 ## Related canonical contracts
 
-- [Approved C0 discovery synthesis](miopages-c0-business-brief.md)
-- [C0 product model and original proof](miopages-c0-product-model.md)
-- [Progressive onboarding and launch readiness](progressive-onboarding-and-launch-readiness.md)
-- [Customer journey/change authority](customer-journey-and-change-management.md)
-- [WordPress delivery, Appearance and inbound editing](wordpress-delivery-feasibility.md)
-- [Launch and ongoing service operations](service-operations-model.md)
+- [Approved C0 discovery synthesis](../miopages-c0-business-brief.md)
+- [C0 product model and original proof](../miopages-c0-product-model.md)
+- [Progressive onboarding and launch readiness](../progressive-onboarding-and-launch-readiness.md)
+- [Customer journey/change authority](../customer-journey-and-change-management.md)
+- [WordPress delivery, Appearance and inbound editing](../wordpress-delivery-feasibility.md)
+- [Launch and ongoing service operations](../service-operations-model.md)
 - [Development control / live host protection](development-control.md)

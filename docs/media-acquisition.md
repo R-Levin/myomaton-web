@@ -487,6 +487,6 @@ reader and all authority, rights, stale-state and byte safeguards remain.
 No request field or environment flag selects this adapter. Its usages remain
 private and acquired media is still excluded from the legacy public query.
 The actual two-photo result is recorded in
-[c0 creation continuity](c0-creation-quality-p0-17.md#original-evidence-eight-page-wordpress-and-stock-checkpoint--november-18-2026).
+[c0 creation continuity](archive/c0-creation-quality-p0-17.md#original-evidence-eight-page-wordpress-and-stock-checkpoint--november-18-2026).
 Production customer authority, master storage and WordPress synchronization policy
 are not settled by this evaluation bridge.

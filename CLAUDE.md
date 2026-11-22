@@ -16,11 +16,12 @@
 2. `AGENTS.md` (imported above; the previous tool's instructions, including the
    Next.js rules). It still applies where it doesn't conflict with this file. If they
    conflict, follow this file and tell the owner.
-3. `docs/development-control.md` and `docs/owner-critical-conversations.md` for
-   history. Old next-step instructions and grants in them are records, not current
+3. `docs/claude-service-inventory.md`: what exists, how sound it is, and where the
+   damage sits. `docs/owner-critical-conversations.md` holds the owner's recorded
+   decisions (P0-1 to P0-27). `docs/archive/` is Codex-era history: records, never
    orders.
 4. Check the branch, HEAD and uncommitted changes. Active work is
-   `codex/first-operational-cycle-2026-11-12` in this worktree. **Never merge, reset
+   `claude/rebuild-2026-11-22` (based on `codex/first-operational-cycle-2026-11-12`) in this worktree. **Never merge, reset
    or fast-forward `main` or the root branch into it.**
 
 ## Work without asking
