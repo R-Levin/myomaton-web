@@ -3,7 +3,7 @@ name: WordPress isolated Linux rehearsal build
 on:
   workflow_dispatch:
   push:
-    branches: ['docs/wordpress-delivery-feasibility-2026-11-02', 'codex/first-operational-cycle-2026-11-12']
+    branches: ['docs/wordpress-delivery-feasibility-2026-11-02', 'codex/first-operational-cycle-2026-11-12', 'claude/rebuild-2026-11-22']
     paths:
       - 'proxy.ts'
       - 'app/**'
@@ -22,6 +22,8 @@ on:
       - 'scripts/intake/presence-workflow-panel.tsx'
       - 'scripts/intake/current-site-review-panel.tsx'
       - 'scripts/core-native-preview.php'
+      - 'wordpress/**'
+      - 'scripts/intake/**'
       - 'tests/retained-site-review.test.tsx'
       - 'scripts/intake/protected-presence-worker.ts'
       - 'scripts/intake/*presence-evaluation*.ts'
@@ -64,7 +66,7 @@ jobs:
       - run: npm ci
       - name: Select protected Core build for manual dispatch
         run: |
-          if [ "$GITHUB_REF_NAME" = codex/first-operational-cycle-2026-11-12 ]; then
+          if [ "$GITHUB_REF_NAME" = codex/first-operational-cycle-2026-11-12 ] || [ "$GITHUB_REF_NAME" = claude/rebuild-2026-11-22 ]; then
             echo "MIOPAGES_PROTECTED_CORE=enabled" >> "$GITHUB_ENV"
           else
             echo "MIOPAGES_WP_PRIVATE_STAGE=enabled" >> "$GITHUB_ENV"
@@ -111,7 +113,7 @@ jobs:
         run: node scripts/wordpress-rehearsal-artifact.mjs
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.ref_name == 'codex/first-operational-cycle-2026-11-12' && 'protected-core-linux-x64' || 'wordpress-rehearsal-linux-x64' }}
+          name: ${{ (github.ref_name == 'codex/first-operational-cycle-2026-11-12' || github.ref_name == 'claude/rebuild-2026-11-22') && 'protected-core-linux-x64' || 'wordpress-rehearsal-linux-x64' }}
           path: |
             runtime-content/wordpress-rehearsal-artifact/*.tar.gz
             runtime-content/wordpress-rehearsal-artifact/miopages-delivery-development.zip
