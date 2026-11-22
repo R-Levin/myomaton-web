@@ -45,8 +45,8 @@ final class DraftTestDatabase
             return $this->state === null ? null : ['option_value' => json_encode($this->state, JSON_THROW_ON_ERROR)];
         }
         $row = $this->pages[$args[0]] ?? null;
-        unset($row['ID']);
-        return $row;
+        // Only the columns the writer's query selects, as real WordPress returns them.
+        return $row === null ? null : array_intersect_key($row, array_flip(['post_type', 'post_status', 'post_title', 'post_content', 'post_name']));
     }
     public function insert(string $table, array $fields): int { return $this->update($table, $fields, []); }
     public function update(string $table, array $fields, array $where): int

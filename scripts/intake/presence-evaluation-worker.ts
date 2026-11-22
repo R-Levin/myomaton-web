@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { designProjection } from "../../lib/platform/design-systems/site-design";
-import { mkdir, open, readFile, realpath, lstat } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir, open, readFile, readdir, realpath, lstat } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { Pool } from "pg";
 import { fingerprint } from "../../lib/platform/canonical/model";
 import { validatePages } from "../../lib/platform/wordpress-delivery/authority";
@@ -29,6 +29,7 @@ import {rebuiltRunApproval} from "../../lib/platform/intake/c0-rebuilt-run";
 import {prepareOriginalCustody} from "../../lib/platform/intake/presence-original-custody";
 import {publicCaptureBridge} from "../../lib/platform/intake/presence-public-capture-bridge";
 import { summarizePresenceWorkflowUsage } from "../../lib/platform/intake/intelligent-responses";
+import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig, type ReviewDeliveryState } from "../../lib/platform/wordpress-delivery/operator-review";
 
 const digest = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 const manifestFile = "docs/presence-evaluation-activation.json";
@@ -200,8 +201,10 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const replaceReport = operation === "replace-report" && approval === commercialApproval;
   const researchReplay = operation === "replay-research";
   const completeResearch = (operation === "complete-research" || researchReplay) && approval === commercialApproval;
+  // Review drafts to Operator WordPress and read-back (owner decisions, Nov 22). No AI calls.
+  const delivery = ["deliver-review", "read-back"].includes(operation) && approval === rebuiltRunApproval;
   if ((scenario !== "c0" && scenario !== "c2") || !approval || extra.length ||
-      !(readOnly || editing || operation === "activate" || operation === "work" || operation === "preflight" || completeResearch || replaceReport) || (editing ? !value : Boolean(value))) {
+      !(readOnly || editing || delivery || operation === "activate" || operation === "work" || operation === "preflight" || completeResearch || replaceReport) || (editing || delivery ? !value : Boolean(value))) {
     throw Error("Evaluation command refused");
   }
   const instance = await openEvaluationWorker({ scenario, approval, databaseUrl: env.MIOPAGES_EVALUATION_DATABASE_URL ?? "",
@@ -235,6 +238,28 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       return { next: prior.next, version: prior.version, file: path };
     }
     if (!prior) throw Error("Evaluation workflow is not started");
+    if (delivery) {
+      const request = JSON.parse(value) as { site?: unknown; version?: unknown };
+      if (typeof request.site !== "string" || !/^[a-z0-9-]{1,40}$/u.test(request.site)) throw Error("Operator site name required");
+      // Core's protected configuration on the Core server: miopages-private-acceptance/wordpress-sites/<site>.json
+      const parent = dirname(dirname(root));
+      const config = readOperatorSiteConfig(await privateWorkflowFile(join(parent, "wordpress-sites", request.site + ".json"), parent, 64_000));
+      const prefix = `wordpress-${request.site}-r`;
+      const history = (await readdir(root)).filter(name => name.startsWith(prefix) && name.endsWith(".json"))
+        .map(name => name.slice(prefix.length, -".json".length)).filter(number => /^[0-9]+$/u.test(number))
+        .map(Number).sort((a, b) => a - b);
+      const state = history.length ? await privateWorkflowFile<ReviewDeliveryState>(join(root, `wordpress-${request.site}-r${history.at(-1)}.json`), root) : null;
+      if (operation === "read-back") {
+        const { readback, summary } = await readBackOperatorSite(config);
+        const file = join(root, `readback-${request.site}-${new Date().toISOString().replace(/[:.]/gu, "-")}.json`);
+        await createPrivate(file, JSON.stringify(readback, null, 2) + "\n");
+        return { site: request.site, delivered: state?.revision ?? null, ...summary, file };
+      }
+      if (request.version !== prior.version) throw Error("Evaluation view is stale");
+      const { state: next, receipt } = await deliverReviewDraft({ config, context, view: prior, state });
+      await createPrivate(join(root, `wordpress-${request.site}-r${next.revision}.json`), JSON.stringify({ ...next, receipt }, null, 2) + "\n");
+      return { site: request.site, revision: next.revision, workflowVersion: prior.version, pages: receipt.posts.map(post => ({ path: post.path, id: post.id })) };
+    }
     if (["home", "site", "local-site", "local-home"].includes(operation)) {
       const localDraft = operation.startsWith("local-");
       const packetType = operation === "local-home" ? "home" : operation === "local-site" ? "site" : operation;

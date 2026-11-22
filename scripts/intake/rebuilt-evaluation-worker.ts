@@ -11,7 +11,9 @@ import { evaluationCommand } from "./presence-evaluation-worker";
 
 const [operation, value, ...extra] = process.argv.slice(2);
 const operations = ["prepare-database", "activate", "preflight", "work", "inspect", "continue", "local-site", "editorial-review-input",
-  "critique-site", "commercial-replan", "revise-site", "revise-local-page", "decide-editorial", "recover", "retry", "resume-undispatched"];
+  "critique-site", "commercial-replan", "revise-site", "revise-local-page", "decide-editorial", "recover", "retry", "resume-undispatched",
+  // Review drafts to Operator WordPress and read-back (owner decisions, Nov 22).
+  "deliver-review", "read-back"];
 
 async function main() {
   if (!operations.includes(operation) || extra.length) throw Error("Fixed rebuilt-run operation required");

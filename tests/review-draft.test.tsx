@@ -6,6 +6,7 @@ import { draftBrand } from "../lib/platform/wordpress-delivery/draft-brand";
 import { readNativeDraftEnvelope, reviewDraftEnvelope } from "../lib/platform/wordpress-delivery/native-draft-envelope";
 import { bindReviewDraft } from "../lib/platform/wordpress-delivery/review-draft";
 import { draftEndpoint, sendSignedDraft } from "../lib/platform/wordpress-delivery/review-delivery";
+import { readbackRequest, summarizeReadback, verifyReadback } from "../lib/platform/wordpress-delivery/readback";
 import type { NativeNode } from "../lib/platform/intake/presence-native-component";
 
 type ReviewInput = Parameters<typeof bindReviewDraft>[0]["review"];
@@ -141,4 +142,49 @@ test("Core delivers over the plugin's web endpoint and accepts only WordPress's 
     secret, expected, fetcher), /HTTP 422/, "WordPress refuses a package Core did not sign");
   assert.throws(() => draftEndpoint({ origin: "http://drafts.example.test" }), /refused/, "Plain HTTP only for a loopback test site");
   assert.equal(String(draftEndpoint({ origin: "http://127.0.0.1:4474" })), "http://127.0.0.1:4474/?rest_route=/miopages/v1/draft");
+});
+
+test("Core reads back the Operator's edits and Notes, each Note tied to its block, and trusts only a signed answer", () => {
+  const secret = Buffer.alloc(32, 9);
+  const pull = { secretHex: secret.toString("hex"), identity: { installationId } };
+  const first = draft(1, null);
+  const wire = JSON.stringify(reviewDraftEnvelope(first, "fixture-key", publicKeyBase64, privateKey));
+  // The Operator rewrites one sentence and adds a Note to the opening paragraph (WordPress stores
+  // the Note's id in that block's metadata), plus a reply and a resolved Note.
+  const edits = { "/": ["What the fixture business does, said plainly.", "What we do, in one plain sentence."],
+    "/start": ["<!-- wp:paragraph {\"className\":\"miopages-pending-action\"} -->",
+      "<!-- wp:paragraph {\"metadata\":{\"noteId\":[41]},\"className\":\"miopages-pending-action\"} -->"] };
+  const notes = [
+    { id: 41, path: "/start", text: "Connect this to the real Direct Start form." },
+    { id: 42, path: "/start", parent: 41, text: "Form is not built yet; keep the notice for now." },
+    { id: 43, path: "/", text: "Old note, already handled.", status: "resolved" },
+  ];
+  const run = (request: unknown, key = secret) => {
+    const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/review-draft-writer.php"],
+      { input: JSON.stringify({ mode: "readback", identity, pull: { ...pull, secretHex: key.toString("hex") }, wires: [wire], edits, notes,
+        request: JSON.stringify(request) }), encoding: "utf8" });
+    assert.equal(php.status, 0, php.stderr);
+    assert.ok(php.stdout.startsWith("{"), php.stdout.slice(0, 600));
+    return JSON.parse(php.stdout).responses[0];
+  };
+  const { nonce, wire: request } = readbackRequest(installationId, "fixture-key", privateKey);
+  const answer = run(request);
+  assert.equal(answer.status, 200);
+  const readback = verifyReadback(answer.body, secret, { installationId, nonce });
+  assert.equal(readback.revision, 1);
+  const summary = summarizeReadback(readback);
+  assert.deepEqual(summary.editedPages.sort(), ["/", "/start"]);
+  assert.equal(readback.pages.find(page => page.path === "/")!.content!.includes("What we do, in one plain sentence."), true);
+  assert.equal(summary.openNotes.length, 1);
+  const [note] = summary.openNotes;
+  assert.equal(note.path, "/start");
+  assert.equal(note.text, "Connect this to the real Direct Start form.");
+  assert.deepEqual(note.block, { name: "paragraph", text: "Begin the fixture start — preview only; submissions disabled" });
+  assert.equal(note.replies[0].text, "Form is not built yet; keep the notice for now.");
+  assert.equal(summary.resolvedNotes.length, 1);
+  // A forged or replayed answer is refused; so is a request Core did not sign.
+  assert.throws(() => verifyReadback(answer.body, Buffer.alloc(32, 1), { installationId, nonce }), /authentication/);
+  assert.throws(() => verifyReadback(answer.body, secret, { installationId, nonce: "0".repeat(32) }), /mismatch/);
+  const other = generateKeyPairSync("ed25519").privateKey;
+  assert.equal(run(readbackRequest(installationId, "fixture-key", other).wire).status, 422);
 });

@@ -3,7 +3,8 @@
  * Core's web endpoint into this WordPress site (owner decision, Nov 22: Core reaches
  * WordPress over HTTPS, never by shell access to the hosting).
  *
- * POST /wp-json/miopages/v1/draft with a Core-signed draft package as the body. The
+ * POST /wp-json/miopages/v1/draft with a Core-signed draft package as the body
+ * (read-back: /readback, see MioPages_Delivery_Readback). The
  * signature is the authentication: the package must verify against this site's enrolled
  * Core key, name this installation, and follow the last applied revision. The reply is
  * the same HMAC-signed receipt the command-line path returns.
@@ -19,6 +20,7 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/class-miopages-native-draft-writer.php';
 require_once __DIR__ . '/class-miopages-native-draft-receipt.php';
+require_once __DIR__ . '/class-miopages-delivery-readback.php';
 
 final class MioPages_Delivery_Endpoint
 {
@@ -50,6 +52,17 @@ final class MioPages_Delivery_Endpoint
                 'callback' => static function (WP_REST_Request $request) {
                     nocache_headers();
                     [$status, $body] = self::draft($request->get_body(), MIOPAGES_NATIVE_DRAFT_IDENTITY,
+                        defined('MIOPAGES_PRIVATE_PULL') ? MIOPAGES_PRIVATE_PULL : null);
+                    return new WP_REST_Response($body, $status);
+                },
+            ]);
+            // Read-only: the delivered pages as they are now, and their Notes.
+            register_rest_route(self::NAMESPACE, '/readback', [
+                'methods' => 'POST',
+                'permission_callback' => '__return_true',
+                'callback' => static function (WP_REST_Request $request) {
+                    nocache_headers();
+                    [$status, $body] = MioPages_Delivery_Readback::handle($request->get_body(), MIOPAGES_NATIVE_DRAFT_IDENTITY,
                         defined('MIOPAGES_PRIVATE_PULL') ? MIOPAGES_PRIVATE_PULL : null);
                     return new WP_REST_Response($body, $status);
                 },

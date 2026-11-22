@@ -10,7 +10,7 @@
  */
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createHash, generateKeyPairSync, randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -26,6 +26,7 @@ import { workflowNativeReviewCandidate } from "../../lib/platform/intake/presenc
 import { pendingContent, type NativeNode } from "../../lib/platform/intake/presence-native-component";
 import type { MarketingAuthority } from "../../lib/platform/intake/presence-marketing-authority";
 import { IntakeService } from "../../lib/platform/intake/service";
+import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig } from "../../lib/platform/wordpress-delivery/operator-review";
 
 type Schema = { properties?: Record<string, Schema>; items?: Schema; enum?: unknown[] };
 const enumAt = (schema: Schema, ...path: string[]) => {
@@ -170,6 +171,47 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.match(php.stdout, /miopages-fpo/);
     assert.match(php.stdout, /Customer testimonial needed/);
     assert.ok(requests.some(row => row.name === "presence_workflow_direction"));
+    // Core delivers this site as a review draft to an Operator WordPress over the plugin's web
+    // endpoint, reads back the Operator's edit and Note, and refuses to overwrite the edit.
+    const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+    const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
+    await writeFile(join(root, "wordmark.png"), png);
+    const config = readOperatorSiteConfig({ name: "dry-run", origin: "https://operator.example.test", gate: { user: "gate", password: "fixture-only" },
+      organizationId: randomUUID(), installationId: randomUUID(), streamId: randomUUID(), keyId: "dry-run-key",
+      signingKeyPkcs8Base64: privateKey.export({ format: "der", type: "pkcs8" }).toString("base64"),
+      publicKeyBase64: Buffer.from(publicKey.export({ format: "jwk" }).x!, "base64url").toString("base64"),
+      receiptSecretHex: "ab".repeat(32),
+      logo: { assetId: randomUUID(), usageId: randomUUID(), alt: "MioPages", file: join(root, "wordmark.png"), sha256: createHash("sha256").update(png).digest("hex") } });
+    const identity = { organizationId: config.organizationId, ...context.scope, installationId: config.installationId, keyId: config.keyId,
+      publicKeyBase64: config.publicKeyBase64, deliveryUser: "core-delivery" };
+    const site = { store: join(root, "wordpress.bin"), identity, pull: { secretHex: config.receiptSecretHex, identity: { installationId: config.installationId } } };
+    const wordpress = (input: object) => {
+      const result = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/review-draft-writer.php"],
+        { input: JSON.stringify({ ...site, ...input }), encoding: "utf8" });
+      assert.equal(result.status, 0, result.stderr + result.stdout.slice(0, 400));
+      return JSON.parse(result.stdout);
+    };
+    const fetcher = (async (url: URL, init: RequestInit) => {
+      const route = new URL(url).searchParams.get("rest_route");
+      const out = route === "/miopages/v1/draft" ? wordpress({ mode: "endpoint", wires: [init.body] })
+        : route === "/miopages/v1/readback" ? wordpress({ mode: "readback", request: init.body }) : null;
+      assert.ok(out, "Unexpected WordPress route " + route);
+      return new Response(JSON.stringify(out.responses[0].body), { status: out.responses[0].status });
+    }) as unknown as typeof fetch;
+    const first = await deliverReviewDraft({ config, context, view, state: null, fetcher });
+    assert.equal(first.state.revision, 1);
+    assert.deepEqual(first.receipt.posts.map(post => post.path), ["/", "/service", "/start"]);
+    const second = await deliverReviewDraft({ config, context, view, state: first.state, fetcher });
+    assert.equal(second.state.revision, 2, "An unedited site can be delivered again");
+    const delivered = wordpress({ mode: "operator" });
+    assert.equal(Object.keys(delivered.ids).length, 3);
+    wordpress({ mode: "operator", edits: { "/service": ["</h1>", " (edited by the Operator)</h1>"] },
+      notes: [{ id: 501, path: "/start", text: "Make the first step shorter." }] });
+    const { summary } = await readBackOperatorSite(config, fetcher);
+    assert.deepEqual(summary.editedPages, ["/service"]);
+    assert.equal(summary.openNotes[0].text, "Make the first step shorter.");
+    await assert.rejects(deliverReviewDraft({ config, context, view, state: second.state, fetcher }),
+      /Operator edits on \/service must be taken into Core/);
     if (process.env.MIOPAGES_DRY_RUN_EXPORT) await writeFile(process.env.MIOPAGES_DRY_RUN_EXPORT,
       JSON.stringify({ review, home: php.stdout, requests: requests.map(row => row.name) }, null, 2));
   } finally {
