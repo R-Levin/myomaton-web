@@ -35,8 +35,14 @@ run pauses when the pages need a rendered critique.
 2. Download the packet and its receipt/intent into
    `runtime-content/p022-wp-validation/source-aware-incoming/`.
 3. Locally: `MIOPAGES_RUN=rebuilt php scripts/intake/source-aware-local-wordpress.php <p022 root> site-<version>.json`
-   (with the SQLite PHP extension flags).
-4. The owner reviews on local WordPress, http://127.0.0.1:4474.
+   (with the SQLite PHP extension flags). Running it again for the same version (e.g.
+   after a renderer fix) re-renders the same pages and keeps every earlier snapshot. It
+   overwrites the page text, so check first that nobody has saved edits or notes there.
+4. The owner reviews on local WordPress, http://127.0.0.1:4474, and can edit and add
+   Notes in the block editor (wp-admin → Pages; log in with the local account). Every
+   block Core renders is one the editor accepts, and a page saved without changes stays
+   identical, so Core's later read-back sees only real edits. A note is tied to its block
+   once the page is saved ("Save draft").
 
 ## 5. Critique and revise (**$**, up to two rounds)
 1. Capture the rendered pages locally (`source-aware-local-capture.ts`) and upload them

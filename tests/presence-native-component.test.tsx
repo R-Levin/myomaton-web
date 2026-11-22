@@ -11,6 +11,14 @@ function node(kind: NativeNode["kind"], changes: Partial<NativeNode> = {}): Nati
     layout: { arrangement: "flow", columns: [], gap: "medium", inset: "none", surface: "none",
       align: "start", measure: "full", typeScale: "body", span: 1, mobileOrder: 0, border: false, rounded: false }, children: [], ...changes };
 }
+/** The theme's column-template CSS for this markup, exactly as WordPress adds it. */
+function layoutCss(html: string): string {
+  const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php",
+    ["-r", 'require "wordpress/miopages-managed-site/layout-css.php"; echo miopages_layout_css(stream_get_contents(STDIN));'],
+    { input: html, encoding: "utf8" });
+  assert.equal(php.status, 0, php.stderr);
+  return php.stdout;
+}
 export const component = {
   version: 2, name: "fixture-decision-map", purpose: "Synthetic layout round trip", mode: "supplement",
   root: node("group", {
@@ -50,7 +58,14 @@ test("original component structure survives Core validation and native WordPress
   assert.equal(php.status, 0, php.stderr);
   const html = php.stdout;
   assert.match(html, /wp:details/);
-  assert.match(html, /minmax\(0,2fr\) minmax\(0,1fr\)/);
+  // Layout travels as classes the WordPress editor keeps; inline styles make it reject the block.
+  assert.match(html, /miopages-cols-2-1/);
+  assert.match(html, /miopages-span-1/);
+  assert.doesNotMatch(html, / style="/);
+  // Markup matches what the editor itself saves, so an unedited block reads back unchanged.
+  assert.doesNotMatch(html, /"level":2[,}]|"ordered":false|&#039;|&#038;| \/>/);
+  assert.match(html, /"metadata":\{"name":"fixture-decision-map"\},"className"/);
+  assert.match(layoutCss(html), /\.miopages-cols-2-1\{--mp-columns:minmax\(0,2fr\) minmax\(0,1fr\);\}/);
   assert.match(html, /Fixture first decision/);
   assert.match(html, /Fixture second decision/);
   assert.ok(html.indexOf("Fixture first decision") < html.indexOf("Fixture second decision"));
@@ -89,7 +104,7 @@ test("the existing disposable WordPress renders nested blocks and responsive ord
   try {
     for (const width of [1440, 390]) {
       const page = await browser.newPage({ viewport: { width, height: 900 } });
-      await page.setContent('<!doctype html><meta name="viewport" content="width=device-width"><style>body{margin:0;padding:24px;--miopages-border:#ddd;--wp--preset--color--support:#e9e5f7;--miopages-tonal-ink:#2d2460}*{box-sizing:border-box}</style><style>' + css + '</style><main>' + result.html + '</main>');
+      await page.setContent('<!doctype html><meta name="viewport" content="width=device-width"><style>body{margin:0;padding:24px;--miopages-border:#ddd;--wp--preset--color--support:#e9e5f7;--miopages-tonal-ink:#2d2460}*{box-sizing:border-box}</style><style>' + css + layoutCss(result.html) + '</style><main>' + result.html + '</main>');
       const columns = page.locator(".miopages-node-columns > .miopages-node");
       const first = await columns.nth(0).boundingBox(), second = await columns.nth(1).boundingBox();
       assert.ok(first && second);
@@ -161,7 +176,7 @@ test("nested comparisons keep readable columns inside an aligned native flow",as
  const browser=await chromium.launch({executablePath:process.platform==="win32"?"C:/Program Files/Google/Chrome/Application/chrome.exe":undefined,headless:true});
  try{for(const width of [1440,390]){
   const page=await browser.newPage({viewport:{width,height:1000}});
-  await page.setContent('<style>body{margin:0;padding:24px}*{box-sizing:border-box}</style><style>'+css+'</style>'+php.stdout);
+  await page.setContent('<style>body{margin:0;padding:24px}*{box-sizing:border-box}</style><style>'+css+layoutCss(php.stdout)+'</style>'+php.stdout);
   const widths=await page.locator(".miopages-native-component p").evaluateAll(nodes=>nodes.map(node=>({width:node.getBoundingClientRect().width,overflow:(node as HTMLElement).scrollWidth>(node as HTMLElement).clientWidth+1})));
   assert.equal(widths.length,2);for(const item of widths){assert.ok(item.width>200,JSON.stringify({width,item}));assert.equal(item.overflow,false)}
   await page.close();

@@ -1,8 +1,15 @@
 <?php
 /** Styles for Core's managed draft blocks. */
 require_once __DIR__ . '/draft-brand.php';
+require_once __DIR__ . '/layout-css.php';
+
 add_action('wp_enqueue_scripts', static function (): void {
     wp_enqueue_style('miopages-managed-site', get_stylesheet_uri(), [], wp_get_theme()->get('Version'));
+    $post = get_queried_object();
+    if ($post instanceof WP_Post) {
+        $layout = miopages_layout_css($post->post_content);
+        if ($layout !== '') wp_add_inline_style('miopages-managed-site', $layout);
+    }
     $brand = miopages_draft_brand();
     if (!$brand) return;
     $p = $brand['palette'];

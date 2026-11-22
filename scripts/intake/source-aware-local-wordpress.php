@@ -47,7 +47,9 @@ foreach($ids as $route=>$id){$post=get_post($id,ARRAY_A);if(!$post||$post['post_
  $before[$route]=array_intersect_key($post,array_flip(['ID','post_title','post_content','post_excerpt','post_name','post_status','post_type']));
  foreach(['_miopages_source_aware_case','_miopages_source_candidate_digest','_miopages_draft_brand'] as $key)$beforeMeta[$route][$key]=get_post_meta($id,$key,true);}
 $snapshot=$root.'/source-aware-before-'.$argv[2];
-if(is_file($snapshot))throw new RuntimeException('Preserve existing materialization evidence; inspect before retry.');
+// Re-rendering the same version (e.g. after a renderer fix) keeps every earlier snapshot.
+if(is_file($snapshot))$snapshot=$root.'/source-aware-before-'.basename($argv[2],'.json').'-'.gmdate('Ymd\THis\Z').'.json';
+if(is_file($snapshot))exit(22);
 file_put_contents($snapshot,json_encode(['pages'=>$before,'metadata'=>$beforeMeta,'renderText'=>is_file($root.'/source-aware-render.json')?file_get_contents($root.'/source-aware-render.json'):null,'render'=>is_file($root.'/source-aware-render.json')?json_decode(file_get_contents($root.'/source-aware-render.json'),true):null],JSON_THROW_ON_ERROR));
 $visible=[];
 foreach($candidate['pages'] as $page){

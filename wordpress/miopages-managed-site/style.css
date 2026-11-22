@@ -186,6 +186,19 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
 .miopages-native-component .miopages-node-flow { display: block; }
 .miopages-native-component .miopages-node-row { display: flex; flex-wrap: wrap; }
 .miopages-native-component .miopages-node-columns { display: grid; grid-template-columns: var(--mp-columns); }
+/* Layout arrives as classes (editor-safe). Column templates come from miopages_layout_css(). */
+.miopages-span-1 { --mp-span: 1; }
+.miopages-span-2 { --mp-span: 2; }
+.miopages-span-3 { --mp-span: 3; }
+.miopages-span-4 { --mp-span: 4; }
+.miopages-span-5 { --mp-span: 5; }
+.miopages-span-6 { --mp-span: 6; }
+.miopages-span-7 { --mp-span: 7; }
+.miopages-span-8 { --mp-span: 8; }
+.miopages-span-9 { --mp-span: 9; }
+.miopages-span-10 { --mp-span: 10; }
+.miopages-span-11 { --mp-span: 11; }
+.miopages-span-12 { --mp-span: 12; }
 .miopages-native-component .miopages-node-gap-none { gap: 0; }
 .miopages-native-component .miopages-node-gap-small { gap: .75rem; }
 .miopages-native-component .miopages-node-gap-medium { gap: 1.25rem; }

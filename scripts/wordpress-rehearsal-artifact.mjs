@@ -104,6 +104,8 @@ if (core) {
     ['wordpress/miopages-delivery/includes/class-miopages-native-component.php', 'class-miopages-native-component.php'],
     ['wordpress/miopages-delivery/includes/class-miopages-native-draft-content.php', 'class-miopages-native-draft-content.php'],
     ['wordpress/miopages-managed-site/style.css', 'managed-site.css'],
+    // Column templates for the renderer's layout classes, exactly as the theme adds them.
+    ['wordpress/miopages-managed-site/layout-css.php', 'layout-css.php'],
     // Self-hosted fonts for Core-designed previews (rebuild step 2).
     ...(await readdir('wordpress/miopages-managed-site/fonts')).filter(name => name.endsWith('.woff2'))
       .map(name => ['wordpress/miopages-managed-site/fonts/' + name, 'fonts/' + name]),

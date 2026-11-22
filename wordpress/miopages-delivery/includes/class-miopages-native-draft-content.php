@@ -6,6 +6,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/class-miopages-native-component.php';
+
 final class MioPages_Native_Draft_Content
 {
     /**
@@ -96,19 +98,10 @@ final class MioPages_Native_Draft_Content
                     throw new InvalidArgumentException('Native draft section is unsupported.');
                 }
                 $blocks[] = '<!-- wp:heading --><h2 class="wp-block-heading">'
-                    . esc_html($section['content']['heading']) . '</h2><!-- /wp:heading -->';
-                $blocks[] = self::paragraph(nl2br(esc_html($section['content']['text']), false));
+                    . MioPages_Native_Component::text($section['content']['heading']) . '</h2><!-- /wp:heading -->';
+                $blocks[] = self::paragraph(nl2br(MioPages_Native_Component::text($section['content']['text']), false));
                 $sectionId = $section['id'] ?? '';
-                if (isset($attachments[$sectionId])) {
-                    $attachment = $attachments[$sectionId];
-                    $id = $attachment['id'];
-                    $image = $attachment['media'];
-                    $src = MioPages_Native_Draft_Media::url($id);
-                    $blocks[] = '<!-- wp:image {"id":' . $id . '} --><figure class="wp-block-image">'
-                        . '<img class="wp-image-' . $id . '" src="' . esc_url($src)
-                        . '" alt="' . esc_attr($image['alt']) . '" width="' . $image['width']
-                        . '" height="' . $image['height'] . '" /></figure><!-- /wp:image -->';
-                }
+                if (isset($attachments[$sectionId])) $blocks[] = self::image($attachments[$sectionId]);
             }
             foreach ($actions as $action) {
                 if ($action['from'] === $path) {
@@ -149,7 +142,6 @@ final class MioPages_Native_Draft_Content
             }
         }
         $componentImages = [];
-        require_once __DIR__ . '/class-miopages-native-component.php';
         foreach ($page['sections'] as $index => $section) {
             if (isset($attachments[$section['id']])) $componentImages['section-' . $index] = $attachments[$section['id']];
             elseif (self::wantsFpo($section)) $componentImages['section-' . $index] = ['fpo'=>$section['visual']];
@@ -182,7 +174,7 @@ final class MioPages_Native_Draft_Content
             $tag = $type === 'hero' ? 'h1' : 'h2';
             $attrs = $type === 'hero' ? ' {"level":1}' : '';
             $content = '<!-- wp:heading' . $attrs . ' --><' . $tag . ' class="wp-block-heading">'
-                . esc_html($section['content']['heading']) . '</' . $tag . '><!-- /wp:heading -->';
+                . MioPages_Native_Component::text($section['content']['heading']) . '</' . $tag . '><!-- /wp:heading -->';
             if (($section['block']['version'] ?? null) === 2 && ($section['block']['mode'] ?? null) === 'section') {
                 $levels = [];
                 $collect = static function (array $node) use (&$collect, &$levels): void {
@@ -208,7 +200,7 @@ final class MioPages_Native_Draft_Content
                     . '<section class="wp-block-group ' . $class . '">' . $authored . '</section><!-- /wp:group -->';
                 continue;
             }
-            $content .= self::paragraph(nl2br(esc_html($section['content']['text']), false));
+            $content .= self::paragraph(nl2br(MioPages_Native_Component::text($section['content']['text']), false));
             if (!empty($placedActions[$id])) {
                 $buttons = [];
                 foreach ($placedActions[$id] as $action) {
@@ -242,7 +234,7 @@ final class MioPages_Native_Draft_Content
         if (!is_string($text) || trim($text) === '' || strlen($text) > $bytes || preg_match('/[<>\x00-\x08\x0b\x0c\x0e-\x1f]/', $text)) {
             throw new InvalidArgumentException('Semantic draft text refused.');
         }
-        return esc_html($text);
+        return MioPages_Native_Component::text($text);
     }
 
     private static function semanticBlock(mixed $value, int $headingLevel, array $images = [], array $actions = [], array $postIds = []): string
@@ -273,7 +265,7 @@ final class MioPages_Native_Draft_Content
                 throw new InvalidArgumentException('Semantic draft group refused.');
             }
             $content .= '<!-- wp:group {"className":"miopages-semantic-group"} --><div class="wp-block-group miopages-semantic-group">'
-                . '<!-- wp:heading {"level":' . $headingLevel . '} --><' . $heading . ' class="wp-block-heading">'
+                . '<!-- wp:heading' . ($headingLevel === 2 ? '' : ' {"level":' . $headingLevel . '}') . ' --><' . $heading . ' class="wp-block-heading">'
                 . self::semanticText($group['heading'], 960) . '</' . $heading . '><!-- /wp:heading -->'
                 . self::paragraph(nl2br(self::semanticText($group['body'], 6000), false));
             if ($group['items'] !== []) {
@@ -294,10 +286,11 @@ final class MioPages_Native_Draft_Content
     {
         $id = $attachment['id'];
         $image = $attachment['media'];
+        // Exactly what WordPress's own image block saves, so the editor accepts it. Width and
+        // height attributes are not part of that markup; the image keeps its own proportions.
         return '<!-- wp:image {"id":' . $id . '} --><figure class="wp-block-image">'
-            . '<img class="wp-image-' . $id . '" src="' . esc_url(MioPages_Native_Draft_Media::url($id))
-            . '" alt="' . esc_attr($image['alt']) . '" width="' . $image['width'] . '" height="' . $image['height']
-            . '" /></figure><!-- /wp:image -->';
+            . '<img src="' . MioPages_Native_Component::href(MioPages_Native_Draft_Media::url($id)) . '" alt="' . htmlspecialchars($image['alt'], ENT_COMPAT | ENT_SUBSTITUTE, 'UTF-8')
+            . '" class="wp-image-' . $id . '"/></figure><!-- /wp:image -->';
     }
 
     /** Core asked for an image (asset-needed / rights-review) in its section visual. */
@@ -314,7 +307,7 @@ final class MioPages_Native_Draft_Content
     private static function link(int $postId, string $label, string $class = ''): string
     {
         return '<a' . ($class !== '' ? ' class="' . esc_attr($class) . '"' : '') . ' href="'
-            . esc_url(home_url('/?page_id=' . $postId . '&preview=true')) . '">'
-            . esc_html($label) . '</a>';
+            . MioPages_Native_Component::href(home_url('/?page_id=' . $postId . '&preview=true')) . '">'
+            . MioPages_Native_Component::text($label) . '</a>';
     }
 }

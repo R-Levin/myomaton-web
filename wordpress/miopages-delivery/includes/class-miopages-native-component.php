@@ -40,7 +40,7 @@ final class MioPages_Native_Component
             throw new InvalidArgumentException('Supporting component cannot introduce a Page title.');
         }
         $class = 'miopages-native-component miopages-component-' . $value['name'];
-        return '<!-- wp:group ' . self::json(['className'=>$class,'metadata'=>['name'=>$value['name']]]) . ' -->'
+        return '<!-- wp:group ' . self::json(['metadata'=>['name'=>$value['name']],'className'=>$class]) . ' -->'
             . '<div class="wp-block-group ' . $class . '">' . self::node($value['root'], $images, $actions, $postIds, 0, false, $localPending)
             . '</div><!-- /wp:group -->';
     }
@@ -92,7 +92,33 @@ final class MioPages_Native_Component
         if (!is_string($value) || trim($value) === '' || preg_match('/[<>\x00-\x08\x0b\x0c\x0e-\x1f]/', $value)) {
             throw new InvalidArgumentException('Native component text refused.');
         }
-        return esc_html($value);
+        return self::text($value);
+    }
+
+    /**
+     * Visible text escaped exactly as WordPress's block editor saves it (&, < and > as
+     * entities; quotes literal), so a page saved without changes stays byte-identical
+     * and Core's read-back sees only real edits.
+     */
+    public static function text(string $value): string
+    {
+        return htmlspecialchars($value, ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    /** A link target as the block editor saves it ("&amp;", not WordPress's display "&#038;"). */
+    public static function href(string $url): string
+    {
+        return str_replace('&#038;', '&amp;', esc_url($url));
+    }
+
+    /** Class prefix for a column template; "miopages-cols-7-5" means 7fr 5fr, "1p5" means 1.5fr. */
+    public const COLUMNS_CLASS = 'miopages-cols-';
+
+    /** A column width as a class-safe token, to two decimals: 7 => "7", 1.5 => "1p5". */
+    private static function fraction(int|float $width): string
+    {
+        $text = rtrim(rtrim(number_format((float)$width, 2, '.', ''), '0'), '.');
+        return str_replace('.', 'p', $text);
     }
 
     private static function json(array $value): string
@@ -129,7 +155,7 @@ final class MioPages_Native_Component
             if ((!is_int($width) && !is_float($width)) || !is_finite((float)$width) || $width <= 0 || $width > 12) {
                 throw new InvalidArgumentException('Native component column refused.');
             }
-            $columns[] = 'minmax(0,' . $width . 'fr)';
+            $columns[] = self::fraction($width);
         }
         if (($layout['arrangement'] === 'columns' && (count($columns) < 2 || count($columns) > 12))
             || ($layout['arrangement'] !== 'columns' && $columns !== [])
@@ -159,16 +185,19 @@ final class MioPages_Native_Component
             . ' miopages-node-gap-' . $layout['gap'] . ' miopages-node-inset-' . $layout['inset']
             . ' miopages-node-surface-' . $layout['surface'] . ' miopages-node-align-' . $layout['align']
             . ' miopages-node-measure-' . $layout['measure'] . ' miopages-node-type-' . $layout['typeScale']
-            . ($layout['border'] ? ' miopages-node-border' : '') . ($layout['rounded'] ? ' miopages-node-rounded' : '');
-        $style = '--mp-span:' . $layout['span'] . ';' . ($columns ? '--mp-columns:' . implode(' ', $columns) . ';' : '');
-        $attrs = ' class="' . $class . '" style="' . esc_attr($style) . '"';
+            . ($layout['border'] ? ' miopages-node-border' : '') . ($layout['rounded'] ? ' miopages-node-rounded' : '')
+            // Layout travels as classes, not inline style: WordPress's editor keeps a block's
+            // classes through edits but rejects markup its own save cannot reproduce.
+            // The theme turns these classes into the grid (miopages_layout_css()).
+            . ' miopages-span-' . $layout['span'] . ($columns ? ' ' . self::COLUMNS_CLASS . implode('-', $columns) : '');
+        $attrs = ' class="' . $class . '"';
         $block = self::json(['className'=>$class]);
         $children = '';
         foreach ($node['children'] as $child) $children .= self::node($child, $images, $actions, $postIds, $depth + 1, $insideDetails || $kind === 'details', $localPending);
         if ($kind === 'group') return '<!-- wp:group ' . $block . ' --><div' . $attrs . '>' . $children . '</div><!-- /wp:group -->';
         if ($kind === 'heading') {
             $tag = 'h' . $node['level'];
-            return '<!-- wp:heading ' . self::json(['level'=>$node['level'],'className'=>$class]) . ' --><' . $tag . $attrs . '>'
+            return '<!-- wp:heading ' . self::json(($node['level'] === 2 ? [] : ['level'=>$node['level']]) + ['className'=>$class]) . ' --><' . $tag . $attrs . '>'
                 . $copy . '</' . $tag . '><!-- /wp:heading -->';
         }
         if ($kind === 'paragraph') return '<!-- wp:paragraph ' . $block . ' --><p' . $attrs . '>' . nl2br($copy, false) . '</p><!-- /wp:paragraph -->';
@@ -177,33 +206,34 @@ final class MioPages_Native_Component
             $items = '';
             foreach ($node['items'] as $item) $items .= '<!-- wp:list-item --><li>' . self::copy($item) . '</li><!-- /wp:list-item -->';
             return ($node['text'] !== null ? '<!-- wp:paragraph --><p>' . self::copy($node['text']) . '</p><!-- /wp:paragraph -->' : '')
-                . '<!-- wp:list ' . self::json(['ordered'=>$node['ordered'],'className'=>$class]) . ' --><' . $tag . $attrs . '>' . $items
+                . '<!-- wp:list ' . self::json(($node['ordered'] ? ['ordered'=>true] : []) + ['className'=>$class]) . ' --><' . $tag . $attrs . '>' . $items
                 . '</' . $tag . '><!-- /wp:list -->';
         }
         if ($kind === 'details') return '<!-- wp:details ' . $block . ' --><details' . $attrs . '><summary>' . $copy . '</summary>'
             . $children . '</details><!-- /wp:details -->';
         if ($kind === 'placeholder') return self::placeholder($node['reference'], $copy, $class);
-        if ($kind === 'separator') return '<!-- wp:separator ' . $block . ' --><hr' . $attrs . ' /><!-- /wp:separator -->';
+        if ($kind === 'separator') return '<!-- wp:separator ' . $block . ' --><hr' . $attrs . '/><!-- /wp:separator -->';
         $reference = $node['reference'];
         if ($kind === 'image') {
             $image = $images[$reference] ?? null;
             if (isset($image['fpo'])) return self::fpo($image['fpo'], $class);
             if ($localPending && PHP_SAPI === 'cli' && ($image['pendingLocal'] ?? false) === true) {
-                return '<!-- wp:paragraph --><p class="miopages-pending-media" role="note">Image placement awaiting asset review.</p><!-- /wp:paragraph -->';
+                return '<!-- wp:paragraph {"className":"miopages-pending-media"} --><p class="miopages-pending-media">Image placement awaiting asset review.</p><!-- /wp:paragraph -->';
             }
             if (!$image || !is_int($image['id']) || $image['id'] < 1) throw new InvalidArgumentException('Native component media is unbound.');
+            // WordPress's own image block markup (no width/height attributes), so the editor accepts it.
             return '<!-- wp:image ' . self::json(['id'=>$image['id'],'className'=>$class]) . ' --><figure' . $attrs . '><img src="'
-                 . esc_url(MioPages_Native_Draft_Media::url($image['id'])) . '" class="wp-image-' . $image['id'] . '" alt="' . esc_attr($image['media']['alt'])
-                . '" width="' . (int)$image['media']['width'] . '" height="' . (int)$image['media']['height'] . '" /></figure><!-- /wp:image -->';
+                . self::href(MioPages_Native_Draft_Media::url($image['id'])) . '" alt="' . htmlspecialchars($image['media']['alt'], ENT_COMPAT | ENT_SUBSTITUTE, 'UTF-8')
+                . '" class="wp-image-' . $image['id'] . '"/></figure><!-- /wp:image -->';
         }
         $action = $actions[$reference] ?? null;
         if ($localPending && PHP_SAPI === 'cli' && ($action['pendingLocal'] ?? false) === true) {
-            return '<!-- wp:paragraph --><p class="miopages-pending-action"><span aria-disabled="true">' . $copy . ' — preview only; submissions disabled</span></p><!-- /wp:paragraph -->';
+            return '<!-- wp:paragraph {"className":"miopages-pending-action"} --><p class="miopages-pending-action"><span aria-disabled="true">' . $copy . ' — preview only; submissions disabled</span></p><!-- /wp:paragraph -->';
         }
         if (!$action || !isset($postIds[$action['destination']])) throw new InvalidArgumentException('Native component Action is unbound.');
         return '<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button ' . $block . ' --><div' . $attrs
             . '><a class="wp-block-button__link wp-element-button" href="'
-            . esc_url(home_url('/?page_id=' . $postIds[$action['destination']] . '&preview=true')) . '">' . $copy
+            . self::href(home_url('/?page_id=' . $postIds[$action['destination']] . '&preview=true')) . '">' . $copy
             . '</a></div><!-- /wp:button --></div><!-- /wp:buttons -->';
     }
 }
