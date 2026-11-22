@@ -81,6 +81,16 @@ reuses everything listed under "Keep" in `docs/claude-service-inventory.md`.
    - inquiries, measurement and Ongoing on real data;
    - a proof with WordPress hosted outside 20i (P0-6).
 
+## Captured for later: customer iteration (owner, Nov 22)
+Customers will respond to the draft site. What they like must be kept, what they don't
+must be revised. That needs a real method:
+- feedback tied to pages and sections;
+- approved elements protected when Core regenerates;
+- revisions aimed only at what was asked.
+
+Build it on the existing editorial findings, revision requests and retain/revise/add
+planning. It comes after the first new test.
+
 ## Infrastructure notes
 - The current server is enough for one or two proof customers with one heavy job at a
   time. Upgrade if real use shows otherwise.

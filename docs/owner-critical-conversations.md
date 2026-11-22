@@ -917,3 +917,66 @@ scope covers only the existing private worker/proof and activation artifact/proo
 hashes; source rights, identities, grants, credentials, model/spending/expiry,
 Core deployment and protected WordPress remain unchanged. This is bounded
 maintenance authority, not permission to remove integrity verification.
+
+## November 21–22 — Claude engagement: owner decisions recorded inline
+
+Recorded by Claude from the owner's own messages in the Claude Code session that began
+November 21. Earlier entries stay as history. Where these differ from older entries,
+these are the later owner statements and govern. Technical detail is in the linked docs
+and Git history on branch `claude/rebuild-2026-11-22`.
+
+**Engagement and direction**
+- Claude replaces Codex for all technical execution. `MIOPAGES-BASELINE.md` Part 1 is the
+  reference; `CLAUDE.md` holds the working rules (Nov 21).
+- Step 2 fixes approved, with strict rights checks on real acquired images kept. Visual
+  design (Fix 5) is a core requirement, not optional (Nov 21).
+- Approved: restart protected Core with a corrected memory safeguard, and copy candidate
+  129's visual briefs read-only (Nov 22; done, see `docs/claude-service-inventory.md`).
+- Approved: archive the Codex-era handoffs and control history, and rebuild the AI layer
+  cleanly, keeping all working machinery. The owner did **not** ask for the whole
+  project to be thrown out (Nov 22). Inventory: `docs/claude-service-inventory.md`.
+  Outline: `docs/core-rebuild-outline.md`.
+- "Move carefully." The owner lost track of what worked and what didn't; every change
+  must stay visible and checkable (Nov 22).
+
+**Product decisions**
+- **Missing material becomes a visible placeholder, never a gap or an invention.**
+  When a page should have a testimonial, price, result or similar that doesn't exist,
+  Core places a marked notice where it belongs. The Codex-era refusals that made the AI
+  avoid these sections were the wrong interpretation (Nov 22).
+- **Nothing in the design is fixed by rule, not even the logo or name.** The owner's
+  earlier question was why the logo disappeared, not a demand to freeze it. Brand assets
+  are inputs Core uses, never drops silently, and may recommend changing; the owner or
+  customer decides (Nov 22). Fixed fonts, colours and layouts were Codex scaffolding and
+  are jettisoned (Nov 22).
+- **Humans review real WordPress sites, not screenshots.** Development and customer
+  sites belong on 20i Reseller WordPress hosting. Screenshots remain an AI input
+  (research, self-critique) only (Nov 22).
+- **WordPress hosted outside 20i** should be integrated after the current test (Nov 22;
+  see P0-6).
+- **The second server account (runtime.miopages.com)** was for connectivity proof and
+  can be stopped for now (owner's view, Nov 22). Claude found it also holds the operator
+  workspace files, so stop the app and keep the files. Stopping it is an owner action in
+  My20i.
+- **Server and database:** proceed on the current server and the free Supabase plan;
+  upgrade when real use requires it (Nov 22).
+- **The first new test waits for the compact design system**, so it shows new content
+  and a new look together (Nov 22).
+
+**Customer iteration requirement (captured for the future; not yet built)** (Nov 22)
+When MioPages is a real product, customers will respond to the draft site. What they
+like must be **retained**; what they don't like must be **revised**. MioPages needs a
+workable method for this iterative improvement: feedback tied to specific pages and
+sections, kept elements protected across regenerations, and revisions aimed only at
+what the customer asked to change. Existing pieces to build on, not yet a complete
+method:
+- editorial findings and decisions;
+- page revision requests;
+- the retain/revise/add plan used when knowledge changes;
+- report corrections.
+
+**Process requirement: decisions made in conversation must not be lost** (Nov 22)
+Discussions and decisions made inline during work must be recorded in this file when
+they happen, not reconstructed later. Claude appends owner decisions here as they occur
+and commits them with the related work. `runtime-content/chat-recovery.md` remains the
+local interruption note; it does not replace this record.

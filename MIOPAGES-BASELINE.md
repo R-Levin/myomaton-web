@@ -57,9 +57,13 @@ nothing below came from an assistant proposal unless it says so.
     copied from competitors. *(P0-20)*
 12. **Visually rich, with actual images placed in the pages:** acquired or stock images,
     or clearly marked **FPO** (for-position-only) images where final art isn't ready.
-    Text descriptions of images don't count. *(P0-9, P0-10, P0-27)*
-13. **Uses the real MioPages brand:** the purple wordmark/logo and approved styling.
-    *(P0-17)*
+    Text descriptions of images don't count. *(P0-9, P0-10, P0-27)* The same applies
+    to other missing material (testimonials, prices, results and so on): a visible
+    placeholder where it belongs, never a gap and never an invention. *(Nov 22)*
+13. **Uses the business's real brand assets as inputs:** never silently dropped (the
+    logo once vanished for no reason). Nothing is fixed by rule, not even logo or name:
+    Core designs each site and may recommend brand changes; the owner or customer
+    decides. *(P0-17; clarified Nov 22: the earlier fixed styling was scaffolding)*
 14. **Free of internal development language.** Copy must state confidently what
     MioPages delivers, through automation plus real Operator work. No invented claims,
     prices, testimonials or results, but also no defensive over-hedging. *(P0-15, P0-16)*
@@ -67,6 +71,11 @@ nothing below came from an assistant proposal unless it says so.
     AI is not limited to a fixed menu of section types. Generated code still needs
     review before production. *(P0-19, P0-20)*
 16. **No fixed page count.** Structure follows the business and its visitors.
+16a. **Customers iterate on the draft:** what they like is retained, what they don't is
+    revised, through a workable feedback-and-revision method tied to specific pages and
+    sections. Captured for the future; not yet built. *(Nov 22)*
+16b. **Humans review real WordPress sites** (20i Reseller hosting), not screenshots;
+    screenshots are only an AI input. *(Nov 22)*
 
 ### How development must work
 17. **Outcome first.** Tests are part of engineering, not product progress. Never
@@ -91,6 +100,9 @@ nothing below came from an assistant proposal unless it says so.
     decision needed. No jargon-dense receipts. *(P0-11, P0-16, Nov 20)*
 25. **Don't make the owner repeat retained information**, and don't ask them to retest
     fixtures.
+26. **Decisions made in conversation are recorded when they happen** in
+    `docs/owner-critical-conversations.md`, so nothing decided inline is lost to the
+    project. *(Nov 22)*
 
 ---
 

@@ -70,3 +70,8 @@ permission for routine steps, and don't invent approval gates.
   inference.
 - Keep `runtime-content/chat-recovery.md` updated during substantial work so an
   interrupted session can resume.
+- **Record owner decisions when they happen.** Append every owner decision, correction
+  or requirement stated in conversation to `docs/owner-critical-conversations.md` (dated,
+  plain language, the owner's meaning, not a hardened rule) and commit it with the
+  related work. Update `MIOPAGES-BASELINE.md` Part 1 when a decision changes a standing
+  requirement. Decisions must never live only in a chat.
