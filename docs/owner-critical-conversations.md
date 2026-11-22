@@ -1025,3 +1025,11 @@ the Codex period; Claude sorts them into site feedback (Core revises), system pr
 - First editing round runs on local WordPress because it works today. Then the
   environment work moves Operator WordPress to miopages.org, with delivery carrying
   Core's own design.
+
+**Nov 22, evening: durability and the overall picture.** After the WordPress editor fix
+the owner was concerned the work might not be durable. Their understanding, confirmed:
+Core needs its own rendering, and WordPress is a delivery mechanism, not part of Core.
+They could not tell what is temporary and what is not, or how the pieces fit, and asked
+for a written picture. Answered in `docs/what-lives-where.md`. Key point recorded there:
+edits and Notes made in local WordPress are not safe until read-back into Core exists.
+The owner has not yet chosen whether read-back or the move to miopages.org comes first.
