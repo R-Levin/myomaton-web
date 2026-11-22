@@ -70,7 +70,7 @@ function simulatedAnswer(name: string, schema: Schema, instructions: string) {
       avoid: [] });
     const ids = enumAt(schema, "pages", "[]", "sourceIds").slice(0, 1);
     return { pages: [["/", "Home"], ["/service", "Service"], ["/start", "Start"]].map(([path, label]) =>
-      ({ path, label, purpose: "Simulated purpose.", sourceIds: ids, decisionBrief: brief(path) })), navigation: ["/", "/service", "/start"], articles: [] };
+      ({ path, label, purpose: "Simulated purpose.", sourceIds: ids, decisionBrief: brief(path) })), navigation: ["/service", "/start"], articles: [] }; // Home left out of the menu, as Core did in the first real run
   }
   if (stage === "page") {
     const path = enumAt(schema, "path")[0];

@@ -93,7 +93,11 @@ function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflow
       }),
     } satisfies PageProposal);
   });
-  if (!view.blueprint.navigation.includes("/")) throw Error("Private navigation requires Home");
+  // Home must be reachable from the menu. When Core's plan leaves it out (the logo often
+  // links home), place it first rather than refusing the whole site.
+  const navigation = view.blueprint.navigation.includes("/") ? view.blueprint.navigation
+    : view.blueprint.pages.some(entry => entry.path === "/") ? ["/", ...view.blueprint.navigation] : view.blueprint.navigation;
+  if (!navigation.includes("/")) throw Error("Private navigation requires Home");
   const actions = view.pages.flatMap(page => {
     const nativePage = pages.find(item => item.slug === page.path)!;
     if(authoredActions){
@@ -119,6 +123,6 @@ function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflow
     return [...navigation].map(([destination, location]) => ({ id: logicalId({ site: context.scope.managedSiteId, from: page.path, destination }),
       type: "page" as const, from: page.path, destination, ...location }));
   });
-  return { scope: context.scope, candidateDigest: target, pages, navigation: view.blueprint.navigation,
+  return { scope: context.scope, candidateDigest: target, pages, navigation,
     actions, ...(authoredActions&&{unresolvedActions:view.pages.flatMap(page=>page.actions.flatMap((action,index)=>!action.destination?[{from:page.path,reference:"action-"+index,label:action.label}]:[]))}), ...(view.brandDigest && { brandDigest: view.brandDigest }), ...(baseline.length && { baselinePages: baseline }) };
 }
