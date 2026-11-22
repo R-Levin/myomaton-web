@@ -993,3 +993,9 @@ b7a4c51) to protected Core, and spending up to $25 of OpenAI credit on one fresh
 run (`docs/c0-rebuilt-run.json`, procedure `docs/core-test-run.md`). The run goes
 straight through without stopping at the report; the owner can read the report
 afterward and correct it if needed. No publication or site approval is implied.
+
+**Nov 22: first run progress (record, not a decision).** Research, report, Direction with
+design, site plan and seven pages completed for about $4.03. The eighth page
+(/scope-ownership) was refused by an over-narrow proof check: it honestly listed
+"Guaranteed rankings, traffic, leads, or revenue." under "Outside the normal service".
+The check was fixed (ef665c7). The saved page is re-checked without a new AI call.
