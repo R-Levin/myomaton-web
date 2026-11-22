@@ -1039,3 +1039,9 @@ prefers to do everything with an eye toward production and to avoid temporary me
 Where it can be done, work should not depend on the developer's computer. Meaning: build
 the real path (Core → hosted Operator WordPress → read-back into Core) rather than
 extending local scaffolding. Local tooling remains acceptable for automated tests.
+
+**Nov 22, evening: start hosted delivery; clean up control.** The owner approved starting
+the work that lets Core's new design go through real delivery to miopages.org (local
+code and test work first). Alongside it, clean up the setup: the second server account
+(runtime.miopages.com) and "what is controlled from where", so control of delivery and
+read-back sits in Core rather than in leftover Codex-era places.
