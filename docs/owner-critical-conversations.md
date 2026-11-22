@@ -987,3 +987,9 @@ ceremony. No artificial limits: page count is Core's decision, internal counters
 retries, revision rounds) are set generously, and the spending ceiling is the only real
 limit (proposed $25, expected about $15; the owner is adding OpenAI credit first). The
 "three pages" mentioned earlier belonged only to Claude's simulated dry run.
+
+**Nov 22: first test approved.** The owner approved deploying the current Core (build of
+b7a4c51) to protected Core, and spending up to $25 of OpenAI credit on one fresh rebuilt
+run (`docs/c0-rebuilt-run.json`, procedure `docs/core-test-run.md`). The run goes
+straight through without stopping at the report; the owner can read the report
+afterward and correct it if needed. No publication or site approval is implied.
