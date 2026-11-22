@@ -999,3 +999,14 @@ design, site plan and seven pages completed for about $4.03. The eighth page
 (/scope-ownership) was refused by an over-narrow proof check: it honestly listed
 "Guaranteed rankings, traffic, leads, or revenue." under "Outside the normal service".
 The check was fixed (ef665c7). The saved page is re-checked without a new AI call.
+
+**Nov 22: first flight accepted as the baseline.** The owner: this is "the first run in
+*forever* that actually displays any change"; most of it is positive. Images are missing.
+The design stayed close to the existing brand, which can be guided in a variety of ways.
+No second fresh run for now: this site (case beb8de9c, version 30, local WordPress pages
+248–256) is the baseline to iterate on. Next, the owner shares issues held back during
+the Codex period; Claude sorts them into site feedback (Core revises), system problems
+(Claude fixes) and direction (recorded, shapes Core's instructions). Known system issues:
+- inherited Codex-era processing rules (one suppressed images);
+- an unreadable button in the Home Direct Start card;
+- the fixed header template.
