@@ -5,7 +5,10 @@ import test from "node:test";
 import { draftBrand } from "../lib/platform/wordpress-delivery/draft-brand";
 import { readNativeDraftEnvelope, reviewDraftEnvelope } from "../lib/platform/wordpress-delivery/native-draft-envelope";
 import { bindReviewDraft } from "../lib/platform/wordpress-delivery/review-draft";
+import { draftEndpoint, sendSignedDraft } from "../lib/platform/wordpress-delivery/review-delivery";
 import type { NativeNode } from "../lib/platform/intake/presence-native-component";
+
+type ReviewInput = Parameters<typeof bindReviewDraft>[0]["review"];
 
 function node(kind: NativeNode["kind"], changes: Partial<NativeNode> = {}): NativeNode {
   return { kind, text: null, level: null, items: [], ordered: false, reference: null,
@@ -65,7 +68,7 @@ const { privateKey, publicKey } = generateKeyPairSync("ed25519");
 const publicKeyBase64 = Buffer.from(publicKey.export({ format: "jwk" }).x!, "base64url").toString("base64");
 const identity = { ...site, installationId, keyId: "fixture-key", publicKeyBase64 };
 const draft = (revision: number, previousDigest: string | null, changes: Partial<typeof review> = {}) =>
-  bindReviewDraft({ site, installationId, streamId, revision, previousDigest, source: { intakeId, workflowVersion: 30 }, review: { ...review, ...changes }, brand });
+  bindReviewDraft({ site, installationId, streamId, revision, previousDigest, source: { intakeId, workflowVersion: 30 }, review: { ...review, ...changes } as unknown as ReviewInput, brand });
 const writer = (wires: unknown[]) => spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php",
   ["wordpress/miopages-delivery/tests/review-draft-writer.php"], { input: JSON.stringify({ identity, wires }), encoding: "utf8" });
 
@@ -99,10 +102,43 @@ test("the next review draft follows its predecessor; a stale, foreign or reshape
   assert.deepEqual(JSON.parse(ok.stdout).applied.map((item: { revision: number }) => item.revision), [1, 2]);
   assert.notEqual(writer([sign(first), sign(draft(2, "0".repeat(64)))]).status, 0, "Wrong predecessor");
   const foreign = bindReviewDraft({ site: { ...site, managedSiteId: randomUUID() }, installationId, streamId, revision: 1, previousDigest: null,
-    source: { intakeId, workflowVersion: 30 }, review });
+    source: { intakeId, workflowVersion: 30 }, review: review as unknown as ReviewInput });
   assert.notEqual(writer([sign(foreign)]).status, 0, "Another site's drafts");
   // Re-labelling a review draft as an ordinary delivery breaks Core's signature.
   const wire = reviewDraftEnvelope(first, "fixture-key", publicKeyBase64, privateKey);
   assert.notEqual(writer([JSON.stringify({ ...wire, version: 5 })]).status, 0);
   assert.throws(() => draft(1, null, { unresolvedActions: [{ from: "/elsewhere", reference: "action-0", label: "x" }] }));
+});
+
+test("Core delivers over the plugin's web endpoint and accepts only WordPress's matching signed receipt", async () => {
+  const secret = Buffer.alloc(32, 7);
+  const pull = { secretHex: secret.toString("hex"), identity: { installationId } };
+  const first = draft(1, null);
+  const wire = reviewDraftEnvelope(first, "fixture-key", publicKeyBase64, privateKey);
+  const seen: { url: string; auth: string | null }[] = [];
+  // Stands in for HTTPS: the request body goes to the plugin's endpoint code unchanged.
+  const fetcher = (async (url: URL, init: RequestInit) => {
+    seen.push({ url: String(url), auth: new Headers(init.headers).get("authorization") });
+    const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/review-draft-writer.php"],
+      { input: JSON.stringify({ mode: "endpoint", identity: { ...identity, deliveryUser: "core-delivery" }, pull, wires: [init.body] }), encoding: "utf8" });
+    assert.equal(php.status, 0, php.stderr);
+    const [response] = JSON.parse(php.stdout).responses;
+    return new Response(JSON.stringify(response.body), { status: response.status });
+  }) as unknown as typeof fetch;
+  const target = { origin: "https://drafts.example.test", gate: { user: "gate", password: "fixture-only" } };
+  const expected = { installationId, siteProposalId: streamId, operation: "apply" as const, requestedDigest: first.digest,
+    appliedDigest: first.digest, revision: 1, paths: ["/", "/start"], brandDigest: brand.digest };
+  const receipt = await sendSignedDraft(target, wire, secret, expected, fetcher);
+  assert.equal(receipt.revision, 1);
+  assert.deepEqual(receipt.posts.map(post => post.path), ["/", "/start"]);
+  assert.equal(seen[0].url, "https://drafts.example.test/?rest_route=/miopages/v1/draft");
+  assert.match(seen[0].auth ?? "", /^Basic /);
+  await assert.rejects(sendSignedDraft(target, wire, Buffer.alloc(32, 8), expected, fetcher), /authentication refused/,
+    "A receipt signed with another key is refused");
+  await assert.rejects(sendSignedDraft(target, wire, secret, { ...expected, revision: 2 }, fetcher), /mismatch/,
+    "A receipt for a different revision is refused");
+  await assert.rejects(sendSignedDraft(target, { ...wire, signatureBase64: wire.signatureBase64.replace(/^./, c => c === "A" ? "B" : "A") },
+    secret, expected, fetcher), /HTTP 422/, "WordPress refuses a package Core did not sign");
+  assert.throws(() => draftEndpoint({ origin: "http://drafts.example.test" }), /refused/, "Plain HTTP only for a loopback test site");
+  assert.equal(String(draftEndpoint({ origin: "http://127.0.0.1:4474" })), "http://127.0.0.1:4474/?rest_route=/miopages/v1/draft");
 });

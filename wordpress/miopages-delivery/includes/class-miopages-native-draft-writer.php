@@ -11,10 +11,11 @@ require_once __DIR__ . '/class-miopages-native-draft-content.php';
 
 final class MioPages_Native_Draft_Writer
 {
-    public static function apply(string $wire, array $identity): array
+    /** $web: called from Core's signed web endpoint (MioPages_Delivery_Endpoint) instead of WP-CLI. */
+    public static function apply(string $wire, array $identity, bool $web = false): array
     {
-        if (!defined('WP_CLI') || !WP_CLI || !current_user_can('edit_pages')) {
-            throw new RuntimeException('Native draft writer requires scoped CLI composition.');
+        if ((!$web && (!defined('WP_CLI') || !WP_CLI)) || !current_user_can('edit_pages')) {
+            throw new RuntimeException('Native draft writer requires Core delivery composition.');
         }
         $payload = MioPages_Native_Draft_Envelope::verify($wire, $identity);
         $candidate = $payload['candidate'];

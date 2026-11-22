@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MioPages Delivery (Development Proof)
  * Description: Restricted, read-only C0 fixture preview for the MioPages WordPress delivery feasibility proof.
- * Version: 0.0.13
+ * Version: 0.1.0
  * Requires PHP: 8.3
  * Text Domain: miopages-delivery
  */
@@ -78,6 +78,13 @@ if (defined('WP_CLI') && WP_CLI && defined('MIOPAGES_PRIVATE_PULL') && is_array(
     });
 }
 
+
+// Core's web endpoint for signed drafts (owner decision, Nov 22). Off unless configured.
+if (defined('MIOPAGES_NATIVE_DRAFT_IDENTITY') && is_array(MIOPAGES_NATIVE_DRAFT_IDENTITY)
+    && isset(MIOPAGES_NATIVE_DRAFT_IDENTITY['deliveryUser'])) {
+    require_once __DIR__ . '/includes/class-miopages-delivery-endpoint.php';
+    MioPages_Delivery_Endpoint::register();
+}
 
 if (defined('MIOPAGES_NATIVE_DRAFT_IDENTITY') && is_array(MIOPAGES_NATIVE_DRAFT_IDENTITY)) {
     require_once __DIR__ . '/includes/class-miopages-native-draft-brand.php';
