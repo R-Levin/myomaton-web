@@ -94,9 +94,16 @@ the development PC.
 6. ~~Read-back: pages and Notes.~~ Done Nov 22. Core gets each delivered page as it
    is now, whether it was edited, and every Note with its block, replies and status.
    Core refuses to deliver over unread edits.
-7. **Next:** turn read-back into revisions inside Core's workflow. Operator edits
-   become the kept text, open Notes become revision requests for their exact block,
-   and Core revises only those spots before the next delivery.
+7. ~~Turn read-back into revisions inside Core's workflow.~~ Done Nov 22 (owner chose
+   this before going live). Core server command `take-in-review`:
+   - the Operator's wording goes into Core's pages as written;
+   - pages with Notes (or added or removed blocks) go to Core's revision with those
+     concerns, and a revision that drops the Operator's wording is rejected;
+   - the next delivery replaces exactly what Core read back, keeps the Operator's
+     version in WordPress's page history, and answers and resolves each Note.
+
+   Known limits: inline formatting the Operator adds (bold, links) is not kept, because
+   Core stores plain text. Images are not covered yet.
 8. **Next:** a "reconcile" action for the rare case where WordPress applied a draft
    but its receipt never reached Core (Core then refuses further deliveries, safely).
 
