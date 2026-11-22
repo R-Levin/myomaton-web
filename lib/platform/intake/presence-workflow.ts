@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { applyOperatorEdits, droppedWording, keptWording, operatorConcerns, type OperatorFeedback } from "./operator-feedback";
 import type { Pool, PoolClient } from "pg";
 import { fingerprint, object, text } from "../canonical/model";
 import type { DeploymentSelection } from "../managed-sites/deployment";
@@ -49,7 +50,17 @@ type Work = {
 type Failure = "operation-blocked" | "output-invalid" | "outcome-unknown";
 type Decision = { actor: Actor; at: string; target: string; decision: "confirmed" | "development-continuation" | "reviewed" };
 type Correction = { finding: WorkflowReport["findings"][number]; text: string; reportDigest: string; actor: Actor; at: string };
-type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: WorkflowPage[]; actor: Actor; at: string; ordinal: number; source?: "home-concept" | "operator-editorial"; batch?: "pending" | "applied" };
+type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: WorkflowPage[]; actor: Actor; at: string; ordinal: number;
+  source?: "home-concept" | "operator-editorial" | "operator-review"; batch?: "pending" | "applied";
+  /** Operator wording a revised page must still contain, word for word (operator-review). */
+  keep?: { path: string; text: string }[] };
+/** One Operator review round read back from Operator WordPress (owner direction, Nov 22). */
+export type WordPressReview = { at: string; actor: Actor; readbackRevision: number;
+  /** The WordPress content Core has taken in, by path; the next delivery may replace exactly this. */
+  acknowledged: { path: string; contentSha256: string; title: string }[];
+  /** Notes Core acted on: answered and resolved with the next delivery. */
+  notes: { id: number; path: string; text: string; revised: boolean }[];
+  keptEdits: number; revisedPaths: string[] };
 export type SourceRepairAuthorization = { authorization: string; baseVersion: number; previousStateDigest: string; materialsDigest: string;
   contextTransition?: { previousContextDigest: string; previousAuthorityDigest: string; nextContextDigest: string; nextAuthorityDigest: string; addedEvidenceDigests: string[] } };
 type SourceRecovery = SourceRepairAuthorization & { actor: Actor; at: string; priorRevisionOrdinal: number;
@@ -86,6 +97,7 @@ type State = {
     priorRejectedPages?: WorkflowPage[];
     conceptCritique?: { target: string; inputDigest: string; editorial: WorkflowEditorial } };
   operatorReview: Decision | null;
+  wordpressReviews?: WordPressReview[];
   qualityReviews?: { actor: Actor; at: string; review: QualityReview; phase?: "home-concept" }[];
   conceptEditorial?: { target: string; inputDigest: string; editorial: WorkflowEditorial } | null;
   sourceRecovery?: SourceRecovery;
@@ -385,6 +397,7 @@ export class PresenceWorkflow {
     const { research, report, confirmation, corrections, direction, blueprint, pages, operatorReview, version, mode, failure } = state;
     return { version, mode, contextDigest: state.contextDigest, research, report, confirmation, corrections, direction, blueprint, pages, editorial: state.editorial, operatorReview,
       ...(state.understandingCorrections && { understandingCorrections: state.understandingCorrections }),
+      ...(state.wordpressReviews && { wordpressReviews: state.wordpressReviews }),
       ...(this.operations.knowledgeConfirmation && { knowledgeConfirmationAvailable: true as const }),
       ...(state.knowledgeReassessments && { knowledgeReassessments: state.knowledgeReassessments }),
       ...(editorial.findings.length > 0 && { editorialFindings: editorial.findings }), canQueueEditorialRevision,
@@ -766,6 +779,10 @@ export class PresenceWorkflow {
           const page = readPage(output, work.path!, paths, pageIds, destinations, provider, Boolean(state.evaluation),
             Boolean(this.operations.marketingAuthority?.strategy && this.boundary === "disposable"));
           if (state.evaluation && page.composition !== "managed-v1") throw Error("Evaluation Page needs the composed format");
+          // A page revised from Operator Notes must still contain the Operator's own wording.
+          if (droppedWording(page, state.revisionRequest?.keep).length) {
+            throw new ArtifactValidationError("operator-wording", "Revised page dropped the Operator's wording");
+          }
           // Keep the exact sitemap order when selected pages are redrafted.
           const drafts = new Map([...state.pages, page].map(draft => [draft.path, draft]));
           next = { ...state, pages: paths.flatMap(path => drafts.get(path) ?? []) };
@@ -882,6 +899,35 @@ export class PresenceWorkflow {
     return this.view(context, await this.store.append(context, version, { ...state, revisionRequest, editorial: null,
       editorialFindings: savedEditorialFindings(state), editorialDecisions: [...state.editorialDecisions ?? [], ...queued],
       pages: batch ? state.pages : state.pages.filter(page => !paths.includes(page.path)) }));
+  }
+
+  /**
+   * Take in an Operator review from WordPress: the Operator's wording is written into
+   * Core's pages as is; pages with Notes or structural changes go to Core's revision,
+   * which must keep that wording. Notes are recorded so the next delivery answers and
+   * resolves them. No AI call happens here; revision runs with the case's next work.
+   */
+  async applyOperatorReview(context: WorkflowContext, version: number, actor: Actor, feedback: OperatorFeedback) {
+    const state = await this.current(context, version);
+    if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || !actor.authority) throw new IntakeError("unavailable", 403);
+    if (state.work || state.failure || !state.pages.length || state.revisionRequest?.batch === "pending") throw new IntakeError("workflow_not_ready", 409);
+    const view = this.view(context, state)!;
+    const pages = applyOperatorEdits(context, view, feedback);
+    const concerns = operatorConcerns(feedback);
+    const paths = [...new Set(concerns.map(item => item.path))].filter(path => pages.some(page => page.path === path));
+    const at = new Date(this.clock()).toISOString();
+    const review: WordPressReview = { at, actor, readbackRevision: feedback.readbackRevision, acknowledged: feedback.acknowledged,
+      notes: feedback.notes.map(note => ({ id: note.id, path: note.path, text: note.text, revised: paths.includes(note.path) })),
+      keptEdits: feedback.edits.length + feedback.titles.length, revisedPaths: paths };
+    const revision = paths.length ? {
+      // Operator review rounds do not use up Core's own self-critique rounds.
+      revisionRequest: { paths, audit: { summary: "Operator review in WordPress", concerns: concerns.filter(item => paths.includes(item.path)) },
+        priorPages: pages.filter(page => paths.includes(page.path)), actor, at, ordinal: revisionOrdinal(state), source: "operator-review" as const,
+        keep: keptWording(feedback, paths) },
+      editorial: null, operatorReview: null,
+    } : {};
+    return this.view(context, await this.store.append(context, version, { ...state, ...revision,
+      pages: pages.filter(page => !paths.includes(page.path)), wordpressReviews: [...state.wordpressReviews ?? [], review] }));
   }
 
   async confirmReport(context: WorkflowContext, version: number, actor: Actor, developmentContinuation = false) {

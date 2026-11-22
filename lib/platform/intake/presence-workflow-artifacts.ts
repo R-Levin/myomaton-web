@@ -68,7 +68,7 @@ export function reassessmentBlueprintSchema<T extends typeof artifactSchemas.blu
     change: options(["retain", "revise", "add"]), changeReason: string })) });
 }
 
-export type ArtifactIssue = "citation" | "page-binding" | "action-destination" | "shape-or-content";
+export type ArtifactIssue = "citation" | "page-binding" | "action-destination" | "shape-or-content" | "operator-wording";
 
 export class ArtifactValidationError extends Error {
   constructor(readonly issue: ArtifactIssue, message: string) { super(message); }

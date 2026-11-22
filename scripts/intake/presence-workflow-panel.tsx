@@ -29,6 +29,7 @@ const artifactIssueLabel = {
   "page-binding": "A page reference does not match the candidate’s page set.",
   "action-destination": "An action destination does not match a verified route.",
   "shape-or-content": "The returned content does not meet the review format.",
+  "operator-wording": "A revised page dropped wording the Operator wrote in WordPress.",
 };
 
 const findingGroups = [

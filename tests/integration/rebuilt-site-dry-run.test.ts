@@ -27,6 +27,7 @@ import { pendingContent, type NativeNode } from "../../lib/platform/intake/prese
 import type { MarketingAuthority } from "../../lib/platform/intake/presence-marketing-authority";
 import { IntakeService } from "../../lib/platform/intake/service";
 import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig } from "../../lib/platform/wordpress-delivery/operator-review";
+import { operatorFeedback } from "../../lib/platform/intake/operator-feedback";
 
 type Schema = { properties?: Record<string, Schema>; items?: Schema; enum?: unknown[] };
 const enumAt = (schema: Schema, ...path: string[]) => {
@@ -128,7 +129,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
       researchResponseBytes: 100_000, expiresAt: Date.now() + 600_000, maxOutputTokens: 20_000,
       ledger: { id: fingerprint("dry-run"), startingLedger: createHash("sha256").update(await readFile(join(root, "onboarding-usage.json"))).digest("hex"),
       baselineAttempts: 0, requests: 200, generations: 100, inputTokens: 1_000_000, inputBytes: 5_000_000, capMicros: 50_000_000 } };
-    const requests: { name: string; instructions: string }[] = [];
+    const requests: { name: string; instructions: string; body: string }[] = [];
     // The real run researches with web search and page capture; here one simulated page stands in.
     const provider = createResponsesPresenceWorkflow({ grant, readGrant: async () => grant, readContext: async () => context,
       rates, ledgerDirectory: root,
@@ -138,7 +139,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
       transport: { async send(path, body) {
         if (path.endsWith("/input_tokens")) return { body: { input_tokens: 2000 } };
         const request = body as { instructions: string; text: { format: { name: string; schema: Schema } } };
-        requests.push({ name: request.text.format.name, instructions: request.instructions });
+        requests.push({ name: request.text.format.name, instructions: request.instructions, body: JSON.stringify(body) });
         const output = simulatedAnswer(request.text.format.name, request.text.format.schema, request.instructions);
         const response = { id: "resp_dry_run_" + requests.length, model: rates.model, status: "completed", service_tier: "default",
           usage: { input_tokens: 2000, output_tokens: 400, total_tokens: 2400, input_tokens_details: { cached_tokens: 0 }, output_tokens_details: { reasoning_tokens: 0 } },
@@ -205,13 +206,51 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.equal(second.state.revision, 2, "An unedited site can be delivered again");
     const delivered = wordpress({ mode: "operator" });
     assert.equal(Object.keys(delivered.ids).length, 3);
-    wordpress({ mode: "operator", edits: { "/service": ["</h1>", " (edited by the Operator)</h1>"] },
+    // The Operator rewrites the Service heading and adds a Note to the first block on /start
+    // (WordPress stores the Note's id in that block's metadata, beside Core's identifier).
+    wordpress({ mode: "operator", edits: { "/service": ["</h1>", " (edited by the Operator)</h1>"],
+      "/start": ['{"metadata":{"mio":"', '{"metadata":{"noteId":[501],"mio":"'] },
       notes: [{ id: 501, path: "/start", text: "Make the first step shorter." }] });
-    const { summary } = await readBackOperatorSite(config, fetcher);
-    assert.deepEqual(summary.editedPages, ["/service"]);
+    const { readback, summary } = await readBackOperatorSite(config, fetcher);
+    assert.deepEqual(summary.editedPages.sort(), ["/service", "/start"]);
     assert.equal(summary.openNotes[0].text, "Make the first step shorter.");
+    assert.ok(summary.openNotes[0].block?.text, "The Note is tied to its block");
     await assert.rejects(deliverReviewDraft({ config, context, view, state: second.state, fetcher }),
-      /Operator edits on \/service must be taken into Core/);
+      /Operator edits on .* must be taken into Core/);
+
+    // Core takes the review in: the Operator's heading is kept as written, the noted page is revised.
+    const feedback = operatorFeedback(context, view, readback);
+    assert.equal(feedback.edits.length, 1);
+    assert.equal(feedback.edits[0].path, "/service");
+    assert.match(feedback.edits[0].after, /\(edited by the Operator\)$/);
+    assert.equal(feedback.notes.length, 1);
+    assert.equal(feedback.notes[0].path, "/start");
+    assert.deepEqual(feedback.structural, []);
+    let revised = (await workflow.applyOperatorReview(context, view.version, actor, feedback))!;
+    assert.ok(revised.pages.find(page => page.path === "/service")!.sections[0].heading.endsWith("(edited by the Operator)"),
+      "The Operator's wording is now Core's own text");
+    assert.ok(!revised.pages.some(page => page.path === "/start"), "The noted page is queued for revision");
+    const requestsBefore = requests.length;
+    for (let step = 0; step < 6 && revised.pages.length < 3; step++) revised = (await workPresenceCase(workflow, context))!;
+    assert.equal(revised.failure, null, JSON.stringify({ failure: revised.failure, next: revised.next }));
+    assert.deepEqual(revised.pages.map(page => page.path), ["/", "/service", "/start"]);
+    const asked = requests.slice(requestsBefore).find(row => row.body.includes("Make the first step shorter."));
+    assert.ok(asked, "The Operator's Note reached Core's revision request");
+    assert.match(asked.body, /Operator note\. On the/, "with the block it is attached to");
+    assert.ok(revised.pages.find(page => page.path === "/service")!.sections[0].heading.endsWith("(edited by the Operator)"));
+
+    // The next delivery replaces exactly what Core read back, and answers and resolves the Note.
+    const third = await deliverReviewDraft({ config, context, view: revised, state: second.state, fetcher });
+    assert.equal(third.state.revision, 3);
+    const after = await readBackOperatorSite(config, fetcher);
+    assert.deepEqual(after.summary.editedPages, [], "WordPress now holds Core's delivery, including the Operator's wording");
+    assert.equal(after.summary.openNotes.length, 0);
+    assert.equal(after.summary.resolvedNotes[0].id, 501);
+    assert.match(after.summary.resolvedNotes[0].replies[0].text, /revised this page in response to this note/);
+    assert.ok(after.readback.pages.find(page => page.path === "/service")!.content!.includes("(edited by the Operator)"));
+    // A change the Operator makes after Core took the review in is never overwritten unread.
+    wordpress({ mode: "operator", edits: { "/": ["</h1>", " again</h1>"] } });
+    await assert.rejects(deliverReviewDraft({ config, context, view: revised, state: third.state, fetcher }), /must be taken into Core/);
     if (process.env.MIOPAGES_DRY_RUN_EXPORT) await writeFile(process.env.MIOPAGES_DRY_RUN_EXPORT,
       JSON.stringify({ review, home: php.stdout, requests: requests.map(row => row.name) }, null, 2));
   } finally {

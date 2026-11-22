@@ -103,6 +103,25 @@ final class MioPages_Native_Draft_Envelope
             || !is_array($candidate['unresolvedActions'] ?? null) || !array_is_list($candidate['unresolvedActions'])) {
             throw new InvalidArgumentException('Review draft claim refused.');
         }
+        // Optional: the Operator content Core read back and took in, and its answers to Notes.
+        if (array_key_exists('readBack', $candidate)) {
+            $read = $candidate['readBack'];
+            if (!is_array($read) || !is_int($read['revision'] ?? null) || !is_array($read['pages'] ?? null) || !array_is_list($read['pages'])) {
+                throw new InvalidArgumentException('Review draft read-back claim refused.');
+            }
+            foreach ($read['pages'] as $page) {
+                if (!is_array($page) || count($page) !== 3 || !is_string($page['path'] ?? null) || !is_string($page['title'] ?? null)
+                    || !is_string($page['contentSha256'] ?? null) || !preg_match('/^[a-f0-9]{64}$/D', $page['contentSha256'])) {
+                    throw new InvalidArgumentException('Review draft read-back claim refused.');
+                }
+            }
+        }
+        foreach ($candidate['answeredNotes'] ?? [] as $answer) {
+            if (!is_array($answer) || count($answer) !== 2 || !is_int($answer['id'] ?? null) || $answer['id'] < 1
+                || !is_string($answer['reply'] ?? null) || trim($answer['reply']) === '' || strlen($answer['reply']) > 2000) {
+                throw new InvalidArgumentException('Review draft Note answer refused.');
+            }
+        }
         foreach ($candidate['unresolvedActions'] as $pending) {
             if (!is_array($pending) || count($pending) !== 3 || !is_string($pending['from'] ?? null)
                 || !is_string($pending['label'] ?? null) || trim($pending['label']) === '' || strlen($pending['label']) > 400

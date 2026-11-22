@@ -27,6 +27,10 @@ export function bindReviewDraft(input: {
   review: Review;
   brand?: SignedBrand;
   baselinePages?: unknown;
+  /** The Operator content Core read back and took in; WordPress may replace exactly this. */
+  readBack?: { revision: number; pages: { path: string; contentSha256: string; title: string }[] };
+  /** Core's reply to each Note it acted on; WordPress adds it to the thread and resolves the Note. */
+  answeredNotes?: { id: number; reply: string }[];
 }) {
   const scope = { organizationId: uuid(input.site.organizationId), webPresenceId: uuid(input.site.webPresenceId),
     managedSiteId: uuid(input.site.managedSiteId) };
@@ -40,6 +44,8 @@ export function bindReviewDraft(input: {
   const candidate = {
     scope, siteProposalId: uuid(input.streamId), installationId: uuid(input.installationId), revision: input.revision,
     previousDigest: input.previousDigest, ...(brand && { brand }), ...(baselinePages && { baselinePages }),
+    ...(input.readBack && { readBack: structuredClone(input.readBack) }),
+    ...(input.answeredNotes?.length && { answeredNotes: structuredClone(input.answeredNotes) }),
     source: { intakeId: uuid(input.source.intakeId), workflowVersion: input.source.workflowVersion,
       candidateDigest: fingerprint(input.review.candidate) },
     pages: structuredClone(input.review.candidate.pages),
@@ -56,7 +62,9 @@ export function readReviewDraftCandidate(value: unknown) {
   const candidate = object(value, ["scope", "siteProposalId", "installationId", "revision", "previousDigest", "source",
     "pages", "navigation", "actions", "unresolvedActions",
     ...(Object.hasOwn(value as object, "brand") ? ["brand"] : []),
-    ...(Object.hasOwn(value as object, "baselinePages") ? ["baselinePages"] : [])]);
+    ...(Object.hasOwn(value as object, "baselinePages") ? ["baselinePages"] : []),
+    ...(Object.hasOwn(value as object, "readBack") ? ["readBack"] : []),
+    ...(Object.hasOwn(value as object, "answeredNotes") ? ["answeredNotes"] : [])]);
   const scope = object(candidate.scope, ["organizationId", "webPresenceId", "managedSiteId"]) as Site;
   const pages = candidate.pages as Parameters<typeof validatePages>[0];
   validatePages(pages, true, true);
@@ -93,5 +101,21 @@ export function readReviewDraftCandidate(value: unknown) {
   if (!Number.isSafeInteger(source.workflowVersion) || !hash(source.candidateDigest)) throw Error("Review draft source refused");
   if (candidate.brand !== undefined) readSignedDraftBrand(candidate.brand, scope);
   if (candidate.baselinePages !== undefined) nativeDraftBaseline(candidate.baselinePages);
+  if (candidate.readBack !== undefined) {
+    const read = object(candidate.readBack, ["revision", "pages"]);
+    if (!Number.isSafeInteger(read.revision) || !Array.isArray(read.pages)) throw Error("Review draft read-back refused");
+    for (const value of read.pages) {
+      const page = object(value, ["path", "contentSha256", "title"]);
+      if (typeof page.path !== "string" || !hash(page.contentSha256) || typeof page.title !== "string") throw Error("Review draft read-back refused");
+    }
+  }
+  if (candidate.answeredNotes !== undefined) {
+    if (!Array.isArray(candidate.answeredNotes) || !candidate.answeredNotes.length) throw Error("Review draft Note answers refused");
+    for (const value of candidate.answeredNotes) {
+      const answer = object(value, ["id", "reply"]);
+      if (!Number.isSafeInteger(answer.id) || (answer.id as number) < 1) throw Error("Review draft Note answer refused");
+      text(answer.reply, 2000);
+    }
+  }
   return candidate;
 }

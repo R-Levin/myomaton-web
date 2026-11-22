@@ -21,6 +21,21 @@ function get_comment_meta(int $id, string $key, bool $single): string {
     foreach ($GLOBALS['testNotes'] ?? [] as $note) if ($note->comment_ID === $id) return $note->status;
     return ''; }
 
+// Note threads, as WordPress stores them (comment type "note", status in _wp_note_status).
+function get_comment(int $id): ?object {
+    foreach ($GLOBALS['testNotes'] ?? [] as $note) if ($note->comment_ID === $id) return $note;
+    return null; }
+function wp_get_current_user(): object { return (object) ['ID' => 7, 'display_name' => 'MioPages Core']; }
+function wp_insert_comment(array $data): int {
+    $id = 9000 + count($GLOBALS['testNotes'] ?? []);
+    $GLOBALS['testNotes'][] = (object) ['comment_ID' => $id, 'comment_post_ID' => $data['comment_post_ID'], 'comment_parent' => $data['comment_parent'],
+        'comment_author' => $data['comment_author'], 'comment_content' => $data['comment_content'], 'comment_date_gmt' => '2026-11-22 21:00:00',
+        'comment_type' => $data['comment_type'], 'status' => ''];
+    return $id; }
+function update_comment_meta(int $id, string $key, string $value): bool {
+    foreach ($GLOBALS['testNotes'] ?? [] as $note) if ($note->comment_ID === $id) { $note->status = $value; return true; }
+    return false; }
+
 function harness_finish(?string $store, array $result): never
 {
     global $wpdb;
@@ -62,12 +77,16 @@ try {
         foreach ($wpdb->pages as $id => $page) $wpdb->pages[$id]['post_modified_gmt'] ??= '2026-11-22 19:00:00';
         $map = $ids();
         foreach ($input['edits'] ?? [] as $path => [$from, $to]) {
-            $wpdb->pages[$map[$path]]['post_content'] = str_replace($from, $to, $wpdb->pages[$map[$path]]['post_content']);
+            // The first occurrence only, as an Operator edits one spot.
+            $content = $wpdb->pages[$map[$path]]['post_content'];
+            $at = strpos($content, $from);
+            if ($at === false) throw new RuntimeException('Simulated edit target not found on ' . $path);
+            $wpdb->pages[$map[$path]]['post_content'] = substr_replace($content, $to, $at, strlen($from));
         }
         foreach ($input['notes'] ?? [] as $note) {
             $GLOBALS['testNotes'][] = (object) ['comment_ID' => $note['id'], 'comment_post_ID' => $map[$note['path']],
                 'comment_parent' => $note['parent'] ?? 0, 'comment_author' => 'Owner', 'comment_content' => $note['text'],
-                'comment_date_gmt' => '2026-11-22 20:00:00', 'status' => $note['status'] ?? ''];
+                'comment_date_gmt' => '2026-11-22 20:00:00', 'comment_type' => 'note', 'status' => $note['status'] ?? ''];
         }
         if ($mode === 'operator') harness_finish($store, ['ids' => $map]);
         [$status, $body] = MioPages_Delivery_Readback::handle($input['request'], $input['identity'], $input['pull']);

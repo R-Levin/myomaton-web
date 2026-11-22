@@ -69,9 +69,10 @@ export async function readBackOperatorSite(config: OperatorSiteConfig, fetcher: 
 }
 
 /**
- * Send the case's current site as the next review draft. Refuses when the Operator has
- * edited pages Core has not yet taken in: those edits must reach Core first, never be
- * overwritten (WordPress refuses too).
+ * Send the case's current site as the next review draft. Pages the Operator edited may be
+ * replaced only after Core took that review in (applyOperatorReview), and only if nothing
+ * changed since: Operator work is never overwritten unread (WordPress checks too). Notes
+ * Core acted on are answered and resolved with this delivery.
  */
 export async function deliverReviewDraft(input: { config: OperatorSiteConfig; context: WorkflowContext; view: PresenceWorkflowView;
   state: ReviewDeliveryState | null; fetcher?: typeof fetch; now?: Date }) {
@@ -90,8 +91,16 @@ export async function deliverReviewDraft(input: { config: OperatorSiteConfig; co
     if (readback.revision !== state.revision || readback.digest !== state.digest) {
       throw Error("Operator WordPress no longer holds Core's last delivery; read it back and reconcile first");
     }
-    const edited = readback.pages.filter(page => page.edited || page.missing).map(page => page.path);
-    if (edited.length) throw Error("Operator edits on " + edited.join(", ") + " must be taken into Core before the next delivery");
+  }
+  const taken = state ? view.wordpressReviews?.filter(review => review.readbackRevision === state.revision).at(-1) : undefined;
+  if (readback) {
+    const changed = readback.pages.filter(page => page.edited || page.missing);
+    if (changed.length && !taken) {
+      throw Error("Operator edits on " + changed.map(page => page.path).join(", ") + " must be taken into Core before the next delivery");
+    }
+    const since = changed.filter(page => page.missing || !taken!.acknowledged.some(read => read.path === page.path &&
+      read.contentSha256 === page.contentSha256 && read.title === page.title));
+    if (since.length) throw Error("The Operator changed " + since.map(page => page.path).join(", ") + " after Core took in the review; take in the new changes first");
   }
   const logoPng = await readFile(input.config.logo.file);
   if (createHash("sha256").update(logoPng).digest("hex") !== config.logo.sha256) throw Error("Wordmark file differs from configuration");
@@ -103,6 +112,10 @@ export async function deliverReviewDraft(input: { config: OperatorSiteConfig; co
   const draft = bindReviewDraft({ site, installationId: config.installationId, streamId: config.streamId,
     revision: (state?.revision ?? 0) + 1, previousDigest: state?.digest ?? null,
     source: { intakeId: context.intakeId, workflowVersion: view.version }, review, brand,
+    ...(taken && { readBack: { revision: state!.revision, pages: taken.acknowledged },
+      answeredNotes: taken.notes.map(note => ({ id: note.id, reply: note.revised
+        ? "MioPages Core revised this page in response to this note. Please review the new version."
+        : "MioPages Core has taken this note into the site." })) }),
     // When Core adds or retires pages, WordPress needs the previous page set: retired
     // drafts are archived there, never deleted.
     ...(state && !samePaths(state.pages, review.candidate.pages) && { baselinePages: state.pages }) });

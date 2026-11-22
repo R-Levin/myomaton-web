@@ -58,7 +58,17 @@ final class MioPages_Native_Draft_Writer
             $baseline = $candidate['baselinePages'] ?? null;
             $priorPosts = $current['posts'] ?? [];
             if ($current !== null) {
-                self::verifyDrafts($current, $candidate['scope']);
+                // Pages the Operator edited may be replaced only once Core has read them back.
+                $acknowledged = $review ? self::acknowledged($candidate) : [];
+                $actual = self::verifyDrafts($current, $candidate['scope'], $acknowledged);
+                // Compare the new text against what WordPress actually holds, so the Operator's
+                // version is kept as a WordPress revision and always replaced.
+                foreach (array_keys($acknowledged) as $path) {
+                    if (isset($priorPosts[$path], $actual[$path])) {
+                        $priorPosts[$path]['post_content'] = $actual[$path]['post_content'];
+                        $priorPosts[$path]['post_title'] = $actual[$path]['post_title'];
+                    }
+                }
                 if ($baseline === null) {
                     $currentIds = $current['logicalPageIds'] ?? null;
                     $currentPaths = array_keys($current['posts']);
@@ -132,6 +142,9 @@ final class MioPages_Native_Draft_Writer
             return ['current' => $next, 'previous' => $previous, 'highWaterRevision' => $candidate['revision'],
                 ...($archive === [] ? [] : ['archive' => $archive])];
         });
+        if ($review) {
+            self::answerNotes($candidate, $applied);
+        }
         return ['operation' => 'apply', 'installationId' => $candidate['installationId'],
             'requestedDigest' => $digest, 'applied' => $applied];
     }
@@ -259,8 +272,43 @@ final class MioPages_Native_Draft_Writer
         return $result;
     }
 
-    private static function verifyDrafts(array $revision, array $scope): void
+    /** Content Core read back and took in, by path: [contentSha256, title]. */
+    private static function acknowledged(array $candidate): array
     {
+        $out = [];
+        foreach ($candidate['readBack']['pages'] ?? [] as $page) {
+            $out[$page['path']] = [$page['contentSha256'], $page['title']];
+        }
+        return $out;
+    }
+
+    /**
+     * Core's reply to each Note it acted on, added as a reply in the Note's thread, and the
+     * Note marked resolved. Only Notes on this installation's own drafts; already resolved
+     * Notes are left as they are.
+     */
+    private static function answerNotes(array $candidate, array $applied): void
+    {
+        $ids = array_map(static fn($post) => (int) $post['ID'], $applied['posts']);
+        $user = wp_get_current_user();
+        foreach ($candidate['answeredNotes'] ?? [] as $answer) {
+            $note = get_comment((int) $answer['id']);
+            if (!$note || $note->comment_type !== 'note' || (int) $note->comment_parent !== 0
+                || !in_array((int) $note->comment_post_ID, $ids, true)
+                || get_comment_meta((int) $note->comment_ID, '_wp_note_status', true) === 'resolved') {
+                continue;
+            }
+            wp_insert_comment(['comment_post_ID' => (int) $note->comment_post_ID, 'comment_parent' => (int) $note->comment_ID,
+                'comment_type' => 'note', 'comment_content' => $answer['reply'], 'comment_approved' => 0,
+                'user_id' => (int) $user->ID, 'comment_author' => $user->display_name ?: 'MioPages Core']);
+            update_comment_meta((int) $note->comment_ID, '_wp_note_status', 'resolved');
+        }
+    }
+
+    /** $acknowledged: per path, content Core read back; the draft may differ from what was delivered only by that. */
+    private static function verifyDrafts(array $revision, array $scope, array $acknowledged = []): array
+    {
+        $rows = [];
         global $wpdb;
         if (isset($revision['brand'])) {
             MioPages_Native_Draft_Brand::bytes($revision['brand'], $scope);
@@ -268,7 +316,7 @@ final class MioPages_Native_Draft_Writer
         foreach ($revision['attachments'] ?? [] as $attachment) {
             MioPages_Native_Draft_Media::verifyAttachment($attachment);
         }
-        foreach ($revision['posts'] as $expected) {
+        foreach ($revision['posts'] as $path => $expected) {
             $row = $wpdb->get_row($wpdb->prepare(
                 "SELECT post_type,post_status,post_title,post_content,post_name FROM {$wpdb->posts} WHERE ID=%d FOR UPDATE",
                 $expected['ID']
@@ -276,10 +324,18 @@ final class MioPages_Native_Draft_Writer
             unset($expected['ID']);
             // The original draft writer always left the slug empty.
             $expected['post_name'] ??= '';
+            if ($row !== $expected && is_array($row) && isset($acknowledged[$path])
+                && hash_equals($acknowledged[$path][0], hash('sha256', (string) $row['post_content']))
+                && $row['post_title'] === $acknowledged[$path][1]) {
+                $expected['post_content'] = $row['post_content'];
+                $expected['post_title'] = $row['post_title'];
+            }
             if ($row !== $expected) {
                 throw new RuntimeException('Native WordPress draft readback mismatch.');
             }
+            $rows[$path] = $row;
         }
+        return $rows;
     }
 
     private static function transaction(string $installation, callable $change): array

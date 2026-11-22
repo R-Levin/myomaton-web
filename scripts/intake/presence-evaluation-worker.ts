@@ -30,6 +30,7 @@ import {prepareOriginalCustody} from "../../lib/platform/intake/presence-origina
 import {publicCaptureBridge} from "../../lib/platform/intake/presence-public-capture-bridge";
 import { summarizePresenceWorkflowUsage } from "../../lib/platform/intake/intelligent-responses";
 import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig, type ReviewDeliveryState } from "../../lib/platform/wordpress-delivery/operator-review";
+import { operatorFeedback } from "../../lib/platform/intake/operator-feedback";
 
 const digest = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 const manifestFile = "docs/presence-evaluation-activation.json";
@@ -202,7 +203,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const researchReplay = operation === "replay-research";
   const completeResearch = (operation === "complete-research" || researchReplay) && approval === commercialApproval;
   // Review drafts to Operator WordPress and read-back (owner decisions, Nov 22). No AI calls.
-  const delivery = ["deliver-review", "read-back"].includes(operation) && approval === rebuiltRunApproval;
+  const delivery = ["deliver-review", "read-back", "take-in-review"].includes(operation) && approval === rebuiltRunApproval;
   if ((scenario !== "c0" && scenario !== "c2") || !approval || extra.length ||
       !(readOnly || editing || delivery || operation === "activate" || operation === "work" || operation === "preflight" || completeResearch || replaceReport) || (editing || delivery ? !value : Boolean(value))) {
     throw Error("Evaluation command refused");
@@ -256,6 +257,19 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
         return { site: request.site, delivered: state?.revision ?? null, ...summary, file };
       }
       if (request.version !== prior.version) throw Error("Evaluation view is stale");
+      if (operation === "take-in-review") {
+        // Keep the Operator's wording in Core's pages; queue noted pages for Core's revision.
+        if (!state) throw Error("Nothing has been delivered to this site yet");
+        const { readback } = await readBackOperatorSite(config);
+        if (readback.revision !== state.revision || readback.digest !== state.digest) throw Error("Operator WordPress no longer holds Core's last delivery");
+        const feedback = operatorFeedback(context, prior, readback);
+        await createPrivate(join(root, `review-taken-${request.site}-r${state.revision}-${new Date().toISOString().replace(/[:.]/gu, "-")}.json`),
+          JSON.stringify({ readback, feedback }, null, 2) + "\n");
+        const actor = { id: "local-evaluation-operator", role: "operator" as const, simulated: false, authority: "Operator review in WordPress " + request.site };
+        const view = await workflow.applyOperatorReview(context, prior.version, actor, feedback);
+        return { site: request.site, version: view?.version, next: view?.next, keptEdits: feedback.edits.length + feedback.titles.length,
+          notes: feedback.notes.length, structural: feedback.structural.length };
+      }
       const { state: next, receipt } = await deliverReviewDraft({ config, context, view: prior, state });
       await createPrivate(join(root, `wordpress-${request.site}-r${next.revision}.json`), JSON.stringify({ ...next, receipt }, null, 2) + "\n");
       return { site: request.site, revision: next.revision, workflowVersion: prior.version, pages: receipt.posts.map(post => ({ path: post.path, id: post.id })) };
