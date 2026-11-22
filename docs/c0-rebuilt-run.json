@@ -41,6 +41,15 @@
       "cacheWritePerMillion": 0,
       "countMicros": 0
     },
+    "ledgerRateCard": {
+      "model": "gpt-5.4-mini-2026-03-17",
+      "verifiedOn": "2026-11-17",
+      "inputPerMillion": 750000,
+      "cachedPerMillion": 75000,
+      "cacheWritePerMillion": 0,
+      "outputPerMillion": 4500000,
+      "countMicros": 0
+    },
     "requestBytes": 36000000,
     "stages": {
       "research": {

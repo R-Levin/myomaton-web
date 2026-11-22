@@ -34,7 +34,7 @@ export async function openRebuiltActivation(parent: string, databaseUrl: string)
   if (new URL(databaseUrl).pathname !== "/" + name) throw Error("Exact isolated new-case database required");
   return {
     item: { ...plan.destination, entry: "DIRECT_START" as const },
-    previousLedger: undefined, reportHold: undefined, primary: plan.provider.rates,
+    previousLedger: undefined, reportHold: undefined, primary: plan.provider.ledgerRateCard, // Core's standard base rate card; stages meter at their own rates
     fingerprint: fingerprint({ run: "rebuilt-2026-11-22", plan }),
     async compile(_original: WorkflowContext) {
       void _original;

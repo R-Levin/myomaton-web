@@ -54,7 +54,7 @@ export function compileRebuiltRun(prior: { context: WorkflowContext; grant: Pres
   validateOriginalGrant(originalMaterials, contextDigest);
   const stages = p.provider.stages as WorkflowStagePlan;
   const ledger = { id: fingerprint({ run: rebuiltRunApproval, case: p.destination }),
-    startingLedger: sha256(JSON.stringify(emptyResponsesUsageLedger(p.provider.rates)) + "\n"), baselineAttempts: 0,
+    startingLedger: sha256(JSON.stringify(emptyResponsesUsageLedger(p.provider.ledgerRateCard)) + "\n"), baselineAttempts: 0,
     requests: p.limits.providerRequests, generations: p.limits.textGenerations, capMicros: p.budget.capMicros,
     inputTokens: Math.max(...Object.values(stages).map(stage => stage.requestInputTokens)), inputBytes: p.provider.requestBytes,
     stageSpendingPolicy: "shared-aggregate" as const,

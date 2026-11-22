@@ -41,7 +41,7 @@ test("the rebuilt test case inherits knowledge only, under a new identity, with 
   assert.equal(grant.marketingAuthority?.contextDigest, fingerprint(context));
   assert.equal(grant.ledger.capMicros, 25_000_000);
   assert.equal(grant.ledger.baselineAttempts, 0, "a fresh ledger, not a continuation of the old one");
-  assert.equal(grant.ledger.startingLedger, sha(JSON.stringify(emptyResponsesUsageLedger(rebuiltRunPlan.provider.rates)) + "\n"));
+  assert.equal(grant.ledger.startingLedger, sha(JSON.stringify(emptyResponsesUsageLedger(rebuiltRunPlan.provider.ledgerRateCard)) + "\n"));
   assert.ok(grant.ledger.generations >= 100 && grant.ledger.requests >= 200, "counters are generous");
   assert.equal(grant.marketSearch?.maxToolCalls, 10);
   assert.equal(grant.reviewSequence, "site-first");
