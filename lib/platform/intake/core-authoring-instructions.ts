@@ -69,9 +69,10 @@ const pageFormat =
   "reading order the same as desktop (mobileOrder 0) for accessibility.";
 
 const design =
-  "Design: you decide the visual design. Choose layout, hierarchy, rhythm, surfaces and emphasis to fit this " +
-  "business and what the research shows about current, credible sites in its field, then explain the intent " +
-  "in the Direction and visual briefs. Existing section roles are semantic jobs, not fixed layouts. If an idea " +
+  "Design: you decide the visual design. The Direction's design object sets the palette, fonts, shape, density " +
+  "and imagery direction; follow it. In compositions choose layout, hierarchy, rhythm and emphasis, and use the " +
+  "section surfaces (light, brand, tonal, strong, supporting, contrast) deliberately to give the page shape. Make " +
+  "every image brief follow the Direction's imagery direction. Existing section roles are semantic jobs, not fixed layouts. If an idea " +
   "cannot be expressed with the available components, describe the needed component in the visual brief so it " +
   "can be built, rather than settling for a generic layout. The customer's brand assets (logo, name, colours) " +
   "are inputs to use; you may recommend changing them in the Direction, but never silently drop them.";
@@ -87,7 +88,17 @@ const stages: Record<AuthoringStage, string> = {
     "Task: write the Presence Direction: positioning, the decisions visitors are making and the paths that serve " +
     "them, search and ongoing content opportunities, and the visual direction (tone, typography character, colour " +
     "use, imagery style and layout rhythm) with the research findings and brand reasons behind each choice. " +
-    "Distinguish what the business already delivers, including by people, from what still depends on launch work.",
+    "Distinguish what the business already delivers, including by people, from what still depends on launch work. " +
+    "Then fill the design object: this is the site's actual visual design, rendered exactly as you specify. Choose " +
+    "a palette for the six surface roles (light is the main page; brand is the primary accent and link colour; " +
+    "strong, tonal and supporting are alternative section surfaces; contrast is the boldest band) with a text " +
+    "colour for each, a border and a muted text colour; a heading and body font from the listed families; the type " +
+    "scale, line height and heading weight; corner shape; spacing density; and the imagery style with art " +
+    "direction every image brief will follow. Keep text readable (Core will adjust any colour that falls below " +
+    "accessible contrast and tell you). Base it on the business, its customers and what the research shows " +
+    "about credible, current sites in this field, using the customer's brand assets as inputs. Explain the " +
+    "reasoning in rationale and cite the research that shaped it. Aim for something distinctive and right for " +
+    "this business, not a generic template.",
   blueprint:
     "Task: plan the complete site. Let the business and its visitors decide which Pages exist; there is no fixed " +
     "number. Put Home first. Give every Page a distinct job and a decision brief tracing it to report findings, " +

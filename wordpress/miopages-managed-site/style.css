@@ -339,3 +339,28 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
 /* Inside authored components, generic node layout classes (flow, inset-none) must not
    flatten the FPO frame or placeholder notice. */
 .miopages-native-component figure.miopages-fpo { display: flex; padding: clamp(1rem, 2.5vw, 1.5rem); }
+
+/* ===== Core-designed sites (brand projection v4) =====
+   Everything below applies only when Core's AI chose this site's design. Values come
+   from the signed projection as CSS variables; older candidates are unaffected. */
+body.miopages-designed { font-family: var(--miopages-body-font); color: var(--wp--preset--color--ink); }
+.miopages-designed h1, .miopages-designed h2, .miopages-designed h3, .miopages-designed h4 {
+  font-family: var(--miopages-heading-font); font-weight: var(--miopages-heading-weight); }
+.miopages-designed .miopages-draft-section h1,
+.miopages-designed .miopages-authored-section .miopages-native-component h1.miopages-node {
+  font-size: clamp(2rem, 5vw, var(--miopages-title-size)); max-width: 22ch; }
+.miopages-designed h2 { font-size: clamp(1.45rem, 3vw, calc(var(--miopages-title-size) * .62)); }
+.miopages-designed .miopages-draft-section { padding: calc(clamp(1.5rem, 5vw, 4rem) * var(--mp-space)); margin-block: calc(1.3rem * var(--mp-space)); }
+.miopages-designed .miopages-draft-intro { padding-block: calc(clamp(1.3rem, 3vw, 2.5rem) * var(--mp-space)); }
+.miopages-designed .miopages-draft-hero, .miopages-designed .miopages-draft-cta { border-radius: var(--mp-radius-lg); }
+.miopages-designed .miopages-draft-with-image img, .miopages-designed .miopages-native-component .miopages-node-rounded,
+.miopages-designed .miopages-native-component figure.miopages-fpo, .miopages-designed .miopages-native-component aside.miopages-placeholder,
+.miopages-designed figure.miopages-fpo, .miopages-designed aside.miopages-placeholder { border-radius: var(--mp-radius-md); }
+.miopages-designed .wp-block-button__link { border-radius: var(--mp-radius-sm); }
+.miopages-designed .miopages-native-component .miopages-node-gap-medium { gap: calc(1rem * var(--mp-space)); }
+.miopages-designed .miopages-native-component .miopages-node-gap-large { gap: calc(2rem * var(--mp-space)); }
+.miopages-designed .miopages-native-component .miopages-node-inset-medium { padding: calc(1.25rem * var(--mp-space)); }
+.miopages-designed .miopages-native-component .miopages-node-inset-large { padding: calc(2.25rem * var(--mp-space)); }
+.miopages-native-component .miopages-node-surface-supporting { background: var(--miopages-supporting-surface, var(--wp--preset--color--support)); color: var(--miopages-supporting-ink, inherit); }
+.miopages-native-component .miopages-node-surface-contrast { background: var(--miopages-contrast-surface, var(--wp--preset--color--ink)); color: var(--miopages-contrast-ink, var(--wp--preset--color--surface)); }
+.miopages-designed .miopages-native-component .miopages-node-surface-contrast a { color: inherit; }

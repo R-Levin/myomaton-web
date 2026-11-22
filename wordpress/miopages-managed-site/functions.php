@@ -23,6 +23,18 @@ add_action('wp_enqueue_scripts', static function (): void {
         '--miopages-body-leading' => (string)$t['lineHeight'],
         '--miopages-title-size' => ($t['baseSize'] * $t['headingScale']) . 'px',
     ];
+    if ($brand['designed']) {
+        // A design Core's AI chose for this site (projection v4): fonts, extra surfaces, corners, spacing.
+        wp_enqueue_style('miopages-site-fonts', get_theme_file_uri('fonts/fonts.css'), [], wp_get_theme()->get('Version'));
+        $radius = ['square' => ['0', '0', '0'], 'soft' => ['.3rem', '.6rem', '1rem'], 'round' => ['.6rem', '1.1rem', '1.75rem']][$brand['shape']];
+        $vars += [
+            '--miopages-supporting-surface' => $p['supporting']['background'], '--miopages-supporting-ink' => $p['supporting']['text'],
+            '--miopages-contrast-surface' => $p['contrast']['background'], '--miopages-contrast-ink' => $p['contrast']['text'],
+            '--miopages-muted' => $p['muted'], '--miopages-heading-weight' => (string)$t['headingWeight'],
+            '--mp-radius-sm' => $radius[0], '--mp-radius-md' => $radius[1], '--mp-radius-lg' => $radius[2],
+            '--mp-space' => ['compact' => '.75', 'balanced' => '1', 'airy' => '1.4'][$brand['density']],
+        ];
+    }
     $css = '';
     foreach ($vars as $name => $value) $css .= $name . ':' . $value . ';';
     wp_add_inline_style('miopages-managed-site', 'body.miopages-branded-draft{' . $css . '}');
@@ -31,6 +43,7 @@ add_filter('body_class', static function (array $classes): array {
     $brand = miopages_draft_brand();
     if ($brand) {
         $classes[] = 'miopages-branded-draft';
+        if ($brand['designed']) $classes[] = 'miopages-designed';
         if ($brand['motion'] === 'off') $classes[] = 'miopages-motion-off';
     }
     return $classes;

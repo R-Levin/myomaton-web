@@ -115,7 +115,7 @@ final class MioPages_Native_Component
         $sizes = ['none','small','medium','large'];
         if (!in_array($layout['arrangement'], ['flow','row','columns'], true)
             || !in_array($layout['gap'], $sizes, true) || !in_array($layout['inset'], $sizes, true)
-            || !in_array($layout['surface'], ['none','light','brand','tonal','strong'], true)
+            || !in_array($layout['surface'], ['none','light','brand','tonal','strong','supporting','contrast'], true)
             || !in_array($layout['align'], ['start','center','end','stretch'], true)
             || !in_array($layout['measure'], ['narrow','reading','wide','full'], true)
             || !in_array($layout['typeScale'], ['small','body','lead','display'], true)

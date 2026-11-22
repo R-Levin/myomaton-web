@@ -1,7 +1,7 @@
 import { fingerprint } from "../canonical/model";
 import { confirmReportReservation, confirmSitePlanningReceipt, meteredPresenceWorkflow, responseProposal, type ReportReservation, type ResponsesRates, type ResponsesTransport,
   validateWorkflowStagePlan, type WorkflowMeterStage, type WorkflowUsageScope } from "./intelligent-responses";
-import { ArtifactValidationError, artifactSchemas, composedArtifactSchemas, strategyBlueprintSchema, strategyPageSchema, creativePageSchema, reassessmentBlueprintSchema } from "./presence-workflow-artifacts";
+import { ArtifactValidationError, artifactSchemas, composedArtifactSchemas, designedDirectionSchema, strategyBlueprintSchema, strategyPageSchema, creativePageSchema, reassessmentBlueprintSchema } from "./presence-workflow-artifacts";
 import { confirmedKnowledgeEvidence } from "./account-work";
 import { marketSourceCandidates, marketSources, marketResearchInput, marketResearchQuestions, retrievePublicResearch, validateDiscovery, validateMarketSearch, validateResearchSources, type MarketSearch,
   type PublicResearchSource, type ResearchDiscovery, type ResearchOriginalCustody } from "./presence-workflow-research";
@@ -531,7 +531,9 @@ export function createResponsesPresenceWorkflow(config: {
       const baseArtifact = batch ? editorialPatchSchema(batch.paths) : exactPage !== undefined
         ? { ...pageSchema, properties: { ...pageSchema.properties, path: { type: "string", enum: [exactPage] } } }
         : operation === "blueprint" && grant.marketingAuthority?.strategy
-          ? bindBlueprintDecisionSchema(run, grant.marketingAuthority) : schemas[operation];
+          ? bindBlueprintDecisionSchema(run, grant.marketingAuthority)
+          // Rebuilt runs: the Direction also chooses the site's visual design.
+          : operation === "direction" && grant.marketingAuthority?.projectionVersion === 2 ? designedDirectionSchema : schemas[operation];
       const artifact = operation === "blueprint" && run.input.knowledgeReassessment
         ? reassessmentBlueprintSchema(baseArtifact as typeof artifactSchemas.blueprint) : baseArtifact;
       const schema = run.context.evaluation || grant.marketingAuthority || run.input.knowledgeReassessment ? bindCitations(artifact, citationIds(run)) : artifact;

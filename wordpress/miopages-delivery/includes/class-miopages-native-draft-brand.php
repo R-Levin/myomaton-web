@@ -21,8 +21,7 @@ final class MioPages_Native_Draft_Brand
             !is_array($logo) || count($logo) !== 4 || !self::digest($logo['sha256'] ?? null) ||
             !is_string($logo['alt'] ?? null) || trim($logo['alt']) === '' || strlen($logo['alt']) > 640 ||
             preg_match('/[<>\x00-\x1f\x7f]/', $logo['alt']) ||
-            !is_array($design) || count($design) !== 5 || ($design['grammar'] ?? null) !== 'service-led' ||
-            !in_array($design['version'] ?? null, [1, 2, 3], true) ||
+            !is_array($design) || !self::designIdentity($design) ||
             !in_array($design['motion'] ?? null, ['off', 'minimal'], true) ||
             !is_string($encoded) || strlen($encoded) > 174764) {
             throw new InvalidArgumentException('Native draft brand binding refused.');
@@ -46,8 +45,24 @@ final class MioPages_Native_Draft_Brand
         return $raw;
     }
 
+    /** Fonts self-hosted by the miopages-managed-site theme (SIL OFL 1.1). Must match site-design.ts. */
+    public const FONTS = ['inter','manrope','dm-sans','work-sans','space-grotesk','plus-jakarta-sans','source-sans-3',
+        'fraunces','source-serif-4','lora','playfair-display','newsreader','jetbrains-mono'];
+
+    /** Historical service-led designs (v1-3) or a design Core's AI chose for the site (v4). */
+    private static function designIdentity(array $design): bool
+    {
+        if (($design['grammar'] ?? null) === 'core-designed') return count($design) === 7 && ($design['version'] ?? null) === 4
+            && ($design['motion'] ?? null) === 'minimal';
+        return count($design) === 5 && ($design['grammar'] ?? null) === 'service-led' && in_array($design['version'] ?? null, [1, 2, 3], true);
+    }
+
     private static function validateDesign(array $design): void
     {
+        if (($design['grammar'] ?? null) === 'core-designed') {
+            self::validateCoreDesign($design);
+            return;
+        }
         $palette = $design['palette'] ?? null;
         $type = $design['typography'] ?? null;
         if (!is_array($palette) || count($palette) !== 8 || !is_array($type) || count($type) !== 5 ||
@@ -66,6 +81,31 @@ final class MioPages_Native_Draft_Brand
         self::color($palette['border'] ?? null);
         self::color($palette['muted'] ?? null);
         foreach (['baseSize' => [14, 22], 'headingScale' => [1.5, 3.5], 'lineHeight' => [1.2, 2]] as $key => [$min, $max]) {
+            $number = $type[$key] ?? null;
+            if ((!is_int($number) && !is_float($number)) || !is_finite($number) || $number < $min || $number > $max) {
+                throw new InvalidArgumentException('Native draft brand type scale refused.');
+            }
+        }
+    }
+
+    private static function validateCoreDesign(array $design): void
+    {
+        $palette = $design['palette'] ?? null;
+        $type = $design['typography'] ?? null;
+        if (!is_array($palette) || count($palette) !== 8 || !is_array($type) || count($type) !== 6 ||
+            !in_array($type['headingFamily'] ?? null, self::FONTS, true) || !in_array($type['bodyFamily'] ?? null, self::FONTS, true) ||
+            !in_array($type['headingWeight'] ?? null, [400, 500, 600, 700, 800], true) ||
+            !in_array($design['shape'] ?? null, ['square', 'soft', 'round'], true) ||
+            !in_array($design['density'] ?? null, ['compact', 'balanced', 'airy'], true)) {
+            throw new InvalidArgumentException('Native draft brand design refused.');
+        }
+        foreach (['light', 'strong', 'tonal', 'brand', 'supporting', 'contrast'] as $role) {
+            if (!is_array($palette[$role] ?? null) || count($palette[$role]) !== 2) throw new InvalidArgumentException('Native draft brand colors refused.');
+            foreach (['background', 'text'] as $key) self::color($palette[$role][$key] ?? null);
+        }
+        self::color($palette['border'] ?? null);
+        self::color($palette['muted'] ?? null);
+        foreach (['baseSize' => [15, 20], 'headingScale' => [1.6, 3.4], 'lineHeight' => [1.35, 1.85]] as $key => [$min, $max]) {
             $number = $type[$key] ?? null;
             if ((!is_int($number) && !is_float($number)) || !is_finite($number) || $number < $min || $number > $max) {
                 throw new InvalidArgumentException('Native draft brand type scale refused.');

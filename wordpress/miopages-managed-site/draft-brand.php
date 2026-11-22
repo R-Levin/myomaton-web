@@ -10,12 +10,13 @@ function miopages_draft_brand(): ?array {
     $signed = apply_filters('miopages_signed_draft_brand', null, $post);
     $binding = $signed['projection'] ?? (defined('MIOPAGES_NATIVE_DRAFT_IDENTITY')
         ? null : get_post_meta($post->ID, '_miopages_draft_brand', true));
-    if (!is_array($binding) || ($binding['version'] ?? null) !== 1 ||
-        ($binding['design']['grammar'] ?? null) !== 'service-led' ||
-        !in_array($binding['design']['version'] ?? null, [1, 2, 3], true)) return null;
+    if (!is_array($binding) || ($binding['version'] ?? null) !== 1) return null;
+    $designed = ($binding['design']['grammar'] ?? null) === 'core-designed' && ($binding['design']['version'] ?? null) === 4;
+    if (!$designed && (($binding['design']['grammar'] ?? null) !== 'service-led' ||
+        !in_array($binding['design']['version'] ?? null, [1, 2, 3], true))) return null;
     $palette = $binding['design']['palette'] ?? [];
     $typography = $binding['design']['typography'] ?? [];
-    foreach (['light', 'brand', 'tonal', 'strong'] as $role) {
+    foreach ($designed ? ['light', 'brand', 'tonal', 'strong', 'supporting', 'contrast'] : ['light', 'brand', 'tonal', 'strong'] as $role) {
         foreach (['background', 'text'] as $channel) {
             if (!is_string($palette[$role][$channel] ?? null) ||
                 !preg_match('/^#[0-9a-f]{6}$/iD', $palette[$role][$channel])) return null;
@@ -27,10 +28,20 @@ function miopages_draft_brand(): ?array {
         'serif' => "Georgia, 'Times New Roman', serif",
         'mono' => "ui-monospace, Consolas, monospace",
     ];
-    $bodyFont = $typography['bodyFont'] ?? null;
-    $headingFont = $typography['headingFont'] ?? null;
-    $body = is_string($bodyFont) ? ($stacks[$bodyFont] ?? null) : null;
-    $heading = is_string($headingFont) ? ($stacks[$headingFont] ?? null) : null;
+    if ($designed) {
+        // Self-hosted curated fonts (fonts/fonts.css). Unknown ids are refused, never passed through as CSS.
+        $families = miopages_site_fonts();
+        $body = $families[$typography['bodyFamily'] ?? ''] ?? null;
+        $heading = $families[$typography['headingFamily'] ?? ''] ?? null;
+        if (!in_array($typography['headingWeight'] ?? null, [400, 500, 600, 700, 800], true) ||
+            !in_array($binding['design']['shape'] ?? null, ['square', 'soft', 'round'], true) ||
+            !in_array($binding['design']['density'] ?? null, ['compact', 'balanced', 'airy'], true)) return null;
+    } else {
+        $bodyFont = $typography['bodyFont'] ?? null;
+        $headingFont = $typography['headingFont'] ?? null;
+        $body = is_string($bodyFont) ? ($stacks[$bodyFont] ?? null) : null;
+        $heading = is_string($headingFont) ? ($stacks[$headingFont] ?? null) : null;
+    }
     if (!$body || !$heading) return null;
     foreach (['baseSize' => [14, 22], 'headingScale' => [1.5, 3.5], 'lineHeight' => [1.2, 2]] as $field => [$min, $max]) {
         $value = $typography[$field] ?? null;
@@ -52,7 +63,22 @@ function miopages_draft_brand(): ?array {
         !is_string($bytes) || !hash_equals($digest, hash('sha256', $bytes))) return null;
     $size = getimagesizefromstring($bytes);
     if ($size === false || $size['mime'] !== 'image/png') return null;
-    return $cache[$post->ID] = ['palette' => $palette, 'typography' => $typography,
+    return $cache[$post->ID] = ['palette' => $palette, 'typography' => $typography, 'designed' => $designed,
+        'shape' => $designed ? $binding['design']['shape'] : null, 'density' => $designed ? $binding['design']['density'] : null,
         'motion' => ($binding['design']['motion'] ?? null) === 'off' ? 'off' : 'minimal',
         'body' => $body, 'heading' => $heading, 'alt' => $alt, 'bytes' => $bytes, 'size' => $size];
+}
+
+/** Curated self-hosted fonts and their fallbacks. Keep in step with lib/platform/design-systems/site-design.ts. */
+function miopages_site_fonts(): array {
+    $sans = ", system-ui, -apple-system, 'Segoe UI', sans-serif";
+    $serif = ", Georgia, 'Times New Roman', serif";
+    return [
+        'inter' => "'MP Inter'" . $sans, 'manrope' => "'MP Manrope'" . $sans, 'dm-sans' => "'MP DM Sans'" . $sans,
+        'work-sans' => "'MP Work Sans'" . $sans, 'space-grotesk' => "'MP Space Grotesk'" . $sans,
+        'plus-jakarta-sans' => "'MP Plus Jakarta Sans'" . $sans, 'source-sans-3' => "'MP Source Sans 3'" . $sans,
+        'fraunces' => "'MP Fraunces'" . $serif, 'source-serif-4' => "'MP Source Serif 4'" . $serif, 'lora' => "'MP Lora'" . $serif,
+        'playfair-display' => "'MP Playfair Display'" . $serif, 'newsreader' => "'MP Newsreader'" . $serif,
+        'jetbrains-mono' => "'MP JetBrains Mono', ui-monospace, Consolas, monospace",
+    ];
 }

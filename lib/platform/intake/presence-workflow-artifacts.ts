@@ -2,6 +2,7 @@ import { choice, object, text } from "../canonical/model";
 import { canonicalPagePath } from "../managed-sites/paths";
 import { decisionBriefSchema, readDecisionBrief } from "./presence-decision-brief";
 import { readSemanticBlock, semanticBlockSchema } from "./presence-semantic-block";
+import { readSiteDesign, siteDesignSchema, type SiteDesign } from "../design-systems/site-design";
 import { assertNativeSection, nativeComponentSchema, recoverProviderNativeComponent } from "./presence-native-component";
 
 export const evidenceKinds = ["owner-confirmed", "earlier-review-answer", "earlier-review-assessment", "website-observation", "customer-unconfirmed", "historical-discovery", "service-direction", "public-research"] as const;
@@ -110,11 +111,21 @@ export function readReport(value: unknown, sources: readonly PresenceEvidence[],
   unique(findings.map(finding => finding.id));
   return { title: copy(report.title), summary: copy(report.summary), findings };
 }
+/** A Direction that also carries the site design Core's AI chose (rebuild step 2). */
+export const designedDirectionSchema = shape({ ...artifactSchemas.direction.properties, design: siteDesignSchema });
+
 export function readDirection(value: unknown, ids: readonly string[], normalizeProviderReferences = false) {
-  const direction = object(value, ["positioning", "approach", "visitorDecisions", "sourceIds"]);
+  const designed = Boolean(value && typeof value === "object" && "design" in value);
+  const direction = object(value, ["positioning", "approach", "visitorDecisions", "sourceIds", ...(designed ? ["design"] : [])]);
   const prose = (input: unknown) => copy(normalizeProviderReferences && typeof input === "string" ? input.replaceAll(" -> ", " → ") : input);
+  let design: SiteDesign | undefined;
+  if (designed) {
+    try { design = readSiteDesign(direction.design, ids); }
+    catch (error) { throw new ArtifactValidationError("shape-or-content", "Site design refused: " + (error instanceof Error ? error.message : "invalid")); }
+  }
   return { positioning: prose(direction.positioning), approach: prose(direction.approach),
-    visitorDecisions: list(direction.visitorDecisions, prose), sourceIds: citedSources(direction.sourceIds, ids, normalizeProviderReferences) };
+    visitorDecisions: list(direction.visitorDecisions, prose), sourceIds: citedSources(direction.sourceIds, ids, normalizeProviderReferences),
+    ...(design && { design }) };
 }
 function citedSources(value: unknown, ids: readonly string[], normalizeProviderReferences: boolean, required = true) {
   // Source repetition carries no additional meaning. Validate every ID even when deduplicating.
