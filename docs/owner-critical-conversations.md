@@ -1010,3 +1010,18 @@ the Codex period; Claude sorts them into site feedback (Core revises), system pr
 - inherited Codex-era processing rules (one suppressed images);
 - an unreadable button in the Home Direct Start card;
 - the fixed header template.
+
+**Nov 22: iteration method and operating environment.**
+- **Iteration method (agreed direction; details to be worked out).** Operators work
+  directly in WordPress: edit text wholesale and annotate inline (WordPress Notes on
+  blocks). Core reads the site back, compares it with what it delivered, keeps the
+  Operator's edits, treats notes as revision requests for those exact spots, keeps
+  untouched content, and revises page by page. Operators should use WordPress at this
+  stage; customers may not need to.
+- **Operating environment (to be nailed down after this hurdle).** Operator WordPress
+  belongs on 20i Reseller hosting (for C0: miopages.org), not on a developer's computer.
+  Core and the Operator/Customer portal live on the Core server. The owner needs a clear
+  picture of what lives where.
+- First editing round runs on local WordPress because it works today. Then the
+  environment work moves Operator WordPress to miopages.org, with delivery carrying
+  Core's own design.
