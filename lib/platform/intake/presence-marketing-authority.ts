@@ -300,7 +300,15 @@ export function unsupportedCommercialCopy(output: unknown, options: { prices: bo
   const testimony = /(?:\b\d(?:\.\d+)?\s*(?:\/\s*5|stars)\b|\b(?:customers?|clients?)\s+(?:say|said|reported)\b)/iu;
   const explicitClaim = { test: (copy: string) => testimony.test(copy) || (options.prices && price.test(copy)) };
   const guaranteedOutcome=/\b(?:guaranteed|guarantee)\b[^.!?]{0,30}\b(?:rankings|sales|profits|revenue|leads|traffic|results)\b/iu;
-  return anyVisitorCopy(output, (copy,excludedList) => explicitClaim.test(copy)||guaranteedOutcome.test(copy)&&
+  // A guarantee denied in its own clause ("Not guaranteed rankings…", "We cannot guarantee
+  // leads") is an honest limit, not a promise. Any affirmative guarantee is still refused.
+  const promisesOutcome=(copy:string)=>copy.split(/(?<=[.!?;])\s+/u).some(sentence=>{
+    const match=guaranteedOutcome.exec(sentence);
+    if(!match)return false;
+    const clause=sentence.slice(0,match.index).split(/[,:]|\b(?:but|yet|however|while|although)\b/iu).at(-1)??"";
+    return !/\b(?:not|no|never|without|cannot|can't|won't|don't|doesn't|isn't|aren't)\b[^,]{0,40}$/iu.test(clause);
+  });
+  return anyVisitorCopy(output, (copy,excludedList) => explicitClaim.test(copy)||promisesOutcome(copy)&&
     !(excludedList&&/^guaranteed\b/iu.test(copy.trim())&&!/\b(?:but|yet|however|we|you|our)\b/iu.test(copy)));
 }
 

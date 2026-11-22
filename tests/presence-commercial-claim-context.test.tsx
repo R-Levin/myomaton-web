@@ -22,3 +22,9 @@ test("exclusion headings are recognised by meaning, as in the first rebuilt run'
  for(const heading of ["Outside the normal service","Beyond our scope","Exclusions","Limits","Out of scope","What we don't promise","What MioPages does not do"])
   assert.equal(unsupportedCommercialCopy(group(heading,["Guaranteed rankings, traffic, leads, or revenue."])),false,heading);
 });
+test("a guarantee denied in its own clause is an honest limit; affirmative guarantees are still refused",()=>{
+ for(const text of ["Not guaranteed rankings, traffic, leads, or revenue.","We cannot guarantee leads or sales.","MioPages does not guarantee rankings.","There are no guaranteed results."])
+  assert.equal(unsupportedCommercialCopy({body:text}),false,text);
+ for(const text of ["We guarantee leads.","Guaranteed rankings in 90 days.","Not slow, and guaranteed results.","No contracts, but guaranteed leads."])
+  assert.equal(unsupportedCommercialCopy({body:text}),true,text);
+});
