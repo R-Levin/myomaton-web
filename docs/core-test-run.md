@@ -19,10 +19,11 @@ From `~/public_html`, with `NODE_ENV=development`:
 2. `node .rehearsal/rebuilt-evaluation-worker.cjs activate`: builds the context and grant
    from the previous case's knowledge, starts a fresh spending ledger, and copies the
    original materials into the new case.
-3. `node .rehearsal/rebuilt-evaluation-worker.cjs preflight`
+3. `preflight` applies only when resuming; before the first `work` it reports `workflow_not_ready`.
 
 ## 3. Run Core (**$**)
-From this computer: `npx tsx scripts/intake/presence-research-controller.ts --rebuilt work`.
+From this computer: `npx tsx scripts/intake/presence-research-controller.ts --rebuilt work`. In Git Bash, put Windows
+OpenSSH first (`PATH="/c/Windows/System32/OpenSSH:$PATH"`) so the key loaded in the Windows agent is used.
 The server runs research. Peer pages are captured in the local browser through the SSH
 link. Then the report. The owner chose not to stop at the report for this test, so it is
 followed by `continue` and `work` again: Direction with design → plan → all pages. The
