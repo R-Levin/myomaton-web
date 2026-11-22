@@ -265,12 +265,14 @@ export function exposesInternalCopy(output: unknown, evidence: readonly Presence
 // These are deterministic refusals for an unpriced development offer. Claims
 // still need source review, including wording this check cannot recognize.
 function anyVisitorCopy(output: unknown, check: (copy: string, excludedList:boolean) => boolean) {
-  const fields = new Set(["heading", "title", "body", "searchTitle", "searchDescription", "label", "items"]);
+  const fields = new Set(["heading", "title", "body", "searchTitle", "searchDescription", "label", "items", "text"]);
   function walk(value: unknown, field = "", excludedList=false): boolean {
     if (typeof value === "string") return fields.has(field) && check(value,field==="items"&&excludedList);
     if (!value || typeof value !== "object") return false;
     if (Array.isArray(value)) return value.some(item => walk(item, field,excludedList));
     const node=value as {kind?:unknown;children?:{kind?:unknown;text?:unknown}[]};
+    // A placeholder names material that is still needed; it is never presented as that material.
+    if(node.kind==="placeholder")return false;
     // A noun phrase under an explicit exclusion heading is not a sales promise.
     // Keep scope inside that immediate native group; other groups reset it.
     if(node.kind==="group"&&Array.isArray(node.children)){

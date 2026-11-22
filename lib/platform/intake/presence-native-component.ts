@@ -1,6 +1,10 @@
 import { choice, object, text } from "../canonical/model";
 
-const kinds = ["group", "heading", "paragraph", "list", "image", "action", "separator", "details"] as const;
+const kinds = ["group", "heading", "paragraph", "list", "image", "action", "separator", "details", "placeholder"] as const;
+/** What a placeholder stands in for. Core places a visible notice where the plan calls
+ * for material that does not exist yet, instead of inventing it or leaving a gap. */
+export const placeholderNeeds = ["testimonial", "price", "result", "case-study", "credential", "guarantee", "contact", "team", "detail"] as const;
+const placeholderPattern = "^need-(" + placeholderNeeds.join("|") + ")$";
 const arrangements = ["flow", "row", "columns"] as const;
 const surfaces = ["none", "light", "brand", "tonal", "strong"] as const;
 const sizes = ["none", "small", "medium", "large"] as const;
@@ -25,12 +29,13 @@ export const nativeComponentSchema = {
     ] },
     nativeNode: { anyOf: kinds.map(kind => shape({
       kind: options([kind]),
-      text: ["heading", "paragraph", "details"].includes(kind) ? { type: "string" }
+      text: ["heading", "paragraph", "details", "placeholder"].includes(kind) ? { type: "string" }
         : ["action", "image", "list"].includes(kind) ? nullableText : { type: "null" },
       level: kind === "heading" ? { type: "integer", enum: [1, 2, 3, 4, 5, 6] } : { type: "null" },
       items: { type: "array", items: { type: "string" }, ...(kind === "list" ? { minItems: 1 } : { maxItems: 0 }) },
       ordered: { type: "boolean" },
-      reference: ["image", "action"].includes(kind) ? { type: "string", pattern: kind === "image" ? "^section-(0|[1-9][0-9]*)$" : "^action-(0|[1-9][0-9]*)$" } : { type: "null" },
+      reference: ["image", "action", "placeholder"].includes(kind) ? { type: "string", pattern: kind === "image" ? "^section-(0|[1-9][0-9]*)$"
+        : kind === "action" ? "^action-(0|[1-9][0-9]*)$" : placeholderPattern } : { type: "null" },
       layout: { $ref: "#/$defs/nativeLayout" },
       children: { type: "array", items: { $ref: "#/$defs/nativeNode" }, ...(["group", "details"].includes(kind) ? { minItems: 1 } : { maxItems: 0 }) },
     })) },
@@ -98,8 +103,9 @@ export function readNativeComponent(value: unknown, normalizeProviderName = fals
     const copy = row.text === null ? null : plain(row.text);
     const reference = row.reference === null ? null : text(row.reference, 160);
     if ((kind === "heading" ? !Number.isSafeInteger(row.level) || Number(row.level) < 1 || Number(row.level) > 6 : row.level !== null) ||
-        (["heading", "paragraph", "action", "details"].includes(kind) ? !copy : ["image", "list"].includes(kind) ? false : copy !== null) ||
-        (["image", "action"].includes(kind) ? !reference || !/^[a-zA-Z0-9][a-zA-Z0-9:_-]*$/u.test(reference) : reference !== null)) {
+        (["heading", "paragraph", "action", "details", "placeholder"].includes(kind) ? !copy : ["image", "list"].includes(kind) ? false : copy !== null) ||
+        (kind === "placeholder" ? !reference || !new RegExp(placeholderPattern, "u").test(reference)
+          : ["image", "action"].includes(kind) ? !reference || !/^[a-zA-Z0-9][a-zA-Z0-9:_-]*$/u.test(reference) : reference !== null)) {
       throw Error("Native component content or reference refused");
     }
     return { kind, text: copy, reference, level: row.level as number | null, ordered: row.ordered,
@@ -148,4 +154,19 @@ export function recoverProviderNativeComponent(value:unknown,actions:unknown):un
   }
   visit((result as {root?:unknown}).root);
   return result;
+}
+
+export type PendingContent = { need: typeof placeholderNeeds[number]; description: string };
+/** Every placeholder in a component, so Core can list what the customer or an Operator
+ * still has to supply. */
+export function pendingContent(component: NativeComponent): PendingContent[] {
+  const found: PendingContent[] = [];
+  const visit = (node: NativeNode) => {
+    if (node.kind === "placeholder" && node.reference && node.text) {
+      found.push({ need: node.reference.slice(5) as PendingContent["need"], description: node.text });
+    }
+    node.children.forEach(visit);
+  };
+  visit(component.root);
+  return found;
 }

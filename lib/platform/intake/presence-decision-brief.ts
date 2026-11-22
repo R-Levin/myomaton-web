@@ -17,8 +17,8 @@ export const decisionBriefSchema = shape({
   avoid: strings,
 });
 
-function list<T>(value: unknown, parse: (value: unknown) => T) {
-  if (!Array.isArray(value) || !value.length || value.length > 30) throw Error("Nonempty bounded decision evidence required");
+function list<T>(value: unknown, parse: (value: unknown) => T, required = true) {
+  if (!Array.isArray(value) || (required && !value.length) || value.length > 30) throw Error("Nonempty bounded decision evidence required");
   return value.map(parse);
 }
 
@@ -37,11 +37,13 @@ export function readDecisionBrief(value: unknown) {
       if (typeof step !== "number" || !Number.isSafeInteger(step) || step < 0) throw Error("Direction step refused");
       return step;
     })),
+    // A Page may rest on business knowledge alone; research must shape the plan as a
+    // whole (validateStrategyBlueprint), not be cited on every Page. Nothing to avoid is valid.
     influences: list(row.influences, item => {
       const influence = object(item, ["sourceIds", "use", "implication"]);
       return { sourceIds: ids(influence.sourceIds), use: choice(influence.use, uses), implication: text(influence.implication, 800) };
-    }),
-    avoid: list(row.avoid, item => text(item, 320)),
+    }, false),
+    avoid: list(row.avoid, item => text(item, 320), false),
   };
 }
 export type DecisionBrief = ReturnType<typeof readDecisionBrief>;
@@ -96,11 +98,10 @@ export function compilePageDecision(run: WorkflowRun, brief: DecisionBrief, path
   // Verified DOM text can support a proposed information composition. Missing
   // viewport captures stay explicitly incomplete; they are not invented pixels
   // or a completed visual-quality review.
-  // Source-aware Pages need a real cited influence, but not a competitor on every
-  // Page: research must visibly shape the plan as a whole (validateStrategyBlueprint),
-  // while an individual Page may rest on customer knowledge, brand or Direction.
-  // Historical grants keep their peer-composition requirement.
-  const researchBasis = sourceAware ? brief.influences.length > 0
+  // Source-aware Pages need no per-Page research citation: research must visibly shape
+  // the plan as a whole (validateStrategyBlueprint), while an individual Page may rest on
+  // customer knowledge, brand or Direction. Historical grants keep their peer rule.
+  const researchBasis = sourceAware ? true
     : brief.influences.some(item => item.use === "composition" && item.sourceIds.some(id => peerIds.has(id)));
   if (!researchBasis || brief.influences.some(item => item.sourceIds.some(id => !observationIds.has(id)))) {
     throw Error(sourceAware ? "Page needs authorized source influence and market evidence" : "Page needs source-backed peer composition and market influence");

@@ -107,11 +107,11 @@ for (const includeOriginals of [false,true]) test("actual metered request carrie
    assert.ok(!knowledge.includes(internal)&&!knowledge.includes(processing));
    assert.ok(request.instructions.includes(processing));
    assert.deepEqual(request.reasoning,includeOriginals?{effort:"medium"}:undefined);
-   assert.match(request.instructions,/permitted customer-owned brand assets/);
-   assert.match(request.instructions,/third-party expression/);
-   assert.match(request.instructions,/Retain strong accurate content or wording/);
-   assert.match(request.instructions,/not disposable inspiration/);
-   assert.match(request.instructions,/optional selection pool/);
+   assert.match(request.instructions,/brand assets \(logo, name, colours\) are inputs to use/);
+   assert.match(request.instructions,/another business's wording, branding or distinctive design/);
+   assert.match(request.instructions,/earlier site and materials are theirs to reuse: keep what is strong/);
+   assert.match(request.instructions,/When a suitable acquired image is supplied in availableMedia, you may place it/);
+   assert.match(request.instructions,/place a placeholder node exactly where it belongs/);
    assert.doesNotMatch(request.instructions,/requires both selected photographs/);
    if(Array.isArray(request.input))assert.match(JSON.parse(request.input[0].content[0].text!).interpretation,/permitted customer-owned brand assets/);
    const encoded=JSON.stringify(request.text.format.schema);
@@ -269,4 +269,12 @@ test("source repair projects provenance without reintroducing superseded AI stra
  assert.ok(JSON.stringify(projected.businessKnowledge).includes(ongoing));
  assert.ok(JSON.stringify(projected.customerAssertions).includes("doubled"));
  assert.deepEqual(run.input.sourceRecovery,before,"Archived responses, prior count and source-repair history remain exact");
+});
+
+test("a Page decision may rest on business knowledge alone and need not list anything to avoid", async () => {
+  const { readDecisionBrief } = await import("../lib/platform/intake/presence-decision-brief");
+  const brief = readDecisionBrief({ decision: "Explain the managed service plainly.", findingIds: ["f1"], directionSteps: [0], claimIds: ["c1"], influences: [], avoid: [] });
+  assert.deepEqual(brief.influences, []);
+  assert.deepEqual(brief.avoid, []);
+  assert.throws(() => readDecisionBrief({ decision: "x", findingIds: [], directionSteps: [0], claimIds: ["c1"], influences: [], avoid: [] }));
 });

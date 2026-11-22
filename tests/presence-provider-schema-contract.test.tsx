@@ -57,8 +57,8 @@ test("source-aware wire instructions agree with customer-owned composition while
  const before=String(Reflect.get(bindBlueprintDecisionSchema(run,authority).properties.pages.items.properties.decisionBrief.properties.influences,"description"));
  const current=String(Reflect.get(bindBlueprintDecisionSchema(run,{...authority,projectionVersion:2}).properties.pages.items.properties.decisionBrief.properties.influences,"description"));
  assert.equal(before,"Each Page requires at least one composition influence citing an observed peer. Keep other uses separate.");
- assert.match(current,/requires a real market influence/);
- assert.match(current,/composition may instead draw on authorized customer knowledge/);
+ assert.match(current,/may rest on business knowledge alone/);
+ assert.match(current,/research must visibly shape the site as a whole/);
  assert.doesNotMatch(current,/composition influence citing an observed peer/);
 });
 

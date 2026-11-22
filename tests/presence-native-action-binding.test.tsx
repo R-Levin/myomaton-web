@@ -50,3 +50,13 @@ test("an empty provider disclosure retains its exact visible statement without i
  const bad=fixture();bad.sections[0].block.root.children.push(node("details",{text:"<script>unsafe</script>"}));
  assert.throws(()=>readNativeComponent(recoverProviderNativeComponent(bad.sections[0].block,bad.actions)));
 });
+
+test("sections cite sources only when they make claims; any citation must still be a real supplied source",()=>{
+ const raw=fixture();
+ raw.sections.push({heading:"Why it matters",body:"A persuasive, structural section with no factual claim.",sourceIds:[],role:"intro",
+  visual:{purpose:"Text",brief:"No media",altIntent:"None",status:"text-only"},block:null as never});
+ const parsed=readPage(raw,"/",["/","/service"],["offer"],{},true,true,true);
+ assert.deepEqual(parsed.sections[1].sourceIds,[]);
+ raw.sections[1].sourceIds=["invented-source"];
+ assert.throws(()=>readPage(raw,"/",["/","/service"],["offer"],{},true,true,true),/Unknown artifact reference/);
+});

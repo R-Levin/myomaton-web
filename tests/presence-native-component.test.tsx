@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { readFile } from "node:fs/promises";
 import { chromium } from "playwright-core";
-import { assertNativeSection, readNativeComponent, type NativeNode } from "../lib/platform/intake/presence-native-component";
+import { assertNativeSection, pendingContent, readNativeComponent, type NativeNode } from "../lib/platform/intake/presence-native-component";
 import { validatePages } from "../lib/platform/wordpress-delivery/authority";
 
 function node(kind: NativeNode["kind"], changes: Partial<NativeNode> = {}): NativeNode {
@@ -182,9 +182,10 @@ test("Core's requested images render as marked FPO frames where no approved asse
   {id:"standard",type:"cta",content:{heading:"Standard",text:"Standard copy."},visual},
  ];
  const candidate={pages:[{id:"home",path:"/",title:"Home",composition:"managed-v1" as const,navigationLabel:"Home",sections}],navigation:["/"],actions:[]};
- validatePages(candidate.pages,true,true);
- assert.throws(()=>validatePages([{...candidate.pages[0],sections:[{...sections[0],visual:{...visual,status:"invented"}}]}],true,true),/visual refused/);
- assert.throws(()=>validatePages([{...candidate.pages[0],sections:[{...sections[0],visual:{...visual,extra:1}}]}],true,true),/visual refused/);
+ validatePages(candidate.pages as Parameters<typeof validatePages>[0],true,true);
+ const invalid=(bad:object)=>[{...candidate.pages[0],sections:[{...sections[0],visual:bad}]}] as unknown as Parameters<typeof validatePages>[0];
+ assert.throws(()=>validatePages(invalid({...visual,status:"invented"}),true,true),/visual refused/);
+ assert.throws(()=>validatePages(invalid({...visual,extra:1}),true,true),/visual refused/);
  const php=spawnSync(process.platform==="win32"?"C:/php/php.exe":"php",["wordpress/miopages-delivery/tests/native-component.php"],
   {input:JSON.stringify({candidate,postIds:{"/":99}}),encoding:"utf8"});
  assert.equal(php.status,0,php.stderr);
@@ -196,4 +197,32 @@ test("Core's requested images render as marked FPO frames where no approved asse
  assert.ok(!php.stdout.includes("Image placement awaiting asset review"));
  const plain=php.stdout.slice(php.stdout.indexOf(">Plain<"),php.stdout.indexOf(">Standard<"));
  assert.ok(!plain.includes("miopages-fpo"),"text-only sections stay text-only");
+});
+
+test("missing material becomes a visible, categorized placeholder rather than a gap or an invention", () => {
+  const notice = "Customer testimonial needed here: a recent client describing the onboarding experience.";
+  const withPlaceholder = { ...component, root: node("group", { children: [
+    node("paragraph", { text: "What clients say." }),
+    node("placeholder", { reference: "need-testimonial", text: notice }),
+    node("placeholder", { reference: "need-price", text: "Monthly price for the managed service." }),
+  ] }) };
+  const parsed = readNativeComponent(withPlaceholder);
+  assert.deepEqual(pendingContent(parsed), [
+    { need: "testimonial", description: notice },
+    { need: "price", description: "Monthly price for the managed service." },
+  ]);
+  const bad = (changes: Partial<NativeNode>) => ({ ...component, root: node("placeholder", changes) });
+  assert.throws(() => readNativeComponent(bad({ reference: "need-anything", text: "x" })));
+  assert.throws(() => readNativeComponent(bad({ reference: "need-testimonial", text: null })));
+  assert.throws(() => readNativeComponent(bad({ reference: null, text: "x" })));
+  const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/native-component.php"],
+    { input: JSON.stringify(withPlaceholder), encoding: "utf8" });
+  assert.equal(php.status, 0, php.stderr);
+  assert.equal((php.stdout.match(/<aside class="miopages-placeholder[^"]*" role="note"/g) ?? []).length, 2);
+  assert.match(php.stdout, /Content needed<\/span><span class="miopages-placeholder-label">Customer testimonial needed<\/span>/);
+  assert.match(php.stdout, /Pricing to be confirmed/);
+  assert.ok(php.stdout.includes("a recent client describing the onboarding experience"));
+  const refused = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/native-component.php"],
+    { input: JSON.stringify(bad({ reference: "need-anything", text: "x" })), encoding: "utf8" });
+  assert.notEqual(refused.status, 0);
 });

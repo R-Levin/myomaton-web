@@ -5,6 +5,29 @@ if (!defined('ABSPATH')) exit;
 
 final class MioPages_Native_Component
 {
+    /** Visible label for each kind of material Core marked as still needed. */
+    private const NEEDS = [
+        'need-testimonial'=>'Customer testimonial needed', 'need-price'=>'Pricing to be confirmed',
+        'need-result'=>'Result or outcome needed', 'need-case-study'=>'Case study needed',
+        'need-credential'=>'Credential or qualification needed', 'need-guarantee'=>'Guarantee terms to be confirmed',
+        'need-contact'=>'Contact detail needed', 'need-team'=>'Team information needed', 'need-detail'=>'Business detail needed',
+    ];
+
+    /**
+     * A clearly marked notice where Core's plan calls for material that does not exist
+     * yet. It states what is needed; it is never presented as the material itself.
+     */
+    public static function placeholder(string $need, string $copy, string $class = ''): string
+    {
+        if (!isset(self::NEEDS[$need])) throw new InvalidArgumentException('Placeholder need refused.');
+        $classes = trim('miopages-placeholder ' . $class);
+        return '<!-- wp:html --><aside class="' . esc_attr($classes) . '" role="note" aria-label="' . esc_attr('Content needed: ' . self::NEEDS[$need]) . '">'
+            . '<span class="miopages-placeholder-badge">Content needed</span>'
+            . '<span class="miopages-placeholder-label">' . esc_html(self::NEEDS[$need]) . '</span>'
+            . '<span class="miopages-placeholder-text">' . $copy . '</span>'
+            . '</aside><!-- /wp:html -->';
+    }
+
     public static function render(array $value, array $images, array $actions, array $postIds, bool $localPending = false): string
     {
         self::keys($value, ['version','name','purpose','mode','root']);
@@ -82,7 +105,7 @@ final class MioPages_Native_Component
         if ($depth > 24) throw new InvalidArgumentException('Native component nesting refused.');
         self::keys($node, ['kind','text','level','items','ordered','reference','layout','children']);
         $kind = $node['kind'];
-        if (!in_array($kind, ['group','heading','paragraph','list','image','action','separator','details'], true)
+        if (!in_array($kind, ['group','heading','paragraph','list','image','action','separator','details','placeholder'], true)
             || !is_array($node['items']) || !array_is_list($node['items'])
             || !is_array($node['children']) || !array_is_list($node['children']) || !is_bool($node['ordered'])) {
             throw new InvalidArgumentException('Native component structure refused.');
@@ -116,14 +139,15 @@ final class MioPages_Native_Component
             || ($kind !== 'list' && $node['items'] !== []) || ($kind === 'list' && $node['items'] === [])) {
             throw new InvalidArgumentException('Native component child contract refused.');
         }
-        $hasText = in_array($kind, ['heading','paragraph','action','details'], true);
+        $hasText = in_array($kind, ['heading','paragraph','action','details','placeholder'], true);
         $copy = $hasText ? self::copy($node['text']) : '';
         // Image text is retained planning intent, never approved alt text or visitor copy.
         if (in_array($kind, ['image','list'], true) && $node['text'] !== null) self::copy($node['text']);
         if ((!$hasText && !in_array($kind, ['image','list'], true) && $node['text'] !== null)
             || ($kind === 'heading' ? !is_int($node['level']) || $node['level'] < 1 || $node['level'] > 6 : $node['level'] !== null)
-            || (in_array($kind, ['image','action'], true) ? !is_string($node['reference'])
-                || !preg_match('/^[a-zA-Z0-9][a-zA-Z0-9:_-]*$/D', $node['reference']) : $node['reference'] !== null)) {
+            || ($kind === 'placeholder' ? !is_string($node['reference']) || !isset(self::NEEDS[$node['reference']])
+                : (in_array($kind, ['image','action'], true) ? !is_string($node['reference'])
+                || !preg_match('/^[a-zA-Z0-9][a-zA-Z0-9:_-]*$/D', $node['reference']) : $node['reference'] !== null))) {
             throw new InvalidArgumentException('Native component content refused.');
         }
         $nativeClass = match ($kind) {
@@ -158,6 +182,7 @@ final class MioPages_Native_Component
         }
         if ($kind === 'details') return '<!-- wp:details ' . $block . ' --><details' . $attrs . '><summary>' . $copy . '</summary>'
             . $children . '</details><!-- /wp:details -->';
+        if ($kind === 'placeholder') return self::placeholder($node['reference'], $copy, $class);
         if ($kind === 'separator') return '<!-- wp:separator ' . $block . ' --><hr' . $attrs . ' /><!-- /wp:separator -->';
         $reference = $node['reference'];
         if ($kind === 'image') {

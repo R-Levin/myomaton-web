@@ -116,9 +116,9 @@ export function readDirection(value: unknown, ids: readonly string[], normalizeP
   return { positioning: prose(direction.positioning), approach: prose(direction.approach),
     visitorDecisions: list(direction.visitorDecisions, prose), sourceIds: citedSources(direction.sourceIds, ids, normalizeProviderReferences) };
 }
-function citedSources(value: unknown, ids: readonly string[], normalizeProviderReferences: boolean) {
+function citedSources(value: unknown, ids: readonly string[], normalizeProviderReferences: boolean, required = true) {
   // Source repetition carries no additional meaning. Validate every ID even when deduplicating.
-  return references(normalizeProviderReferences && Array.isArray(value) ? [...new Set(value)] : value, ids, true, "citation");
+  return references(normalizeProviderReferences && Array.isArray(value) ? [...new Set(value)] : value, ids, required, "citation");
 }
 
 export function readBlueprint(value: unknown, ids: readonly string[], normalizeProviderReferences = false, withStrategy = false, reassessment = false) {
@@ -161,7 +161,10 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
       normalizeProviderReferences && semanticBlocks ? recoverProviderNativeComponent(section.block,page.actions) : section.block,
       normalizeProviderReferences && semanticBlocks);
     if (block?.version === 2) assertNativeSection(block, copy(section.heading), role ?? "intro");
-    return { heading: copy(section.heading), body: copy(section.body), sourceIds: citedSources(section.sourceIds, ids, normalizeProviderReferences),
+    return { heading: copy(section.heading), body: copy(section.body), // A section cites sources when it makes a factual claim; persuasive, structural or
+    // navigational sections need not (forced citations produced hedged copy). Any
+    // citation given must still be a real supplied source.
+    sourceIds: citedSources(section.sourceIds, ids, normalizeProviderReferences, false),
       ...(role && { role }),
       ...(block && { block }),
       visual: { purpose: copy(visual.purpose), brief: copy(visual.brief), altIntent: copy(visual.altIntent), status: choice(visual.status, visualStates) } };

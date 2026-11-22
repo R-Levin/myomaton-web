@@ -237,11 +237,12 @@ test("the normal metered concept critique requires actual scoped image inputs an
       transport: { async send(path, body) {
         calls++; assert.ok(request);
         const value = body as { instructions: string; input: { content: { type: string; text?: string }[] }[] };
-        assert.match(value.instructions, /early Home-concept critique/);
-        assert.match(value.instructions, /Review only the supplied Home/);
+        assert.match(value.instructions, /critique the Home concept early/);
+        assert.doesNotMatch(value.instructions, /critique the complete site/);
+        assert.match(value.instructions, /from the actual rendered desktop and mobile images, before the other Pages are written/);
         assert.doesNotMatch(value.instructions, /Critically review the complete candidate/);
-        assert.match(value.instructions, /Challenge the underlying positioning/);
-        assert.match(value.instructions, /do not demand public publication rights before a permitted non-public preview/);
+        assert.match(value.instructions, /Challenge the positioning, value, originality and visual concept/);
+        assert.match(value.instructions, /image rights still pending for public use are a launch prerequisite, not a design flaw/);
         const content = value.input[0].content;
         assert.equal(content.filter(row => row.type === "input_image").length, 2);
         const task = resolveSourceReferences(JSON.parse(content[0].text!).task, new Map([[source.id, original.toString()]])) as { reviewStage: unknown };
