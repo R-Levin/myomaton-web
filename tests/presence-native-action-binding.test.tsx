@@ -60,3 +60,14 @@ test("sections cite sources only when they make claims; any citation must still 
  raw.sections[1].sourceIds=["invented-source"];
  assert.throws(()=>readPage(raw,"/",["/","/service"],["offer"],{},true,true,true),/Unknown artifact reference/);
 });
+
+test("an honest list of what the service does not include may name guaranteed outcomes; a positive guarantee is still refused", async () => {
+  const { unsupportedCommercialCopy } = await import("../lib/platform/intake/presence-marketing-authority");
+  const excluded = { block: { version: 2, root: node("group", { children: [node("heading", { level: 3, text: "Outside the normal service" }),
+    node("list", { items: ["Bespoke applications.", "Guaranteed rankings, traffic, leads, or revenue."] })] }) } };
+  assert.equal(unsupportedCommercialCopy(excluded, { prices: false }), false);
+  const promised = { block: { version: 2, root: node("group", { children: [node("heading", { level: 3, text: "What you get" }),
+    node("list", { items: ["Guaranteed rankings, traffic, leads, or revenue."] })] }) } };
+  assert.equal(unsupportedCommercialCopy(promised, { prices: false }), true);
+  assert.equal(unsupportedCommercialCopy({ body: "We guarantee more leads and sales within 90 days." }, { prices: false }), true);
+});

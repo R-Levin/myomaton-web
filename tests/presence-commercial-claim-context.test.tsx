@@ -18,3 +18,7 @@ test("positive promises, disguised affirmative clauses, prices and customer proo
   assert.equal(unsupportedCommercialCopy(group("Not promised here",[text])),true,text);
  }
 });
+test("exclusion headings are recognised by meaning, as in the first rebuilt run's scope page",()=>{
+ for(const heading of ["Outside the normal service","Beyond our scope","Exclusions","Limits","Out of scope","What we don't promise","What MioPages does not do"])
+  assert.equal(unsupportedCommercialCopy(group(heading,["Guaranteed rankings, traffic, leads, or revenue."])),false,heading);
+});

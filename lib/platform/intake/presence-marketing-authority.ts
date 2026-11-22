@@ -280,7 +280,10 @@ function anyVisitorCopy(output: unknown, check: (copy: string, excludedList:bool
       if(Object.entries(value).some(([key,child])=>key!=="children"&&walk(child,key,false)))return true;
       return node.children.some(child=>{
         if(child&&typeof child==="object"&&child.kind==="heading")localScope=typeof child.text==="string"&&
-          /^(?:not\s+(?:promised|included|offered|provided|covered|guaranteed)|no\s+(?:promises|guarantees))\b|^what\b[^.!?]*\b(?:is|are)\s+not\b/iu.test(child.text.trim());
+          // Headings that mark an exclusion ("Outside the normal service", "What we don't
+          // promise", "Limits", "Not included"), but not positive framings such as
+          // "No barriers" or "Not just promises".
+          /^(?:not\s+(?:promised|included|offered|provided|covered|guaranteed|part\s+of|in\s+scope)|no\s+(?:promises|guarantees)|outside\b|beyond\b|out\s+of\s+scope|exclu(?:ded|sions?)\b|limits?\b)|^what\b[^.!?]*\b(?:is|are)\s+not\b|^what\b[^.!?]*\b(?:don't|do\s+not|won't|will\s+not|doesn't|does\s+not)\b/iu.test(child.text.trim());
         return walk(child,"",localScope);
       });
     }
