@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { designProjection } from "../../lib/platform/design-systems/site-design";
 import { mkdir, open, readFile, realpath, lstat } from "node:fs/promises";
 import { join } from "node:path";
 import { Pool } from "pg";
@@ -287,8 +288,11 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
               sourceIds: section.sourceIds, ...(section.block && { semanticBlock: section.block.name }),
             })) })),
         } : undefined;
+        // The design Core's AI chose in the Direction travels with the candidate (rebuild step 2).
+        const design = localDraft && prior.direction?.design ? designProjection(prior.direction.design) : undefined;
         packet = { candidate, images, ...(unresolvedActions&&{unresolvedActions}), ...(localDraft && { localDraftOnly: true }), ...(decisionTrace && { decisionTrace }),
-          digest: fingerprint({ candidate, images, review: input.candidateDigest, ...(decisionTrace && { decisionTrace }) }) };
+          ...(design && { design }),
+          digest: fingerprint({ candidate, images, review: input.candidateDigest, ...(decisionTrace && { decisionTrace }), ...(design && { design }) }) };
       }
       const path = join(root, `${packetType}-${prior.version}.json`);
       await createPrivate(path, JSON.stringify(packet, null, 2) + "\n");

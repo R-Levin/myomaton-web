@@ -30,6 +30,10 @@ $oldBrand=get_post_meta((int)$oldRender['pages']['/'],'_miopages_draft_brand',tr
 $logo=$oldBrand['logoAttachment']??null;$logoFile=is_int($logo)?get_attached_file($logo,true):false;
 if(!$logoFile||!is_file($logoFile)||hash_file('sha256',$logoFile)!==$brand['projection']['logo']['sha256'])exit(19);
 $projection=$brand['projection'];$projection['logoAttachment']=$logo;
+// A design Core's AI chose for this candidate (brand projection v4) replaces the stored design; the logo stays.
+if(isset($packet['design'])){$d=$packet['design'];
+ if(!is_array($d)||($d['grammar']??null)!=='core-designed'||($d['version']??null)!==4||count($d)!==7)exit(21);
+ $projection['design']=$d;}
 $validationIds=array_combine(array_column($candidate['pages'],'path'),range(1,count($candidate['pages'])));
 MioPages_Native_Draft_Content::posts($candidate,$validationIds,[],true,$packet['unresolvedActions']??$packet['pendingActions']??[]);
 $track=$root.'/source-aware-ids.json';$ids=is_file($track)?json_decode(file_get_contents($track),true,512,JSON_THROW_ON_ERROR):[];

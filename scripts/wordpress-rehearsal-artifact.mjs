@@ -104,8 +104,12 @@ if (core) {
     ['wordpress/miopages-delivery/includes/class-miopages-native-component.php', 'class-miopages-native-component.php'],
     ['wordpress/miopages-delivery/includes/class-miopages-native-draft-content.php', 'class-miopages-native-draft-content.php'],
     ['wordpress/miopages-managed-site/style.css', 'managed-site.css'],
+    // Self-hosted fonts for Core-designed previews (rebuild step 2).
+    ...(await readdir('wordpress/miopages-managed-site/fonts')).filter(name => name.endsWith('.woff2'))
+      .map(name => ['wordpress/miopages-managed-site/fonts/' + name, 'fonts/' + name]),
   ]) {
     const relative = path.join('.rehearsal', target);
+    await mkdir(path.dirname(path.join(staging, relative)), { recursive: true });
     await cp(source, path.join(staging, relative));
     hashes[relative] = createHash('sha256').update(await readFile(source)).digest('hex');
   }

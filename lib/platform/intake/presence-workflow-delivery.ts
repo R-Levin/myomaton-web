@@ -1,4 +1,5 @@
 import { fingerprint } from "../canonical/model";
+import { designProjection } from "../design-systems/site-design";
 import { pageProposal, type PageProposal } from "../content-editing/proposal";
 import { nativeDraftBaseline } from "../wordpress-delivery/site-draft";
 import type { PresenceWorkflowView, WorkflowContext } from "./presence-workflow";
@@ -65,7 +66,8 @@ export function workflowNativeReviewCandidate(context: WorkflowContext, view: Pr
       ...(page.composition && sectionVisual(view, page.slug, index)),
     })),
   }));
-  return { candidate: { pages, navigation: input.navigation, actions: input.actions }, unresolvedActions: input.unresolvedActions };
+  return { candidate: { pages, navigation: input.navigation, actions: input.actions }, unresolvedActions: input.unresolvedActions,
+    ...(view.direction?.design && { design: designProjection(view.direction.design) }) };
 }
 
 function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflowView & { blueprint: NonNullable<PresenceWorkflowView["blueprint"]> }, target: string,
