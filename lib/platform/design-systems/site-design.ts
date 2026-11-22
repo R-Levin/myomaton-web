@@ -120,10 +120,12 @@ export function readSiteDesign(value: unknown, sourceIds: readonly string[]): Si
   const row = record(value, ["palette", "typography", "shape", "density", "imagery", "rationale", "sourceIds"], "Site design");
   const adjustments: string[] = [];
   const paletteRow = record(row.palette, [...paletteRoles, "border", "muted"], "Palette");
+  const chosenText: Record<string, string> = {};
   const palette = Object.fromEntries(paletteRoles.map(role => {
     const pairRow = record(paletteRow[role], ["background", "text"], "Palette " + role);
     const background = colour(pairRow.background, role + " background");
     const chosen = colour(pairRow.text, role + " text");
+    chosenText[role] = chosen;
     const text = repair(chosen, [background]);
     if (!text) throw Error("Palette " + role + " text cannot be made readable");
     if (text !== chosen) adjustments.push(`${role} text ${chosen} → ${text} for readable contrast`);
@@ -135,7 +137,8 @@ export function readSiteDesign(value: unknown, sourceIds: readonly string[]): Si
   if (!link) throw Error("Brand colour cannot be made readable as a link colour");
   if (link !== brand) {
     adjustments.push(`brand ${brand} → ${link} so links stay readable on light and tonal surfaces`);
-    palette.brand = { background: link, text: repair(palette.brand.text, [link]) ?? (luminance(link) > 0.179 ? "#000000" : "#ffffff") };
+    // Re-derive the text on the adjusted brand colour from the AI's own choice.
+    palette.brand = { background: link, text: repair(chosenText.brand, [link]) ?? (luminance(link) > 0.179 ? "#000000" : "#ffffff") };
   }
   const mutedChosen = colour(paletteRow.muted, "muted");
   const muted = repair(mutedChosen, [palette.light.background]);

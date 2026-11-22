@@ -785,6 +785,7 @@ export class PresenceWorkflow {
         }
       }
     } catch (error) {
+      if (process.env.MIOPAGES_DEBUG_VALIDATION) console.error("VALIDATION:", work.operation, work.path, error instanceof Error ? error.message : error);
       return this.fail(context, state, "output-invalid", error instanceof ArtifactValidationError ? error.issue : "shape-or-content");
     }
     return this.view(context, await this.store.append(context, state.version, { ...next, work: null, failure: null,

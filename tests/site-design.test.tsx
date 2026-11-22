@@ -29,6 +29,7 @@ test("Core keeps the AI's design choices and repairs only unreadable colours, re
   assert.ok(contrast(repaired.palette.brand.background, repaired.palette.light.background) >= 4.5);
   assert.ok(contrast(repaired.palette.brand.text, repaired.palette.brand.background) >= 4.5);
   assert.equal(repaired.palette.tonal.background, "#f1ebe2", "backgrounds the AI chose are kept");
+  assert.equal(repaired.palette.brand.text, "#ffffff", "text on an adjusted brand colour starts again from the AI's choice");
   assert.equal(repaired.adjustments.length >= 2, true);
 });
 
