@@ -86,13 +86,26 @@ the development PC.
 4. ~~Add the plugin's web endpoint for delivery, and Core's sender.~~ Done Nov 22
    (plugin 0.1.0). Images still go through the command-line path; they move to the
    endpoint when a case has images.
-5. Core's control: an Operator action in Core that builds, signs and sends a review
-   draft for a case, with the site's settings (address, gate login, keys) held in
-   Core's protected configuration.
-6. Read-back: the endpoint returns pages and Notes, and Core keeps edits and turns
-   Notes into revision requests.
+5. ~~Core's control: send a review draft for a case from Core, with the site's
+   settings in Core's protected configuration.~~ Done Nov 22: Core server commands
+   `deliver-review` and `read-back`, settings in `wordpress-sites/<site>.json` on the
+   Core server, enrolment tool `scripts/wordpress-enrol-review-site.ts`. The same
+   functions will serve the Operator portal once its interface is rebuilt.
+6. ~~Read-back: pages and Notes.~~ Done Nov 22. Core gets each delivered page as it
+   is now, whether it was edited, and every Note with its block, replies and status.
+   Core refuses to deliver over unread edits.
+7. **Next:** turn read-back into revisions inside Core's workflow. Operator edits
+   become the kept text, open Notes become revision requests for their exact block,
+   and Core revises only those spots before the next delivery.
+8. **Next:** a "reconcile" action for the rare case where WordPress applied a draft
+   but its receipt never reached Core (Core then refuses further deliveries, safely).
 
 **Then one owner approval covering:**
+- running the enrolment for miopages.org (creates its keys);
+- a dedicated WordPress account for Core's delivery on miopages.org (or using the
+  existing admin account);
+- adding the site's new private settings to miopages.org's configuration, and
+  archiving the Codex-era command-line settings it replaces;
 - deploying the current Core;
 - updating the plugin and theme on miopages.org;
 - enrolling miopages.org for the rebuilt case;
