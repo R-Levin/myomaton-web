@@ -1054,3 +1054,8 @@ read-back sits in Core rather than in leftover Codex-era places.
 2. **Review drafts need no per-page approval.** Drafts Core sends to Operator WordPress
    for review are private and signed by Core, and need no per-page approval first.
    Releases (anything public) keep the approval path.
+
+**Nov 22, late: revisions before going live.** The owner chose to build the
+notes-to-revisions step before going live on miopages.org, so the first round of
+Operator edits and Notes there is acted on by Core: edits kept, Notes revised at their
+exact spot.
