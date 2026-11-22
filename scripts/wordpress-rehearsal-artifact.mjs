@@ -135,6 +135,7 @@ if (core) {
     ["scripts/wordpress-private-operator.ts", "wordpress-private-operator.cjs"],
     ["scripts/intake/run-presence-evaluation.ts", "presence-evaluation-worker.cjs"],
     ["scripts/intake/rebuilt-evaluation-worker.ts", "rebuilt-evaluation-worker.cjs"],
+    ["scripts/intake/source-aware-rendered-review.ts", "rendered-review.cjs"],
   ]) {
     const relative = path.join(".rehearsal", executable);
     const outfile = path.join(staging, relative);

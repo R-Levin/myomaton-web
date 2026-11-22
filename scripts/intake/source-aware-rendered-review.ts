@@ -3,7 +3,8 @@ import {lstat,open,readFile,realpath} from "node:fs/promises";
 import {join} from "node:path";
 import {createHash} from "node:crypto";
 import {Pool} from "pg";
-import plan from "../../docs/c0-source-aware-run-proposal.json";
+import sourceAwarePlan from "../../docs/c0-source-aware-run-proposal.json";
+import {rebuiltRunPlan} from "../../lib/platform/intake/c0-rebuilt-run";
 import {fingerprint} from "../../lib/platform/canonical/model";
 import {renderedCaptureIntent,validateRenderedCaptureIntent,type RenderedCandidateBinding} from "../../lib/platform/intake/presence-candidate-capture";
 import {prepareRenderedCandidateCustody} from "../../lib/platform/intake/presence-original-custody";
@@ -13,7 +14,11 @@ import type {PresenceWorkflowGrant} from "../../lib/platform/intake/presence-wor
 import {verifySourceAwareStock} from "./source-aware-stock";
 import type {OriginalMaterial} from "../../lib/platform/intake/presence-source-material";
 const sha=(b:Buffer)=>createHash("sha256").update(b).digest("hex");
-const proposal="f560374969b7abdff53fa33917c9b84f7053f5f9b092b0dccf9a505bcc8f9ddd";
+// The first rebuilt-Core test case (MIOPAGES_RUN=rebuilt) uses its own plan; its evaluation
+// basis is the plan's hash. Codex-era runs keep their pinned proposal.
+const rebuilt=process.env.MIOPAGES_RUN==="rebuilt";
+const plan={destination:rebuilt?rebuiltRunPlan.destination:sourceAwarePlan.destination};
+const proposal=rebuilt?createHash("sha256").update(JSON.stringify(rebuiltRunPlan)).digest("hex"):"f560374969b7abdff53fa33917c9b84f7053f5f9b092b0dccf9a505bcc8f9ddd";
 let operationStage="arguments";
 async function bytes(file:string,root:string,maximum:number){
  const m=await lstat(file);

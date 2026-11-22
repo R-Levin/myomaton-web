@@ -4,10 +4,12 @@ declare(strict_types=1);
 if (PHP_SAPI!=='cli'||count($argv)!==3||!preg_match('/^(home|site)-[1-9][0-9]*(?:-media|-fpo)?\.json$/D',$argv[2])) exit(1);
 if(!extension_loaded('pdo_sqlite')){fwrite(STDERR,"BLOCKED: run with the existing WordPress SQLite PHP extension options.\n");exit(20);}
 $root=realpath($argv[1]);if(!$root||basename($root)!=='p022-wp-validation'||!is_file($root.'/wordpress/wp-load.php')||str_contains(str_replace('\\','/',$root),'/public_html/'))exit(2);
-$manifest=dirname(__DIR__,2).'/docs/c0-source-aware-run-proposal.json';
-$manifestSha='f560374969b7abdff53fa33917c9b84f7053f5f9b092b0dccf9a505bcc8f9ddd';
-if(hash_file('sha256',$manifest)!==$manifestSha)exit(3);
+// The first rebuilt-Core test case (MIOPAGES_RUN=rebuilt) is bound to its own plan file.
+$rebuilt=getenv('MIOPAGES_RUN')==='rebuilt';
+$manifest=dirname(__DIR__,2).($rebuilt?'/docs/c0-rebuilt-run.json':'/docs/c0-source-aware-run-proposal.json');
 $plan=json_decode(file_get_contents($manifest),true,512,JSON_THROW_ON_ERROR);
+$manifestSha=$rebuilt?hash('sha256',json_encode($plan,JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)):'f560374969b7abdff53fa33917c9b84f7053f5f9b092b0dccf9a505bcc8f9ddd';
+if(!$rebuilt&&hash_file('sha256',$manifest)!==$manifestSha)exit(3);
 $file=$root.'/source-aware-incoming/'.$argv[2];$receiptFile=$file.'.receipt.json';
 if(!is_file($file)||is_link($file)||!is_file($receiptFile)||is_link($receiptFile))exit(4);
 $packet=json_decode(file_get_contents($file),true,512,JSON_THROW_ON_ERROR);
