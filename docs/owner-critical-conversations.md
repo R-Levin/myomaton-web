@@ -1139,3 +1139,6 @@ placeholders, which contradicted the FPO requirement), and folding the sixth (no
 development talk in visitor copy; unverified prices, performance, availability and proof
 stay unconfirmed) into Core's standing instructions. A rule given for one round belongs
 to that round.
+
+**Nov 23: install approved for the rule retirement.** The owner approved installing f4569d6 on
+protected Core and running the rule retirement on case beb8de9c there (no AI spending).
