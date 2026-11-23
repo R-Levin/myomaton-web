@@ -1112,3 +1112,12 @@ delivery 2 reached miopages.org (pages 53-61): the owner's sentence is kept word
 word, the page now has "Usually better handled another way" with the owner's two
 situations, and the Note carries Core's reply and is resolved; no pages differ from
 Core's delivery. Case AI spending so far: about $6.08 of the $25 ceiling.
+
+**Nov 23: how revisions should be scoped; review of the AI instructions (owner).** The
+owner asked how an Operator should see an updated draft, noting that many Operators will
+leave the current draft open in the editor. On revision scope: rewriting part of a page,
+or even the site, is fine when the change makes a fundamental difference; otherwise there
+is no reason to rewrite what was not asked about. The owner also asked for a good look at
+whether their fairly general prompting needs revising, as far as how the AI and the
+WordPress integration work. To be settled before returning to the next build choices
+(facts to the knowledge base; cheaper, faster requests).
