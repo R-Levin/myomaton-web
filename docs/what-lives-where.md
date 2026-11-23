@@ -47,8 +47,9 @@ code serves the local install and the delivery to hosted WordPress.
 **Status of each step (Nov 23):** all three work end to end on miopages.org with protected
 Core. The first full loop (one kept edit, one Note on the Questions page) was completed
 on Nov 23. Not yet built: facts from edits flowing into the Business Knowledge Base, a
-review summary to confirm before paid revision, edits inside placeholder boxes, and
-revising only the noted section instead of the whole page.
+review summary to confirm before paid revision, and edits inside placeholder boxes.
+Since Nov 23 a Note tied to text revises only that section (Core d07fc66), and plugin 0.1.3
+warns an editor left open on an older copy and refuses its save.
 
 **Core's in-app preview** reuses the translator's output (WordPress-format page
 markup) to show the site inside Core, rather than having a separate renderer. The

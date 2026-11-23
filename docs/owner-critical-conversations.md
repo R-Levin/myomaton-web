@@ -1125,3 +1125,9 @@ WordPress integration work. To be settled before returning to the next build cho
 **Nov 23: install approved.** The owner approved installing d07fc66 (section-level Operator
 revisions, Operator-review instruction) on protected Core and plugin 0.1.3 (editor guard)
 on miopages.org. Retiring the six Nov 21 case rules is a separate, still-open decision.
+
+**Nov 23: install carried out (record, not a decision).** Protected Core runs d07fc66
+(rollback copy app-before-d07fc66-was-d4b107b-20261123T190536Z). miopages.org runs plugin
+0.1.3 (0.1.2 archived in archive-golive-20261123T001516Z); the editor guard is loaded and
+tracks the delivered pages. Read-back from the updated Core: delivery 2, no edited or
+missing pages, no open Notes.
