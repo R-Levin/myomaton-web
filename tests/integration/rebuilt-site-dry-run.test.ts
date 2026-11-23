@@ -130,14 +130,21 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
       ledger: { id: fingerprint("dry-run"), startingLedger: createHash("sha256").update(await readFile(join(root, "onboarding-usage.json"))).digest("hex"),
       baselineAttempts: 0, requests: 200, generations: 100, inputTokens: 1_000_000, inputBytes: 5_000_000, capMicros: 50_000_000 } };
     const requests: { name: string; instructions: string; body: string }[] = [];
+    let loseNextAnswer = false;
     // The real run researches with web search and page capture; here one simulated page stands in.
     const provider = createResponsesPresenceWorkflow({ grant, readGrant: async () => grant, readContext: async () => context,
       rates, ledgerDirectory: root,
       fetchPage: (async (url: string) => ({ ok: true, url, headers: new Headers({ "content-type": "text/html" }),
         body: new Response("<html><body><main><h1>Simulated peer</h1><p>A simulated public page about managed websites.</p></main></body></html>").body,
       })) as unknown as typeof fetch,
-      transport: { async send(path, body) {
+      transport: { async send(path, body, started) {
         if (path.endsWith("/input_tokens")) return { body: { input_tokens: 2000 } };
+        if (loseNextAnswer) {
+          // The provider starts writing, then the connection drops before the answer arrives.
+          loseNextAnswer = false;
+          await started?.({ responseId: "resp_dry_run_lost", requestId: "req_lost" });
+          throw Error("Responses HTTPS result unavailable");
+        }
         const request = body as { instructions: string; text: { format: { name: string; schema: Schema } } };
         requests.push({ name: request.text.format.name, instructions: request.instructions, body: JSON.stringify(body) });
         const output = simulatedAnswer(request.text.format.name, request.text.format.schema, request.instructions);
@@ -237,6 +244,20 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
       "The Operator's wording is now Core's own text");
     assert.ok(!revised.pages.some(page => page.path === "/start"), "The noted page is queued for revision");
     const requestsBefore = requests.length;
+    // The revision's answer is lost in transit once: Core stops, keeps the charge on record, and the
+    // Operator's retry sends the same unchanged work again.
+    loseNextAnswer = true;
+    const sentBefore = requests.length;
+    let lost = (await workPresenceCase(workflow, context))!;
+    assert.equal(lost.failure, "outcome-unknown");
+    lost = (await workPresenceCase(workflow, context))!;
+    assert.equal(lost.failure, "outcome-unknown", "Working the case again does not guess or resend");
+    assert.equal(requests.length, sentBefore, "Nothing more is sent while the charge is unsettled");
+    revised = (await workflow.retryLostAnswer(context, lost.version, actor))!;
+    assert.equal(revised.failure, null);
+    await assert.rejects(workflow.retryLostAnswer(context, revised.version, actor), "Only a lost answer can be retried");
+    const ledgerRows = JSON.parse(await readFile(join(root, "onboarding-usage.json"), "utf8")).attempts as { status: string; responseId?: string }[];
+    assert.deepEqual(ledgerRows.filter(row => row.status === "lost").map(row => row.responseId), ["resp_dry_run_lost"]);
     for (let step = 0; step < 6 && revised.pages.length < 3; step++) revised = (await workPresenceCase(workflow, context))!;
     assert.equal(revised.failure, null, JSON.stringify({ failure: revised.failure, next: revised.next }));
     assert.deepEqual(revised.pages.map(page => page.path), ["/", "/service", "/start"]);

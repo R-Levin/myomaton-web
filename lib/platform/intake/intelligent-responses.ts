@@ -18,14 +18,17 @@ export type ResponsesRates = {
 };
 type Rates = ResponsesRates;
 export type ResponsesTransport = {
-  send(path: "/v1/responses/input_tokens" | "/v1/responses", request: object): Promise<Reply>;
+  /** `started` is called once the provider has begun the answer, before it is complete. */
+  send(path: "/v1/responses/input_tokens" | "/v1/responses", request: object,
+    started?: (ids: { responseId: string; requestId?: string }) => Promise<void>): Promise<Reply>;
 };
 type Reply = { body: unknown; requestId?: string; rawBody?: Buffer };
 export type OfflineResponsesTransport = ResponsesTransport & { readonly mode: "offline-test" };
 type Usage = { input: number; cached: number; cacheWrite: number; output: number; reasoning: number };
 type Receipt = QuestionAttribution & { reservedMicros: number; countDispatched: boolean; generationDispatched: boolean;
   countRequestId?: string; generationRequestId?: string; responseId?: string; usage?: Usage; estimatedMicros?: number;
-  status: "pending" | "completed" | "rejected" | "uncertain";
+  // "lost": sent and probably charged, but the answer never arrived; debited at its full reservation.
+  status: "pending" | "completed" | "rejected" | "uncertain" | "lost";
   outputLimit?: number;
   inputLimit?: number;
   workflowScope?: string;
@@ -37,7 +40,8 @@ type Receipt = QuestionAttribution & { reservedMicros: number; countDispatched: 
   imageRun?: { model: string; requestId?: string; resultDigest: string };
   recoveryAuthorized?: true;
   proposalValidation?: "valid" | "proposal_shape" | "proposal_citations" | "proposal_route" | "proposal_content" | "response_decode";
-  failure?: "output_token_limit" | "content_filter" | "provider_incomplete" | "reservation_exceeded";
+  failure?: "output_token_limit" | "content_filter" | "provider_incomplete" | "reservation_exceeded" | "answer_lost";
+  settledAt?: string;
 };
 type Ledger = { ratesDigest: string; rateCard: Rates; adapterVersion: string; model: string; tier: "default"; attempts: Receipt[] };
 
@@ -464,7 +468,8 @@ export async function summarizePresenceWorkflowUsage(directory: string, scope: W
       outputTokens: rows.reduce((sum, item) => sum + (item.usage?.output ?? 0), 0),
       searchCalls: rows.reduce((sum, item) => sum + (item.webSearchCalls ?? 0), 0),
       accountedMicros: rows.reduce((sum, item) => sum + (item.estimatedMicros ?? 0), 0),
-      heldMicros: rows.reduce((sum, item) => sum + (["completed", "rejected"].includes(item.status)
+      lost: rows.filter(item => item.status === "lost").length,
+      heldMicros: rows.reduce((sum, item) => sum + (["completed", "rejected", "lost"].includes(item.status)
         ? workflowDebit(item) : item.reservedMicros), 0),
       uncertain: rows.filter(item => item.status === "pending" || item.status === "uncertain").length,
     };
@@ -560,7 +565,8 @@ function verifiedSpend(ledger: Ledger, retainedReservation?: string, reportHold?
       retained = true;
       return total + integer(receipt.reservedMicros);
     }
-    if (!["completed", "rejected"].includes(receipt.status) || receipt.estimatedMicros === undefined ||
+    if (receipt.status === "lost" && receipt.estimatedMicros !== receipt.reservedMicros) throw Error("Unreconciled development usage");
+    if (!["completed", "rejected", "lost"].includes(receipt.status) || receipt.estimatedMicros === undefined ||
         integer(receipt.estimatedMicros) > integer(receipt.reservedMicros)) throw Error("Unreconciled development usage");
     return total + receipt.estimatedMicros;
   }, 0);
@@ -735,11 +741,18 @@ function meteredResponsesDispatch(directory: string, configuredRates: Rates, tra
       stage = "provider_transport";
       const result = await transport.send("/v1/responses", structuredClone({ ...request, service_tier: "default", store: false, max_output_tokens: outputLimit,
         ...(search && { tools: [{ type: "web_search" }], tool_choice: { type: "web_search" },
-          max_tool_calls: toolLimit, include: ["web_search_call.action.sources"] }) }));
+          max_tool_calls: toolLimit, include: ["web_search_call.action.sources"] }) }), async ids => {
+        // Record which answer the provider is writing, so a lost connection still names a known charge.
+        receipt.generationRequestId = receiptId(ids.requestId);
+        receipt.responseId = receiptId(ids.responseId);
+        await checkpoint();
+      });
       stage = "response_decode";
       const body = record(result.body);
+      const announced = receipt.responseId;
       receipt.generationRequestId = receiptId(result.requestId);
       receipt.responseId = receiptId(body.id);
+      if (announced && announced !== receipt.responseId) { await checkpoint(); throw Error("Provider answer identity changed"); }
       // A failed checkpoint or ambiguous outcome leaves the durable reservation pending.
       if (body.model !== rates.model || body.service_tier !== "default") {
         await checkpoint();
@@ -877,4 +890,28 @@ export async function confirmUndispatchedPlanningRequest(directory:string,scope:
       throw Error("Unsent zero-cost generation is not independently established");
     }
   } finally { await lock.close(); await unlink(path+".lock"); }
+}
+
+/** Settle a generation that was sent but whose answer never arrived (lost connection or ended
+ * process). The provider probably charged it, so it is debited at its full reservation; this frees
+ * the case for an Operator-requested retry. Only an exactly matching unsettled receipt qualifies. */
+export async function settleLostAnswer(directory: string, scope: WorkflowUsageScope, ownerDigest: string, workDigest: string, at: string) {
+  const path = join(directory, "onboarding-usage.json"), info = await lstat(path);
+  if (!info.isFile() || await realpath(path) !== path || process.platform !== "win32" && (info.uid !== process.getuid?.() || (info.mode & 0o777) !== 0o600)) {
+    throw Error("Private usage receipt refused");
+  }
+  const lock = await open(path + ".lock", "wx", 0o600);
+  try {
+    const ledger = JSON.parse(await readFile(path, "utf8")) as Ledger;
+    const rows = recentWorkflow(ledger, scope, ownerDigest).filter(row => row.workDigest === workDigest);
+    const receipt = rows[0];
+    if (rows.length !== 1 || receipt.status !== "pending" || !receipt.generationDispatched || receipt.usage ||
+        receipt.estimatedMicros !== undefined || receipt.webSearchCalls) throw Error("No lost answer to settle");
+    Object.assign(receipt, { status: "lost", estimatedMicros: receipt.reservedMicros, failure: "answer_lost", settledAt: at });
+    verifiedSpend(ledger, undefined, scope.carryForward?.reportHold);
+    const next = path + "." + randomUUID() + ".tmp";
+    await durableWrite(next, ledger);
+    await rename(next, path);
+    return { reservedMicros: receipt.reservedMicros, responseId: receipt.responseId ?? null };
+  } finally { await lock.close(); await unlink(path + ".lock"); }
 }

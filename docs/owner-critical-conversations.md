@@ -1091,3 +1091,11 @@ in again. Revision spending is still to be approved separately.
 kept edit and one Note on the Questions page, nothing else), the owner approved about
 $0.50 of AI spending for Core to revise the Questions page from the Note, keeping the
 owner's wording, and to redeliver it to miopages.org as review drafts. No publication.
+
+**Nov 23: lost AI answer; owner correction.** The approved Questions page revision was
+sent to the AI service but Core gave up waiting after 2.5 minutes, so the answer (likely
+charged, about $0.45) was lost. The owner: this makes no sense; Core must either record
+the answer or wait longer, and something this obvious should not have been overlooked.
+Build the fix, and find out why the AI takes as long as it does. Once the OpenAI credits
+are used up, the owner is open to trying Claude as the AI if it is comparable in
+capability and cost.

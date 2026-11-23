@@ -197,7 +197,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const [operation, scenario, approval, value, ...extra] = args;
   const localCommercial = approval === commercialApproval || approval === p022RunProposalSha256 || approval === originalEvidenceApproval || approval === sourceAwareC0ProposalSha256 || approval === rebuiltRunApproval;
   const readOnly = ["inspect", "home", "site", "concept-review-input", "editorial-review-input"].includes(operation) || (["local-site", "local-home"].includes(operation) && localCommercial);
-  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "resume-undispatched", "recover", "queue-image", "decide-image", "review-quality", "commercial-replan", "concept-review-input", "editorial-review-input", "critique-home", "critique-site", "repair-sources"].includes(operation) ||
+  const editing = ["continue", "review-home", "revise-home", "review-site", "revise-site", "decide-editorial", "retry", "retry-lost-answer", "resume-undispatched", "recover", "queue-image", "decide-image", "review-quality", "commercial-replan", "concept-review-input", "editorial-review-input", "critique-home", "critique-site", "repair-sources"].includes(operation) ||
     (["continue-local-home", "revise-local-page"].includes(operation) && localCommercial);
   const replaceReport = operation === "replace-report" && approval === commercialApproval;
   const researchReplay = operation === "replay-research";
@@ -396,6 +396,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       : operation === "recover" ? await workflow.recover(context, prior.version)
       : operation === "resume-undispatched" ? await workflow.resumeUndispatchedRequest(context,prior.version,actor)
       : operation === "retry" ? await workflow.retryRejectedOutput(context, prior.version, actor)
+      : operation === "retry-lost-answer" ? await workflow.retryLostAnswer(context, prior.version, actor)
       : operation === "queue-image" ? await workflow.queueVisual(context, prior.version, actor, input.path ?? "", input.index ?? -1, input.brief)
       : await workflow.decideVisual(context, prior.version, actor, input.decision);
     return { next: result?.next, version: result?.version };

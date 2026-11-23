@@ -8,7 +8,7 @@ import { marketSourceCandidates, marketSources, marketResearchInput, marketResea
 import { WorkflowBlocked, type PresenceWorkflowOperations, type WorkflowContext, type WorkflowRun } from "./presence-workflow";
 import { editorialPatchSchema } from "./presence-editorial-patch";
 
-import {confirmUndispatchedPlanningRequest} from "./intelligent-responses";
+import {confirmUndispatchedPlanningRequest, settleLostAnswer} from "./intelligent-responses";
 import { exposesInternalCopy, marketingCitationIds, marketingProjection, repeatsPeerObservation, unsupportedCommercialCopy, validateMarketingAuthority, validateStrategyBlueprint, sourceTransitionAuthorityMatches, type MarketingAuthority } from "./presence-marketing-authority";
 import type { PresenceImageGrant } from "./presence-workflow-visual";
 import { originalMaterialInput, validateOriginalGrant, type OriginalMaterialGrant, type OriginalMaterialReader } from "./presence-source-material";
@@ -590,6 +590,11 @@ export function createResponsesPresenceWorkflow(config: {
       if (grant.originalMaterials) await config.retainRequest!(run, Buffer.from(JSON.stringify(request)));
       const output = await budget(workScope(run, grant), request, () => authorize(run), retain);
       return verifyCitations(output, run);
+    },
+    async settleLostAnswer(run: WorkflowRun) {
+      await authorize(run, false);
+      const { ownerDigest, workDigest } = workScope(run, grant);
+      return settleLostAnswer(ledgerDirectory, grant.ledger, ownerDigest, workDigest, new Date().toISOString());
     },
     async verifyUndispatchedRequest(run:WorkflowRun) {
       if(!grant.originalMaterials||!run.context.evaluation)throw Error("Isolated original-evidence scope required");

@@ -107,6 +107,7 @@ type State = {
   failure: Failure | null;
   artifactIssue?: ArtifactIssue | null;
   retry?: { previous: string; count: number };
+  lostAnswers?: { attempt: string; operation: string; reservedMicros: number; by: string; at: string }[];
   visuals?: PresenceVisual[];
 };
 type Task = Pick<Work, "operation" | "path">;
@@ -136,6 +137,8 @@ export interface PresenceWorkflowOperations {
   recover(run: WorkflowRun, bytes: Buffer): Promise<unknown>;
   verifyReportReplacement?(run: WorkflowRun): Promise<void>;
   verifyUndispatchedRequest?(run:WorkflowRun):Promise<void>;
+  /** Settle a sent generation whose answer never arrived, debiting its full reservation. */
+  settleLostAnswer?(run: WorkflowRun): Promise<{ reservedMicros: number }>;
   completeMarketResearch?(run: WorkflowRun, original: Buffer, custody: {
     read(attempt: string): Promise<Buffer | null>;
     retain(attempt: string, bytes: Buffer): Promise<void>;
@@ -676,7 +679,8 @@ export class PresenceWorkflow {
 
   private async executeTask(context: WorkflowContext, state: State, task: Task & { reviewStage?: ConceptReviewStage }) {
     const input = runInput(context, state, task.reviewStage);
-    const work = { ...task, attempt: randomUUID(), until: this.clock() + 180_000, inputDigest: fingerprint(input),
+    // The lease outlasts the longest streamed answer, so no one treats live work as abandoned.
+    const work = { ...task, attempt: randomUUID(), until: this.clock() + 35 * 60_000, inputDigest: fingerprint(input),
       ...(state.retry?.previous && { retryOf: state.retry.previous }) };
     const run = { context, input, work };
     await this.operations.preflight?.(run);
@@ -846,6 +850,26 @@ export class PresenceWorkflow {
     await this.operations.verifyUndispatchedRequest({context,input,work});
     return this.view(context,await this.store.append(context,version,{...state,work:null,failure:null,
       retry:{previous:work.attempt,count:state.retry?.count??0}}));
+  }
+
+  /** Operator retry after an answer was lost in transit: the lost attempt stays on record, charged at
+   * its full reservation, and the same unchanged work is queued again as a new attempt. */
+  async retryLostAnswer(context: WorkflowContext, version: number, actor: Actor) {
+    const state = await this.current(context, version), work = state.work;
+    if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || (!actor.simulated && !actor.authority)) {
+      throw new IntakeError("unavailable", 403);
+    }
+    const count = state.retry?.count ?? 0;
+    if (state.failure !== "outcome-unknown" || !work || work.attempt === "preparation-only" || !this.operations.settleLostAnswer ||
+        count >= (this.operations.maxRetries ?? 0) || await this.store.output(context, work)) throw new IntakeError("workflow_not_ready", 409);
+    const input = runInput(context, state, work.reviewStage);
+    if (fingerprint(input) !== work.inputDigest) throw new IntakeError("draft_changed", 409);
+    const settled = await this.operations.settleLostAnswer({ context, input, work });
+    const next = await this.store.append(context, version, { ...state, work: null, failure: null,
+      retry: { previous: work.attempt, count: count + 1 },
+      lostAnswers: [...state.lostAnswers ?? [], { attempt: work.attempt, operation: work.operation, reservedMicros: settled.reservedMicros,
+        by: actor.id, at: new Date(this.clock()).toISOString() }] });
+    return this.view(context, next);
   }
 
   async retryRejectedOutput(context: WorkflowContext, version: number, actor: Actor) {
