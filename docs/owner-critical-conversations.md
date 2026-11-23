@@ -1121,3 +1121,7 @@ is no reason to rewrite what was not asked about. The owner also asked for a goo
 whether their fairly general prompting needs revising, as far as how the AI and the
 WordPress integration work. To be settled before returning to the next build choices
 (facts to the knowledge base; cheaper, faster requests).
+
+**Nov 23: install approved.** The owner approved installing d07fc66 (section-level Operator
+revisions, Operator-review instruction) on protected Core and plugin 0.1.3 (editor guard)
+on miopages.org. Retiring the six Nov 21 case rules is a separate, still-open decision.
