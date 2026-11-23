@@ -1103,3 +1103,12 @@ capability and cost.
 **Nov 23: fix deployment and retry approved.** The owner approved installing d4b107b
 (streamed AI answers, lost-answer retry) on protected Core and about $0.50 to redo the
 Questions page revision, then delivering it to miopages.org as review drafts.
+
+**Nov 23: first full review loop completed (record, not a decision).** Protected Core
+runs d4b107b (rollback copy app-before-d4b107b-was-b66ee34-20261123T183008Z). The lost
+answer was settled at its full $0.68 reservation and retried; the Questions revision
+took about 3.5 minutes (longer than the old 2.5-minute limit) and cost $0.49. Review
+delivery 2 reached miopages.org (pages 53-61): the owner's sentence is kept word for
+word, the page now has "Usually better handled another way" with the owner's two
+situations, and the Note carries Core's reply and is resolved; no pages differ from
+Core's delivery. Case AI spending so far: about $6.08 of the $25 ceiling.

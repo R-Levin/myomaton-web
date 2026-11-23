@@ -32,10 +32,10 @@ Core (the site, in Core's own format)
   │ 1. Deliver: the translator turns each page into WordPress blocks
   ▼
 WordPress (people look, edit text, add Notes)
-  │ 2. Read back: Core compares the pages with what it delivered        ← NOT BUILT
+  │ 2. Read back: Core compares the pages with what it delivered
   ▼
 Core: edits become kept content, Notes become revision requests for that spot
-  │ 3. Revise: Core rewrites only what was asked for, keeps the rest   ← partly exists
+  │ 3. Revise: Core revises the noted pages and keeps the Operator's wording
   └──► back to step 1
 ```
 
@@ -44,16 +44,11 @@ Core: edits become kept content, Notes become revision requests for that spot
 It takes Core's page description and writes WordPress pages. The same page-building
 code serves the local install and the delivery to hosted WordPress.
 
-**Status of each step:**
-1. **Deliver.** Works to local WordPress, carrying Core's new design. Delivery to hosted
-   WordPress (miopages.org) works but predates the rebuild: it does not yet carry
-   Core's own design.
-2. **Read back.** Not built. Nothing yet carries WordPress edits or Notes into Core.
-   The Nov 22 editor fix was its precondition: a page saved without changes now comes
-   back byte-identical, so Core will see only real edits.
-3. **Revise.** Core can already critique and revise pages, and it has pieces of a
-   keep/revise method (editorial findings, page revision requests). It cannot yet take
-   revision requests from WordPress Notes.
+**Status of each step (Nov 23):** all three work end to end on miopages.org with protected
+Core. The first full loop (one kept edit, one Note on the Questions page) was completed
+on Nov 23. Not yet built: facts from edits flowing into the Business Knowledge Base, a
+review summary to confirm before paid revision, edits inside placeholder boxes, and
+revising only the noted section instead of the whole page.
 
 **Core's in-app preview** reuses the translator's output (WordPress-format page
 markup) to show the site inside Core, rather than having a separate renderer. The
