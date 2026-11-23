@@ -1148,3 +1148,11 @@ protected Core and running the rule retirement on case beb8de9c there (no AI spe
 from case beb8de9c at version 38; the previous settings and binding are kept beside the
 receipt case-rules-retired-2026-11-23T19-16-22-322Z.json. The case opens normally with the
 new settings (read-back PASS). No AI call.
+
+**Nov 23: facts from Operator edits into Core's knowledge (owner decision).** The owner approved
+the proposed design: at take-in Core spots business facts in kept edits (small AI step) and
+in Notes starting "Fact:"; a Review summary, delivered to miopages.org as a draft page,
+lists kept edits, proposed facts, the sections to revise (from Notes and from facts) and the
+estimated cost; the Operator confirms, corrects or rejects items with Notes on that page; only
+then are facts recorded and paid revisions run, section by section. The report and Direction
+pick facts up at their next refresh. The summary is also the confirm-before-paid-work step.
