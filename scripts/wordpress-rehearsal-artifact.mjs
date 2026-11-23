@@ -138,6 +138,8 @@ if (core) {
     ["scripts/intake/run-presence-evaluation.ts", "presence-evaluation-worker.cjs"],
     ["scripts/intake/rebuilt-evaluation-worker.ts", "rebuilt-evaluation-worker.cjs"],
     ["scripts/intake/source-aware-rendered-review.ts", "rendered-review.cjs"],
+    // Enrols an Operator WordPress site for review drafts; runs on the Core server so keys stay there.
+    ["scripts/wordpress-enrol-review-site.ts", "enrol-review-site.cjs"],
   ]) {
     const relative = path.join(".rehearsal", executable);
     const outfile = path.join(staging, relative);

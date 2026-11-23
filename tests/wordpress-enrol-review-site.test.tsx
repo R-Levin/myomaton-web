@@ -35,3 +35,20 @@ test("enrolment creates matching Core and WordPress settings; WordPress gets no 
       logo, ids[3], ids[4], "Fixture wordmark"], {}), /EEXIST/, "Existing credentials are never overwritten");
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
+
+test("a generated gate login stays in Core's settings; only its Apache hash is written for the site", { skip: spawnSync("openssl", ["version"]).status !== 0 }, async () => {
+  const dir = await mkdtemp(join(tmpdir(), "miopages-enrol-gate-"));
+  try {
+    const logo = join(dir, "wordmark.png");
+    await writeFile(logo, Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64"));
+    const ids = [randomUUID(), randomUUID(), randomUUID(), randomUUID(), randomUUID()];
+    const result = await enrolReviewSite([dir, "gate-site", "https://operator.example.test", ids[0], ids[1], ids[2], "miopages-core",
+      logo, ids[3], ids[4], "Fixture wordmark"], { MIOPAGES_SITE_GATE_USER: "miopages-core", MIOPAGES_SITE_GATE_PASSWORD: "generate" });
+    const core = readOperatorSiteConfig(JSON.parse(await readFile(join(dir, "gate-site.json"), "utf8")));
+    assert.match(core.gate!.password, /^[a-f0-9]{48}$/);
+    const line = await readFile(join(dir, "gate-site-gate-htpasswd-line.txt"), "utf8");
+    assert.match(line, /^miopages-core:\$apr1\$/);
+    assert.ok(!line.includes(core.gate!.password), "The site receives only the hash");
+    assert.ok(result.files.includes("gate-site-gate-htpasswd-line.txt"));
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});

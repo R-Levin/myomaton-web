@@ -17,6 +17,7 @@
  * The gate login is read from the environment, never from the command line.
  */
 import { createHash, generateKeyPairSync, randomBytes, randomUUID } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { lstat, open, readFile, realpath } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
 import { readOperatorSiteConfig } from "../lib/platform/wordpress-delivery/operator-review";
@@ -41,7 +42,18 @@ export async function enrolReviewSite(args: string[], env: Record<string, string
   if (!isAbsolute(logoFile)) throw Error("Absolute wordmark path required");
   const png = await readFile(logoFile);
   if (!png.subarray(0, 8).equals(Buffer.from("89504e470d0a1a0a", "hex"))) throw Error("Wordmark must be a PNG");
-  const gate = env.MIOPAGES_SITE_GATE_USER ? { user: env.MIOPAGES_SITE_GATE_USER, password: env.MIOPAGES_SITE_GATE_PASSWORD ?? "" } : undefined;
+  // MIOPAGES_SITE_GATE_PASSWORD=generate: Core gets its own random gate login; only its
+  // Apache hash leaves this machine (<name>-gate-htpasswd-line.txt, for the site's password file).
+  const generated = env.MIOPAGES_SITE_GATE_PASSWORD === "generate";
+  if (env.MIOPAGES_SITE_GATE_USER && !/^[a-zA-Z0-9._-]{1,60}$/u.test(env.MIOPAGES_SITE_GATE_USER)) throw Error("Gate user name refused");
+  const gate = env.MIOPAGES_SITE_GATE_USER ? { user: env.MIOPAGES_SITE_GATE_USER,
+    password: generated ? randomBytes(24).toString("hex") : env.MIOPAGES_SITE_GATE_PASSWORD ?? "" } : undefined;
+  let gateLine: string | undefined;
+  if (gate && generated) {
+    const hashed = spawnSync("openssl", ["passwd", "-apr1", "-stdin"], { input: gate.password + "\n", encoding: "utf8" });
+    if (hashed.status !== 0 || !/^\$apr1\$[./0-9A-Za-z]{1,8}\$[./0-9A-Za-z]{22}$/u.test(hashed.stdout.trim())) throw Error("Gate login hash unavailable");
+    gateLine = gate.user + ":" + hashed.stdout.trim() + "\n";
+  }
   const { privateKey, publicKey } = generateKeyPairSync("ed25519");
   const config = readOperatorSiteConfig({
     name, origin, ...(gate && { gate }), organizationId, installationId: randomUUID(), streamId: randomUUID(), keyId: "review-" + name,
@@ -60,12 +72,16 @@ define('MIOPAGES_PRIVATE_PULL', ['secretHex' => ${php(config.receiptSecretHex)},
 `;
   await writePrivate(join(directory, name + ".json"), JSON.stringify(config, null, 2) + "\n");
   await writePrivate(join(directory, name + "-wordpress-config.php"), wordpress);
+  if (gateLine) await writePrivate(join(directory, name + "-gate-htpasswd-line.txt"), gateLine);
   // Only non-secret identifiers are printed.
   return { name, origin, installationId: config.installationId, streamId: config.streamId, keyId: config.keyId,
-    files: [name + ".json", name + "-wordpress-config.php"] };
+    files: [name + ".json", name + "-wordpress-config.php", ...(gateLine ? [name + "-gate-htpasswd-line.txt"] : [])] };
 }
 
-if (process.argv[1]?.endsWith("wordpress-enrol-review-site.ts")) {
+if (/(wordpress-enrol-review-site\.ts|enrol-review-site\.cjs)$/u.test(process.argv[1] ?? "")) {
   enrolReviewSite(process.argv.slice(2), process.env).then(result => console.log(JSON.stringify(result)))
-    .catch((error: Error) => { console.error(error.message); process.exitCode = 1; });
+    .catch((error: Error) => {
+      console.error(JSON.stringify({ status: "BLOCKED", detail: /^[A-Za-z0-9 ,.;:'()/-]{1,200}$/u.test(error.message) ? error.message : "Enrolment refused" }));
+      process.exitCode = 1;
+    });
 }
