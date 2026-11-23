@@ -264,23 +264,29 @@ final class MioPages_Native_Draft_Content
         $class = 'miopages-semantic miopages-semantic-' . $value['layout'];
         $content = '<!-- wp:group {"className":"' . $class . '"} --><div class="wp-block-group ' . $class . '">';
         $heading = 'h' . $headingLevel;
-        foreach ($value['groups'] as $group) {
+        foreach ($value['groups'] as $groupIndex => $group) {
             if (!is_array($group)) throw new InvalidArgumentException('Semantic draft group refused.');
+            // In a review draft each text names Core's text: "<section>:g<group>/heading|body|i<item>".
+            $named = static fn(string $part): string => $origin === '' ? '' : ' ' . json_encode(MioPages_Native_Component::origin($origin . ':g' . $groupIndex . '/' . $part),
+                JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             $keys = array_keys($group);
             sort($keys);
             if ($keys !== ['body', 'heading', 'items'] || !is_array($group['items']) || !array_is_list($group['items'])) {
                 throw new InvalidArgumentException('Semantic draft group refused.');
             }
             $content .= '<!-- wp:group {"className":"miopages-semantic-group"} --><div class="wp-block-group miopages-semantic-group">'
-                . '<!-- wp:heading' . ($headingLevel === 2 ? '' : ' {"level":' . $headingLevel . '}') . ' --><' . $heading . ' class="wp-block-heading">'
+                . '<!-- wp:heading' . ($origin === '' ? ($headingLevel === 2 ? '' : ' {"level":' . $headingLevel . '}')
+                    : ' ' . json_encode(($headingLevel === 2 ? [] : ['level' => $headingLevel]) + MioPages_Native_Component::origin($origin . ':g' . $groupIndex . '/heading'),
+                        JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+                . ' --><' . $heading . ' class="wp-block-heading">'
                 . self::semanticText($group['heading'], 960) . '</' . $heading . '><!-- /wp:heading -->'
-                . self::paragraph(nl2br(self::semanticText($group['body'], 6000), false));
+                . self::paragraph(nl2br(self::semanticText($group['body'], 6000), false), $origin === '' ? '' : $origin . ':g' . $groupIndex . '/body');
             if ($group['items'] !== []) {
                 $ordered = $value['listStyle'] === 'steps';
                 $tag = $ordered ? 'ol' : 'ul';
                 $content .= '<!-- wp:list' . ($ordered ? ' {"ordered":true}' : '') . ' --><' . $tag . ' class="wp-block-list">';
-                foreach ($group['items'] as $item) {
-                    $content .= '<!-- wp:list-item --><li>' . self::semanticText($item, 1440) . '</li><!-- /wp:list-item -->';
+                foreach ($group['items'] as $itemIndex => $item) {
+                    $content .= '<!-- wp:list-item' . $named('i' . $itemIndex) . ' --><li>' . self::semanticText($item, 1440) . '</li><!-- /wp:list-item -->';
                 }
                 $content .= '</' . $tag . '><!-- /wp:list -->';
             }

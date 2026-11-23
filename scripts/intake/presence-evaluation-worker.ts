@@ -203,7 +203,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const researchReplay = operation === "replay-research";
   const completeResearch = (operation === "complete-research" || researchReplay) && approval === commercialApproval;
   // Review drafts to Operator WordPress and read-back (owner decisions, Nov 22). No AI calls.
-  const delivery = ["deliver-review", "read-back", "take-in-review"].includes(operation) && approval === rebuiltRunApproval;
+  const delivery = ["deliver-review", "read-back", "take-in-review", "withdraw-review"].includes(operation) && approval === rebuiltRunApproval;
   if ((scenario !== "c0" && scenario !== "c2") || !approval || extra.length ||
       !(readOnly || editing || delivery || operation === "activate" || operation === "work" || operation === "preflight" || completeResearch || replaceReport) || (editing || delivery ? !value : Boolean(value))) {
     throw Error("Evaluation command refused");
@@ -257,6 +257,13 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
         return { site: request.site, delivered: state?.revision ?? null, ...summary, file };
       }
       if (request.version !== prior.version) throw Error("Evaluation view is stale");
+      if (operation === "withdraw-review") {
+        const reason = (request as { reason?: unknown }).reason;
+        if (typeof reason !== "string" || !reason.trim()) throw Error("A reason for the withdrawal is required");
+        const actor = { id: "local-evaluation-operator", role: "operator" as const, simulated: false, authority: "Withdraw Operator review " + request.site };
+        const view = await workflow.withdrawOperatorReview(context, prior.version, actor, reason);
+        return { site: request.site, version: view?.version, next: view?.next, pages: view?.pages.length };
+      }
       if (operation === "take-in-review") {
         // Keep the Operator's wording in Core's pages; queue noted pages for Core's revision.
         if (!state) throw Error("Nothing has been delivered to this site yet");

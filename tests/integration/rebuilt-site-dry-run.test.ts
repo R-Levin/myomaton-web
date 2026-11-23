@@ -226,7 +226,13 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.equal(feedback.notes.length, 1);
     assert.equal(feedback.notes[0].path, "/start");
     assert.deepEqual(feedback.structural, []);
-    let revised = (await workflow.applyOperatorReview(context, view.version, actor, feedback))!;
+    // A review taken in by mistake can be withdrawn while nothing has run: the case returns exactly.
+    const taken = (await workflow.applyOperatorReview(context, view.version, actor, feedback))!;
+    const withdrawn = (await workflow.withdrawOperatorReview(context, taken.version, actor, "Dry-run withdrawal"))!;
+    assert.deepEqual(withdrawn.pages, view.pages, "Withdrawal restores Core's pages exactly");
+    assert.equal(withdrawn.wordpressReviews, undefined);
+    await assert.rejects(workflow.withdrawOperatorReview(context, withdrawn.version, actor, "again"), "Nothing left to withdraw");
+    let revised = (await workflow.applyOperatorReview(context, withdrawn.version, actor, feedback))!;
     assert.ok(revised.pages.find(page => page.path === "/service")!.sections[0].heading.endsWith("(edited by the Operator)"),
       "The Operator's wording is now Core's own text");
     assert.ok(!revised.pages.some(page => page.path === "/start"), "The noted page is queued for revision");

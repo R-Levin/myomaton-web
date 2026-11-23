@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import type { NativeComponent, NativeNode } from "./presence-native-component";
 import type { PresenceWorkflowView, WorkflowContext } from "./presence-workflow";
 import { workflowNativeReviewCandidate } from "./presence-workflow-delivery";
-import type { Readback } from "../wordpress-delivery/readback";
+import { noteBlocks, type Readback } from "../wordpress-delivery/readback";
 
 /**
  * Turns a WordPress read-back into what Core acts on (owner direction, Nov 22):
@@ -76,6 +76,8 @@ function coreText(sections: { id: string; content: { heading: string; text: stri
   if (!section) return null;
   if (rest === "heading") return section.content.heading;
   if (rest === "text") return section.content.text;
+  const grouped = groupText(section.block, rest);
+  if (grouped !== undefined) return grouped;
   const block = section.block as NativeComponent | undefined;
   if (!block || block.version !== 2) return null;
   const located = locate(block.root, rest);
@@ -84,6 +86,21 @@ function coreText(sections: { id: string; content: { heading: string; text: stri
   if (item !== undefined) return node.items[item] ?? null;
   if (label) return node.text;
   return node.text;
+}
+
+/** Core's older layout block (version 1): groups of heading, body and items. */
+type GroupedBlock = { version: 1; groups: { heading: string; body: string; items: string[] }[] };
+const groupPath = /^g([0-9]+)\/(heading|body|i([0-9]+))$/u;
+
+/** Text in an older layout block, by "g<group>/heading|body|i<item>"; undefined if the path is not of that kind. */
+function groupText(block: unknown, path: string): string | null | undefined {
+  const match = groupPath.exec(path);
+  if (!match) return undefined;
+  const grouped = block as GroupedBlock | undefined;
+  if (grouped?.version !== 1) return null;
+  const group = grouped.groups[Number(match[1])];
+  if (!group) return null;
+  return match[3] !== undefined ? group.items[Number(match[3])] ?? null : group[match[2] as "heading" | "body"];
 }
 
 /** The node an origin path names ("r.0.2", list item "r.1/i3", list label "r.1/label"). */
@@ -103,11 +120,17 @@ export function locate(root: NativeNode, path: string) {
   return item && node.kind === "list" ? { node, item: Number(item[1]) } : null;
 }
 
-const same = (a: string, b: string) => a.replace(/\s+/gu, " ").trim() === b.replace(/\s+/gu, " ").trim();
+const normal = (value: string) => value.replace(/\s+/gu, " ").trim();
+const same = (a: string, b: string) => normal(a) === normal(b);
 
 export function operatorFeedback(context: WorkflowContext, view: PresenceWorkflowView, readback: Readback): OperatorFeedback {
+  return operatorFeedbackFromCandidate(workflowNativeReviewCandidate(context, view).candidate, readback);
+}
+
+/** The same, from the review candidate Core delivered (its pages, sections and section ids). */
+export function operatorFeedbackFromCandidate(candidate: { pages: { path: string; title: string;
+  sections: { id: string; content: { heading: string; text: string }; block?: unknown }[] }[] }, readback: Readback): OperatorFeedback {
   if (readback.revision === null) throw Error("Nothing has been delivered to this site yet");
-  const { candidate } = workflowNativeReviewCandidate(context, view);
   const edits: OperatorEdit[] = [], titles: OperatorFeedback["titles"] = [], structural: OperatorStructural[] = [];
   const blockOf = new Map<number, Unit & { path: string }>();
   for (const page of readback.pages) {
@@ -117,6 +140,8 @@ export function operatorFeedback(context: WorkflowContext, view: PresenceWorkflo
       continue;
     }
     const units = textUnits(page.content);
+    // The block text each Note sits on, read from the Note's own anchor (works for any block).
+    const anchored = noteBlocks(page.content);
     // Note anchors: WordPress stores each Note id in its block's metadata.
     const opener = /<!-- wp:([a-z0-9/-]+) (\{[\s\S]*?\}) (\/)?-->/gu;
     for (let match = opener.exec(page.content); match; match = opener.exec(page.content)) {
@@ -125,16 +150,21 @@ export function operatorFeedback(context: WorkflowContext, view: PresenceWorkflo
       const ids = [attributes.metadata?.noteId].flat().filter((id): id is number => Number.isSafeInteger(id));
       if (!ids.length) continue;
       const origin = typeof attributes.metadata?.mio === "string" ? attributes.metadata.mio : null;
-      const unit = units.find(item => item.origin !== null && item.origin === origin) ??
-        { origin, name: match[1].replace(/^core\//u, ""), text: "" };
-      for (const id of ids) blockOf.set(id, { ...unit, path: page.path });
+      const unit = units.find(item => item.origin !== null && item.origin === origin);
+      for (const id of ids) blockOf.set(id, { origin, name: unit?.name ?? match[1].replace(/^core\//u, ""),
+        text: unit?.text || anchored.get(id)?.text || "", path: page.path });
     }
     if (!page.edited) continue;
     if (page.title !== undefined && page.title !== core.title) titles.push({ path: page.path, before: core.title, after: page.title });
+    // Safety net: a block without Core's identifier whose text Core already has on this page
+    // (for example from a delivery made before that block type was labelled) is not new.
+    const known = new Set(core.sections.flatMap(section => originsOf(section)).map(origin => coreText(core.sections, origin))
+      .filter((text): text is string => Boolean(text)).map(normal));
+    const present = new Set(units.map(unit => normal(unit.text)));
     const seen = new Set<string>();
     for (const unit of units) {
       if (unit.origin === null || seen.has(unit.origin)) {
-        if (unit.text) structural.push({ path: page.path, kind: "added", text: unit.text });
+        if (unit.text && !known.has(normal(unit.text))) structural.push({ path: page.path, kind: "added", text: unit.text });
         continue;
       }
       seen.add(unit.origin);
@@ -152,7 +182,8 @@ export function operatorFeedback(context: WorkflowContext, view: PresenceWorkflo
       for (const origin of originsOf(section)) {
         if (!delivered.has(origin)) {
           const text = coreText(core.sections, origin);
-          if (text) structural.push({ path: page.path, kind: "removed", text });
+          // Still on the page, just without an identifier: not removed.
+          if (text && !present.has(normal(text))) structural.push({ path: page.path, kind: "removed", text });
         }
       }
     }
@@ -173,8 +204,12 @@ export function operatorFeedback(context: WorkflowContext, view: PresenceWorkflo
 
 /** Every text origin a delivered section names. */
 function originsOf(section: { id: string; content: { heading: string; text: string }; block?: unknown }): string[] {
-  const block = section.block as NativeComponent | undefined;
-  if (!block || block.version !== 2) return [section.id + ":heading", ...(section.content.text ? [section.id + ":text"] : [])];
+  const block = section.block as NativeComponent | GroupedBlock | undefined;
+  const own = [section.id + ":heading", ...(section.content.text ? [section.id + ":text"] : [])];
+  if (block?.version === 1) return [...own, ...block.groups.flatMap((group, index) => [
+    `${section.id}:g${index}/heading`, ...(group.body ? [`${section.id}:g${index}/body`] : []),
+    ...group.items.map((_, item) => `${section.id}:g${index}/i${item}`)])];
+  if (!block || block.version !== 2) return own;
   const out: string[] = [];
   const walk = (node: NativeNode, path: string) => {
     if (["heading", "paragraph", "action", "details"].includes(node.kind) && node.text) out.push(section.id + ":" + path);
@@ -220,6 +255,15 @@ export function applyOperatorEdits(context: WorkflowContext, view: PresenceWorkf
       section[field] = after;
       continue;
     }
+    const grouped = groupPath.exec(rest);
+    if (grouped) {
+      const group = (section.block as GroupedBlock | undefined)?.version === 1 ? (section.block as GroupedBlock).groups[Number(grouped[1])] : undefined;
+      const current = group && (grouped[3] !== undefined ? group.items[Number(grouped[3])] : group[grouped[2] as "heading" | "body"]);
+      if (!group || current === undefined || !same(current, edit.before)) throw Error("Operator edit no longer matches Core's text");
+      if (grouped[3] !== undefined) group.items[Number(grouped[3])] = after;
+      else group[grouped[2] as "heading" | "body"] = after;
+      continue;
+    }
     const block = section.block as NativeComponent | undefined;
     const located = block?.version === 2 ? locate(block.root, rest) : null;
     if (!located) throw Error("Operator edit names a block Core no longer has");
@@ -253,8 +297,9 @@ export function pageText(page: PresenceWorkflowView["pages"][number]) {
   };
   for (const section of page.sections) {
     parts.push(section.heading, section.body);
-    const block = section.block as NativeComponent | undefined;
+    const block = section.block as NativeComponent | GroupedBlock | undefined;
     if (block?.version === 2) walk(block.root);
+    if (block?.version === 1) for (const group of block.groups) parts.push(group.heading, group.body, ...group.items);
   }
   parts.push(...page.actions.map(action => action.label));
   return parts.join("\n").replace(/\s+/gu, " ");

@@ -98,6 +98,8 @@ type State = {
     conceptCritique?: { target: string; inputDigest: string; editorial: WorkflowEditorial } };
   operatorReview: Decision | null;
   wordpressReviews?: WordPressReview[];
+  /** Reviews taken in and then withdrawn before any revision ran (kept on record). */
+  withdrawnReviews?: (WordPressReview & { withdrawnAt: string; withdrawnBy: Actor; reason: string })[];
   qualityReviews?: { actor: Actor; at: string; review: QualityReview; phase?: "home-concept" }[];
   conceptEditorial?: { target: string; inputDigest: string; editorial: WorkflowEditorial } | null;
   sourceRecovery?: SourceRecovery;
@@ -174,6 +176,15 @@ class WorkflowStore {
       SELECT payload, digest FROM ${this.events}
       WHERE web_presence_id=$1 AND managed_site_id=$2 AND intake_id=$3
       ORDER BY version DESC LIMIT 1`, identity(context));
+    if (!row) return null;
+    if (fingerprint(row.payload) !== row.digest) throw new IntakeError("unavailable", 503);
+    return row.payload;
+  }
+
+  async readVersion(context: WorkflowContext, version: number): Promise<State | null> {
+    const { rows: [row] } = await this.pool.query<{ payload: State; digest: string }>(`
+      SELECT payload, digest FROM ${this.events}
+      WHERE web_presence_id=$1 AND managed_site_id=$2 AND intake_id=$3 AND version=$4`, [...identity(context), version]);
     if (!row) return null;
     if (fingerprint(row.payload) !== row.digest) throw new IntakeError("unavailable", 503);
     return row.payload;
@@ -928,6 +939,24 @@ export class PresenceWorkflow {
     } : {};
     return this.view(context, await this.store.append(context, version, { ...state, ...revision,
       pages: pages.filter(page => !paths.includes(page.path)), wordpressReviews: [...state.wordpressReviews ?? [], review] }));
+  }
+
+  /**
+   * Withdraw the Operator review just taken in, while nothing has run since: the case
+   * returns exactly to its state before the take-in, and the withdrawn review stays on
+   * record with who withdrew it and why. No AI call; WordPress is not touched.
+   */
+  async withdrawOperatorReview(context: WorkflowContext, version: number, actor: Actor, reason: string) {
+    const state = await this.current(context, version);
+    if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || !actor.authority) throw new IntakeError("unavailable", 403);
+    const last = state.wordpressReviews?.at(-1);
+    const before = version > 1 ? await this.store.readVersion(context, version - 1) : null;
+    if (!last || state.work || state.revisionRequest?.source !== "operator-review" && last.revisedPaths.length ||
+        !before || (before.wordpressReviews?.length ?? 0) !== state.wordpressReviews!.length - 1) throw new IntakeError("workflow_not_ready", 409);
+    const { version: _previousVersion, ...restored } = before;
+    return this.view(context, await this.store.append(context, version, { ...restored,
+      withdrawnReviews: [...state.withdrawnReviews ?? [], { ...last, withdrawnAt: new Date(this.clock()).toISOString(), withdrawnBy: actor,
+        reason: text(reason, 500) }] }));
   }
 
   async confirmReport(context: WorkflowContext, version: number, actor: Actor, developmentContinuation = false) {
