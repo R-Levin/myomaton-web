@@ -38,7 +38,7 @@ Page." That told the AI to rewrite the page. Your Note asked for one paragraph t
 - A Note on the page as a whole, or text you added or removed, still gets a whole-page revision.
 - Also cheaper and faster: the AI writes one section, not 10,000–15,000 words.
 
-### 3. Six old case rules ride along on every request. **Proposed: retire five, reword one**
+### 3. Six old case rules rode along on every request. **Done Nov 23: all six retired on protected Core; the lasting one is in Core's writing instruction**
 They come from the Codex-era Nov 21 "customer-facing correction round" and are labelled "Owner
 instruction":
 

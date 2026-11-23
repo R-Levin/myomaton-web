@@ -1142,3 +1142,9 @@ to that round.
 
 **Nov 23: install approved for the rule retirement.** The owner approved installing f4569d6 on
 protected Core and running the rule retirement on case beb8de9c there (no AI spending).
+
+**Nov 23: case rules retired (record, not a decision).** Protected Core runs f4569d6
+(rollback copy app-before-f4569d6-was-d07fc66-20261123T191551Z). All six rules were removed
+from case beb8de9c at version 38; the previous settings and binding are kept beside the
+receipt case-rules-retired-2026-11-23T19-16-22-322Z.json. The case opens normally with the
+new settings (read-back PASS). No AI call.
