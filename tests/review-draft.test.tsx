@@ -189,3 +189,9 @@ test("Core reads back the Operator's edits and Notes, each Note tied to its bloc
   const other = generateKeyPairSync("ed25519").privateKey;
   assert.equal(run(readbackRequest(installationId, "fixture-key", other).wire).status, 422);
 });
+
+test("an editor left open on an older copy is told Core took over and cannot save over the new delivery", () => {
+  const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/editor-guard.php"], { encoding: "utf8" });
+  assert.equal(php.status, 0, php.stderr);
+  assert.equal(php.stdout.trim(), "PASS");
+});
