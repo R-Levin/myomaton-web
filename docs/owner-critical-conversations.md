@@ -1068,3 +1068,14 @@ miopages.org's settings to the review setup (the 16 old Codex drafts keep their 
 lose their branded preview); update the plugin (0.1.0) and theme and archive the two
 Codex leftovers; deliver case beb8de9c version 30 as review drafts. No AI spending and
 no publication are included.
+
+**Nov 22–23: go-live carried out (record, not a decision).** All eight approved steps
+done. Protected Core runs 4450677 (rollback copy app-before-4450677-was-b03afc1-…).
+miopages.org: Core enrolled (keys and Core's own gate login generated on the Core
+server), `miopages-core` Editor account, settings switched, plugin and theme updated,
+two Codex leftovers archived (archive-golive-20261123T001516Z, with rollback.sh). The
+first delivery was refused because miopages.org's PHP writes 1.6 as 1.6000000000000001;
+fixed in plugin 0.1.1 (6b57bc9, tests now run with the host's setting) and installed as
+a correction within the approved plugin update. Delivery 1 then landed: case beb8de9c
+version 30, nine draft pages (IDs 53–61); all 1,226 blocks valid and unchanged on
+re-save. Visual check in a browser is the owner's (Claude has no miopages.org login).
