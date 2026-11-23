@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { designProjection } from "../../lib/platform/design-systems/site-design";
-import { mkdir, open, readFile, readdir, realpath, lstat } from "node:fs/promises";
+import { mkdir, open, readFile, readdir, realpath, rename, lstat } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { Pool } from "pg";
 import { fingerprint } from "../../lib/platform/canonical/model";
@@ -203,7 +203,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const researchReplay = operation === "replay-research";
   const completeResearch = (operation === "complete-research" || researchReplay) && approval === commercialApproval;
   // Review drafts to Operator WordPress and read-back (owner decisions, Nov 22). No AI calls.
-  const delivery = ["deliver-review", "read-back", "take-in-review", "withdraw-review"].includes(operation) && approval === rebuiltRunApproval;
+  const delivery = ["deliver-review", "read-back", "take-in-review", "retire-case-rules", "withdraw-review"].includes(operation) && approval === rebuiltRunApproval;
   if ((scenario !== "c0" && scenario !== "c2") || !approval || extra.length ||
       !(readOnly || editing || delivery || operation === "activate" || operation === "work" || operation === "preflight" || completeResearch || replaceReport) || (editing || delivery ? !value : Boolean(value))) {
     throw Error("Evaluation command refused");
@@ -239,6 +239,31 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       return { next: prior.next, version: prior.version, file: path };
     }
     if (!prior) throw Error("Evaluation workflow is not started");
+    if (operation === "retire-case-rules") {
+      // Owner decision, Nov 23: the case's standing rules from the Nov 21 correction round are
+      // retired (their lasting content is in Core's own instructions). No AI call. The previous
+      // grant and binding are kept beside a receipt so the change can be reversed.
+      const request = JSON.parse(value) as { version?: unknown; reason?: unknown };
+      if (request.version !== prior.version || prior.pendingOperation) throw Error("Evaluation view is stale or busy");
+      if (typeof request.reason !== "string" || !request.reason.trim()) throw Error("A reason is required");
+      const before = await privateWorkflowBytes(join(root, "grant.json"), root, 4_000_000);
+      const binding = await privateWorkflowFile<{ activation: string; grant: string }>(join(root, "activation.json"), root);
+      const grant = JSON.parse(before.toString("utf8")) as PresenceWorkflowGrant;
+      const rules = grant.marketingAuthority?.processingInstructions ?? [];
+      if (binding.grant !== fingerprint(grant) || !rules.length) throw Error("No case rules to retire, or the stored binding differs");
+      const next = structuredClone(grant);
+      delete (next.marketingAuthority as { processingInstructions?: unknown }).processingInstructions;
+      const stamp = new Date().toISOString().replace(/[:.]/gu, "-");
+      await createPrivate(join(root, `grant.json.before-rules-${stamp}`), before);
+      await createPrivate(join(root, `activation.json.before-rules-${stamp}`), JSON.stringify(binding) + "\n");
+      await createPrivate(join(root, `case-rules-retired-${stamp}.json`), JSON.stringify({ reason: request.reason.trim(),
+        workflowVersion: prior.version, retired: rules, beforeGrant: fingerprint(grant), nextGrant: fingerprint(next), providerCalls: 0 }, null, 2) + "\n");
+      await createPrivate(join(root, `grant.next-${stamp}`), JSON.stringify(next) + "\n");
+      await createPrivate(join(root, `activation.next-${stamp}`), JSON.stringify({ ...binding, grant: fingerprint(next) }) + "\n");
+      await rename(join(root, `grant.next-${stamp}`), join(root, "grant.json"));
+      await rename(join(root, `activation.next-${stamp}`), join(root, "activation.json"));
+      return { retired: rules.length, receipt: `case-rules-retired-${stamp}.json`, version: prior.version };
+    }
     if (delivery) {
       const request = JSON.parse(value) as { site?: unknown; version?: unknown };
       if (typeof request.site !== "string" || !/^[a-z0-9-]{1,40}$/u.test(request.site)) throw Error("Operator site name required");

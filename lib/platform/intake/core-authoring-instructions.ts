@@ -42,7 +42,10 @@ const writing =
   "Writing: address the reader as you. State plainly and confidently what the business delivers, including work " +
   "done by people (Operators), not only automation. No hedging, apologies or disclaimers about previews, " +
   "approvals, models or development; none of that belongs in a visitor's view. Keep internal notes, uncertainty " +
-  "and launch prerequisites in the fields meant for them (strategy, visual briefs, critique summary). " +
+  "and launch prerequisites in the fields meant for them (strategy, visual briefs, critique summary). The " +
+  "business's own service descriptions state its intended offer: present that offer in original copy without " +
+  "commentary on whether every part already runs, and keep unverified prices, performance, availability and " +
+  "customer proof unconfirmed (placeholders, not claims). " +
   "Plain text only, no HTML.";
 
 /** Originality and research use (Part 1 #10, #11; legal). */
