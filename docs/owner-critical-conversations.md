@@ -1059,3 +1059,12 @@ read-back sits in Core rather than in leftover Codex-era places.
 notes-to-revisions step before going live on miopages.org, so the first round of
 Operator edits and Notes there is acted on by Core: edits kept, Notes revised at their
 exact spot.
+
+**Nov 22, late: go-live approved.** The owner approved all eight steps of
+`docs/go-live-review-drafts-request.md` as written: push the branch; deploy the current
+Core to protected Core; enrol miopages.org (new keys, Core's own gate login); a
+dedicated `miopages-core` WordPress account (Editor); add Core's gate login; switch
+miopages.org's settings to the review setup (the 16 old Codex drafts keep their text but
+lose their branded preview); update the plugin (0.1.0) and theme and archive the two
+Codex leftovers; deliver case beb8de9c version 30 as review drafts. No AI spending and
+no publication are included.
