@@ -1156,3 +1156,7 @@ lists kept edits, proposed facts, the sections to revise (from Notes and from fa
 estimated cost; the Operator confirms, corrects or rejects items with Notes on that page; only
 then are facts recorded and paid revisions run, section by section. The report and Direction
 pick facts up at their next refresh. The summary is also the confirm-before-paid-work step.
+
+**Nov 23: install approved for review rounds.** The owner approved installing b65bb81 (review
+rounds, Review summary, facts into Core) on protected Core and plugin 0.1.4 on miopages.org.
+Running a real round (AI analysis about $0.25) is still to be approved separately.
