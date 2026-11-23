@@ -100,6 +100,26 @@ export function authoringOutputLimit(grant: PresenceWorkflowGrant, name: Workflo
   return grant.marketingAuthority?.projectionVersion === 2 ? permitted : Math.min(12_000, permitted);
 }
 
+/** Output for a revision limited to noted sections: each listed section in full, plus any wider change Core judges necessary. */
+export function sectionRevisionSchema(pageSchema: { properties: { sections: { items: { properties: object } } }; $defs?: object }, indexes: readonly number[]) {
+  return { type: "object", additionalProperties: false, ...(pageSchema.$defs && { $defs: pageSchema.$defs }),
+    required: ["sections", "widerChange"],
+    properties: {
+      sections: { type: "array", items: { type: "object", additionalProperties: false,
+        required: ["index", ...Object.keys(pageSchema.properties.sections.items.properties)],
+        properties: { index: { type: "integer", enum: [...indexes] }, ...pageSchema.properties.sections.items.properties } } },
+      widerChange: { type: "object", additionalProperties: false, required: ["needed", "reason"],
+        properties: { needed: { type: "boolean" }, reason: { type: "string" } } },
+    } };
+}
+
+export function sectionRevisionInstructions(indexes: readonly number[]) {
+  return "This revision is limited to the noted section" + (indexes.length > 1 ? "s" : "") + " of the previous Page: zero-based section index " +
+    indexes.join(", ") + ". Return each listed section once, complete and in the same section format, revised to address the Operator's Notes. " +
+    "Every other section, the Page heading, search text and Actions stay exactly as they are and are not returned. Keep the section's role, and keep any image or Action references valid for the unchanged Page. " +
+    "If a Note can only be properly addressed by also changing other sections or Pages, do your best within the listed sections and set widerChange.needed with a short plain-language reason naming what else should change and why; Core will propose it to the Operator rather than making it. Otherwise set needed to false and reason to an empty string.";
+}
+
 export function bindCitations(schema: object, references: readonly string[]) {
   // Provider decoding and local semantic checks must use the same allowlist.
   const bound = structuredClone(schema) as Record<string, unknown>;
@@ -528,7 +548,10 @@ export function createResponsesPresenceWorkflow(config: {
         ? " Reassess the exact confirmed changes using the complete retained business evidence. A fact about one business area must not change unrelated offerings or eligibility. Prior report, Direction and Pages are comparisons, not current truth. Explain consequences and unresolved questions. In the blueprint classify each Page as retain, revise or add with a substantive changeReason; retain only where existing content remains accurate and useful. Do not default to rewriting the whole site or impose a fixed Page count. Each revised Page must materially reflect its evidence and purpose. A publicUse=false fact is internal understanding only and cannot become a public claim. No confirmation authorizes publication. " : "";
       const pageSchema = grant.nativeComponents === 2 ? creativePageSchema
         : grant.marketingAuthority?.strategy ? strategyPageSchema : schemas.page;
-      const baseArtifact = batch ? editorialPatchSchema(batch.paths) : exactPage !== undefined
+      // An Operator Note tied to specific sections revises only those sections (owner, Nov 23).
+      const noted = exactPage !== undefined && run.input.revisionRequest?.paths.includes(exactPage)
+        ? run.input.revisionRequest.sections?.find(item => item.path === exactPage) : undefined;
+      const baseArtifact = batch ? editorialPatchSchema(batch.paths) : noted ? sectionRevisionSchema(pageSchema, noted.indexes) : exactPage !== undefined
         ? { ...pageSchema, properties: { ...pageSchema.properties, path: { type: "string", enum: [exactPage] } } }
         : operation === "blueprint" && grant.marketingAuthority?.strategy
           ? bindBlueprintDecisionSchema(run, grant.marketingAuthority)
@@ -566,11 +589,13 @@ export function createResponsesPresenceWorkflow(config: {
       const rebuilt = grant.marketingAuthority?.projectionVersion === 2 && !batch;
       const authoringStage: AuthoringStage = operation === "editorial"
         ? (run.work.reviewStage?.phase === "home-concept" ? "concept-critique" : "editorial")
-        : operation === "page" ? (stageFor(run) === "revision" ? "revision" : "page") : operation;
+        : operation === "page" ? (stageFor(run) !== "revision" ? "page"
+          : run.input.revisionRequest?.source === "operator-review" ? "operator-revision" : "revision") : operation;
       const ownerRules = (grant.marketingAuthority?.processingInstructions ?? [])
         .map(rule => "Owner instruction (" + rule.basis + "; " + rule.reference + "): " + rule.text).join("\n");
       const rebuiltInstructions = rebuilt ? [coreAuthoringInstructions(authoringStage),
         exactPage === undefined ? "" : "The single required Page is " + JSON.stringify(exactPage) + ".",
+        noted ? sectionRevisionInstructions(noted.indexes) : "",
         preview.trim(), knowledgeInstructions.trim(), ownerRules].filter(Boolean).join("\n\n") : "";
       const request = {
         model, ...(grant.marketingAuthority?.projectionVersion === 2 && model === "gpt-5.4-2026-03-05" && { reasoning: { effort: "medium" as const } }), input: providerInput,

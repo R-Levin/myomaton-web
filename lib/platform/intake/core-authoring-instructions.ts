@@ -7,7 +7,7 @@
  * (projectionVersion 2). Historical runs keep their original wording for recovery.
  */
 
-export type AuthoringStage = "report" | "direction" | "blueprint" | "page" | "revision" | "editorial" | "concept-critique";
+export type AuthoringStage = "report" | "direction" | "blueprint" | "page" | "revision" | "operator-revision" | "editorial" | "concept-critique";
 
 /** Who the AI is and how it should work, for every stage. */
 const role =
@@ -117,6 +117,16 @@ const stages: Record<AuthoringStage, string> = {
     "evidence of what to change, not a template: rethink structure, copy and design where the critique says the " +
     "concept is weak; a cosmetic rewrite is not a revision. Keep what was accurate and effective. Return the " +
     "complete revised Page.",
+  // Owner direction, Nov 23: an Operator's review changes what it asks about, at the scope it asks
+  // for; Core's own critique rounds (above) may rethink a Page.
+  "operator-revision":
+    "Task: act on the Operator's review of this Page. Each Note says what the Operator wants changed and is " +
+    "attached to the text it is about. Make the change the Note asks for, as fully as it asks for it, and leave " +
+    "everything the Notes do not concern as it is: the Operator reviewed it and did not ask for it to change. " +
+    "Operator wording marked to keep stays word for word. Use the Operator's examples as direction, in their " +
+    "meaning, and do not invent policies, prices, commitments or facts to fill a gap; use a placeholder where " +
+    "business detail is missing. Unless told below that only some sections are returned, return the complete " +
+    "Page with the parts the Notes do not concern exactly as they were.",
   editorial:
     "Task: critique the complete site as a demanding agency creative director would, using the actual rendered " +
     "desktop and mobile images where supplied. Judge offer clarity, persuasiveness, originality, research " +
@@ -133,7 +143,7 @@ const stages: Record<AuthoringStage, string> = {
 
 /** Complete instructions for one source-aware stage. Optional extras are appended by the caller. */
 export function coreAuthoringInstructions(stage: AuthoringStage) {
-  const authoring = stage === "page" || stage === "revision";
+  const authoring = stage === "page" || stage === "revision" || stage === "operator-revision";
   const planning = stage === "direction" || stage === "blueprint";
   return [
     role,

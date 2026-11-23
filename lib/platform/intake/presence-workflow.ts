@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import { applyOperatorEdits, droppedWording, keptWording, operatorConcerns, type OperatorFeedback } from "./operator-feedback";
+import { applyOperatorEdits, droppedWording, keptWording, notedSections, operatorConcerns, type OperatorFeedback } from "./operator-feedback";
 import type { Pool, PoolClient } from "pg";
 import { fingerprint, object, text } from "../canonical/model";
 import type { DeploymentSelection } from "../managed-sites/deployment";
@@ -12,7 +12,7 @@ import { applyEditorialPatch } from "./presence-editorial-patch";
 import { editorialDecision, editorialFindings, withEditorialHistory, type EditorialDecision, type EditorialFinding } from "./presence-editorial-decisions";
 import { presenceVisualPlacement, type PresenceVisual, type PresenceVisualOperations } from "./presence-workflow-visual";
 import {
-  ArtifactValidationError, readBlueprint, readDirection, readEditorial, readPage, readReport, type ArtifactIssue, type PresenceEvidence,
+  ArtifactValidationError, readBlueprint, readDirection, readEditorial, readPage, readReport, readSectionRevision, type ArtifactIssue, type PresenceEvidence,
   type WorkflowBlueprint, type WorkflowDirection, type WorkflowEditorial, type WorkflowPage, type WorkflowReport,
 } from "./presence-workflow-artifacts";
 
@@ -53,13 +53,17 @@ type Correction = { finding: WorkflowReport["findings"][number]; text: string; r
 type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: WorkflowPage[]; actor: Actor; at: string; ordinal: number;
   source?: "home-concept" | "operator-editorial" | "operator-review"; batch?: "pending" | "applied";
   /** Operator wording a revised page must still contain, word for word (operator-review). */
-  keep?: { path: string; text: string }[] };
+  keep?: { path: string; text: string }[];
+  /** Pages whose revision is limited to these sections (zero-based); other pages are revised whole. */
+  sections?: { path: string; indexes: number[] }[] };
+/** A change beyond the noted sections that Core judged necessary; proposed to the Operator, not made. */
+export type WiderChange = { path: string; reason: string; at: string; reviewAt: string };
 /** One Operator review round read back from Operator WordPress (owner direction, Nov 22). */
 export type WordPressReview = { at: string; actor: Actor; readbackRevision: number;
   /** The WordPress content Core has taken in, by path; the next delivery may replace exactly this. */
   acknowledged: { path: string; contentSha256: string; title: string }[];
   /** Notes Core acted on: answered and resolved with the next delivery. */
-  notes: { id: number; path: string; text: string; revised: boolean }[];
+  notes: { id: number; path: string; text: string; revised: boolean; sectionOnly?: boolean }[];
   keptEdits: number; revisedPaths: string[] };
 export type SourceRepairAuthorization = { authorization: string; baseVersion: number; previousStateDigest: string; materialsDigest: string;
   contextTransition?: { previousContextDigest: string; previousAuthorityDigest: string; nextContextDigest: string; nextAuthorityDigest: string; addedEvidenceDigests: string[] } };
@@ -108,6 +112,7 @@ type State = {
   artifactIssue?: ArtifactIssue | null;
   retry?: { previous: string; count: number };
   lostAnswers?: { attempt: string; operation: string; reservedMicros: number; by: string; at: string }[];
+  widerChanges?: WiderChange[];
   visuals?: PresenceVisual[];
 };
 type Task = Pick<Work, "operation" | "path">;
@@ -412,6 +417,7 @@ export class PresenceWorkflow {
     return { version, mode, contextDigest: state.contextDigest, research, report, confirmation, corrections, direction, blueprint, pages, editorial: state.editorial, operatorReview,
       ...(state.understandingCorrections && { understandingCorrections: state.understandingCorrections }),
       ...(state.wordpressReviews && { wordpressReviews: state.wordpressReviews }),
+      ...(state.widerChanges && { widerChanges: state.widerChanges }),
       ...(this.operations.knowledgeConfirmation && { knowledgeConfirmationAvailable: true as const }),
       ...(state.knowledgeReassessments && { knowledgeReassessments: state.knowledgeReassessments }),
       ...(editorial.findings.length > 0 && { editorialFindings: editorial.findings }), canQueueEditorialRevision,
@@ -791,7 +797,17 @@ export class PresenceWorkflow {
           }
           const destinations = state.evaluation ? Object.fromEntries(Object.entries(this.destinations).filter(([, destination]) =>
             destination !== work.path && paths.includes(destination))) : this.destinations;
-          const page = readPage(output, work.path!, paths, pageIds, destinations, provider, Boolean(state.evaluation),
+          // A revision limited to noted sections keeps the rest of the Page exactly (owner, Nov 23).
+          const noted = state.revisionRequest?.sections?.find(item => item.path === work.path);
+          const prior = noted && state.revisionRequest!.priorPages.find(item => item.path === work.path);
+          let widerChange: string | null = null;
+          let page: WorkflowPage;
+          if (noted && prior) {
+            const revised = readSectionRevision(output, prior, noted.indexes, pageIds, provider,
+              Boolean(this.operations.marketingAuthority?.strategy && this.boundary === "disposable"));
+            page = revised.page;
+            widerChange = revised.widerChange;
+          } else page = readPage(output, work.path!, paths, pageIds, destinations, provider, Boolean(state.evaluation),
             Boolean(this.operations.marketingAuthority?.strategy && this.boundary === "disposable"));
           if (state.evaluation && page.composition !== "managed-v1") throw Error("Evaluation Page needs the composed format");
           // A page revised from Operator Notes must still contain the Operator's own wording.
@@ -800,7 +816,9 @@ export class PresenceWorkflow {
           }
           // Keep the exact sitemap order when selected pages are redrafted.
           const drafts = new Map([...state.pages, page].map(draft => [draft.path, draft]));
-          next = { ...state, pages: paths.flatMap(path => drafts.get(path) ?? []) };
+          next = { ...state, pages: paths.flatMap(path => drafts.get(path) ?? []),
+            ...(widerChange && { widerChanges: [...state.widerChanges ?? [], { path: work.path!, reason: widerChange,
+              at: new Date(this.clock()).toISOString(), reviewAt: state.revisionRequest!.at }] }) };
           break;
         }
         case "editorial": {
@@ -950,15 +968,17 @@ export class PresenceWorkflow {
     const pages = applyOperatorEdits(context, view, feedback);
     const concerns = operatorConcerns(feedback);
     const paths = [...new Set(concerns.map(item => item.path))].filter(path => pages.some(page => page.path === path));
+    const scoped = notedSections(context, view, feedback, paths);
     const at = new Date(this.clock()).toISOString();
     const review: WordPressReview = { at, actor, readbackRevision: feedback.readbackRevision, acknowledged: feedback.acknowledged,
-      notes: feedback.notes.map(note => ({ id: note.id, path: note.path, text: note.text, revised: paths.includes(note.path) })),
+      notes: feedback.notes.map(note => ({ id: note.id, path: note.path, text: note.text, revised: paths.includes(note.path),
+        ...(scoped.some(item => item.path === note.path) && { sectionOnly: true }) })),
       keptEdits: feedback.edits.length + feedback.titles.length, revisedPaths: paths };
     const revision = paths.length ? {
       // Operator review rounds do not use up Core's own self-critique rounds.
       revisionRequest: { paths, audit: { summary: "Operator review in WordPress", concerns: concerns.filter(item => paths.includes(item.path)) },
         priorPages: pages.filter(page => paths.includes(page.path)), actor, at, ordinal: revisionOrdinal(state), source: "operator-review" as const,
-        keep: keptWording(feedback, paths) },
+        keep: keptWording(feedback, paths), sections: scoped },
       editorial: null, operatorReview: null,
     } : {};
     return this.view(context, await this.store.append(context, version, { ...state, ...revision,

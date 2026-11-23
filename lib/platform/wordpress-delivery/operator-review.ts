@@ -113,9 +113,8 @@ export async function deliverReviewDraft(input: { config: OperatorSiteConfig; co
     revision: (state?.revision ?? 0) + 1, previousDigest: state?.digest ?? null,
     source: { intakeId: context.intakeId, workflowVersion: view.version }, review, brand,
     ...(taken && { readBack: { revision: state!.revision, pages: taken.acknowledged },
-      answeredNotes: taken.notes.map(note => ({ id: note.id, reply: note.revised
-        ? "MioPages Core revised this page in response to this note. Please review the new version."
-        : "MioPages Core has taken this note into the site." })) }),
+      answeredNotes: taken.notes.map(note => ({ id: note.id, reply: noteReply(note,
+        view.widerChanges?.filter(change => change.path === note.path && change.reviewAt === taken.at) ?? []) })) }),
     // When Core adds or retires pages, WordPress needs the previous page set: retired
     // drafts are archived there, never deleted.
     ...(state && !samePaths(state.pages, review.candidate.pages) && { baselinePages: state.pages }) });
@@ -129,4 +128,17 @@ export async function deliverReviewDraft(input: { config: OperatorSiteConfig; co
     revision: receipt.revision, digest: receipt.appliedDigest, workflowVersion: view.version, pages,
     deliveredAt: (input.now ?? new Date()).toISOString() };
   return { state: next, receipt };
+}
+
+/** Core's reply on an Operator Note it acted on, including any wider change it proposes rather than makes. */
+export function noteReply(note: { revised: boolean; sectionOnly?: boolean }, wider: readonly { reason: string }[]) {
+  if (!note.revised) return "MioPages Core has taken this note into the site.";
+  const done = note.sectionOnly
+    ? "MioPages Core revised the section this note is on and left the rest of the page as it was. Please review the new version."
+    : "MioPages Core revised this page in response to this note. Please review the new version.";
+  if (!wider.length) return done;
+  const reason = wider.map(change => change.reason).join(" ");
+  // WordPress replies are limited to 2,000 bytes; the full reason stays in Core's record.
+  const clipped = Buffer.byteLength(reason) > 1400 ? Buffer.from(reason).subarray(0, 1400).toString("utf8").replace(/�*$/u, "") + "…" : reason;
+  return done + " Core also suggests a wider change, not made: " + clipped + " Add a note if you want it done.";
 }

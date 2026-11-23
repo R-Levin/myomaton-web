@@ -338,3 +338,24 @@ export function operatorConcerns(feedback: OperatorFeedback) {
   }
   return concerns;
 }
+
+/**
+ * The sections each noted page's revision is limited to (owner direction, Nov 23: rewrite only
+ * what was asked about unless the change is fundamental). A page is limited to the sections its
+ * Notes are attached to; a Note on the page as a whole, or text the Operator added or removed
+ * there, leaves that page to a whole-page revision. Indexes are positions in Core's page.
+ */
+export function notedSections(context: WorkflowContext, view: PresenceWorkflowView,
+  feedback: Pick<OperatorFeedback, "notes" | "structural">, paths: readonly string[]) {
+  const { candidate } = workflowNativeReviewCandidate(context, view);
+  const scoped: { path: string; indexes: number[] }[] = [];
+  for (const path of paths) {
+    const notes = feedback.notes.filter(note => note.path === path);
+    const delivered = candidate.pages.find(page => page.path === path);
+    if (!delivered || !notes.length || feedback.structural.some(change => change.path === path)) continue;
+    const indexes = notes.map(note => note.origin ? delivered.sections.findIndex(section => section.id === note.origin!.slice(0, note.origin!.indexOf(":"))) : -1);
+    if (indexes.some(index => index < 0)) continue;
+    scoped.push({ path, indexes: [...new Set(indexes)].sort((a, b) => a - b) });
+  }
+  return scoped;
+}

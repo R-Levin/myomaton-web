@@ -74,6 +74,22 @@ function simulatedAnswer(name: string, schema: Schema, instructions: string) {
     return { pages: [["/", "Home"], ["/service", "Service"], ["/start", "Start"]].map(([path, label]) =>
       ({ path, label, purpose: "Simulated purpose.", sourceIds: ids, decisionBrief: brief(path) })), navigation: ["/service", "/start"], articles: [] }; // Home left out of the menu, as Core did in the first real run
   }
+  if (stage === "page" && schema.properties?.widerChange) {
+    // A revision limited to the noted sections: only those sections come back.
+    assert.match(instructions, /act on the Operator's review/);
+    assert.match(instructions, /limited to the noted section/);
+    const indexes = enumAt(schema, "sections", "[]", "index") as unknown as number[];
+    const visual = { purpose: "Simulated", brief: "Simulated brief.", altIntent: "Simulated alt", status: "text-only" };
+    return { widerChange: { needed: true, reason: "The Home page should mention the shorter first step too." },
+      sections: indexes.map(index => index === 0
+        ? { index, heading: "Simulated heading for /start", body: "A shorter first step (revised).", sourceIds: [], role: "hero", visual: { ...visual, status: "asset-needed" },
+          block: { version: 2, name: "simulated-opening", purpose: "Simulated hero", mode: "section", root: node("group", { children: [
+            node("heading", { level: 1, text: "Simulated heading for /start" }), node("paragraph", { text: "A shorter first step (revised)." }),
+            node("action", { reference: "action-0", text: "See how it works" })] }) } }
+        : { index, heading: "What clients say", body: "Revised proof section.", sourceIds: [], role: "intro", visual,
+          block: { version: 2, name: "simulated-proof", purpose: "Simulated proof", mode: "section", root: node("group", { children: [
+            node("heading", { level: 2, text: "What clients say" }), node("paragraph", { text: "Revised proof section." })] }) } }) };
+  }
   if (stage === "page") {
     const path = enumAt(schema, "path")[0];
     assert.match(instructions, /place a placeholder node exactly where it belongs/);
@@ -265,6 +281,12 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.ok(asked, "The Operator's Note reached Core's revision request");
     assert.match(asked.body, /Operator note\. On the/, "with the block it is attached to");
     assert.ok(revised.pages.find(page => page.path === "/service")!.sections[0].heading.endsWith("(edited by the Operator)"));
+    // Only the noted section changed; the rest of the page is exactly as the Operator reviewed it.
+    const startBefore = view.pages.find(page => page.path === "/start")!, startAfter = revised.pages.find(page => page.path === "/start")!;
+    const changed = startAfter.sections.flatMap((section, index) => JSON.stringify(section) === JSON.stringify(startBefore.sections[index]) ? [] : [index]);
+    assert.equal(changed.length, 1, "exactly one section was revised: " + JSON.stringify(changed));
+    assert.deepEqual({ ...startAfter, sections: [] }, { ...startBefore, sections: [] }, "heading, search text and Actions are unchanged");
+    assert.equal(revised.widerChanges?.length, 1, "Core's suggested wider change is recorded, not made");
 
     // The next delivery replaces exactly what Core read back, and answers and resolves the Note.
     const third = await deliverReviewDraft({ config, context, view: revised, state: second.state, fetcher });
@@ -273,7 +295,8 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.deepEqual(after.summary.editedPages, [], "WordPress now holds Core's delivery, including the Operator's wording");
     assert.equal(after.summary.openNotes.length, 0);
     assert.equal(after.summary.resolvedNotes[0].id, 501);
-    assert.match(after.summary.resolvedNotes[0].replies[0].text, /revised this page in response to this note/);
+    assert.match(after.summary.resolvedNotes[0].replies[0].text, /revised the section this note is on/);
+    assert.match(after.summary.resolvedNotes[0].replies[0].text, /suggests a wider change, not made: The Home page/);
     assert.ok(after.readback.pages.find(page => page.path === "/service")!.content!.includes("(edited by the Operator)"));
     // A change the Operator makes after Core took the review in is never overwritten unread.
     wordpress({ mode: "operator", edits: { "/": ["</h1>", " again</h1>"] } });

@@ -158,28 +158,61 @@ export function readBlueprint(value: unknown, ids: readonly string[], normalizeP
 }
 type PageAction = { label: string; kind: typeof actionKinds[number]; destination: string | null; sectionIndex?: number; unresolvedDestination?: string };
 
+/** One Page section from provider output. `actions` is the Page's raw Action list (for provider reference recovery). */
+export function readSection(value: unknown, composed: boolean, ids: readonly string[], actions: unknown,
+  normalizeProviderReferences = false, semanticBlocks = false) {
+  const section = object(value, composed ? ["heading", "body", "sourceIds", "visual", "role", ...(semanticBlocks ? ["block"] : [])] : ["heading", "body", "sourceIds", "visual"]);
+  const role = composed ? choice(section.role, sectionRoles) : undefined;
+  const visual = object(section.visual, ["purpose", "brief", "altIntent", "status"]);
+  const block = section.block == null ? undefined : readSemanticBlock(
+    normalizeProviderReferences && semanticBlocks ? recoverProviderNativeComponent(section.block, actions) : section.block,
+    normalizeProviderReferences && semanticBlocks);
+  if (block?.version === 2) assertNativeSection(block, copy(section.heading), role ?? "intro");
+  return { heading: copy(section.heading), body: copy(section.body), // A section cites sources when it makes a factual claim; persuasive, structural or
+  // navigational sections need not (forced citations produced hedged copy). Any
+  // citation given must still be a real supplied source.
+  sourceIds: citedSources(section.sourceIds, ids, normalizeProviderReferences, false),
+    ...(role && { role }),
+    ...(block && { block }),
+    visual: { purpose: copy(visual.purpose), brief: copy(visual.brief), altIntent: copy(visual.altIntent), status: choice(visual.status, visualStates) } };
+}
+
+/**
+ * Splice a revision limited to noted sections into the previous Page. Every other section, the
+ * heading, search text and Actions stay byte-identical; a revised section keeps its role so Action
+ * placement and the opening Hero stay valid.
+ */
+export function readSectionRevision(value: unknown, previous: WorkflowPage, indexes: readonly number[], ids: readonly string[],
+  normalizeProviderReferences = false, semanticBlocks = false) {
+  const output = object(value, ["sections", "widerChange"]);
+  if (!Array.isArray(output.sections)) throw Error("Expected revised sections");
+  const sections = [...previous.sections];
+  const seen = new Set<number>();
+  const rawActions = previous.actions.map(action => ({ label: action.label, kind: action.kind, destination: action.destination,
+    sectionIndex: action.sectionIndex ?? null }));
+  for (const raw of output.sections) {
+    const { index, ...rest } = object(raw, ["index", "heading", "body", "sourceIds", "visual", "role", ...(semanticBlocks ? ["block"] : [])]) as Record<string, unknown>;
+    if (typeof index !== "number" || !indexes.includes(index) || seen.has(index)) throw new ArtifactValidationError("page-binding", "Revised section is outside the noted sections");
+    seen.add(index);
+    const section = readSection(rest, Boolean(previous.composition), ids, rawActions, normalizeProviderReferences, semanticBlocks);
+    if (section.role !== sections[index].role) throw new ArtifactValidationError("page-binding", "A revised section must keep its role");
+    sections[index] = section;
+  }
+  if (seen.size !== indexes.length) throw new ArtifactValidationError("page-binding", "Every noted section must be revised");
+  const wider = object(output.widerChange, ["needed", "reason"]);
+  if (typeof wider.needed !== "boolean") throw Error("Wider change flag required");
+  const reason = wider.needed ? copy(wider.reason) : "";
+  if (wider.needed && !reason.trim()) throw Error("A wider change needs a reason");
+  return { page: { ...previous, sections }, widerChange: wider.needed ? reason.trim() : null };
+}
+
 export function readPage(value: unknown, exactPath: string, paths: readonly string[], ids: readonly string[],
   destinations: Partial<Record<Exclude<typeof actionKinds[number], "navigate">, string>>, normalizeProviderReferences = false,
   evaluationPlacement = false, semanticBlocks = false) {
   const page = object(value, ["path", "heading", "searchTitle", "searchDescription", "sections", "actions", "internalLinks", "composition"]);
   const composition = page.composition === undefined ? undefined : choice(page.composition, ["managed-v1"] as const);
   if (page.path !== exactPath) throw new ArtifactValidationError("page-binding", "Page does not match the blueprint");
-  const sections = list(page.sections, value => {
-    const section = object(value, composition ? ["heading", "body", "sourceIds", "visual", "role", ...(semanticBlocks ? ["block"] : [])] : ["heading", "body", "sourceIds", "visual"]);
-    const role = composition ? choice(section.role, sectionRoles) : undefined;
-    const visual = object(section.visual, ["purpose", "brief", "altIntent", "status"]);
-    const block = section.block == null ? undefined : readSemanticBlock(
-      normalizeProviderReferences && semanticBlocks ? recoverProviderNativeComponent(section.block,page.actions) : section.block,
-      normalizeProviderReferences && semanticBlocks);
-    if (block?.version === 2) assertNativeSection(block, copy(section.heading), role ?? "intro");
-    return { heading: copy(section.heading), body: copy(section.body), // A section cites sources when it makes a factual claim; persuasive, structural or
-    // navigational sections need not (forced citations produced hedged copy). Any
-    // citation given must still be a real supplied source.
-    sourceIds: citedSources(section.sourceIds, ids, normalizeProviderReferences, false),
-      ...(role && { role }),
-      ...(block && { block }),
-      visual: { purpose: copy(visual.purpose), brief: copy(visual.brief), altIntent: copy(visual.altIntent), status: choice(visual.status, visualStates) } };
-  });
+  const sections = list(page.sections, value => readSection(value, Boolean(composition), ids, page.actions, normalizeProviderReferences, semanticBlocks));
   if (composition && (sections[0].role !== "hero" || sections.slice(1).some(section => section.role === "hero"))) {
     throw Error("Composed page needs one opening Hero");
   }
