@@ -187,7 +187,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
       publicKeyBase64: config.publicKeyBase64, deliveryUser: "core-delivery" };
     const site = { store: join(root, "wordpress.bin"), identity, pull: { secretHex: config.receiptSecretHex, identity: { installationId: config.installationId } } };
     const wordpress = (input: object) => {
-      const result = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/review-draft-writer.php"],
+      const result = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["-d", "serialize_precision=17", "wordpress/miopages-delivery/tests/review-draft-writer.php"],
         { input: JSON.stringify({ ...site, ...input }), encoding: "utf8" });
       assert.equal(result.status, 0, result.stderr + result.stdout.slice(0, 400));
       return JSON.parse(result.stdout);

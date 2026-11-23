@@ -126,8 +126,16 @@ final class MioPages_Native_Draft_Brand
             ksort($record, SORT_STRING);
             return array_map(static fn($value) => is_array($value) ? $sort($value) : $value, $record);
         };
-        return hash('sha256', json_encode($sort($projection),
-            JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS));
+        // Numbers must encode as Core encodes them (shortest form: 1.6, not 1.6000000000000001),
+        // whatever this server's serialize_precision is (some hosts set 17).
+        $precision = ini_get('serialize_precision');
+        ini_set('serialize_precision', '-1');
+        try {
+            return hash('sha256', json_encode($sort($projection),
+                JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS));
+        } finally {
+            ini_set('serialize_precision', $precision === false ? '-1' : $precision);
+        }
     }
 
     private static function digest(mixed $value): bool

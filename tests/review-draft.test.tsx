@@ -71,7 +71,7 @@ const identity = { ...site, installationId, keyId: "fixture-key", publicKeyBase6
 const draft = (revision: number, previousDigest: string | null, changes: Partial<typeof review> = {}) =>
   bindReviewDraft({ site, installationId, streamId, revision, previousDigest, source: { intakeId, workflowVersion: 30 }, review: { ...review, ...changes } as unknown as ReviewInput, brand });
 const writer = (wires: unknown[]) => spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php",
-  ["wordpress/miopages-delivery/tests/review-draft-writer.php"], { input: JSON.stringify({ identity, wires }), encoding: "utf8" });
+  ["-d", "serialize_precision=17", "wordpress/miopages-delivery/tests/review-draft-writer.php"], { input: JSON.stringify({ identity, wires }), encoding: "utf8" });
 
 test("a Core-signed review draft reaches WordPress with Core's design, FPO, placeholders and pending Actions intact", () => {
   const first = draft(1, null);
@@ -120,7 +120,7 @@ test("Core delivers over the plugin's web endpoint and accepts only WordPress's 
   // Stands in for HTTPS: the request body goes to the plugin's endpoint code unchanged.
   const fetcher = (async (url: URL, init: RequestInit) => {
     seen.push({ url: String(url), auth: new Headers(init.headers).get("authorization") });
-    const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/review-draft-writer.php"],
+    const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["-d", "serialize_precision=17", "wordpress/miopages-delivery/tests/review-draft-writer.php"],
       { input: JSON.stringify({ mode: "endpoint", identity: { ...identity, deliveryUser: "core-delivery" }, pull, wires: [init.body] }), encoding: "utf8" });
     assert.equal(php.status, 0, php.stderr);
     const [response] = JSON.parse(php.stdout).responses;
@@ -161,7 +161,7 @@ test("Core reads back the Operator's edits and Notes, each Note tied to its bloc
     { id: 43, path: "/", text: "Old note, already handled.", status: "resolved" },
   ];
   const run = (request: unknown, key = secret) => {
-    const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/review-draft-writer.php"],
+    const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["-d", "serialize_precision=17", "wordpress/miopages-delivery/tests/review-draft-writer.php"],
       { input: JSON.stringify({ mode: "readback", identity, pull: { ...pull, secretHex: key.toString("hex") }, wires: [wire], edits, notes,
         request: JSON.stringify(request) }), encoding: "utf8" });
     assert.equal(php.status, 0, php.stderr);
