@@ -1160,3 +1160,8 @@ pick facts up at their next refresh. The summary is also the confirm-before-paid
 **Nov 23: install approved for review rounds.** The owner approved installing b65bb81 (review
 rounds, Review summary, facts into Core) on protected Core and plugin 0.1.4 on miopages.org.
 Running a real round (AI analysis about $0.25) is still to be approved separately.
+
+**Nov 23: review rounds installed (record, not a decision).** Protected Core runs b65bb81
+(rollback copy app-before-b65bb81-was-f4569d6-20261123T201755Z); miopages.org runs plugin
+0.1.4 (0.1.3 archived). Read-back from the updated Core: delivery 2, no edited or missing
+pages, no open Notes. No AI call.
