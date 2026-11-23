@@ -1079,3 +1079,10 @@ fixed in plugin 0.1.1 (6b57bc9, tests now run with the host's setting) and insta
 a correction within the approved plugin update. Delivery 1 then landed: case beb8de9c
 version 30, nine draft pages (IDs 53–61); all 1,226 blocks valid and unchanged on
 re-save. Visual check in a browser is the owner's (Claude has no miopages.org login).
+
+**Nov 23: first review-loop test; fix deployment approved.** The owner made one edit and
+one Note on the Questions page of miopages.org. Core recorded both correctly but also
+reported 16 untouched texts as additions (older layout blocks carried no identifiers;
+fixed in b66ee34, no AI spent). The owner approved deploying the fix to protected Core
+and plugin 0.1.2 to miopages.org, withdrawing the mistaken record and taking the review
+in again. Revision spending is still to be approved separately.
