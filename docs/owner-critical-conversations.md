@@ -1086,3 +1086,8 @@ reported 16 untouched texts as additions (older layout blocks carried no identif
 fixed in b66ee34, no AI spent). The owner approved deploying the fix to protected Core
 and plugin 0.1.2 to miopages.org, withdrawing the mistaken record and taking the review
 in again. Revision spending is still to be approved separately.
+
+**Nov 23: revision spending approved.** After the corrected take-in (case version 33: one
+kept edit and one Note on the Questions page, nothing else), the owner approved about
+$0.50 of AI spending for Core to revise the Questions page from the Note, keeping the
+owner's wording, and to redeliver it to miopages.org as review drafts. No publication.
