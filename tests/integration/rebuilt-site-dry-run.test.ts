@@ -22,12 +22,12 @@ import { PresenceWorkflow, type WorkflowContext } from "../../lib/platform/intak
 import { workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
 import { createResponsesPresenceWorkflow } from "../../lib/platform/intake/presence-workflow-provider";
 import { initializeResponsesUsageLedger } from "../../lib/platform/intake/intelligent-responses";
-import { workflowNativeReviewCandidate } from "../../lib/platform/intake/presence-workflow-delivery";
+import { reviewSummaryPage, reviewSummaryPath, workflowNativeReviewCandidate } from "../../lib/platform/intake/presence-workflow-delivery";
 import { pendingContent, type NativeNode } from "../../lib/platform/intake/presence-native-component";
 import type { MarketingAuthority } from "../../lib/platform/intake/presence-marketing-authority";
 import { IntakeService } from "../../lib/platform/intake/service";
-import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig } from "../../lib/platform/wordpress-delivery/operator-review";
-import { operatorFeedback } from "../../lib/platform/intake/operator-feedback";
+import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig, summaryDecision } from "../../lib/platform/wordpress-delivery/operator-review";
+import { operatorFeedback, operatorFeedbackFromCandidate } from "../../lib/platform/intake/operator-feedback";
 
 type Schema = { properties?: Record<string, Schema>; items?: Schema; enum?: unknown[] };
 const enumAt = (schema: Schema, ...path: string[]) => {
@@ -73,6 +73,15 @@ function simulatedAnswer(name: string, schema: Schema, instructions: string) {
     const ids = enumAt(schema, "pages", "[]", "sourceIds").slice(0, 1);
     return { pages: [["/", "Home"], ["/service", "Service"], ["/start", "Start"]].map(([path, label]) =>
       ({ path, label, purpose: "Simulated purpose.", sourceIds: ids, decisionBrief: brief(path) })), navigation: ["/service", "/start"], articles: [] }; // Home left out of the menu, as Core did in the first real run
+  }
+  if (stage === "review-analysis") {
+    assert.match(instructions, /analyse the Operator's review/);
+    return { summary: "One fact in your Service edit; Home should mention it.",
+      facts: [{ statement: "The Service page heading is as the Operator wrote it.", publicUse: true, sourcePath: "/service",
+        sourceText: "Simulated heading for /service (edited by the Operator)" },
+        { statement: "An invented fact with no source.", publicUse: true, sourcePath: "/", sourceText: "Text the Operator never wrote" }],
+      revisions: [{ path: "/", sectionIndex: 1, reason: "Mention the Operator's Service wording.", factIds: ["F1"] },
+        { path: "/start", sectionIndex: 0, reason: "Already queued from the Note.", factIds: ["F1"] }] };
   }
   if (stage === "page" && schema.properties?.widerChange) {
     // A revision limited to the noted sections: only those sections come back.
@@ -222,6 +231,15 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
       assert.ok(out, "Unexpected WordPress route " + route);
       return new Response(JSON.stringify(out.responses[0].body), { status: out.responses[0].status });
     }) as unknown as typeof fetch;
+    // The Operator's answers on the Review summary, as the worker's decide-review reads them.
+    const decideFromWordPress = async (readback: Parameters<typeof operatorFeedbackFromCandidate>[1], at: NonNullable<typeof view>) => {
+      const summary = reviewSummaryPage(context, at)!;
+      const read = operatorFeedbackFromCandidate(workflowNativeReviewCandidate(context, at).candidate, readback);
+      const { decision, replies } = summaryDecision(summary.items, read.notes.filter(item => item.path === reviewSummaryPath));
+      if (!decision.approved) return null;
+      return workflow.decideReview(context, at.version, actor, decision,
+        { readbackRevision: read.readbackRevision, acknowledged: read.acknowledged, summaryNotes: replies });
+    };
     const first = await deliverReviewDraft({ config, context, view, state: null, fetcher });
     assert.equal(first.state.revision, 1);
     assert.deepEqual(first.receipt.posts.map(post => post.path), ["/", "/service", "/start"]);
@@ -258,9 +276,10 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     let revised = (await workflow.applyOperatorReview(context, withdrawn.version, actor, feedback))!;
     assert.ok(revised.pages.find(page => page.path === "/service")!.sections[0].heading.endsWith("(edited by the Operator)"),
       "The Operator's wording is now Core's own text");
-    assert.ok(!revised.pages.some(page => page.path === "/start"), "The noted page is queued for revision");
+    assert.deepEqual(revised.pages.map(page => page.path), ["/", "/service", "/start"], "Nothing is queued for revision before the Operator decides");
+    assert.equal(revised.next, "review-analysis");
     const requestsBefore = requests.length;
-    // The revision's answer is lost in transit once: Core stops, keeps the charge on record, and the
+    // The analysis answer is lost in transit once: Core stops, keeps the charge on record, and the
     // Operator's retry sends the same unchanged work again.
     loseNextAnswer = true;
     const sentBefore = requests.length;
@@ -274,6 +293,36 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     await assert.rejects(workflow.retryLostAnswer(context, revised.version, actor), "Only a lost answer can be retried");
     const ledgerRows = JSON.parse(await readFile(join(root, "onboarding-usage.json"), "utf8")).attempts as { status: string; responseId?: string }[];
     assert.deepEqual(ledgerRows.filter(row => row.status === "lost").map(row => row.responseId), ["resp_dry_run_lost"]);
+    // Core analyses the review: a fact in the Operator's edit, and a section elsewhere it affects.
+    revised = (await workPresenceCase(workflow, context))!;
+    assert.equal(revised.failure, null, JSON.stringify({ failure: revised.failure, issue: (revised as { artifactIssue?: unknown }).artifactIssue }));
+    assert.equal(revised.next, "review-summary");
+    const round = revised.reviewRounds!.at(-1)!;
+    assert.deepEqual(round.analysis!.facts.map(fact => [fact.id, fact.source.kind, fact.source.path]), [["F1", "edit", "/service"]]);
+    assert.deepEqual([...round.noteRevisions, ...round.analysis!.revisions].map(item => [item.path, item.indexes, item.source]),
+      [["/start", [0], "note"], ["/", [1], "fact"]]);
+    assert.ok(round.analysis!.estimateMicros > 0);
+    // The Review summary is delivered with the site; the Operator's Note stays open until the decision.
+    const summaryDelivery = await deliverReviewDraft({ config, context, view: revised, state: second.state, fetcher });
+    assert.deepEqual(summaryDelivery.receipt.posts.map(post => post.path), ["/", "/service", "/start", "/review-summary"]);
+    let check = await readBackOperatorSite(config, fetcher);
+    assert.deepEqual(check.summary.openNotes.map(note => note.id), [501]);
+    const summaryPage = reviewSummaryPage(context, revised)!.page;
+    const note = (id: number, section: number, text: string) => wordpress({ mode: "operator",
+      edits: { "/review-summary": ['{"metadata":{"mio":"' + summaryPage.sections[section].id, '{"metadata":{"noteId":[' + id + '],"mio":"' + summaryPage.sections[section].id] },
+      notes: [{ id, path: "/review-summary", text }] });
+    // Sections: 0 opening, 1 fact F1, 2 change C1 (/start), 3 change C2 (/).
+    assert.match(summaryPage.sections[3].content.heading, /^Change C2: \/, section 2$/);
+    note(601, 3, "No");
+    check = await readBackOperatorSite(config, fetcher);
+    const pending = await decideFromWordPress(check.readback, revised);
+    assert.equal(pending, null, "Without an Approve note nothing is decided");
+    note(602, 0, "Approve");
+    check = await readBackOperatorSite(config, fetcher);
+    revised = (await decideFromWordPress(check.readback, revised))!;
+    assert.deepEqual(revised.businessFacts!.map(fact => fact.source.path), ["/service"], "The confirmed fact is in Core's knowledge");
+    assert.deepEqual(revised.reviewRounds!.at(-1)!.decision!.revisions.map(item => item.path), ["/start"], "The change marked No is left out");
+    assert.ok(!revised.pages.some(page => page.path === "/start"), "The approved change is queued");
     for (let step = 0; step < 6 && revised.pages.length < 3; step++) revised = (await workPresenceCase(workflow, context))!;
     assert.equal(revised.failure, null, JSON.stringify({ failure: revised.failure, next: revised.next }));
     assert.deepEqual(revised.pages.map(page => page.path), ["/", "/service", "/start"]);
@@ -288,15 +337,20 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.deepEqual({ ...startAfter, sections: [] }, { ...startBefore, sections: [] }, "heading, search text and Actions are unchanged");
     assert.equal(revised.widerChanges?.length, 1, "Core's suggested wider change is recorded, not made");
 
-    // The next delivery replaces exactly what Core read back, and answers and resolves the Note.
-    const third = await deliverReviewDraft({ config, context, view: revised, state: second.state, fetcher });
-    assert.equal(third.state.revision, 3);
+    const factRequest = requests.slice(requestsBefore).find(row => row.name === "presence_workflow_page");
+    assert.ok(factRequest?.body.includes("businessFacts"), "Later AI steps receive the confirmed fact");
+
+    // The next delivery replaces exactly what Core read back, answers and resolves the Notes, and
+    // retires the Review summary page.
+    const third = await deliverReviewDraft({ config, context, view: revised, state: summaryDelivery.state, fetcher });
+    assert.equal(third.state.revision, 4);
+    assert.ok(!third.receipt.posts.some(post => post.path === "/review-summary"));
     const after = await readBackOperatorSite(config, fetcher);
     assert.deepEqual(after.summary.editedPages, [], "WordPress now holds Core's delivery, including the Operator's wording");
     assert.equal(after.summary.openNotes.length, 0);
-    assert.equal(after.summary.resolvedNotes[0].id, 501);
-    assert.match(after.summary.resolvedNotes[0].replies[0].text, /revised the section this note is on/);
-    assert.match(after.summary.resolvedNotes[0].replies[0].text, /suggests a wider change, not made: The Home page/);
+    const resolved = new Map(after.summary.resolvedNotes.map(item => [item.id, item.replies[0]?.text ?? ""]));
+    assert.match(resolved.get(501)!, /revised the section this note is on/);
+    assert.match(resolved.get(501)!, /suggests a wider change, not made: The Home page/);
     assert.ok(after.readback.pages.find(page => page.path === "/service")!.content!.includes("(edited by the Operator)"));
     // A change the Operator makes after Core took the review in is never overwritten unread.
     wordpress({ mode: "operator", edits: { "/": ["</h1>", " again</h1>"] } });

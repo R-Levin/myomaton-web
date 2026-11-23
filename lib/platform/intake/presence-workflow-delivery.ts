@@ -34,8 +34,10 @@ export function workflowEvaluationPreviewInput(context: WorkflowContext, view: P
 export function workflowLocalDraftInput(context: WorkflowContext, view: PresenceWorkflowView) {
   const blueprint = view.blueprint;
   const beforeCritique = view.canRenderForEditorial === true && view.next === "editorial";
-  if (!context.evaluation || view.contextDigest !== fingerprint(context) || !blueprint || (!view.editorial && !beforeCritique) || view.failure ||
-      (!beforeCritique && !["editorial-review", "operator-review", "review-complete"].includes(view.next)) ||
+  // While an Operator review round is analysed or awaits its decision, the site stays deliverable.
+  const reviewing = ["review-analysis", "review-summary"].includes(view.next);
+  if (!context.evaluation || view.contextDigest !== fingerprint(context) || !blueprint || (!view.editorial && !beforeCritique && !reviewing) || view.failure ||
+      (!beforeCritique && !reviewing && !["editorial-review", "operator-review", "review-complete"].includes(view.next)) ||
       view.pages.length !== blueprint.pages.length || blueprint.pages.some(entry => !view.pages.some(page => page.path === entry.path)) ||
       view.visuals?.some(visual => ["queued", "running", "unverified"].includes(visual.state))) {
     throw Error("Complete isolated editorial draft required");
@@ -66,7 +68,9 @@ export function workflowNativeReviewCandidate(context: WorkflowContext, view: Pr
       ...(page.composition && sectionVisual(view, page.slug, index)),
     })),
   }));
-  return { candidate: { pages, navigation: input.navigation, actions: input.actions }, unresolvedActions: input.unresolvedActions,
+  // While a review round awaits the Operator's decision, its Review summary is delivered as a draft page (not in navigation).
+  const summary = reviewSummaryPage(context, view);
+  return { candidate: { pages: summary ? [...pages, summary.page] : pages, navigation: input.navigation, actions: input.actions }, unresolvedActions: input.unresolvedActions,
     ...(view.direction?.design && { design: designProjection(view.direction.design) }) };
 }
 
@@ -125,4 +129,43 @@ function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflow
   });
   return { scope: context.scope, candidateDigest: target, pages, navigation,
     actions, ...(authoredActions&&{unresolvedActions:view.pages.flatMap(page=>page.actions.flatMap((action,index)=>!action.destination?[{from:page.path,reference:"action-"+index,label:action.label}]:[]))}), ...(view.brandDigest && { brandDigest: view.brandDigest }), ...(baseline.length && { baselinePages: baseline }) };
+}
+
+export const reviewSummaryPath = "/review-summary";
+type SummaryItem = { kind: "approve" } | { kind: "edit" } | { kind: "fact"; id: string } | { kind: "revision"; index: number };
+
+const dollars = (micros: number) => "$" + (Math.max(micros, 10_000) / 1_000_000).toFixed(2);
+const where = (path: string, indexes: readonly number[]) => indexes.length
+  ? `${path}, section${indexes.length > 1 ? "s" : ""} ${indexes.map(index => index + 1).join(", ")}` : `${path} (whole page)`;
+
+/**
+ * The Review summary Core delivers as a draft page while a review round awaits the Operator's
+ * decision (owner decision, Nov 23). Each item is its own section so a Note can answer it.
+ */
+export function reviewSummaryPage(context: WorkflowContext, view: PresenceWorkflowView) {
+  const round = view.reviewRounds?.at(-1);
+  if (round?.status !== "summary" || !round.analysis) return null;
+  const analysis = round.analysis;
+  const items: { item: SummaryItem; heading: string; text: string }[] = [];
+  const revisions = [...round.noteRevisions, ...analysis.revisions];
+  items.push({ item: { kind: "approve" }, heading: "Review summary",
+    text: [analysis.summary,
+      `Your edits are already kept. Below are the business facts Core proposes to record and the changes it proposes to make. Nothing is recorded or changed until you approve. Estimated AI cost of the changes: about ${dollars(analysis.estimateMicros)}.`,
+      "To approve, add a note on this paragraph saying Approve. To leave out an item, add a note on it saying No. To correct a fact, add a note on it with the corrected wording. To add to a change, add a note on it saying what else it should do."].join("\n\n") });
+  for (const fact of analysis.facts) items.push({ item: { kind: "fact", id: fact.id },
+    heading: `Fact ${fact.id}: from your ${fact.source.kind === "note" ? "note" : "edit"} on ${fact.source.path}`,
+    text: fact.statement + (fact.publicUse ? "" : "\n\n(For Core's understanding only; not for the website.)") });
+  revisions.forEach((revision, index) => items.push({ item: { kind: "revision", index },
+    heading: `Change C${index + 1}: ${where(revision.path, revision.indexes)}`,
+    text: revision.source === "note" ? "Revise in response to your note: " + round.notes.filter(note => note.path === revision.path).map(note => note.text).join(" / ")
+      : `Because of ${revision.factIds.join(", ")}: ${revision.reason}` }));
+  if (!analysis.facts.length && !revisions.length) items.push({ item: { kind: "edit" }, heading: "Nothing else to change",
+    text: "Core found no business facts to record and no other changes to make." });
+  for (const edit of round.edits) items.push({ item: { kind: "edit" }, heading: `Kept: your edit on ${edit.path}`,
+    text: `Before: ${edit.before}\n\nNow: ${edit.after}` });
+  const pageId = logicalId({ site: context.scope.managedSiteId, path: reviewSummaryPath });
+  const sections = items.map((entry, index) => ({ id: logicalId({ round: round.id, item: index }), type: "intro",
+    content: { heading: entry.heading.slice(0, 300), text: entry.text } }));
+  return { page: { id: pageId, path: reviewSummaryPath, title: "Review summary", sections },
+    items: new Map(sections.map((section, index) => [section.id, items[index].item])) };
 }

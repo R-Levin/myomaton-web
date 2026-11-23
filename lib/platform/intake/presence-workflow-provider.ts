@@ -100,6 +100,18 @@ export function authoringOutputLimit(grant: PresenceWorkflowGrant, name: Workflo
   return grant.marketingAuthority?.projectionVersion === 2 ? permitted : Math.min(12_000, permitted);
 }
 
+/** Output of a review analysis: facts spotted in the Operator's edits, and the sections each fact affects. */
+export function reviewAnalysisSchema(paths: readonly string[]) {
+  const shape = (properties: Record<string, object>) => ({ type: "object", additionalProperties: false, required: Object.keys(properties), properties });
+  return shape({
+    facts: { type: "array", items: shape({ statement: { type: "string" }, publicUse: { type: "boolean" },
+      sourcePath: { type: "string", enum: [...paths] }, sourceText: { type: "string" } }) },
+    revisions: { type: "array", items: shape({ path: { type: "string", enum: [...paths] }, sectionIndex: { type: "integer" },
+      reason: { type: "string" }, factIds: { type: "array", items: { type: "string" } } }) },
+    summary: { type: "string" },
+  });
+}
+
 /** Output for a revision limited to noted sections: each listed section in full, plus any wider change Core judges necessary. */
 export function sectionRevisionSchema(pageSchema: { properties: { sections: { items: { properties: object } } }; $defs?: object }, indexes: readonly number[]) {
   return { type: "object", additionalProperties: false, ...(pageSchema.$defs && { $defs: pageSchema.$defs }),
@@ -250,6 +262,8 @@ function approvedProjection(run: WorkflowRun, grant: PresenceWorkflowGrant) {
       return { ...base, report, direction, blueprint, pagePath: run.work.path, ...(previous && { previous, concerns }) };
     }
     case "editorial": return { ...base, report, direction, blueprint, pages };
+    case "review-analysis": return { ...base, report, direction, blueprint, pages, reviewRound: run.input.reviewRound,
+      ...(run.input.businessFacts?.length && { businessFacts: run.input.businessFacts }) };
   }
 }
 
@@ -314,7 +328,8 @@ export function createResponsesPresenceWorkflow(config: {
   if (grant.ledger.stages) validateWorkflowStagePlan(grant.ledger.stages, grant.ledger, grant.marketSearch?.maxToolCalls);
   const legacyBudget = grant.ledger.stages ? undefined : meteredPresenceWorkflow(ledgerDirectory, rates, transport, grant.ledger,
     grant.maxOutputTokens, grant.retainedReservation, grant.marketSearch?.maxToolCalls);
-  const stageFor = (run: WorkflowRun): WorkflowMeterStage =>
+  // A review analysis is metered as critique work (same model and rates).
+  const stageFor = (run: WorkflowRun): WorkflowMeterStage => run.work.operation === "review-analysis" ? "editorial" :
     run.work.operation === "page" && (run.input.revisionRequest || run.input.replan && !run.input.sourceRecovery ||
       run.input.knowledgeReassessment && run.input.blueprint?.pages.some(page => page.path === run.work.path && page.change === "revise")) ? "revision" : run.work.operation;
   const meter = (run: WorkflowRun) => {
@@ -540,7 +555,7 @@ export function createResponsesPresenceWorkflow(config: {
         return findings;
       }
       const schemas = grant.siteComposition === "managed-v1" ? composedArtifactSchemas : artifactSchemas;
-      const guidance = grant.siteComposition && operation !== "report" ? compositionInstructions[operation] : "";
+      const guidance = grant.siteComposition && operation !== "report" && operation !== "review-analysis" ? compositionInstructions[operation] : "";
       const batch = run.context.evaluation && operation === "page" && !run.work.path && run.input.revisionRequest?.batch === "pending"
         ? run.input.revisionRequest : null;
       const exactPage = operation === "page" && !batch ? run.work.path : undefined;
@@ -551,7 +566,8 @@ export function createResponsesPresenceWorkflow(config: {
       // An Operator Note tied to specific sections revises only those sections (owner, Nov 23).
       const noted = exactPage !== undefined && run.input.revisionRequest?.paths.includes(exactPage)
         ? run.input.revisionRequest.sections?.find(item => item.path === exactPage) : undefined;
-      const baseArtifact = batch ? editorialPatchSchema(batch.paths) : noted ? sectionRevisionSchema(pageSchema, noted.indexes) : exactPage !== undefined
+      const baseArtifact = operation === "review-analysis" ? reviewAnalysisSchema(run.input.pages.map(page => page.path))
+        : batch ? editorialPatchSchema(batch.paths) : noted ? sectionRevisionSchema(pageSchema, noted.indexes) : exactPage !== undefined
         ? { ...pageSchema, properties: { ...pageSchema.properties, path: { type: "string", enum: [exactPage] } } }
         : operation === "blueprint" && grant.marketingAuthority?.strategy
           ? bindBlueprintDecisionSchema(run, grant.marketingAuthority)
@@ -571,7 +587,8 @@ export function createResponsesPresenceWorkflow(config: {
         ? " Use the exact approved staffed offer. Describe what the customer can expect and keep unverified delivery details for review."
         : " Describe intended service as proposed where delivery is not yet supported by evidence. Documented Operator work may support delivery without automation.")
         : operation === "editorial" && grant.marketingAuthority?.projectionVersion === 2
-          ? editorialScopeInstructions(run.work.reviewStage?.phase === "home-concept") : instructions[operation];
+          ? editorialScopeInstructions(run.work.reviewStage?.phase === "home-concept")
+          : operation === "review-analysis" ? "" : instructions[operation];
       const strategy = grant.nativeComponents !== 2 && grant.marketingAuthority?.strategy && (operation === "blueprint" || operation === "page")
         ? " Put the actual report findings and Direction to work in the specific Page job. Use verified claims for public promises and market observations solely for original buyer language, architecture, and design. Give each Page an actionable brief that cites both, separates facts from inferences, names what to leave out and uses a peer visual observation to decide something specific. Historic copy and layout are optional precedent. For a Page, propose an originally named semantic block where it helps a visitor compare, follow steps or understand relationships. Compose it from grouped headings, explanatory text and lists with a responsive grid or reading-order stack. Use a lowercase, hyphen-separated machine name for each semantic block. Use null when a standard section is sufficient. Supply no raw markup, external styling or script and keep all Actions in the approved Action list. For an existing-site change, honor the exact base revision and the specified Page scope." : "";
       const revision = operation === "page" && exactPage !== undefined && grant.marketingAuthority?.strategy &&
@@ -587,7 +604,7 @@ export function createResponsesPresenceWorkflow(config: {
       // Source-aware runs use the rebuilt, plain instruction set (core-authoring-instructions.ts).
       // Historical runs below keep their original wording so retained work stays recoverable.
       const rebuilt = grant.marketingAuthority?.projectionVersion === 2 && !batch;
-      const authoringStage: AuthoringStage = operation === "editorial"
+      const authoringStage: AuthoringStage = operation === "review-analysis" ? "review-analysis" : operation === "editorial"
         ? (run.work.reviewStage?.phase === "home-concept" ? "concept-critique" : "editorial")
         : operation === "page" ? (stageFor(run) !== "revision" ? "page"
           : run.input.revisionRequest?.source === "operator-review" ? "operator-revision" : "revision") : operation;

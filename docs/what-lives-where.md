@@ -45,11 +45,20 @@ It takes Core's page description and writes WordPress pages. The same page-build
 code serves the local install and the delivery to hosted WordPress.
 
 **Status of each step (Nov 23):** all three work end to end on miopages.org with protected
-Core. The first full loop (one kept edit, one Note on the Questions page) was completed
-on Nov 23. Not yet built: facts from edits flowing into the Business Knowledge Base, a
-review summary to confirm before paid revision, and edits inside placeholder boxes.
-Since Nov 23 a Note tied to text revises only that section (Core d07fc66), and plugin 0.1.3
-warns an editor left open on an older copy and refuses its save.
+Core. The first full loop (one kept edit, one Note on the Questions page) was completed on
+Nov 23. Since then:
+
+- A Note tied to text revises only that section (Core d07fc66).
+- Plugin 0.1.3 warns an editor left open on an older copy and refuses its save.
+- **Built, not yet deployed:** a review round. Core now analyses each review first: business facts
+  in edits, Notes starting "Fact:", and the other sections those facts affect. It delivers a
+  **Review summary** draft page; the Operator approves it, or leaves items out, with Notes. Only
+  then are facts recorded in Core and paid revisions run.
+- Confirmed facts are kept in Core's case record, and every later AI step receives them as
+  confirmed business knowledge.
+
+Not yet built: the customer-facing Business Knowledge view (P0-14 portal); edits inside
+placeholder boxes.
 
 **Core's in-app preview** reuses the translator's output (WordPress-format page
 markup) to show the site inside Core, rather than having a separate renderer. The

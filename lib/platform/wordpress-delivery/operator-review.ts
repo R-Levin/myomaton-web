@@ -113,8 +113,9 @@ export async function deliverReviewDraft(input: { config: OperatorSiteConfig; co
     revision: (state?.revision ?? 0) + 1, previousDigest: state?.digest ?? null,
     source: { intakeId: context.intakeId, workflowVersion: view.version }, review, brand,
     ...(taken && { readBack: { revision: state!.revision, pages: taken.acknowledged },
-      answeredNotes: taken.notes.map(note => ({ id: note.id, reply: noteReply(note,
-        view.widerChanges?.filter(change => change.path === note.path && change.reviewAt === taken.at) ?? []) })) }),
+      // Notes taken into a review round stay open until the Operator decides on its Review summary.
+      ...(!taken.deferNotes && taken.notes.length && { answeredNotes: taken.notes.map(note => ({ id: note.id, reply: noteReply(note,
+        view.widerChanges?.filter(change => change.path === note.path && change.reviewAt === taken.at) ?? []) })) }) }),
     // When Core adds or retires pages, WordPress needs the previous page set: retired
     // drafts are archived there, never deleted.
     ...(state && !samePaths(state.pages, review.candidate.pages) && { baselinePages: state.pages }) });
@@ -131,7 +132,8 @@ export async function deliverReviewDraft(input: { config: OperatorSiteConfig; co
 }
 
 /** Core's reply on an Operator Note it acted on, including any wider change it proposes rather than makes. */
-export function noteReply(note: { revised: boolean; sectionOnly?: boolean }, wider: readonly { reason: string }[]) {
+export function noteReply(note: { revised: boolean; sectionOnly?: boolean; reply?: string }, wider: readonly { reason: string }[]) {
+  if (note.reply) return note.reply;
   if (!note.revised) return "MioPages Core has taken this note into the site.";
   const done = note.sectionOnly
     ? "MioPages Core revised the section this note is on and left the rest of the page as it was. Please review the new version."
@@ -141,4 +143,40 @@ export function noteReply(note: { revised: boolean; sectionOnly?: boolean }, wid
   // WordPress replies are limited to 2,000 bytes; the full reason stays in Core's record.
   const clipped = Buffer.byteLength(reason) > 1400 ? Buffer.from(reason).subarray(0, 1400).toString("utf8").replace(/�*$/u, "") + "…" : reason;
   return done + " Core also suggests a wider change, not made: " + clipped + " Add a note if you want it done.";
+}
+
+/**
+ * Read the Operator's answers on the Review summary from the Notes left on it (owner decision,
+ * Nov 23): "Approve" on the opening paragraph approves; "No" on an item leaves it out; other text
+ * on a fact corrects it; other text on a change adds to it. Each Note gets a reply saying what was recorded.
+ */
+export function summaryDecision(items: ReadonlyMap<string, { kind: string; id?: string; index?: number }>,
+  notes: readonly { id: number; path: string; origin: string | null; text: string; replies: string[] }[]) {
+  const decision = { approved: false, rejectFacts: [] as string[], correctFacts: [] as { id: string; statement: string }[],
+    rejectRevisions: [] as number[], reviseNotes: [] as { index: number; text: string }[] };
+  const replies: { id: number; path: string; text: string; reply: string }[] = [];
+  const refuse = /^\s*(no|reject|skip|remove|leave (it )?out|don'?t|do not)\b/iu;
+  for (const note of notes) {
+    const text = [note.text, ...note.replies].join(" ").trim();
+    const item = note.origin ? items.get(note.origin.slice(0, note.origin.indexOf(":"))) : undefined;
+    let reply = "MioPages Core read this note but could not tie it to an item on the Review summary.";
+    if (item?.kind === "approve") {
+      if (/\bapprove(d)?\b/iu.test(text)) { decision.approved = true; reply = "Recorded: approved."; }
+      else reply = "Recorded. To approve, add a note here saying Approve.";
+    } else if (item?.kind === "fact" && item.id) {
+      if (refuse.test(note.text)) { decision.rejectFacts.push(item.id); reply = "Recorded: this fact is left out."; }
+      else if (/^\s*(yes|ok|okay|approve|confirm|keep|correct)\s*[.!]?\s*$/iu.test(note.text)) reply = "Recorded: confirmed.";
+      else {
+        const statement = note.text.replace(/^\s*(fact|correction|corrected)\s*:\s*/iu, "").trim();
+        decision.correctFacts.push({ id: item.id, statement });
+        reply = "Recorded: corrected to your wording.";
+      }
+    } else if (item?.kind === "revision" && item.index !== undefined) {
+      if (refuse.test(note.text)) { decision.rejectRevisions.push(item.index); reply = "Recorded: this change is left out."; }
+      else if (/^\s*(yes|ok|okay|approve|confirm)\s*[.!]?\s*$/iu.test(note.text)) reply = "Recorded: approved.";
+      else { decision.reviseNotes.push({ index: item.index, text: note.text.trim() }); reply = "Recorded: Core will include this in the change."; }
+    } else if (item?.kind === "edit") reply = "Recorded. Your edits are kept as written; to change one, edit the page itself.";
+    replies.push({ id: note.id, path: note.path, text: note.text, reply });
+  }
+  return { decision, replies };
 }

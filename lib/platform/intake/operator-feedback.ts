@@ -359,3 +359,59 @@ export function notedSections(context: WorkflowContext, view: PresenceWorkflowVi
   }
   return scoped;
 }
+
+/** Estimated provider cost of one revision call: a whole Page, or a Page limited to noted sections (Nov 23 observations). */
+export const revisionEstimateMicros = { page: 500_000, sections: 300_000 } as const;
+
+/**
+ * Read Core's review analysis. Every fact must trace to the Operator: a "Fact:" Note (kept word for
+ * word, and always included) or the text of one of the Operator's edits. Facts that do not trace,
+ * and revisions of sections already queued, are left out and counted.
+ */
+export function readReviewAnalysis(value: unknown, round: { edits: { path: string; after: string }[]; factNotes: { path: string; statement: string }[];
+  noteRevisions: { path: string; indexes: number[] }[] }, pages: readonly { path: string; sections: readonly unknown[] }[]) {
+  const record = (item: unknown, keys: string[]) => {
+    if (!item || typeof item !== "object" || Array.isArray(item) || Object.keys(item).sort().join() !== [...keys].sort().join()) throw Error("Review analysis shape refused");
+    return item as Record<string, unknown>;
+  };
+  const words = (item: unknown, limit: number) => {
+    if (typeof item !== "string" || item.length > limit || /[<>]/u.test(item)) throw Error("Review analysis text refused");
+    return item.trim();
+  };
+  const output = record(value, ["facts", "revisions", "summary"]);
+  if (!Array.isArray(output.facts) || !Array.isArray(output.revisions)) throw Error("Review analysis lists required");
+  const numbering = new Map<string, string>(), facts: { id: string; statement: string; publicUse: boolean;
+    source: { path: string; kind: "edit" | "note"; text: string } }[] = [];
+  let untraced = 0;
+  output.facts.forEach((raw, index) => {
+    const fact = record(raw, ["statement", "publicUse", "sourcePath", "sourceText"]);
+    const statement = words(fact.statement, 1000), path = words(fact.sourcePath, 200), text = words(fact.sourceText, 20_000);
+    if (!statement || typeof fact.publicUse !== "boolean") throw Error("Review analysis fact refused");
+    const note = round.factNotes.find(item => item.path === path && same(item.statement, text));
+    const edit = !note && round.edits.find(item => item.path === path && (normal(item.after).includes(normal(text)) || normal(text).includes(normal(item.after))) && normal(text));
+    if (!note && !edit) { untraced++; return; }
+    const id = "F" + (facts.length + 1);
+    numbering.set("F" + (index + 1), id);
+    facts.push({ id, statement: note ? note.statement : statement, publicUse: fact.publicUse,
+      source: note ? { path, kind: "note", text: note.statement } : { path, kind: "edit", text: (edit as { after: string }).after } });
+  });
+  for (const note of round.factNotes) if (!facts.some(fact => fact.source.kind === "note" && fact.source.path === note.path && fact.source.text === note.statement)) {
+    facts.push({ id: "F" + (facts.length + 1), statement: note.statement, publicUse: true, source: { path: note.path, kind: "note", text: note.statement } });
+  }
+  const revisions: { path: string; indexes: number[]; reason: string; source: "fact"; factIds: string[] }[] = [];
+  let skipped = 0;
+  for (const raw of output.revisions) {
+    const revision = record(raw, ["path", "sectionIndex", "reason", "factIds"]);
+    const page = pages.find(item => item.path === revision.path);
+    const index = revision.sectionIndex;
+    const factIds = Array.isArray(revision.factIds) ? [...new Set(revision.factIds.flatMap(id => numbering.get(String(id)) ?? []))] : [];
+    if (!page || typeof index !== "number" || !Number.isInteger(index) || index < 0 || index >= page.sections.length) throw Error("Review analysis section refused");
+    const queued = round.noteRevisions.some(item => item.path === page.path && (!item.indexes.length || item.indexes.includes(index)));
+    if (queued || !factIds.length || revisions.some(item => item.path === page.path && item.indexes[0] === index)) { skipped++; continue; }
+    revisions.push({ path: page.path, indexes: [index], reason: words(revision.reason, 1000), source: "fact", factIds });
+  }
+  const paths = new Map<string, boolean>();
+  for (const item of [...round.noteRevisions, ...revisions]) paths.set(item.path, (paths.get(item.path) ?? false) || !item.indexes.length);
+  const estimateMicros = [...paths.values()].reduce((sum, whole) => sum + (whole ? revisionEstimateMicros.page : revisionEstimateMicros.sections), 0);
+  return { facts, revisions, summary: words(output.summary, 2000), estimateMicros, untraced, skipped };
+}

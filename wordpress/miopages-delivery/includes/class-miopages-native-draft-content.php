@@ -101,9 +101,13 @@ final class MioPages_Native_Draft_Content
                 if (!in_array($section['type'], ['hero', 'intro', 'relationship', 'collection', 'cta'], true)) {
                     throw new InvalidArgumentException('Native draft section is unsupported.');
                 }
-                $blocks[] = '<!-- wp:heading --><h2 class="wp-block-heading">'
+                // In a review draft every block names its Core text, so a Note on it can be answered
+                // (the Review summary is a plain page, Nov 23).
+                $origin = $reviewDraft && is_string($section['id'] ?? null) ? $section['id'] : '';
+                $blocks[] = '<!-- wp:heading' . ($origin === '' ? '' : ' ' . json_encode(MioPages_Native_Component::origin($origin . ':heading'),
+                        JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) . ' --><h2 class="wp-block-heading">'
                     . MioPages_Native_Component::text($section['content']['heading']) . '</h2><!-- /wp:heading -->';
-                $blocks[] = self::paragraph(nl2br(MioPages_Native_Component::text($section['content']['text']), false));
+                $blocks[] = self::paragraph(nl2br(MioPages_Native_Component::text($section['content']['text']), false), $origin === '' ? '' : $origin . ':text');
                 $sectionId = $section['id'] ?? '';
                 if (isset($attachments[$sectionId])) $blocks[] = self::image($attachments[$sectionId]);
             }

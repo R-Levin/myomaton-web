@@ -354,7 +354,7 @@ export async function workPresenceCase(workflow: PresenceWorkflow, current: Awai
     if (previous.canRenderForEditorial) return previous;
     if (previous.recoverable && !previous.failure) {
       previous = await workflow.recover(current, previous.version);
-    } else if (!previous.failure && ["research", "report", "direction", "blueprint", "page", "editorial"].includes(previous.next)) {
+    } else if (!previous.failure && ["research", "report", "direction", "blueprint", "page", "editorial", "review-analysis"].includes(previous.next)) {
       previous = await workflow.advance(current, previous.version);
     } else if (["review-complete", "home-concept"].includes(previous.next) && previous.visuals?.some(visual => ["queued", "running", "unverified"].includes(visual.state))) {
       return workflow.advanceVisual(current, previous.version);

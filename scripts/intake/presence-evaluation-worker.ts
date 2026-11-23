@@ -30,7 +30,9 @@ import {prepareOriginalCustody} from "../../lib/platform/intake/presence-origina
 import {publicCaptureBridge} from "../../lib/platform/intake/presence-public-capture-bridge";
 import { summarizePresenceWorkflowUsage } from "../../lib/platform/intake/intelligent-responses";
 import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig, type ReviewDeliveryState } from "../../lib/platform/wordpress-delivery/operator-review";
-import { operatorFeedback } from "../../lib/platform/intake/operator-feedback";
+import { operatorFeedback, operatorFeedbackFromCandidate } from "../../lib/platform/intake/operator-feedback";
+import { reviewSummaryPage, reviewSummaryPath, workflowNativeReviewCandidate } from "../../lib/platform/intake/presence-workflow-delivery";
+import { summaryDecision } from "../../lib/platform/wordpress-delivery/operator-review";
 
 const digest = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 const manifestFile = "docs/presence-evaluation-activation.json";
@@ -203,7 +205,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
   const researchReplay = operation === "replay-research";
   const completeResearch = (operation === "complete-research" || researchReplay) && approval === commercialApproval;
   // Review drafts to Operator WordPress and read-back (owner decisions, Nov 22). No AI calls.
-  const delivery = ["deliver-review", "read-back", "take-in-review", "retire-case-rules", "withdraw-review"].includes(operation) && approval === rebuiltRunApproval;
+  const delivery = ["deliver-review", "read-back", "take-in-review", "decide-review", "retire-case-rules", "withdraw-review"].includes(operation) && approval === rebuiltRunApproval;
   if ((scenario !== "c0" && scenario !== "c2") || !approval || extra.length ||
       !(readOnly || editing || delivery || operation === "activate" || operation === "work" || operation === "preflight" || completeResearch || replaceReport) || (editing || delivery ? !value : Boolean(value))) {
     throw Error("Evaluation command refused");
@@ -301,6 +303,33 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
         const view = await workflow.applyOperatorReview(context, prior.version, actor, feedback);
         return { site: request.site, version: view?.version, next: view?.next, keptEdits: feedback.edits.length + feedback.titles.length,
           notes: feedback.notes.length, structural: feedback.structural.length };
+      }
+      if (operation === "decide-review") {
+        // The Operator's answers on the Review summary (Notes on that page). No AI call.
+        if (!state) throw Error("Nothing has been delivered to this site yet");
+        const summary = reviewSummaryPage(context, prior);
+        if (!summary) throw Error("No Review summary is waiting for a decision");
+        const { readback } = await readBackOperatorSite(config);
+        if (readback.revision !== state.revision || readback.digest !== state.digest) throw Error("Operator WordPress no longer holds Core's last delivery");
+        if (!state.pages.some(page => page.path === reviewSummaryPath)) throw Error("Deliver the Review summary first");
+        const feedback = operatorFeedbackFromCandidate(workflowNativeReviewCandidate(context, prior).candidate, readback);
+        const round = prior.reviewRounds!.at(-1)!;
+        const known = new Set([...round.notes, ...round.factNotes].map(note => note.id));
+        const elsewhere = [...feedback.edits, ...feedback.titles, ...feedback.structural].filter(item => item.path !== reviewSummaryPath).length +
+          feedback.notes.filter(note => note.path !== reviewSummaryPath && !known.has(note.id)).length;
+        if (elsewhere) throw Error("There are new edits or notes on other pages; decide the Review summary first, then make them");
+        const { decision, replies } = summaryDecision(summary.items, feedback.notes.filter(note => note.path === reviewSummaryPath));
+        await createPrivate(join(root, `review-decided-${request.site}-r${state.revision}-${new Date().toISOString().replace(/[:.]/gu, "-")}.json`),
+          JSON.stringify({ readback, decision, replies }, null, 2) + "\n");
+        if (!decision.approved) return { site: request.site, approved: false, version: prior.version,
+          message: "Not approved yet: add a note saying Approve on the summary's opening paragraph", notes: replies.length };
+        const actor = { id: "local-evaluation-operator", role: "operator" as const, simulated: false, authority: "Operator decision in WordPress " + request.site };
+        const view = await workflow.decideReview(context, prior.version, actor, decision,
+          { readbackRevision: feedback.readbackRevision, acknowledged: feedback.acknowledged, summaryNotes: replies });
+        const decided = view?.reviewRounds?.at(-1)?.decision;
+        return { site: request.site, approved: true, version: view?.version, next: view?.next,
+          factsRecorded: decided?.confirmedFacts.length ?? 0, factsLeftOut: decided?.rejectedFacts.length ?? 0,
+          changes: decided?.revisions.map(item => ({ path: item.path, sections: item.indexes.length ? item.indexes : "whole page" })) ?? [] };
       }
       const { state: next, receipt } = await deliverReviewDraft({ config, context, view: prior, state });
       await createPrivate(join(root, `wordpress-${request.site}-r${next.revision}.json`), JSON.stringify({ ...next, receipt }, null, 2) + "\n");

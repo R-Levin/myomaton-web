@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import { applyOperatorEdits, droppedWording, keptWording, notedSections, operatorConcerns, type OperatorFeedback } from "./operator-feedback";
+import { applyOperatorEdits, droppedWording, keptWording, notedSections, operatorConcerns, readReviewAnalysis, type OperatorFeedback } from "./operator-feedback";
 import type { Pool, PoolClient } from "pg";
 import { fingerprint, object, text } from "../canonical/model";
 import type { DeploymentSelection } from "../managed-sites/deployment";
@@ -33,7 +33,7 @@ export type WorkflowContext = {
   conflicts: string[];
   evaluation?: EvaluationBinding;
 };
-export type WorkflowOperation = "research" | "report" | "direction" | "blueprint" | "page" | "editorial";
+export type WorkflowOperation = "research" | "report" | "direction" | "blueprint" | "page" | "editorial" | "review-analysis";
 export type WorkflowActor = { id: string; role: "customer" | "operator"; simulated: boolean; authority?: string };
 type Actor = WorkflowActor;
 type ConceptReviewStage = { phase: "home-concept"; target: string };
@@ -56,6 +56,29 @@ type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: 
   keep?: { path: string; text: string }[];
   /** Pages whose revision is limited to these sections (zero-based); other pages are revised whole. */
   sections?: { path: string; indexes: number[] }[] };
+/** A business fact Core proposes from an Operator review: from an edit (spotted by Core) or a Note starting "Fact:". */
+export type ReviewFact = { id: string; statement: string; publicUse: boolean; source: { path: string; kind: "edit" | "note"; text: string } };
+/** Sections Core proposes to revise. An empty indexes list means the whole Page. */
+export type ReviewRevision = { path: string; indexes: number[]; reason: string; source: "note" | "fact"; factIds: string[] };
+/**
+ * One Operator review round (owner decision, Nov 23). Kept edits apply at take-in. Core then
+ * analyses the round (facts, affected sections, cost) and shows a Review summary; nothing is
+ * recorded as fact and no paid revision runs until the Operator decides on it.
+ */
+export type ReviewRound = { id: string; at: string; actor: Actor; status: "analysing" | "summary" | "decided";
+  edits: { path: string; before: string; after: string }[];
+  notes: { id: number; path: string; text: string }[];
+  factNotes: { id: number; path: string; statement: string }[];
+  concerns: { path: string; concern: string }[];
+  keep: { path: string; text: string }[];
+  noteRevisions: ReviewRevision[];
+  analysis?: { facts: ReviewFact[]; revisions: ReviewRevision[]; summary: string; estimateMicros: number };
+  decision?: { at: string; actor: Actor; confirmedFacts: string[]; rejectedFacts: string[]; revisions: ReviewRevision[] };
+  /** What Core left out of the AI's analysis: facts that did not trace to the Operator, revisions already queued. */
+  analysisNotes?: { untracedFacts: number; skippedRevisions: number } };
+/** A business fact the Operator confirmed; every later AI step receives it as owner-confirmed knowledge. */
+export type BusinessFact = { id: string; statement: string; publicUse: boolean; source: ReviewFact["source"]; roundId: string;
+  confirmedBy: Actor; at: string; corrected: boolean };
 /** A change beyond the noted sections that Core judged necessary; proposed to the Operator, not made. */
 export type WiderChange = { path: string; reason: string; at: string; reviewAt: string };
 /** One Operator review round read back from Operator WordPress (owner direction, Nov 22). */
@@ -63,7 +86,9 @@ export type WordPressReview = { at: string; actor: Actor; readbackRevision: numb
   /** The WordPress content Core has taken in, by path; the next delivery may replace exactly this. */
   acknowledged: { path: string; contentSha256: string; title: string }[];
   /** Notes Core acted on: answered and resolved with the next delivery. */
-  notes: { id: number; path: string; text: string; revised: boolean; sectionOnly?: boolean }[];
+  notes: { id: number; path: string; text: string; revised: boolean; sectionOnly?: boolean; reply?: string }[];
+  /** Notes stay open until the round is decided (the Review summary is in between). */
+  deferNotes?: boolean;
   keptEdits: number; revisedPaths: string[] };
 export type SourceRepairAuthorization = { authorization: string; baseVersion: number; previousStateDigest: string; materialsDigest: string;
   contextTransition?: { previousContextDigest: string; previousAuthorityDigest: string; nextContextDigest: string; nextAuthorityDigest: string; addedEvidenceDigests: string[] } };
@@ -113,12 +138,19 @@ type State = {
   retry?: { previous: string; count: number };
   lostAnswers?: { attempt: string; operation: string; reservedMicros: number; by: string; at: string }[];
   widerChanges?: WiderChange[];
+  reviewRounds?: ReviewRound[];
+  businessFacts?: BusinessFact[];
   visuals?: PresenceVisual[];
 };
 type Task = Pick<Work, "operation" | "path">;
-export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest" | "replan"> &
+export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest" | "replan" | "businessFacts"> &
+  { reviewRound?: Pick<ReviewRound, "id" | "edits" | "factNotes" | "noteRevisions" | "notes"> } &
   Pick<WorkflowContext, "entry" | "evidence" | "limitations" | "conflicts"> & { reviewStage?: ConceptReviewStage; sourceRecovery?: SourceRecovery; knowledgeReassessment?: ReasoningReassessment };
 export type WorkflowRun = { context: WorkflowContext; input: WorkflowInput; work: Work };
+/** The Operator's answers on a Review summary. Revision indexes number the summary's proposed revisions in order. */
+export type ReviewDecision = { approved: boolean; rejectFacts: string[]; correctFacts: { id: string; statement: string }[]; rejectRevisions: number[];
+  /** Operator additions to a proposed change, by its index. */
+  reviseNotes?: { index: number; text: string }[] };
 export interface PresenceWorkflowOperations {
   readonly mode: State["mode"];
   readonly maxRetries?: number;
@@ -271,6 +303,9 @@ function nextTask(state: State, siteFirst = false): Task | null {
   if (!state.confirmation) return null;
   if (!state.direction) return { operation: "direction" };
   if (!state.blueprint) return { operation: "blueprint" };
+  const round = state.reviewRounds?.at(-1)?.status;
+  if (round === "analysing") return { operation: "review-analysis" };
+  if (round === "summary") return null;
   const drafted = new Set(state.pages.map(page => page.path));
   if (!drafted.has("/") && state.blueprint.pages.some(page => page.path === "/")) return { operation: "page", path: "/" };
   if (state.evaluation && !state.homeReview && !siteFirst) return null;
@@ -304,6 +339,9 @@ export function runInput(context: WorkflowContext, state: State, reviewStage = s
   };
   return { entry, evidence: knowledgeReassessment ? [...evidence, ...confirmedSources(state)] : evidence, limitations, conflicts,
     report, research, direction, blueprint, pages, corrections, ...(knowledgeReassessment && { knowledgeReassessment }),
+    ...(state.businessFacts?.length && { businessFacts: state.businessFacts }),
+    ...(state.reviewRounds?.at(-1)?.status === "analysing" && { reviewRound: (({ id, edits, factNotes, noteRevisions, notes }) =>
+      ({ id, edits, factNotes, noteRevisions, notes }))(state.reviewRounds.at(-1)!) }),
     ...(revisionRequest && { revisionRequest }), ...(replan && { replan }), ...(!knowledgeReassessment && sourceRecovery && { sourceRecovery }), ...(reviewStage && { reviewStage }) };
 }
 function readResearch(value: unknown, ids: readonly string[]): PresenceEvidence[] {
@@ -388,6 +426,7 @@ export class PresenceWorkflow {
       revisionOrdinal(state) < (this.operations.maxEditorialRevisions ?? 1) &&
       Boolean(state.editorial?.concerns.length || editorial.assigned.length);
     const next = !current ? "evidence-changed" : knowledgePending ? "understanding-review" : reassessmentPending ? "reassessment-ready" : state.failure ? "recover" : state.work ? "in-progress" :
+      state.reviewRounds?.at(-1)?.status === "summary" ? "review-summary" :
       nextTask(state, siteFirst)?.operation ?? (concept ? "home-concept" : !state.confirmation ? "customer-review" :
         state.editorial && (state.editorial.concerns.length || editorial.open) ? "editorial-review" :
           !state.operatorReview ? "operator-review" : "review-complete");
@@ -418,6 +457,8 @@ export class PresenceWorkflow {
       ...(state.understandingCorrections && { understandingCorrections: state.understandingCorrections }),
       ...(state.wordpressReviews && { wordpressReviews: state.wordpressReviews }),
       ...(state.widerChanges && { widerChanges: state.widerChanges }),
+      ...(state.reviewRounds && { reviewRounds: state.reviewRounds }),
+      ...(state.businessFacts && { businessFacts: state.businessFacts }),
       ...(this.operations.knowledgeConfirmation && { knowledgeConfirmationAvailable: true as const }),
       ...(state.knowledgeReassessments && { knowledgeReassessments: state.knowledgeReassessments }),
       ...(editorial.findings.length > 0 && { editorialFindings: editorial.findings }), canQueueEditorialRevision,
@@ -821,6 +862,14 @@ export class PresenceWorkflow {
               at: new Date(this.clock()).toISOString(), reviewAt: state.revisionRequest!.at }] }) };
           break;
         }
+        case "review-analysis": {
+          const round = state.reviewRounds?.at(-1);
+          if (round?.status !== "analysing") throw Error("No review round is being analysed");
+          const { untraced, skipped, ...analysis } = readReviewAnalysis(output, round, state.pages);
+          next = { ...state, reviewRounds: [...state.reviewRounds!.slice(0, -1), { ...round, status: "summary", analysis,
+            ...((untraced || skipped) && { analysisNotes: { untracedFacts: untraced, skippedRevisions: skipped } }) }] };
+          break;
+        }
         case "editorial": {
           const editorial = readEditorial(output, work.reviewStage ? ["/"] : paths, provider);
           if (work.reviewStage) {
@@ -960,29 +1009,98 @@ export class PresenceWorkflow {
    * which must keep that wording. Notes are recorded so the next delivery answers and
    * resolves them. No AI call happens here; revision runs with the case's next work.
    */
+  /**
+   * Take in an Operator review read back from WordPress. Kept edits become Core's text at once.
+   * Notes, "Fact:" Notes and the edits themselves go into a review round that Core analyses and
+   * shows as a Review summary; nothing is revised or recorded as fact until the Operator decides.
+   */
   async applyOperatorReview(context: WorkflowContext, version: number, actor: Actor, feedback: OperatorFeedback) {
     const state = await this.current(context, version);
     if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || !actor.authority) throw new IntakeError("unavailable", 403);
-    if (state.work || state.failure || !state.pages.length || state.revisionRequest?.batch === "pending") throw new IntakeError("workflow_not_ready", 409);
+    if (state.work || state.failure || !state.pages.length || state.revisionRequest?.batch === "pending" ||
+        ["analysing", "summary"].includes(state.reviewRounds?.at(-1)?.status ?? "")) throw new IntakeError("workflow_not_ready", 409);
     const view = this.view(context, state)!;
     const pages = applyOperatorEdits(context, view, feedback);
-    const concerns = operatorConcerns(feedback);
+    const factPattern = /^\s*fact\s*:\s*/iu;
+    const factNotes = feedback.notes.filter(note => factPattern.test(note.text));
+    const revisionNotes = { ...feedback, notes: feedback.notes.filter(note => !factPattern.test(note.text)) };
+    const concerns = operatorConcerns(revisionNotes);
     const paths = [...new Set(concerns.map(item => item.path))].filter(path => pages.some(page => page.path === path));
-    const scoped = notedSections(context, view, feedback, paths);
+    const scoped = notedSections(context, view, revisionNotes, paths);
     const at = new Date(this.clock()).toISOString();
+    const edits = [...feedback.titles.map(({ path, before, after }) => ({ path, before, after })),
+      ...feedback.edits.map(({ path, before, after }) => ({ path, before, after }))];
+    const hasRound = edits.length > 0 || feedback.notes.length > 0 || feedback.structural.length > 0;
     const review: WordPressReview = { at, actor, readbackRevision: feedback.readbackRevision, acknowledged: feedback.acknowledged,
-      notes: feedback.notes.map(note => ({ id: note.id, path: note.path, text: note.text, revised: paths.includes(note.path),
-        ...(scoped.some(item => item.path === note.path) && { sectionOnly: true }) })),
-      keptEdits: feedback.edits.length + feedback.titles.length, revisedPaths: paths };
+      notes: feedback.notes.map(note => ({ id: note.id, path: note.path, text: note.text, revised: false })),
+      keptEdits: feedback.edits.length + feedback.titles.length, revisedPaths: [], ...(hasRound && { deferNotes: true }) };
+    const round: ReviewRound | null = hasRound ? { id: randomUUID(), at, actor, status: "analysing", edits,
+      notes: revisionNotes.notes.map(({ id, path, text }) => ({ id, path, text })),
+      factNotes: factNotes.map(({ id, path, text }) => ({ id, path, statement: text.replace(factPattern, "").trim() })).filter(note => note.statement),
+      concerns, keep: keptWording(feedback, paths),
+      noteRevisions: paths.map(path => {
+        const sections = scoped.find(item => item.path === path);
+        return { path, indexes: sections?.indexes ?? [], source: "note" as const, factIds: [],
+          reason: concerns.filter(item => item.path === path).map(item => item.concern).join(" ").slice(0, 2000) };
+      }) } : null;
+    return this.view(context, await this.store.append(context, version, { ...state, pages,
+      wordpressReviews: [...state.wordpressReviews ?? [], review], ...(round && { reviewRounds: [...state.reviewRounds ?? [], round] }) }));
+  }
+
+  /**
+   * The Operator's decision on a Review summary (owner decision, Nov 23). Confirmed facts become
+   * owner-confirmed business knowledge in Core; approved revisions are queued, limited to their
+   * sections. `summaryReview` records the WordPress content read back with the decision.
+   */
+  async decideReview(context: WorkflowContext, version: number, actor: Actor, decision: ReviewDecision,
+    summaryReview: Pick<WordPressReview, "readbackRevision" | "acknowledged"> & { summaryNotes: { id: number; path: string; text: string; reply: string }[] }) {
+    const state = await this.current(context, version);
+    if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || !actor.authority) throw new IntakeError("unavailable", 403);
+    const round = state.reviewRounds?.at(-1);
+    if (!round || round.status !== "summary" || !round.analysis || state.work || state.failure) throw new IntakeError("workflow_not_ready", 409);
+    if (!decision.approved) throw new IntakeError("invalid_request", 400);
+    const at = new Date(this.clock()).toISOString();
+    const rejected = new Set(decision.rejectFacts);
+    const corrected = new Map(decision.correctFacts.map(item => [item.id, item.statement]));
+    const confirmed = round.analysis.facts.filter(fact => !rejected.has(fact.id));
+    const facts: BusinessFact[] = confirmed.map(fact => ({ id: round.id + ":" + fact.id, statement: corrected.get(fact.id) ?? fact.statement,
+      publicUse: fact.publicUse, source: fact.source, roundId: round.id, confirmedBy: actor, at, corrected: corrected.has(fact.id) }));
+    const proposed = [...round.noteRevisions, ...round.analysis.revisions];
+    const approved = proposed.filter((revision, index) => !decision.rejectRevisions.includes(index) &&
+      (revision.source === "note" || revision.factIds.some(id => confirmed.some(fact => fact.id === id))));
+    const paths = [...new Set(approved.map(item => item.path))].filter(path => state.pages.some(page => page.path === path));
+    const sections = paths.flatMap(path => {
+      const own = approved.filter(item => item.path === path);
+      return own.some(item => !item.indexes.length) ? [] : [{ path, indexes: [...new Set(own.flatMap(item => item.indexes))].sort((a, b) => a - b) }];
+    });
+    const statement = (id: string) => facts.find(fact => fact.id === round.id + ":" + id)?.statement;
+    const concerns = [...round.concerns.filter(item => approved.some(revision => revision.source === "note" && revision.path === item.path)),
+      ...approved.filter(revision => revision.source === "fact").map(revision => ({ path: revision.path,
+        concern: "Confirmed business fact: " + revision.factIds.flatMap(id => statement(id) ?? []).join(" ") + " " + revision.reason })),
+      ...(decision.reviseNotes ?? []).flatMap(note => approved.includes(proposed[note.index]) && proposed[note.index]
+        ? [{ path: proposed[note.index].path, concern: "Operator note on the Review summary for this change: " + note.text.slice(0, 2000) }] : [])]
+      .filter(item => paths.includes(item.path));
+    const factNoteReply = (id: number) => {
+      const note = round.factNotes.find(item => item.id === id);
+      const fact = note && round.analysis!.facts.find(item => item.source.kind === "note" && item.source.text === note.statement);
+      return fact && !rejected.has(fact.id) ? "MioPages Core recorded this as a confirmed business fact." : "MioPages Core did not record this as a fact.";
+    };
+    const review: WordPressReview = { at, actor, readbackRevision: summaryReview.readbackRevision, acknowledged: summaryReview.acknowledged,
+      notes: [...round.notes.map(note => ({ id: note.id, path: note.path, text: note.text, revised: paths.includes(note.path),
+          ...(sections.some(item => item.path === note.path) && { sectionOnly: true }) })),
+        ...round.factNotes.map(note => ({ id: note.id, path: note.path, text: note.statement, revised: false, reply: factNoteReply(note.id) })),
+        ...summaryReview.summaryNotes.map(note => ({ id: note.id, path: note.path, text: note.text, revised: false, reply: note.reply }))],
+      keptEdits: 0, revisedPaths: paths };
     const revision = paths.length ? {
-      // Operator review rounds do not use up Core's own self-critique rounds.
-      revisionRequest: { paths, audit: { summary: "Operator review in WordPress", concerns: concerns.filter(item => paths.includes(item.path)) },
-        priorPages: pages.filter(page => paths.includes(page.path)), actor, at, ordinal: revisionOrdinal(state), source: "operator-review" as const,
-        keep: keptWording(feedback, paths), sections: scoped },
+      revisionRequest: { paths, audit: { summary: "Operator review in WordPress", concerns }, priorPages: state.pages.filter(page => paths.includes(page.path)),
+        actor, at, ordinal: revisionOrdinal(state), source: "operator-review" as const, keep: round.keep.filter(item => paths.includes(item.path)), sections },
       editorial: null, operatorReview: null,
     } : {};
     return this.view(context, await this.store.append(context, version, { ...state, ...revision,
-      pages: pages.filter(page => !paths.includes(page.path)), wordpressReviews: [...state.wordpressReviews ?? [], review] }));
+      pages: state.pages.filter(page => !paths.includes(page.path)), wordpressReviews: [...state.wordpressReviews ?? [], review],
+      businessFacts: [...state.businessFacts ?? [], ...facts],
+      reviewRounds: [...state.reviewRounds!.slice(0, -1), { ...round, status: "decided", decision: { at, actor,
+        confirmedFacts: facts.map(fact => fact.id), rejectedFacts: [...rejected], revisions: approved } }] }));
   }
 
   /**

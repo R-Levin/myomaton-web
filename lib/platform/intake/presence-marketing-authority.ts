@@ -155,6 +155,8 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
         ...(previous && { previous, concerns: revisionRequest?.audit.concerns.filter(concern => concern.path === path) }),
         ...(!path && revisionRequest?.batch === "pending" && { pages: revisionRequest.priorPages, concerns: revisionRequest.audit.concerns }) }),
       ...(operation === "editorial" && { pages, ...(run.input.reviewStage && { reviewStage: run.input.reviewStage }) }),
+      ...(operation === "review-analysis" && { pages, reviewRound: run.input.reviewRound }),
+      ...(run.input.businessFacts?.length && { businessFacts: run.input.businessFacts.map(({ id, statement, publicUse, at }) => ({ id, statement, publicUse, confirmedAt: at })) }),
       ...(replan && !sourceRecovery && { independentReviewCriteriaToCorrect: replan.concerns,
         ...(replan.priorRejectedPages && { priorRejectedPages: replan.priorRejectedPages }),
         ...(replan.conceptCritique && { priorCoreConceptCritique: replan.conceptCritique }) }),
@@ -186,6 +188,7 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
     case "direction": return { ...base, report };
     case "blueprint": return { ...base, report, direction };
     case "editorial": return { ...base, report, direction, blueprint, pages };
+    case "review-analysis": return { ...base, report, direction, blueprint, pages, reviewRound: run.input.reviewRound };
   }
 }
 
