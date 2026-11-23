@@ -1131,3 +1131,11 @@ on miopages.org. Retiring the six Nov 21 case rules is a separate, still-open de
 0.1.3 (0.1.2 archived in archive-golive-20261123T001516Z); the editor guard is loaded and
 tracks the delivered pages. Read-back from the updated Core: delivery 2, no edited or
 missing pages, no open Notes.
+
+**Nov 23: retire the Nov 21 case rules (owner decision).** The owner approved retiring the
+five Codex-era Nov 21 correction-round rules sent with every AI request in case beb8de9c
+(including "treat this as a whole-site correction" and the Home rule forbidding image
+placeholders, which contradicted the FPO requirement), and folding the sixth (no
+development talk in visitor copy; unverified prices, performance, availability and proof
+stay unconfirmed) into Core's standing instructions. A rule given for one round belongs
+to that round.
