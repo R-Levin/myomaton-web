@@ -1099,3 +1099,7 @@ the answer or wait longer, and something this obvious should not have been overl
 Build the fix, and find out why the AI takes as long as it does. Once the OpenAI credits
 are used up, the owner is open to trying Claude as the AI if it is comparable in
 capability and cost.
+
+**Nov 23: fix deployment and retry approved.** The owner approved installing d4b107b
+(streamed AI answers, lost-answer retry) on protected Core and about $0.50 to redo the
+Questions page revision, then delivering it to miopages.org as review drafts.
