@@ -1182,3 +1182,7 @@ approval it joins Core's site plan and the main menu (always the menu, since a s
 cannot add links), Core writes it as a full new page, and the next delivery adds it to WordPress and
 answers the note. Plugin 0.1.5 fixes a fault that would have refused a second Review summary.
 Not yet installed; the first real use needs the owner's approval for the install and the AI cost.
+
+**Nov 24: install on hold.** The owner paused here: the new-page work (fbe5bbc, plugin 0.1.5)
+stays built but not installed while the wider questions it raised are considered at a high level.
+Resume from that commit when the owner says so.
