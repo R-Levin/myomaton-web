@@ -1224,3 +1224,16 @@ modification, and that waits until the review and modification process itself is
 Getting the site live remains a shorter-term goal, but the project's overall status decides what
 happens when. So the order is: improve the review and modification process first, then use it to
 bring Core's site up to standard, then go live and start measuring.
+
+**Nov 24: object orientation becomes the primary focus (owner direction).** MioPages was
+branched from the Myomaton robotics project, where the owner had fought and won the argument
+for an object-oriented approach: the underlying components of different tasks (room navigation
+and charger docking, for example) are the same and must be reused, not reinvented. MioPages
+began with the explicit direction that the same approach must apply, but the seeds of the
+problem were planted at or near the beginning: functions were rebuilt separately in each area
+(the new-page feature as its own branch of review rounds is a recent example). The owner's
+direction: applying this object-oriented approach, both across the whole service and within its
+parts, is a fundamental guiding principle for the entire project and product, and is now the
+primary focus. Claude has the owner's permission to make it a reality, in a timely way but
+thoroughly; if it is not done thoroughly now, the project will fail. This builds on Baseline #19
+(one connected cycle) and #20 (reuse), P0-21 and the Nov 20 project-wide reuse direction.

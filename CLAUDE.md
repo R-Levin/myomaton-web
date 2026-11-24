@@ -24,6 +24,15 @@
    `claude/rebuild-2026-11-22` (based on `codex/first-operational-cycle-2026-11-12`) in this worktree. **Never merge, reset
    or fast-forward `main` or the root branch into it.**
 
+## Object orientation (owner's fundamental principle, Nov 24)
+- `docs/service-object-model.md` defines the shared objects (Account, Knowledge,
+  Evidence, Work product, Request, Decision, Change, Review, Delivery, Observation,
+  Person and authority, Task, Cost). Every workflow is composed from them.
+- Before building anything, state which object it uses or extends. If it fits none, stop
+  and discuss with the owner; don't build a new path. A feature request is usually a new
+  origin or grain of an existing object (e.g. "add a page" is a Change grain).
+- One object, one place, one name. C0 material is data, never code.
+
 ## Work without asking
 Do ordinary local engineering on your own: reading, searching, editing code, running
 tests and builds, local WordPress previews, diagnosing failures and retrying. Don't ask

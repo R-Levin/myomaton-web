@@ -95,6 +95,14 @@ nothing below came from an assistant proposal unless it says so.
     measurement and Ongoing **in parallel**. *(P0-23)*
 20. **Reuse what works** across all development. Explain the need before building
     anything new; no parallel demo architecture.
+20a. **Object orientation is the fundamental guiding principle, and the primary focus
+    now.** The service is built from a small set of shared objects (knowledge, requests,
+    decisions, changes, reviews, delivery, observations and the like), and every stage
+    (onboarding, site creation, review, knowledge correction, Ongoing) is a workflow
+    composed from them, not a new machine. This applies across the whole service and
+    within its parts. Before anything is built, say which object it uses or extends; if
+    it fits none, stop and discuss. Carried over from Myomaton, where the same components
+    served different tasks. *(Nov 24; the model lives in `docs/service-object-model.md`)*
 21. **Do the routine work without asking.** Stop only for real gates: spending,
     sending protected data to providers, hosted/live changes, credentials, merges,
     publication, customer approval. Ask once, with precise scope. *(Nov 14, P0-18, Nov 21)*
