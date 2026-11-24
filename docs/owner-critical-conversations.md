@@ -1237,3 +1237,10 @@ parts, is a fundamental guiding principle for the entire project and product, an
 primary focus. Claude has the owner's permission to make it a reality, in a timely way but
 thoroughly; if it is not done thoroughly now, the project will fail. This builds on Baseline #19
 (one connected cycle) and #20 (reuse), P0-21 and the Nov 20 project-wide reuse direction.
+
+**Nov 24: proceed with the object model and the five refinements (owner).** The owner agreed
+to proceed on the basis of the object model and the practices review
+(`docs/object-model-best-practices.md`): a glossary, named Core areas, Changes that behave like
+pull requests, routed and scoped AI operations, and one-path-at-a-time migration. The glossary
+is the next step. Move as quickly as is practical. The owner expects the end result to look
+much like what has been seen so far, but this restructuring is the key to long-run success.

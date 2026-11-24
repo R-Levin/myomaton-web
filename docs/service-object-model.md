@@ -2,7 +2,8 @@
 
 **Status:** first draft for the owner's review, Nov 24 2026 (Claude). Nothing has been
 moved in the code yet. Once the owner has shaped it, this document is the reference
-every piece of work is checked against (Baseline Part 1, #20a).
+every piece of work is checked against (Baseline Part 1, #20a). Names follow
+`docs/glossary.md`; practices behind the design are in `docs/object-model-best-practices.md`.
 
 ## Why this exists
 

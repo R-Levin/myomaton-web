@@ -32,6 +32,8 @@
   and discuss with the owner; don't build a new path. A feature request is usually a new
   origin or grain of an existing object (e.g. "add a page" is a Change grain).
 - One object, one place, one name. C0 material is data, never code.
+- Use the names in `docs/glossary.md` in conversation, documents, screens and code. A
+  retired word is not reused for that thing.
 
 ## Work without asking
 Do ordinary local engineering on your own: reading, searching, editing code, running
