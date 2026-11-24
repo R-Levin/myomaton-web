@@ -1217,3 +1217,10 @@ stand. Development now should serve two nearer goals:
    if Operators do some of the work the system or AI will eventually do.
 The owner has ideas that may help reach these goals but does not want to add more complexity now.
 Claude is to re-read the full record with this perspective before the service is laid out.
+
+**Nov 24: Core's site will replace miopages.com, but not yet (owner decision).** Core's site
+will replace the current miopages.com site. It is not ready: it still needs extensive review and
+modification, and that waits until the review and modification process itself is improved.
+Getting the site live remains a shorter-term goal, but the project's overall status decides what
+happens when. So the order is: improve the review and modification process first, then use it to
+bring Core's site up to standard, then go live and start measuring.
