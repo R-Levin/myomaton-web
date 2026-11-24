@@ -1209,3 +1209,11 @@ meaning:
 - The gaps surfaced by chance: a few simple page edits that were not part of a normal onboarding.
   The "add a page" build was too narrow a response. The larger questions come first, and the full
   service is still not structured as it logically needs to be. Keep this conversation high level.
+
+**Nov 24: near-term goals frame the work (owner direction).** The goals in the full record still
+stand. Development now should serve two nearer goals:
+1. Get the MioPages site itself operating, so it starts gaining useful metrics.
+2. Slightly later, start taking on clients for the core Ongoing service as soon as practical, even
+   if Operators do some of the work the system or AI will eventually do.
+The owner has ideas that may help reach these goals but does not want to add more complexity now.
+Claude is to re-read the full record with this perspective before the service is laid out.
