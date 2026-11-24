@@ -1186,3 +1186,20 @@ Not yet installed; the first real use needs the owner's approval for the install
 **Nov 24: install on hold.** The owner paused here: the new-page work (fbe5bbc, plugin 0.1.5)
 stays built but not installed while the wider questions it raised are considered at a high level.
 Resume from that commit when the owner says so.
+
+**Nov 24: step back to the whole service (owner direction).** The owner's view, in their words'
+meaning:
+- Once the system works, most day-to-day work will be metrics, and the content marketing and
+  optimization they feed. Customer changes to business knowledge should be few; direct requests for
+  new site content or content marketing will be occasional. Site building matters, but it is not
+  where the service spends most of its time.
+- The service will be WordPress-based: its functionality and cost savings, and the huge installed
+  base of potential customers already on WordPress. Without leveraging WordPress we would be
+  developing forever. (Baseline Part 1 #3 updated: WordPress is no longer "replaceable delivery".)
+- The open question is the better pathway for customers and Operators to communicate and do work.
+  Account management and Operator day-to-day work could move into WordPress, as many analytics
+  products do. There are also reasons to build MioPages' own portal for both. For Operators a hybrid
+  is likely.
+- The gaps surfaced by chance: a few simple page edits that were not part of a normal onboarding.
+  The "add a page" build was too narrow a response. The larger questions come first, and the full
+  service is still not structured as it logically needs to be. Keep this conversation high level.

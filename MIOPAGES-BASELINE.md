@@ -28,8 +28,12 @@ nothing below came from an assistant proposal unless it says so.
    media, SEO, Actions) → Customer/Operator review → authorized delivery and Launch →
    inquiries and outcomes → first-party measurement and reporting → Ongoing improvement.
 3. **Core is the system of record.** It owns knowledge, workflow, proposals, approvals,
-   revisions and history. WordPress and hosting providers (including 20i) are
-   replaceable delivery. 20i-only is an option under discussion, not a decision.
+   revisions and history. **The service is WordPress-based** (owner, Nov 24): its
+   functionality, cost savings and large installed base of potential customers make it
+   the platform, not a replaceable output. Hosting providers (including 20i) remain
+   replaceable; 20i-only is an option under discussion, not a decision. Where customers
+   and Operators communicate and do their work (inside WordPress, a MioPages portal, or
+   a hybrid, which Operators will likely need) is an open question. *(Nov 24)*
 4. **Core and the in-app AI do the customer-facing intellectual work.** The developer
    (formerly Codex, now Claude) builds and fixes Core. It never writes the marketing
    copy or site content as a stand-in for Core's AI output. *(P0-2, P0-3, Nov 21)*
