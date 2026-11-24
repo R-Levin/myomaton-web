@@ -1,7 +1,7 @@
 # MioPages service object model
 
-**Status:** first draft for the owner's review, Nov 24 2026 (Claude). Nothing has been
-moved in the code yet. Once the owner has shaped it, this document is the reference
+**Status:** first draft for the Principal's review, Nov 24 2026 (Claude). Review rounds
+now run on the Change area (step 2); nothing else has moved yet. Once the Principal has shaped it, this document is the reference
 every piece of work is checked against (Baseline Part 1, #20a). Names follow
 `docs/glossary.md`; practices behind the design are in `docs/object-model-best-practices.md`.
 
@@ -26,7 +26,7 @@ built as its own path. The result today:
   generation, accounts and WordPress read-back. Several of them are C0-specific code.
 
 The cause is not any one bad decision. Direction stated as a principle loses, in the
-moment, to a concrete request ("let Operators add a page"). This document gives the
+moment, to a concrete request ("let Specialists add a page"). This document gives the
 principle a shape that a concrete request can be checked against.
 
 ## The rule
@@ -35,8 +35,8 @@ principle a shape that a concrete request can be checked against.
    knowledge correction, business change, Ongoing improvement and inquiry handling are
    **workflows composed from these objects**, not separate machines.
 2. Before anything is built, the work says which objects it uses or extends. If it fits
-   none, stop and discuss with the owner. A new object is a design decision.
-3. An object is implemented once, in one place, with one name. Customer-specific
+   none, stop and discuss with the Principal. A new object is a design decision.
+3. An object is implemented once, in one place, with one name. Client-specific
    material (C0) is data, never code.
 4. Every interface (Core screens, a portal, WordPress, email) is a view over the same
    objects. An interface never owns its own copy of the truth.
@@ -56,16 +56,16 @@ Ongoing).
 
 **Knowledge.** What MioPages knows about the business: facts, offerings, audiences,
 claims and preferences, each with its source, its status (confirmed, proposed,
-observed, inferred, disputed, unknown) and its history. This is what the customer sees
+observed, inferred, disputed, unknown) and its history. This is what the Client sees
 and corrects as My Business (P0-14).
 - *Today:* canonical Knowledge and Offering records with versions (`canonical`), plus
   My Business.
-- *Duplicates:* the workflow's own `businessFacts` (facts learned from Operator edits),
+- *Duplicates:* the workflow's own `businessFacts` (facts learned from Specialist edits),
   report corrections, understanding corrections and the facts inside review rounds. All
   of these should be changes to Knowledge.
 
 **Evidence.** Material the service has gathered but which is not business truth: the
-customer's own documents and answers, research findings, peer website observations
+Client's own documents and answers, research findings, peer website observations
 (text and visual), Free Review findings, and read-backs of what is on the site.
 - *Today:* source material and original custody, research capture and cache, peer
   browser, Review evidence. These are reasonably separate but named differently in
@@ -73,7 +73,7 @@ customer's own documents and answers, research findings, peer website observatio
 
 ### What the service makes
 
-**Work product.** Anything the service produces for the customer: the Business
+**Work product.** Anything the service produces for the Client: the Business
 Understanding Report, Presence Direction, the site plan, Pages, Sections, Assets
 (images, FPO), Actions (buttons, forms), Navigation, Articles, design system, reports.
 Each has a stable identity and versions.
@@ -90,7 +90,7 @@ to fixing one sentence to a metrics-led improvement, goes through the same six o
 Only the **origin** and the **grain** differ.
 
 **Request.** Someone or something wants a change or an answer. A Request records:
-- its origin: the customer, an Operator, Core itself (a quality check), an
+- its origin: the Client, a Specialist, Core itself (a quality check), an
   Observation (a metric, an inquiry pattern), a business change ("something changed in
   my business") or the start of the service (onboarding, "create the site");
 - what it is about: a piece of Knowledge, a Work product, or the account as a whole;
@@ -100,7 +100,7 @@ Only the **origin** and the **grain** differ.
   Review requests, Contact inquiries that lead to work, and the Ongoing recommendation.
 
 **Decision.** The reasoning about a Request: the evidence used, what was inferred, what
-to change, **what to leave alone** and why. It is made by Core's AI, an Operator, or
+to change, **what to leave alone** and why. It is made by Core's AI, a Specialist, or
 both. A Decision can also be "no change": maintain, or watch.
 - *Today:* the decision brief (`presence-decision-brief.ts`), the report, the Direction,
   the review analysis, editorial critique and the account review. These are the same
@@ -116,10 +116,10 @@ or the whole site.
 
 **Review.** A person looks at a Change, or a Work product, and responds: approve,
 decline, correct, add a note, or ask a question. A Review says who reviewed, in what
-role, through which interface, and at what level of consequence. The customer approval,
-Operator review and routine levels are set out in the change-management contract.
-- *Today:* Operator review decisions, Review summary pages in WordPress, page-proposal
-  approvals, report confirmation, quality reviews and owner home reviews.
+role, through which interface, and at what level of consequence. The Client approval,
+Specialist review and routine levels are set out in the change-management contract.
+- *Today:* Specialist review decisions, Review summary pages in WordPress, page-proposal
+  approvals, report confirmation, quality reviews and Principal home reviews.
 - *Naming collision:* "Review" also means the **Free Review** prospect product. In code
   and screens, the Free Review should be called that every time.
 
@@ -140,20 +140,20 @@ the loop. This is where Ongoing lives.
 
 ### Who, when and at what cost
 
-**Person and authority.** Who is acting (a customer, an Operator or the owner, or Core,
+**Person and authority.** Who is acting (a Client, a Specialist or the Principal, or Core,
 AI or a tool) and what they may do for which account. There is one definition.
 - *Today:* separate Actor, Authority and Scope types in `content-editing`, `activation`,
   `intake` and `reviews`.
 
 **Task.** Who must do what next, by when, with what inputs, and what came of it. Tasks
-cover Core and AI jobs, Operator work, customer actions, retries and failures. This is
-the "minimal orchestration unit" of P0-1, and how Operator work that stands in for future
+cover Core and AI jobs, Specialist work, Client actions, retries and failures. This is
+the "minimal orchestration unit" of P0-1, and how Specialist work that stands in for future
 automation stays visible and costed (P0-12).
-- *Today:* the workflow's `work` and failure handling, plus Operator queue ideas in the
+- *Today:* the workflow's `work` and failure handling, plus Queue ideas in the
   overview console. There is no shared task list.
 
 **Cost.** AI and provider spending, estimated before the work and recorded after it,
-per account and per Task. Operator time belongs here too, so that it can be priced
+per account and per Task. Specialist time belongs here too, so that it can be priced
 (P0-12).
 - *Today:* the grant, reservation and estimate logic inside the AI workflow.
 
@@ -161,15 +161,15 @@ per account and per Task. Operator time belongs here too, so that it can be pric
 
 | Workflow | Request origin | Typical grain | Decision by | Review by | Delivered to |
 |---|---|---|---|---|---|
-| Onboarding and interview | Start of service | Knowledge, many facts | AI (questions), customer (answers) | Customer confirms | Knowledge |
-| Report and Direction | Core, after research | Account | AI | Customer and Operator | Work product |
-| First site creation | Core, after Direction | Whole site | AI | Operator, then customer | WordPress drafts |
-| Review round (today's notes) | Operator or customer | Section, page, new page, fact | AI plus Operator | Operator | WordPress drafts |
-| Knowledge correction (My Business) | Customer or Operator | Fact | Core works out the impact | Per consequence level | Knowledge, then affected pages |
-| Business change | Customer ("something changed") | Fact, then affected pages | AI plus Operator | Customer and Operator | Knowledge, site |
-| Ongoing improvement | Observation | Section, page, Article | AI plus Operator | Operator, customer if material | WordPress |
-| Inquiry handling | Visitor via an Action | Account | Operator | n/a | Contact outcome (Observation) |
-| Go live | Operator or owner | Whole site | Operator | Owner or customer | Public WordPress |
+| Onboarding and interview | Start of service | Knowledge, many facts | AI (questions), Client (answers) | Client confirms | Knowledge |
+| Report and Direction | Core, after research | Account | AI | Client and Specialist | Work product |
+| First site creation | Core, after Direction | Whole site | AI | Specialist, then Client | WordPress drafts |
+| Review round (today's notes) | Specialist or Client | Section, page, new page, fact | AI plus Specialist | Specialist | WordPress drafts |
+| Knowledge correction (My Business) | Client or Specialist | Fact | Core works out the impact | Per consequence level | Knowledge, then affected pages |
+| Business change | Client ("something changed") | Fact, then affected pages | AI plus Specialist | Client and Specialist | Knowledge, site |
+| Ongoing improvement | Observation | Section, page, Article | AI plus Specialist | Specialist, Client if material | WordPress |
+| Lead handling | Visitor via an Action | Account | Specialist | n/a | Lead outcome (Observation) |
+| Publish | Specialist or Principal | Whole site | Specialist | Principal or Client | Public WordPress |
 
 Seen this way, the "add a page" feature is not a feature. It is a Request whose grain is
 "new page". It should have needed no new machinery beyond letting the Change object
@@ -192,9 +192,9 @@ as P0-21 asks.
 ## Interfaces are views
 
 Because Requests, Reviews, Tasks and Knowledge are shared objects, the open question of
-where customers and Operators work becomes answerable piece by piece:
-- An Operator queue is a view of open Tasks and Requests across accounts.
-- A customer's My Business is a view of Knowledge, with "correct" creating a Request.
+where Clients and Specialists work becomes answerable piece by piece:
+- The Queue is a view of open Tasks and Requests across accounts.
+- A Client's My Business is a view of Knowledge, with "correct" creating a Request.
 - A Review summary is a view of pending Changes, with buttons that create Reviews.
 - WordPress is two things:
   - a Delivery target;
@@ -234,15 +234,15 @@ The good news: most objects already exist somewhere in sound form. The work is m
 ## How to get there while the plane flies
 
 Each step keeps the current system working on protected Core and miopages.org. Tests pass
-at every step. Nothing hosted changes without the owner's approval.
+at every step. Nothing hosted changes without the Principal's approval.
 
 From step 2 onward, the **whole cycle runs end to end** (Baseline #19). Every object that
 isn't built yet appears as a clearly labelled placeholder at its exact place: Observation,
-Task and the Operator queue at first. Each later step then replaces a placeholder with the
+Task and the Queue at first. Each later step then replaces a placeholder with the
 real object. The steps are an order of replacement, not a queue in which Ongoing waits
 until the end.
 
-1. **Agree the model** (this document, shaped by the owner). Fix names, including the
+1. **Agree the model** (this document, shaped by the Principal). Fix names, including the
    Free Review collision.
 2. **Request, Decision, Change and Review as real shared objects.** Route today's review
    rounds through them first, since that is the most recent and best-tested path. The
@@ -255,30 +255,30 @@ until the end.
    Decline, Correct, Ask) and Round, plus conflict flagging, withdrawal and one timeline.
    Review rounds are routed through it (`lib/platform/intake/review-round-changes.ts`):
    each Note and hand edit is a Request, Core's analysis is a Decision with its Changes,
-   the Operator's answers are Reviews, and **what is recorded, added or revised is now read
+   the Specialist's answers are Reviews, and **what is recorded, added or revised is now read
    from the Change ledger**. "Add a page" is a Change of the new-page grain. Rounds taken in
    on protected Core before this are read into the ledger when decided.
    Still to do in this step: draw the Review summary from the Changes rather than the round
    record, then remove the round's duplicate fields; and the labelled placeholders that
-   let the whole cycle run end to end (Observation, Task, Operator queue).
-3. **One Knowledge.** Operator-learned facts and report corrections become Changes to
+   let the whole cycle run end to end (Observation, Task, Queue).
+3. **One Knowledge.** Specialist-learned facts and report corrections become Changes to
    canonical Knowledge. My Business shows the same records Core uses.
 4. **One set of Work products.** The AI workflow's pages and plan become versions of the
    canonical Page, Section, Navigation and Asset identities. Delivery already speaks
    their language.
-5. **Task and Cost as shared objects.** Operator work becomes visible and costed, and the
-   Operator queue becomes a view.
+5. **Task and Cost as shared objects.** Specialist work becomes visible and costed, and the
+   Queue becomes a view.
 6. **Observation feeds Requests.** Inquiries and first-party measurement create
    Requests. This closes the cycle end to end (Baseline #19), at first with labelled
    placeholders.
-7. **Interfaces.** Build Operator and customer views over the shared objects, choosing
+7. **Interfaces.** Build Specialist and Client views over the shared objects, choosing
    Core, portal or WordPress per view.
 
 The public miopages.com site for metrics is a separate track (P0-5, Nov 20). It needs
 none of these steps to begin, although it will use the Observation object once that
 exists.
 
-## Questions for the owner
+## Questions for the Principal
 
 - Are these the right objects? Anything missing, merged wrongly or split wrongly? For
   example, is an Article a Work product like a Page, or something of its own?

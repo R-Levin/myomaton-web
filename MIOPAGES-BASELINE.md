@@ -10,6 +10,9 @@ final Issue #12 handoffs.
 in Part 3 about code state is *Codex's account* and has not yet been checked against
 the source. Verifying it is the first job.
 
+**Names (Nov 24):** the owner is now the **Principal**, the customer business the **Client**, and the
+Operator the **Specialist** (`docs/glossary.md`). Text written before Nov 24 keeps the old words.
+
 ---
 
 ## Part 1 — What the owner has decided

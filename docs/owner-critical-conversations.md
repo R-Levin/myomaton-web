@@ -7,6 +7,9 @@ dated execution instructions are not renewed grants. Follow the current recovery
 index for live/source state; retained historical owner decisions keep their authority
 unless explicitly superseded.
 
+**Names (Nov 24):** the owner is now the **Principal**, the customer business the **Client**, and the
+Operator the **Specialist** (`docs/glossary.md`). Text written before Nov 24 keeps the old words.
+
 **Status:** Active, owner-directed canonical continuity index. **Priority: P0 development-process reliability.**
 **Created:** 2026-11-15 following repeated harmful loss of strategic context at ChatGPT conversation boundaries.
 **Repository:** `R-Levin/myomaton-web`. **Companion first read:** [development-control.md](archive/development-control.md). **Live execution ledger:** [Issue #12](https://github.com/R-Levin/myomaton-web/issues/12); [adaptive onboarding acceptance #10](https://github.com/R-Levin/myomaton-web/issues/10).
@@ -1245,7 +1248,20 @@ pull requests, routed and scoped AI operations, and one-path-at-a-time migration
 is the next step. Move as quickly as is practical. The owner expects the end result to look
 much like what has been seen so far, but this restructuring is the key to long-run success.
 
-**Nov 24: start step 2 now; names follow the glossary as the owner corrects it (owner).** The
+**Nov 24: start step 2 now; names follow the glossary as the Principal corrects it (Principal).** The
 owner approved starting step 2 of the object model (shared Request, Decision, Change and Review,
 review rounds routed through them first) without waiting for the glossary corrections. Names in
 code change as the owner corrects the glossary.
+
+**Nov 24: the glossary's names (Principal).** Worked through conversationally and agreed:
+- **Client** is the business MioPages serves (it suits a managed, bespoke service, and it
+  leaves "customer" for the Client's own customers).
+- **Specialist** replaces Operator. **Account Manager** is a Role with wider Permissions (a
+  super-Specialist and troubleshooter), held by the Principal for now.
+- **Principal** replaces "owner" everywhere, including the working rules, so "owner" stays free
+  for a Client's business owner.
+- Screens say **Proposed change**. **Round** is fine as long as it is unambiguous: Core's
+  internal loops are "passes".
+- A **Visitor** has arrived on a Client's site but not got in touch; anyone who has got in touch
+  is a **Lead**; someone who bought is a **customer**. No other funnel terms.
+- Remove unneeded terminology and duplication. Case doesn't matter where nothing is confusing.
