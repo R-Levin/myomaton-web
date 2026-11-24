@@ -153,7 +153,14 @@ const stages: Record<AuthoringStage, string> = {
     "path, zero-based sectionIndex in that Page, a short reason, and the fact numbers (F1, F2, … in the order you " +
     "list facts). Leave out the section the fact came from and the sections already queued in " +
     "reviewRound.noteRevisions. List only sections that genuinely need to change; an empty list is a normal " +
-    "answer. Summary: two or three plain sentences for the Operator.",
+    "answer. Notes starting \"New page:\" (reviewRound.pageNotes, when present) ask for a Page the site does not " +
+    "have. For each, propose one new Page (newPages) that does what the Note asks: its noteId, a short new path " +
+    "that no planned Page uses, a menu label (it goes in the main menu), its purpose, and a decision " +
+    "brief built like the planned Pages' briefs. If a request is already met by a planned Page or cannot be " +
+    "supported by the business knowledge, propose no Page for it and say why in the summary. Also list any " +
+    "existing sections whose text should mention the new Page (a section revision cannot add links), with its number (P1, P2, … in the order you " +
+    "list new Pages) in newPageIds and an empty factIds list unless a fact is also involved. Summary: two or three " +
+    "plain sentences for the Operator.",
   "concept-critique":
     "Task: critique the Home concept early, from the actual rendered desktop and mobile images, before the other " +
     "Pages are written. Challenge the positioning, value, originality and visual concept where they are weak; " +

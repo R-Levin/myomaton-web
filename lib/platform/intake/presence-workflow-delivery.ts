@@ -132,7 +132,7 @@ function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflow
 }
 
 export const reviewSummaryPath = "/review-summary";
-type SummaryItem = { kind: "approve" } | { kind: "edit" } | { kind: "fact"; id: string } | { kind: "revision"; index: number };
+type SummaryItem = { kind: "approve" } | { kind: "edit" } | { kind: "fact"; id: string } | { kind: "revision"; index: number } | { kind: "page"; id: string } | { kind: "info" };
 
 const dollars = (micros: number) => "$" + (Math.max(micros, 10_000) / 1_000_000).toFixed(2);
 const where = (path: string, indexes: readonly number[]) => indexes.length
@@ -150,16 +150,24 @@ export function reviewSummaryPage(context: WorkflowContext, view: PresenceWorkfl
   const revisions = [...round.noteRevisions, ...analysis.revisions];
   items.push({ item: { kind: "approve" }, heading: "Review summary",
     text: [analysis.summary,
-      `Your edits are already kept. Below are the business facts Core proposes to record and the changes it proposes to make. Nothing is recorded or changed until you approve. Estimated AI cost of the changes: about ${dollars(analysis.estimateMicros)}.`,
-      "To approve, add a note on this paragraph saying Approve. To leave out an item, add a note on it saying No. To correct a fact, add a note on it with the corrected wording. To add to a change, add a note on it saying what else it should do."].join("\n\n") });
+      `Your edits are already kept. Below are the business facts Core proposes to record${analysis.newPages?.length ? ", the pages it proposes to add" : ""} and the changes it proposes to make. Nothing is recorded, added or changed until you approve. Estimated AI cost of the changes: about ${dollars(analysis.estimateMicros)}.`,
+      "To approve, add a note on this paragraph saying Approve. To leave out an item, add a note on it saying No. To correct a fact, add a note on it with the corrected wording. To add to a change or a new page, add a note on it saying what else it should do."].join("\n\n") });
   for (const fact of analysis.facts) items.push({ item: { kind: "fact", id: fact.id },
     heading: `Fact ${fact.id}: from your ${fact.source.kind === "note" ? "note" : "edit"} on ${fact.source.path}`,
     text: fact.statement + (fact.publicUse ? "" : "\n\n(For Core's understanding only; not for the website.)") });
+  for (const page of analysis.newPages ?? []) items.push({ item: { kind: "page", id: page.id },
+    heading: `New page ${page.id}: ${page.label} (${page.path})`,
+    text: [page.purpose, page.navigation ? "It goes in the main menu." : "It is linked from other pages, not the main menu.",
+      "You asked: " + page.request].join("\n\n") });
+  for (const note of round.pageNotes ?? []) if (!analysis.newPages?.some(page => page.noteId === note.id)) items.push({ item: { kind: "info" },
+    heading: "No page proposed for your request", text: "You asked: " + note.request + "\n\n" + (round.analysisNotes?.refusedPageNotes?.includes(note.id)
+      ? "Core drafted a page plan for this, but it did not pass Core's checks (for example, it was at an address the site already uses, or its brief did not trace to the business knowledge), so it is left out. To try again, add a new note starting New page: after this review."
+      : "Core did not propose a page for this; the summary above says why.") });
   revisions.forEach((revision, index) => items.push({ item: { kind: "revision", index },
     heading: `Change C${index + 1}: ${where(revision.path, revision.indexes)}`,
     text: revision.source === "note" ? "Revise in response to your note: " + round.notes.filter(note => note.path === revision.path).map(note => note.text).join(" / ")
-      : `Because of ${revision.factIds.join(", ")}: ${revision.reason}` }));
-  if (!analysis.facts.length && !revisions.length) items.push({ item: { kind: "edit" }, heading: "Nothing else to change",
+      : `Because of ${[...revision.factIds, ...revision.newPageIds ?? []].join(", ")}: ${revision.reason}` }));
+  if (!analysis.facts.length && !revisions.length && !analysis.newPages?.length) items.push({ item: { kind: "edit" }, heading: "Nothing else to change",
     text: "Core found no business facts to record and no other changes to make." });
   for (const edit of round.edits) items.push({ item: { kind: "edit" }, heading: `Kept: your edit on ${edit.path}`,
     text: `Before: ${edit.before}\n\nNow: ${edit.after}` });

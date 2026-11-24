@@ -80,7 +80,15 @@ final class MioPages_Native_Draft_Writer
                     self::verifyBaseline($current, $baseline);
                     foreach ($current['logicalPageIds'] as $path => $logicalId) {
                         if (!isset($logicalIds[$path])) {
-                            $archive[$path] = ['logicalId' => $logicalId, 'post' => $current['posts'][$path]];
+                            // Archive what WordPress actually holds, including Operator changes Core
+                            // has read back (such as Notes on a Review summary), so Core can bring the
+                            // page back later without that being mistaken for an unread edit.
+                            $saved = $current['posts'][$path];
+                            if (isset($actual[$path])) {
+                                $saved['post_content'] = $actual[$path]['post_content'];
+                                $saved['post_title'] = $actual[$path]['post_title'];
+                            }
+                            $archive[$path] = ['logicalId' => $logicalId, 'post' => $saved];
                         }
                     }
                 }

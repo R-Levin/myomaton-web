@@ -52,7 +52,7 @@ final class MioPages_Delivery_Editor_Guard
         if (!$post instanceof WP_Post || $post->post_type !== 'page' || !current_user_can('edit_post', $post->ID)) return;
         $version = self::version($installation, $post->ID);
         if ($version === null) return;
-        wp_register_script('miopages-delivery-editor-guard', false, ['wp-api-fetch', 'heartbeat', 'jquery'], '0.1.4', true);
+        wp_register_script('miopages-delivery-editor-guard', false, ['wp-api-fetch', 'heartbeat', 'jquery'], '0.1.5', true);
         wp_enqueue_script('miopages-delivery-editor-guard');
         wp_add_inline_script('miopages-delivery-editor-guard', self::script($post->ID, $version));
     }

@@ -30,9 +30,9 @@ import {prepareOriginalCustody} from "../../lib/platform/intake/presence-origina
 import {publicCaptureBridge} from "../../lib/platform/intake/presence-public-capture-bridge";
 import { summarizePresenceWorkflowUsage } from "../../lib/platform/intake/intelligent-responses";
 import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig, type ReviewDeliveryState } from "../../lib/platform/wordpress-delivery/operator-review";
-import { operatorFeedback, operatorFeedbackFromCandidate } from "../../lib/platform/intake/operator-feedback";
-import { reviewSummaryPage, reviewSummaryPath, workflowNativeReviewCandidate } from "../../lib/platform/intake/presence-workflow-delivery";
-import { summaryDecision } from "../../lib/platform/wordpress-delivery/operator-review";
+import { operatorFeedback } from "../../lib/platform/intake/operator-feedback";
+import { reviewSummaryPage, reviewSummaryPath } from "../../lib/platform/intake/presence-workflow-delivery";
+import { reviewDecisionFromReadback } from "../../lib/platform/wordpress-delivery/operator-review";
 
 const digest = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 const manifestFile = "docs/presence-evaluation-activation.json";
@@ -307,18 +307,11 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
       if (operation === "decide-review") {
         // The Operator's answers on the Review summary (Notes on that page). No AI call.
         if (!state) throw Error("Nothing has been delivered to this site yet");
-        const summary = reviewSummaryPage(context, prior);
-        if (!summary) throw Error("No Review summary is waiting for a decision");
+        if (!reviewSummaryPage(context, prior)) throw Error("No Review summary is waiting for a decision");
         const { readback } = await readBackOperatorSite(config);
         if (readback.revision !== state.revision || readback.digest !== state.digest) throw Error("Operator WordPress no longer holds Core's last delivery");
         if (!state.pages.some(page => page.path === reviewSummaryPath)) throw Error("Deliver the Review summary first");
-        const feedback = operatorFeedbackFromCandidate(workflowNativeReviewCandidate(context, prior).candidate, readback);
-        const round = prior.reviewRounds!.at(-1)!;
-        const known = new Set([...round.notes, ...round.factNotes].map(note => note.id));
-        const elsewhere = [...feedback.edits, ...feedback.titles, ...feedback.structural].filter(item => item.path !== reviewSummaryPath).length +
-          feedback.notes.filter(note => note.path !== reviewSummaryPath && !known.has(note.id)).length;
-        if (elsewhere) throw Error("There are new edits or notes on other pages; decide the Review summary first, then make them");
-        const { decision, replies } = summaryDecision(summary.items, feedback.notes.filter(note => note.path === reviewSummaryPath));
+        const { decision, replies, feedback } = reviewDecisionFromReadback(context, prior, readback);
         await createPrivate(join(root, `review-decided-${request.site}-r${state.revision}-${new Date().toISOString().replace(/[:.]/gu, "-")}.json`),
           JSON.stringify({ readback, decision, replies }, null, 2) + "\n");
         if (!decision.approved) return { site: request.site, approved: false, version: prior.version,
@@ -328,7 +321,7 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
           { readbackRevision: feedback.readbackRevision, acknowledged: feedback.acknowledged, summaryNotes: replies });
         const decided = view?.reviewRounds?.at(-1)?.decision;
         return { site: request.site, approved: true, version: view?.version, next: view?.next,
-          factsRecorded: decided?.confirmedFacts.length ?? 0, factsLeftOut: decided?.rejectedFacts.length ?? 0,
+          factsRecorded: decided?.confirmedFacts.length ?? 0, factsLeftOut: decided?.rejectedFacts.length ?? 0, pagesAdded: decided?.addedPages ?? [],
           changes: decided?.revisions.map(item => ({ path: item.path, sections: item.indexes.length ? item.indexes : "whole page" })) ?? [] };
       }
       const { state: next, receipt } = await deliverReviewDraft({ config, context, view: prior, state });

@@ -7,7 +7,7 @@ import type { EntryIntent } from "./model";
 import { IntakeError } from "./model";
 import type { EvaluationBinding } from "./presence-evaluation";
 import { composeHomeConcept, homeConceptDigest } from "./presence-home-concept";
-import { strategyBasis } from "./presence-decision-brief";
+import { strategyBasis, type DecisionBrief } from "./presence-decision-brief";
 import { applyEditorialPatch } from "./presence-editorial-patch";
 import { editorialDecision, editorialFindings, withEditorialHistory, type EditorialDecision, type EditorialFinding } from "./presence-editorial-decisions";
 import { presenceVisualPlacement, type PresenceVisual, type PresenceVisualOperations } from "./presence-workflow-visual";
@@ -58,8 +58,16 @@ type RevisionRequest = { paths: string[]; audit: WorkflowEditorial; priorPages: 
   sections?: { path: string; indexes: number[] }[] };
 /** A business fact Core proposes from an Operator review: from an edit (spotted by Core) or a Note starting "Fact:". */
 export type ReviewFact = { id: string; statement: string; publicUse: boolean; source: { path: string; kind: "edit" | "note"; text: string } };
-/** Sections Core proposes to revise. An empty indexes list means the whole Page. */
-export type ReviewRevision = { path: string; indexes: number[]; reason: string; source: "note" | "fact"; factIds: string[] };
+/** Sections Core proposes to revise. An empty indexes list means the whole Page. `newPageIds` ties a
+ * revision (usually a link) to proposed new Pages; it is made only if one of them is approved. */
+export type ReviewRevision = { path: string; indexes: number[]; reason: string; source: "note" | "fact" | "page"; factIds: string[]; newPageIds?: string[] };
+/**
+ * A Page Core proposes to add to the site plan because of an Operator Note starting "New page:"
+ * (owner request, Nov 24). It carries a full Page brief, checked like the planned Pages' briefs;
+ * the Page is written only after the Operator approves it on the Review summary.
+ */
+export type ReviewNewPage = { id: string; noteId: number; request: string; path: string; label: string; purpose: string;
+  navigation: boolean; sourceIds: string[]; decisionBrief: DecisionBrief };
 /**
  * One Operator review round (owner decision, Nov 23). Kept edits apply at take-in. Core then
  * analyses the round (facts, affected sections, cost) and shows a Review summary; nothing is
@@ -69,13 +77,17 @@ export type ReviewRound = { id: string; at: string; actor: Actor; status: "analy
   edits: { path: string; before: string; after: string }[];
   notes: { id: number; path: string; text: string }[];
   factNotes: { id: number; path: string; statement: string }[];
+  /** Notes starting "New page:": a Page the Operator wants added to the site. */
+  pageNotes?: { id: number; path: string; request: string }[];
   concerns: { path: string; concern: string }[];
   keep: { path: string; text: string }[];
   noteRevisions: ReviewRevision[];
-  analysis?: { facts: ReviewFact[]; revisions: ReviewRevision[]; summary: string; estimateMicros: number };
-  decision?: { at: string; actor: Actor; confirmedFacts: string[]; rejectedFacts: string[]; revisions: ReviewRevision[] };
+  analysis?: { facts: ReviewFact[]; revisions: ReviewRevision[]; summary: string; estimateMicros: number; newPages?: ReviewNewPage[] };
+  decision?: { at: string; actor: Actor; confirmedFacts: string[]; rejectedFacts: string[]; revisions: ReviewRevision[]; addedPages?: string[] };
   /** What Core left out of the AI's analysis: facts that did not trace to the Operator, revisions already queued. */
-  analysisNotes?: { untracedFacts: number; skippedRevisions: number } };
+  analysisNotes?: { untracedFacts: number; skippedRevisions: number; refusedPages?: number; refusedPageNotes?: number[] } };
+/** A Note asking for a Page to be added: "New page: …" (also "Add page:" / "Add a page:"). */
+export const newPagePattern = /^\s*(new page|add (a )?page)\s*:\s*/iu;
 /** A business fact the Operator confirmed; every later AI step receives it as owner-confirmed knowledge. */
 export type BusinessFact = { id: string; statement: string; publicUse: boolean; source: ReviewFact["source"]; roundId: string;
   confirmedBy: Actor; at: string; corrected: boolean };
@@ -144,13 +156,15 @@ type State = {
 };
 type Task = Pick<Work, "operation" | "path">;
 export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest" | "replan" | "businessFacts"> &
-  { reviewRound?: Pick<ReviewRound, "id" | "edits" | "factNotes" | "noteRevisions" | "notes"> } &
+  { reviewRound?: Pick<ReviewRound, "id" | "edits" | "factNotes" | "noteRevisions" | "notes" | "pageNotes"> } &
   Pick<WorkflowContext, "entry" | "evidence" | "limitations" | "conflicts"> & { reviewStage?: ConceptReviewStage; sourceRecovery?: SourceRecovery; knowledgeReassessment?: ReasoningReassessment };
 export type WorkflowRun = { context: WorkflowContext; input: WorkflowInput; work: Work };
 /** The Operator's answers on a Review summary. Revision indexes number the summary's proposed revisions in order. */
 export type ReviewDecision = { approved: boolean; rejectFacts: string[]; correctFacts: { id: string; statement: string }[]; rejectRevisions: number[];
   /** Operator additions to a proposed change, by its index. */
-  reviseNotes?: { index: number; text: string }[] };
+  reviseNotes?: { index: number; text: string }[];
+  /** Proposed new Pages the Operator left out (P1, P2, …), and Operator additions to the others. */
+  rejectPages?: string[]; pageNotes?: { id: string; text: string }[] };
 export interface PresenceWorkflowOperations {
   readonly mode: State["mode"];
   readonly maxRetries?: number;
@@ -340,8 +354,8 @@ export function runInput(context: WorkflowContext, state: State, reviewStage = s
   return { entry, evidence: knowledgeReassessment ? [...evidence, ...confirmedSources(state)] : evidence, limitations, conflicts,
     report, research, direction, blueprint, pages, corrections, ...(knowledgeReassessment && { knowledgeReassessment }),
     ...(state.businessFacts?.length && { businessFacts: state.businessFacts }),
-    ...(state.reviewRounds?.at(-1)?.status === "analysing" && { reviewRound: (({ id, edits, factNotes, noteRevisions, notes }) =>
-      ({ id, edits, factNotes, noteRevisions, notes }))(state.reviewRounds.at(-1)!) }),
+    ...(state.reviewRounds?.at(-1)?.status === "analysing" && { reviewRound: (({ id, edits, factNotes, noteRevisions, notes, pageNotes }) =>
+      ({ id, edits, factNotes, noteRevisions, notes, ...(pageNotes?.length && { pageNotes }) }))(state.reviewRounds.at(-1)!) }),
     ...(revisionRequest && { revisionRequest }), ...(replan && { replan }), ...(!knowledgeReassessment && sourceRecovery && { sourceRecovery }), ...(reviewStage && { reviewStage }) };
 }
 function readResearch(value: unknown, ids: readonly string[]): PresenceEvidence[] {
@@ -742,6 +756,7 @@ export class PresenceWorkflow {
       output = await this.operations.run(run, bytes => this.store.retain(context, work, bytes));
       if (!await this.store.output(context, work)) throw Error("Response custody missing");
     } catch (error) {
+
       return this.fail(context, claimed, error instanceof WorkflowBlocked ? "operation-blocked" : "outcome-unknown");
     }
     return this.settle(context, claimed, output);
@@ -865,9 +880,10 @@ export class PresenceWorkflow {
         case "review-analysis": {
           const round = state.reviewRounds?.at(-1);
           if (round?.status !== "analysing") throw Error("No review round is being analysed");
-          const { untraced, skipped, ...analysis } = readReviewAnalysis(output, round, state.pages);
+          const { untraced, skipped, refusedPages, refusedNotes, ...analysis } = readReviewAnalysis(output, round, state.pages, paths);
           next = { ...state, reviewRounds: [...state.reviewRounds!.slice(0, -1), { ...round, status: "summary", analysis,
-            ...((untraced || skipped) && { analysisNotes: { untracedFacts: untraced, skippedRevisions: skipped } }) }] };
+            ...((untraced || skipped || refusedPages) && { analysisNotes: { untracedFacts: untraced, skippedRevisions: skipped,
+              ...(refusedPages && { refusedPages, refusedPageNotes: refusedNotes }) } }) }] };
           break;
         }
         case "editorial": {
@@ -1023,7 +1039,8 @@ export class PresenceWorkflow {
     const pages = applyOperatorEdits(context, view, feedback);
     const factPattern = /^\s*fact\s*:\s*/iu;
     const factNotes = feedback.notes.filter(note => factPattern.test(note.text));
-    const revisionNotes = { ...feedback, notes: feedback.notes.filter(note => !factPattern.test(note.text)) };
+    const pageNotes = feedback.notes.filter(note => newPagePattern.test(note.text));
+    const revisionNotes = { ...feedback, notes: feedback.notes.filter(note => !factPattern.test(note.text) && !newPagePattern.test(note.text)) };
     const concerns = operatorConcerns(revisionNotes);
     const paths = [...new Set(concerns.map(item => item.path))].filter(path => pages.some(page => page.path === path));
     const scoped = notedSections(context, view, revisionNotes, paths);
@@ -1037,6 +1054,8 @@ export class PresenceWorkflow {
     const round: ReviewRound | null = hasRound ? { id: randomUUID(), at, actor, status: "analysing", edits,
       notes: revisionNotes.notes.map(({ id, path, text }) => ({ id, path, text })),
       factNotes: factNotes.map(({ id, path, text }) => ({ id, path, statement: text.replace(factPattern, "").trim() })).filter(note => note.statement),
+      ...(pageNotes.length && { pageNotes: pageNotes.map(({ id, path, text }) => ({ id, path, request: text.replace(newPagePattern, "").trim().slice(0, 4000) }))
+        .filter(note => note.request) }),
       concerns, keep: keptWording(feedback, paths),
       noteRevisions: paths.map(path => {
         const sections = scoped.find(item => item.path === path);
@@ -1065,9 +1084,14 @@ export class PresenceWorkflow {
     const confirmed = round.analysis.facts.filter(fact => !rejected.has(fact.id));
     const facts: BusinessFact[] = confirmed.map(fact => ({ id: round.id + ":" + fact.id, statement: corrected.get(fact.id) ?? fact.statement,
       publicUse: fact.publicUse, source: fact.source, roundId: round.id, confirmedBy: actor, at, corrected: corrected.has(fact.id) }));
+    // New Pages the Operator asked for and did not leave out join the site plan with their brief.
+    const rejectedPages = new Set(decision.rejectPages ?? []);
+    const added = (round.analysis.newPages ?? []).filter(page => !rejectedPages.has(page.id) &&
+      !state.blueprint?.pages.some(planned => planned.path === page.path));
     const proposed = [...round.noteRevisions, ...round.analysis.revisions];
     const approved = proposed.filter((revision, index) => !decision.rejectRevisions.includes(index) &&
-      (revision.source === "note" || revision.factIds.some(id => confirmed.some(fact => fact.id === id))));
+      (revision.source === "note" || revision.factIds.some(id => confirmed.some(fact => fact.id === id)) ||
+        (revision.newPageIds ?? []).some(id => added.some(page => page.id === id))));
     const paths = [...new Set(approved.map(item => item.path))].filter(path => state.pages.some(page => page.path === path));
     const sections = paths.flatMap(path => {
       const own = approved.filter(item => item.path === path);
@@ -1077,6 +1101,9 @@ export class PresenceWorkflow {
     const concerns = [...round.concerns.filter(item => approved.some(revision => revision.source === "note" && revision.path === item.path)),
       ...approved.filter(revision => revision.source === "fact").map(revision => ({ path: revision.path,
         concern: "Confirmed business fact: " + revision.factIds.flatMap(id => statement(id) ?? []).join(" ") + " " + revision.reason })),
+      ...approved.filter(revision => revision.source === "page").map(revision => ({ path: revision.path,
+        concern: "New Page added to the site at the Operator's request: " + added.filter(page => revision.newPageIds?.includes(page.id))
+          .map(page => `${page.label} (${page.path})`).join(", ") + ". " + revision.reason })),
       ...(decision.reviseNotes ?? []).flatMap(note => approved.includes(proposed[note.index]) && proposed[note.index]
         ? [{ path: proposed[note.index].path, concern: "Operator note on the Review summary for this change: " + note.text.slice(0, 2000) }] : [])]
       .filter(item => paths.includes(item.path));
@@ -1085,22 +1112,38 @@ export class PresenceWorkflow {
       const fact = note && round.analysis!.facts.find(item => item.source.kind === "note" && item.source.text === note.statement);
       return fact && !rejected.has(fact.id) ? "MioPages Core recorded this as a confirmed business fact." : "MioPages Core did not record this as a fact.";
     };
+    const pageNoteReply = (id: number) => {
+      const page = round.analysis!.newPages?.find(item => item.noteId === id);
+      if (!page) return round.analysisNotes?.refusedPageNotes?.includes(id)
+        ? "MioPages Core's plan for this page did not pass its checks, so no page was added. Add a new note starting New page: to try again."
+        : "MioPages Core did not propose a page for this note; the Review summary says why.";
+      return added.includes(page) ? `MioPages Core added the page "${page.label}" (${page.path}) in response to this note. Please review it.`
+        : "MioPages Core did not add this page: it was left out on the Review summary.";
+    };
+    const extra = new Map<string, string[]>();
+    for (const note of decision.pageNotes ?? []) extra.set(note.id, [...extra.get(note.id) ?? [], note.text.slice(0, 2000)]);
+    const blueprint = added.length && state.blueprint ? { ...state.blueprint,
+      pages: [...state.blueprint.pages, ...added.map(page => ({ path: page.path, label: page.label, purpose: page.purpose, sourceIds: page.sourceIds,
+        decisionBrief: page.decisionBrief, operatorRequest: [page.request, ...extra.get(page.id) ?? []].join("\n\n") }))],
+      navigation: [...state.blueprint.navigation, ...added.filter(page => page.navigation).map(page => page.path)] } : state.blueprint;
     const review: WordPressReview = { at, actor, readbackRevision: summaryReview.readbackRevision, acknowledged: summaryReview.acknowledged,
       notes: [...round.notes.map(note => ({ id: note.id, path: note.path, text: note.text, revised: paths.includes(note.path),
           ...(sections.some(item => item.path === note.path) && { sectionOnly: true }) })),
         ...round.factNotes.map(note => ({ id: note.id, path: note.path, text: note.statement, revised: false, reply: factNoteReply(note.id) })),
+        ...(round.pageNotes ?? []).map(note => ({ id: note.id, path: note.path, text: note.request, revised: false, reply: pageNoteReply(note.id) })),
         ...summaryReview.summaryNotes.map(note => ({ id: note.id, path: note.path, text: note.text, revised: false, reply: note.reply }))],
       keptEdits: 0, revisedPaths: paths };
     const revision = paths.length ? {
       revisionRequest: { paths, audit: { summary: "Operator review in WordPress", concerns }, priorPages: state.pages.filter(page => paths.includes(page.path)),
         actor, at, ordinal: revisionOrdinal(state), source: "operator-review" as const, keep: round.keep.filter(item => paths.includes(item.path)), sections },
       editorial: null, operatorReview: null,
-    } : {};
-    return this.view(context, await this.store.append(context, version, { ...state, ...revision,
+    } : added.length ? { editorial: null, operatorReview: null } : {};
+    return this.view(context, await this.store.append(context, version, { ...state, ...revision, blueprint,
       pages: state.pages.filter(page => !paths.includes(page.path)), wordpressReviews: [...state.wordpressReviews ?? [], review],
       businessFacts: [...state.businessFacts ?? [], ...facts],
       reviewRounds: [...state.reviewRounds!.slice(0, -1), { ...round, status: "decided", decision: { at, actor,
-        confirmedFacts: facts.map(fact => fact.id), rejectedFacts: [...rejected], revisions: approved } }] }));
+        confirmedFacts: facts.map(fact => fact.id), rejectedFacts: [...rejected], revisions: approved,
+        ...(added.length && { addedPages: added.map(page => page.path) }) } }] }));
   }
 
   /**

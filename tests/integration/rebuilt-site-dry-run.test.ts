@@ -22,11 +22,11 @@ import { PresenceWorkflow, type WorkflowContext } from "../../lib/platform/intak
 import { workPresenceCase } from "../../lib/platform/intake/protected-presence-workflow";
 import { createResponsesPresenceWorkflow } from "../../lib/platform/intake/presence-workflow-provider";
 import { initializeResponsesUsageLedger } from "../../lib/platform/intake/intelligent-responses";
-import { reviewSummaryPage, reviewSummaryPath, workflowNativeReviewCandidate } from "../../lib/platform/intake/presence-workflow-delivery";
+import { reviewSummaryPage, workflowNativeReviewCandidate } from "../../lib/platform/intake/presence-workflow-delivery";
 import { pendingContent, type NativeNode } from "../../lib/platform/intake/presence-native-component";
 import type { MarketingAuthority } from "../../lib/platform/intake/presence-marketing-authority";
 import { IntakeService } from "../../lib/platform/intake/service";
-import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig, summaryDecision } from "../../lib/platform/wordpress-delivery/operator-review";
+import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig, reviewDecisionFromReadback } from "../../lib/platform/wordpress-delivery/operator-review";
 import { operatorFeedback, operatorFeedbackFromCandidate } from "../../lib/platform/intake/operator-feedback";
 
 type Schema = { properties?: Record<string, Schema>; items?: Schema; enum?: unknown[] };
@@ -73,6 +73,19 @@ function simulatedAnswer(name: string, schema: Schema, instructions: string) {
     const ids = enumAt(schema, "pages", "[]", "sourceIds").slice(0, 1);
     return { pages: [["/", "Home"], ["/service", "Service"], ["/start", "Start"]].map(([path, label]) =>
       ({ path, label, purpose: "Simulated purpose.", sourceIds: ids, decisionBrief: brief(path) })), navigation: ["/service", "/start"], articles: [] }; // Home left out of the menu, as Core did in the first real run
+  }
+  if (stage === "review-analysis" && schema.properties?.newPages) {
+    // Second round: the Operator asked for a page the site does not have.
+    assert.match(instructions, /New page:/);
+    const brief = (key: string) => enumAt(schema, "newPages", "[]", "decisionBrief", key).slice(0, 1);
+    const decisionBrief = { decision: "Give people one clear way to get in touch.", findingIds: brief("findingIds"),
+      directionSteps: brief("directionSteps"), claimIds: brief("claimIds"), influences: [], avoid: [] };
+    const page = { path: "/contact", label: "Contact", purpose: "Tell people how to reach MioPages and what to include.",
+      sourceIds: [], decisionBrief };
+    const noteId = enumAt(schema, "newPages", "[]", "noteId")[0];
+    return { summary: "You asked for a Contact page; Core proposes one, linked from Home.", facts: [],
+      newPages: [{ ...page, noteId }, { ...page, noteId, path: "/service" }],
+      revisions: [{ path: "/", sectionIndex: 1, reason: "Point people to the new Contact page.", factIds: [], newPageIds: ["P1"] }] };
   }
   if (stage === "review-analysis") {
     assert.match(instructions, /analyse the Operator's review/);
@@ -233,9 +246,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     }) as unknown as typeof fetch;
     // The Operator's answers on the Review summary, as the worker's decide-review reads them.
     const decideFromWordPress = async (readback: Parameters<typeof operatorFeedbackFromCandidate>[1], at: NonNullable<typeof view>) => {
-      const summary = reviewSummaryPage(context, at)!;
-      const read = operatorFeedbackFromCandidate(workflowNativeReviewCandidate(context, at).candidate, readback);
-      const { decision, replies } = summaryDecision(summary.items, read.notes.filter(item => item.path === reviewSummaryPath));
+      const { decision, replies, feedback: read } = reviewDecisionFromReadback(context, at, readback);
       if (!decision.approved) return null;
       return workflow.decideReview(context, at.version, actor, decision,
         { readbackRevision: read.readbackRevision, acknowledged: read.acknowledged, summaryNotes: replies });
@@ -352,9 +363,62 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.match(resolved.get(501)!, /revised the section this note is on/);
     assert.match(resolved.get(501)!, /suggests a wider change, not made: The Home page/);
     assert.ok(after.readback.pages.find(page => page.path === "/service")!.content!.includes("(edited by the Operator)"));
+
+    // Second round: a Note asking for a page the site does not have (owner request, Nov 24).
+    const serviceBlock = workflowNativeReviewCandidate(context, revised).candidate.pages.find(page => page.path === "/service")!.sections[0].id;
+    wordpress({ mode: "operator", edits: { "/service": ['{"metadata":{"mio":"' + serviceBlock, '{"metadata":{"noteId":[701],"mio":"' + serviceBlock] },
+      notes: [{ id: 701, path: "/service", text: "New page: a Contact page that tells people how to reach us." }] });
+    const round2 = await readBackOperatorSite(config, fetcher);
+    const asking = operatorFeedback(context, revised, round2.readback);
+    revised = (await workflow.applyOperatorReview(context, revised.version, actor, asking))!;
+    assert.deepEqual(revised.reviewRounds!.at(-1)!.pageNotes, [{ id: 701, path: "/service", request: "a Contact page that tells people how to reach us." }]);
+    assert.deepEqual(revised.reviewRounds!.at(-1)!.noteRevisions, [], "A page request is not a revision of the page it sits on");
+    revised = (await workPresenceCase(workflow, context))!;
+    assert.equal(revised.failure, null, JSON.stringify({ failure: revised.failure, issue: (revised as { artifactIssue?: unknown }).artifactIssue }));
+    const proposedRound = revised.reviewRounds!.at(-1)!;
+    assert.deepEqual(proposedRound.analysis!.newPages!.map(page => [page.id, page.path, page.label]), [["P1", "/contact", "Contact"]],
+      "A proposal at a path the site already has is left out");
+    assert.equal(proposedRound.analysisNotes?.refusedPages, 1);
+    assert.deepEqual(proposedRound.analysis!.revisions.map(item => [item.path, item.indexes, item.source, item.newPageIds]), [["/", [1], "page", ["P1"]]]);
+    const summary2 = reviewSummaryPage(context, revised)!;
+    const pageItem = summary2.page.sections.findIndex(section => section.content.heading.startsWith("New page P1: Contact (/contact)"));
+    assert.ok(pageItem > 0, "The Review summary shows the proposed page");
+    const summary2Delivery = await deliverReviewDraft({ config, context, view: revised, state: third.state, fetcher });
+    const reopened = await readBackOperatorSite(config, fetcher);
+    assert.deepEqual(reopened.summary.openNotes.map(item => item.id), [701], "Round-1 notes on the Review summary are answered and closed");
+    assert.ok(reopened.summary.resolvedNotes.some(item => item.id === 602 && /approved/.test(item.replies[0]?.text ?? "")));
+    const note2 = (id: number, section: number, text: string) => wordpress({ mode: "operator",
+      edits: { "/review-summary": ['{"metadata":{"mio":"' + summary2.page.sections[section].id, '{"metadata":{"noteId":[' + id + '],"mio":"' + summary2.page.sections[section].id] },
+      notes: [{ id, path: "/review-summary", text }] });
+    note2(702, pageItem, "Also say we reply within two working days.");
+    note2(703, 0, "Approve");
+    revised = (await decideFromWordPress((await readBackOperatorSite(config, fetcher)).readback, revised))!;
+    assert.deepEqual(revised.reviewRounds!.at(-1)!.decision!.addedPages, ["/contact"]);
+    assert.ok(revised.blueprint!.navigation.includes("/contact"), "The new page is in the menu");
+    const sentBeforePage = requests.length;
+    for (let step = 0; step < 6 && revised.pages.length < 4; step++) revised = (await workPresenceCase(workflow, context))!;
+    assert.equal(revised.failure, null, JSON.stringify({ failure: revised.failure, next: revised.next, issue: (revised as { artifactIssue?: unknown }).artifactIssue }));
+    assert.deepEqual(revised.pages.map(page => page.path), ["/", "/service", "/start", "/contact"]);
+    const pageRequest = requests.slice(sentBeforePage).find(row => row.body.includes('"enum":["/contact"]'));
+    assert.ok(pageRequest, "Core wrote the new page");
+    assert.match(pageRequest.instructions, /asked for this Page to be added/);
+    assert.ok(pageRequest.body.includes("reply within two working days"), "with the Operator's addition from the Review summary");
+    assert.ok(!/act on the Operator's review/.test(pageRequest.instructions), "A new page is written, not revised");
+    const fourth = await deliverReviewDraft({ config, context, view: revised, state: summary2Delivery.state, fetcher });
+    assert.deepEqual(fourth.receipt.posts.map(post => post.path), ["/", "/service", "/start", "/contact"]);
+    const after2 = await readBackOperatorSite(config, fetcher);
+    assert.deepEqual(after2.summary.editedPages, []);
+    assert.equal(after2.summary.openNotes.length, 0);
+    const replies2 = new Map(after2.summary.resolvedNotes.map(item => [item.id, item.replies[0]?.text ?? ""]));
+    assert.match(replies2.get(701)!, /added the page "Contact" \(\/contact\)/);
+    const recorded = revised.wordpressReviews!.at(-1)!.notes.filter(note => note.path === "/review-summary").map(note => [note.id, note.reply]);
+    assert.deepEqual(recorded.map(([id]) => id), [702, 703], "Notes answered in round 1 are not read again");
+    assert.match(String(recorded[0][1]), /include this when it writes the page/);
+    const thirdState = fourth;
+
     // A change the Operator makes after Core took the review in is never overwritten unread.
     wordpress({ mode: "operator", edits: { "/": ["</h1>", " again</h1>"] } });
-    await assert.rejects(deliverReviewDraft({ config, context, view: revised, state: third.state, fetcher }), /must be taken into Core/);
+    await assert.rejects(deliverReviewDraft({ config, context, view: revised, state: thirdState.state, fetcher }), /must be taken into Core/);
     if (process.env.MIOPAGES_DRY_RUN_EXPORT) await writeFile(process.env.MIOPAGES_DRY_RUN_EXPORT,
       JSON.stringify({ review, home: php.stdout, requests: requests.map(row => row.name) }, null, 2));
   } finally {

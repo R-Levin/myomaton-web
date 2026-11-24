@@ -1,7 +1,7 @@
 import { fingerprint, object, text } from "../canonical/model";
 import type { WorkflowRun } from "./presence-workflow";
 import { readBlueprint, type PresenceEvidence, type WorkflowPage } from "./presence-workflow-artifacts";
-import { checkStrategyScope, compilePageDecision, strategyBasis, type StrategyScope } from "./presence-decision-brief";
+import { checkStrategyScope, compilePageDecision, readDecisionBrief, strategyBasis, type StrategyScope } from "./presence-decision-brief";
 import { confirmedKnowledgeEvidence } from "./account-work";
 
 const uses = ["business-fact", "staffed-offer", "editorial", "analysis", "excluded"] as const;
@@ -152,6 +152,7 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
       research: research?.map(expose), report, direction, blueprint,
       corrections: corrections.filter(({ finding }) => finding.sourceIds.every(id => readable.has(id))).map(({ finding, text }) => ({ finding, text, status: "correction-to-review" })),
       ...(operation === "page" && { pagePath: path, ...(path && authority.strategy && { decisionBrief: strategyDecision(run, authority, blueprint?.pages.find(page => page.path === path)) }),
+        ...(!previous && operatorRequest(blueprint, path) && { operatorRequest: operatorRequest(blueprint, path) }),
         ...(previous && { previous, concerns: revisionRequest?.audit.concerns.filter(concern => concern.path === path) }),
         ...(!path && revisionRequest?.batch === "pending" && { pages: revisionRequest.priorPages, concerns: revisionRequest.audit.concerns }) }),
       ...(operation === "editorial" && { pages, ...(run.input.reviewStage && { reviewStage: run.input.reviewStage }) }),
@@ -192,6 +193,12 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
   }
 }
 
+/** The Operator's words for a Page added to the plan from a review round. */
+function operatorRequest(blueprint: WorkflowRun["input"]["blueprint"], path: string | undefined) {
+  const page = blueprint?.pages.find(item => item.path === path) as { operatorRequest?: unknown } | undefined;
+  return typeof page?.operatorRequest === "string" ? page.operatorRequest : undefined;
+}
+
 function strategyDecision(run: WorkflowRun, authority: MarketingAuthority, page: ReturnType<typeof readBlueprint>["pages"][number] | undefined) {
   if (!authority.strategy || !page?.decisionBrief) throw Error("Provenance-linked Page brief required");
   const sources = marketingSources(authority, run.input.evidence);
@@ -209,6 +216,19 @@ function strategyDecision(run: WorkflowRun, authority: MarketingAuthority, page:
     [...influenceSources, ...run.input.research ?? []], authority.contextDigest, authority.projectionVersion === 2);
   if (exposesInternalCopy(brief, run.input.evidence, authority, true)) throw Error("Excluded content in Page decision");
   return brief;
+}
+
+/** Whether a proposed new Page's brief holds up as one more Page in the current plan (review rounds). */
+export function acceptedPageDecision(run: WorkflowRun, authority: MarketingAuthority, proposal: unknown) {
+  try {
+    const page = proposal as { path?: unknown; label?: unknown; purpose?: unknown; sourceIds?: unknown; decisionBrief?: unknown };
+    if (typeof page?.path !== "string" || !run.input.blueprint) return false;
+    const entry = { path: page.path, label: String(page.label ?? ""), purpose: String(page.purpose ?? ""),
+      sourceIds: Array.isArray(page.sourceIds) ? page.sourceIds as string[] : [], decisionBrief: readDecisionBrief(page.decisionBrief) };
+    const blueprint = { ...run.input.blueprint, pages: [...run.input.blueprint.pages, entry] };
+    strategyDecision({ ...run, work: { ...run.work, operation: "page", path: page.path }, input: { ...run.input, blueprint } }, authority, entry);
+    return true;
+  } catch { return false; }
 }
 
 export function assertPlanUsesResearch(pages: readonly { decisionBrief?: { influences: readonly { sourceIds: readonly string[] }[] } }[], researchIds: readonly string[]) {

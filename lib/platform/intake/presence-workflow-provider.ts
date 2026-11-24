@@ -9,12 +9,20 @@ import { WorkflowBlocked, type PresenceWorkflowOperations, type WorkflowContext,
 import { editorialPatchSchema } from "./presence-editorial-patch";
 
 import {confirmUndispatchedPlanningRequest, settleLostAnswer} from "./intelligent-responses";
-import { exposesInternalCopy, marketingCitationIds, marketingProjection, repeatsPeerObservation, unsupportedCommercialCopy, validateMarketingAuthority, validateStrategyBlueprint, sourceTransitionAuthorityMatches, type MarketingAuthority } from "./presence-marketing-authority";
+import { acceptedPageDecision, exposesInternalCopy, marketingCitationIds, marketingProjection, repeatsPeerObservation, unsupportedCommercialCopy, validateMarketingAuthority, validateStrategyBlueprint, sourceTransitionAuthorityMatches, type MarketingAuthority } from "./presence-marketing-authority";
 import type { PresenceImageGrant } from "./presence-workflow-visual";
 import { originalMaterialInput, validateOriginalGrant, type OriginalMaterialGrant, type OriginalMaterialReader } from "./presence-source-material";
 import { existingWorkAuthoringInstructions } from "./presence-existing-work";
 import { editorialScopeInstructions, fpoImageInstructions, stockPlacementInstructions } from "./presence-review-instructions";
 import { coreAuthoringInstructions, type AuthoringStage } from "./core-authoring-instructions";
+import { decisionBriefSchema } from "./presence-decision-brief";
+
+/** The Operator's request for a Page Core added to the plan from a review round, if this Page is one. */
+export function addedPage(run: WorkflowRun) {
+  const page = run.work.operation === "page" && run.work.path !== undefined
+    ? run.input.blueprint?.pages.find(item => item.path === run.work.path) as { operatorRequest?: unknown } | undefined : undefined;
+  return typeof page?.operatorRequest === "string" && !run.input.revisionRequest?.paths.includes(run.work.path!) ? page.operatorRequest : undefined;
+}
 
 export class WorkflowMediaUnavailable extends WorkflowBlocked {
   readonly code: "MEDIA_PERMISSION_EXPIRED" | "MEDIA_CONTEXT_UNAVAILABLE";
@@ -101,13 +109,18 @@ export function authoringOutputLimit(grant: PresenceWorkflowGrant, name: Workflo
 }
 
 /** Output of a review analysis: facts spotted in the Operator's edits, and the sections each fact affects. */
-export function reviewAnalysisSchema(paths: readonly string[]) {
+export function reviewAnalysisSchema(paths: readonly string[], pageRequests?: { noteIds: readonly number[]; decisionBrief: object }) {
   const shape = (properties: Record<string, object>) => ({ type: "object", additionalProperties: false, required: Object.keys(properties), properties });
   return shape({
     facts: { type: "array", items: shape({ statement: { type: "string" }, publicUse: { type: "boolean" },
       sourcePath: { type: "string", enum: [...paths] }, sourceText: { type: "string" } }) },
     revisions: { type: "array", items: shape({ path: { type: "string", enum: [...paths] }, sectionIndex: { type: "integer" },
-      reason: { type: "string" }, factIds: { type: "array", items: { type: "string" } } }) },
+      reason: { type: "string" }, factIds: { type: "array", items: { type: "string" } },
+      ...(pageRequests && { newPageIds: { type: "array", items: { type: "string" } } }) }) },
+    // Pages the Operator asked for in "New page:" Notes: each with a brief like a planned Page's.
+    ...(pageRequests && { newPages: { type: "array", items: shape({ noteId: { type: "integer", enum: [...pageRequests.noteIds] },
+      path: { type: "string" }, label: { type: "string" }, purpose: { type: "string" },
+      sourceIds: { type: "array", items: { type: "string" } }, decisionBrief: pageRequests.decisionBrief }) } }),
     summary: { type: "string" },
   });
 }
@@ -330,7 +343,7 @@ export function createResponsesPresenceWorkflow(config: {
     grant.maxOutputTokens, grant.retainedReservation, grant.marketSearch?.maxToolCalls);
   // A review analysis is metered as critique work (same model and rates).
   const stageFor = (run: WorkflowRun): WorkflowMeterStage => run.work.operation === "review-analysis" ? "editorial" :
-    run.work.operation === "page" && (run.input.revisionRequest || run.input.replan && !run.input.sourceRecovery ||
+    run.work.operation === "page" && (run.input.revisionRequest && !addedPage(run) || run.input.replan && !run.input.sourceRecovery ||
       run.input.knowledgeReassessment && run.input.blueprint?.pages.some(page => page.path === run.work.path && page.change === "revise")) ? "revision" : run.work.operation;
   const meter = (run: WorkflowRun) => {
     const name = stageFor(run);
@@ -403,6 +416,15 @@ export function createResponsesPresenceWorkflow(config: {
         ? allowed(item) : Array.isArray(item) && item.every(id => ids.has(id)));
     }
     if (!allowed(output)) return new ArtifactValidationError("citation", "Citation outside the approved evidence");
+    // A proposed new Page needs a brief that holds up like a planned Page's; one that does not is
+    // left out of the analysis (the Operator's Note is answered that no Page was added).
+    if (run.work.operation === "review-analysis" && grant.marketingAuthority?.strategy && output && typeof output === "object" &&
+        Array.isArray((output as { newPages?: unknown }).newPages)) {
+      const proposals = (output as { newPages: unknown[] }).newPages;
+      // Kept with an empty brief so Core's reader counts it as refused and tells the Operator.
+      output = { ...output, newPages: proposals.map(page => acceptedPageDecision(run, grant.marketingAuthority!, page) ? page
+        : { ...page as object, decisionBrief: null }) };
+    }
     if (run.work.operation === "blueprint" && grant.marketingAuthority?.strategy) {
       try { validateStrategyBlueprint(output, run, grant.marketingAuthority, grant.previewActionDestinations); }
       catch { return new ArtifactValidationError("citation", "Page decisions lack bound business, Direction or peer evidence"); }
@@ -566,7 +588,10 @@ export function createResponsesPresenceWorkflow(config: {
       // An Operator Note tied to specific sections revises only those sections (owner, Nov 23).
       const noted = exactPage !== undefined && run.input.revisionRequest?.paths.includes(exactPage)
         ? run.input.revisionRequest.sections?.find(item => item.path === exactPage) : undefined;
-      const baseArtifact = operation === "review-analysis" ? reviewAnalysisSchema(run.input.pages.map(page => page.path))
+      const pageNotes = operation === "review-analysis" ? run.input.reviewRound?.pageNotes ?? [] : [];
+      const baseArtifact = operation === "review-analysis" ? reviewAnalysisSchema(run.input.pages.map(page => page.path), pageNotes.length ? {
+          noteIds: pageNotes.map(note => note.id), decisionBrief: grant.marketingAuthority?.strategy
+            ? bindBlueprintDecisionSchema(run, grant.marketingAuthority).properties.pages.items.properties.decisionBrief : decisionBriefSchema } : undefined)
         : batch ? editorialPatchSchema(batch.paths) : noted ? sectionRevisionSchema(pageSchema, noted.indexes) : exactPage !== undefined
         ? { ...pageSchema, properties: { ...pageSchema.properties, path: { type: "string", enum: [exactPage] } } }
         : operation === "blueprint" && grant.marketingAuthority?.strategy
@@ -613,6 +638,8 @@ export function createResponsesPresenceWorkflow(config: {
       const rebuiltInstructions = rebuilt ? [coreAuthoringInstructions(authoringStage),
         exactPage === undefined ? "" : "The single required Page is " + JSON.stringify(exactPage) + ".",
         noted ? sectionRevisionInstructions(noted.indexes) : "",
+        exactPage !== undefined && addedPage(run) ? "The Operator asked for this Page to be added to the site (operatorRequest). It is new: " +
+          "write it in full so that it does what the Operator asked, within the business knowledge, and link it into the site like the other Pages." : "",
         preview.trim(), knowledgeInstructions.trim(), ownerRules].filter(Boolean).join("\n\n") : "";
       const request = {
         model, ...(grant.marketingAuthority?.projectionVersion === 2 && model === "gpt-5.4-2026-03-05" && { reasoning: { effort: "medium" as const } }), input: providerInput,

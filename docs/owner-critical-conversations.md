@@ -1172,3 +1172,13 @@ see it. On the owner's yes, the 16 pre-Core draft pages (IDs 13-16 and 26-37, No
 moved to Trash, where they can still be restored; page 36 keeps the owner's edit. Core's nine pages
 (53-61) are untouched, and Core's read-back still passes (delivery 2, no edits). Open point the
 owner raised by the edit: Core's site has no Contact page, and the review loop cannot add a page yet.
+
+**Nov 24: Operators can ask for a new page with a note.** The owner asked for Core to be able to
+add a page (prompted by a missing Contact page). Built as part of review rounds: a note starting
+"New page:" (or "Add page:") on any page asks for one. Core's review analysis proposes the page
+(address, menu label, purpose and a page brief checked like the planned pages'), and the Review
+summary shows it with the estimated cost. The Operator can say No, or add to it with a note. On
+approval it joins Core's site plan and the main menu (always the menu, since a section-only revision
+cannot add links), Core writes it as a full new page, and the next delivery adds it to WordPress and
+answers the note. Plugin 0.1.5 fixes a fault that would have refused a second Review summary.
+Not yet installed; the first real use needs the owner's approval for the install and the AI cost.

@@ -3,6 +3,8 @@ import type { NativeComponent, NativeNode } from "./presence-native-component";
 import type { PresenceWorkflowView, WorkflowContext } from "./presence-workflow";
 import { workflowNativeReviewCandidate } from "./presence-workflow-delivery";
 import { noteBlocks, type Readback } from "../wordpress-delivery/readback";
+import { canonicalPagePath } from "../managed-sites/paths";
+import { readDecisionBrief } from "./presence-decision-brief";
 
 /**
  * Turns a WordPress read-back into what Core acts on (owner direction, Nov 22):
@@ -362,6 +364,10 @@ export function notedSections(context: WorkflowContext, view: PresenceWorkflowVi
 
 /** Estimated provider cost of one revision call: a whole Page, or a Page limited to noted sections (Nov 23 observations). */
 export const revisionEstimateMicros = { page: 500_000, sections: 300_000 } as const;
+/** Estimated provider cost of writing one new Page (a full Page draft, Nov 23 observations). */
+export const newPageEstimateMicros = 700_000;
+/** Paths Core keeps for itself on the review site; a new Page may not take them. */
+const reservedPaths = ["/review-summary"];
 
 /**
  * Read Core's review analysis. Every fact must trace to the Operator: a "Fact:" Note (kept word for
@@ -369,7 +375,8 @@ export const revisionEstimateMicros = { page: 500_000, sections: 300_000 } as co
  * and revisions of sections already queued, are left out and counted.
  */
 export function readReviewAnalysis(value: unknown, round: { edits: { path: string; after: string }[]; factNotes: { path: string; statement: string }[];
-  noteRevisions: { path: string; indexes: number[] }[] }, pages: readonly { path: string; sections: readonly unknown[] }[]) {
+  noteRevisions: { path: string; indexes: number[] }[]; pageNotes?: { id: number; request: string }[] },
+  pages: readonly { path: string; sections: readonly unknown[] }[], planned: readonly string[] = pages.map(page => page.path)) {
   const record = (item: unknown, keys: string[]) => {
     if (!item || typeof item !== "object" || Array.isArray(item) || Object.keys(item).sort().join() !== [...keys].sort().join()) throw Error("Review analysis shape refused");
     return item as Record<string, unknown>;
@@ -378,8 +385,40 @@ export function readReviewAnalysis(value: unknown, round: { edits: { path: strin
     if (typeof item !== "string" || item.length > limit || /[<>]/u.test(item)) throw Error("Review analysis text refused");
     return item.trim();
   };
-  const output = record(value, ["facts", "revisions", "summary"]);
-  if (!Array.isArray(output.facts) || !Array.isArray(output.revisions)) throw Error("Review analysis lists required");
+  const asksForPages = Boolean(round.pageNotes?.length);
+  const output = record(value, ["facts", "revisions", "summary", ...(asksForPages ? ["newPages"] : [])]);
+  if (!Array.isArray(output.facts) || !Array.isArray(output.revisions) || (asksForPages && !Array.isArray(output.newPages))) throw Error("Review analysis lists required");
+  // New Pages: only for an Operator "New page:" Note, at a new path, with a Page brief like the planned Pages'.
+  const pageNumbering = new Map<string, string>();
+  const newPages: { id: string; noteId: number; request: string; path: string; label: string; purpose: string; navigation: boolean;
+    sourceIds: string[]; decisionBrief: ReturnType<typeof readDecisionBrief> }[] = [];
+  // A proposal that fails a check is left out and counted, not allowed to void the whole paid answer;
+  // the Operator's Note is then answered that no Page was added.
+  let refusedPages = 0;
+  const refusedNotes: number[] = [];
+  ((output.newPages ?? []) as unknown[]).forEach((raw, index) => {
+    try {
+      const page = record(raw, ["noteId", "path", "label", "purpose", "sourceIds", "decisionBrief"]);
+      const note = round.pageNotes!.find(item => item.id === page.noteId);
+      const path = canonicalPagePath(page.path);
+      if (!note || !path || planned.includes(path) || reservedPaths.includes(path) || newPages.some(item => item.path === path || item.noteId === note.id) ||
+          !Array.isArray(page.sourceIds) || page.sourceIds.some(id => typeof id !== "string")) {
+        throw Error("Review analysis new Page refused");
+      }
+      const label = words(page.label, 80), purpose = words(page.purpose, 1000);
+      if (!label || !purpose) throw Error("Review analysis new Page refused");
+      const decisionBrief = readDecisionBrief(page.decisionBrief);
+      const id = "P" + (newPages.length + 1);
+      pageNumbering.set("P" + (index + 1), id);
+      // Always in the main menu: a section revision cannot add links, so the menu is what connects a new Page.
+      newPages.push({ id, noteId: note.id, request: note.request, path, label, purpose, navigation: true,
+        sourceIds: [...new Set(page.sourceIds as string[])], decisionBrief });
+    } catch {
+      refusedPages++;
+      const noteId = (raw as { noteId?: unknown })?.noteId;
+      if (round.pageNotes!.some(item => item.id === noteId) && !refusedNotes.includes(noteId as number)) refusedNotes.push(noteId as number);
+    }
+  });
   const numbering = new Map<string, string>(), facts: { id: string; statement: string; publicUse: boolean;
     source: { path: string; kind: "edit" | "note"; text: string } }[] = [];
   let untraced = 0;
@@ -398,20 +437,24 @@ export function readReviewAnalysis(value: unknown, round: { edits: { path: strin
   for (const note of round.factNotes) if (!facts.some(fact => fact.source.kind === "note" && fact.source.path === note.path && fact.source.text === note.statement)) {
     facts.push({ id: "F" + (facts.length + 1), statement: note.statement, publicUse: true, source: { path: note.path, kind: "note", text: note.statement } });
   }
-  const revisions: { path: string; indexes: number[]; reason: string; source: "fact"; factIds: string[] }[] = [];
+  const revisions: { path: string; indexes: number[]; reason: string; source: "fact" | "page"; factIds: string[]; newPageIds?: string[] }[] = [];
   let skipped = 0;
   for (const raw of output.revisions) {
-    const revision = record(raw, ["path", "sectionIndex", "reason", "factIds"]);
+    const revision = record(raw, ["path", "sectionIndex", "reason", "factIds", ...(asksForPages ? ["newPageIds"] : [])]);
     const page = pages.find(item => item.path === revision.path);
     const index = revision.sectionIndex;
     const factIds = Array.isArray(revision.factIds) ? [...new Set(revision.factIds.flatMap(id => numbering.get(String(id)) ?? []))] : [];
+    const newPageIds = Array.isArray(revision.newPageIds) ? [...new Set(revision.newPageIds.flatMap(id => pageNumbering.get(String(id)) ?? []))] : [];
     if (!page || typeof index !== "number" || !Number.isInteger(index) || index < 0 || index >= page.sections.length) throw Error("Review analysis section refused");
     const queued = round.noteRevisions.some(item => item.path === page.path && (!item.indexes.length || item.indexes.includes(index)));
-    if (queued || !factIds.length || revisions.some(item => item.path === page.path && item.indexes[0] === index)) { skipped++; continue; }
-    revisions.push({ path: page.path, indexes: [index], reason: words(revision.reason, 1000), source: "fact", factIds });
+    if (queued || (!factIds.length && !newPageIds.length) || revisions.some(item => item.path === page.path && item.indexes[0] === index)) { skipped++; continue; }
+    revisions.push({ path: page.path, indexes: [index], reason: words(revision.reason, 1000), source: factIds.length ? "fact" : "page", factIds,
+      ...(newPageIds.length && { newPageIds }) });
   }
   const paths = new Map<string, boolean>();
   for (const item of [...round.noteRevisions, ...revisions]) paths.set(item.path, (paths.get(item.path) ?? false) || !item.indexes.length);
-  const estimateMicros = [...paths.values()].reduce((sum, whole) => sum + (whole ? revisionEstimateMicros.page : revisionEstimateMicros.sections), 0);
-  return { facts, revisions, summary: words(output.summary, 2000), estimateMicros, untraced, skipped };
+  const estimateMicros = [...paths.values()].reduce((sum, whole) => sum + (whole ? revisionEstimateMicros.page : revisionEstimateMicros.sections), 0) +
+    newPages.length * newPageEstimateMicros;
+  return { facts, revisions, summary: words(output.summary, 2000), estimateMicros, untraced, skipped, refusedPages,
+    refusedNotes: refusedNotes.filter(id => !newPages.some(page => page.noteId === id)), ...(asksForPages && { newPages }) };
 }
