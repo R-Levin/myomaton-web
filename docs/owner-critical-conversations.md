@@ -1193,9 +1193,15 @@ meaning:
   optimization they feed. Customer changes to business knowledge should be few; direct requests for
   new site content or content marketing will be occasional. Site building matters, but it is not
   where the service spends most of its time.
-- The service will be WordPress-based: its functionality and cost savings, and the huge installed
-  base of potential customers already on WordPress. Without leveraging WordPress we would be
-  developing forever. (Baseline Part 1 #3 updated: WordPress is no longer "replaceable delivery".)
+- WordPress: its functionality and cost savings, and the huge installed base of potential
+  customers already on WordPress, matter; without leveraging it we would be developing forever.
+  Clarified by the owner the same day: philosophically nothing has changed. WordPress is one of
+  the delivery mechanisms and stays out of the overarching view and development of what the
+  MioPages service is. Practically, it removes a massive development hurdle, so it sits at the
+  centre of what is being built now. Three resources are at our disposal: WordPress, the cloud
+  server running Core, and the 20i Reseller account where its use makes sense. (Claude had first
+  recorded this as "the service is WordPress-based"; corrected. Baseline Part 1 #3 reflects it.)
+  The owner also noted that Claude does not have the whole development record in mind.
 - The open question is the better pathway for customers and Operators to communicate and do work.
   Account management and Operator day-to-day work could move into WordPress, as many analytics
   products do. There are also reasons to build MioPages' own portal for both. For Operators a hybrid
