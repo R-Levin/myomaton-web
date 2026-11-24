@@ -215,10 +215,10 @@ convenience. It does not change the service's design, so a hybrid costs nothing 
 | Knowledge | Canonical Knowledge and Offering, My Business | Workflow businessFacts and corrections hold their own copies |
 | Evidence | Source custody, research, peer capture | Named differently in each place |
 | Work product | Canonical Page, Section, Asset, Action, Navigation | AI workflow keeps its own report, direction, blueprint and pages |
-| Request | Nothing shared | About a dozen separate shapes |
+| Request | Change area (review rounds routed, Nov 24) | Other paths still keep about a dozen separate shapes |
 | Decision | Decision brief, report, Direction | Each workflow has its own |
-| Change | Page proposals, section revisions, releases | No single Change with grain; ChangeSet never built |
-| Review | Several approval records | No single Review; the "Free Review" name collision |
+| Change | Change area with grain, base, conflicts (review rounds, Nov 24); page proposals, releases | Other paths not yet routed |
+| Review | Change area Review (review rounds, Nov 24); several older approval records | Older records not yet routed |
 | Delivery | WordPress stack, sound and shared | Older Next.js path |
 | Observation | Measurement and Contact foundations | Not live; not feeding Requests |
 | Person and authority | Several working versions | Four separate definitions |
@@ -248,6 +248,19 @@ until the end.
    rounds through them first, since that is the most recent and best-tested path. The
    held new-page work (fbe5bbc) is reworked as a Change grain rather than installed as
    it stands.
+
+   *Progress, Nov 24 (local only, nothing hosted):* the Change area exists in
+   `lib/platform/change/model.ts`, with Request, Decision, Change (grain, base Version,
+   difference, preserved wording, Consequence level, dependencies), Review (Approve,
+   Decline, Correct, Ask) and Round, plus conflict flagging, withdrawal and one timeline.
+   Review rounds are routed through it (`lib/platform/intake/review-round-changes.ts`):
+   each Note and hand edit is a Request, Core's analysis is a Decision with its Changes,
+   the Operator's answers are Reviews, and **what is recorded, added or revised is now read
+   from the Change ledger**. "Add a page" is a Change of the new-page grain. Rounds taken in
+   on protected Core before this are read into the ledger when decided.
+   Still to do in this step: draw the Review summary from the Changes rather than the round
+   record, then remove the round's duplicate fields; and the labelled placeholders that
+   let the whole cycle run end to end (Observation, Task, Operator queue).
 3. **One Knowledge.** Operator-learned facts and report corrections become Changes to
    canonical Knowledge. My Business shows the same records Core uses.
 4. **One set of Work products.** The AI workflow's pages and plan become versions of the

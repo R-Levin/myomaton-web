@@ -283,6 +283,13 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     const withdrawn = (await workflow.withdrawOperatorReview(context, taken.version, actor, "Dry-run withdrawal"))!;
     assert.deepEqual(withdrawn.pages, view.pages, "Withdrawal restores Core's pages exactly");
     assert.equal(withdrawn.wordpressReviews, undefined);
+    // The Change ledger keeps the withdrawn round on record: Requests withdrawn, the kept edit reverted.
+    const statuses = (at: { changes?: { changes: { id: string; label: string; status: string }[] } }, roundId: string) =>
+      Object.fromEntries(at.changes!.changes.filter(change => change.id.startsWith(roundId + ":")).map(change => [change.label, change.status]));
+    const withdrawnRound = withdrawn.changes!.rounds.at(-1)!;
+    assert.equal(withdrawnRound.status, "withdrawn");
+    assert.deepEqual(statuses(withdrawn, withdrawnRound.id), { E1: "reverted" });
+    assert.ok(withdrawn.changes!.requests.filter(request => request.roundId === withdrawnRound.id).every(request => request.status === "withdrawn"));
     await assert.rejects(workflow.withdrawOperatorReview(context, withdrawn.version, actor, "again"), "Nothing left to withdraw");
     let revised = (await workflow.applyOperatorReview(context, withdrawn.version, actor, feedback))!;
     assert.ok(revised.pages.find(page => page.path === "/service")!.sections[0].heading.endsWith("(edited by the Operator)"),
@@ -313,6 +320,13 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.deepEqual([...round.noteRevisions, ...round.analysis!.revisions].map(item => [item.path, item.indexes, item.source]),
       [["/start", [0], "note"], ["/", [1], "fact"]]);
     assert.ok(round.analysis!.estimateMicros > 0);
+    // The analysis is Core's Decision: each proposal is a Change with its grain, base and consequence level.
+    assert.deepEqual(statuses(revised, round.id), { E1: "applied", F1: "proposed", C1: "proposed", C2: "proposed" });
+    const c2 = revised.changes!.changes.find(change => change.id === round.id + ":C2")!;
+    assert.deepEqual([c2.target, c2.consequence, c2.dependsOn], [{ grain: "section", path: "/", sections: [1] }, "operator-review", [round.id + ":F1"]]);
+    assert.ok(c2.base.digest, "A revision names the exact page it was proposed against");
+    assert.deepEqual(revised.changes!.changes.find(change => change.id === round.id + ":C1")!.requestIds, [round.id + ":note:501"],
+      "The noted change answers the Operator's Note");
     // The Review summary is delivered with the site; the Operator's Note stays open until the decision.
     const summaryDelivery = await deliverReviewDraft({ config, context, view: revised, state: second.state, fetcher });
     assert.deepEqual(summaryDelivery.receipt.posts.map(post => post.path), ["/", "/service", "/start", "/review-summary"]);
@@ -333,6 +347,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     revised = (await decideFromWordPress(check.readback, revised))!;
     assert.deepEqual(revised.businessFacts!.map(fact => fact.source.path), ["/service"], "The confirmed fact is in Core's knowledge");
     assert.deepEqual(revised.reviewRounds!.at(-1)!.decision!.revisions.map(item => item.path), ["/start"], "The change marked No is left out");
+    assert.deepEqual(statuses(revised, round.id), { E1: "applied", F1: "applied", C1: "approved", C2: "declined" }, "The ledger decides");
     assert.ok(!revised.pages.some(page => page.path === "/start"), "The approved change is queued");
     for (let step = 0; step < 6 && revised.pages.length < 3; step++) revised = (await workPresenceCase(workflow, context))!;
     assert.equal(revised.failure, null, JSON.stringify({ failure: revised.failure, next: revised.next }));
@@ -347,6 +362,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.equal(changed.length, 1, "exactly one section was revised: " + JSON.stringify(changed));
     assert.deepEqual({ ...startAfter, sections: [] }, { ...startBefore, sections: [] }, "heading, search text and Actions are unchanged");
     assert.equal(revised.widerChanges?.length, 1, "Core's suggested wider change is recorded, not made");
+    assert.equal(statuses(revised, round.id).C1, "applied", "The approved change is applied once Core has written it");
 
     const factRequest = requests.slice(requestsBefore).find(row => row.name === "presence_workflow_page");
     assert.ok(factRequest?.body.includes("businessFacts"), "Later AI steps receive the confirmed fact");
@@ -394,6 +410,11 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     note2(703, 0, "Approve");
     revised = (await decideFromWordPress((await readBackOperatorSite(config, fetcher)).readback, revised))!;
     assert.deepEqual(revised.reviewRounds!.at(-1)!.decision!.addedPages, ["/contact"]);
+    // "Add a page" is a Change of the new-page grain, approved with the Operator's addition.
+    const p1 = revised.changes!.changes.find(change => change.id === proposedRound.id + ":P1")!;
+    assert.deepEqual([p1.target, p1.status, p1.reviews.map(entry => [entry.response, entry.words])],
+      [{ grain: "new-page", path: "/contact" }, "applied", [["approve", "Also say we reply within two working days."]]]);
+    assert.deepEqual(statuses(revised, proposedRound.id), { P1: "applied", C1: "approved" });
     assert.ok(revised.blueprint!.navigation.includes("/contact"), "The new page is in the menu");
     const sentBeforePage = requests.length;
     for (let step = 0; step < 6 && revised.pages.length < 4; step++) revised = (await workPresenceCase(workflow, context))!;

@@ -1244,3 +1244,8 @@ to proceed on the basis of the object model and the practices review
 pull requests, routed and scoped AI operations, and one-path-at-a-time migration. The glossary
 is the next step. Move as quickly as is practical. The owner expects the end result to look
 much like what has been seen so far, but this restructuring is the key to long-run success.
+
+**Nov 24: start step 2 now; names follow the glossary as the owner corrects it (owner).** The
+owner approved starting step 2 of the object model (shared Request, Decision, Change and Review,
+review rounds routed through them first) without waiting for the glossary corrections. Names in
+code change as the owner corrects the glossary.

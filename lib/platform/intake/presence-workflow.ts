@@ -23,6 +23,8 @@ import { confirmKnowledge, knowledgeConfirmationInput, KnowledgeConfirmationErro
 import { canonicalWritePool } from "../canonical/transaction";
 import { inspectCanonical } from "../canonical/writes";
 import type { CustomerAuthority } from "../content-editing/proposal";
+import { ChangeError, withdrawRound, type ChangeLedger } from "../change/model";
+import { analysedRound, appliedInRound, approvedInRound, reviewRound, roundLedger, RoundConflict, takeInRound } from "./review-round-changes";
 
 export type WorkflowContext = {
   scope: DeploymentSelection;
@@ -151,6 +153,8 @@ type State = {
   lostAnswers?: { attempt: string; operation: string; reservedMicros: number; by: string; at: string }[];
   widerChanges?: WiderChange[];
   reviewRounds?: ReviewRound[];
+  /** The Account's Requests, Decisions, Changes and Reviews (the Change area; review rounds first). */
+  changes?: ChangeLedger;
   businessFacts?: BusinessFact[];
   visuals?: PresenceVisual[];
 };
@@ -472,6 +476,7 @@ export class PresenceWorkflow {
       ...(state.wordpressReviews && { wordpressReviews: state.wordpressReviews }),
       ...(state.widerChanges && { widerChanges: state.widerChanges }),
       ...(state.reviewRounds && { reviewRounds: state.reviewRounds }),
+      ...(state.changes && { changes: state.changes }),
       ...(state.businessFacts && { businessFacts: state.businessFacts }),
       ...(this.operations.knowledgeConfirmation && { knowledgeConfirmationAvailable: true as const }),
       ...(state.knowledgeReassessments && { knowledgeReassessments: state.knowledgeReassessments }),
@@ -872,7 +877,11 @@ export class PresenceWorkflow {
           }
           // Keep the exact sitemap order when selected pages are redrafted.
           const drafts = new Map([...state.pages, page].map(draft => [draft.path, draft]));
+          // A page revised for an Operator review round carries out that round's approved Changes on it.
+          const decidedRound = state.revisionRequest?.source === "operator-review" ? state.reviewRounds?.findLast(item => item.status === "decided") : undefined;
           next = { ...state, pages: paths.flatMap(path => drafts.get(path) ?? []),
+            ...(decidedRound && state.changes && { changes: appliedInRound(state.changes, decidedRound.id, change =>
+              change.label.startsWith("C") && change.target.path === work.path, new Date(this.clock()).toISOString(), state.version + 1) }),
             ...(widerChange && { widerChanges: [...state.widerChanges ?? [], { path: work.path!, reason: widerChange,
               at: new Date(this.clock()).toISOString(), reviewAt: state.revisionRequest!.at }] }) };
           break;
@@ -881,9 +890,13 @@ export class PresenceWorkflow {
           const round = state.reviewRounds?.at(-1);
           if (round?.status !== "analysing") throw Error("No review round is being analysed");
           const { untraced, skipped, refusedPages, refusedNotes, ...analysis } = readReviewAnalysis(output, round, state.pages, paths);
-          next = { ...state, reviewRounds: [...state.reviewRounds!.slice(0, -1), { ...round, status: "summary", analysis,
+          const analysed: ReviewRound = { ...round, status: "summary", analysis,
             ...((untraced || skipped || refusedPages) && { analysisNotes: { untracedFacts: untraced, skippedRevisions: skipped,
-              ...(refusedPages && { refusedPages, refusedPageNotes: refusedNotes }) } }) }] };
+              ...(refusedPages && { refusedPages, refusedPageNotes: refusedNotes }) } }) };
+          // Core's analysis is its Decision on the round's Requests: the Changes it proposes, each made against these pages.
+          const taken = roundLedger(state.changes, { ...round, analysis: undefined }, state.version, state.pages);
+          next = { ...state, reviewRounds: [...state.reviewRounds!.slice(0, -1), analysed],
+            changes: analysedRound(taken, analysed, state.version, state.pages, new Date(this.clock()).toISOString()) };
           break;
         }
         case "editorial": {
@@ -1063,7 +1076,8 @@ export class PresenceWorkflow {
           reason: concerns.filter(item => item.path === path).map(item => item.concern).join(" ").slice(0, 2000) };
       }) } : null;
     return this.view(context, await this.store.append(context, version, { ...state, pages,
-      wordpressReviews: [...state.wordpressReviews ?? [], review], ...(round && { reviewRounds: [...state.reviewRounds ?? [], round] }) }));
+      wordpressReviews: [...state.wordpressReviews ?? [], review], ...(round && { reviewRounds: [...state.reviewRounds ?? [], round],
+        changes: takeInRound(state.changes, round, version) }) }));
   }
 
   /**
@@ -1079,19 +1093,30 @@ export class PresenceWorkflow {
     if (!round || round.status !== "summary" || !round.analysis || state.work || state.failure) throw new IntakeError("workflow_not_ready", 409);
     if (!decision.approved) throw new IntakeError("invalid_request", 400);
     const at = new Date(this.clock()).toISOString();
-    const rejected = new Set(decision.rejectFacts);
-    const corrected = new Map(decision.correctFacts.map(item => [item.id, item.statement]));
-    const confirmed = round.analysis.facts.filter(fact => !rejected.has(fact.id));
-    const facts: BusinessFact[] = confirmed.map(fact => ({ id: round.id + ":" + fact.id, statement: corrected.get(fact.id) ?? fact.statement,
-      publicUse: fact.publicUse, source: fact.source, roundId: round.id, confirmedBy: actor, at, corrected: corrected.has(fact.id) }));
+    // The Operator's answers become Reviews of the round's Changes; what is recorded, added or
+    // revised is read from the Change ledger, not from the summary's lists.
+    let ledger: ChangeLedger;
+    try {
+      ledger = reviewRound(roundLedger(state.changes, round, version, state.pages), round, decision, actor, at, state.pages);
+    } catch (error) {
+      if (error instanceof RoundConflict) throw new IntakeError("draft_changed", 409);
+      if (error instanceof ChangeError) throw new IntakeError("invalid_request", 400);
+      throw error;
+    }
+    const outcome = approvedInRound(ledger, round.id);
+    const confirmed = round.analysis.facts.filter(fact => outcome.facts.some(item => item.label === fact.id));
+    const rejected = new Set(round.analysis.facts.filter(fact => !confirmed.includes(fact)).map(fact => fact.id));
+    const facts: BusinessFact[] = confirmed.map(fact => {
+      const item = outcome.facts.find(entry => entry.label === fact.id)!;
+      return { id: round.id + ":" + fact.id, statement: item.statement, publicUse: fact.publicUse, source: fact.source, roundId: round.id,
+        confirmedBy: actor, at, corrected: item.corrected };
+    });
     // New Pages the Operator asked for and did not leave out join the site plan with their brief.
-    const rejectedPages = new Set(decision.rejectPages ?? []);
-    const added = (round.analysis.newPages ?? []).filter(page => !rejectedPages.has(page.id) &&
+    const added = (round.analysis.newPages ?? []).filter(page => outcome.pages.some(item => item.label === page.id) &&
       !state.blueprint?.pages.some(planned => planned.path === page.path));
     const proposed = [...round.noteRevisions, ...round.analysis.revisions];
-    const approved = proposed.filter((revision, index) => !decision.rejectRevisions.includes(index) &&
-      (revision.source === "note" || revision.factIds.some(id => confirmed.some(fact => fact.id === id)) ||
-        (revision.newPageIds ?? []).some(id => added.some(page => page.id === id))));
+    const approved = outcome.revisions.flatMap(item => proposed[item.index] ?? []).filter(revision => revision.source === "note" ||
+      revision.factIds.some(id => confirmed.some(fact => fact.id === id)) || (revision.newPageIds ?? []).some(id => added.some(page => page.id === id)));
     const paths = [...new Set(approved.map(item => item.path))].filter(path => state.pages.some(page => page.path === path));
     const sections = paths.flatMap(path => {
       const own = approved.filter(item => item.path === path);
@@ -1104,8 +1129,8 @@ export class PresenceWorkflow {
       ...approved.filter(revision => revision.source === "page").map(revision => ({ path: revision.path,
         concern: "New Page added to the site at the Operator's request: " + added.filter(page => revision.newPageIds?.includes(page.id))
           .map(page => `${page.label} (${page.path})`).join(", ") + ". " + revision.reason })),
-      ...(decision.reviseNotes ?? []).flatMap(note => approved.includes(proposed[note.index]) && proposed[note.index]
-        ? [{ path: proposed[note.index].path, concern: "Operator note on the Review summary for this change: " + note.text.slice(0, 2000) }] : [])]
+      ...outcome.revisions.flatMap(item => approved.includes(proposed[item.index]) ? item.words.map(words =>
+        ({ path: proposed[item.index].path, concern: "Operator note on the Review summary for this change: " + words })) : [])]
       .filter(item => paths.includes(item.path));
     const factNoteReply = (id: number) => {
       const note = round.factNotes.find(item => item.id === id);
@@ -1120,8 +1145,7 @@ export class PresenceWorkflow {
       return added.includes(page) ? `MioPages Core added the page "${page.label}" (${page.path}) in response to this note. Please review it.`
         : "MioPages Core did not add this page: it was left out on the Review summary.";
     };
-    const extra = new Map<string, string[]>();
-    for (const note of decision.pageNotes ?? []) extra.set(note.id, [...extra.get(note.id) ?? [], note.text.slice(0, 2000)]);
+    const extra = new Map(outcome.pages.map(item => [item.label, item.words]));
     const blueprint = added.length && state.blueprint ? { ...state.blueprint,
       pages: [...state.blueprint.pages, ...added.map(page => ({ path: page.path, label: page.label, purpose: page.purpose, sourceIds: page.sourceIds,
         decisionBrief: page.decisionBrief, operatorRequest: [page.request, ...extra.get(page.id) ?? []].join("\n\n") }))],
@@ -1141,6 +1165,9 @@ export class PresenceWorkflow {
     return this.view(context, await this.store.append(context, version, { ...state, ...revision, blueprint,
       pages: state.pages.filter(page => !paths.includes(page.path)), wordpressReviews: [...state.wordpressReviews ?? [], review],
       businessFacts: [...state.businessFacts ?? [], ...facts],
+      // Facts are recorded and pages added now; section and page revisions are applied when Core writes them.
+      changes: appliedInRound(ledger, round.id, change => change.target.grain === "fact" ||
+        (change.target.grain === "new-page" && added.some(page => page.path === change.target.path)), at, version + 1),
       reviewRounds: [...state.reviewRounds!.slice(0, -1), { ...round, status: "decided", decision: { at, actor,
         confirmedFacts: facts.map(fact => fact.id), rejectedFacts: [...rejected], revisions: approved,
         ...(added.length && { addedPages: added.map(page => page.path) }) } }] }));
@@ -1159,7 +1186,12 @@ export class PresenceWorkflow {
     if (!last || state.work || state.revisionRequest?.source !== "operator-review" && last.revisedPaths.length ||
         !before || (before.wordpressReviews?.length ?? 0) !== state.wordpressReviews!.length - 1) throw new IntakeError("workflow_not_ready", 409);
     const { version: _previousVersion, ...restored } = before;
-    return this.view(context, await this.store.append(context, version, { ...restored,
+    // The withdrawn round stays in the Change ledger: its Requests withdrawn, its kept edits reverted.
+    const withdrawnRound = (state.reviewRounds?.length ?? 0) > (before.reviewRounds?.length ?? 0) ? state.reviewRounds!.at(-1) : undefined;
+    const changes = withdrawnRound && state.changes?.rounds.some(item => item.id === withdrawnRound.id)
+      ? withdrawRound(state.changes, withdrawnRound.id, new Date(this.clock()).toISOString(), { id: actor.id, role: actor.role, simulated: actor.simulated })
+      : restored.changes;
+    return this.view(context, await this.store.append(context, version, { ...restored, ...(changes && { changes }),
       withdrawnReviews: [...state.withdrawnReviews ?? [], { ...last, withdrawnAt: new Date(this.clock()).toISOString(), withdrawnBy: actor,
         reason: text(reason, 500) }] }));
   }
