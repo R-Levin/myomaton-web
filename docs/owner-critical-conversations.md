@@ -1165,3 +1165,10 @@ Running a real round (AI analysis about $0.25) is still to be approved separatel
 (rollback copy app-before-b65bb81-was-f4569d6-20261123T201755Z); miopages.org runs plugin
 0.1.4 (0.1.3 archived). Read-back from the updated Core: delivery 2, no edited or missing
 pages, no open Notes. No AI call.
+
+**Nov 24: old drafts moved to Trash on miopages.org.** The owner's first review edit went onto
+an old Nov 17 "Contact MioPages" draft (page 36), which Core does not manage, so Core could not
+see it. On the owner's yes, the 16 pre-Core draft pages (IDs 13-16 and 26-37, Nov 12-17) were
+moved to Trash, where they can still be restored; page 36 keeps the owner's edit. Core's nine pages
+(53-61) are untouched, and Core's read-back still passes (delivery 2, no edits). Open point the
+owner raised by the edit: Core's site has no Contact page, and the review loop cannot add a page yet.
