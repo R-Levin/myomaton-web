@@ -1,7 +1,8 @@
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { existsSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { Pool } from "pg";
 import { disposableCluster } from "../backup/disposable-cluster";
@@ -33,17 +34,19 @@ async function main() {
     { operatorId: "specialist", authorityReference: "Local preview" }, "For C0 the Principal speaks as the Client");
   await pool.end();
   const root = await mkdtemp(join(tmpdir(), "miopages-workspace-preview-"));
-  // The delivery plugin needs WordPress on MySQL/MariaDB, as hosted. Until a local one is set up
-  // (MIOPAGES_PREVIEW_MYSQL), the preview runs without WordPress and the workspace says so.
-  const wordpress = process.env.MIOPAGES_PREVIEW_MYSQL ? await previewWordPress({ root, port: Number(process.env.WORDPRESS_PORT ?? 4481), organizationId: organization,
+  // The delivery plugin needs WordPress on MySQL/MariaDB, as hosted: MIOPAGES_PREVIEW_MYSQL is a
+  // local MariaDB's bin folder (default: ~/tools/mariadb-11.4.14-winx64/bin). Without it the preview runs without WordPress and the workspace says so.
+  const mysqlBin = process.env.MIOPAGES_PREVIEW_MYSQL ?? join(homedir(), "tools", "mariadb-11.4.14-winx64", "bin");
+  const wordpress = existsSync(join(mysqlBin, "mariadbd.exe")) ? await previewWordPress({ root, port: Number(process.env.WORDPRESS_PORT ?? 4481), databasePort: Number(process.env.WORDPRESS_DATABASE_PORT ?? 4482),
+    mysqlBin, organizationId: organization,
     account: { webPresenceId, managedSiteId }, siteName: "MioPages (C0)",
     source: process.env.WORDPRESS_SOURCE ?? "../p022-wp-validation/wordpress" }) : null;
-  console.log(`Workspace preview: http://localhost:${port}/workspace`);
+  console.log(`Workspace preview: http://127.0.0.1:${port}/workspace`);
   console.log(wordpress ? `Its WordPress: ${wordpress.origin}/wp-admin (login in ${wordpress.login})` : "No WordPress: set MIOPAGES_PREVIEW_MYSQL to a local MariaDB to add one.");
   const next = spawn(process.execPath, ["node_modules/next/dist/bin/next", "dev", "-H", "127.0.0.1", "-p", String(port)], { stdio: "inherit",
     env: { ...process.env, MIOPAGES_WORKSPACE: "local-preview", SERVICE_DATABASE_URL: cluster.url, DATABASE_URL: cluster.url, NEXT_TELEMETRY_DISABLED: "1",
     ...(wordpress && { MIOPAGES_PREVIEW_WORDPRESS: wordpress.config }) } });
-  const stop = async () => { next.kill(); wordpress?.server.kill(); await cluster.stop().catch(() => undefined);
+  const stop = async () => { next.kill(); wordpress?.stop(); await cluster.stop().catch(() => undefined);
     await rm(root, { recursive: true, force: true }).catch(() => undefined); process.exit(0); };
   process.on("SIGINT", stop); process.on("SIGTERM", stop); next.on("exit", stop);
 }

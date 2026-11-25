@@ -170,3 +170,11 @@ Plain server-rendered pages, one form per action, every action checking who is a
   is set up (a download, for the Principal's OK). Delivery and Notes remain tested on the plugin's
   own code (`tests/integration/service-launch.test.ts`). Also still to do: Report corrections
   that state facts, and a hand edit as the Specialist's own Change.
+- *Nov 25, WordPress from the workspace (local preview):* with the Principal's OK, a portable
+  MariaDB now backs the preview's own throwaway WordPress. Checked in the browser: the Specialist
+  sends the approved site as review drafts (they render in WordPress with the managed theme, the
+  Menu and FPO image placeholders); a Note on the Start page is read back as a Request on that
+  page; Core reworks it, the Specialist approves, and the next draft answers and resolves the
+  Note in WordPress. (The Note was added through WordPress directly, standing in for a person
+  typing it in the editor.) Still to do in milestone 2: Report corrections that state facts, and
+  a hand edit as the Specialist's own Change.

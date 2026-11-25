@@ -4,8 +4,12 @@
     {
       "name": "workspace-preview",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["tsx", "scripts/service/workspace-preview.ts"],
-      "port": 4480
+      "runtimeArgs": [
+        "tsx",
+        "scripts/service/workspace-preview.ts"
+      ],
+      "port": 4480,
+      "url": "http://127.0.0.1:4480"
     }
   ]
 }

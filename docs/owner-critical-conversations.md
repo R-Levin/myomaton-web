@@ -1348,3 +1348,9 @@ Principal approves.
 - The Principal's approvals "will be pretty much proforma at this point", because their picture
   of what exists is clouded by what was asked for and not delivered. Claude carries the
   technical judgment; the real gates still stop for the Principal, explained plainly.
+
+- **Nov 25 — local MariaDB for the preview WordPress.** Asked whether Claude may download
+  portable MariaDB (about 90 MB, from mariadb.org) so the workspace preview's throwaway WordPress
+  can take drafts the way the hosted one does (the delivery plugin needs MySQL), the Principal
+  said "Yes, download it". Downloaded 11.4.14 (checksum checked) to the Principal's computer,
+  outside the repository; it runs only while the preview runs, on this computer only.

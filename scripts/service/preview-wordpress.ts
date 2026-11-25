@@ -10,22 +10,37 @@ import { enrolReviewSite } from "../wordpress-enrol-review-site";
  * WordPress on this computer with an empty database, this branch's delivery plugin and theme,
  * and its own delivery keys, enrolled exactly as a real review site is. Drafts from the
  * workspace land here, and the Principal can open them, leave Notes and edit, without touching
- * any existing local site. Everything lives in `root` and goes when the preview stops.
- *
- * Not finished: the plugin writes drafts in a MySQL transaction (InnoDB and GET_LOCK), so the
- * database must move from SQLite to a local MariaDB before drafts can land here.
+ * any existing local site. Its database is a throwaway MariaDB (`mysqlBin`), because the plugin
+ * writes drafts in a MySQL transaction (InnoDB and GET_LOCK), as on the hosting. Everything lives
+ * in `root` and goes when the preview stops.
  */
 const php = process.env.PHP_BIN ?? "C:/php/php.exe";
-const phpFlags = ["-d", "extension_dir=C:/php/ext", "-d", "extension=pdo_sqlite", "-d", "extension=sqlite3", "-d", "extension=gd"];
+const phpFlags = ["-d", "extension_dir=C:/php/ext", "-d", "extension=mysqli", "-d", "extension=gd"];
 const phpString = (value: string) => "'" + value.replaceAll("\\", "\\\\").replaceAll("'", "\\'") + "'";
 const slash = (path: string) => path.replaceAll("\\", "/");
 
-export async function previewWordPress(input: { root: string; source: string; port: number; organizationId: string;
+/** Start a throwaway MariaDB on this computer only, with a random root password; wait until it answers. */
+async function throwawayMariaDB(mysqlBin: string, root: string, port: number) {
+  const data = join(root, "mariadb"), password = randomBytes(18).toString("base64url");
+  const made = spawnSync(join(mysqlBin, "mariadb-install-db.exe"), [`--datadir=${data}`, `--password=${password}`, `--port=${port}`], { encoding: "utf8" });
+  if (made.status !== 0) throw Error("Preview MariaDB did not initialise: " + (made.stderr || made.stdout).slice(0, 300));
+  const server = spawn(join(mysqlBin, "mariadbd.exe"), [`--datadir=${data}`, `--port=${port}`, "--bind-address=127.0.0.1", "--console"], { stdio: "ignore" });
+  const client = (sql: string) => spawnSync(join(mysqlBin, "mariadb.exe"), ["-h", "127.0.0.1", "-P", String(port), "-u", "root", "-e", sql],
+    { encoding: "utf8", env: { ...process.env, MYSQL_PWD: password } });
+  for (let tries = 0; client("SELECT 1").status !== 0; tries++) {
+    if (tries > 60) { server.kill(); throw Error("Preview MariaDB did not start"); }
+    await new Promise(done => setTimeout(done, 500));
+  }
+  if (client("CREATE DATABASE miopages_preview CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci").status !== 0) { server.kill(); throw Error("Preview database not created"); }
+  return { server, host: `127.0.0.1:${port}`, password };
+}
+
+export async function previewWordPress(input: { root: string; source: string; port: number; databasePort: number; mysqlBin: string; organizationId: string;
   account: { webPresenceId: string; managedSiteId: string }; siteName: string }) {
   const { root, port } = input, origin = `http://127.0.0.1:${port}`;
   const site = join(root, "wordpress"), secrets = join(root, "private");
   // WordPress itself, without the source site's content, local helpers or older copies of MioPages' plugin and theme.
-  const skip = ["wp-config.php", "wp-content/uploads", "wp-content/mu-plugins", "wp-content/plugins/miopages-delivery", "wp-content/themes/miopages-managed-site"];
+  const skip = ["wp-config.php", "wp-content/db.php", "wp-content/plugins/sqlite-database-integration", "wp-content/uploads", "wp-content/mu-plugins", "wp-content/plugins/miopages-delivery", "wp-content/themes/miopages-managed-site"];
   await cp(input.source, site, { recursive: true, filter: from => !skip.some(item => slash(relative(input.source, from)).startsWith(item)) });
   await cp("wordpress/miopages-delivery", join(site, "wp-content/plugins/miopages-delivery"), { recursive: true });
   await cp("wordpress/miopages-managed-site", join(site, "wp-content/themes/miopages-managed-site"), { recursive: true });
@@ -39,12 +54,16 @@ export async function previewWordPress(input: { root: string; source: string; po
   const enrolled = await enrolReviewSite([secrets, "preview", origin, input.organizationId, input.account.webPresenceId, input.account.managedSiteId,
     "core-delivery", wordmark, randomUUID(), randomUUID(), input.siteName], {});
 
+  const database = await throwawayMariaDB(input.mysqlBin, root, input.databasePort);
   const salts = ["AUTH_KEY", "SECURE_AUTH_KEY", "LOGGED_IN_KEY", "NONCE_KEY", "AUTH_SALT", "SECURE_AUTH_SALT", "LOGGED_IN_SALT", "NONCE_SALT"]
     .map(name => `define('${name}', '${randomBytes(32).toString("hex")}');`).join("\n");
   await writeFile(join(site, "wp-config.php"), `<?php
 // Workspace preview only: a throwaway WordPress on this computer.
 define('DB_NAME', 'miopages_preview');
-define('DB_PATH', ${phpString(slash(join(root, "site.sqlite")))});
+define('DB_USER', 'root');
+define('DB_PASSWORD', ${phpString(database.password)});
+define('DB_HOST', '${database.host}');
+define('DB_CHARSET', 'utf8mb4');
 define('WP_HOME', '${origin}');
 define('WP_SITEURL', '${origin}');
 define('WP_HTTP_BLOCK_EXTERNAL', true);
@@ -73,12 +92,13 @@ update_option('blog_public', '0');
 $plugin = activate_plugin('miopages-delivery/miopages-delivery.php');
 if (is_wp_error($plugin)) { fwrite(STDERR, $plugin->get_error_message()); exit(1); }
 switch_theme('miopages-managed-site');
-$user = wp_insert_user(['user_login' => 'core-delivery', 'user_pass' => ${phpString(randomBytes(24).toString("hex"))}, 'role' => 'editor', 'user_email' => 'core-delivery@preview.test']);
+$user = wp_insert_user(['user_login' => 'core-delivery', 'user_pass' => ${phpString(randomBytes(24).toString("hex"))}, 'role' => 'editor', 'display_name' => 'MioPages Core', 'user_email' => 'core-delivery@preview.test']);
 if (is_wp_error($user)) { fwrite(STDERR, $user->get_error_message()); exit(1); }
 echo 'installed';
 `;
   await writeFile(join(root, "install.php"), install);
   const installed = spawnSync(php, [...phpFlags, join(root, "install.php")], { encoding: "utf8", cwd: site });
+  if (installed.status !== 0 || !installed.stdout.includes("installed")) database.server.kill();
   if (installed.status !== 0 || !installed.stdout.includes("installed")) throw Error("Preview WordPress did not install: " + (installed.stderr || installed.stdout).slice(0, 400));
 
   await writeFile(join(root, "router.php"), `<?php
@@ -91,5 +111,6 @@ chdir(__DIR__ . '/wordpress');
 require __DIR__ . '/wordpress/index.php';
 `);
   const server: ChildProcess = spawn(php, [...phpFlags, "-S", `127.0.0.1:${port}`, "-t", site, join(root, "router.php")], { stdio: "ignore", cwd: site });
-  return { origin, server, config: join(secrets, enrolled.files[0]), login: join(root, "WORDPRESS-LOGIN.txt").split(sep).join("/") };
+  const stop = () => { server.kill(); database.server.kill(); };
+  return { origin, stop, config: join(secrets, enrolled.files[0]), login: join(root, "WORDPRESS-LOGIN.txt").split(sep).join("/") };
 }
