@@ -32,6 +32,7 @@ import { summarizePresenceWorkflowUsage } from "../../lib/platform/intake/intell
 import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig, type ReviewDeliveryState } from "../../lib/platform/wordpress-delivery/operator-review";
 import { operatorFeedback } from "../../lib/platform/intake/operator-feedback";
 import { reviewSummaryPage, reviewSummaryPath } from "../../lib/platform/intake/presence-workflow-delivery";
+import { roundOutcome } from "../../lib/platform/intake/review-round-changes";
 import { reviewDecisionFromReadback } from "../../lib/platform/wordpress-delivery/operator-review";
 
 const digest = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
@@ -319,10 +320,11 @@ export async function evaluationCommand(args: string[], env: NodeJS.ProcessEnv =
         const actor = { id: "local-evaluation-operator", role: "operator" as const, simulated: false, authority: "Operator decision in WordPress " + request.site };
         const view = await workflow.decideReview(context, prior.version, actor, decision,
           { readbackRevision: feedback.readbackRevision, acknowledged: feedback.acknowledged, summaryNotes: replies });
-        const decided = view?.reviewRounds?.at(-1)?.decision;
+        const round = view?.reviewRounds?.at(-1);
+        const decided = view?.changes && round ? roundOutcome(view.changes, round.id) : undefined;
         return { site: request.site, approved: true, version: view?.version, next: view?.next,
-          factsRecorded: decided?.confirmedFacts.length ?? 0, factsLeftOut: decided?.rejectedFacts.length ?? 0, pagesAdded: decided?.addedPages ?? [],
-          changes: decided?.revisions.map(item => ({ path: item.path, sections: item.indexes.length ? item.indexes : "whole page" })) ?? [] };
+          factsRecorded: decided?.factsRecorded.length ?? 0, factsLeftOut: decided?.factsLeftOut.length ?? 0, pagesAdded: decided?.pagesAdded ?? [],
+          changes: decided?.changes.map(item => ({ path: item.path, sections: item.sections.length ? item.sections : "whole page" })) ?? [] };
       }
       const { state: next, receipt } = await deliverReviewDraft({ config, context, view: prior, state });
       await createPrivate(join(root, `wordpress-${request.site}-r${next.revision}.json`), JSON.stringify({ ...next, receipt }, null, 2) + "\n");

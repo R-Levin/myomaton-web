@@ -3,6 +3,8 @@ import { designProjection } from "../design-systems/site-design";
 import { pageProposal, type PageProposal } from "../content-editing/proposal";
 import { nativeDraftBaseline } from "../wordpress-delivery/site-draft";
 import type { PresenceWorkflowView, WorkflowContext } from "./presence-workflow";
+import { roundChanges, type Change } from "../change/model";
+import { internalOnly, roundLedger } from "./review-round-changes";
 
 function logicalId(value: unknown) {
   const id = fingerprint(value);
@@ -139,38 +141,50 @@ const where = (path: string, indexes: readonly number[]) => indexes.length
   ? `${path}, section${indexes.length > 1 ? "s" : ""} ${indexes.map(index => index + 1).join(", ")}` : `${path} (whole page)`;
 
 /**
- * The Review summary Core delivers as a draft page while a review round awaits the Operator's
- * decision (owner decision, Nov 23). Each item is its own section so a Note can answer it.
+ * The Review summary Core delivers as a draft page while a review round awaits the Specialist's
+ * decision (Principal decision, Nov 23). It is a view of the round's Proposed changes in the
+ * Change area: each item is one Change, or a Request no Change answers, in its own section so a
+ * Note can answer it.
  */
 export function reviewSummaryPage(context: WorkflowContext, view: PresenceWorkflowView) {
   const round = view.reviewRounds?.at(-1);
   if (round?.status !== "summary" || !round.analysis) return null;
-  const analysis = round.analysis;
+  const ledger = roundLedger(view.changes, round, view.version, view.pages);
+  const decision = ledger.decisions.find(item => item.id === `${round.id}:analysis`);
+  if (!decision) return null;
+  const changes = roundChanges(ledger, round.id);
+  const requestsOf = (change: Change) => ledger.requests.filter(request => change.requestIds.includes(request.id));
+  const labelOf = (id: string) => ledger.changes.find(change => change.id === id)?.label ?? id;
+  const facts = changes.filter(change => change.target.grain === "fact");
+  const pages = changes.filter(change => change.target.grain === "new-page");
+  const revisions = changes.filter(change => change.label.startsWith("C"));
   const items: { item: SummaryItem; heading: string; text: string }[] = [];
-  const revisions = [...round.noteRevisions, ...analysis.revisions];
   items.push({ item: { kind: "approve" }, heading: "Review summary",
-    text: [analysis.summary,
-      `Your edits are already kept. Below are the business facts Core proposes to record${analysis.newPages?.length ? ", the pages it proposes to add" : ""} and the changes it proposes to make. Nothing is recorded, added or changed until you approve. Estimated AI cost of the changes: about ${dollars(analysis.estimateMicros)}.`,
+    text: [decision.reasoning,
+      `Your edits are already kept. Below are the business facts Core proposes to record${pages.length ? ", the pages it proposes to add" : ""} and the changes it proposes to make. Nothing is recorded, added or changed until you approve. Estimated AI cost of the changes: about ${dollars(decision.estimateMicros ?? 0)}.`,
       "To approve, add a note on this paragraph saying Approve. To leave out an item, add a note on it saying No. To correct a fact, add a note on it with the corrected wording. To add to a change or a new page, add a note on it saying what else it should do."].join("\n\n") });
-  for (const fact of analysis.facts) items.push({ item: { kind: "fact", id: fact.id },
-    heading: `Fact ${fact.id}: from your ${fact.source.kind === "note" ? "note" : "edit"} on ${fact.source.path}`,
-    text: fact.statement + (fact.publicUse ? "" : "\n\n(For Core's understanding only; not for the website.)") });
-  for (const page of analysis.newPages ?? []) items.push({ item: { kind: "page", id: page.id },
-    heading: `New page ${page.id}: ${page.label} (${page.path})`,
-    text: [page.purpose, page.navigation ? "It goes in the main menu." : "It is linked from other pages, not the main menu.",
-      "You asked: " + page.request].join("\n\n") });
-  for (const note of round.pageNotes ?? []) if (!analysis.newPages?.some(page => page.noteId === note.id)) items.push({ item: { kind: "info" },
-    heading: "No page proposed for your request", text: "You asked: " + note.request + "\n\n" + (round.analysisNotes?.refusedPageNotes?.includes(note.id)
-      ? "Core drafted a page plan for this, but it did not pass Core's checks (for example, it was at an address the site already uses, or its brief did not trace to the business knowledge), so it is left out. To try again, add a new note starting New page: after this review."
-      : "Core did not propose a page for this; the summary above says why.") });
-  revisions.forEach((revision, index) => items.push({ item: { kind: "revision", index },
-    heading: `Change C${index + 1}: ${where(revision.path, revision.indexes)}`,
-    text: revision.source === "note" ? "Revise in response to your note: " + round.notes.filter(note => note.path === revision.path).map(note => note.text).join(" / ")
-      : `Because of ${[...revision.factIds, ...revision.newPageIds ?? []].join(", ")}: ${revision.reason}` }));
-  if (!analysis.facts.length && !revisions.length && !analysis.newPages?.length) items.push({ item: { kind: "edit" }, heading: "Nothing else to change",
+  for (const fact of facts) items.push({ item: { kind: "fact", id: fact.label },
+    heading: `Fact ${fact.label}: from your ${requestsOf(fact).some(request => request.origin.channel === "wordpress-note") ? "note" : "edit"} on ${fact.target.path}`,
+    text: fact.difference.after + (internalOnly(fact) ? "\n\n(For Core's understanding only; not for the website.)" : "") });
+  for (const page of pages) items.push({ item: { kind: "page", id: page.label },
+    heading: `New page ${page.label}: ${page.target.name ?? page.target.path} (${page.target.path})`,
+    text: [page.difference.after, page.difference.summary + ".", "You asked: " + requestsOf(page).map(request => request.words).join(" / ")].join("\n\n") });
+  // A "New page:" Note that no Change answers is said so, not dropped.
+  const answered = new Set(changes.flatMap(change => change.requestIds));
+  for (const request of ledger.requests.filter(item => item.roundId === round.id && item.target.grain === "new-page" && !answered.has(item.id))) {
+    items.push({ item: { kind: "info" }, heading: "No page proposed for your request", text: "You asked: " + request.words + "\n\n" +
+      (round.analysisNotes?.refusedPageNotes?.includes(Number(request.channelRef))
+        ? "Core drafted a page plan for this, but it did not pass Core's checks (for example, it was at an address the site already uses, or its brief did not trace to the business knowledge), so it is left out. To try again, add a new note starting New page: after this review."
+        : "Core did not propose a page for this; the summary above says why.") });
+  }
+  for (const revision of revisions) items.push({ item: { kind: "revision", index: Number(revision.label.slice(1)) - 1 },
+    heading: `Change ${revision.label}: ${where(revision.target.path!, revision.target.sections ?? [])}`,
+    text: revision.dependsOn?.length ? `Because of ${revision.dependsOn.map(labelOf).join(", ")}: ${revision.difference.summary}`
+      : "Revise in response to your note: " + requestsOf(revision).map(request => request.words).join(" / ") });
+  if (!facts.length && !revisions.length && !pages.length) items.push({ item: { kind: "edit" }, heading: "Nothing else to change",
     text: "Core found no business facts to record and no other changes to make." });
-  for (const edit of round.edits) items.push({ item: { kind: "edit" }, heading: `Kept: your edit on ${edit.path}`,
-    text: `Before: ${edit.before}\n\nNow: ${edit.after}` });
+  for (const edit of changes.filter(change => change.label.startsWith("E"))) items.push({ item: { kind: "edit" },
+    heading: `Kept: your edit on ${edit.target.path}`, text: `Before: ${edit.difference.before}\n\nNow: ${edit.difference.after}` });
   const pageId = logicalId({ site: context.scope.managedSiteId, path: reviewSummaryPath });
   const sections = items.map((entry, index) => ({ id: logicalId({ round: round.id, item: index }), type: "intro",
     content: { heading: entry.heading.slice(0, 300), text: entry.text } }));

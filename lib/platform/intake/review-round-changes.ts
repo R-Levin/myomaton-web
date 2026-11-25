@@ -28,6 +28,10 @@ const changeId = (round: Pick<ReviewRound, "id">, label: string) => `${round.id}
 export const revisionLabel = (index: number) => "C" + (index + 1);
 
 type Page = { path: string };
+const publicFact = "Record this business fact";
+const internalFact = "Record this business fact (for Core's understanding only; not for the website)";
+/** Whether a proposed fact is for Core's understanding only, not for the website. */
+export const internalOnly = (change: Change) => change.difference.summary === internalFact;
 
 /** The Requests an Operator review round raises, and the hand edits already kept. */
 export function takeInRound(ledger: ChangeLedger | undefined, round: ReviewRound, version: number): ChangeLedger {
@@ -73,11 +77,10 @@ export function analysedRound(ledger: ChangeLedger, round: ReviewRound, version:
     : round.edits.flatMap((edit, index) => edit.path === source.path && edit.after === source.text ? [editRequestId(round, index)] : []);
   const facts: Omit<Change, "status" | "reviews" | "decisionId">[] = analysis.facts.map(fact => ({ id: changeId(round, fact.id), label: fact.id, at,
     requestIds: sourceRequest(fact.source), target: { grain: "fact", path: fact.source.path }, base: { version },
-    difference: { summary: fact.publicUse ? "Record this business fact" : "Record this business fact (for Core's understanding only; not for the website)",
-      after: fact.statement }, preserve: [], consequence: "operator-review" }));
+    difference: { summary: fact.publicUse ? publicFact : internalFact, after: fact.statement }, preserve: [], consequence: "operator-review" }));
   const newPages: Omit<Change, "status" | "reviews" | "decisionId">[] = (analysis.newPages ?? []).map(page => ({ id: changeId(round, page.id), label: page.id, at,
-    requestIds: [noteRequestId(round, page.noteId)], target: { grain: "new-page", path: page.path }, base: { version },
-    difference: { summary: `Add the page ${page.label} (${page.path}) to the site plan${page.navigation ? ", in the main menu" : ""}`, after: page.purpose },
+    requestIds: [noteRequestId(round, page.noteId)], target: { grain: "new-page", path: page.path, name: page.label }, base: { version },
+    difference: { summary: `Add the page ${page.label} (${page.path}) to the site plan${page.navigation ? ", in the main menu" : ", linked from other pages rather than the main menu"}`, after: page.purpose },
     preserve: [], consequence: "operator-review" }));
   const revisions = [...round.noteRevisions, ...analysis.revisions].map((revision, index): Omit<Change, "status" | "reviews" | "decisionId"> => {
     const factChanges = revision.factIds.map(id => changeId(round, id));
@@ -159,4 +162,17 @@ export function approvedInRound(ledger: ChangeLedger, roundId: string) {
 export function appliedInRound(ledger: ChangeLedger, roundId: string, which: (change: Change) => boolean, at: string, version: number) {
   const ids = roundChanges(ledger, roundId).filter(change => change.status === "approved" && which(change)).map(change => change.id);
   return ids.length ? markApplied(ledger, ids, at, version) : ledger;
+}
+
+/** What a decided Round recorded, added and changed, read from its Changes. */
+export function roundOutcome(ledger: ChangeLedger, roundId: string) {
+  const changes = roundChanges(ledger, roundId);
+  const done = (change: Change) => change.status === "approved" || change.status === "applied";
+  return {
+    factsRecorded: changes.filter(change => change.target.grain === "fact" && change.status === "applied").map(change => change.label),
+    factsLeftOut: changes.filter(change => change.target.grain === "fact" && change.status === "declined").map(change => change.label),
+    pagesAdded: changes.filter(change => change.target.grain === "new-page" && change.status === "applied").map(change => change.target.path!),
+    changes: changes.filter(change => change.label.startsWith("C") && done(change))
+      .map(change => ({ label: change.label, path: change.target.path!, sections: change.target.sections ?? [] })),
+  };
 }

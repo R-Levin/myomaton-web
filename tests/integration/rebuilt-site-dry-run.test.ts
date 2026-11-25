@@ -23,6 +23,10 @@ import { workPresenceCase } from "../../lib/platform/intake/protected-presence-w
 import { createResponsesPresenceWorkflow } from "../../lib/platform/intake/presence-workflow-provider";
 import { initializeResponsesUsageLedger } from "../../lib/platform/intake/intelligent-responses";
 import { reviewSummaryPage, workflowNativeReviewCandidate } from "../../lib/platform/intake/presence-workflow-delivery";
+import { roundOutcome } from "../../lib/platform/intake/review-round-changes";
+import { timeline } from "../../lib/platform/change/model";
+import { observeDelivery } from "../../lib/platform/measurement/observation-beacon";
+import { accountTasks, queue } from "../../lib/platform/work/tasks";
 import { pendingContent, type NativeNode } from "../../lib/platform/intake/presence-native-component";
 import type { MarketingAuthority } from "../../lib/platform/intake/presence-marketing-authority";
 import { IntakeService } from "../../lib/platform/intake/service";
@@ -346,7 +350,8 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     check = await readBackOperatorSite(config, fetcher);
     revised = (await decideFromWordPress(check.readback, revised))!;
     assert.deepEqual(revised.businessFacts!.map(fact => fact.source.path), ["/service"], "The confirmed fact is in Core's knowledge");
-    assert.deepEqual(revised.reviewRounds!.at(-1)!.decision!.revisions.map(item => item.path), ["/start"], "The change marked No is left out");
+    assert.deepEqual(roundOutcome(revised.changes!, round.id).changes.map(item => item.path), ["/start"], "The change marked No is left out");
+    assert.equal(revised.reviewRounds!.at(-1)!.decision, undefined, "What was decided lives in the Change ledger only");
     assert.deepEqual(statuses(revised, round.id), { E1: "applied", F1: "applied", C1: "approved", C2: "declined" }, "The ledger decides");
     assert.ok(!revised.pages.some(page => page.path === "/start"), "The approved change is queued");
     for (let step = 0; step < 6 && revised.pages.length < 3; step++) revised = (await workPresenceCase(workflow, context))!;
@@ -409,11 +414,11 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     note2(702, pageItem, "Also say we reply within two working days.");
     note2(703, 0, "Approve");
     revised = (await decideFromWordPress((await readBackOperatorSite(config, fetcher)).readback, revised))!;
-    assert.deepEqual(revised.reviewRounds!.at(-1)!.decision!.addedPages, ["/contact"]);
+    assert.deepEqual(roundOutcome(revised.changes!, proposedRound.id).pagesAdded, ["/contact"]);
     // "Add a page" is a Change of the new-page grain, approved with the Operator's addition.
     const p1 = revised.changes!.changes.find(change => change.id === proposedRound.id + ":P1")!;
     assert.deepEqual([p1.target, p1.status, p1.reviews.map(entry => [entry.response, entry.words])],
-      [{ grain: "new-page", path: "/contact" }, "applied", [["approve", "Also say we reply within two working days."]]]);
+      [{ grain: "new-page", path: "/contact", name: "Contact" }, "applied", [["approve", "Also say we reply within two working days."]]]);
     assert.deepEqual(statuses(revised, proposedRound.id), { P1: "applied", C1: "approved" });
     assert.ok(revised.blueprint!.navigation.includes("/contact"), "The new page is in the menu");
     const sentBeforePage = requests.length;
@@ -436,6 +441,16 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.deepEqual(recorded.map(([id]) => id), [702, 703], "Notes answered in round 1 are not read again");
     assert.match(String(recorded[0][1]), /include this when it writes the page/);
     const thirdState = fourth;
+
+    // The cycle closes at its exact places, with labelled Beacons where pieces are unbuilt:
+    // Delivery → Observation → Request → Decision ("watch"), and the work waiting shows as Tasks in the Queue.
+    const observed = observeDelivery(revised.changes!, { account: context.intakeId, at: "2026-11-24T13:00:00.000Z", version: revised.version });
+    assert.match(observed.observation.beacon!, /^Beacon:/);
+    assert.deepEqual(timeline(observed.ledger).filter(item => item.id.startsWith(observed.observation.id)).map(item => [item.what, item.by.role]), [["request", "core"], ["decision", "core"]]);
+    assert.equal(observed.ledger.decisions.at(-1)!.outcome, "watch");
+    assert.equal(observed.ledger.changes.length, revised.changes!.changes.length, "Watching proposes no Change");
+    const open = queue(accountTasks(context.intakeId, { ...revised, changes: observed.ledger }, "2026-11-24T13:00:00.000Z"));
+    assert.ok(open.length > 0 && open.every(task => /^Beacon:/.test(task.beacon)), "Every waiting Task is shown, and labelled a Beacon");
 
     // A change the Operator makes after Core took the review in is never overwritten unread.
     wordpress({ mode: "operator", edits: { "/": ["</h1>", " again</h1>"] } });

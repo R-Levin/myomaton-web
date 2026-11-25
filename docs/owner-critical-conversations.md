@@ -1265,3 +1265,7 @@ code change as the owner corrects the glossary.
 - A **Visitor** has arrived on a Client's site but not got in touch; anyone who has got in touch
   is a **Lead**; someone who bought is a **customer**. No other funnel terms.
 - Remove unneeded terminology and duplication. Case doesn't matter where nothing is confusing.
+
+**Nov 24: carry on with the rest of step 2 (Principal).** "OK, carry on with the rest of step 2":
+draw the Review summary from the Changes, remove the round's duplicate record of what was decided,
+and add the labelled Beacons (Observation, Task, Queue) so the cycle runs end to end.

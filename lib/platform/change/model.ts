@@ -33,6 +33,8 @@ export type Target = {
   path?: string;
   /** Zero-based sections of a Page, for the section grain. */
   sections?: number[];
+  /** The name people see, where the target is new (a new Page's label). */
+  name?: string;
 };
 
 /** How much review a Change needs. Publishing always needs customer approval. */

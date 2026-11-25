@@ -85,6 +85,7 @@ export type ReviewRound = { id: string; at: string; actor: Actor; status: "analy
   keep: { path: string; text: string }[];
   noteRevisions: ReviewRevision[];
   analysis?: { facts: ReviewFact[]; revisions: ReviewRevision[]; summary: string; estimateMicros: number; newPages?: ReviewNewPage[] };
+  /** Rounds decided before Nov 24 only: what was decided now lives in the Change ledger. */
   decision?: { at: string; actor: Actor; confirmedFacts: string[]; rejectedFacts: string[]; revisions: ReviewRevision[]; addedPages?: string[] };
   /** What Core left out of the AI's analysis: facts that did not trace to the Operator, revisions already queued. */
   analysisNotes?: { untracedFacts: number; skippedRevisions: number; refusedPages?: number; refusedPageNotes?: number[] } };
@@ -1168,9 +1169,8 @@ export class PresenceWorkflow {
       // Facts are recorded and pages added now; section and page revisions are applied when Core writes them.
       changes: appliedInRound(ledger, round.id, change => change.target.grain === "fact" ||
         (change.target.grain === "new-page" && added.some(page => page.path === change.target.path)), at, version + 1),
-      reviewRounds: [...state.reviewRounds!.slice(0, -1), { ...round, status: "decided", decision: { at, actor,
-        confirmedFacts: facts.map(fact => fact.id), rejectedFacts: [...rejected], revisions: approved,
-        ...(added.length && { addedPages: added.map(page => page.path) }) } }] }));
+      // What was decided lives in the Change ledger (its Reviews); the round records only that it was decided.
+      reviewRounds: [...state.reviewRounds!.slice(0, -1), { ...round, status: "decided" }] }));
   }
 
   /**

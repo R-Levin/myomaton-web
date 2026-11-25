@@ -220,9 +220,9 @@ convenience. It does not change the service's design, so a hybrid costs nothing 
 | Change | Change area with grain, base, conflicts (review rounds, Nov 24); page proposals, releases | Other paths not yet routed |
 | Review | Change area Review (review rounds, Nov 24); several older approval records | Older records not yet routed |
 | Delivery | WordPress stack, sound and shared | Older Next.js path |
-| Observation | Measurement and Contact foundations | Not live; not feeding Requests |
+| Observation | Measurement and Contact foundations; Observation Beacon raises a Request (Nov 24) | Not live; real measurement not feeding Requests |
 | Person and authority | Several working versions | Four separate definitions |
-| Task | Workflow work and retries | No shared task list |
+| Task | Workflow work and retries; Task and Queue Beacons read from the workflow (Nov 24) | No shared task list |
 | Cost | Grant and estimate logic | Lives inside the AI workflow only |
 
 The good news: most objects already exist somewhere in sound form. The work is mainly to:
@@ -258,9 +258,15 @@ until the end.
    the Specialist's answers are Reviews, and **what is recorded, added or revised is now read
    from the Change ledger**. "Add a page" is a Change of the new-page grain. Rounds taken in
    on protected Core before this are read into the ledger when decided.
-   Still to do in this step: draw the Review summary from the Changes rather than the round
-   record, then remove the round's duplicate fields; and the labelled placeholders that
-   let the whole cycle run end to end (Observation, Task, Queue).
+   The Review summary is now a view of the round's Proposed changes, and the round no
+   longer keeps its own copy of what was decided (the Reviews in the ledger are the record).
+   The round still keeps the Notes, edits and Core's raw analysis, because the AI's input
+   and its output checks read them; they move when the AI works per Request (the Decision
+   section above). The cycle now closes end to end with labelled Beacons
+   (`lib/platform/measurement/observation-beacon.ts`, `lib/platform/work/tasks.ts`): after a
+   Delivery, a stand-in Observation raises a Request that Core decides to watch, and the
+   work waiting on each Account shows as Tasks in a Queue, each marked as a Beacon. Nothing
+   is stored or shown on a screen yet; the end-to-end dry run exercises them.
 3. **One Knowledge.** Specialist-learned facts and report corrections become Changes to
    canonical Knowledge. My Business shows the same records Core uses.
 4. **One set of Work products.** The AI workflow's pages and plan become versions of the
