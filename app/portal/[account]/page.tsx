@@ -3,7 +3,7 @@ import { clientAddresses } from "@/lib/platform/accounts/people";
 import { readMyBusiness } from "@/lib/platform/intake/my-business";
 import { outcome } from "@/lib/platform/service/cycle";
 import { accounts, acting, serviceRuntime } from "@/lib/platform/service/runtime";
-import { answerFact, review, signOut } from "../../workspace/actions";
+import { answerFact, answerReport, review, signOut } from "../../workspace/actions";
 import { Content, Frame, ReviewForm, Section, button, field, primary, productName } from "../../workspace/ui";
 
 export const dynamic = "force-dynamic";
@@ -42,7 +42,8 @@ export default async function ClientAccount({ params }: { params: Promise<{ acco
                   return version && (<details key={page.id} className="mt-2 rounded border border-neutral-200 p-3"><summary className="cursor-pointer font-medium">Page {page.path}</summary>
                     <div className="mt-2"><Content item={version} /></div></details>);
                 })}</>) : product && <Content item={product} />}
-              <ReviewForm action={review.bind(null, id, change.id)} approveLabel={isPublish ? "Approve publishing" : "Yes, this is right"} />
+              {product?.kind === "report" ? <ReportForm action={answerReport.bind(null, id, change.id)} findings={(product.content as { findings: { id: string; heading: string }[] }).findings} />
+                : <ReviewForm action={review.bind(null, id, change.id)} approveLabel={isPublish ? "Approve publishing" : "Yes, this is right"} />}
             </article>
           );
         })}
@@ -82,5 +83,26 @@ export default async function ClientAccount({ params }: { params: Promise<{ acco
           <ul className="list-disc pl-6">{business.offerings.map(item => <li key={item.id}><span className="font-medium">{item.name}</span>: {item.summary}</li>)}</ul></>)}
       </Section>
     </Frame>
+  );
+}
+
+/**
+ * The Client's answer to the Report: approve it, or say, finding by finding, what is true. Their
+ * words on a finding go into My Business as their own word, and Core reworks the Report from them.
+ */
+function ReportForm({ action, findings }: { action: (form: FormData) => Promise<void>; findings: { id: string; heading: string }[] }) {
+  return (
+    <form action={action} className="mt-3 space-y-2">
+      <p className="text-sm text-neutral-600">If something is not right, say what is true under that heading. It goes into My Business as your word.</p>
+      {findings.map(finding => (
+        <label key={finding.id} className="block text-sm"><span className="font-medium">{finding.heading}</span>
+          <textarea name={"finding:" + finding.id} rows={1} className={field} placeholder="What is true, in your words (leave empty if right)" /></label>))}
+      <textarea name="words" rows={2} className={field} placeholder="Anything else about the Report as a whole" />
+      <div className="flex flex-wrap gap-2">
+        <button name="response" value="approve" className={primary}>Yes, this is right</button>
+        <button name="response" value="correct" className={button}>Send my corrections</button>
+        <button name="response" value="decline" className={button}>Decline</button>
+      </div>
+    </form>
   );
 }

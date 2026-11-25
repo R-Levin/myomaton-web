@@ -30,6 +30,12 @@ test("Facts are entries of the one Knowledge record and read back with their sta
   assert.deepEqual(factsIn(confirmed).map(item => item.status), ["confirmed", "confirmed"], "The Client later confirms the Proposed fact in place");
   assert.equal(confirmed.entries.length, 3);
   assert.throws(() => withFacts(existing, [fact({ kind: "core" }, { key: "audience" })], { by: "sp", at }), /cannot replace other Knowledge/);
+  assert.throws(() => withFacts(existing, [fact({ kind: "specialist", person: "sp" }, { key: "audience" })], { by: "sp", at }), /cannot replace other Knowledge/);
+  // The Client correcting their own Knowledge (a Report correction) replaces it in place, keeping its kind.
+  const corrected = normalizeKnowledge(withFacts(existing, [fact({ kind: "client", person: "owner", record: "report:c1:audience" },
+    { key: "audience", statement: "Owner-led firms of 3 to 25 people" })], { by: "owner", at }));
+  assert.deepEqual([corrected.entries.length, corrected.entries[0].kind, corrected.entries[0].value, corrected.entries[0].evidence.confirmation],
+    [1, "audience", "Owner-led firms of 3 to 25 people", "confirmed"]);
 });
 
 test("only the Client's own words in the email count as quoted", () => {

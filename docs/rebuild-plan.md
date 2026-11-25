@@ -178,3 +178,15 @@ Plain server-rendered pages, one form per action, every action checking who is a
   Note in WordPress. (The Note was added through WordPress directly, standing in for a person
   typing it in the editor.) Still to do in milestone 2: Report corrections that state facts, and
   a hand edit as the Specialist's own Change.
+- *Nov 25, milestone 2 complete (local preview):* the last two items, checked in the browser.
+  **Report corrections that state facts:** the Client corrects the Report finding by finding in
+  the portal; each correction goes into Knowledge as the Client's own word (Confirmed) and to
+  Core as a Request to rework the Report. When the finding rests on exactly one entry of
+  Knowledge, the Client's wording replaces it in place, keeping its kind (C0's onboarded service
+  area was corrected this way); only the Client's own word may correct onboarded Knowledge.
+  **A hand edit is the Specialist's own Change:** read back from WordPress section by section (each
+  delivered heading and paragraph carries its section), it becomes the page's next Version at
+  once, as the Specialist's Decision and Review, with no AI rework; the next draft keeps it. An
+  edit that cannot be read that way (an added block, a removed section, structured parts) still
+  goes to Core as a Request to work in, so no hand edit is lost. Next: milestone 3, the real AI on
+  C0, which needs the Principal's spending approval.

@@ -32,7 +32,8 @@ export const beaconWriter: Writer = {
         return { title: `${label}: Business Understanding Report`, summary: `What Core holds about the business, grouped by kind.${answering}`,
           findings: kinds.map(kind => ({ id: kind, heading: kind[0].toUpperCase() + kind.slice(1).replaceAll("-", " "),
             body: facts.filter(item => (item.kind ?? "fact") === kind).map(item => item.value).join(" "),
-            status: facts.some(item => item.kind === kind && item.status === "proposed") ? "proposed" : "established", sourceIds: [] })) };
+            status: facts.some(item => item.kind === kind && item.status === "proposed") ? "proposed" : "established",
+            sourceIds: facts.filter(item => (item.kind ?? "fact") === kind && item.key).map(item => "knowledge:" + item.key) })) };
       }
       case "direction":
         return { positioning: `${label}: ${offering?.summary ?? "The Client's offer"}`, approach: `Lead with what the business does for its customers.${answering}`,

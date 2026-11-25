@@ -67,13 +67,14 @@ export function factEntry(fact: Fact, at: string): Entry {
   return { key: fact.key, kind: "fact", value: fact.statement, evidence };
 }
 
-/** The Knowledge record with these Facts added, or replaced where the key exists. */
+/** The Knowledge record with these Facts added, or replaced where the key exists (the Client may correct any entry). */
 export function withFacts(knowledge: Knowledge | null, facts: readonly Fact[], approval: { by: string; at: string }): Knowledge {
   const entries = [...knowledge?.entries ?? []];
   for (const fact of facts) {
     const entry = factEntry(fact, approval.at), index = entries.findIndex(item => item.key === fact.key);
-    if (index >= 0 && entries[index].kind !== "fact") throw Error("A Fact cannot replace other Knowledge");
-    if (index >= 0) entries[index] = entry; else entries.push(entry);
+    // Only the Client's own word may correct other Knowledge (such as onboarding's service area); it keeps its kind.
+    if (index >= 0 && entries[index].kind !== "fact" && fact.said.kind !== "client") throw Error("A Fact cannot replace other Knowledge");
+    if (index >= 0) entries[index] = { ...entry, kind: entries[index].kind }; else entries.push(entry);
   }
   return { entries, identityEvidence: knowledge?.identityEvidence ?? [],
     approval: { scope: knowledge?.approval.scope ?? "internal", by: approval.by, at: approval.at } };

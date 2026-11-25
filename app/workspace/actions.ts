@@ -191,9 +191,7 @@ export async function enterEmail(webPresenceId: string, form: FormData) { await 
       throw Error(`${from || "That sender"} is not on this Account's Client people, so the email cannot count as the Client's word. Add them first if they speak for the Client.`);
     const when = received ? new Date(received).toISOString() : now();
     return ask(record, { id: `email:${from}:${when}`, at: now(), by: { id: from, role: "customer" }, enteredBy: ctx.person, ...about(text(form, "about")),
-      words: (subject ? `${subject}
-
-` : "") + body.slice(0, 20_000), channel: "email", channelRef: `${from} ${when}${subject ? " " + subject : ""}` });
+      words: (subject ? `${subject}\n\n` : "") + body.slice(0, 20_000), channel: "email", channelRef: `${from} ${when}${subject ? " " + subject : ""}` });
   });
 }); }
 
@@ -206,3 +204,42 @@ export async function directRequest(webPresenceId: string, requestId: string, fo
     return direct(record, requestId, ctx.person, now(), to as Parameters<typeof direct>[4]);
   });
 }); }
+
+/**
+ * The Client's Review of a proposed Report, finding by finding. What they write about a finding is
+ * their own word about the business, so it goes into Knowledge as Confirmed: it replaces the fact
+ * the finding rests on when there is exactly one, and is added otherwise. Any correction also asks
+ * Core to rework the Report, in the Client's words.
+ */
+export async function answerReport(webPresenceId: string, changeId: string, form: FormData) {
+  const ctx = await context(webPresenceId, "client");
+  const response = text(form, "response") as "approve" | "correct" | "decline";
+  if (!["approve", "correct", "decline"].includes(response)) throw Error("Choose a response");
+  const read = await ctx.store.read(ctx.account);
+  const proposed = read.products.find(item => item.changeId === changeId && item.kind === "report" && item.status === "proposed");
+  if (!proposed) throw Error("That Report is no longer waiting for you");
+  const findings = (proposed.content as { findings: { id: string; heading: string; sourceIds?: string[] }[] }).findings;
+  const said = findings.map(finding => ({ finding, words: text(form, "finding:" + finding.id) })).filter(item => item.words);
+  const general = text(form, "words");
+  if (response === "approve" && said.length) throw Error("You corrected a finding: send it as a correction");
+  if (response === "correct" && !said.length && !general) throw Error("Say what should change");
+  const at = now();
+  if (response === "correct" && said.length) {
+    const known = (await accountKnowledge(ctx.pool, ctx.account.webPresenceId)).items;
+    const db = await ctx.pool.connect();
+    try {
+      await db.query("BEGIN");
+      await recordFacts(db, ctx.account, said.map(({ finding, words }, index) => {
+        const cited = (finding.sourceIds ?? []).filter(id => id.startsWith("knowledge:")).map(id => known.find(item => "knowledge:" + item.key === id)).filter(Boolean);
+        const replaces = cited.length === 1 ? cited[0]! : null;
+        return { key: replaces?.key ?? factKey("report", `${Date.now().toString(36)}${index}`), statement: words.slice(0, 2000),
+          publicUse: replaces?.forWebsite ?? true, source: `Report ${proposed.version}, ${finding.heading}`, enteredBy: ctx.person.id,
+          said: { kind: "client" as const, person: ctx.person.id, record: `report:${changeId}:${finding.id}` } };
+      }), ctx.person.id, at, "The Client's correction of the Report");
+      await db.query("COMMIT");
+    } catch (error) { await db.query("ROLLBACK"); throw error; } finally { db.release(); }
+  }
+  const words = [...said.map(({ finding, words }) => `${finding.heading}: ${words}`), ...general ? [general] : []].join("\n");
+  await ctx.store.save(read, respond(read, changeId, ctx.person, response, at, words || undefined));
+  refresh(webPresenceId);
+}

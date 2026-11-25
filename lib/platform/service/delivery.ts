@@ -7,8 +7,8 @@ import { deliveryTarget, readBackOperatorSite, samePaths, signingKey, type Opera
 import type { Readback } from "../wordpress-delivery/readback";
 import { sendSignedDraft } from "../wordpress-delivery/review-delivery";
 import { bindReviewDraft } from "../wordpress-delivery/review-draft";
-import { directionIdentity, logicalId } from "../work-products/pages";
-import { ask, current, currentSite, type ServiceRecord } from "./cycle";
+import { directionIdentity, logicalId, pageIdentity } from "../work-products/pages";
+import { ask, current, currentSite, edit, type ServiceRecord } from "./cycle";
 
 /**
  * Delivery (rebuild plan, milestone 1): the engine's current Pages, Menu and Design go to WordPress
@@ -110,10 +110,46 @@ export async function deliverDraft(input: { config: OperatorSiteConfig; record: 
   return { delivery, receipt };
 }
 
+/** Plain text of a block's HTML. */
+function plain(html: string) {
+  const named: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'", nbsp: " " };
+  return html.replace(/<br\s*\/?>/giu, "\n").replace(/<[^>]+>/gu, "")
+    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/giu, (whole, code: string) => code[0] === "#"
+      ? String.fromCodePoint(code[1].toLowerCase() === "x" ? parseInt(code.slice(2), 16) : Number(code.slice(1))) : named[code.toLowerCase()] ?? whole)
+    .replace(/[ \t]+/gu, " ").trim();
+}
+
 /**
- * Read-back: each open Note in WordPress and each hand-edited page becomes a Request on that page,
- * in the person's own words, for Core to handle like any other. Taking the same Note in twice
- * changes nothing.
+ * A hand-edited page, section by section, when it can be read that way: every heading and
+ * paragraph still carries the section it was delivered for, no section is missing, and nothing
+ * else was added. Otherwise null, and the edit goes to Core as a Request to work in.
+ */
+export function editedSections(content: string, sectionIds: readonly string[]) {
+  const found = new Map<string, { heading?: string[]; text?: string[] }>();
+  for (const match of content.matchAll(/<!-- wp:(heading|paragraph)(?: (\{.*?\}))? -->([\s\S]*?)<!-- \/wp:\1 -->/gu)) {
+    let mio: unknown;
+    try { mio = match[2] ? (JSON.parse(match[2]) as { metadata?: { mio?: unknown } }).metadata?.mio : undefined; } catch { return null; }
+    const [section, part] = typeof mio === "string" ? mio.split(":") : [];
+    if (!section || !sectionIds.includes(section) || (part !== "heading" && part !== "text")) { if (plain(match[3])) return null; continue; }
+    const entry = found.get(section) ?? {};
+    (entry[part] ??= []).push(plain(match[3]));
+    found.set(section, entry);
+  }
+  // Anything else a person may have added (lists, images, other blocks) is beyond a section-by-section reading.
+  const other = content.replace(/<!-- wp:(heading|paragraph)[\s\S]*?<!-- \/wp:\1 -->/gu, "").replace(/<!-- wp:html -->[\s\S]*?<!-- \/wp:html -->/gu, "")
+    .replace(/<!-- \/?wp:group[^>]*-->/gu, "").replace(/<\/?(div|section)[^>]*>/gu, "").trim();
+  if (other || sectionIds.some(id => !found.has(id))) return null;
+  return sectionIds.map(id => {
+    const { heading, text } = found.get(id)!;
+    return { id, ...(heading && { heading: heading.join(" ") }), ...(text && { body: text.join("\n\n") }) };
+  });
+}
+
+/**
+ * Read-back: each open Note in WordPress becomes a Request on its page, in the person's own words,
+ * for Core to handle like any other. A hand edit is the Specialist's own: read section by section,
+ * it becomes the page's next Version directly; when it cannot be read that way it becomes a
+ * Request for Core to work in, so it is never lost. Taking the same thing in twice changes nothing.
  */
 export function takeInReadBack(record: ServiceRecord, readback: Readback, by: { id: string; role: "operator" | "customer" }, at: string) {
   const pathOf = (postId: number) => readback.pages.find(page => page.id === postId)?.path;
@@ -123,6 +159,15 @@ export function takeInReadBack(record: ServiceRecord, readback: Readback, by: { 
     record = ask(record, { id: `wp-note:${note.id}`, at, by, kind: "page", path, words: note.content.trim().slice(0, 4000), channel: "wordpress-note", channelRef: String(note.id) });
   }
   for (const page of readback.pages.filter(item => item.edited && !item.missing)) {
+    const channelRef = `${page.path}:${page.contentSha256}`;
+    if (record.ledger.requests.some(request => request.channelRef === channelRef)) continue;
+    const delivered = current(record, pageIdentity(record.account.managedSiteId, page.path))?.content as { sections?: { id: string }[] } | undefined;
+    const sections = by.role === "operator" && delivered?.sections && page.content ? editedSections(page.content, delivered.sections.map(section => section.id)) : null;
+    if (sections) {
+      record = edit(record, { id: `wp-edit:${channelRef}`, at, by, path: page.path, sections, channel: "hand-edit", channelRef,
+        words: "Hand edit in WordPress, taken in section by section." });
+      continue;
+    }
     record = ask(record, { id: `wp-edit:${page.path}:${page.contentSha256}`, at, by, kind: "page", path: page.path, channel: "hand-edit",
       channelRef: `${page.path}:${page.contentSha256}`,
       words: `Keep the hand edits made in WordPress on this page and work them into it: ${(page.content ?? "").replace(/<[^>]+>/gu, " ").replace(/\s+/gu, " ").trim().slice(0, 3500)}` });

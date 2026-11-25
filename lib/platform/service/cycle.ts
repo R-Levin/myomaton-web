@@ -178,6 +178,39 @@ export async function work(record: ServiceRecord, task: Task, writer: Writer, kn
   return { ...record, ledger, products: [...products, { id, kind, version, ...(path && { path }), content: stored, changeId, at, status: "proposed" }] };
 }
 
+/**
+ * A person's own edit of a page, such as a Specialist's hand edit in WordPress. Nobody else writes
+ * it, so it is their Decision and their Change, and making it is their Review: the edited Version
+ * becomes current at once. Only a Specialist (or the Principal) edits pages by hand.
+ */
+export function edit(record: ServiceRecord, input: { id: string; at: string; by: Person; path: string; words: string;
+  sections: { id: string; heading?: string; body?: string }[]; channel: Request["origin"]["channel"]; channelRef?: string }): ServiceRecord {
+  if (input.by.role !== "operator" && input.by.role !== "owner") throw new CycleError("not-permitted", "Only a Specialist edits pages by hand");
+  const id = pageIdentity(record.account.managedSiteId, input.path), base = current(record, id);
+  if (!base) throw new CycleError("not-found", "No approved Version of that page to edit");
+  if (record.ledger.requests.some(request => request.id === input.id + ":request")) return record;
+  const before = base.content as PageContent & { sections: { id: string; heading: string; body: string }[] };
+  for (const section of input.sections) if (!before.sections.some(item => item.id === section.id)) throw new CycleError("invalid", "That section is not on the page");
+  const sections = before.sections.map(section => { const edited = input.sections.find(item => item.id === section.id);
+    return edited ? { ...section, ...(edited.heading !== undefined && { heading: edited.heading }), ...(edited.body !== undefined && { body: edited.body }) } : section; });
+  const requestId = input.id + ":request";
+  let ledger = takeIn(record.ledger, { id: input.id, at: input.at, by: input.by }, [{ id: requestId, at: input.at,
+    origin: { kind: "operator", by: input.by, channel: input.channel }, target: { grain: "page", path: input.path }, words: input.words,
+    ...(input.channelRef && { channelRef: input.channelRef }) }]);
+  const unchanged = fingerprint(sections) === fingerprint(before.sections);
+  if (unchanged) return { ...record, ledger: decide(ledger, { id: input.id + ":decision", at: input.at, by: input.by, requestIds: [requestId], outcome: "maintain",
+    reasoning: "The edit leaves the page as it is." }, []) };
+  const version = Math.max(0, ...record.products.filter(item => item.id === id).map(item => item.version)) + 1, changeId = `${id}:v${version}`;
+  ledger = decide(ledger, { id: changeId + ":decision", at: input.at, by: input.by, requestIds: [requestId], outcome: "change", reasoning: "Their own edit." },
+    [{ id: changeId, label: `page-v${version}`, at: input.at, requestIds: [requestId],
+      target: { grain: "page", path: input.path, workProduct: { id, version: base.version } }, base: { version: record.version, digest: fingerprint(base.content) },
+      difference: { summary: `the page ${input.path}, version ${version} (edited by hand)` }, preserve: [], consequence: "operator-review" }]);
+  const products = record.products.map(item => item.id === id && item.status === "proposed" ? { ...item, status: "superseded" as const } : item);
+  const proposed = { ...record, ledger, products: [...products, { id, kind: "page" as const, version, path: input.path,
+    content: versionedPage(record, id, { ...before, sections }), changeId, at: input.at, status: "proposed" as const }] };
+  return respond(proposed, changeId, input.by, "approve", input.at);
+}
+
 /** A Page's Sections keep their identities across Versions, as delivery has always given them. */
 function versionedPage(record: ServiceRecord, id: string, page: PageContent) {
   const before = current(record, id)?.content as PageContent | undefined;
