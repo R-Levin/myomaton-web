@@ -107,6 +107,10 @@ something always runs end to end. Git keeps its history.
   Onboarding done outside Core enters an Account as its Knowledge through the normal Knowledge
   writer (`knowledge/import.ts`); C0's reviewed manifest is one such data file, and loads into
   any Account (the old loader demanded the whole database match a frozen snapshot).
-  Still to do in milestone 1: the real AI writer, reusing the kept AI connection and
-  instructions; delivery to WordPress drafts and read-back of Notes as Requests; Publish as a
+  The real AI writer (`service/ai-writer.ts`) is built on the kept AI connection: every call is
+  priced and recorded against the Account's budget, the AI may cite only the Account's own
+  Knowledge (proposed items are marked as not yet confirmed), Core's current authoring
+  instructions are used, and each answer is checked before it becomes a proposed Version. Tested
+  through the whole Launch over an offline connection; no paid call has been made.
+  Still to do in milestone 1: delivery to WordPress drafts and read-back of Notes as Requests; Publish as a
   labelled Beacon; then the end-to-end run moves onto this engine and the old workflow retires.
