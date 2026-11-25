@@ -1,6 +1,5 @@
--- Proposed amendment (Principal, Nov 25): the Account's Client people. NOT covered by any
--- earlier approved checksum. Apply after the account policy and customer-mandate amendment, in
--- one guarded transaction, with search_path miopages_core_account,public, after people.sql.
+-- The Account's Client people (Principal, Nov 25): update 0004 in the protected account update
+-- sequence (scripts/db/protected-account-updates.ts), applied after people.sql in the same step.
 -- Creates no grants and no people: a reviewed enrollment adds the permission row and the list.
 ALTER TABLE miopages_core_account.account_people_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE miopages_core_account.account_people_events FORCE ROW LEVEL SECURITY;

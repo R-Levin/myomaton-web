@@ -17,7 +17,8 @@ import { confirmKnowledge,knowledgeTargets } from "../../lib/platform/canonical/
 import { protectedAccountBoundary,protectedAccountFoundation,protectedAccountConfirmation,protectedAccountPeople } from "../../lib/platform/intake/protected-account";
 import { protectedOwnerId,protectedOwnerToken,protectedOwnerVerifier } from "../../lib/platform/intake/protected-owner";
 import { ProtectedOperator } from "../../lib/platform/wordpress-delivery/operator";
-import { protectedAccountSql,protectedAccountCorrectedSql,protectedAccountPeopleSql } from "../../scripts/db/protected-account-policy";
+import { protectedAccountSql,protectedAccountCorrectedSql } from "../../scripts/db/protected-account-policy";
+import { applyProtectedUpdates,protectedAccountUpdates } from "../../scripts/db/protected-account-updates";
 import { clientAddresses } from "../../lib/platform/accounts/people";
 import { InquiryOutcomes } from "../../lib/platform/contact/outcomes";
 import { acceptContactSubmission } from "../../lib/platform/contact/submissions";
@@ -75,8 +76,7 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
   for(const permission of ["inspect-site-proposal","prepare-site-proposal"]){await admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,$5,NULL,NULL)",[randomUUID(),protectedOwnerId,scope.webPresenceId,scope.managedSiteId,permission]);}
   // Only the fixture case UUID differs; actual migration/activation guards,
   // exact C0 scope, record restriction and policy statements are unchanged.
-  const originalSql=await protectedAccountSql(),sql=await protectedAccountCorrectedSql(),peopleSql=await protectedAccountPeopleSql();
-  assert.ok(peopleSql.forward.startsWith(sql.forward),"The Client people amendment comes after the approved bytes, never inside them");
+  const originalSql=await protectedAccountSql(),sql=await protectedAccountCorrectedSql();
   const installer=await admin.connect();
   try {
    const initial=(await installer.query("SELECT * FROM public.business_knowledge WHERE id=$1",[recordId])).rows[0];
@@ -101,7 +101,18 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
    assert.equal(trial.grantIds.length,3);await installer.query("ROLLBACK");
    assert.equal((await installer.query("SELECT to_regnamespace('miopages_core_account') AS existing")).rows[0].existing,null);
    assert.equal((await installer.query("SELECT count(*)::int n FROM miopages_wp.wordpress_operator_grants")).rows[0].n,2);
-   await installer.query("BEGIN");await installer.query(peopleSql.forward.replaceAll(protectedAccountFoundation.caseId,owner.caseId));await installer.query("COMMIT");
+   // Installed as protected Core is today (the approved policy with the mandate amendment)...
+   await installer.query("BEGIN");await installer.query(sql.forward.replaceAll(protectedAccountFoundation.caseId,owner.caseId));await installer.query("COMMIT");
+   // ...then the one update sequence: it recognises what is there and applies only what is new.
+   const updates=await protectedAccountUpdates();
+   await installer.query("BEGIN");
+   assert.deepEqual(await applyProtectedUpdates(installer,updates,text=>text.replaceAll(protectedAccountFoundation.caseId,owner.caseId)),["0004-client-people","0005-rules-per-account"]);
+   await installer.query("COMMIT");
+   assert.deepEqual(await applyProtectedUpdates(installer,updates),[],"Applied once; running it again changes nothing");
+   await assert.rejects(applyProtectedUpdates(installer,updates.map(item=>item.name==="0004-client-people"?{...item,sha256:"0".repeat(64)}:item)),
+    (error:unknown)=>Boolean(error&&typeof error==="object"&&"code" in error&&error.code==="UPDATE_CHANGED"));
+   const rules=(await installer.query("SELECT pg_get_viewdef('miopages_core_account.activation_customer_bindings') AS bindings,pg_get_viewdef('miopages_core_account.business_knowledge') AS knowledge")).rows[0];
+   assert.ok(!rules.bindings.includes(owner.caseId)&&!rules.knowledge.includes(recordId),"The rules cover every Account in scope, not C0's records alone");
   }
   catch(e){await installer.query("ROLLBACK");throw e;}finally{installer.release();}
   const first=await inspectCanonical(admin,"knowledge",scope.webPresenceId,recordId);assert.ok(first);

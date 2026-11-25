@@ -85,8 +85,18 @@ refuses things go with it, and none of the safeguards in "Keep" is weakened.
   lists blocked.
 - *Nov 25, item 4 (local):* the AI model and prices are no longer written into the code (five
   places). A rate card only has to be well formed; the ledger still prices every call from it.
-- Next: item 5 (internal fingerprints), item 6 (one path, C0 as data), removing leftovers; items
-  2 and 3 prepared for the next approved deploy.
+- *Nov 25, items 2 and 3 (prepared, not installed):* the protected database is one ordered update
+  sequence (`scripts/db/protected-account-updates.ts`). Each update is applied once and recorded
+  with its checksum, and the sequence recognises what protected Core already has. Update 0005
+  makes the rules cover every Account in scope instead of naming C0's records. It goes on at
+  the next deploy the Principal approves.
+- *Nov 25, leftovers:* six one-off proof scripts referenced nowhere were removed (Git keeps their
+  history). Recovery and rollout scripts for the hosted servers, and the script that finishes
+  custody of retained images, were kept. The local rehearsal folders in `runtime-content` are
+  outside Git and hold retained evidence; they are left untouched.
+- Next: item 5 (internal fingerprints) and item 6 (one path per object, C0 as data). Item 6 also
+  takes in the AI authorization's pin to one exact snapshot of the Account's material, and
+  Core's code still serving C0 alone.
 
 ## Decisions for the Principal
 
