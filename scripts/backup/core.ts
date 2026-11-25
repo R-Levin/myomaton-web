@@ -103,8 +103,10 @@ export async function hashFile(file: string) {
 }
 async function protect(root: string) {
   if (process.platform !== "win32") { assert.equal((await lstat(root)).mode & 0o077, 0, "Backup root must be private"); return; }
-  const sid = (await exec("whoami.exe", ["/user","/fo","csv","/nh"], { windowsHide:true })).stdout.match(/S-1-5-[0-9-]+/)?.[0]; assert.ok(sid);
-  await exec("icacls.exe", [root,"/inheritance:r","/grant:r",`*${sid}:(OI)(CI)F`,"*S-1-5-18:(OI)(CI)F","*S-1-5-32-544:(OI)(CI)F"], {windowsHide:true});
+  // Windows' own tools by full path: on PATH, Git's or another runtime's whoami can shadow them.
+  const system32=path.join(process.env.SystemRoot||"C:\\Windows","System32");
+  const sid = (await exec(path.join(system32,"whoami.exe"), ["/user","/fo","csv","/nh"], { windowsHide:true })).stdout.match(/S-1-5-[0-9-]+/)?.[0]; assert.ok(sid);
+  await exec(path.join(system32,"icacls.exe"), [root,"/inheritance:r","/grant:r",`*${sid}:(OI)(CI)F`,"*S-1-5-18:(OI)(CI)F","*S-1-5-32-544:(OI)(CI)F"], {windowsHide:true});
   // Use the durable Windows installation, independent of Codex/PATH runtimes.
   // Reset only this child's module search path to Windows PowerShell's modules.
   const systemRoot=process.env.SystemRoot||"C:\\Windows";

@@ -52,7 +52,7 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
   const entry = privateReview ? "scripts/intake/c0-site-journey-entry.tsx"
     : adaptive ? "scripts/intake/adaptive-onboarding-client.tsx" : "scripts/intake/c0-onboarding-client.tsx";
   const client = await build({ entryPoints: { onboarding: entry }, bundle: true, write: false,
-    outdir: "onboarding", jsx: "automatic", platform: "browser", define: { "process.env.NODE_ENV": '"production"' }, minify: true });
+    outdir: "onboarding", jsx: "automatic", platform: "browser", define: { "process.env.NODE_ENV": '"production"', "process.env": "{}" }, minify: true });
   const assets = new Map(client.outputFiles.map(file => [file.path.endsWith(".css") ? "/onboarding.css" : "/onboarding.js", file.text]));
   if (assets.size !== 2) throw Error("Expected isolated interview assets");
   // This entry point creates its own password-protected loopback cluster. It
