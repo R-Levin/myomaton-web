@@ -7,7 +7,9 @@ import { accountKnowledge } from "@/lib/platform/knowledge/account";
 import { factKey } from "@/lib/platform/knowledge/facts";
 import { confirmOnPublish, factsToConfirmOnPublish } from "@/lib/platform/knowledge/publish";
 import { currentFacts, recordFacts } from "@/lib/platform/knowledge/store";
-import { citedBySite, proposePublish, respond, startLaunch, tasks, work, type ServiceRecord } from "@/lib/platform/service/cycle";
+import { ask, citedBySite, direct, proposePublish, respond, startLaunch, tasks, work, type Kind, type ServiceRecord } from "@/lib/platform/service/cycle";
+import { deliverDraft, takeInReadBack } from "@/lib/platform/service/delivery";
+import { readBackOperatorSite } from "@/lib/platform/wordpress-delivery/operator-review";
 import { accounts, actAs, acting, serviceRuntime, type Acting } from "@/lib/platform/service/runtime";
 
 /**
@@ -27,6 +29,15 @@ async function context(webPresenceId: string, need: "specialist" | "client") {
 }
 const now = () => new Date().toISOString();
 const text = (form: FormData, name: string) => String(form.get(name) ?? "").trim();
+/**
+ * Run a Specialist's action; if it is refused, come back to the Account page saying why, in
+ * plain words, instead of failing the page.
+ */
+async function shown(webPresenceId: string, run: () => Promise<void>) {
+  let problem: string | null = null;
+  try { await run(); } catch (error) { problem = error instanceof Error ? error.message : "That did not work"; }
+  if (problem) redirect(`/workspace/${webPresenceId}?problem=${encodeURIComponent(problem.slice(0, 300))}`);
+}
 const refresh = (webPresenceId: string) => { revalidatePath("/workspace"); revalidatePath(`/workspace/${webPresenceId}`); revalidatePath(`/portal/${webPresenceId}`); };
 
 async function change(webPresenceId: string, need: "specialist" | "client", apply: (record: ServiceRecord, ctx: Awaited<ReturnType<typeof context>>) => ServiceRecord | Promise<ServiceRecord>) {
@@ -140,3 +151,58 @@ export async function removePerson(webPresenceId: string, personId: string) {
   await removeClientPerson(ctx.pool, ctx.account.webPresenceId, personId, { operatorId: ctx.person.id, authorityReference: "Local preview" }, "No longer speaks for the business");
   refresh(webPresenceId);
 }
+
+/** Send the current site to the Account's WordPress as review drafts. */
+export async function sendDrafts(webPresenceId: string) { await shown(webPresenceId, async () => {
+  const ctx = await context(webPresenceId, "specialist");
+  if (!ctx.wordpress) throw Error("No WordPress is connected");
+  const read = await ctx.store.read(ctx.account);
+  const { delivery } = await deliverDraft({ config: await ctx.wordpress(), record: read, previous: read.deliveries?.at(-1) ?? null });
+  await ctx.store.save(read, { ...read, deliveries: [...read.deliveries ?? [], delivery] });
+  refresh(webPresenceId);
+}); }
+
+/** Bring WordPress Notes and hand edits home: each becomes a Request on its page. */
+export async function readBack(webPresenceId: string) { await shown(webPresenceId, async () => {
+  const ctx = await context(webPresenceId, "specialist");
+  if (!ctx.wordpress) throw Error("No WordPress is connected");
+  const { readback } = await readBackOperatorSite(await ctx.wordpress());
+  const read = await ctx.store.read(ctx.account);
+  await ctx.store.save(read, takeInReadBack(read, readback, { id: ctx.person.id, role: "operator" }, now()));
+  refresh(webPresenceId);
+}); }
+
+/** What a Request is about, from a form's "about" choice: "site", or a Work product kind with its page path. */
+function about(value: string): { kind: Kind | "site"; path?: string } {
+  const [kind, path] = value.split(":", 2) as [string, string | undefined];
+  if (!["site", "report", "direction", "site-plan", "page"].includes(kind) || (kind === "page") !== Boolean(path)) throw Error("Choose what it is about");
+  return { kind: kind as Kind | "site", ...(path && { path }) };
+}
+
+/**
+ * A Specialist enters an email from the Client (until the email service is connected). It counts
+ * as the Client's Request only when the sender is on the Account's list of Client people.
+ */
+export async function enterEmail(webPresenceId: string, form: FormData) { await shown(webPresenceId, async () => {
+  const from = text(form, "from").toLowerCase(), subject = text(form, "subject"), body = text(form, "body"), received = text(form, "received");
+  if (!body) throw Error("Paste the email's text");
+  await change(webPresenceId, "specialist", async (record, ctx) => {
+    if (!(await clientAddresses(ctx.pool, ctx.account.webPresenceId)).includes(from))
+      throw Error(`${from || "That sender"} is not on this Account's Client people, so the email cannot count as the Client's word. Add them first if they speak for the Client.`);
+    const when = received ? new Date(received).toISOString() : now();
+    return ask(record, { id: `email:${from}:${when}`, at: now(), by: { id: from, role: "customer" }, enteredBy: ctx.person, ...about(text(form, "about")),
+      words: (subject ? `${subject}
+
+` : "") + body.slice(0, 20_000), channel: "email", channelRef: `${from} ${when}${subject ? " " + subject : ""}` });
+  });
+}); }
+
+/** A Specialist directs a Request on the site as a whole: to Core on one Work product, or answered with no change. */
+export async function directRequest(webPresenceId: string, requestId: string, form: FormData) { await shown(webPresenceId, async () => {
+  const answer = text(form, "answer");
+  await change(webPresenceId, "specialist", (record, ctx) => {
+    const to = form.get("how") === "answer" ? { answer } : about(text(form, "about"));
+    if ("kind" in to && to.kind === "site") throw Error("Choose which Work product it is about");
+    return direct(record, requestId, ctx.person, now(), to as Parameters<typeof direct>[4]);
+  });
+}); }

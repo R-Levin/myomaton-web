@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ask, CycleError, currentSite, openRecord, respond, startLaunch, tasks, work, type ServiceRecord, type WriteInput, type Writer } from "../lib/platform/service/cycle";
+import { ask, CycleError, currentSite, direct, openRecord, outcome, respond, startLaunch, tasks, work, type ServiceRecord, type WriteInput, type Writer } from "../lib/platform/service/cycle";
 import { pageIdentity, reportIdentity } from "../lib/platform/work-products/pages";
 
 const account = { webPresenceId: "819d007a-595d-4374-a2f0-96b900d46559", managedSiteId: "1d92a248-416f-4e22-baaf-d2f1fca70352" };
@@ -84,4 +84,41 @@ test("one engine runs Launch from the start of the Stage to a complete site, on 
   const change = record.ledger.changes.find(item => item.id === proposed.changeId)!;
   assert.deepEqual([change.status, change.target.workProduct], ["applied", { id: pageIdentity(account.managedSiteId, "/start"), version: 1 }],
     "The Change names the Version it was made against");
+});
+
+test("a Client's email is the Client's Request: a Specialist directs it to a Work product or answers it, and the Client sees what became of it", async () => {
+  const { writer, seen } = beacon();
+  let record = startLaunch(openRecord(account), at(0), specialist);
+  for (let minute = 1; minute < 12 && !currentSite(record)?.complete; minute += 2) {
+    record = await coreWork(record, writer, minute);
+    for (const task of tasks(record).filter(item => item.changeId))
+      record = respond(record, task.changeId!, task.who === "client" ? client : specialist, "approve", at(minute + 1));
+  }
+  assert.ok(currentSite(record)?.complete);
+
+  // Entered by a Specialist, about the site in general: it stays the Client's word, and waits for the Specialist to direct.
+  record = ask(record, { id: "email:1", at: at(30), by: client, enteredBy: specialist, kind: "site", words: "Say the first month is free.",
+    channel: "email", channelRef: "client@example.test 2026-11-25" });
+  const email = record.ledger.requests.find(item => item.id === "email:1:request")!;
+  assert.deepEqual([email.origin.kind, email.origin.by, email.origin.enteredBy, email.origin.channel], ["customer", client, specialist, "email"]);
+  assert.deepEqual(tasks(record).map(task => task.who), ["specialist"]);
+  assert.equal(outcome(record, email).state, "working");
+  assert.throws(() => direct(record, email.id, client, at(31), { kind: "page", path: "/start" }), CycleError, "Only a Specialist directs");
+  assert.throws(() => direct(record, email.id, specialist, at(31), { kind: "page", path: "/missing" }), CycleError, "Only to a page the site has");
+
+  record = direct(record, email.id, specialist, at(31), { kind: "page", path: "/start" });
+  assert.deepEqual(tasks(record).map(task => [task.who, task.what]), [["core", "Write the page /start"]]);
+  record = await coreWork(record, writer, 32);
+  assert.deepEqual(seen.at(-1)!.requests, ["Say the first month is free."], "Core works from the Client's own words");
+  assert.equal(outcome(record, email).words, "Done; waiting for review.");
+  record = respond(record, tasks(record)[0].changeId!, specialist, "approve", at(33));
+  assert.equal(outcome(record, email).words, "Done: in the page /start, version 2.");
+  assert.throws(() => direct(record, email.id, specialist, at(34), { answer: "Twice" }), CycleError, "A Request is directed once");
+
+  // Or answered with no change: that is a Decision too, and the Client sees the answer.
+  record = ask(record, { id: "email:2", at: at(40), by: client, enteredBy: specialist, kind: "site", words: "Is the site live yet?", channel: "email" });
+  const question = record.ledger.requests.find(item => item.id === "email:2:request")!;
+  record = direct(record, question.id, specialist, at(41), { answer: "Not yet: it goes live when you approve Publish." });
+  assert.deepEqual(outcome(record, question), { state: "answered", words: "Not yet: it goes live when you approve Publish." });
+  assert.deepEqual(tasks(record), [], "Nothing waits on anyone");
 });

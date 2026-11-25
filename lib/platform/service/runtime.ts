@@ -1,6 +1,8 @@
 import "server-only";
 import { cookies, headers } from "next/headers";
+import { readFile } from "node:fs/promises";
 import { Pool } from "pg";
+import { readOperatorSiteConfig } from "../wordpress-delivery/operator-review";
 import type { Person } from "../change/model";
 import { beaconWriter } from "./beacon-writer";
 import { ServiceStore } from "./store";
@@ -17,7 +19,10 @@ export async function serviceRuntime() {
   const local = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/u.test(host);
   if (process.env.NODE_ENV === "production" || process.env.MIOPAGES_WORKSPACE !== "local-preview" || !local || !process.env.SERVICE_DATABASE_URL) return null;
   pool ??= new Pool({ connectionString: process.env.SERVICE_DATABASE_URL, max: 4 });
-  return { pool, store: new ServiceStore(pool), writer: beaconWriter, writerLabel: "Beacon (stand-in for Core's AI)" };
+  // The preview's own throwaway WordPress, enrolled like any review site; its keys stay on the server.
+  const wordpressFile = process.env.MIOPAGES_PREVIEW_WORDPRESS;
+  const wordpress = wordpressFile ? async () => readOperatorSiteConfig(JSON.parse(await readFile(wordpressFile, "utf8"))) : null;
+  return { pool, store: new ServiceStore(pool), writer: beaconWriter, writerLabel: "Beacon (stand-in for Core's AI)", wordpress };
 }
 
 /** Who is acting, as chosen on the local preview's sign-in. Every action checks it again. */

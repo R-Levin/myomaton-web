@@ -1,5 +1,6 @@
 import { decide, emptyLedger, markApplied, review as reviewChange, takeIn, type Change, type ChangeLedger, type Consequence,
   type Grain, type Person, type Request } from "../change/model";
+import type { Delivery } from "./delivery";
 import { fingerprint } from "../canonical/model";
 import { directionIdentity, pageIdentity, reportIdentity, sitePlanIdentity, versionPages } from "../work-products/pages";
 
@@ -26,7 +27,9 @@ export type ProductVersion = {
 /** An Account's service record: its Change record and every Version of its Work products. */
 export type ServiceRecord = { account: { webPresenceId: string; managedSiteId: string }; version: number; ledger: ChangeLedger; products: ProductVersion[];
   /** Approved Publishes. Until public delivery is built (milestone 5) each is a labelled Beacon: approved, not yet public. */
-  publications?: Publication[] };
+  publications?: Publication[];
+  /** Each review draft sent to the Account's WordPress, latest last (service/delivery.ts). */
+  deliveries?: Delivery[] };
 
 /** A Publish the Client approved: exactly which Page Versions, and the Proposed facts the approval confirmed. */
 export type Publication = { changeId: string; at: string; by: Person; pages: { id: string; path: string; version: number }[];
@@ -74,16 +77,40 @@ export function startLaunch(record: ServiceRecord, at: string, by: Person): Serv
     origin: { kind: "stage-start", by, channel: "core-screen" }, target: { grain: "report" }, words: "Understand the business." }]) };
 }
 
-/** A person asks for a Work product to change (a correction, a Note, an email): a Request on it. */
-export function ask(record: ServiceRecord, request: { id: string; at: string; by: Person; kind: Kind; path?: string; words: string;
-  channel?: Request["origin"]["channel"]; channelRef?: string }): ServiceRecord {
+/**
+ * A person asks for a Work product to change (a correction, a Note, an email): a Request on it.
+ * "site" is a Request on the site as a whole, for a Specialist to direct (`direct`).
+ */
+export function ask(record: ServiceRecord, request: { id: string; at: string; by: Person; kind: Kind | "site"; path?: string; words: string;
+  channel?: Request["origin"]["channel"]; channelRef?: string; enteredBy?: Person }): ServiceRecord {
   if (!request.words.trim()) throw new CycleError("invalid", "A Request needs its words");
   if (record.ledger.requests.some(item => item.id === request.id + ":request")) return record;
   const origin = request.by.role === "customer" ? "customer" : request.by.role === "core" ? "core" : "operator";
-  return { ...record, ledger: takeIn(record.ledger, { id: request.id, at: request.at, by: request.by }, [{ id: request.id + ":request", at: request.at,
-    origin: { kind: origin, by: request.by, channel: request.channel ?? "core-screen" },
-    target: { grain: grainOf[request.kind], ...(request.path && { path: request.path }) }, words: request.words.trim(),
+  return { ...record, ledger: takeIn(record.ledger, { id: request.id, at: request.at, by: request.enteredBy ?? request.by }, [{ id: request.id + ":request", at: request.at,
+    origin: { kind: origin, by: request.by, channel: request.channel ?? "core-screen", ...(request.enteredBy && { enteredBy: request.enteredBy }) },
+    target: { grain: request.kind === "site" ? "site" : grainOf[request.kind], ...(request.path && { path: request.path }) }, words: request.words.trim(),
     ...(request.channelRef && { channelRef: request.channelRef }) }]) };
+}
+
+/**
+ * A Specialist handles a Request on the site as a whole (an email, the Client's reason for not
+ * publishing yet): sends it to Core as a Request on one Work product, in the same person's words,
+ * or answers it without changing anything. Either way it is a Decision on the record.
+ */
+export function direct(record: ServiceRecord, requestId: string, by: Person, at: string, to: { kind: Kind; path?: string } | { answer: string }): ServiceRecord {
+  const request = record.ledger.requests.find(item => item.id === requestId);
+  if (!request) throw new CycleError("not-found", "No such Request");
+  if (request.status !== "open" || request.target.grain !== "site") throw new CycleError("not-open", "That Request is not waiting to be directed");
+  if (by.role !== "operator" && by.role !== "owner") throw new CycleError("not-permitted", "A Specialist directs Requests");
+  if ("answer" in to && !to.answer.trim()) throw new CycleError("invalid", "Say how it was answered");
+  if ("kind" in to && to.kind === "page" && !currentSite(record)?.plan.pages.some(entry => entry.path === to.path)) throw new CycleError("invalid", "No such page");
+  const where = "kind" in to ? (to.kind === "page" ? `page ${to.path}` : label({ target: { grain: grainOf[to.kind] } } as Request)) : "";
+  let ledger = decide(record.ledger, { id: `${requestId}:directed`, at, by, requestIds: [requestId], outcome: "answer",
+    reasoning: "answer" in to ? to.answer.trim() : `Sent to Core as a Request on the ${where}.` }, []);
+  if ("kind" in to) ledger = takeIn(ledger, { id: `${requestId}:directed`, at, by }, [{ id: `${requestId}:to:${to.kind}${to.path ?? ""}`, at,
+    origin: { ...request.origin, enteredBy: request.origin.enteredBy ?? by }, target: { grain: grainOf[to.kind], ...(to.path && { path: to.path }) },
+    words: request.words, ...(request.channelRef && { channelRef: request.channelRef }) }]);
+  return { ...record, ledger };
 }
 
 /** Who must do what next: Core writes for open Requests; the right person reviews proposed Changes. */
@@ -193,6 +220,29 @@ function follow(record: ServiceRecord, approved: ProductVersion, at: string): Se
   return requests.length ? { ...record, ledger: takeIn(record.ledger, { id: `${approved.changeId}:next`, at, by: core }, requests) } : record;
 }
 
+/**
+ * What became of a person's Request, in words they can follow: still with someone, waiting for
+ * a Review, done (in which Version), answered, or not taken up. A Request a Specialist sent on to
+ * a Work product is followed to where it went.
+ */
+export function outcome(record: ServiceRecord, request: Request): { state: "working" | "review" | "done" | "answered" | "declined"; words: string } {
+  request = record.ledger.requests.find(item => item.id === request.id) ?? request;
+  const onward = record.ledger.requests.find(item => item.id.startsWith(request.id + ":to:"));
+  if (onward) return outcome(record, onward);
+  if (request.status === "withdrawn") return { state: "declined", words: "Withdrawn." };
+  if (request.status === "open") return { state: "working", words: "Being worked on." };
+  const changes = record.ledger.changes.filter(change => change.requestIds.includes(request.id));
+  const decision = record.ledger.decisions.find(item => item.requestIds.includes(request.id));
+  if (!changes.length) return { state: "answered", words: decision?.reasoning ?? "Answered." };
+  const applied = changes.find(change => change.status === "applied");
+  const product = applied && record.products.find(item => item.changeId === applied.id);
+  if (applied) return { state: "done", words: product ? `Done: in the ${product.kind === "page" ? `page ${product.path}` : label({ target: { grain: grainOf[product.kind] } } as Request)}, version ${product.version}.` : "Done." };
+  if (changes.some(change => change.status === "proposed")) return { state: "review", words: "Done; waiting for review." };
+  // Declined: a correction raised the next Request, so the work goes on.
+  return changes.some(change => change.reviews.some(review => review.response === "decline" && review.words)) ? { state: "working", words: "Being reworked." }
+    : { state: "declined", words: "Not taken up." };
+}
+
 /** The site's current Pages in Site plan order: what delivery puts into WordPress drafts. */
 export function currentSite(record: ServiceRecord) {
   const plan = current(record, sitePlanIdentity(record.account.managedSiteId))?.content as SitePlan | undefined;
@@ -215,10 +265,10 @@ export function proposePublish(record: ServiceRecord, input: { at: string; by: P
   const pages = site.pages.map(page => ({ id: page.id, path: page.path, version: page.version }));
   let ledger = takeIn(record.ledger, { id, at: input.at, by: input.by }, [{ id: requestId, at: input.at,
     origin: { kind: input.by.role === "core" ? "core" : "operator", by: input.by, channel: "core-screen" }, target: { grain: "site" }, words: "Publish the site." }]);
-  const confirms = input.relies.length ? " Approving also confirms, as true and fit for the website: " + input.relies.map(fact => `"${fact.statement}"`).join("; ") + "." : "";
+  const confirms = input.relies.length ? ". Approving also confirms, as true and fit for the website: " + input.relies.map(fact => `"${fact.statement}"`).join("; ") : "";
   ledger = decide(ledger, { id: id + ":decision", at: input.at, by: core, requestIds: [requestId], outcome: "change", reasoning: "The site is complete and reviewed." },
     [{ id, label: "Publish", at: input.at, requestIds: [requestId], target: { grain: "site" }, base: { version: record.version, digest: fingerprint(pages) },
-      difference: { summary: `publishing the site: ${pages.length} pages` + confirms, after: JSON.stringify({ pages, confirms: input.relies }) },
+      difference: { summary: `publishing the site (${pages.length} pages)` + confirms, after: JSON.stringify({ pages, confirms: input.relies }) },
       preserve: [], consequence: "customer-approval" }]);
   return { ...record, ledger };
 }

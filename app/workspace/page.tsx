@@ -32,7 +32,8 @@ export default async function Workspace() {
     );
   }
   if (person.role !== "operator") return (
-    <Frame title="Specialist workspace" who={person.name}><p>This is the Specialists&apos; workspace. <Link className="underline" href="/portal">Go to your portal</Link>.</p></Frame>);
+    <Frame title="Specialist workspace" who={person.name}><p className="mb-4">This is the Specialists&apos; workspace. <Link className="underline" href="/portal">Go to your portal</Link>.</p>
+      <form action={signOut}><button className={button}>Switch person</button></form></Frame>);
   const rows = await Promise.all(all.map(async item => ({ ...item, tasks: tasks(await runtime.store.read(item.account)) })));
   return (
     <Frame title="Queue" who={`${person.name}`}>

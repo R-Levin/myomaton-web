@@ -154,3 +154,19 @@ Plain server-rendered pages, one form per action, every action checking who is a
   the Client people list. Still to do: Client email entry on the engine, WordPress delivery and
   Notes from the workspace, Report corrections that state facts, and a full walk-through to Publish.
 
+- *Nov 25, milestone 2 second slice (local preview):* a full walk-through to Publish on screen.
+  The Specialist starts Launch; the Client approves the Report in the portal; Core (the Beacon)
+  writes the Direction, Site plan and pages, each approved by the Specialist. A **Client email**,
+  entered by the Specialist, counts as the Client's Request only when the sender is on the Client
+  people list; one about the site in general waits for the Specialist to **direct** it to a Work
+  product (or answer it with no change), and Core reworks that page from the Client's own words.
+  The Client holds off Publish with a reason; the Specialist directs it to the Home page; Core
+  reworks it; the Client reads every page in the Publish request and approves, which confirms the
+  Proposed fact the site cites. The portal's "What you asked for" shows what became of each
+  request (being worked on, done in which Version, or answered). Refusals now show in plain words.
+  **Not done:** WordPress from the workspace. The delivery plugin writes drafts in a MySQL
+  transaction, as on the hosting, and this computer has no MySQL; the preview's own throwaway
+  WordPress (`scripts/service/preview-wordpress.ts`) is built but stays off until a local MariaDB
+  is set up (a download, for the Principal's OK). Delivery and Notes remain tested on the plugin's
+  own code (`tests/integration/service-launch.test.ts`). Also still to do: Report corrections
+  that state facts, and a hand edit as the Specialist's own Change.

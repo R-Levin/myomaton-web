@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { clientAddresses } from "@/lib/platform/accounts/people";
 import { readMyBusiness } from "@/lib/platform/intake/my-business";
+import { outcome } from "@/lib/platform/service/cycle";
 import { accounts, acting, serviceRuntime } from "@/lib/platform/service/runtime";
 import { answerFact, review, signOut } from "../../workspace/actions";
 import { Content, Frame, ReviewForm, Section, button, field, primary, productName } from "../../workspace/ui";
@@ -20,8 +21,9 @@ export default async function ClientAccount({ params }: { params: Promise<{ acco
   const record = await runtime.store.read(found.account);
   const business = await readMyBusiness(runtime.pool, id);
   const forYou = record.ledger.changes.filter(change => change.status === "proposed" && change.consequence === "customer-approval");
-  // The Client's own Requests still being worked on, so nothing they asked for disappears from view.
-  const asked = record.ledger.requests.filter(request => request.status === "open" && request.origin.by.id === person.id);
+  // Everything the Client asked for, and what became of it, so nothing they asked for disappears from view.
+  // A Request a Specialist sent on to a Work product is shown once, as first asked.
+  const asked = record.ledger.requests.filter(request => request.origin.by.id === person.id && !/:to:/u.test(request.id)).slice(-12).reverse();
   return (
     <Frame title={found.name} who={person.name}>
       <form action={signOut} className="mb-6"><button className={button}>Switch person</button></form>
@@ -33,7 +35,13 @@ export default async function ClientAccount({ params }: { params: Promise<{ acco
           return (
             <article key={change.id} className="mb-4 rounded border border-neutral-200 p-4">
               <h3 className="font-semibold">{isPublish ? "Publish your site" : product ? `${productName(product)}, version ${product.version}` : change.difference.summary}</h3>
-              {isPublish ? <p>Your site would go live exactly as it is now: {change.difference.summary}.</p> : product && <Content item={product} />}
+              {isPublish ? (<><p>Your site would go live exactly as it is now: {change.difference.summary}. Read each page first:</p>
+                {(JSON.parse(change.difference.after ?? "{}") as { pages?: { id: string; path: string; version: number }[] }).pages?.map(page => {
+                  // Exactly the Version being approved.
+                  const version = record.products.find(item => item.id === page.id && item.version === page.version);
+                  return version && (<details key={page.id} className="mt-2 rounded border border-neutral-200 p-3"><summary className="cursor-pointer font-medium">Page {page.path}</summary>
+                    <div className="mt-2"><Content item={version} /></div></details>);
+                })}</>) : product && <Content item={product} />}
               <ReviewForm action={review.bind(null, id, change.id)} approveLabel={isPublish ? "Approve publishing" : "Yes, this is right"} />
             </article>
           );
@@ -54,9 +62,17 @@ export default async function ClientAccount({ params }: { params: Promise<{ acco
         ))}
       </Section>
 
+      {record.publications?.length ? (
+        <Section title="Your site" note={`You approved publishing on ${record.publications.at(-1)!.at.slice(0, 10)}.`}>
+          <p>Approved, not public yet: MioPages&apos; public delivery is still being built. Nothing changes on your live site until it is.</p>
+        </Section>) : null}
+
       {asked.length > 0 && (
-        <Section title="What you asked for" note="Being worked on. You will see the result here to confirm.">
-          <ul className="list-disc space-y-1 pl-6">{asked.map(request => <li key={request.id}>{request.words}</li>)}</ul>
+        <Section title="What you asked for" note="Each thing you asked for, most recent first, and where it stands.">
+          <ul className="space-y-2">{asked.map(request => { const result = outcome(record, request); return (
+            <li key={request.id} className="rounded border border-neutral-200 p-3"><p className="whitespace-pre-wrap">{request.words.length > 400 ? request.words.slice(0, 400) + "…" : request.words}</p>
+              <p className={"mt-1 text-sm " + (result.state === "done" || result.state === "answered" ? "text-green-800" : "text-neutral-600")}>
+                {request.origin.channel === "email" ? "Your email" : "You asked"} on {request.at.slice(0, 10)}. {result.words}</p></li>); })}</ul>
         </Section>
       )}
 
