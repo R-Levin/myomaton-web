@@ -211,7 +211,7 @@ convenience. It does not change the service's design, so a hybrid costs nothing 
 
 | Object | Exists and sound | Duplicated or missing |
 |---|---|---|
-| Account | Web Presence, activation, protected account | Spread over three folders |
+| Account | Web Presence, activation, protected account; the Account's Client people (Nov 25) | Spread over four folders |
 | Knowledge | Canonical Knowledge and Offering, My Business; Facts with the standing rule; Report corrections reach it (Nov 24) | The correction text itself is still kept on the workflow as the AI's input |
 | Evidence | Source custody, research, peer capture | Named differently in each place |
 | Work product | Canonical Page, Section, Asset, Action, Navigation | AI workflow keeps its own report, direction, blueprint and pages |
@@ -289,8 +289,16 @@ until the end.
    Report it lists the facts each open correction states, and Core applies the same rule
    (the Client's own words Confirmed, Core's rewording or a Specialist's correction
    Proposed), writing them to Knowledge with the Report (Principal, Nov 24).
-   Still to do in this step: supplying the Account's Client people on protected Core; a Specialist screen or worker command for
-   entering an email. Publish is not built yet; when it is, its approval lists the Proposed
+   *Nov 25:* the Account's Client people (`lib/platform/accounts/people.ts`) record who
+   speaks for the Client: each person's name, email and, where they sign in, their sign-in
+   identity, so they are one Person. The list is append only (who added or removed each
+   person, when and why), one email per person per Account, and only someone holding
+   "manage-account-people" for that exact Account keeps it. A Client email counts only when
+   its sender is on the list; with no list, nobody's email counts. For protected Core the
+   amendment is prepared (`protected-account-people.sql`) but not installed.
+   Still to do in this step: installing that amendment on protected Core and putting the
+   Principal on C0's list (both need the Principal's approval); a Specialist screen for
+   keeping the list and entering an email. Publish is not built yet; when it is, its approval lists the Proposed
    facts the pages rely on, and approving confirms them.
 4. **One set of Work products.** The AI workflow's pages and plan become versions of the
    canonical Page, Section, Navigation and Asset identities. Delivery already speaks

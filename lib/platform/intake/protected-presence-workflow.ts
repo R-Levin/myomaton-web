@@ -12,6 +12,7 @@ import { protectedOwnerScope } from "./protected-owner";
 import { IntakeService, type IntakeEvidence } from "./service";
 import { protectedConnection, protectedPool } from "../wordpress-delivery/protected-connection";
 import { PresenceWorkflow, WorkflowBlocked, type WorkflowActor } from "./presence-workflow";
+import { clientAddresses } from "../accounts/people";
 import { createResponsesPresenceWorkflow, type PresenceWorkflowGrant } from "./presence-workflow-provider";
 import { researchUrlAllowed } from "./presence-workflow-research";
 import { pinnedResearchFetch } from "./presence-workflow-egress";
@@ -341,7 +342,8 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
           },
         };
       }
-      const scoped = { ...operations, visuals, ...(processingContinuation && {processingContinuation}), ...(knowledgeConfirmation && { knowledgeConfirmation }) };
+      // Who speaks for the Client on this Account: the Account's Client people.
+      const scoped = { ...operations, visuals, clientPeople: (current: WorkflowContext) => clientAddresses(pool, current.scope.webPresenceId), ...(processingContinuation && {processingContinuation}), ...(knowledgeConfirmation && { knowledgeConfirmation }) };
       return new PresenceWorkflow(pool, capability.kind === "review" ? { ...scoped, run: noOutbound } : scoped,
         boundary === "disposable" ? grant.previewActionDestinations ?? {} : {}, Date.now, boundary);
     },

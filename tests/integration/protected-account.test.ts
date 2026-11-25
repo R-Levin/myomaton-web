@@ -14,10 +14,11 @@ import { factKey } from "../../lib/platform/knowledge/facts";
 import { recordFacts } from "../../lib/platform/knowledge/store";
 import { inspectCanonical,writeApprovedInactiveKnowledge,writeFoundationFacts,type OnboardingOwner } from "../../lib/platform/canonical/writes";
 import { confirmKnowledge,knowledgeTargets } from "../../lib/platform/canonical/confirmed-information";
-import { protectedAccountBoundary,protectedAccountFoundation,protectedAccountConfirmation } from "../../lib/platform/intake/protected-account";
+import { protectedAccountBoundary,protectedAccountFoundation,protectedAccountConfirmation,protectedAccountPeople } from "../../lib/platform/intake/protected-account";
 import { protectedOwnerId,protectedOwnerToken,protectedOwnerVerifier } from "../../lib/platform/intake/protected-owner";
 import { ProtectedOperator } from "../../lib/platform/wordpress-delivery/operator";
-import { protectedAccountSql,protectedAccountCorrectedSql } from "../../scripts/db/protected-account-policy";
+import { protectedAccountSql,protectedAccountCorrectedSql,protectedAccountPeopleSql } from "../../scripts/db/protected-account-policy";
+import { clientAddresses } from "../../lib/platform/accounts/people";
 import { InquiryOutcomes } from "../../lib/platform/contact/outcomes";
 import { acceptContactSubmission } from "../../lib/platform/contact/submissions";
 import { protectedInquiry } from "../../lib/platform/contact/protected-inquiry";
@@ -74,7 +75,8 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
   for(const permission of ["inspect-site-proposal","prepare-site-proposal"]){await admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,$5,NULL,NULL)",[randomUUID(),protectedOwnerId,scope.webPresenceId,scope.managedSiteId,permission]);}
   // Only the fixture case UUID differs; actual migration/activation guards,
   // exact C0 scope, record restriction and policy statements are unchanged.
-  const originalSql=await protectedAccountSql(),sql=await protectedAccountCorrectedSql();
+  const originalSql=await protectedAccountSql(),sql=await protectedAccountCorrectedSql(),peopleSql=await protectedAccountPeopleSql();
+  assert.ok(peopleSql.forward.startsWith(sql.forward),"The Client people amendment comes after the approved bytes, never inside them");
   const installer=await admin.connect();
   try {
    const initial=(await installer.query("SELECT * FROM public.business_knowledge WHERE id=$1",[recordId])).rows[0];
@@ -99,7 +101,7 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
    assert.equal(trial.grantIds.length,3);await installer.query("ROLLBACK");
    assert.equal((await installer.query("SELECT to_regnamespace('miopages_core_account') AS existing")).rows[0].existing,null);
    assert.equal((await installer.query("SELECT count(*)::int n FROM miopages_wp.wordpress_operator_grants")).rows[0].n,2);
-   await installer.query("BEGIN");await installer.query(sql.forward.replaceAll(protectedAccountFoundation.caseId,owner.caseId));await installer.query("COMMIT");
+   await installer.query("BEGIN");await installer.query(peopleSql.forward.replaceAll(protectedAccountFoundation.caseId,owner.caseId));await installer.query("COMMIT");
   }
   catch(e){await installer.query("ROLLBACK");throw e;}finally{installer.release();}
   const first=await inspectCanonical(admin,"knowledge",scope.webPresenceId,recordId);assert.ok(first);
@@ -158,6 +160,23 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
   await assert.rejects(capability.authorize({...workflowActor,simulated:true},context));
   await admin.query("UPDATE miopages_wp.wordpress_operator_grants SET revoked_at=now() WHERE id=$1",[grant]);
   await assert.rejects(capability.authorize(workflowActor,context));
+  // The Account's Client people: kept only with "manage-account-people", append only, this Account only.
+  const people=protectedAccountPeople(role,operators,session);
+  assert.deepEqual(await clientAddresses(role,scope.webPresenceId),[],"Nobody speaks for the Client until the list says so");
+  await assert.rejects(people.add(scope,{name:"Fixture owner",email:"owner@fixture.example"},"Fixture"),/unavailable/);
+  await assert.rejects(admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,'manage-account-people',$5,NULL)",[randomUUID(),protectedOwnerId,scope.webPresenceId,scope.managedSiteId,mandate]),/wordpress_operator_grants_check/);
+  await admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,'manage-account-people',NULL,NULL)",[randomUUID(),protectedOwnerId,scope.webPresenceId,scope.managedSiteId]);
+  const added=await people.add(scope,{name:"Fixture owner",email:"Owner@Fixture.example",subjectId:protectedOwnerId},"Fixture: speaks for the business");
+  assert.deepEqual([added.email,added.subjectId,added.addedBy],["owner@fixture.example",protectedOwnerId,protectedOwnerId]);
+  assert.deepEqual(await people.add(scope,{name:"Fixture owner",email:"owner@fixture.example",subjectId:protectedOwnerId},"Again"),added,"Adding the same person twice is the same as once");
+  await assert.rejects(people.add(scope,{name:"Someone else",email:"owner@fixture.example"},"Fixture"),/conflict/);
+  await assert.rejects(people.add({...scope,webPresenceId:randomUUID()},{name:"Elsewhere",email:"x@fixture.example"},"Fixture"),/unavailable/);
+  assert.deepEqual(await clientAddresses(role,scope.webPresenceId),["owner@fixture.example"]);
+  await assert.rejects(role.query("UPDATE account_people_events SET email='other@fixture.example'"),/permission denied/);
+  await assert.rejects(role.query("DELETE FROM account_people_events"),/permission denied/);
+  await assert.rejects(role.query("INSERT INTO account_people_events(web_presence_id,person_id,version,event,role,name,email,recorded_by,authority_reference,reason) VALUES($1,gen_random_uuid(),1,'add','client','X','x@fixture.example','x','x','x')",[randomUUID()]),/row.level security|foreign key/);
+  assert.deepEqual(await people.remove(scope,added.id,"Fixture: left"),[]);
+  assert.equal((await admin.query("SELECT count(*)::int n FROM miopages_core_account.account_people_events")).rows[0].n,2,"Removal is recorded, never erased");
   for(const permission of ["inspect-inquiry-outcomes","record-inquiry-outcome"]){await admin.query("INSERT INTO miopages_wp.wordpress_operator_grants VALUES($1,$2,$3,$4,$5,$6,NULL)",[randomUUID(),protectedOwnerId,scope.webPresenceId,scope.managedSiteId,permission,permission==='record-inquiry-outcome'?mandate:null]);}
   const page=(await admin.query("INSERT INTO pages(managed_site_id,slug,name,title) VALUES($1,'/contact','Fixture','Fixture') RETURNING id",[scope.managedSiteId])).rows[0].id;
   const definition=(await admin.query("INSERT INTO contact_definitions(web_presence_id,name,configuration) VALUES($1,'Fixture',$2) RETURNING id",[scope.webPresenceId,{fields:[{key:'message',label:'Message',required:true}]}])).rows[0].id;

@@ -17,6 +17,20 @@ export async function protectedAccountSql() {
     sources:files.map(file=>({path:file.path,sha256:hash(file.bytes)}))};
 }
 
+/** The Account's Client people (Principal, Nov 25): a further proposed amendment with its own
+ * identity, after the customer-mandate amendment. Never folded into the approved bytes. */
+export async function protectedAccountPeopleSql() {
+  const corrected=await protectedAccountCorrectedSql();
+  const paths=["lib/platform/accounts/people.sql","lib/platform/intake/protected-account-people.sql"];
+  const [table,policy]=await Promise.all(paths.map(path=>readFile(path)));
+  const amendment=["SET LOCAL search_path TO miopages_core_account,public;",
+    table.toString("utf8").replaceAll("REFERENCES web_presences(","REFERENCES public.web_presences("),policy.toString("utf8")].join("\n");
+  const hash=(s:Buffer|string)=>createHash("sha256").update(s).digest("hex");
+  const forward=corrected.forward+"\n"+amendment;
+  return {...corrected,forward,correctedForwardSha256:corrected.forwardSha256,forwardSha256:hash(forward),amendmentSha256:hash(amendment),
+    sources:[...corrected.sources,...paths.map((path,index)=>({path,sha256:hash([table,policy][index])}))]};
+}
+
 /** Separate proposed SQL identity. Never silently replace the approved bytes. */
 export async function protectedAccountCorrectedSql() {
   const original=await protectedAccountSql(),path="lib/platform/intake/protected-account-customer-mandate.sql";

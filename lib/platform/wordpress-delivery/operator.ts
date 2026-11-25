@@ -5,7 +5,7 @@ import { object, text } from "../canonical/model";
 import type { Actor, CustomerAuthority, Permission, ProposalAuthority } from "../content-editing/proposal";
 
 type Operation = Permission | "review-private-stage" | "authorize-native-draft" | "enroll" | "rotate" | "revoke" | "issue"
-  | "confirm-business-information" | "inspect-inquiry-outcomes" | "record-inquiry-outcome";
+  | "confirm-business-information" | "inspect-inquiry-outcomes" | "record-inquiry-outcome" | "manage-account-people";
 type Grant = Actor & { customer?: CustomerAuthority };
 
 export function customerMandate(value: unknown): CustomerAuthority {

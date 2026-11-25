@@ -1292,3 +1292,8 @@ correction to the Business Understanding Report should reach the one Knowledge, 
 chose: the correction is a Client Request on the Report, and when Core next works on the Report
 it lists the facts the correction states, under the same rule as Client emails (the Client's own
 words Confirmed, anything Core rewords Proposed for the Client to confirm).
+
+**Nov 25: the Account's Client people, then step 4 (Principal).** Asked whether to build the
+Account's list of Client people or move to step 4, the Principal said: "Create the list, then
+we're good to perform step 4." The list records who speaks for the Client on each Account, so a
+Client email entered by a Specialist counts only when its sender is on it.

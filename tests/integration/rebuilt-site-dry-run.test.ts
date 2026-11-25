@@ -33,6 +33,7 @@ import type { MarketingAuthority } from "../../lib/platform/intake/presence-mark
 import { IntakeService } from "../../lib/platform/intake/service";
 import { deliverReviewDraft, readBackOperatorSite, readOperatorSiteConfig, reviewDecisionFromReadback } from "../../lib/platform/wordpress-delivery/operator-review";
 import { operatorFeedback, operatorFeedbackFromCandidate } from "../../lib/platform/intake/operator-feedback";
+import { addClientPerson, clientAddresses, clientPeople, removeClientPerson } from "../../lib/platform/accounts/people";
 
 type Schema = { properties?: Record<string, Schema>; items?: Schema; enum?: unknown[] };
 const enumAt = (schema: Schema, ...path: string[]) => {
@@ -196,7 +197,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
           output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(output) }] }] };
         return { body: response, rawBody: Buffer.from(JSON.stringify(response)) };
       } } });
-    const operations = { ...provider, requiresResearch: true, clientPeople: async () => ["owner@c0.example"],
+    const operations = { ...provider, requiresResearch: true, clientPeople: (current: { scope: { webPresenceId: string } }) => clientAddresses(setup.pool, current.scope.webPresenceId),
       knowledgeConfirmation: { async authorize(person: { id: string; role: string }) {
         if (person.id !== "owner@c0.example" || person.role !== "customer") throw Error("Not the Client");
         return { operatorId: person.id, authorityReference: "Dry-run Client", customer: { kind: "business-representative" as const,
@@ -390,6 +391,12 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
       text: "Hi, two updates. We now answer enquiries within one working day. Thanks!", facts: [
         { statement: "We now answer enquiries within one working day.", publicUse: true },
         { statement: "Replies are guaranteed within 24 hours.", publicUse: true }] };
+    await assert.rejects(workflow.recordClientEmail(context, revised.version, actor, email), /unavailable/,
+      "Until the Account lists who speaks for the Client, nobody's email counts");
+    // The Principal, as Account Manager, puts the Client's person on the Account's list.
+    const principal = { operatorId: "principal", authorityReference: "Dry-run Account Manager" };
+    const person = await addClientPerson(setup.pool, context.scope.webPresenceId, { name: "Dry-run owner", email: "Owner@C0.example" }, principal, "Speaks for the business");
+    assert.deepEqual([person.email, person.addedBy], ["owner@c0.example", "principal"]);
     await assert.rejects(workflow.recordClientEmail(context, revised.version, actor, { ...email, from: "someone@else.example" }), /unavailable/,
       "Only a person who speaks for the Client can give the Client's word");
     revised = (await workflow.recordClientEmail(context, revised.version, actor, email))!;
@@ -403,6 +410,12 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.ok(known.facts.some(item => item.value === email.facts[0].statement && item.source === "customer"), "My Business shows the Client's confirmed fact");
     assert.equal(known.proposed.length, 2);
     assert.deepEqual((await workflow.recordClientEmail(context, revised.version - 1, actor, email))!.version, revised.version, "Entering it twice is the same as once");
+    // Someone removed from the list no longer speaks for the Client; what they said before stays.
+    assert.deepEqual(await removeClientPerson(setup.pool, context.scope.webPresenceId, person.id, principal, "Left the business"), []);
+    await assert.rejects(workflow.recordClientEmail(context, revised.version, actor, { ...email, id: randomUUID() }), /unavailable/);
+    assert.deepEqual((await clientPeople(setup.pool, context.scope.webPresenceId)), []);
+    const readded = await addClientPerson(setup.pool, context.scope.webPresenceId, { name: "Dry-run owner", email: "owner@c0.example" }, principal, "Back in the business");
+    assert.equal(readded.id, person.id, "Added again, the same Person keeps their history");
 
     // The Client answers the Proposed facts in My Business: their word settles each one.
     const clientPerson = { id: "owner@c0.example", role: "customer", simulated: false } as const;

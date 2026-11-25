@@ -22,6 +22,7 @@ import { FirstPartyMeasurement, type MeasurementSource } from "../../lib/platfor
 import { accountReviewActivity } from "../../lib/platform/measurement/account-review";
 import { InquiryOutcomes } from "../../lib/platform/contact/outcomes";
 import { fingerprint } from "../../lib/platform/canonical/model";
+import { clientAddresses } from "../../lib/platform/accounts/people";
 
 const host = "127.0.0.1", port = 4320;
 const headers = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer",
@@ -62,6 +63,7 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
   try {
     await migrateWithBootstrapCompatibility(pool);
     if (runWorkflow) await pool.query(await readFile(new URL("../../lib/platform/intake/presence-workflow.sql", import.meta.url), "utf8"));
+    if (runWorkflow) await pool.query(await readFile(new URL("../../lib/platform/accounts/people.sql", import.meta.url), "utf8"));
     async function scope(name: string) {
       const organization = randomUUID(), webPresenceId = randomUUID(), managedSiteId = randomUUID();
       await pool.query("INSERT INTO organizations(id,name,status) VALUES($1,$2,'active')", [organization, name]);
@@ -71,7 +73,8 @@ export async function createC0Onboarding(bin: string, adaptive = false, retained
     }
     const database = new URL(cluster.url).pathname.slice(1);
     const selection = await scope("C0 onboarding rehearsal");
-    const workflow = runWorkflow ? new PresenceWorkflow(pool, { ...workflowFixture, knowledgeConfirmation: {
+    const workflow = runWorkflow ? new PresenceWorkflow(pool, { ...workflowFixture,
+      clientPeople: context => clientAddresses(pool, context.scope.webPresenceId), knowledgeConfirmation: {
       async authorize(actor, context) {
         if (!actor.simulated || actor.id !== "local-customer" || actor.role !== "customer" || fingerprint(context.scope) !== fingerprint(selection)) throw Error("Simulated customer confirmation scope refused");
         return { operatorId: actor.id, authorityReference: "Isolated local confirmation only", customer: {

@@ -5,6 +5,7 @@ import { protectedOwnerId, protectedOwnerScope } from "./protected-owner";
 import { fingerprint } from "../canonical/model";
 import { protectedConnection } from "../wordpress-delivery/protected-connection";
 import type { OnboardingOwner } from "../canonical/writes";
+import { AccountPeople } from "../accounts/people";
 
 export const protectedAccountFoundation = Object.freeze({
   caseId: "e3e75949-f2af-4d58-9b31-d91e43862b4f", organizationId: "b3b46645-0364-4329-83c7-86a6ea9e56c4",
@@ -47,4 +48,13 @@ export function protectedAccountConfirmation(pool: Pool, operators: ProtectedOpe
     try { await protectedAccountBoundary(db,foundation); } finally { db.release(); }
     return { ...grant, customer:grant.customer, foundation };
   } };
+}
+
+/** The Account's Client people on the protected inactive account, kept by whoever holds "manage-account-people" there. */
+export function protectedAccountPeople(pool: Pool, operators: ProtectedOperator, authenticated: unknown) {
+  return new AccountPeople(pool, async scope => {
+    if (fingerprint(scope) !== fingerprint(protectedOwnerScope)) throw Error("Account people scope refused");
+    const grant = await operators.authorize(authenticated, "manage-account-people", scope);
+    return { operatorId: grant.operatorId, authorityReference: grant.authorityReference };
+  });
 }
