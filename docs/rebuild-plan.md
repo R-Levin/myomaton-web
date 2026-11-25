@@ -112,5 +112,10 @@ something always runs end to end. Git keeps its history.
   Knowledge (proposed items are marked as not yet confirmed), Core's current authoring
   instructions are used, and each answer is checked before it becomes a proposed Version. Tested
   through the whole Launch over an offline connection; no paid call has been made.
-  Still to do in milestone 1: delivery to WordPress drafts and read-back of Notes as Requests; Publish as a
+  Delivery (`service/delivery.ts`) sends the engine's current Pages, Menu and Design to
+  WordPress drafts through the kept signed path, with each page and section keeping its
+  identity. Read-back turns open Notes and hand edits into Requests on their pages; delivery
+  waits until hand edits are worked in, so they are never overwritten, and the next delivery
+  answers and resolves each Note that was carried out.
+  Still to do in milestone 1: Publish as a
   labelled Beacon; then the end-to-end run moves onto this engine and the old workflow retires.

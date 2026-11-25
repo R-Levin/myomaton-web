@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import type { ResponsesTransport } from "../../lib/platform/intake/intelligent-responses";
 import type { NativeNode } from "../../lib/platform/intake/presence-native-component";
 
 /** The shared stand-in for Core's AI in tests: plausible answers in exactly the requested format (a Beacon). */
@@ -113,4 +114,20 @@ export function simulatedAnswer(name: string, schema: Schema, instructions: stri
   }
   if (stage === "editorial") return { summary: "Simulated critique.", concerns: [] };
   throw Error("Unexpected simulated stage " + name);
+}
+
+/** An offline AI connection answering with the shared stand-in, recording each request. */
+export function offlineAi(model: string) {
+  const sent: { name: string; instructions: string; input: string; schema: Schema }[] = [];
+  const transport: ResponsesTransport = { async send(path, body) {
+    if (path.endsWith("/input_tokens")) return { body: { input_tokens: 2000 } };
+    const request = body as { instructions: string; input: string; text: { format: { name: string; schema: Schema } } };
+    sent.push({ name: request.text.format.name, instructions: request.instructions, input: request.input, schema: request.text.format.schema });
+    const output = simulatedAnswer(request.text.format.name, request.text.format.schema, request.instructions);
+    const response = { id: "resp_offline_" + sent.length, model, status: "completed", service_tier: "default",
+      usage: { input_tokens: 2000, output_tokens: 400, total_tokens: 2400, input_tokens_details: { cached_tokens: 0 }, output_tokens_details: { reasoning_tokens: 0 } },
+      output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(output) }] }] };
+    return { body: response, rawBody: Buffer.from(JSON.stringify(response)) };
+  } };
+  return { transport, sent };
 }

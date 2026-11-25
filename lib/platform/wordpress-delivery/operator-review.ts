@@ -57,14 +57,14 @@ export function readOperatorSiteConfig(value: unknown): OperatorSiteConfig {
   return config;
 }
 
-const samePaths = (before: { path: string }[], after: { path: string }[]) =>
+export const samePaths = (before: { path: string }[], after: { path: string }[]) =>
   JSON.stringify(before.map(page => page.path).sort()) === JSON.stringify(after.map(page => page.path).sort());
-const signingKey = (config: OperatorSiteConfig) =>
+export const signingKey = (config: OperatorSiteConfig) =>
   createPrivateKey({ key: Buffer.from(config.signingKeyPkcs8Base64, "base64"), format: "der", type: "pkcs8" });
-const target = (config: OperatorSiteConfig): WordPressTarget => ({ origin: config.origin, ...(config.gate && { gate: config.gate }) });
+export const deliveryTarget = (config: OperatorSiteConfig): WordPressTarget => ({ origin: config.origin, ...(config.gate && { gate: config.gate }) });
 
 export async function readBackOperatorSite(config: OperatorSiteConfig, fetcher: typeof fetch = fetch) {
-  const readback = await fetchReadback(target(config), config.installationId, config.keyId, signingKey(config),
+  const readback = await fetchReadback(deliveryTarget(config), config.installationId, config.keyId, signingKey(config),
     Buffer.from(config.receiptSecretHex, "hex"), fetcher);
   return { readback, summary: summarizeReadback(readback) };
 }
@@ -130,7 +130,7 @@ export async function deliverReviewDraft(input: { config: OperatorSiteConfig; co
   const wire = reviewDraftEnvelope(draft, config.keyId, config.publicKeyBase64, signingKey(config));
   const paths = draft.candidate.pages.map(page => page.path);
   const pages = draft.candidate.pages.map(page => ({ path: page.path, id: page.id }));
-  const receipt = await sendSignedDraft(target(config), wire, Buffer.from(config.receiptSecretHex, "hex"), {
+  const receipt = await sendSignedDraft(deliveryTarget(config), wire, Buffer.from(config.receiptSecretHex, "hex"), {
     installationId: config.installationId, siteProposalId: config.streamId, operation: "apply", requestedDigest: draft.digest,
     appliedDigest: draft.digest, revision: draft.candidate.revision, paths, brandDigest: brand.digest }, fetcher);
   const next: ReviewDeliveryState = { site: config.name, installationId: config.installationId, streamId: config.streamId,

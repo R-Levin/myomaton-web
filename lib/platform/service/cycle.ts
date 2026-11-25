@@ -70,13 +70,14 @@ export function startLaunch(record: ServiceRecord, at: string, by: Person): Serv
 
 /** A person asks for a Work product to change (a correction, a Note, an email): a Request on it. */
 export function ask(record: ServiceRecord, request: { id: string; at: string; by: Person; kind: Kind; path?: string; words: string;
-  channel?: Request["origin"]["channel"] }): ServiceRecord {
+  channel?: Request["origin"]["channel"]; channelRef?: string }): ServiceRecord {
   if (!request.words.trim()) throw new CycleError("invalid", "A Request needs its words");
   if (record.ledger.requests.some(item => item.id === request.id + ":request")) return record;
   const origin = request.by.role === "customer" ? "customer" : request.by.role === "core" ? "core" : "operator";
   return { ...record, ledger: takeIn(record.ledger, { id: request.id, at: request.at, by: request.by }, [{ id: request.id + ":request", at: request.at,
     origin: { kind: origin, by: request.by, channel: request.channel ?? "core-screen" },
-    target: { grain: grainOf[request.kind], ...(request.path && { path: request.path }) }, words: request.words.trim() }]) };
+    target: { grain: grainOf[request.kind], ...(request.path && { path: request.path }) }, words: request.words.trim(),
+    ...(request.channelRef && { channelRef: request.channelRef }) }]) };
 }
 
 /** Who must do what next: Core writes for open Requests; the right person reviews proposed Changes. */
