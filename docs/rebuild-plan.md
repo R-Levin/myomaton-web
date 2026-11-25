@@ -90,3 +90,17 @@ something always runs end to end. Git keeps its history.
 - Keep only the safeguards in the review's "Keep" list; add none that do not trace to Part 1
   or a real security or legal need.
 - Adversarial review before showing anything; the Principal is not QA.
+
+## Progress
+
+- *Nov 25, milestone 1 begun (local):* the engine (`lib/platform/service/cycle.ts`) runs Launch
+  on the shared objects. The start of the Stage raises a Request to understand the business;
+  Core writes the Report, and only the Client may approve it. A Client correction is a Request in
+  their words, and Core reworks from the draft. Each approval raises what builds on it
+  (Direction, Site plan, one Request per page); Pages and Sections keep their identities and
+  Versions; a later Request on a page is the same cycle at a smaller grain. It runs end to end
+  with a labelled Beacon in place of the AI.
+  Still to do in milestone 1: keep the record in the database; give Core the Account's
+  Knowledge (C0's imported); the real AI writer, reusing the kept AI connection and
+  instructions; delivery to WordPress drafts and read-back of Notes as Requests; Publish as a
+  labelled Beacon; then the end-to-end run moves onto this engine and the old workflow retires.
