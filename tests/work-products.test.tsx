@@ -44,3 +44,25 @@ test("a Page's content digest is the same before and after it carried an identit
   assert.deepEqual([upgraded.pages[0].version, upgraded.pages[0].sections.map(section => section.id)],
     [1, [sectionIdentity(pageIdentity(site, "/"), 0), sectionIdentity(pageIdentity(site, "/"), 1)]]);
 });
+
+test("the Site plan and its Menu keep their identities and take a version only when they change", async () => {
+  const { versionPlan, sitePlanIdentity, menuIdentity } = await import("../lib/platform/work-products/pages");
+  const plan = { pages: [{ path: "/", label: "Home" }], navigation: ["/"] };
+  const first = versionPlan(site, plan, { pages: {}, sections: {} });
+  assert.deepEqual([first.plan!.id, first.plan!.version, first.menu!.id, first.menu!.version], [sitePlanIdentity(site), 1, menuIdentity(site), 1]);
+  assert.deepEqual(versionPlan(site, plan, first), first, "Saved again unchanged, nothing moves");
+  const added = versionPlan(site, { pages: [...plan.pages, { path: "/contact", label: "Contact" }], navigation: ["/"] }, first);
+  assert.deepEqual([added.plan!.version, added.menu!.version], [2, 1], "A page linked from other pages changes the plan, not the Menu");
+  const inMenu = versionPlan(site, { pages: [...plan.pages, { path: "/contact", label: "Contact" }], navigation: ["/", "/contact"] }, added);
+  assert.deepEqual([inMenu.plan!.version, inMenu.menu!.version], [2, 2]);
+  // Page versions recorded alongside never drop the plan's.
+  assert.deepEqual(versionPages(site, [], [page("/", "a")], inMenu).index.plan, inMenu.plan);
+});
+
+test("an image placement follows its Section by identity; one recorded before step 4 by position", async () => {
+  const { placedAt } = await import("../lib/platform/intake/presence-workflow-visual");
+  const sections = [{ id: "a" }, { id: "b" }, { id: "c" }];
+  assert.equal(placedAt({ sectionIndex: 0, sectionId: "c" }, sections), 2);
+  assert.equal(placedAt({ sectionIndex: 1 }, sections), 1);
+  assert.equal(placedAt({ sectionIndex: 1, sectionId: "gone" }, sections), -1, "A Section that no longer exists holds no image");
+});

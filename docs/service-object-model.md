@@ -314,10 +314,14 @@ until the end.
    against. The AI's input is unchanged: it receives the pages' content, not their
    identities. Checks recorded before this (review targets, image approvals, editorial
    decisions) compare content only, so they still match.
-   Still to do in this step: the plan (blueprint) and Navigation as Work products; Assets
-   placed by Section identity rather than position; the Report and Direction as versioned
-   Work products; and, when the Principal approves the hosted change, keeping the drafts in
-   Core's canonical Page and Section records rather than in the workflow's own history.
+   The Site plan and its Menu are Work products too: one identity each per site, and the next
+   version whenever their content changes; a proposed new page names the Site plan version
+   it adds to. An image is placed in a Section by the Section's identity (placements recorded
+   earlier keep their position). The portal's older "confirm business information"
+   correction now records a Request and the Client's Decision, like every other Client input.
+   Still to do in this step: the Report and Direction as versioned Work products; and, when
+   the Principal approves the hosted change, keeping the drafts in Core's canonical Page and
+   Section records rather than in the workflow's own history.
 5. **Task and Cost as shared objects.** Specialist work becomes visible and costed, and the
    Queue becomes a view.
 6. **Observation feeds Requests.** Inquiries and first-party measurement create

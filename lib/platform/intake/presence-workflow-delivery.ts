@@ -1,3 +1,4 @@
+import { placedAt } from "./presence-workflow-visual";
 import { logicalId, pageIdentity, sectionIdentity, withoutIdentity } from "../work-products/pages";
 import { fingerprint } from "../canonical/model";
 import { designProjection } from "../design-systems/site-design";
@@ -90,7 +91,7 @@ function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflow
       ...(page.composition && { composition: page.composition, navigationLabel: view.blueprint!.pages.find(entry => entry.path === page.path)!.label }),
       sections: page.sections.map((section, index) => {
         const approved = view.visuals?.find(item => item.placement.path === page.path &&
-          item.placement.sectionIndex === index && item.state === "approved");
+          placedAt(item.placement, page.sections) === index && item.state === "approved");
         if (approved && (!approved.association || !approved.decision?.alt)) throw Error("Approved placement evidence incomplete");
         return { id: section.id && pageId === page.id ? section.id : sectionIdentity(pageId, index), type: section.role ?? "intro", heading: editorial(section.heading), text: editorial(section.body),
           ...(approved && { image: { ...approved.association!, altText: approved.decision!.alt! } }) };

@@ -8,7 +8,7 @@
  * and the fetched research page. This checks that the pieces connect; it says nothing
  * about the quality a real model will produce.
  */
-import { pageIdentity, withoutIdentity, workDigest } from "../../lib/platform/work-products/pages";
+import { menuIdentity, pageIdentity, sitePlanIdentity, withoutIdentity, workDigest } from "../../lib/platform/work-products/pages";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash, generateKeyPairSync, randomUUID } from "node:crypto";
@@ -499,12 +499,20 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
       notes: [{ id, path: "/review-summary", text }] });
     note2(702, pageItem, "Also say we reply within two working days.");
     note2(703, 0, "Approve");
+    const menuBefore = revised.sitePlan!.menu!.version;
     revised = (await decideFromWordPress((await readBackOperatorSite(config, fetcher)).readback, revised))!;
     assert.deepEqual(roundOutcome(revised.changes!, proposedRound.id).pagesAdded, ["/contact"]);
     // "Add a page" is a Change of the new-page grain, approved with the Operator's addition.
     const p1 = revised.changes!.changes.find(change => change.id === proposedRound.id + ":P1")!;
+    const planBase = p1.target.workProduct!;
     assert.deepEqual([p1.target, p1.status, p1.reviews.map(entry => [entry.response, entry.words])],
-      [{ grain: "new-page", path: "/contact", name: "Contact" }, "applied", [["approve", "Also say we reply within two working days."]]]);
+      [{ grain: "new-page", path: "/contact", name: "Contact", workProduct: planBase }, "applied", [["approve", "Also say we reply within two working days."]]]);
+    // The Site plan and its Menu are Work products: adding the page made the next version of each.
+    assert.equal(planBase.id, sitePlanIdentity(context.scope.managedSiteId), "The new page names the Site plan version it adds to");
+    assert.equal(revised.sitePlan!.id, planBase.id);
+    assert.ok(revised.sitePlan!.version > planBase.version, "The plan with the new page is its next version");
+    assert.equal(revised.sitePlan!.menu!.id, menuIdentity(context.scope.managedSiteId));
+    assert.ok(revised.sitePlan!.menu!.version > menuBefore, "The Menu with the new page is its next version");
     assert.deepEqual(statuses(revised, proposedRound.id), { P1: "applied", C1: "approved" });
     assert.ok(revised.blueprint!.navigation.includes("/contact"), "The new page is in the menu");
     const sentBeforePage = requests.length;

@@ -75,6 +75,11 @@ test("confirmed knowledge and workflow receipts commit together; targeted reasse
     const confirmed = await post(operation); assert.equal(confirmed.status, 200);
     let response = await confirmed.json(); state = response.workflow; account = response.accountWork;
     assert.equal(state.next, "reassessment-ready"); assert.equal(account.pendingCorrections, 0);
+    // The portal records the Client's correction like every other Client input: a Request, and the Client's Decision that applied it.
+    const request = state.changes!.requests.find((item: { id: string }) => item.id === `understanding:${note.id}:request`);
+    assert.deepEqual([request!.origin.kind, request!.origin.channel, request!.target.grain, request!.status], ["customer", "core-screen", "fact", "decided"]);
+    const applied = state.changes!.changes.find((item: { id: string }) => item.id === `understanding:${note.id}:K1`);
+    assert.deepEqual([applied!.status, applied!.target.path, applied!.difference.after], ["applied", fact.key, input.value]);
     assert.deepEqual(state.pages, original.pages); assert.equal(await outputs(), initialOutputs);
     const after = await inspectCanonical(setup.pool, "knowledge", setup.selection.webPresenceId, initialRecord.id); assert.ok(after);
     assert.equal(after.row.version, before.row.version + 1);

@@ -1,4 +1,4 @@
-import { versionPages, withoutIdentity, workDigest, type VersionIndex } from "../work-products/pages";
+import { versionPages, versionPlan, withoutIdentity, workDigest, type VersionIndex } from "../work-products/pages";
 import { createHash, randomUUID } from "node:crypto";
 import { applyOperatorEdits, droppedWording, keptWording, notedSections, operatorConcerns, readReviewAnalysis, type OperatorFeedback } from "./operator-feedback";
 import type { Pool, PoolClient } from "pg";
@@ -11,7 +11,7 @@ import { composeHomeConcept, homeConceptDigest } from "./presence-home-concept";
 import { strategyBasis, type DecisionBrief } from "./presence-decision-brief";
 import { applyEditorialPatch } from "./presence-editorial-patch";
 import { editorialDecision, editorialFindings, withEditorialHistory, type EditorialDecision, type EditorialFinding } from "./presence-editorial-decisions";
-import { presenceVisualPlacement, type PresenceVisual, type PresenceVisualOperations } from "./presence-workflow-visual";
+import { placedAt, presenceVisualPlacement, samePlacement, type PresenceVisual, type PresenceVisualOperations } from "./presence-workflow-visual";
 import {
   ArtifactValidationError, readBlueprint, readDirection, readEditorial, readPage, readReport, readSectionRevision, type ArtifactIssue, type PresenceEvidence,
   type WorkflowBlueprint, type WorkflowDirection, type WorkflowEditorial, type WorkflowPage, type WorkflowReport,
@@ -271,7 +271,8 @@ class WorkflowStore {
     // Every saved change to the pages makes new versions of the same Page and Section Work products.
     const before = previous ? await this.readVersion(context, previous) : null;
     const versioned = versionPages(context.scope.managedSiteId, before?.pages ?? [], next.pages, before?.workProducts ?? next.workProducts);
-    const state = { ...next, pages: versioned.pages, ...(versioned.pages.length || before?.workProducts ? { workProducts: versioned.index } : {}), version: previous + 1 };
+    const index = versionPlan(context.scope.managedSiteId, next.blueprint, versioned.index);
+    const state = { ...next, pages: versioned.pages, ...(versioned.pages.length || next.blueprint || before?.workProducts ? { workProducts: index } : {}), version: previous + 1 };
     const { rowCount } = await this.pool.query(`
       INSERT INTO ${this.events} (web_presence_id,managed_site_id,intake_id,version,payload,digest)
       SELECT web_presence_id, managed_site_id, id, $4::int, $5::jsonb, $6
@@ -379,6 +380,19 @@ function inputFacts(state: State): InputFact[] {
     ...known.map(fact => ({ id: fact.key, statement: fact.statement, publicUse: fact.publicUse, status: fact.status, ...(fact.at && { at: fact.at }) }))];
 }
 export const correctionRound = (note: Pick<Correction, "finding" | "at">) => `report-correction:${note.finding.id}:${note.at}`;
+const understandingRound = (id: string) => `understanding:${id}`;
+/** The Client's confirmation of a correction is their Decision on its Request: the Knowledge entry it changed, applied. */
+function confirmedUnderstanding(ledger: ChangeLedger, id: string, input: { target: { key: string; version: number }; value: string },
+  actor: Actor, at: string, version: number): ChangeLedger {
+  const requestId = understandingRound(id) + ":request";
+  if (!ledger.requests.some(request => request.id === requestId && request.status === "open")) return ledger;
+  const by = { id: actor.id, role: actor.role, simulated: actor.simulated }, changeId = understandingRound(id) + ":K1";
+  const decided = decide(ledger, { id: understandingRound(id) + ":confirmed", at, by, requestIds: [requestId], outcome: "change",
+    reasoning: "Confirmed by someone with the Client's standing." }, [{ id: changeId, label: "K1", at, requestIds: [requestId],
+    target: { grain: "fact", path: input.target.key }, base: { version: input.target.version },
+    difference: { summary: "The Client's confirmed wording", after: input.value }, preserve: [], consequence: "routine" }]);
+  return markApplied(decided, [changeId], at, version);
+}
 const openCorrections = (state: State) => state.corrections.filter(note => state.changes?.requests
   .some(request => request.id === correctionRound(note) + ":request" && request.status === "open")).map(note => note.finding.id);
 
@@ -556,6 +570,9 @@ export class PresenceWorkflow {
       ...(state.widerChanges && { widerChanges: state.widerChanges }),
       ...(state.reviewRounds && { reviewRounds: state.reviewRounds }),
       ...(state.changes && { changes: state.changes }),
+      // The Site plan and its Menu as Work products: their identities and current versions.
+      ...(state.workProducts?.plan && { sitePlan: { id: state.workProducts.plan.id, version: state.workProducts.plan.version,
+        ...(state.workProducts.menu && { menu: { id: state.workProducts.menu.id, version: state.workProducts.menu.version } }) } }),
       ...(state.businessFacts && { businessFacts: state.businessFacts }),
       ...(state.knowledge?.length && { facts: state.knowledge.at(-1)!.facts, knowledgeReceipts: state.knowledge }),
       ...(state.clientStatements && { clientStatements: state.clientStatements }),
@@ -637,8 +654,13 @@ export class PresenceWorkflow {
     const source = [...state.sourceSnapshot.evidence, ...state.research ?? []].find(item => item.id === proposed.sourceId);
     if (!source || fingerprint(source) !== proposed.sourceDigest) throw new IntakeError("draft_changed", 409);
     if (state.work || state.visuals?.some(visual => visual.state === "running")) throw new IntakeError("workflow_not_ready", 409);
-    return this.view(context, await this.store.append(context, version, { ...state,
-      understandingCorrections: [...state.understandingCorrections ?? [], { ...proposed, actor, at: new Date(this.clock()).toISOString() }],
+    // A correction to what Core understood from a source is a Request on Knowledge, on the Account's record.
+    const at = new Date(this.clock()).toISOString(), by = { id: actor.id, role: actor.role, simulated: actor.simulated };
+    const changes = takeIn(state.changes ?? emptyLedger(), { id: understandingRound(proposed.id), at, by }, [{ id: understandingRound(proposed.id) + ":request", at,
+      origin: { kind: actor.role === "customer" ? "customer" : "operator", by, channel: "core-screen" },
+      target: { grain: "fact", path: proposed.sourceId }, words: proposed.text.slice(0, 4000) }]);
+    return this.view(context, await this.store.append(context, version, { ...state, changes,
+      understandingCorrections: [...state.understandingCorrections ?? [], { ...proposed, actor, at }],
     }));
   }
 
@@ -757,6 +779,7 @@ export class PresenceWorkflow {
     }));
   }
 
+  /** Withdraw a correction not yet confirmed; its Request stays on record, withdrawn. */
   async withdrawUnderstandingCorrection(context: WorkflowContext, version: number, value: unknown, actor: Actor) {
     let input: Record<string, unknown>, reason: string;
     try { input = object(value, ["id", "reason"]); reason = text(input.reason, Infinity, true); }
@@ -773,9 +796,12 @@ export class PresenceWorkflow {
       return this.view(context, state);
     }
     if (state.version !== version) throw new IntakeError("draft_changed", 409);
+    const at = new Date(this.clock()).toISOString();
+    const round = state.changes?.rounds.find(entry => entry.id === understandingRound(item.id) && entry.status === "taken-in");
     return this.view(context, await this.store.append(context, version, { ...state,
+      ...(round && { changes: withdrawRound(state.changes!, round.id, at, { id: actor.id, role: actor.role, simulated: actor.simulated }) }),
       understandingCorrections: state.understandingCorrections!.map(entry => entry.id !== item.id ? entry
-        : { ...entry, withdrawn: { actor, reason, at: new Date(this.clock()).toISOString() } }),
+        : { ...entry, withdrawn: { actor, reason, at } }),
     }));
   }
 
@@ -804,6 +830,7 @@ export class PresenceWorkflow {
           { intakeId: context.intakeId, sourceId: note.sourceId, sourceDigest: note.sourceDigest, proposedCorrectionDigest: fingerprint(note) },
           new Date(this.clock()).toISOString(), grant.foundation);
         return this.view(context, await store.append(context, version, { ...state,
+          ...(state.changes && { changes: confirmedUnderstanding(state.changes, note.id, input, actor, new Date(this.clock()).toISOString(), version + 1) }),
           understandingCorrections: state.understandingCorrections!.map(item => item.id === note.id ? { ...item, confirmation } : item),
         }));
       });
@@ -1102,7 +1129,8 @@ export class PresenceWorkflow {
           // Core's analysis is its Decision on the round's Requests: the Changes it proposes, each made against these pages.
           const taken = roundLedger(state.changes, { ...round, analysis: undefined }, state.version, state.pages);
           next = { ...state, reviewRounds: [...state.reviewRounds!.slice(0, -1), analysed],
-            changes: analysedRound(taken, analysed, state.version, state.pages, new Date(this.clock()).toISOString()) };
+            changes: analysedRound(taken, analysed, state.version, state.pages, new Date(this.clock()).toISOString(),
+              state.workProducts?.plan && { id: state.workProducts.plan.id, version: state.workProducts.plan.version }) };
           break;
         }
         case "editorial": {
@@ -1488,7 +1516,7 @@ export class PresenceWorkflow {
     if (!brief || !this.operations.visuals?.requestable) throw new IntakeError("workflow_not_ready", 409);
     const placement = presenceVisualPlacement(context, this.view(context, state)!, path, index);
     const visuals = state.visuals ?? [];
-    if (visuals.some(item => fingerprint(item.placement) === fingerprint(placement) &&
+    if (visuals.some(item => samePlacement(placement, item.placement) &&
         !["rejected", "revoked"].includes(item.state))) throw new IntakeError("workflow_not_ready", 409);
     const visual: PresenceVisual = { id: randomUUID(), placement, briefId: brief.id, requestDigest: brief.requestDigest, requester, state: "queued" };
     return this.view(context, await this.store.append(context, version, { ...state, visuals: [...visuals, visual] }));
@@ -1532,7 +1560,8 @@ export class PresenceWorkflow {
     const decision = object(input, ["id", "provenanceDigest", "decision", "reference", "alt"]);
     const visual = state.visuals?.find(item => item.id === decision.id);
     if (!visual?.result || !this.operations.visuals ||
-        fingerprint(presenceVisualPlacement(context, this.view(context, state)!, visual.placement.path, visual.placement.sectionIndex)) !== fingerprint(visual.placement) ||
+        !samePlacement(presenceVisualPlacement(context, this.view(context, state)!, visual.placement.path,
+          placedAt(visual.placement, state.pages.find(page => page.path === visual.placement.path)?.sections ?? [])), visual.placement) ||
         decision.provenanceDigest !== visual.result.provenanceDigest) throw new IntakeError("workflow_not_ready", 409);
     const next = decision.decision;
     if (next !== "approved" && next !== "rejected" && next !== "revoked" ||
@@ -1565,7 +1594,8 @@ export class PresenceWorkflow {
       throw Error("Exact approved private image placements required");
     }
     const placements = await Promise.all(wanted.map(async ({ index, section, image }) => {
-      const approved = choices.find(value => value.placement.sectionIndex === index && value.association?.assetId === image.assetId &&
+      const approved = choices.find(value => placedAt(value.placement, view.pages.find(item => item.path === page.slug)?.sections ?? []) === index &&
+        value.association?.assetId === image.assetId &&
         value.association?.usageId === image.usageId);
       const decision = approved?.decision, result = approved?.result;
       const currentSection = resolved.sections[index];
@@ -1607,7 +1637,8 @@ export class PresenceWorkflow {
   async localDraftImage(context: WorkflowContext, version: number, id: string) {
     const state = await this.current(context, version);
     const image = state.visuals?.find(entry => entry.id === id && ["review", "approved"].includes(entry.state));
-    const section = state.pages.find(page => page.path === image?.placement.path)?.sections[image?.placement.sectionIndex ?? -1];
+    const imagePage = state.pages.find(page => page.path === image?.placement.path);
+    const section = image && imagePage ? imagePage.sections[placedAt(image.placement, imagePage.sections)] : undefined;
     if (this.boundary !== "disposable" || !context.evaluation || !image?.result || !section ||
         workDigest(section) !== image.placement.sectionDigest || !this.operations.visuals) {
       throw new IntakeError("unavailable", 404);

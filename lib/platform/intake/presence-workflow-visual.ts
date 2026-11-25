@@ -12,6 +12,8 @@ import { hash } from "../content-editing/proposal";
 
 export type PresenceVisualPlacement = {
   owner: string; site: string; intake: string; path: string; sectionIndex: number;
+  /** The Section Work product the image is placed in (step 4); placements recorded earlier have only its position. */
+  sectionId?: string;
   sectionDigest: string; candidateDigest: string; purpose: string; brief: string; altIntent: string;
 };
 
@@ -26,7 +28,7 @@ export function presenceVisualPlacement(context: WorkflowContext, view: Presence
   const { purpose, brief, altIntent } = section.visual;
   return {
     owner: uuid(context.scope.webPresenceId), site: uuid(context.scope.managedSiteId), intake: uuid(context.intakeId),
-    path, sectionIndex, sectionDigest: workDigest(section), candidateDigest: concept?.digest ?? decision!.target,
+    path, sectionIndex, ...(section.id && { sectionId: section.id }), sectionDigest: workDigest(section), candidateDigest: concept?.digest ?? decision!.target,
     purpose, brief, altIntent,
   };
 }
@@ -126,4 +128,14 @@ export async function acquirePresenceVisual(provider: ImageProvider, selection: 
     height: result.height, altIntent: selection.altIntent,
   };
   return { ...provenance, provenanceDigest: fingerprint(provenance), usage: result.usage, actualMicros: result.actualMicros };
+}
+
+/** Where a placement sits on its Page now: by its Section's identity, or by position for placements recorded earlier. */
+export function placedAt(placement: Pick<PresenceVisualPlacement, "sectionIndex" | "sectionId">, sections: readonly { id?: string }[]) {
+  return placement.sectionId ? sections.findIndex(section => section.id === placement.sectionId) : placement.sectionIndex;
+}
+/** Whether a placement is still exactly the one Core would make now (a placement recorded earlier is compared without the identity). */
+export function samePlacement(current: PresenceVisualPlacement, recorded: PresenceVisualPlacement) {
+  const { sectionId, ...rest } = current;
+  return fingerprint(recorded.sectionId ? { ...rest, sectionId } : rest) === fingerprint(recorded);
 }

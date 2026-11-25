@@ -255,11 +255,16 @@ export function PresenceWorkflowPanel({ hosted, workflow, snapshot, busy, run, c
   </section>;
 }
 
+/** Where an image placement sits on its page: by its section's identity, or by position for earlier placements. */
+const placedAt = (placement: { sectionIndex: number; sectionId?: string }, sections: readonly { id?: string }[]) =>
+  placement.sectionId ? sections.findIndex(section => section.id === placement.sectionId) : placement.sectionIndex;
+
 function VisualReview({ workflow, path, index, altIntent, busy, submit }: {
   workflow: PresenceWorkflowView; path: string; index: number; altIntent: string; busy: boolean;
   submit: (operation: string, options?: object) => Promise<void>;
 }) {
-  const visual = workflow.visuals?.filter(item => item.placement.path === path && item.placement.sectionIndex === index).at(-1);
+  const visual = workflow.visuals?.filter(item => item.placement.path === path &&
+    placedAt(item.placement, workflow.pages.find(page => page.path === path)?.sections ?? []) === index).at(-1);
   const [brief, setBrief] = useState("");
   const [reference, setReference] = useState("");
   const [alt, setAlt] = useState(altIntent);

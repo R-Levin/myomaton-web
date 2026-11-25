@@ -1,3 +1,4 @@
+import { withoutIdentity } from "../work-products/pages";
 import { fingerprint } from "../canonical/model";
 import { validatePages } from "../wordpress-delivery/authority";
 import { requireEvaluationContext } from "./presence-evaluation";
@@ -12,7 +13,7 @@ function scopedId(value: unknown) {
 export function homeConceptDigest(context: WorkflowContext, view: { blueprint: WorkflowBlueprint | null; direction: WorkflowDirection | null; pages: readonly WorkflowPage[] }) {
   if (!context.evaluation || !view.direction || !view.blueprint) return undefined;
   const home = view.pages.find(page => page.path === "/" && page.composition === "managed-v1");
-  return home && fingerprint({ binding: requireEvaluationContext(context), page: home, siteDirection: view.direction, blueprint: view.blueprint });
+  return home && fingerprint({ binding: requireEvaluationContext(context), page: withoutIdentity(home), siteDirection: view.direction, blueprint: view.blueprint });
 }
 
 // Input for the existing WordPress native block projector in a disposable

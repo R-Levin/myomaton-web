@@ -1297,3 +1297,21 @@ words Confirmed, anything Core rewords Proposed for the Client to confirm).
 Account's list of Client people or move to step 4, the Principal said: "Create the list, then
 we're good to perform step 4." The list records who speaks for the Client on each Account, so a
 Client email entered by a Specialist counts only when its sender is on it.
+
+**Nov 25: email, the portal and how heavy the system should be (Principal).**
+- The Principal asked whether any Client email could go into Core automatically and reach the
+  Specialist, so Client input is always recorded. Agreed direction: the Account gets an address
+  Core receives at; email from the Account's Client people becomes a Client Request (the email
+  kept as Evidence) in the Specialist's Queue; email from anyone else goes to the Queue to sort
+  out and never counts as the Client's word. Receiving mail is a hosted change and needs the
+  Principal's go-ahead. Email across the system (reports, notices, copies to the right people,
+  administrative reports) is to be written up as a short proposal first: incoming email is a
+  Request with Evidence, outgoing email is a Delivery of a Work product to people on the Account.
+- The portal must record Client changes the same way as email; the older direct confirmation
+  path is to be brought into line.
+- "The site is built only once, then everything going forward would be modification. Function
+  should not be too top heavy overall." The Principal wants "a safe, but not overweening
+  system". Codex ignored the Principal's repeated concerns that it was too conservative and
+  timid. A review of the inherited safeguards follows step 4: keep what protects real data,
+  money and the Client's word; simplify the rest.
+- Go-ahead: continue step 4, kept lean; then the email proposal; then the safeguards review.

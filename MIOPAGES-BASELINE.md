@@ -119,6 +119,10 @@ nothing below came from an assistant proposal unless it says so.
 22. **Controls should match the stage.** Local iteration needs little ceremony;
     protected writes and public or customer actions need progressively stronger
     controls. The founder may hold several roles. *(P0-18)*
+    The system must be safe but not overweening: keep the safeguards that protect real
+    data, money and the Client's word, and remove ceremony that only slows the work. The
+    previous tool ignored repeated direction that it was too conservative and timid; that
+    must not recur. *(Nov 25)*
 23. **Check your own work hard before showing it.** Review it adversarially and fix what
     you find. The owner is not the QA department. *(P0-16, P0-19)*
 24. **Report in plain business language**: what changed, what's still wrong and the one

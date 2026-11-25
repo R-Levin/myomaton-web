@@ -34,7 +34,9 @@ export const workDigest = (value: unknown) => fingerprint(Array.isArray(value) ?
 const content = (value: { [key: string]: unknown }): string => workDigest(value);
 
 /** The latest version of every Page and Section ever made, with its content digest, so a Page set aside and drafted again continues its history. */
-export type VersionIndex = { pages: Record<string, Latest>; sections: Record<string, Latest> };
+export type VersionIndex = { pages: Record<string, Latest>; sections: Record<string, Latest>;
+  /** The Site plan and its Menu (glossary): one of each per site, versioned like Pages. */
+  plan?: WorkIdentity & { digest: string }; menu?: WorkIdentity & { digest: string } };
 type Latest = { version: number; digest: string };
 
 /**
@@ -45,7 +47,7 @@ type Latest = { version: number; digest: string };
  */
 export function versionPages<P extends Page>(managedSiteId: string, previous: readonly Page[], next: readonly P[],
   index: VersionIndex = { pages: {}, sections: {} }): { pages: Identified<P>[]; index: VersionIndex } {
-  const known: VersionIndex = { pages: { ...index.pages }, sections: { ...index.sections } };
+  const known: VersionIndex = { ...index, pages: { ...index.pages }, sections: { ...index.sections } };
   const note = (into: Record<string, Latest>, item: Partial<WorkIdentity> & { [key: string]: unknown }) => {
     if (item.id && item.version && (into[item.id]?.version ?? 0) < item.version) into[item.id] = { version: item.version, digest: content(item) };
   };
@@ -80,4 +82,22 @@ export function versionPages<P extends Page>(managedSiteId: string, previous: re
     return { ...candidate, id, version: versionOf(known.pages, id, content(candidate)) } as unknown as Identified<P>;
   });
   return { pages, index: known };
+}
+
+/** The Site plan's and Menu's identities on a site. */
+export const sitePlanIdentity = (managedSiteId: string) => logicalId({ site: managedSiteId, plan: "site" });
+export const menuIdentity = (managedSiteId: string) => logicalId({ site: managedSiteId, menu: "primary" });
+
+/**
+ * Version the Site plan (its Pages and purposes) and its Menu. They keep their identities for the
+ * life of the site; each takes its next version when its content changes. The plan itself is left
+ * exactly as Core wrote it, so everything already recorded against it still matches.
+ */
+export function versionPlan(managedSiteId: string, plan: { navigation: readonly string[]; [key: string]: unknown } | null, index: VersionIndex): VersionIndex {
+  if (!plan) return index;
+  const next = (latest: (WorkIdentity & { digest: string }) | undefined, id: string, digest: string) =>
+    latest?.digest === digest ? latest : { id, version: (latest?.version ?? 0) + 1, digest };
+  const { navigation, ...rest } = plan as { navigation: readonly string[]; [key: string]: unknown };
+  return { ...index, plan: next(index.plan, sitePlanIdentity(managedSiteId), fingerprint(rest)),
+    menu: next(index.menu, menuIdentity(managedSiteId), fingerprint(navigation)) };
 }

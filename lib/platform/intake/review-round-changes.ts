@@ -68,7 +68,8 @@ export function takeInRound(ledger: ChangeLedger | undefined, round: ReviewRound
  * Core's analysis of a round as a Decision and the Changes it proposes. `pages` are Core's
  * pages at `version` (the base every proposed Change is made against).
  */
-export function analysedRound(ledger: ChangeLedger, round: ReviewRound, version: number, pages: readonly Page[], at: string): ChangeLedger {
+export function analysedRound(ledger: ChangeLedger, round: ReviewRound, version: number, pages: readonly Page[], at: string,
+  sitePlan?: { id: string; version: number }): ChangeLedger {
   const analysis = round.analysis;
   if (!analysis) throw Error("The round has not been analysed");
   const digest = (path: string) => { const page = pages.find(item => item.path === path); return page ? workDigest(page) : undefined; };
@@ -87,7 +88,7 @@ export function analysedRound(ledger: ChangeLedger, round: ReviewRound, version:
     requestIds: sourceRequest(fact.source), target: { grain: "fact", path: fact.source.path }, base: { version },
     difference: { summary: fact.publicUse ? publicFact : internalFact, after: fact.statement }, preserve: [], consequence: "operator-review" }));
   const newPages: Omit<Change, "status" | "reviews" | "decisionId">[] = (analysis.newPages ?? []).map(page => ({ id: changeId(round, page.id), label: page.id, at,
-    requestIds: [noteRequestId(round, page.noteId)], target: { grain: "new-page", path: page.path, name: page.label }, base: { version },
+    requestIds: [noteRequestId(round, page.noteId)], target: { grain: "new-page", path: page.path, name: page.label, ...(sitePlan && { workProduct: { id: sitePlan.id, version: sitePlan.version } }) }, base: { version },
     difference: { summary: `Add the page ${page.label} (${page.path}) to the site plan${page.navigation ? ", in the main menu" : ", linked from other pages rather than the main menu"}`, after: page.purpose },
     preserve: [], consequence: "operator-review" }));
   const revisions = [...round.noteRevisions, ...analysis.revisions].map((revision, index): Omit<Change, "status" | "reviews" | "decisionId"> => {
