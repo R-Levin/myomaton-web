@@ -36,7 +36,9 @@ const content = (value: { [key: string]: unknown }): string => workDigest(value)
 /** The latest version of every Page and Section ever made, with its content digest, so a Page set aside and drafted again continues its history. */
 export type VersionIndex = { pages: Record<string, Latest>; sections: Record<string, Latest>;
   /** The Site plan and its Menu (glossary): one of each per site, versioned like Pages. */
-  plan?: WorkIdentity & { digest: string }; menu?: WorkIdentity & { digest: string } };
+  plan?: WorkIdentity & { digest: string }; menu?: WorkIdentity & { digest: string };
+  /** The Business Understanding Report and the Presence Direction: one of each per site, versioned the same way. */
+  report?: WorkIdentity & { digest: string }; direction?: WorkIdentity & { digest: string } };
 type Latest = { version: number; digest: string };
 
 /**
@@ -100,4 +102,19 @@ export function versionPlan(managedSiteId: string, plan: { navigation: readonly 
   const { navigation, ...rest } = plan as { navigation: readonly string[]; [key: string]: unknown };
   return { ...index, plan: next(index.plan, sitePlanIdentity(managedSiteId), fingerprint(rest)),
     menu: next(index.menu, menuIdentity(managedSiteId), fingerprint(navigation)) };
+}
+
+export const reportIdentity = (managedSiteId: string) => logicalId({ site: managedSiteId, work: "report" });
+export const directionIdentity = (managedSiteId: string) => logicalId({ site: managedSiteId, work: "direction" });
+
+/** Version the Report and the Direction: the next version when Core writes different content; none while there is none. */
+export function versionDocuments(managedSiteId: string, documents: { report: unknown; direction: unknown }, index: VersionIndex): VersionIndex {
+  const next = (latest: (WorkIdentity & { digest: string }) | undefined, id: string, value: unknown) => {
+    if (value === null || value === undefined) return latest;
+    const digest = fingerprint(value);
+    return latest?.digest === digest ? latest : { id, version: (latest?.version ?? 0) + 1, digest };
+  };
+  const report = next(index.report, reportIdentity(managedSiteId), documents.report);
+  const direction = next(index.direction, directionIdentity(managedSiteId), documents.direction);
+  return { ...index, ...(report && { report }), ...(direction && { direction }) };
 }

@@ -1,4 +1,4 @@
-import { versionPages, versionPlan, withoutIdentity, workDigest, type VersionIndex } from "../work-products/pages";
+import { versionDocuments, versionPages, versionPlan, withoutIdentity, workDigest, type VersionIndex } from "../work-products/pages";
 import { createHash, randomUUID } from "node:crypto";
 import { applyOperatorEdits, droppedWording, keptWording, notedSections, operatorConcerns, readReviewAnalysis, type OperatorFeedback } from "./operator-feedback";
 import type { Pool, PoolClient } from "pg";
@@ -271,8 +271,9 @@ class WorkflowStore {
     // Every saved change to the pages makes new versions of the same Page and Section Work products.
     const before = previous ? await this.readVersion(context, previous) : null;
     const versioned = versionPages(context.scope.managedSiteId, before?.pages ?? [], next.pages, before?.workProducts ?? next.workProducts);
-    const index = versionPlan(context.scope.managedSiteId, next.blueprint, versioned.index);
-    const state = { ...next, pages: versioned.pages, ...(versioned.pages.length || next.blueprint || before?.workProducts ? { workProducts: index } : {}), version: previous + 1 };
+    const index = versionDocuments(context.scope.managedSiteId, next, versionPlan(context.scope.managedSiteId, next.blueprint, versioned.index));
+    const state = { ...next, pages: versioned.pages, ...(versioned.pages.length || next.blueprint || next.report || next.direction || before?.workProducts
+      ? { workProducts: index } : {}), version: previous + 1 };
     const { rowCount } = await this.pool.query(`
       INSERT INTO ${this.events} (web_presence_id,managed_site_id,intake_id,version,payload,digest)
       SELECT web_presence_id, managed_site_id, id, $4::int, $5::jsonb, $6
@@ -380,6 +381,12 @@ function inputFacts(state: State): InputFact[] {
     ...known.map(fact => ({ id: fact.key, statement: fact.statement, publicUse: fact.publicUse, status: fact.status, ...(fact.at && { at: fact.at }) }))];
 }
 export const correctionRound = (note: Pick<Correction, "finding" | "at">) => `report-correction:${note.finding.id}:${note.at}`;
+/** The site-wide Work products' identities and current versions, for screens and Changes. */
+function workProductsView(index: VersionIndex) {
+  const pick = (item?: { id: string; version: number }) => item && { id: item.id, version: item.version };
+  return { ...(index.report && { report: pick(index.report) }), ...(index.direction && { direction: pick(index.direction) }),
+    ...(index.plan && { sitePlan: pick(index.plan) }), ...(index.menu && { menu: pick(index.menu) }) };
+}
 const understandingRound = (id: string) => `understanding:${id}`;
 /** The Client's confirmation of a correction is their Decision on its Request: the Knowledge entry it changed, applied. */
 function confirmedUnderstanding(ledger: ChangeLedger, id: string, input: { target: { key: string; version: number }; value: string },
@@ -570,9 +577,8 @@ export class PresenceWorkflow {
       ...(state.widerChanges && { widerChanges: state.widerChanges }),
       ...(state.reviewRounds && { reviewRounds: state.reviewRounds }),
       ...(state.changes && { changes: state.changes }),
-      // The Site plan and its Menu as Work products: their identities and current versions.
-      ...(state.workProducts?.plan && { sitePlan: { id: state.workProducts.plan.id, version: state.workProducts.plan.version,
-        ...(state.workProducts.menu && { menu: { id: state.workProducts.menu.id, version: state.workProducts.menu.version } }) } }),
+      // The Report, Direction, Site plan and Menu as Work products: their identities and current versions.
+      ...(state.workProducts && { workProducts: workProductsView(state.workProducts) }),
       ...(state.businessFacts && { businessFacts: state.businessFacts }),
       ...(state.knowledge?.length && { facts: state.knowledge.at(-1)!.facts, knowledgeReceipts: state.knowledge }),
       ...(state.clientStatements && { clientStatements: state.clientStatements }),
@@ -1179,7 +1185,8 @@ export class PresenceWorkflow {
     const prior = earlierRound ? withdrawRound(state.changes!, earlierRound.id, note.at, by) : state.changes ?? emptyLedger();
     const changes = takeIn(prior, { id: roundId, at: note.at, by }, [{ id: roundId + ":request", at: note.at,
       origin: { kind: actor.role === "customer" ? "customer" : "operator", by, channel: "core-screen" },
-      target: { grain: "report", path: priorFinding.id }, words: note.text }]);
+      target: { grain: "report", path: priorFinding.id, ...(state.workProducts?.report && {
+        workProduct: { id: state.workProducts.report.id, version: state.workProducts.report.version } }) }, words: note.text }]);
     return this.view(context, await this.store.append(context, version, { ...state, changes,
       corrections: [...state.corrections.filter(item => item.finding.id !== finding), note],
       report: null, confirmation: null, direction: null, blueprint: null, pages: [], editorial: null, revisionRequest: null, operatorReview: null,

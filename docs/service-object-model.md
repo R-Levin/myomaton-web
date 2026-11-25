@@ -319,8 +319,10 @@ until the end.
    it adds to. An image is placed in a Section by the Section's identity (placements recorded
    earlier keep their position). The portal's older "confirm business information"
    correction now records a Request and the Client's Decision, like every other Client input.
-   Still to do in this step: the Report and Direction as versioned Work products; and, when
-   the Principal approves the hosted change, keeping the drafts in Core's canonical Page and
+   The Report and the Direction are Work products as well (one identity each per site, the next
+   version when Core writes something different), and a Report correction names the Report
+   version it corrects. Step 4 is complete locally. One part remains for later, with the
+   Principal's approval of the hosted change: keeping the drafts in Core's canonical Page and
    Section records rather than in the workflow's own history.
 5. **Task and Cost as shared objects.** Specialist work becomes visible and costed, and the
    Queue becomes a view.

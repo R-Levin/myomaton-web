@@ -1,8 +1,8 @@
 # Email across MioPages — proposal for the Principal (Nov 25)
 
-Status: **proposed**, not built. Asked for by the Principal on Nov 25 (see
-`docs/owner-critical-conversations.md`). It needs the Principal's decisions on the four
-questions at the end before anything hosted is set up.
+Status: **accepted** by the Principal on Nov 25 (all four recommendations; see
+`docs/owner-critical-conversations.md`). Not built yet. The local build (step 1 below) needs no
+further decision; connecting an email service is a hosted change for the Principal's go-ahead.
 
 ## Why
 

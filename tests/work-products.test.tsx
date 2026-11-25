@@ -66,3 +66,16 @@ test("an image placement follows its Section by identity; one recorded before st
   assert.equal(placedAt({ sectionIndex: 1 }, sections), 1);
   assert.equal(placedAt({ sectionIndex: 1, sectionId: "gone" }, sections), -1, "A Section that no longer exists holds no image");
 });
+
+test("the Report and Direction keep one identity each and take a version when Core writes something different", async () => {
+  const { versionDocuments, reportIdentity, directionIdentity } = await import("../lib/platform/work-products/pages");
+  const empty = versionDocuments(site, { report: null, direction: null }, { pages: {}, sections: {} });
+  assert.equal(empty.report, undefined, "No Report yet, no Work product yet");
+  const first = versionDocuments(site, { report: { title: "R" }, direction: null }, empty);
+  assert.deepEqual([first.report!.id, first.report!.version, first.direction], [reportIdentity(site), 1, undefined]);
+  const both = versionDocuments(site, { report: { title: "R" }, direction: { d: 1 } }, first);
+  assert.deepEqual([both.report!.version, both.direction!.id, both.direction!.version], [1, directionIdentity(site), 1]);
+  // Set aside for a reassessment and rewritten: the same Report continues its history.
+  const cleared = versionDocuments(site, { report: null, direction: null }, both);
+  assert.equal(versionDocuments(site, { report: { title: "R2" }, direction: null }, cleared).report!.version, 2);
+});

@@ -1315,3 +1315,11 @@ Client email entered by a Specialist counts only when its sender is on it.
   timid. A review of the inherited safeguards follows step 4: keep what protects real data,
   money and the Client's word; simplify the rest.
 - Go-ahead: continue step 4, kept lean; then the email proposal; then the safeguards review.
+
+**Nov 25: email decisions (Principal).** On `docs/email-proposal.md` the Principal accepted the
+recommendations: one address per Account (Core still checks the sender); Core's AI reads each
+incoming email and proposes its facts and changes for the Specialist to confirm (a small paid
+call per email); the email service is chosen when it is connected; by default the Specialist is
+copied on every Client email and notice, and the Principal on administrative reports only,
+adjustable per Account. Connecting the service remains a hosted change for the Principal's
+go-ahead; each paid call still follows the usual approval for provider spending.
