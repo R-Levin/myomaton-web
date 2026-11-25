@@ -11,6 +11,7 @@ import { inspectCanonical, writeCanonical } from "../../lib/platform/canonical/w
 import { FirstPartyMeasurement, type MeasurementSource } from "../../lib/platform/measurement/first-party";
 import { PresenceWorkflow, type PresenceWorkflowView, type WorkflowContext } from "../../lib/platform/intake/presence-workflow";
 import { IntakeService } from "../../lib/platform/intake/service";
+import { readMyBusiness } from "../../lib/platform/intake/my-business";
 
 test("the existing local Core interface persists a report, correction, revised site and performance snapshot", async () => {
   const retainedEvidence = process.env.MIOPAGES_LOCAL_WORKFLOW_RETAINED;
@@ -202,6 +203,13 @@ test("the existing local Core interface persists a report, correction, revised s
     await run("next");
     assert.equal(state!.report?.findings[1].body, correction);
     assert.equal(state!.report?.findings[0].body, first.report?.findings[0].body);
+    // The correction was a Client Request on the Report; the fact it states, in the Client's own
+    // words, is now a Confirmed fact in the one Knowledge (Principal, Nov 24).
+    const correctionRequest = state!.changes!.requests.find(item => item.target.grain === "report")!;
+    assert.deepEqual([correctionRequest.origin.kind, correctionRequest.target.path, correctionRequest.status], ["customer", "existing-website", "decided"]);
+    assert.deepEqual(state!.facts!.map(fact => [fact.statement, fact.status, fact.said.kind]), [[correction, "confirmed", "client"]]);
+    const business = await readMyBusiness(setup.pool, setup.selection.webPresenceId);
+    assert.ok(business.facts.some(item => item.value === correction && item.source === "customer"), "My Business shows it");
     assert.equal((await post({ operation: "workflow-next", version: state.version })).status, 409);
     let progress = await run("confirm");
     for (let step = 0; progress.next !== "operator-review" && step < 12; step++) {

@@ -184,8 +184,8 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
     ...(authority.strategy && { strategy: authority.strategy }),
     ...(replan && { independentReviewCriteriaToCorrect: replan.concerns }) };
   switch (operation) {
-    case "research":
-    case "report": return base;
+    case "research": return base;
+    case "report": return { ...base, ...(run.input.openCorrections?.length && { openCorrections: run.input.openCorrections }) };
     case "direction": return { ...base, report };
     case "blueprint": return { ...base, report, direction };
     case "editorial": return { ...base, report, direction, blueprint, pages };

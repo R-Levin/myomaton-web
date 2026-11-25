@@ -39,3 +39,25 @@ test("only the Client's own words in the email count as quoted", () => {
   assert.ok(!quotedIn("We answer enquiries within one working day.", email), "A changed wording is the Specialist's, not the Client's");
   assert.ok(!quotedIn("", email));
 });
+
+test("a Report correction's facts: the Client's own words Confirmed, Core's rewording and a Specialist's correction Proposed", async () => {
+  const { reportCorrectionFacts, correctionRound } = await import("../lib/platform/intake/presence-workflow");
+  const { takeIn, emptyLedger } = await import("../lib/platform/change/model");
+  const finding = (id: string) => ({ id, heading: id, body: "", status: "proposed" as const, sourceIds: [] });
+  const notes = [
+    { finding: finding("audience"), text: "We serve owner-led UK businesses. Too broad.", reportDigest: "d", at, actor: { id: "owner", role: "customer" as const, simulated: true } },
+    { finding: finding("offer"), text: "Launch includes six pages.", reportDigest: "d", at, actor: { id: "sp", role: "operator" as const, simulated: true } }];
+  let changes = emptyLedger();
+  for (const note of notes) changes = takeIn(changes, { id: correctionRound(note), at, by: { id: note.actor.id, role: note.actor.role } },
+    [{ id: correctionRound(note) + ":request", at, origin: { kind: note.actor.role === "customer" ? "customer" : "operator", by: { id: note.actor.id, role: note.actor.role }, channel: "core-screen" },
+      target: { grain: "report", path: note.finding.id }, words: note.text }]);
+  const state = { version: 4, corrections: notes, changes };
+  const { ledger, facts } = reportCorrectionFacts(state, [
+    { findingId: "audience", statement: "We serve owner-led UK businesses.", publicUse: true },
+    { findingId: "audience", statement: "Clients are UK owner-run firms.", publicUse: true },
+    { findingId: "offer", statement: "Launch includes six pages.", publicUse: true }], at);
+  assert.deepEqual(facts.map(fact => [fact.said.kind, statusOf(fact.said)]), [["client", "confirmed"], ["core", "proposed"], ["specialist", "proposed"]]);
+  assert.ok(ledger.requests.every(request => request.status === "decided"));
+  assert.throws(() => reportCorrectionFacts(state, [{ findingId: "elsewhere", statement: "x", publicUse: true }], at), /does not trace/);
+  assert.equal(reportCorrectionFacts(state, [], at).ledger.decisions.at(-1)!.outcome, "answer", "No facts is a normal answer");
+});

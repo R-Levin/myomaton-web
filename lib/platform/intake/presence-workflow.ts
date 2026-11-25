@@ -25,7 +25,7 @@ import { inspectCanonical } from "../canonical/writes";
 import type { CustomerAuthority } from "../content-editing/proposal";
 import { ChangeError, decide, emptyLedger, markApplied, takeIn, withdrawRound, type ChangeLedger } from "../change/model";
 import { analysedRound, appliedInRound, approvedInRound, reviewRound, roundLedger, RoundConflict, takeInRound } from "./review-round-changes";
-import { factKey, quotedIn, statusOf, type Fact, type FactStatus } from "../knowledge/facts";
+import { factKey, quotedIn, statusOf, type Fact, type FactStatus, type SaidBy } from "../knowledge/facts";
 import { currentFacts, recordFacts, type KnowledgeReceipt } from "../knowledge/store";
 
 export type WorkflowContext = {
@@ -171,7 +171,9 @@ export type ClientStatement = { id: string; from: string; sentAt: string; text: 
 /** A Fact as later AI steps receive it: from the one Knowledge, with its standing. */
 export type InputFact = { id: string; statement: string; publicUse: boolean; status: FactStatus; at?: string };
 type Task = Pick<Work, "operation" | "path">;
-export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest" | "replan"> & { businessFacts?: InputFact[] } &
+export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest" | "replan"> & { businessFacts?: InputFact[];
+  /** Findings whose correction Core has not yet answered: the Report lists the facts each one states. */
+  openCorrections?: string[] } &
   { reviewRound?: Pick<ReviewRound, "id" | "edits" | "factNotes" | "noteRevisions" | "notes" | "pageNotes"> } &
   Pick<WorkflowContext, "entry" | "evidence" | "limitations" | "conflicts"> & { reviewStage?: ConceptReviewStage; sourceRecovery?: SourceRecovery; knowledgeReassessment?: ReasoningReassessment };
 export type WorkflowRun = { context: WorkflowContext; input: WorkflowInput; work: Work };
@@ -370,6 +372,43 @@ function inputFacts(state: State): InputFact[] {
     .map(fact => ({ id: fact.id, statement: fact.statement, publicUse: fact.publicUse, status: "proposed" as const })),
     ...known.map(fact => ({ id: fact.key, statement: fact.statement, publicUse: fact.publicUse, status: fact.status, ...(fact.at && { at: fact.at }) }))];
 }
+export const correctionRound = (note: Pick<Correction, "finding" | "at">) => `report-correction:${note.finding.id}:${note.at}`;
+const openCorrections = (state: State) => state.corrections.filter(note => state.changes?.requests
+  .some(request => request.id === correctionRound(note) + ":request" && request.status === "open")).map(note => note.finding.id);
+
+/**
+ * Core's Decision on the open Report corrections: the facts each one states, from the Report's AI
+ * output. The Client's own words in their correction are Confirmed; Core's rewording, and anything
+ * from a Specialist's correction, is Proposed (Principal, Nov 24).
+ */
+export function reportCorrectionFacts(state: Pick<State, "changes" | "corrections" | "version">, value: unknown, at: string) {
+  if (!Array.isArray(value) || value.length > 40) throw Error("Correction facts refused");
+  let ledger = state.changes ?? emptyLedger();
+  const open = state.corrections.map(note => ({ note, requestId: correctionRound(note) + ":request" }))
+    .filter(item => ledger.requests.some(request => request.id === item.requestId && request.status === "open"));
+  const facts: Fact[] = [];
+  const changes = value.map((item, index) => {
+    const fact = object(item, ["findingId", "statement", "publicUse"]);
+    const source = open.find(entry => entry.note.finding.id === fact.findingId);
+    if (!source || typeof fact.publicUse !== "boolean") throw Error("Correction fact does not trace to an open correction");
+    const statement = text(fact.statement, 2000, true), requestId = source.requestId;
+    const said: SaidBy = source.note.actor.role !== "customer" ? { kind: "specialist", person: source.note.actor.id }
+      : quotedIn(statement, source.note.text) ? { kind: "client", person: source.note.actor.id, record: requestId } : { kind: "core" };
+    const key = factKey("report", `${fingerprint(requestId).slice(0, 8)}-${index + 1}`);
+    facts.push({ key, statement, publicUse: fact.publicUse, said, source: requestId, enteredBy: "core" });
+    return { id: `${requestId}:F${index + 1}`, label: `F${index + 1}`, at, requestIds: [requestId], target: { grain: "fact" as const, path: key },
+      base: { version: state.version }, preserve: [], consequence: "routine" as const,
+      difference: { summary: statusOf(said) === "confirmed" ? "Record the Client's own words as a Confirmed fact" : "Record as a Proposed fact for the Client to confirm",
+        after: statement } };
+  });
+  if (open.length) {
+    ledger = decide(ledger, { id: `report:${state.version}:corrections`, at, by: { id: "core", role: "core" }, requestIds: open.map(item => item.requestId),
+      outcome: changes.length ? "change" : "answer", reasoning: "The facts stated in the corrections to the Report." }, changes);
+    if (changes.length) ledger = markApplied(ledger, changes.map(item => item.id), at, state.version + 1);
+  } else if (changes.length) throw Error("Correction facts without an open correction");
+  return { ledger, facts };
+}
+
 export function runInput(context: WorkflowContext, state: State, reviewStage = state.work?.reviewStage): WorkflowInput {
   const { entry, evidence, limitations, conflicts } = context;
   const { report, research, direction, blueprint, pages, corrections, revisionRequest, replan, sourceRecovery } = state;
@@ -382,6 +421,7 @@ export function runInput(context: WorkflowContext, state: State, reviewStage = s
   return { entry, evidence: knowledgeReassessment ? [...evidence, ...confirmedSources(state)] : evidence, limitations, conflicts,
     report, research, direction, blueprint, pages, corrections, ...(knowledgeReassessment && { knowledgeReassessment }),
     ...(inputFacts(state).length && { businessFacts: inputFacts(state) }),
+    ...(openCorrections(state).length && { openCorrections: openCorrections(state) }),
     ...(state.reviewRounds?.at(-1)?.status === "analysing" && { reviewRound: (({ id, edits, factNotes, noteRevisions, notes, pageNotes }) =>
       ({ id, edits, factNotes, noteRevisions, notes, ...(pageNotes?.length && { pageNotes }) }))(state.reviewRounds.at(-1)!) }),
     ...(revisionRequest && { revisionRequest }), ...(replan && { replan }), ...(!knowledgeReassessment && sourceRecovery && { sourceRecovery }), ...(reviewStage && { reviewStage }) };
@@ -964,6 +1004,7 @@ export class PresenceWorkflow {
   }
 
   private async settle(context: WorkflowContext, state: State, output: unknown) {
+    let knowledgeWrite: Fact[] = [];
     const work = state.work!;
     const sources = [...context.evidence, ...confirmedSources(state), ...state.research ?? []];
     const ids = sources.map(source => source.id);
@@ -976,7 +1017,16 @@ export class PresenceWorkflow {
       if (output instanceof ArtifactValidationError) throw output;
       switch (work.operation) {
         case "research": next = { ...state, research: readResearch(output, ids) }; break;
-        case "report": next = { ...state, report: readReport(output, sources, provider) }; break;
+        case "report": {
+          const { correctionFacts, ...report } = (output && typeof output === "object" ? output : {}) as Record<string, unknown>;
+          next = { ...state, report: readReport(correctionFacts === undefined ? output : report, sources, provider) };
+          if (correctionFacts !== undefined) {
+            const answered = reportCorrectionFacts(state, correctionFacts, new Date(this.clock()).toISOString());
+            next = { ...next, changes: answered.ledger };
+            knowledgeWrite = answered.facts;
+          }
+          break;
+        }
         case "direction": next = { ...state, direction: readDirection(output, ids, provider) }; break;
         case "blueprint": {
           const reassessment = state.knowledgeReassessments?.at(-1);
@@ -1059,8 +1109,16 @@ export class PresenceWorkflow {
       if (process.env.MIOPAGES_DEBUG_VALIDATION) console.error("VALIDATION:", work.operation, work.path, error instanceof Error ? error.message : error);
       return this.fail(context, state, "output-invalid", error instanceof ArtifactValidationError ? error.issue : "shape-or-content");
     }
-    return this.view(context, await this.store.append(context, state.version, { ...next, work: null, failure: null,
-      ...(state.artifactIssue && { artifactIssue: null }), ...(state.retry && { retry: { ...state.retry, previous: "" } }) }));
+    const settled = { ...next, work: null, failure: null,
+      ...(state.artifactIssue && { artifactIssue: null }), ...(state.retry && { retry: { ...state.retry, previous: "" } }) };
+    if (!knowledgeWrite.length) return this.view(context, await this.store.append(context, state.version, settled));
+    // Facts from Report corrections go into the one Knowledge with the Report, or not at all.
+    const facts = knowledgeWrite;
+    return this.view(context, await this.store.atomic(context, async (store, db) => {
+      if ((await store.read(context))?.version !== state.version) throw new IntakeError("draft_changed", 409);
+      const receipt = await recordFacts(db, context.scope, facts, "core", new Date(this.clock()).toISOString(), "Facts stated in corrections to the Business Understanding Report");
+      return store.append(context, state.version, { ...settled, knowledge: [...state.knowledge ?? [], receipt] });
+    }));
   }
 
   async correctReport(context: WorkflowContext, version: number, finding: string, correction: unknown, actor: Actor, developmentCorrection = false) {
@@ -1070,7 +1128,18 @@ export class PresenceWorkflow {
     if (state.work || state.visuals?.some(visual => visual.state === "running") || !state.report || !priorFinding) throw new IntakeError("workflow_not_ready", 409);
     const note = { finding: priorFinding, text: text(correction, 8_000, true), actor,
       reportDigest: fingerprint(state.report), at: new Date(this.clock()).toISOString() };
-    return this.view(context, await this.store.append(context, version, { ...state,
+    // A Request on the Report (Change area). When Core next writes the Report it lists the facts
+    // the correction states, under the standing rule (Principal, Nov 24).
+    const by = { id: actor.id, role: actor.role, simulated: actor.simulated };
+    const roundId = correctionRound(note);
+    // A newer correction of the same finding replaces the earlier one, which stays on record, withdrawn.
+    const earlier = state.corrections.find(item => item.finding.id === finding);
+    const earlierRound = earlier && state.changes?.rounds.find(item => item.id === correctionRound(earlier) && item.status === "taken-in");
+    const prior = earlierRound ? withdrawRound(state.changes!, earlierRound.id, note.at, by) : state.changes ?? emptyLedger();
+    const changes = takeIn(prior, { id: roundId, at: note.at, by }, [{ id: roundId + ":request", at: note.at,
+      origin: { kind: actor.role === "customer" ? "customer" : "operator", by, channel: "core-screen" },
+      target: { grain: "report", path: priorFinding.id }, words: note.text }]);
+    return this.view(context, await this.store.append(context, version, { ...state, changes,
       corrections: [...state.corrections.filter(item => item.finding.id !== finding), note],
       report: null, confirmation: null, direction: null, blueprint: null, pages: [], editorial: null, revisionRequest: null, operatorReview: null,
       editorialFindings: savedEditorialFindings(state),

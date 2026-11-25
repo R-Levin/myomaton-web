@@ -212,7 +212,7 @@ convenience. It does not change the service's design, so a hybrid costs nothing 
 | Object | Exists and sound | Duplicated or missing |
 |---|---|---|
 | Account | Web Presence, activation, protected account | Spread over three folders |
-| Knowledge | Canonical Knowledge and Offering, My Business; Facts with the standing rule (Nov 24) | Report corrections still hold their own copy |
+| Knowledge | Canonical Knowledge and Offering, My Business; Facts with the standing rule; Report corrections reach it (Nov 24) | The correction text itself is still kept on the workflow as the AI's input |
 | Evidence | Source custody, research, peer capture | Named differently in each place |
 | Work product | Canonical Page, Section, Asset, Action, Navigation | AI workflow keeps its own report, direction, blueprint and pages |
 | Request | Change area (review rounds routed, Nov 24) | Other paths still keep about a dozen separate shapes |
@@ -285,8 +285,11 @@ until the end.
    answer; each answer is a Client Request with its Change, and a Fact declined leaves
    Knowledge (its history stays) and raises a Request to revise copy that relied on it,
    which shows as a Task.
-   Still to do in this step: report corrections as Requests and Facts; supplying the
-   Account's Client people on protected Core; a Specialist screen or worker command for
+   A correction to the Report is a Client Request on the Report; when Core rewrites the
+   Report it lists the facts each open correction states, and Core applies the same rule
+   (the Client's own words Confirmed, Core's rewording or a Specialist's correction
+   Proposed), writing them to Knowledge with the Report (Principal, Nov 24).
+   Still to do in this step: supplying the Account's Client people on protected Core; a Specialist screen or worker command for
    entering an email. Publish is not built yet; when it is, its approval lists the Proposed
    facts the pages rely on, and approving confirms them.
 4. **One set of Work products.** The AI workflow's pages and plan become versions of the

@@ -26,6 +26,9 @@ function fixture({ input, work }: WorkflowRun) {
         reference: "https://example.org/", content: "This recorded example represents a research result. No website was contacted." }];
     case "report":
       return { title: "Business understanding", summary: "This local example uses the saved business brief to make two findings available for correction.",
+        // An open correction: the recorded example lists its first sentence, in the correction's own words, as the fact it states.
+        ...(input.openCorrections?.length && { correctionFacts: input.corrections.filter(item => input.openCorrections!.includes(item.finding.id))
+          .map(item => ({ findingId: item.finding.id, statement: item.text.split(/(?<=[.!?])\s/u)[0], publicUse: true })) }),
         findings: [
           { id: "business-offer", heading: "What the business offers", body: "Launch establishes a managed site. Ongoing keeps it useful as the business changes.",
             status: source.kind === "owner-confirmed" ? "established" : "proposed", sourceIds: [originalSource.id] },

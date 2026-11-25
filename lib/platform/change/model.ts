@@ -26,7 +26,7 @@ export type Origin = {
 };
 
 /** How much a Change touches (glossary: Grain). */
-export type Grain = "fact" | "section" | "page" | "new-page" | "menu" | "design" | "site";
+export type Grain = "fact" | "section" | "page" | "new-page" | "menu" | "design" | "site" | "report";
 
 /** What a Request or Change is about: one object of Knowledge or a Work product. */
 export type Target = {

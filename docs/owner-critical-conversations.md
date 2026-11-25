@@ -1286,3 +1286,9 @@ acceptances", without making it complicated and without levels of Specialist. Ag
   Client's confirmation. For C0 the Principal speaks as the Client.
 - "We may have to make adjustments"; the Client Portal will have to update Client Knowledge the
   same way.
+
+**Nov 24: Report corrections reach Knowledge through Core (Principal).** Asked how a Client's
+correction to the Business Understanding Report should reach the one Knowledge, the Principal
+chose: the correction is a Client Request on the Report, and when Core next works on the Report
+it lists the facts the correction states, under the same rule as Client emails (the Client's own
+words Confirmed, anything Core rewords Proposed for the Client to confirm).

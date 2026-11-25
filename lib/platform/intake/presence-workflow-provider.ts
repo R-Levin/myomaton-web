@@ -109,6 +109,20 @@ export function authoringOutputLimit(grant: PresenceWorkflowGrant, name: Workflo
 }
 
 /** Output of a review analysis: facts spotted in the Operator's edits, and the sections each fact affects. */
+/**
+ * The Report with the facts each open correction states (Principal, Nov 24). Core checks each one:
+ * the Client's own words become a Confirmed fact, anything else is Proposed for the Client.
+ */
+export function correctionReportSchema(report: typeof artifactSchemas.report, findings: readonly string[]) {
+  return { ...report, required: [...report.required, "correctionFacts"], properties: { ...report.properties,
+    correctionFacts: { type: "array", items: { type: "object", additionalProperties: false, required: ["findingId", "statement", "publicUse"], properties: {
+      findingId: { type: "string", enum: [...findings] }, statement: { type: "string" }, publicUse: { type: "boolean" } } } } } };
+}
+export const correctionFactInstructions = "Some corrections are still open (openCorrections lists their findings). In correctionFacts, " +
+  "list each business fact an open correction states, one per item, with the finding it corrects. Where the correction says it plainly, " +
+  "use its own words exactly as the statement. Leave out opinions about the Report itself. Set publicUse false for a fact that should " +
+  "inform understanding but not appear on the website. An empty list is a normal answer.";
+
 export function reviewAnalysisSchema(paths: readonly string[], pageRequests?: { noteIds: readonly number[]; decisionBrief: object }) {
   const shape = (properties: Record<string, object>) => ({ type: "object", additionalProperties: false, required: Object.keys(properties), properties });
   return shape({
@@ -263,7 +277,7 @@ function approvedProjection(run: WorkflowRun, grant: PresenceWorkflowGrant) {
     ...(reassessment && { knowledgeReassessment: projectKnowledgeReassessment(run) }) };
   switch (run.work.operation) {
     case "research": return base;
-    case "report": return base;
+    case "report": return { ...base, ...(run.input.openCorrections?.length && { openCorrections: run.input.openCorrections }) };
     case "direction": return { ...base, report };
     case "blueprint": return { ...base, report, direction };
     case "page": {
@@ -581,8 +595,9 @@ export function createResponsesPresenceWorkflow(config: {
       const batch = run.context.evaluation && operation === "page" && !run.work.path && run.input.revisionRequest?.batch === "pending"
         ? run.input.revisionRequest : null;
       const exactPage = operation === "page" && !batch ? run.work.path : undefined;
-      const knowledgeInstructions = run.input.knowledgeReassessment
-        ? " Reassess the exact confirmed changes using the complete retained business evidence. A fact about one business area must not change unrelated offerings or eligibility. Prior report, Direction and Pages are comparisons, not current truth. Explain consequences and unresolved questions. In the blueprint classify each Page as retain, revise or add with a substantive changeReason; retain only where existing content remains accurate and useful. Do not default to rewriting the whole site or impose a fixed Page count. Each revised Page must materially reflect its evidence and purpose. A publicUse=false fact is internal understanding only and cannot become a public claim. No confirmation authorizes publication. " : "";
+      const knowledgeInstructions = (run.input.knowledgeReassessment
+        ? " Reassess the exact confirmed changes using the complete retained business evidence. A fact about one business area must not change unrelated offerings or eligibility. Prior report, Direction and Pages are comparisons, not current truth. Explain consequences and unresolved questions. In the blueprint classify each Page as retain, revise or add with a substantive changeReason; retain only where existing content remains accurate and useful. Do not default to rewriting the whole site or impose a fixed Page count. Each revised Page must materially reflect its evidence and purpose. A publicUse=false fact is internal understanding only and cannot become a public claim. No confirmation authorizes publication. " : "") +
+        (operation === "report" && run.input.openCorrections?.length ? " " + correctionFactInstructions : "");
       const pageSchema = grant.nativeComponents === 2 ? creativePageSchema
         : grant.marketingAuthority?.strategy ? strategyPageSchema : schemas.page;
       // An Operator Note tied to specific sections revises only those sections (owner, Nov 23).
@@ -597,7 +612,8 @@ export function createResponsesPresenceWorkflow(config: {
         : operation === "blueprint" && grant.marketingAuthority?.strategy
           ? bindBlueprintDecisionSchema(run, grant.marketingAuthority)
           // Rebuilt runs: the Direction also chooses the site's visual design.
-          : operation === "direction" && grant.marketingAuthority?.projectionVersion === 2 ? designedDirectionSchema : schemas[operation];
+          : operation === "direction" && grant.marketingAuthority?.projectionVersion === 2 ? designedDirectionSchema
+          : operation === "report" && run.input.openCorrections?.length ? correctionReportSchema(schemas.report, run.input.openCorrections) : schemas[operation];
       const artifact = operation === "blueprint" && run.input.knowledgeReassessment
         ? reassessmentBlueprintSchema(baseArtifact as typeof artifactSchemas.blueprint) : baseArtifact;
       const schema = run.context.evaluation || grant.marketingAuthority || run.input.knowledgeReassessment ? bindCitations(artifact, citationIds(run)) : artifact;
