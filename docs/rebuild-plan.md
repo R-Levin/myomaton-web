@@ -104,6 +104,9 @@ something always runs end to end. Git keeps its history.
   from a stale read is refused, so two people never overwrite each other. Core reads the
   Account's Knowledge from the one Knowledge record, with each item's standing and whether it
   may appear on the website.
-  Still to do in milestone 1: C0's onboarding imported as Knowledge; the real AI writer, reusing the kept AI connection and
+  Onboarding done outside Core enters an Account as its Knowledge through the normal Knowledge
+  writer (`knowledge/import.ts`); C0's reviewed manifest is one such data file, and loads into
+  any Account (the old loader demanded the whole database match a frozen snapshot).
+  Still to do in milestone 1: the real AI writer, reusing the kept AI connection and
   instructions; delivery to WordPress drafts and read-back of Notes as Requests; Publish as a
   labelled Beacon; then the end-to-end run moves onto this engine and the old workflow retires.

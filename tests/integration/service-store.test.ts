@@ -8,6 +8,7 @@ import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
 import { respond, startLaunch, tasks, work } from "../../lib/platform/service/cycle";
 import { ServiceStore, StoreError } from "../../lib/platform/service/store";
 import { accountKnowledge } from "../../lib/platform/knowledge/account";
+import { importOnboarding, onboardingFromManifest } from "../../lib/platform/knowledge/import";
 import { writeCanonical } from "../../lib/platform/canonical/writes";
 
 test("an Account's service record is saved as append-only versions, and two saves never overwrite each other", async () => {
@@ -58,5 +59,16 @@ test("an Account's service record is saved as append-only versions, and two save
     await pool.query("INSERT INTO web_presences(id,organization_id,name) VALUES($1,$2,'Other')", [other, organization]);
     await assert.rejects(store.save(await store.read({ webPresenceId: other, managedSiteId }), startLaunch(await store.read({ webPresenceId: other, managedSiteId }),
       "2026-11-25T12:03:00.000Z", specialist)), /another Account/, "A record is only ever saved for the Account that owns the site");
+
+    // Onboarding done outside Core (C0's, from its reviewed manifest) enters a fresh Account as its Knowledge.
+    const c0 = randomUUID();
+    await pool.query("INSERT INTO web_presences(id,organization_id,name) VALUES($1,$2,'C0 test Account')", [c0, organization]);
+    const manifest = JSON.parse(await readFile("scripts/customer-initializers/miopages-c0-manifest.json", "utf8"));
+    await importOnboarding(pool, c0, onboardingFromManifest(manifest), "principal", "C0 onboarding, done before Core");
+    const c0Known = await accountKnowledge(pool, c0);
+    assert.equal(c0Known.items.length, manifest.knowledge.payload.entries.length);
+    assert.ok(c0Known.items.every(item => item.status === "confirmed"), "The Client's confirmed word");
+    assert.deepEqual(c0Known.offerings.map(item => item.name), [manifest.offering.name]);
+    await assert.rejects(importOnboarding(pool, c0, onboardingFromManifest(manifest), "principal", "Again"), /already has Knowledge/);
   } finally { await pool.end(); await cluster.stop(); }
 });
