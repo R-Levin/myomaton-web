@@ -1,0 +1,92 @@
+# Rebuild plan (Principal direction, Nov 25)
+
+Rebuild Core's working heart on the shared objects; keep what is sound; retire, not repair,
+what betrays the guiding concepts. Recorded in `docs/owner-critical-conversations.md`
+(Nov 25). Supersedes items 5 and 6 of `docs/safeguards-review.md`: the code they would have
+cleaned is retired instead.
+
+## What we are building toward
+
+A product a person can operate: a **Client Portal** and a **Specialist workspace**, with real
+delivery to WordPress. Each milestone ends in something the Principal can see and use, not a
+test count.
+
+## How Core works after the rebuild
+
+Every piece of work is the same cycle of shared objects (`docs/service-object-model.md`):
+
+1. A **Request** arrives. Its origin is the start of the service ("understand the business",
+   "create the site"), the Client, a Specialist, an email, an Observation or Core's own check.
+2. A **Task** says who handles it: Core and its AI, a Specialist, or the Client.
+3. The handler makes a **Decision**: the **Changes** it proposes to **Knowledge** or a
+   **Work product** (Report, Direction, Site plan, Menu, Page, Section, Asset), each against an
+   exact Version, at a consequence level.
+4. A **Review** by the right person (routine changes go ahead; Specialist review; Client
+   approval). The Client's word follows the standing rule.
+5. **Delivery** puts approved Changes in WordPress as drafts; **Publish** is always an explicit
+   approval. **Read-back** brings hand edits home as Requests.
+6. **Observations** (Leads, Visitors, later search) raise new Requests. That is Ongoing.
+
+Onboarding, Launch and Ongoing are this one cycle at different grains. Building the site once
+is one large Change; everything after is smaller ones. There is one engine, not one per case.
+
+## C0
+
+C0 is MioPages itself, as a Client, and the system's full test case. It is an Account like any
+other:
+- its onboarding, done before Core existed, enters as **imported Knowledge**, the Client's
+  confirmed word (the Principal speaks as the Client);
+- the parts of it that are the actual product (MioPages' own site and brand) are its **Work
+  products**, delivered like any Client's;
+- its own material is **data**. Nothing in Core is written for C0 alone.
+
+## Keep (sound; carried into the rebuilt Core)
+
+| Area | What |
+|---|---|
+| Database | Accounts, Web Presences, sites, Pages, Sections, Assets, Actions, Menus, Knowledge and Offering with immutable revisions; the schema and migrations |
+| Shared objects | Change record (`change/`), Knowledge and Facts (`knowledge/`), Work product identities and versions (`work-products/`), Client people (`accounts/`), Tasks (`work/`) |
+| AI connection | The Responses transport, its usage ledger, spending cap and rate card; the instructions that produced the Report the Principal judged broadly accurate |
+| WordPress | The delivery plugin and theme, enrolment, signed drafts, receipts, read-back, Notes |
+| Design and media | Design projection and rendering, FPO, stock search and per-placement rights, Asset provenance |
+| Contact and measurement | Contact definitions and submissions, Lead outcomes, the first-party measurement ledger |
+| Operations | Sign-in and permissions, backup and recovery, the protected update sequence |
+
+## Retire (replaced by the rebuilt Core, not repaired)
+
+- The AI workflow engine (`presence-workflow.ts` and its dozen record shapes), its provider
+  authorization files and "marketing authority", and the separate disposable, evaluation and
+  protected ways of running it.
+- The ten C0-only files (`intake/c0-*`) and C0-only code elsewhere: what they hold that is
+  real C0 material becomes data.
+- Parallel page shapes (`WorkflowPage`, `PageProposal`) once the rebuilt Core writes Page and
+  Section Work products directly.
+- Codex's rehearsal, proof and recovery scaffolding around those paths.
+
+Retired code is removed when the milestone that replaces it is accepted, never before, so
+something always runs end to end. Git keeps its history.
+
+## Milestones
+
+1. **One Core on the objects (local).** One engine runs the cycle above from the start of the
+   service to WordPress drafts: Report, Direction, Site plan, Pages, a Review Round and a
+   Publish approval (Publish itself stays a Beacon), with labelled stand-in AI answers. C0's
+   imported Knowledge is the test case. *Acceptance:* the end-to-end run passes on the new
+   engine, and the old workflow is no longer used by it.
+2. **The Specialist workspace and Client Portal** on that Core: the Queue, Proposed changes and
+   the Review summary, My Business, approvals, Client people, email entry. *Acceptance:* a
+   person can do each job on screen without help.
+3. **One real AI run on C0** (needs the Principal's approval of the spending). *Acceptance:*
+   the site meets Part 1 of the baseline (#9–#16).
+4. **The rebuilt Core on protected Core**, replacing the old one for C0 (needs the Principal's
+   approval). *Acceptance:* the same run on the hosted system.
+5. **Publish to WordPress, and email in and out** (`docs/email-proposal.md`). *Acceptance:* a
+   real change reaches miopages.com with the Principal's approval, and a Client email becomes a
+   Request on its own.
+
+## Guardrails while rebuilding
+
+- Name the object before building anything; one object, one place, one name.
+- Keep only the safeguards in the review's "Keep" list; add none that do not trace to Part 1
+  or a real security or legal need.
+- Adversarial review before showing anything; the Principal is not QA.

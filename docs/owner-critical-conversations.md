@@ -1331,3 +1331,20 @@ instead of hand-issued files listing every item the AI may read; during developm
 call is still put to the Principal first; (2) make the local simplifications now, and apply the
 protected-database parts (rules per Account, one update sequence) at the next deploy the
 Principal approves.
+
+**Nov 25: rebuild, not repair; what C0 is (Principal).**
+- Codex's work is "fundamentally a betrayal of the guiding concepts". The Principal wants the
+  "moronic complexity" "torn out and replaced root and branch", without throwing out what
+  works, and without the clean-up taking our eye off the object-oriented, shared-logic approach.
+  Agreed: rebuild Core's working heart on the shared objects; keep the parts that are sound;
+  retire (not repair) the rest. Progress is measured by human-operable portals and real
+  delivery endpoints, which are "lightyears away" today. The plan is `docs/rebuild-plan.md`.
+- C0 was special at first mainly because its onboarding had already been done outside Core.
+  The Principal wanted it used as the system test case, because it is the only full business
+  available for development. Codex "fetishized" its place. Some of C0 is also part of the
+  actual product (MioPages' own site and brand), which is a clear division Codex failed to
+  keep. So: C0 is an Account like any other, its existing onboarding enters as imported
+  Knowledge, its product parts are its Work products, and nothing in Core is written for C0.
+- The Principal's approvals "will be pretty much proforma at this point", because their picture
+  of what exists is clouded by what was asked for and not delivered. Claude carries the
+  technical judgment; the real gates still stop for the Principal, explained plainly.

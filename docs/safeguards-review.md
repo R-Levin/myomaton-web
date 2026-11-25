@@ -94,9 +94,8 @@ refuses things go with it, and none of the safeguards in "Keep" is weakened.
   history). Recovery and rollout scripts for the hosted servers, and the script that finishes
   custody of retained images, were kept. The local rehearsal folders in `runtime-content` are
   outside Git and hold retained evidence; they are left untouched.
-- Next: item 5 (internal fingerprints) and item 6 (one path per object, C0 as data). Item 6 also
-  takes in the AI authorization's pin to one exact snapshot of the Account's material, and
-  Core's code still serving C0 alone.
+- *Nov 25:* items 5 and 6 are superseded by `docs/rebuild-plan.md`: the code they would have
+  cleaned is retired and replaced, not repaired (Principal direction).
 
 ## Decisions for the Principal
 
