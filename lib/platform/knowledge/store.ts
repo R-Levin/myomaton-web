@@ -8,7 +8,7 @@ import type { PoolClient } from "pg";
 import { normalizeKnowledge } from "../canonical/model";
 import { canonicalWritePool } from "../canonical/transaction";
 import { inspectCanonical, writeCanonical, writeFoundationFacts } from "../canonical/writes";
-import { factsIn, withFacts, type Fact, type KnownFact } from "./facts";
+import { factsIn, withFacts, withoutFacts, type Fact, type KnownFact } from "./facts";
 
 /**
  * What the write left in Knowledge: the record's Version and fingerprint, and every Fact in it
@@ -18,14 +18,15 @@ import { factsIn, withFacts, type Fact, type KnownFact } from "./facts";
 export type KnowledgeReceipt = { recordId: string; version: number; fingerprint: string; at: string; written: string[]; facts: KnownFact[] };
 
 export async function recordFacts(db: PoolClient, scope: { webPresenceId: string; managedSiteId: string }, facts: readonly Fact[],
-  by: string, at: string, reason: string): Promise<KnowledgeReceipt> {
-  if (!facts.length) throw Error("No Facts to record");
+  by: string, at: string, reason: string, remove: readonly string[] = []): Promise<KnowledgeReceipt> {
+  if (!facts.length && !remove.length) throw Error("No Facts to record");
   const { rows: [record] } = await db.query<{ id: string }>("SELECT id FROM business_knowledge WHERE web_presence_id=$1", [scope.webPresenceId]);
   const recordId = record?.id ?? randomUUID();
   const current = record ? await inspectCanonical(db, "knowledge", scope.webPresenceId, recordId) : null;
   if (record && !current) throw Error("Knowledge record unavailable");
   const previous = current ? normalizeKnowledge(current.row.payload) : null;
-  const payload = withFacts(previous, facts, { by, at });
+  const added = withFacts(previous, facts, { by, at });
+  const payload = remove.length && added ? withoutFacts(added, remove, { by, at }) : added;
   const input = { domain: "knowledge" as const, id: recordId, webPresenceId: scope.webPresenceId,
     expectedVersion: current?.row.version ?? null, expectedFingerprint: current?.fingerprint ?? null,
     payload, responsibleIdentity: by, changeReason: reason.slice(0, 1000) };
@@ -42,6 +43,12 @@ export async function recordFacts(db: PoolClient, scope: { webPresenceId: string
   }
   const after = await inspectCanonical(db, "knowledge", scope.webPresenceId, recordId);
   if (!after) throw Error("Knowledge write not visible");
-  return { recordId, version: after.row.version, fingerprint: after.fingerprint, at, written: facts.map(fact => fact.key),
+  return { recordId, version: after.row.version, fingerprint: after.fingerprint, at, written: [...facts.map(fact => fact.key), ...remove],
     facts: factsIn(normalizeKnowledge(after.row.payload)) };
+}
+
+/** The Facts in the Account's Knowledge record now. */
+export async function currentFacts(db: Pick<PoolClient, "query">, webPresenceId: string) {
+  const { rows: [record] } = await db.query<{ payload: unknown }>("SELECT payload FROM business_knowledge WHERE web_presence_id=$1", [webPresenceId]);
+  return record ? factsIn(normalizeKnowledge(record.payload)) : [];
 }

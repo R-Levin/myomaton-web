@@ -14,7 +14,7 @@ export const intakeCookie = "miopages_intake";
 
 async function updateLocalWorkflow(workflow: PresenceWorkflow, context: Awaited<ReturnType<IntakeService["workflowContext"]>>, input: Record<string, unknown>) {
   const keys = input.operation === "workflow-start" ? ["operation"] :
-    ["workflow-understanding-correct", "workflow-understanding-withdraw", "workflow-understanding-confirm", "workflow-understanding-reassess"].includes(String(input.operation)) ? ["operation", "version", "correction"] :
+    ["workflow-understanding-correct", "workflow-understanding-withdraw", "workflow-understanding-confirm", "workflow-understanding-reassess", "workflow-fact-review"].includes(String(input.operation)) ? ["operation", "version", "correction"] :
     input.operation === "workflow-correct" ? ["operation", "version", "finding", "correction"] : ["operation", "version"];
   if (Object.keys(input).some(key => !keys.includes(key))) throw new IntakeError("invalid_request");
   if (input.operation === "workflow-start") return workflow.start(context);
@@ -23,6 +23,7 @@ async function updateLocalWorkflow(workflow: PresenceWorkflow, context: Awaited<
   const customer = { id: "local-customer", role: "customer", simulated: true } as const;
   switch (input.operation) {
     case "workflow-understanding-confirm": return workflow.confirmUnderstanding(context, version, input.correction, customer);
+    case "workflow-fact-review": return workflow.reviewFact(context, version, input.correction, customer);
     case "workflow-understanding-reassess": return workflow.reassessUnderstanding(context, version, input.correction, customer);
     case "workflow-understanding-correct": return workflow.correctUnderstanding(context, version, input.correction, customer);
     case "workflow-understanding-withdraw": return workflow.withdrawUnderstandingCorrection(context, version, input.correction, customer);

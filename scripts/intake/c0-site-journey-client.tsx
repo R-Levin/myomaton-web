@@ -188,6 +188,8 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
         ? "Proposed correction saved. The original sources and existing work are retained."
         : "operation" in operation && operation.operation === "workflow-understanding-confirm"
           ? "Exact business fact confirmed. Existing work is retained and awaits reassessment."
+        : "operation" in operation && operation.operation === "workflow-fact-review"
+          ? "Thank you. Your answer is recorded in My Business."
         : "operation" in operation && operation.operation === "workflow-understanding-reassess"
           ? "Reassessment queued. Previous work remains available for comparison."
         : "operation" in operation && operation.operation === "record-inquiry-outcome"
@@ -289,7 +291,8 @@ export function Journey({ hosted = false }: { hosted?: boolean }) {
           canCorrect={!hosted || workspace?.understandingCorrectionsAvailable === true} />}
         {view.inquiryOutcomesUnavailable && <p role="alert">Core could not read inquiry outcomes. Their current status is unknown; no absence of inquiries or business result is implied.</p>}
         {view.inquiryOutcomes && <AccountInquiriesPanel view={view.inquiryOutcomes} busy={busy} run={run} />}
-        {view.myBusiness && <MyBusinessPanel business={view.myBusiness} corrections={view.workflow?.corrections} />}
+        {view.myBusiness && <MyBusinessPanel business={view.myBusiness} corrections={view.workflow?.corrections}
+          version={view.workflow?.knowledgeConfirmationAvailable ? view.workflow.version : undefined} busy={busy} run={run} />}
         <PresenceWorkflowPanel hosted={hosted} workflow={view.workflow ?? null} snapshot={view.firstParty} busy={busy} run={run}
           canTriage={workspace?.role === "operator" && workspace.editorialDecisionsAvailable === true} />
       </> : <>

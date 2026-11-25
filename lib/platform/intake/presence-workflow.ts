@@ -26,7 +26,7 @@ import type { CustomerAuthority } from "../content-editing/proposal";
 import { ChangeError, decide, emptyLedger, markApplied, takeIn, withdrawRound, type ChangeLedger } from "../change/model";
 import { analysedRound, appliedInRound, approvedInRound, reviewRound, roundLedger, RoundConflict, takeInRound } from "./review-round-changes";
 import { factKey, quotedIn, statusOf, type Fact, type FactStatus } from "../knowledge/facts";
-import { recordFacts, type KnowledgeReceipt } from "../knowledge/store";
+import { currentFacts, recordFacts, type KnowledgeReceipt } from "../knowledge/store";
 
 export type WorkflowContext = {
   scope: DeploymentSelection;
@@ -645,6 +645,62 @@ export class PresenceWorkflow {
       const receipt = await recordFacts(db, context.scope, facts, actor.id, at, `Client email ${input.id} from ${input.from}, entered by ${actor.id}`);
       return store.append(context, version, { ...state, changes: ledger, knowledge: [...state.knowledge ?? [], receipt],
         clientStatements: [...state.clientStatements ?? [], statement] });
+    }));
+  }
+
+  /**
+   * The Client answers a Fact in My Business: confirm it as it stands, correct its wording, or say
+   * it is not true. Only someone with the Client's standing may (the same check as confirming a
+   * business correction). A confirmed or corrected Fact is the Client's word; a declined one
+   * leaves Knowledge (its history stays) and raises a Request to revise any copy that relied on it.
+   */
+  async reviewFact(context: WorkflowContext, version: number, value: unknown, actor: Actor) {
+    let input: { requestId: string; key: string; response: "confirm" | "correct" | "decline"; wording?: string };
+    try {
+      const raw = object(value, ["requestId", "key", "response", "wording"]);
+      const response = raw.response;
+      if (response !== "confirm" && response !== "correct" && response !== "decline") throw Error();
+      input = { requestId: text(raw.requestId, 36), key: text(raw.key, 64), response,
+        ...(response === "correct" && { wording: text(raw.wording, 2000, true) }) };
+      if (!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/u.test(input.requestId) || (response !== "correct" && raw.wording !== undefined)) throw Error();
+    } catch { throw new IntakeError("invalid_request"); }
+    if (!this.operations.knowledgeConfirmation || actor.simulated !== (this.operations.mode === "fixture")) throw new IntakeError("unavailable", 403);
+    const grant = await this.operations.knowledgeConfirmation.authorize(actor, context).catch(() => { throw new IntakeError("unavailable", 403); });
+    if (grant.operatorId !== actor.id || !["business-representative", "accepted-authority"].includes(grant.customer?.kind)) throw new IntakeError("unavailable", 403);
+    const saved = await this.store.read(context);
+    if (!saved) throw new IntakeError("workflow_not_ready", 409);
+    const state = await this.current(context, saved.version, true);
+    if (state.changes?.rounds.some(item => item.id === input.requestId)) return this.view(context, state);
+    if (state.version !== version) throw new IntakeError("draft_changed", 409);
+    if (state.work) throw new IntakeError("workflow_not_ready", 409);
+    const at = new Date(this.clock()).toISOString();
+    const client = { id: grant.customer.subjectId, role: "customer" as const };
+    const record = `my-business:${input.requestId}` + (grant.customer.kind === "accepted-authority" ? `; authority ${grant.customer.authorityReference}` : "");
+    return this.view(context, await this.store.atomic(context, async (store, db) => {
+      if ((await store.read(context))?.version !== version) throw new IntakeError("draft_changed", 409);
+      const fact = (await currentFacts(db, context.scope.webPresenceId)).find(item => item.key === input.key);
+      if (!fact) throw new IntakeError("draft_changed", 409);
+      const statement = input.wording ?? fact.statement;
+      const requestId = `${input.requestId}:request`;
+      let ledger = takeIn(state.changes ?? emptyLedger(), { id: input.requestId, at, by: client }, [{ id: requestId, at,
+        origin: { kind: "customer", by: client, channel: "core-screen" }, target: { grain: "fact", path: fact.key },
+        words: input.response === "decline" ? `Not true: ${fact.statement}` : input.response === "correct" ? `Correct to: ${statement}` : `Confirm: ${statement}` }]);
+      const change = { id: `${input.requestId}:F1`, label: "F1", at, requestIds: [requestId], target: { grain: "fact" as const, path: fact.key },
+        base: { version }, difference: { summary: input.response === "decline" ? "Remove this Fact: the Client says it is not true"
+          : "The Client confirms this Fact in their own words", before: fact.statement, ...(input.response !== "decline" && { after: statement }) },
+        preserve: [], consequence: "routine" as const };
+      ledger = decide(ledger, { id: `${input.requestId}:decided`, at, by: client, requestIds: [requestId], outcome: "change",
+        reasoning: "The Client's own answer about their business." }, [change]);
+      ledger = markApplied(ledger, [change.id], at, version + 1);
+      if (input.response === "decline") ledger = takeIn(ledger, { id: `${input.requestId}:follow-up`, at, by: { id: "core", role: "core" } }, [{
+        id: `${input.requestId}:revise-copy`, at, origin: { kind: "core", by: { id: "core", role: "core" }, channel: "core-screen" }, target: { grain: "site" },
+        words: `The Client says this is not true: "${fact.statement}". Revise any copy that relies on it.` }]);
+      const receipt = await recordFacts(db, context.scope,
+        input.response === "decline" ? [] : [{ key: fact.key, statement, publicUse: fact.publicUse, source: fact.source, enteredBy: actor.id,
+          said: { kind: "client", person: client.id, record } }],
+        actor.id, at, `The Client ${input.response === "decline" ? "declined" : input.response === "correct" ? "corrected" : "confirmed"} Fact ${fact.key} in My Business`,
+        input.response === "decline" ? [fact.key] : []);
+      return store.append(context, version, { ...state, changes: ledger, knowledge: [...state.knowledge ?? [], receipt] });
     }));
   }
 

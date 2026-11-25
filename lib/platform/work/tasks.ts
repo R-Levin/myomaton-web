@@ -59,6 +59,10 @@ export function accountTasks(account: string, view: { next: string; work?: { ope
     tasks.push({ id: `${account}:review:${change.id}`, account, who, what: `Review the Proposed change ${change.label}: ${change.difference.summary}`,
       since: change.at, beacon });
   }
+  // Requests nobody has decided yet (for example, copy to revise after the Client declined a Fact).
+  const coreAnswering = ["review-analysis", "in-progress", "review-summary"].includes(view.next);
+  for (const request of view.changes?.requests ?? []) if (request.status === "open" && !coreAnswering)
+    tasks.push({ id: `${account}:request:${request.id}`, account, who: "specialist", what: `Answer the Request: ${request.words}`, since: request.at, beacon });
   return tasks;
 }
 

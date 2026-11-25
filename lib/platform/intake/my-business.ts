@@ -52,7 +52,7 @@ export async function readMyBusiness(database: Pick<Pool, "query">, webPresenceI
   });
   // Facts a Specialist or Core introduced: the Client sees them here and confirms them.
   const proposed = knowledge.rows.flatMap(row => factsIn(normalizeKnowledge(row.payload)).filter(fact => fact.status === "proposed")
-    .map(fact => ({ id: `${row.id}:${fact.key}`, value: fact.statement, forWebsite: fact.publicUse,
+    .map(fact => ({ id: `${row.id}:${fact.key}`, key: fact.key, value: fact.statement, forWebsite: fact.publicUse,
       from: fact.said.kind === "core" ? "Core" as const : "Specialist" as const })));
   const offerings = offers.rows.flatMap(row => {
     const offering = normalizeOffering(row.payload);

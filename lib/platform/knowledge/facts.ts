@@ -79,6 +79,13 @@ export function withFacts(knowledge: Knowledge | null, facts: readonly Fact[], a
     approval: { scope: knowledge?.approval.scope ?? "internal", by: approval.by, at: approval.at } };
 }
 
+/** The Knowledge record without these Facts (the Client said they are not true). History keeps them. */
+export function withoutFacts(knowledge: Knowledge, keys: readonly string[], approval: { by: string; at: string }): Knowledge {
+  for (const key of keys) if (knowledge.entries.find(entry => entry.key === key)?.kind !== "fact") throw Error("No such Fact");
+  return { ...knowledge, entries: knowledge.entries.filter(entry => !keys.includes(entry.key)),
+    approval: { scope: knowledge.approval.scope, by: approval.by, at: approval.at } };
+}
+
 export type KnownFact = { key: string; statement: string; publicUse: boolean; status: FactStatus; said: SaidBy; source: string; at?: string };
 
 /** The Facts in a Knowledge record, with their standing. */

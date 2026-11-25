@@ -280,10 +280,15 @@ until the end.
    and the sender must be one of the Account's Client people. My Business lists the
    Proposed facts waiting for the Client. Accounts still being set up (C0 on protected
    Core) write through their bound foundation, Facts only.
-   Still to do in this step: the Client confirming a Proposed fact (in My Business, and in
-   the Publish approval); report corrections as Requests and Facts; supplying the Account's
-   Client people on protected Core; a Specialist screen or worker command for entering an
-   email.
+   In My Business the Client answers each Proposed fact: "Yes, that is right", "Correct it"
+   (their own wording) or "That is not true". Only someone with the Client's standing can
+   answer; each answer is a Client Request with its Change, and a Fact declined leaves
+   Knowledge (its history stays) and raises a Request to revise copy that relied on it,
+   which shows as a Task.
+   Still to do in this step: report corrections as Requests and Facts; supplying the
+   Account's Client people on protected Core; a Specialist screen or worker command for
+   entering an email. Publish is not built yet; when it is, its approval lists the Proposed
+   facts the pages rely on, and approving confirms them.
 4. **One set of Work products.** The AI workflow's pages and plan become versions of the
    canonical Page, Section, Navigation and Asset identities. Delivery already speaks
    their language.

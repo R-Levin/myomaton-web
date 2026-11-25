@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import type { MyBusinessView } from "../../lib/platform/intake/my-business";
 import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-workflow";
 
@@ -8,8 +9,36 @@ const factLabels = {
 
 const sources = { customer: "Client", operator: "Specialist", "public-reference": "Public reference" };
 
-export function MyBusinessPanel({ business, corrections = [] }: {
+/** One Proposed fact the Client can confirm, correct or say is not true (the Client's own word). */
+function ProposedFact({ item, version, busy, run }: { item: MyBusinessView["proposed"][number]; version?: number; busy?: boolean;
+  run?: (input: object) => Promise<void> }) {
+  const [correcting, setCorrecting] = useState(false);
+  const [wording, setWording] = useState(item.value);
+  const requestId = useRef<string | null>(null);
+  const answer = (response: "confirm" | "correct" | "decline") => {
+    requestId.current ??= crypto.randomUUID();
+    void run!({ operation: "workflow-fact-review", version, correction: { requestId: requestId.current, key: item.key, response,
+      ...(response === "correct" && { wording }) } });
+  };
+  return <li>{item.value}<br /><small>Proposed by {item.from === "Core" ? "MioPages Core" : "your Web Presence Specialist"}{item.forWebsite ? "" : " · for our understanding only, not for your website"}</small>
+    {run && version !== undefined && <div>
+      {!correcting ? <>
+        <button type="button" disabled={busy} onClick={() => answer("confirm")}>Yes, that is right</button>{" "}
+        <button type="button" disabled={busy} onClick={() => { requestId.current = null; setCorrecting(true); }}>Correct it</button>{" "}
+        <button type="button" disabled={busy} onClick={() => answer("decline")}>That is not true</button>
+      </> : <form onSubmit={event => { event.preventDefault(); if (wording.trim()) answer("correct"); }}>
+        <label>In your words<textarea value={wording} disabled={busy} onChange={event => { requestId.current = null; setWording(event.target.value); }} /></label>
+        <button type="submit" disabled={busy || !wording.trim()}>Save my wording</button>{" "}
+        <button type="button" disabled={busy} onClick={() => setCorrecting(false)}>Cancel</button>
+      </form>}
+    </div>}
+  </li>;
+}
+
+export function MyBusinessPanel({ business, corrections = [], version, busy, run }: {
   business: MyBusinessView; corrections?: PresenceWorkflowView["corrections"];
+  /** When given, the Client can answer each Proposed fact here. */
+  version?: number; busy?: boolean; run?: (input: object) => Promise<void>;
 }) {
   const customerCorrections = corrections.filter(item => item.actor.role === "customer");
   const descriptions = (item: MyBusinessView["facts"][number] | MyBusinessView["offerings"][number]) =>
@@ -34,7 +63,7 @@ export function MyBusinessPanel({ business, corrections = [] }: {
     {business.proposed.length > 0 && <section aria-labelledby="proposed-facts-heading">
       <h3 id="proposed-facts-heading">Waiting for your confirmation</h3>
       <p>Your MioPages team noted these about your business. They count as yours only once you confirm them, and you will be asked before anything that relies on them is published.</p>
-      <ul>{business.proposed.map(item => <li key={item.id}>{item.value}<br /><small>Proposed by {item.from === "Core" ? "MioPages Core" : "your Web Presence Specialist"}{item.forWebsite ? "" : " · for our understanding only, not for your website"}</small></li>)}</ul>
+      <ul>{business.proposed.map(item => <ProposedFact key={item.id} item={item} version={version} busy={busy} run={run} />)}</ul>
     </section>}
     {business.offerings.map(item => <article key={item.id}>
       <h3>{item.name}</h3><p>{item.summary}</p><p><small>{descriptions(item)}</small></p>

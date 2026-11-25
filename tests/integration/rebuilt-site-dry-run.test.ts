@@ -196,7 +196,12 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
           output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(output) }] }] };
         return { body: response, rawBody: Buffer.from(JSON.stringify(response)) };
       } } });
-    const operations = { ...provider, requiresResearch: true, clientPeople: async () => ["owner@c0.example"] };
+    const operations = { ...provider, requiresResearch: true, clientPeople: async () => ["owner@c0.example"],
+      knowledgeConfirmation: { async authorize(person: { id: string; role: string }) {
+        if (person.id !== "owner@c0.example" || person.role !== "customer") throw Error("Not the Client");
+        return { operatorId: person.id, authorityReference: "Dry-run Client", customer: { kind: "business-representative" as const,
+          subjectId: person.id, authorityReference: "Dry-run Client representative" } };
+      } } };
     const workflow = new PresenceWorkflow(setup.pool, operations);
     const actor = { id: "dry-run", authority: "test-only", role: "operator", simulated: false } as const;
     await workflow.start(context);
@@ -398,6 +403,24 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.ok(known.facts.some(item => item.value === email.facts[0].statement && item.source === "customer"), "My Business shows the Client's confirmed fact");
     assert.equal(known.proposed.length, 2);
     assert.deepEqual((await workflow.recordClientEmail(context, revised.version - 1, actor, email))!.version, revised.version, "Entering it twice is the same as once");
+
+    // The Client answers the Proposed facts in My Business: their word settles each one.
+    const clientPerson = { id: "owner@c0.example", role: "customer", simulated: false } as const;
+    const [reviewFactKey, rewordedKey] = known.proposed.map(item => item.key);
+    const answer = (response: string, key: string, extra: object = {}) => ({ requestId: randomUUID(), key, response, ...extra });
+    await assert.rejects(workflow.reviewFact(context, revised.version, answer("confirm", reviewFactKey), actor), /unavailable/,
+      "A Specialist cannot confirm on the Client's behalf");
+    const corrected = answer("correct", reviewFactKey, { wording: "Open weekdays from 9." });
+    revised = (await workflow.reviewFact(context, revised.version, corrected, clientPerson))!;
+    assert.equal((await workflow.reviewFact(context, revised.version - 1, corrected, clientPerson))!.version, revised.version, "Answering twice is the same as once");
+    revised = (await workflow.reviewFact(context, revised.version, answer("decline", rewordedKey), clientPerson))!;
+    const settled = await readMyBusiness(setup.pool, context.scope.webPresenceId);
+    assert.equal(settled.proposed.length, 0, "Nothing waits for the Client now");
+    assert.ok(settled.facts.some(item => item.value === "Open weekdays from 9." && item.source === "customer"), "The Client's wording is the Fact");
+    assert.ok(!revised.facts!.some(item => item.key === rewordedKey), "A Fact the Client says is not true leaves Knowledge");
+    assert.deepEqual(revised.facts!.find(item => item.key === reviewFactKey)!.said.kind, "client");
+    const followUp = accountTasks(context.intakeId, revised, "2026-11-24T14:00:00.000Z").filter(task => task.id.includes(":request:"));
+    assert.ok(followUp.some(task => /not true[^]*Revise any copy/.test(task.what)), "Revising copy that relied on it is waiting as a Task");
 
     // The next delivery replaces exactly what Core read back, answers and resolves the Notes, and
     // retires the Review summary page.

@@ -376,6 +376,7 @@ export async function reviewWorkflowChange(workflow: PresenceWorkflow,
   // no authority to confirm business facts as a customer or publish anything.
   switch (operation) {
     case "workflow-understanding-confirm": return workflow.confirmUnderstanding(current, version, details?.correction, actor);
+    case "workflow-fact-review": return workflow.reviewFact(current, version, details?.correction, actor);
     case "workflow-understanding-reassess": return workflow.reassessUnderstanding(current, version, details?.correction, actor);
     case "workflow-understanding-correct": return workflow.correctUnderstanding(current, version, details?.correction, actor);
     case "workflow-understanding-withdraw": return workflow.withdrawUnderstandingCorrection(current, version, details?.correction, actor);
