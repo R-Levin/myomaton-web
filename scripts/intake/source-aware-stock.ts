@@ -1,5 +1,6 @@
 
 /** Trusted, disposable composition of the existing stock intake and AssetUsage writers. */
+import { workDigest } from "../../lib/platform/work-products/pages";
 import assert from "node:assert/strict";
 import{readFile,writeFile,mkdir,lstat,realpath,rename}from"node:fs/promises";
 import{join}from"node:path";
@@ -146,7 +147,7 @@ async function main(){
   await verifySourceAwareStock(f.pool,root,{context},packetWithMedia);
   await save(join(root,stage+"-"+version+"-media.json"),packetWithMedia);
   const reviewedContext={contextDigest:state.contextDigest,schema:f.schema,
-   pageDigests:Object.fromEntries(placements.map(p=>[p.sourcePage.path,fingerprint(p.sourcePage)])),records};
+   pageDigests:Object.fromEntries(placements.map(p=>[p.sourcePage.path,workDigest(p.sourcePage)])),records};
   await save(join(root,"media/reviewed-stock-context-"+version+".json"),reviewedContext);
   await currentStockContext(root,version,reviewedContext);
   console.log(JSON.stringify({status:"PASS",operation:"exact-private-stock-placement",version,images:images.length,schema:f.schema,publicCanonicalUnchanged:true,publicUseApproved:false,providerCalls:0}));

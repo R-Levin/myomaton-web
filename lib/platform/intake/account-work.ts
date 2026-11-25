@@ -1,3 +1,4 @@
+import { workDigest } from "../work-products/pages";
 import { fingerprint } from "../canonical/model";
 import type { PresenceWorkflowView, WorkflowActor, WorkflowContext } from "./presence-workflow";
 import type { KnowledgeConfirmation } from "../canonical/confirmed-information";
@@ -57,7 +58,7 @@ export function accountWork(context: WorkflowContext, view: PresenceWorkflowView
         beforeHeading: previous.pages.find(item => item.path === page.path)?.heading ?? null,
         afterHeading: view.pages.find(item => item.path === page.path)?.heading ?? null,
         contentChanged: view.pages.some(item => item.path === page.path)
-          ? fingerprint(view.pages.find(item => item.path === page.path)) !== fingerprint(previous.pages.find(item => item.path === page.path) ?? null) : null,
+          ? workDigest(view.pages.find(item => item.path === page.path)) !== workDigest(previous.pages.find(item => item.path === page.path) ?? null) : null,
       })) ?? [],
     } }),
     work: {

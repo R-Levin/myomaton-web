@@ -1,5 +1,5 @@
+import { workDigest } from "../work-products/pages";
 import assert from "node:assert/strict";
-import { fingerprint } from "../canonical/model";
 import type { WorkflowRun } from "./presence-workflow";
 
 /** Resolve only actual, unambiguous Core choices; the retained pool is not a quota. */
@@ -34,8 +34,8 @@ export function stockReviewMatchesPages(review: { homeDigest?: string; pageDiges
   records: { pagePath?: string }[] }, pages: WorkflowRun["input"]["pages"]) {
   if (review.pageDigests) return review.records.every(record => {
     const page = pages.find(page => page.path === record.pagePath);
-    return page && review.pageDigests![page.path] === fingerprint(page);
+    return page && review.pageDigests![page.path] === workDigest(page);
   }) && Object.keys(review.pageDigests).length === new Set(review.records.map(record => record.pagePath)).size;
   const home = pages.find(page => page.path === "/");
-  return Boolean(home && review.homeDigest === fingerprint(home) && review.records.every(record => !record.pagePath || record.pagePath === "/"));
+  return Boolean(home && review.homeDigest === workDigest(home) && review.records.every(record => !record.pagePath || record.pagePath === "/"));
 }

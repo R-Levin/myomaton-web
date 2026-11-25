@@ -214,7 +214,7 @@ convenience. It does not change the service's design, so a hybrid costs nothing 
 | Account | Web Presence, activation, protected account; the Account's Client people (Nov 25) | Spread over four folders |
 | Knowledge | Canonical Knowledge and Offering, My Business; Facts with the standing rule; Report corrections reach it (Nov 24) | The correction text itself is still kept on the workflow as the AI's input |
 | Evidence | Source custody, research, peer capture | Named differently in each place |
-| Work product | Canonical Page, Section, Asset, Action, Navigation | AI workflow keeps its own report, direction, blueprint and pages |
+| Work product | Canonical Page, Section, Asset, Action, Navigation; the AI's Pages and Sections carry their identities and versions (Nov 25) | The AI workflow still keeps its own report, direction, blueprint and page content |
 | Request | Change area (review rounds routed, Nov 24) | Other paths still keep about a dozen separate shapes |
 | Decision | Decision brief, report, Direction | Each workflow has its own |
 | Change | Change area with grain, base, conflicts (review rounds, Nov 24); page proposals, releases | Other paths not yet routed |
@@ -303,6 +303,21 @@ until the end.
 4. **One set of Work products.** The AI workflow's pages and plan become versions of the
    canonical Page, Section, Navigation and Asset identities. Delivery already speaks
    their language.
+
+   *Progress, Nov 25 (local only, nothing hosted):* every Page and Section Core drafts is a
+   Work product with one stable identity and numbered versions (`lib/platform/work-products/`).
+   Each saved change to the pages makes the next version of the Pages and Sections whose
+   content changed; the rest keep theirs, and a Page set aside and drafted again continues
+   its history. The identities are the ones delivery has always given the canonical Page and
+   the WordPress draft, so nothing already delivered changes identity. Delivery now uses them
+   directly, and a Proposed change names the exact Page and Section versions it is made
+   against. The AI's input is unchanged: it receives the pages' content, not their
+   identities. Checks recorded before this (review targets, image approvals, editorial
+   decisions) compare content only, so they still match.
+   Still to do in this step: the plan (blueprint) and Navigation as Work products; Assets
+   placed by Section identity rather than position; the Report and Direction as versioned
+   Work products; and, when the Principal approves the hosted change, keeping the drafts in
+   Core's canonical Page and Section records rather than in the workflow's own history.
 5. **Task and Cost as shared objects.** Specialist work becomes visible and costed, and the
    Queue becomes a view.
 6. **Observation feeds Requests.** Inquiries and first-party measurement create

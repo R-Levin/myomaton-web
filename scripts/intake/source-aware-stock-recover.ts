@@ -1,5 +1,6 @@
 
 /** Finish exact retained image custody; never rerun ingestion or create Assets. */
+import { workDigest } from "../../lib/platform/work-products/pages";
 import assert from"node:assert/strict";
 import{readFile,writeFile,realpath,lstat}from"node:fs/promises";
 import{join}from"node:path";
@@ -40,7 +41,7 @@ async function main(){
   assert.equal(stateFingerprint(await snapshotPublic(db)),before);
   stage="complete-existing-private-packet";
   await save(join(root,"home-42-media.json"),result);
-  const reviewed={contextDigest:fingerprint(context),schema:checkpoint.schema,homeDigest:fingerprint(event.payload.pages.find((p:{path:string})=>p.path==="/")),records};
+  const reviewed={contextDigest:fingerprint(context),schema:checkpoint.schema,homeDigest:workDigest(event.payload.pages.find((p:{path:string})=>p.path==="/")),records};
   await save(join(root,"media/reviewed-stock-context-42.json"),reviewed);
   await save(join(root,"media/reviewed-stock-context.json"),reviewed);
   await save(join(root,"media/stock-recovery-42.json"),{proposal,sourceEvent:event.digest,packet:result.digest,assets:images.map(i=>i.assetId),usages:images.map(i=>i.usageId),publicBaseline:before,ingestionRepeated:false,newAssets:0,providerCalls:0});

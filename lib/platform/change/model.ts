@@ -37,6 +37,8 @@ export type Target = {
   sections?: number[];
   /** The name people see, where the target is new (a new Page's label). */
   name?: string;
+  /** The exact Page Work product, and its Sections, at the versions the Change is made against (step 4). */
+  workProduct?: { id: string; version: number; sections?: { id: string; version: number }[] };
 };
 
 /** How much review a Change needs. Publishing always needs customer approval. */

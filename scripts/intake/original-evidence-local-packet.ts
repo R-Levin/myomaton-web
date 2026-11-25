@@ -1,3 +1,4 @@
+import { workDigest } from "../../lib/platform/work-products/pages";
 import {readFile,writeFile,realpath} from "node:fs/promises";
 import {join} from "node:path";
 import {Pool} from "pg";
@@ -46,7 +47,7 @@ async function main(){
     if(!record||!home||record.target.pageId!==home.id||!home.sections.some(section=>section.id===image.sectionId&&section.type==="intro"))throw Error("Exact media placement differs");
     const placed=home.sections.findIndex(section=>section.id===image.sectionId);
     const homeOf=(payload:{pages:{path:string;sections:unknown[]}[]})=>payload.pages.find(page=>page.path==="/")!.sections[placed];
-    if(fingerprint(homeOf(prior))!==fingerprint(homeOf(state)))throw Error("Reviewed image section changed; new media review required");
+    if(workDigest(homeOf(prior))!==workDigest(homeOf(state)))throw Error("Reviewed image section changed; new media review required");
     const asset=(await c.query("SELECT * FROM assets WHERE id=$1 AND web_presence_id=$2 AND status='active'",[image.assetId,context.scope.webPresenceId])).rows[0];
     const usage=(await c.query("SELECT * FROM asset_usages WHERE id=$1",[image.usageId])).rows[0];
     if(!asset||usage?.asset_id!==asset.id||usage.entity_type!=="section"||usage.entity_id!==image.sectionId||usage.web_presence_id!==context.scope.webPresenceId||usage.role!=="image")throw Error("Owned stock AssetUsage differs");
@@ -57,7 +58,7 @@ async function main(){
    }
    await c.query("ROLLBACK");
   }finally{c.release()}}finally{await pool.end()}
-  const permissionContext={contextDigest:state.contextDigest,schema:checkpoint.schema,homeDigest:fingerprint(state.pages.find((page:{path:string})=>page.path==="/")),
+  const permissionContext={contextDigest:state.contextDigest,schema:checkpoint.schema,homeDigest:workDigest(state.pages.find((page:{path:string})=>page.path==="/")),
    records:media.localStockEvidence.records.map((record:{assetId:string;target:unknown;lineage:unknown;sourceId:string})=>({...record,image:images.find(image=>image.assetId===record.assetId)}))};
   const permissionFile=join(root,"media/reviewed-stock-context.json");
   await writeFile(permissionFile,JSON.stringify(permissionContext),{mode:0o600,flag:"wx"}).catch(async(error:NodeJS.ErrnoException)=>{

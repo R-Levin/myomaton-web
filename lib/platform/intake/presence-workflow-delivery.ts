@@ -1,3 +1,4 @@
+import { logicalId, pageIdentity, sectionIdentity, withoutIdentity } from "../work-products/pages";
 import { fingerprint } from "../canonical/model";
 import { designProjection } from "../design-systems/site-design";
 import { pageProposal, type PageProposal } from "../content-editing/proposal";
@@ -6,10 +7,6 @@ import type { PresenceWorkflowView, WorkflowContext } from "./presence-workflow"
 import { roundChanges, type Change } from "../change/model";
 import { internalOnly, roundLedger } from "./review-round-changes";
 
-function logicalId(value: unknown) {
-  const id = fingerprint(value);
-  return id.slice(0, 8) + "-" + id.slice(8, 12) + "-5" + id.slice(13, 16) + "-8" + id.slice(17, 20) + "-" + id.slice(20, 32);
-}
 
 /** Translate the exact reviewed workflow into ordinary protected Page proposals.
  * This prepares inputs only. Each Page still requires a verified preview and
@@ -44,7 +41,7 @@ export function workflowLocalDraftInput(context: WorkflowContext, view: Presence
       view.visuals?.some(visual => ["queued", "running", "unverified"].includes(visual.state))) {
     throw Error("Complete isolated editorial draft required");
   }
-  const target = fingerprint({ draft: view.pages, outline: blueprint, editorial: view.editorial, scope: context.scope });
+  const target = fingerprint({ draft: view.pages.map(withoutIdentity), outline: blueprint, editorial: view.editorial, scope: context.scope });
   return projectWorkflowPreview(context, { ...view, blueprint }, target, null, [], "Unapproved isolated draft " + target, true);
 }
 
@@ -85,7 +82,8 @@ function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflow
     const owned = canonical.find(row => row.slug === page.path);
     const existing = baseline.find(row => row.path === page.path);
     if (owned && existing && owned.id !== existing.id) throw Error("Canonical Page and prior WordPress identity differ");
-    const pageId = existing?.id ?? owned?.id ?? logicalId({ site: context.scope.managedSiteId, path: page.path });
+    // The Page Work product's own identity, unless WordPress or the canonical site already hold it under another.
+    const pageId = existing?.id ?? owned?.id ?? page.id ?? pageIdentity(context.scope.managedSiteId, page.path);
     return pageProposal({ operation: owned ? "replace-page" : "create-page", pageId, slug: page.path,
       title: editorial(page.heading), purpose: view.blueprint!.pages.find(entry => entry.path === page.path)!.purpose,
       workflowReview: { intakeId: context.intakeId, candidateDigest: target },
@@ -94,7 +92,7 @@ function projectWorkflowPreview(context: WorkflowContext, view: PresenceWorkflow
         const approved = view.visuals?.find(item => item.placement.path === page.path &&
           item.placement.sectionIndex === index && item.state === "approved");
         if (approved && (!approved.association || !approved.decision?.alt)) throw Error("Approved placement evidence incomplete");
-        return { id: logicalId({ pageId, section: index }), type: section.role ?? "intro", heading: editorial(section.heading), text: editorial(section.body),
+        return { id: section.id && pageId === page.id ? section.id : sectionIdentity(pageId, index), type: section.role ?? "intro", heading: editorial(section.heading), text: editorial(section.body),
           ...(approved && { image: { ...approved.association!, altText: approved.decision!.alt! } }) };
       }),
     } satisfies PageProposal);

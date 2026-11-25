@@ -8,6 +8,7 @@
  * and the fetched research page. This checks that the pieces connect; it says nothing
  * about the quality a real model will produce.
  */
+import { pageIdentity, withoutIdentity, workDigest } from "../../lib/platform/work-products/pages";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash, generateKeyPairSync, randomUUID } from "node:crypto";
@@ -292,7 +293,10 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     // A review taken in by mistake can be withdrawn while nothing has run: the case returns exactly.
     const taken = (await workflow.applyOperatorReview(context, view.version, actor, feedback))!;
     const withdrawn = (await workflow.withdrawOperatorReview(context, taken.version, actor, "Dry-run withdrawal"))!;
-    assert.deepEqual(withdrawn.pages, view.pages, "Withdrawal restores Core's pages exactly");
+    assert.deepEqual(withdrawn.pages.map(withoutIdentity), view.pages.map(withoutIdentity), "Withdrawal restores Core's pages exactly");
+    // The same Page and Section Work products, with the restored content as their next version: history only moves forward.
+    assert.deepEqual(withdrawn.pages.map(page => [page.id, page.sections.map(section => section.id)]), view.pages.map(page => [page.id, page.sections.map(section => section.id)]));
+    assert.ok(withdrawn.pages.every((page, index) => page.version! >= view.pages[index].version!));
     assert.equal(withdrawn.wordpressReviews, undefined);
     // The Change ledger keeps the withdrawn round on record: Requests withdrawn, the kept edit reverted.
     const statuses = (at: { changes?: { changes: { id: string; label: string; status: string }[] } }, roundId: string) =>
@@ -334,7 +338,12 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     // The analysis is Core's Decision: each proposal is a Change with its grain, base and consequence level.
     assert.deepEqual(statuses(revised, round.id), { E1: "applied", F1: "proposed", C1: "proposed", C2: "proposed" });
     const c2 = revised.changes!.changes.find(change => change.id === round.id + ":C2")!;
-    assert.deepEqual([c2.target, c2.consequence, c2.dependsOn], [{ grain: "section", path: "/", sections: [1] }, "operator-review", [round.id + ":F1"]]);
+    // Step 4: the Change names the exact Page and Section Work products, at their versions, it is made against.
+    const home = revised.pages.find(page => page.path === "/")!;
+    assert.deepEqual([c2.target, c2.consequence, c2.dependsOn], [{ grain: "section", path: "/", sections: [1],
+      workProduct: { id: home.id, version: home.version, sections: [{ id: home.sections[1].id, version: home.sections[1].version }] } },
+      "operator-review", [round.id + ":F1"]]);
+    assert.equal(home.id, pageIdentity(context.scope.managedSiteId, "/"), "The Page keeps the identity delivery has always given it");
     assert.ok(c2.base.digest, "A revision names the exact page it was proposed against");
     assert.deepEqual(revised.changes!.changes.find(change => change.id === round.id + ":C1")!.requestIds, [round.id + ":note:501"],
       "The noted change answers the Operator's Note");
@@ -377,9 +386,23 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     const startBefore = view.pages.find(page => page.path === "/start")!, startAfter = revised.pages.find(page => page.path === "/start")!;
     const changed = startAfter.sections.flatMap((section, index) => JSON.stringify(section) === JSON.stringify(startBefore.sections[index]) ? [] : [index]);
     assert.equal(changed.length, 1, "exactly one section was revised: " + JSON.stringify(changed));
-    assert.deepEqual({ ...startAfter, sections: [] }, { ...startBefore, sections: [] }, "heading, search text and Actions are unchanged");
+    assert.deepEqual({ ...startAfter, sections: [], version: 0 }, { ...startBefore, sections: [], version: 0 }, "heading, search text and Actions are unchanged");
+    assert.equal(startAfter.version, startBefore.version! + 1, "the Page is its next version because one of its Sections is");
     assert.equal(revised.widerChanges?.length, 1, "Core's suggested wider change is recorded, not made");
     assert.equal(statuses(revised, round.id).C1, "applied", "The approved change is applied once Core has written it");
+    // The revision is the next version of the same Sections; the Sections it did not touch keep their versions.
+    const homeAfter = revised.pages.find(page => page.path === "/")!;
+    assert.equal(homeAfter.id, home.id);
+    assert.deepEqual(homeAfter.sections.map(section => section.id), home.sections.map(section => section.id));
+    for (const [index, section] of homeAfter.sections.entries()) {
+      const before = home.sections[index];
+      assert.equal(section.version, workDigest(section) === workDigest(before) ? before.version : before.version! + 1, "Section " + index);
+    }
+    if (workDigest(homeAfter) === workDigest(home)) assert.equal(homeAfter.version, home.version, "Home's revision was declined: it keeps its version");
+    else assert.ok(homeAfter.version! > home.version!);
+    const deliveredHome = workflowNativeReviewCandidate(context, revised).candidate.pages.find(page => page.path === "/")!;
+    assert.deepEqual([deliveredHome.id, deliveredHome.sections.map(section => section.id)], [home.id, home.sections.map(section => section.id)],
+      "WordPress receives the Work products' own identities");
 
     const factRequest = requests.slice(requestsBefore).find(row => row.name === "presence_workflow_page");
     assert.ok(factRequest?.body.includes("businessFacts"), "Later AI steps receive the fact");

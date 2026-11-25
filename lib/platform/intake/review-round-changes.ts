@@ -12,7 +12,7 @@
  * The older ReviewRound fields stay for now (the AI input and the record read them); they
  * are removed path by path once nothing reads them.
  */
-import { fingerprint } from "../canonical/model";
+import { workDigest } from "../work-products/pages";
 import {
   closeRound, decide, emptyLedger, flagConflicts, markApplied, review, roundChanges, takeIn,
   type Change, type ChangeLedger, type Person, type Request,
@@ -27,7 +27,7 @@ const changeId = (round: Pick<ReviewRound, "id">, label: string) => `${round.id}
 /** Revision labels on the Review summary: C1, C2, … in the order proposed. */
 export const revisionLabel = (index: number) => "C" + (index + 1);
 
-type Page = { path: string };
+type Page = { path: string; id?: string; version?: number; sections?: readonly unknown[] };
 const publicFact = "Record this business fact";
 const internalFact = "Record this business fact (for Core's understanding only; not for the website)";
 /** Whether a proposed fact is for Core's understanding only, not for the website. */
@@ -71,7 +71,15 @@ export function takeInRound(ledger: ChangeLedger | undefined, round: ReviewRound
 export function analysedRound(ledger: ChangeLedger, round: ReviewRound, version: number, pages: readonly Page[], at: string): ChangeLedger {
   const analysis = round.analysis;
   if (!analysis) throw Error("The round has not been analysed");
-  const digest = (path: string) => { const page = pages.find(item => item.path === path); return page ? fingerprint(page) : undefined; };
+  const digest = (path: string) => { const page = pages.find(item => item.path === path); return page ? workDigest(page) : undefined; };
+  // The Page and Sections each revision is made against, by identity and version.
+  const workProduct = (path: string, indexes: readonly number[]) => {
+    const page = pages.find(item => item.path === path);
+    if (!page?.id || !page.version) return {};
+    const sections = indexes.flatMap(index => { const section = page.sections?.[index] as { id?: string; version?: number } | undefined;
+      return section?.id && section.version ? [{ id: section.id, version: section.version }] : []; });
+    return { workProduct: { id: page.id, version: page.version, ...(sections.length && { sections }) } };
+  };
   const sourceRequest = (source: { path: string; kind: "edit" | "note"; text: string }) => source.kind === "note"
     ? round.factNotes.filter(note => note.path === source.path && note.statement === source.text).map(note => noteRequestId(round, note.id))
     : round.edits.flatMap((edit, index) => edit.path === source.path && edit.after === source.text ? [editRequestId(round, index)] : []);
@@ -89,7 +97,8 @@ export function analysedRound(ledger: ChangeLedger, round: ReviewRound, version:
       ? round.notes.filter(note => note.path === revision.path).map(note => noteRequestId(round, note.id))
       : [...new Set([...facts, ...newPages].filter(item => [...factChanges, ...pageChanges].includes(item.id)).flatMap(item => item.requestIds))];
     return { id: changeId(round, revisionLabel(index)), label: revisionLabel(index), at, requestIds,
-      target: revision.indexes.length ? { grain: "section", path: revision.path, sections: revision.indexes } : { grain: "page", path: revision.path },
+      target: { ...(revision.indexes.length ? { grain: "section" as const, path: revision.path, sections: revision.indexes } : { grain: "page" as const, path: revision.path }),
+        ...workProduct(revision.path, revision.indexes) },
       base: { version, ...(digest(revision.path) && { digest: digest(revision.path) }) },
       difference: { summary: revision.source === "note" ? "Revise in response to your note" : revision.reason },
       preserve: round.keep.filter(item => item.path === revision.path).map(item => item.text),
@@ -121,7 +130,7 @@ export function reviewRound(ledger: ChangeLedger, round: ReviewRound, decision: 
   pages: readonly Page[]): ChangeLedger {
   const by = person(actor);
   const id = (label: string) => changeId(round, label);
-  let next = flagConflicts(ledger, new Map(pages.map(page => [page.path, fingerprint(page)])));
+  let next = flagConflicts(ledger, new Map(pages.map(page => [page.path, workDigest(page)])));
   const conflicts = roundChanges(next, round.id).filter(change => change.status === "conflict");
   if (conflicts.length) throw new RoundConflict(conflicts.map(change => change.label));
   // Several Notes may answer the same item: a No wins, and the last correction counts.

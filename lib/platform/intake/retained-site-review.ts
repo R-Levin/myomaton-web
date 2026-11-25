@@ -1,3 +1,4 @@
+import { workDigest } from "../work-products/pages";
 import { fingerprint } from "../canonical/model";
 import { marketingSources, type MarketingAuthority } from "./presence-marketing-authority";
 import type { WorkflowContext, PresenceWorkflowView } from "./presence-workflow";
@@ -43,17 +44,17 @@ export function projectRetainedSite(context: WorkflowContext, current: PresenceW
   if (critique && (critique.contextDigest !== current.contextDigest || !Number.isSafeInteger(critique.version) ||
       critique.version < 1 || critique.version > current.version)) throw Error("Retained critique binding refused");
   const lastCritique = critique ? { version: critique.version, editorial: critique.editorial,
-    changedPaths: critique.pages.filter(page => fingerprint(page) !== fingerprint(current.pages.find(item => item.path === page.path) ?? null)).map(page => page.path) }
+    changedPaths: critique.pages.filter(page => workDigest(page) !== workDigest(current.pages.find(item => item.path === page.path) ?? null)).map(page => page.path) }
     : current.editorial ? { version: current.version, editorial: current.editorial, changedPaths: [] as string[] } : null;
   const changes = current.pages.flatMap(page => {
     const before = previous.pages.find(item => item.path === page.path);
-    if (before && fingerprint(before) === fingerprint(page)) return [];
+    if (before && workDigest(before) === workDigest(page)) return [];
     return [{ path: page.path, label: current.blueprint?.pages.find(item => item.path === page.path)?.label ?? page.heading,
       before: before ?? null, after: page }];
   });
   return {
     kind: "retained-site-review/1" as const, scope: context.scope, intakeId: context.intakeId,
-    revision: current.version, baselineRevision: previous.version, candidateDigest: fingerprint(current.pages),
+    revision: current.version, baselineRevision: previous.version, candidateDigest: workDigest(current.pages),
     origin: "retained-core-ai" as const, readonly: true as const, lineage,
     referenceImages: [] as { id: string; label: string }[],
     wordpress: null as WordPressReviewObservation | null,

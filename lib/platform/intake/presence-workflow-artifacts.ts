@@ -1,3 +1,4 @@
+import type { WorkIdentity } from "../work-products/pages";
 import { choice, object, text } from "../canonical/model";
 import { canonicalPagePath } from "../managed-sites/paths";
 import { decisionBriefSchema, readDecisionBrief } from "./presence-decision-brief";
@@ -276,5 +277,7 @@ export function readEditorial(value: unknown, paths: readonly string[], normaliz
 export type WorkflowReport = ReturnType<typeof readReport>;
 export type WorkflowDirection = ReturnType<typeof readDirection>;
 export type WorkflowBlueprint = ReturnType<typeof readBlueprint> & { strategyBasis?: string };
-export type WorkflowPage = ReturnType<typeof readPage>;
+type DraftedPage = ReturnType<typeof readPage>;
+/** A Page Work product: Core's draft with its stable identity and version (step 4). Older states carry none until saved again. */
+export type WorkflowPage = Omit<DraftedPage, "sections"> & Partial<WorkIdentity> & { sections: (DraftedPage["sections"][number] & Partial<WorkIdentity>)[] };
 export type WorkflowEditorial = ReturnType<typeof readEditorial>;

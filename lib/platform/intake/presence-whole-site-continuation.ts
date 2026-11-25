@@ -1,3 +1,4 @@
+import { workDigest } from "../work-products/pages";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { fingerprint } from "../canonical/model";
@@ -36,7 +37,7 @@ export function compileWholeSiteContinuation(grant:PresenceWorkflowGrant, contex
  }else{
   assert.ok(state.report&&state.direction&&state.blueprint&&state.pages.length>0,"Retained complete candidate required");
   const correction=plan.correction;assert.ok(correction);
-  assert.equal(fingerprint(state.pages),correction.pagesDigest);
+  assert.equal(workDigest(state.pages),correction.pagesDigest);
   assert.equal(correction.maximumNewSpendMicros,5_000_000,"Owner-approved new-round ceiling required");
   assert.equal(plan.next.capMicros,plan.usage.heldMicros+correction.maximumNewSpendMicros,"Unused prior allowance cannot be stacked");
   assert.ok(plan.next.generations<=plan.usage.generations+8&&plan.next.requests<=plan.usage.requests+16);

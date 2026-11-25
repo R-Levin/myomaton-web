@@ -1,3 +1,4 @@
+import { workDigest } from "../work-products/pages";
 import { createHash } from "node:crypto";
 import { lstat, realpath } from "node:fs/promises";
 import { isAbsolute, sep } from "node:path";
@@ -25,7 +26,7 @@ export function presenceVisualPlacement(context: WorkflowContext, view: Presence
   const { purpose, brief, altIntent } = section.visual;
   return {
     owner: uuid(context.scope.webPresenceId), site: uuid(context.scope.managedSiteId), intake: uuid(context.intakeId),
-    path, sectionIndex, sectionDigest: fingerprint(section), candidateDigest: concept?.digest ?? decision!.target,
+    path, sectionIndex, sectionDigest: workDigest(section), candidateDigest: concept?.digest ?? decision!.target,
     purpose, brief, altIntent,
   };
 }

@@ -1,3 +1,4 @@
+import { workDigest } from "../work-products/pages";
 import { fingerprint, object, text } from "../canonical/model";
 import type { QualityCriterion } from "./presence-marketing-authority";
 import { IntakeError } from "./model";
@@ -48,7 +49,7 @@ export function editorialDecision(raw: unknown, findings: readonly EditorialFind
       if (!Array.isArray(input.paths) || input.paths.length < 1 || input.paths.length > available.size) throw new IntakeError("invalid_request");
       const paths = input.paths.map(path => text(path, 120));
       if (new Set(paths).size !== paths.length || paths.some(path => !available.has(path))) throw new IntakeError("invalid_request");
-      return { ...base, status: "assigned", pages: paths.map(path => ({ path, baseline: fingerprint(available.get(path)) })) };
+      return { ...base, status: "assigned", pages: paths.map(path => ({ path, baseline: workDigest(available.get(path)) })) };
     }
     if (input.status === "open" && input.paths === undefined && input.evidence === undefined) return { ...base, status: "open" };
     if (input.status === "resolved" && input.paths === undefined) {

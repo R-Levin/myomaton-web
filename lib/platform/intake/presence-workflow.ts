@@ -1,3 +1,4 @@
+import { versionPages, withoutIdentity, workDigest, type VersionIndex } from "../work-products/pages";
 import { createHash, randomUUID } from "node:crypto";
 import { applyOperatorEdits, droppedWording, keptWording, notedSections, operatorConcerns, readReviewAnalysis, type OperatorFeedback } from "./operator-feedback";
 import type { Pool, PoolClient } from "pg";
@@ -135,6 +136,8 @@ type State = {
   direction: WorkflowDirection | null;
   blueprint: WorkflowBlueprint | null;
   pages: WorkflowPage[];
+  /** The latest version of every Page and Section made for this Account's site (step 4). */
+  workProducts?: VersionIndex;
   editorial: WorkflowEditorial | null;
   editorialFindings?: EditorialFinding[];
   editorialDecisions?: EditorialDecision[];
@@ -265,7 +268,10 @@ class WorkflowStore {
   }
 
   async append(context: WorkflowContext, previous: number, next: Omit<State, "version">) {
-    const state = { ...next, version: previous + 1 };
+    // Every saved change to the pages makes new versions of the same Page and Section Work products.
+    const before = previous ? await this.readVersion(context, previous) : null;
+    const versioned = versionPages(context.scope.managedSiteId, before?.pages ?? [], next.pages, before?.workProducts ?? next.workProducts);
+    const state = { ...next, pages: versioned.pages, ...(versioned.pages.length || before?.workProducts ? { workProducts: versioned.index } : {}), version: previous + 1 };
     const { rowCount } = await this.pool.query(`
       INSERT INTO ${this.events} (web_presence_id,managed_site_id,intake_id,version,payload,digest)
       SELECT web_presence_id, managed_site_id, id, $4::int, $5::jsonb, $6
@@ -308,7 +314,7 @@ function editorialProgress(state: State) {
   const assigned = findings.flatMap(finding => {
     const decision = finding.history.at(-1);
     return decision?.status === "assigned" && decision.pages.every(({ path, baseline }) =>
-      pages.has(path) && fingerprint(pages.get(path)) === baseline) ? [{ finding, decision }] : [];
+      pages.has(path) && workDigest(pages.get(path)) === baseline) ? [{ finding, decision }] : [];
   });
   return { findings, assigned, open: findings.some(finding => finding.history.at(-1)?.status !== "resolved") };
 }
@@ -316,7 +322,7 @@ function editorialProgress(state: State) {
 function candidateReviewTarget(state: State) {
   return fingerprint({ confirmation: state.confirmation?.target, direction: state.direction, blueprint: state.blueprint,
     ...(state.knowledgeReassessments?.length && { knowledgeReassessment: fingerprint(state.knowledgeReassessments.at(-1)) }),
-    pages: state.pages, editorial: state.editorial, ...(state.editorialDecisions?.length && { editorialDecisions: state.editorialDecisions }) });
+    pages: state.pages.map(withoutIdentity), editorial: state.editorial, ...(state.editorialDecisions?.length && { editorialDecisions: state.editorialDecisions }) });
 }
 
 function conceptQualityTarget(context: WorkflowContext, state: State, authority: MarketingAuthority | undefined, disposable: boolean) {
@@ -409,10 +415,17 @@ export function reportCorrectionFacts(state: Pick<State, "changes" | "correction
   return { ledger, facts };
 }
 
+/** What Core sends the AI: the pages' content, never their Work product identities (the AI's input is unchanged by step 4). */
+const bare = <T extends { pages: WorkflowPage[] }>(value: T): T => ({ ...value, pages: value.pages.map(withoutIdentity) });
+
 export function runInput(context: WorkflowContext, state: State, reviewStage = state.work?.reviewStage): WorkflowInput {
   const { entry, evidence, limitations, conflicts } = context;
-  const { report, research, direction, blueprint, pages, corrections, revisionRequest, replan, sourceRecovery } = state;
-  const retainedReassessment = state.knowledgeReassessments?.at(-1);
+  const { report, research, direction, blueprint, corrections, replan } = state;
+  const pages = state.pages.map(withoutIdentity);
+  const revisionRequest = state.revisionRequest && { ...state.revisionRequest, priorPages: state.revisionRequest.priorPages.map(withoutIdentity) };
+  const sourceRecovery = state.sourceRecovery && { ...state.sourceRecovery, previous: bare(state.sourceRecovery.previous) };
+  const retained = state.knowledgeReassessments?.at(-1);
+  const retainedReassessment = retained && { ...retained, previous: bare(retained.previous) };
   const knowledgeReassessment: ReasoningReassessment | undefined = retainedReassessment && {
     id: retainedReassessment.id, correctionIds: retainedReassessment.correctionIds, previous: retainedReassessment.previous,
     confirmations: retainedReassessment.confirmations.map(({ recordId, key, kind, value, publicUse, previousValue, version, fingerprint, at }) =>
@@ -1559,7 +1572,7 @@ export class PresenceWorkflow {
       const reviewedSection = reviewedPage.sections[index];
       if (!approved || !decision || !result || decision.scope !== "non-public-draft-only" ||
           decision.provenanceDigest !== result.provenanceDigest || decision.alt !== image.altText ||
-          fingerprint(reviewedSection) !== approved.placement.sectionDigest || currentSection.id !== section.id ||
+          workDigest(reviewedSection) !== approved.placement.sectionDigest || currentSection.id !== section.id ||
           currentSection.content.heading !== reviewedSection.heading || (currentSection.content.text ?? "") !== reviewedSection.body) {
         throw Error("Protected image rights, reviewed copy or placement changed");
       }
@@ -1596,7 +1609,7 @@ export class PresenceWorkflow {
     const image = state.visuals?.find(entry => entry.id === id && ["review", "approved"].includes(entry.state));
     const section = state.pages.find(page => page.path === image?.placement.path)?.sections[image?.placement.sectionIndex ?? -1];
     if (this.boundary !== "disposable" || !context.evaluation || !image?.result || !section ||
-        fingerprint(section) !== image.placement.sectionDigest || !this.operations.visuals) {
+        workDigest(section) !== image.placement.sectionDigest || !this.operations.visuals) {
       throw new IntakeError("unavailable", 404);
     }
     return this.operations.visuals.read(image);
