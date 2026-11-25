@@ -1,10 +1,13 @@
 import type { Pool } from "pg";
 import { normalizeKnowledge, normalizeOffering, type Approval, type Evidence } from "../canonical/model";
+import { factsIn } from "../knowledge/facts";
 
 type Revision = { version: number; snapshot: { payload: unknown; contract_version: number; name?: string; status?: string } };
 
-function confirmedPublic(approval: Approval, evidence: Evidence) {
-  return approval.scope === "public" && evidence.confirmation === "confirmed" && evidence.visibility === "public";
+function confirmedPublic(approval: Approval, evidence: Evidence, kind?: string) {
+  // A Fact carries its own standing (lib/platform/knowledge/facts.ts): a confirmed one is shown
+  // whatever the record's scope, because it is the Client's own word.
+  return (approval.scope === "public" || kind === "fact") && evidence.confirmation === "confirmed" && evidence.visibility === "public";
 }
 
 function earlierRevisions<T>(revisions: Revision[], current: string, display: (snapshot: Revision["snapshot"]) => { key: string; entry: T } | null) {
@@ -36,17 +39,21 @@ export async function readMyBusiness(database: Pick<Pool, "query">, webPresenceI
   ]);
   const facts = knowledge.rows.flatMap(row => {
     const record = normalizeKnowledge(row.payload);
-    return record.entries.filter(({ evidence }) => confirmedPublic(record.approval, evidence))
+    return record.entries.filter(({ kind, evidence }) => confirmedPublic(record.approval, evidence, kind))
       .map(({ key, kind, value, evidence }) => ({
         id: `${row.id}:${key}`, kind, value, revision: Number(row.version), source: evidence.sourceKind, confirmedAt: evidence.confirmedAt!,
         history: earlierRevisions(row.history, value, snapshot => {
           const prior = normalizeKnowledge(snapshot.payload);
           const entry = prior.entries.find(item => item.key === key);
-          return entry && confirmedPublic(prior.approval, entry.evidence)
+          return entry && confirmedPublic(prior.approval, entry.evidence, entry.kind)
             ? { key: entry.value, entry: { value: entry.value, confirmedAt: entry.evidence.confirmedAt! } } : null;
         }),
       }));
   });
+  // Facts a Specialist or Core introduced: the Client sees them here and confirms them.
+  const proposed = knowledge.rows.flatMap(row => factsIn(normalizeKnowledge(row.payload)).filter(fact => fact.status === "proposed")
+    .map(fact => ({ id: `${row.id}:${fact.key}`, value: fact.statement, forWebsite: fact.publicUse,
+      from: fact.said.kind === "core" ? "Core" as const : "Specialist" as const })));
   const offerings = offers.rows.flatMap(row => {
     const offering = normalizeOffering(row.payload);
     if (!confirmedPublic(offering.approval, offering.evidence)) return [];
@@ -61,7 +68,7 @@ export async function readMyBusiness(database: Pick<Pool, "query">, webPresenceI
       }),
     }];
   });
-  return { facts, offerings };
+  return { facts, proposed, offerings };
 }
 
 export type MyBusinessView = Awaited<ReturnType<typeof readMyBusiness>>;

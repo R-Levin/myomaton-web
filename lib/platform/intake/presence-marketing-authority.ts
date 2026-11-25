@@ -157,7 +157,7 @@ export function marketingProjection(run: WorkflowRun, authority: MarketingAuthor
         ...(!path && revisionRequest?.batch === "pending" && { pages: revisionRequest.priorPages, concerns: revisionRequest.audit.concerns }) }),
       ...(operation === "editorial" && { pages, ...(run.input.reviewStage && { reviewStage: run.input.reviewStage }) }),
       ...(operation === "review-analysis" && { pages, reviewRound: run.input.reviewRound }),
-      ...(run.input.businessFacts?.length && { businessFacts: run.input.businessFacts.map(({ id, statement, publicUse, at }) => ({ id, statement, publicUse, confirmedAt: at })) }),
+      ...(run.input.businessFacts?.length && { businessFacts: run.input.businessFacts.map(({ id, statement, publicUse, status, at }) => ({ id, statement, publicUse, status, ...(at && { confirmedAt: at }) })) }),
       ...(replan && !sourceRecovery && { independentReviewCriteriaToCorrect: replan.concerns,
         ...(replan.priorRejectedPages && { priorRejectedPages: replan.priorRejectedPages }),
         ...(replan.conceptCritique && { priorCoreConceptCritique: replan.conceptCritique }) }),

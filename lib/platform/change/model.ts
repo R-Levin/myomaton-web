@@ -21,6 +21,8 @@ export type Origin = {
   by: Person;
   /** How it was raised: a WordPress Note, a hand edit read back, a Core screen, a quality check. */
   channel: "wordpress-note" | "hand-edit" | "review-summary" | "core-screen" | "quality-check" | "measurement" | "email";
+  /** Who carried it into Core, when that is not the person who said it (a Specialist entering a Client's email). */
+  enteredBy?: Person;
 };
 
 /** How much a Change touches (glossary: Grain). */

@@ -8,8 +8,11 @@ import { migrateWithBootstrapCompatibility } from "../../scripts/db/bootstrap";
 import { IntakeService,newResumeToken,resumeHash } from "../../lib/platform/intake/service";
 import { ActivationService } from "../../lib/platform/activation/service";
 import { intakeAnswersV2 } from "../helpers/intake";
-import { fingerprint } from "../../lib/platform/canonical/model";
-import { inspectCanonical,writeApprovedInactiveKnowledge,type OnboardingOwner } from "../../lib/platform/canonical/writes";
+import { fingerprint,normalizeKnowledge } from "../../lib/platform/canonical/model";
+import { canonicalWritePool } from "../../lib/platform/canonical/transaction";
+import { factKey } from "../../lib/platform/knowledge/facts";
+import { recordFacts } from "../../lib/platform/knowledge/store";
+import { inspectCanonical,writeApprovedInactiveKnowledge,writeFoundationFacts,type OnboardingOwner } from "../../lib/platform/canonical/writes";
 import { confirmKnowledge,knowledgeTargets } from "../../lib/platform/canonical/confirmed-information";
 import { protectedAccountBoundary,protectedAccountFoundation,protectedAccountConfirmation } from "../../lib/platform/intake/protected-account";
 import { protectedOwnerId,protectedOwnerToken,protectedOwnerVerifier } from "../../lib/platform/intake/protected-owner";
@@ -124,6 +127,20 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
    assert.equal((await inspectCanonical(admin,"knowledge",scope.webPresenceId,recordId))!.row.version,2);
    assert.equal((await admin.query("SELECT count(*)::int n FROM business_knowledge_revisions WHERE knowledge_id=$1",[recordId])).rows[0].n,2);
    await assert.rejects(confirmKnowledge(c,scope,request,proof,{},new Date().toISOString(),owner),/stale/);
+   // One Knowledge on the inactive account: a Specialist's Fact goes into the same record, Proposed,
+   // through the exact bound foundation; nothing else in the record can change that way.
+   const before=normalizeKnowledge((await inspectCanonical(admin,"knowledge",scope.webPresenceId,recordId))!.row.payload);
+   await c.query("BEGIN");
+   const facts=await recordFacts(c,scope,[{key:factKey("protected","f1"),statement:"Fixture opening hour",publicUse:true,said:{kind:"specialist",person:protectedOwnerId},source:"test",enteredBy:protectedOwnerId}],
+     protectedOwnerId,new Date(Date.now()+1000).toISOString(),"Fixture Specialist fact");
+   await c.query("COMMIT");
+   assert.deepEqual([facts.version,facts.facts.map(item=>[item.statement,item.status])],[3,[["Fixture opening hour","proposed"]]]);
+   const after=normalizeKnowledge((await inspectCanonical(admin,"knowledge",scope.webPresenceId,recordId))!.row.payload);
+   assert.deepEqual(after.entries.filter(entry=>entry.kind!=="fact"),before.entries,"Other Knowledge is untouched");
+   const current=await inspectCanonical(admin,"knowledge",scope.webPresenceId,recordId);
+   await assert.rejects(writeFoundationFacts(canonicalWritePool(c),{domain:"knowledge",id:recordId,webPresenceId:scope.webPresenceId,expectedVersion:current!.row.version,
+     expectedFingerprint:current!.fingerprint,payload:{...after,entries:after.entries.map(entry=>entry.kind==="fact"?entry:{...entry,value:"Changed"}),approval:{...after.approval,at:new Date(Date.now()+2000).toISOString()}},
+     responsibleIdentity:after.approval.by,changeReason:"Not a Fact"},owner,current!.row.payload),/Only Facts may change/);
   }finally{c.release();}
   const operators=new ProtectedOperator(role,async c=>{await protectedAccountBoundary(c,owner);},true),session=await operators.authenticateDevelopmentOwner(verifier,protectedOwnerId);
   const capability=protectedAccountConfirmation(role,operators,session,owner);
@@ -167,7 +184,7 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
   assert.deepEqual(access.rows[0],{canonical:false,binding:false});
   await admin.query(sql.rollback);
   await assert.rejects(role.query("SELECT * FROM miopages_core_account.business_knowledge"),/permission denied/);
-  assert.equal((await inspectCanonical(admin,"knowledge",scope.webPresenceId,recordId))!.row.version,2);
-  assert.equal((await admin.query("SELECT count(*)::int n FROM business_knowledge_revisions WHERE knowledge_id=$1",[recordId])).rows[0].n,2);
+  assert.equal((await inspectCanonical(admin,"knowledge",scope.webPresenceId,recordId))!.row.version,3,"The confirmed correction and the Proposed Fact both stay on record");
+  assert.equal((await admin.query("SELECT count(*)::int n FROM business_knowledge_revisions WHERE knowledge_id=$1",[recordId])).rows[0].n,3);
  }finally{await role.end();await admin.end();await cluster.stop();}
 });

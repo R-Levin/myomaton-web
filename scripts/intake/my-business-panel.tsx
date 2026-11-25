@@ -3,10 +3,10 @@ import type { PresenceWorkflowView } from "../../lib/platform/intake/presence-wo
 
 const factLabels = {
   audience: "Who you serve", goal: "Business goals", "service-area": "Where you serve",
-  differentiator: "What makes you different", constraint: "Service boundaries", preference: "Preferences",
+  differentiator: "What makes you different", constraint: "Service boundaries", preference: "Preferences", fact: "Business facts",
 } satisfies Record<MyBusinessView["facts"][number]["kind"], string>;
 
-const sources = { customer: "Customer", operator: "Operator", "public-reference": "Public reference" };
+const sources = { customer: "Client", operator: "Specialist", "public-reference": "Public reference" };
 
 export function MyBusinessPanel({ business, corrections = [] }: {
   business: MyBusinessView; corrections?: PresenceWorkflowView["corrections"];
@@ -31,6 +31,11 @@ export function MyBusinessPanel({ business, corrections = [] }: {
         {entries.length > 1 && <details><summary>{entries.length - 1} more confirmed {entries.length === 2 ? "record" : "records"}</summary>{entries.slice(1).map(entry)}</details>}
       </section>;
     })}
+    {business.proposed.length > 0 && <section aria-labelledby="proposed-facts-heading">
+      <h3 id="proposed-facts-heading">Waiting for your confirmation</h3>
+      <p>Your MioPages team noted these about your business. They count as yours only once you confirm them, and you will be asked before anything that relies on them is published.</p>
+      <ul>{business.proposed.map(item => <li key={item.id}>{item.value}<br /><small>Proposed by {item.from === "Core" ? "MioPages Core" : "your Web Presence Specialist"}{item.forWebsite ? "" : " · for our understanding only, not for your website"}</small></li>)}</ul>
+    </section>}
     {business.offerings.map(item => <article key={item.id}>
       <h3>{item.name}</h3><p>{item.summary}</p><p><small>{descriptions(item)}</small></p>
       {item.history.length > 0 && <details><summary>Earlier confirmed offering</summary>

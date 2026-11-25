@@ -42,7 +42,8 @@ export function evidence(value: unknown): Evidence {
     ...(confirmation === "confirmed" ? { confirmedBy: text(r.confirmedBy), confirmedAt: date(r.confirmedAt) } : {}),
     ...(r.correction === undefined ? {} : { correction: text(r.correction, 1000) }) };
 }
-export const knowledgeKinds = ["audience", "goal", "service-area", "differentiator", "constraint", "preference"] as const;
+/** "fact": a single business Fact with its own standing (lib/platform/knowledge/facts.ts). */
+export const knowledgeKinds = ["audience", "goal", "service-area", "differentiator", "constraint", "preference", "fact"] as const;
 export type Knowledge = { entries: { key: string; kind: typeof knowledgeKinds[number]; value: string; evidence: Evidence }[];
   identityEvidence: { field: "displayName" | "phone" | "email" | "socials"; digest: string; evidence: Evidence }[]; approval: Approval };
 export function normalizeKnowledge(value: unknown): Knowledge {

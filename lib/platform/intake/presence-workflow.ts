@@ -23,8 +23,10 @@ import { confirmKnowledge, knowledgeConfirmationInput, KnowledgeConfirmationErro
 import { canonicalWritePool } from "../canonical/transaction";
 import { inspectCanonical } from "../canonical/writes";
 import type { CustomerAuthority } from "../content-editing/proposal";
-import { ChangeError, withdrawRound, type ChangeLedger } from "../change/model";
+import { ChangeError, decide, emptyLedger, markApplied, takeIn, withdrawRound, type ChangeLedger } from "../change/model";
 import { analysedRound, appliedInRound, approvedInRound, reviewRound, roundLedger, RoundConflict, takeInRound } from "./review-round-changes";
+import { factKey, quotedIn, statusOf, type Fact, type FactStatus } from "../knowledge/facts";
+import { recordFacts, type KnowledgeReceipt } from "../knowledge/store";
 
 export type WorkflowContext = {
   scope: DeploymentSelection;
@@ -156,11 +158,20 @@ type State = {
   reviewRounds?: ReviewRound[];
   /** The Account's Requests, Decisions, Changes and Reviews (the Change area; review rounds first). */
   changes?: ChangeLedger;
+  /** Rounds decided before Nov 24 only. Facts now live in the one Knowledge (`knowledge`). */
   businessFacts?: BusinessFact[];
+  /** Receipts of this workflow's writes to the Account's Knowledge, checked against the record. */
+  knowledge?: KnowledgeReceipt[];
+  /** Client emails a Specialist entered, kept as Evidence for the Facts taken from them. */
+  clientStatements?: ClientStatement[];
   visuals?: PresenceVisual[];
 };
+/** A Client's email, entered by a Specialist: Evidence of the Client's own word (Principal, Nov 24). */
+export type ClientStatement = { id: string; from: string; sentAt: string; text: string; enteredBy: Actor; at: string; facts: string[] };
+/** A Fact as later AI steps receive it: from the one Knowledge, with its standing. */
+export type InputFact = { id: string; statement: string; publicUse: boolean; status: FactStatus; at?: string };
 type Task = Pick<Work, "operation" | "path">;
-export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest" | "replan" | "businessFacts"> &
+export type WorkflowInput = Pick<State, "research" | "report" | "corrections" | "direction" | "blueprint" | "pages" | "revisionRequest" | "replan"> & { businessFacts?: InputFact[] } &
   { reviewRound?: Pick<ReviewRound, "id" | "edits" | "factNotes" | "noteRevisions" | "notes" | "pageNotes"> } &
   Pick<WorkflowContext, "entry" | "evidence" | "limitations" | "conflicts"> & { reviewStage?: ConceptReviewStage; sourceRecovery?: SourceRecovery; knowledgeReassessment?: ReasoningReassessment };
 export type WorkflowRun = { context: WorkflowContext; input: WorkflowInput; work: Work };
@@ -188,6 +199,8 @@ export interface PresenceWorkflowOperations {
     foundation?: import("../canonical/writes").OnboardingOwner;
   }> };
   readonly visuals?: PresenceVisualOperations;
+  /** The people who speak for the Client on this Account (by id or email), for checking who sent a Client email. */
+  clientPeople?(context: WorkflowContext): Promise<readonly string[]>;
   preflight?(run: WorkflowRun): Promise<void>;
   run(run: WorkflowRun, retain: (bytes: Buffer) => Promise<void>): Promise<unknown>;
   recover(run: WorkflowRun, bytes: Buffer): Promise<unknown>;
@@ -347,6 +360,16 @@ function revisionOrdinal(state: State) {
 function replanOrdinal(state: State) {
   return Math.max(state.replan?.ordinal ?? 0, state.knowledgeReassessments?.at(-1)?.replanOrdinal ?? 0);
 }
+/**
+ * The Facts later AI steps receive: every Fact in the one Knowledge as of this workflow's last
+ * write, with its standing. Facts recorded before Nov 24 (by a Specialist alone) count as Proposed.
+ */
+function inputFacts(state: State): InputFact[] {
+  const known = state.knowledge?.at(-1)?.facts ?? [];
+  return [...(state.businessFacts ?? []).filter(fact => !known.some(item => item.source === fact.id))
+    .map(fact => ({ id: fact.id, statement: fact.statement, publicUse: fact.publicUse, status: "proposed" as const })),
+    ...known.map(fact => ({ id: fact.key, statement: fact.statement, publicUse: fact.publicUse, status: fact.status, ...(fact.at && { at: fact.at }) }))];
+}
 export function runInput(context: WorkflowContext, state: State, reviewStage = state.work?.reviewStage): WorkflowInput {
   const { entry, evidence, limitations, conflicts } = context;
   const { report, research, direction, blueprint, pages, corrections, revisionRequest, replan, sourceRecovery } = state;
@@ -358,7 +381,7 @@ export function runInput(context: WorkflowContext, state: State, reviewStage = s
   };
   return { entry, evidence: knowledgeReassessment ? [...evidence, ...confirmedSources(state)] : evidence, limitations, conflicts,
     report, research, direction, blueprint, pages, corrections, ...(knowledgeReassessment && { knowledgeReassessment }),
-    ...(state.businessFacts?.length && { businessFacts: state.businessFacts }),
+    ...(inputFacts(state).length && { businessFacts: inputFacts(state) }),
     ...(state.reviewRounds?.at(-1)?.status === "analysing" && { reviewRound: (({ id, edits, factNotes, noteRevisions, notes, pageNotes }) =>
       ({ id, edits, factNotes, noteRevisions, notes, ...(pageNotes?.length && { pageNotes }) }))(state.reviewRounds.at(-1)!) }),
     ...(revisionRequest && { revisionRequest }), ...(replan && { replan }), ...(!knowledgeReassessment && sourceRecovery && { sourceRecovery }), ...(reviewStage && { reviewStage }) };
@@ -418,10 +441,12 @@ export class PresenceWorkflow {
   }
 
   private async confirmedKnowledgeCurrent(context: WorkflowContext, state: State) {
-    const latest = new Map<string, KnowledgeConfirmation>();
-    for (const item of state.understandingCorrections ?? []) if (item.confirmation) {
-      const prior = latest.get(item.confirmation.recordId);
-      if (!prior || prior.version < item.confirmation.version) latest.set(item.confirmation.recordId, item.confirmation);
+    const latest = new Map<string, { recordId: string; version: number; fingerprint: string }>();
+    const receipts: { recordId: string; version: number; fingerprint: string }[] = [
+      ...(state.understandingCorrections ?? []).flatMap(item => item.confirmation ? [item.confirmation] : []), ...state.knowledge ?? []];
+    for (const item of receipts) {
+      const prior = latest.get(item.recordId);
+      if (!prior || prior.version < item.version) latest.set(item.recordId, item);
     }
     for (const item of latest.values()) {
       const current = await inspectCanonical(this.pool, "knowledge", context.scope.webPresenceId, item.recordId);
@@ -479,6 +504,8 @@ export class PresenceWorkflow {
       ...(state.reviewRounds && { reviewRounds: state.reviewRounds }),
       ...(state.changes && { changes: state.changes }),
       ...(state.businessFacts && { businessFacts: state.businessFacts }),
+      ...(state.knowledge?.length && { facts: state.knowledge.at(-1)!.facts, knowledgeReceipts: state.knowledge }),
+      ...(state.clientStatements && { clientStatements: state.clientStatements }),
       ...(this.operations.knowledgeConfirmation && { knowledgeConfirmationAvailable: true as const }),
       ...(state.knowledgeReassessments && { knowledgeReassessments: state.knowledgeReassessments }),
       ...(editorial.findings.length > 0 && { editorialFindings: editorial.findings }), canQueueEditorialRevision,
@@ -559,6 +586,65 @@ export class PresenceWorkflow {
     if (state.work || state.visuals?.some(visual => visual.state === "running")) throw new IntakeError("workflow_not_ready", 409);
     return this.view(context, await this.store.append(context, version, { ...state,
       understandingCorrections: [...state.understandingCorrections ?? [], { ...proposed, actor, at: new Date(this.clock()).toISOString() }],
+    }));
+  }
+
+  /**
+   * A Specialist enters an email from the Client (Principal, Nov 24). The Client introduced
+   * what it says, so a Fact quoted from it goes into the one Knowledge as Confirmed by the
+   * Client; anything the Specialist words differently goes in as Proposed. The email is kept as
+   * Evidence, and the Request, Decision and Changes are on the Account's record.
+   */
+  async recordClientEmail(context: WorkflowContext, version: number, actor: Actor, value: unknown) {
+    let input: { id: string; from: string; sentAt: string; text: string; facts: { statement: string; publicUse: boolean }[] };
+    try {
+      const raw = object(value, ["id", "from", "sentAt", "text", "facts"]);
+      if (!Array.isArray(raw.facts) || !raw.facts.length || raw.facts.length > 20) throw Error();
+      input = { id: text(raw.id, 36), from: text(raw.from, 200), sentAt: text(raw.sentAt, 40), text: text(raw.text, 20_000, true),
+        facts: raw.facts.map(item => { const fact = object(item, ["statement", "publicUse"]);
+          if (typeof fact.publicUse !== "boolean") throw Error();
+          return { statement: text(fact.statement, 2000, true), publicUse: fact.publicUse }; }) };
+      if (!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/u.test(input.id) || !Number.isFinite(Date.parse(input.sentAt))) throw Error();
+    } catch { throw new IntakeError("invalid_request"); }
+    if (!Number.isSafeInteger(version) || version < 1) throw new IntakeError("invalid_request");
+    const saved = await this.store.read(context);
+    if (!saved) throw new IntakeError("workflow_not_ready", 409);
+    const state = await this.current(context, saved.version, true);
+    if (actor.role !== "operator" || actor.simulated !== (state.mode === "fixture") || !actor.authority) throw new IntakeError("unavailable", 403);
+    // Only someone who speaks for the Client on this Account can give the Client's word.
+    const people = await this.operations.clientPeople?.(context) ?? [];
+    if (!people.some(person => person.toLowerCase() === input.from.toLowerCase())) throw new IntakeError("unavailable", 403);
+    const existing = state.clientStatements?.find(item => item.id === input.id);
+    if (existing) {
+      if (existing.text !== input.text || existing.from !== input.from) throw new IntakeError("draft_changed", 409);
+      return this.view(context, state);
+    }
+    if (state.version !== version) throw new IntakeError("draft_changed", 409);
+    if (state.work) throw new IntakeError("workflow_not_ready", 409);
+    const at = new Date(this.clock()).toISOString();
+    const client = { id: input.from, role: "customer" as const }, specialist = { id: actor.id, role: actor.role, simulated: actor.simulated };
+    const facts: Fact[] = input.facts.map((fact, index) => ({ key: factKey(input.id.slice(0, 8), "m" + (index + 1)), statement: fact.statement,
+      publicUse: fact.publicUse, source: `client-email:${input.id}`, enteredBy: actor.id,
+      said: quotedIn(fact.statement, input.text) ? { kind: "client", person: input.from, record: `client-email:${input.id}` } : { kind: "specialist", person: actor.id } }));
+    // The Client's Request, and the Specialist's Decision to record it, on the Account's record.
+    const requestId = `${input.id}:email`;
+    let ledger = takeIn(state.changes ?? emptyLedger(), { id: input.id, at, by: specialist }, [{ id: requestId, at: input.sentAt,
+      origin: { kind: "customer", by: client, channel: "email", enteredBy: specialist }, target: { grain: "fact" }, words: input.text.slice(0, 4000),
+      channelRef: input.id }]);
+    const changes = facts.map((fact, index) => ({ id: `${input.id}:F${index + 1}`, label: `F${index + 1}`, at, requestIds: [requestId],
+      target: { grain: "fact" as const, path: fact.key }, base: { version },
+      difference: { summary: statusOf(fact.said) === "confirmed" ? "Record the Client's own words as a Confirmed fact"
+        : "Record as a Proposed fact: the Specialist's wording, not the Client's", after: fact.statement },
+      preserve: [], consequence: "routine" as const }));
+    ledger = decide(ledger, { id: `${input.id}:recorded`, at, by: specialist, requestIds: [requestId], outcome: "change",
+      reasoning: "A Client email entered by a Specialist: quoted facts are the Client's word; the rest wait for the Client." }, changes);
+    ledger = markApplied(ledger, changes.map(item => item.id), at, version + 1);
+    const statement: ClientStatement = { id: input.id, from: input.from, sentAt: input.sentAt, text: input.text, enteredBy: actor, at, facts: facts.map(fact => fact.key) };
+    return this.view(context, await this.store.atomic(context, async (store, db) => {
+      if ((await store.read(context))?.version !== version) throw new IntakeError("draft_changed", 409);
+      const receipt = await recordFacts(db, context.scope, facts, actor.id, at, `Client email ${input.id} from ${input.from}, entered by ${actor.id}`);
+      return store.append(context, version, { ...state, changes: ledger, knowledge: [...state.knowledge ?? [], receipt],
+        clientStatements: [...state.clientStatements ?? [], statement] });
     }));
   }
 
@@ -1136,7 +1222,8 @@ export class PresenceWorkflow {
     const factNoteReply = (id: number) => {
       const note = round.factNotes.find(item => item.id === id);
       const fact = note && round.analysis!.facts.find(item => item.source.kind === "note" && item.source.text === note.statement);
-      return fact && !rejected.has(fact.id) ? "MioPages Core recorded this as a confirmed business fact." : "MioPages Core did not record this as a fact.";
+      return fact && !rejected.has(fact.id) ? "MioPages Core recorded this in the business's Knowledge as a Proposed fact. The Client confirms it before anything is published."
+        : "MioPages Core did not record this as a fact.";
     };
     const pageNoteReply = (id: number) => {
       const page = round.analysis!.newPages?.find(item => item.noteId === id);
@@ -1163,14 +1250,24 @@ export class PresenceWorkflow {
         actor, at, ordinal: revisionOrdinal(state), source: "operator-review" as const, keep: round.keep.filter(item => paths.includes(item.path)), sections },
       editorial: null, operatorReview: null,
     } : added.length ? { editorial: null, operatorReview: null } : {};
-    return this.view(context, await this.store.append(context, version, { ...state, ...revision, blueprint,
+    // Approved facts go into the one Knowledge. A Specialist introduced them (their edits and
+    // Notes), so they are Proposed until the Client confirms them (Principal, Nov 24).
+    const knowledgeFacts: Fact[] = facts.map(fact => ({ key: factKey(round.id.slice(0, 8), fact.id.slice(round.id.length + 1)),
+      statement: fact.statement, publicUse: fact.publicUse, said: { kind: "specialist", person: actor.id },
+      source: fact.id, enteredBy: actor.id }));
+    return this.view(context, await this.store.atomic(context, async (store, client) => {
+      if ((await store.read(context))?.version !== version) throw new IntakeError("draft_changed", 409);
+      const receipt = knowledgeFacts.length ? await recordFacts(client, context.scope, knowledgeFacts, actor.id, at,
+        `Facts from Operator review round ${round.id}, approved by ${actor.id}; Proposed until the Client confirms`) : undefined;
+      return store.append(context, version, { ...state, ...revision, blueprint,
       pages: state.pages.filter(page => !paths.includes(page.path)), wordpressReviews: [...state.wordpressReviews ?? [], review],
-      businessFacts: [...state.businessFacts ?? [], ...facts],
+      ...(receipt && { knowledge: [...state.knowledge ?? [], receipt] }),
       // Facts are recorded and pages added now; section and page revisions are applied when Core writes them.
       changes: appliedInRound(ledger, round.id, change => change.target.grain === "fact" ||
         (change.target.grain === "new-page" && added.some(page => page.path === change.target.path)), at, version + 1),
       // What was decided lives in the Change ledger (its Reviews); the round records only that it was decided.
-      reviewRounds: [...state.reviewRounds!.slice(0, -1), { ...round, status: "decided" }] }));
+      reviewRounds: [...state.reviewRounds!.slice(0, -1), { ...round, status: "decided" }] });
+    }));
   }
 
   /**

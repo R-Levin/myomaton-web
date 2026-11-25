@@ -47,6 +47,21 @@ export async function writeApprovedInactiveKnowledge(pool: Pool, input: WriteInp
   return write(pool, input, {}, owner);
 }
 
+// Facts (kind "fact") on the exact bound inactive foundation. Only fact entries may change:
+// every other entry, the identity evidence and the record's approval scope stay exactly as they were.
+export async function writeFoundationFacts(pool: Pool, input: WriteInput, owner: OnboardingOwner, current: unknown) {
+  object(owner, ["caseId", "organizationId", "webPresenceId", "managedSiteId"]);
+  for (const value of Object.values(owner)) uuid(value);
+  if (input.domain !== "knowledge" || input.webPresenceId !== owner.webPresenceId || input.image || input.offering) throw Error("Bound inactive Knowledge owner required");
+  const next = normalizeKnowledge(input.payload);
+  if (current !== null) {
+    const before = normalizeKnowledge(current), others = (k: typeof next) => k.entries.filter(entry => entry.kind !== "fact");
+    if (!isDeepStrictEqual(others(before), others(next)) || !isDeepStrictEqual(before.identityEvidence, next.identityEvidence) ||
+      before.approval.scope !== next.approval.scope) throw Error("Only Facts may change through this writer");
+  } else if (next.entries.some(entry => entry.kind !== "fact") || next.identityEvidence.length) throw Error("Only Facts may change through this writer");
+  return write(pool, input, {}, owner);
+}
+
 async function write(pool:Pool,input:WriteInput,options:{failAfterCurrent?:boolean},foundation?:OnboardingOwner) {
   object(input,["domain","id","webPresenceId","expectedVersion","expectedFingerprint","payload","offering","image","responsibleIdentity","changeReason"]);
   if(input.offering)object(input.offering,["key","type","name","status"]);

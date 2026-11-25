@@ -47,7 +47,14 @@ nothing below came from an assistant proposal unless it says so.
    Social posting is a small optional derivative. GA4/Search Console are optional
    extras. *(P0-4)*
 6. **There is a living, customer-owned Business Knowledge Base** that the customer can
-   see, correct and enrich. *(P0-14)*
+   see, correct and enrich. *(P0-14)* **The Client is the authority on their own
+   business** (Principal, Nov 24): a Fact is Confirmed only on the Client's word, with the
+   record to show it (for example a Client email kept as Evidence, entered by a
+   Specialist). Anything else, from a Specialist or Core, is Proposed until the Client
+   approves it, at the latest when they approve Publish. The standing of whoever
+   introduced a change must pass every acceptance. No levels of Specialist; the
+   Principal (as Account Manager) may override, recorded as an override. The Client
+   Portal updates Knowledge the same way.
 7. **Human Operator work is a normal, costed part of the service**, not a failure of
    automation. Launch needs every promised function to have a credible delivery path,
    whether system or person. *(P0-12, Nov 20: "the bigger challenge is to deliver the

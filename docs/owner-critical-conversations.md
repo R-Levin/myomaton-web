@@ -1269,3 +1269,20 @@ code change as the owner corrects the glossary.
 **Nov 24: carry on with the rest of step 2 (Principal).** "OK, carry on with the rest of step 2":
 draw the Review summary from the Changes, remove the round's duplicate record of what was decided,
 and add the labelled Beacons (Observation, Task, Queue) so the cycle runs end to end.
+
+**Nov 24: who may confirm a Fact (Principal).** For step 3 (One Knowledge) the Principal set the
+condition that "the stature/standing of the entity introducing the change must pass any
+acceptances", without making it complicated and without levels of Specialist. Agreed rule:
+- The Client is the authority on their own business. A Fact is **Confirmed** only on the
+  Client's word, with the record to show it.
+- When a Client emails changes they are "basically pre-approved": the Client introduced them,
+  the Specialist only carries them into Core. The email is kept as Evidence and the facts go in
+  as Confirmed by the Client by email, entered by the Specialist. Anything the Specialist adds
+  beyond the email stays Proposed. The email must come from a person who speaks for the Client
+  on that Account.
+- Anything else a Specialist or Core introduces is **Proposed**. Core may use it in drafts,
+  marked as Proposed; the Client confirms it at the latest when approving Publish.
+- The Principal, as Account Manager, may override; it is recorded as an override, never as the
+  Client's confirmation. For C0 the Principal speaks as the Client.
+- "We may have to make adjustments"; the Client Portal will have to update Client Knowledge the
+  same way.

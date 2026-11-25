@@ -212,7 +212,7 @@ convenience. It does not change the service's design, so a hybrid costs nothing 
 | Object | Exists and sound | Duplicated or missing |
 |---|---|---|
 | Account | Web Presence, activation, protected account | Spread over three folders |
-| Knowledge | Canonical Knowledge and Offering, My Business | Workflow businessFacts and corrections hold their own copies |
+| Knowledge | Canonical Knowledge and Offering, My Business; Facts with the standing rule (Nov 24) | Report corrections still hold their own copy |
 | Evidence | Source custody, research, peer capture | Named differently in each place |
 | Work product | Canonical Page, Section, Asset, Action, Navigation | AI workflow keeps its own report, direction, blueprint and pages |
 | Request | Change area (review rounds routed, Nov 24) | Other paths still keep about a dozen separate shapes |
@@ -269,6 +269,21 @@ until the end.
    is stored or shown on a screen yet; the end-to-end dry run exercises them.
 3. **One Knowledge.** Specialist-learned facts and report corrections become Changes to
    canonical Knowledge. My Business shows the same records Core uses.
+
+   *Progress, Nov 24 (local only, nothing hosted):* Facts are entries of the Account's one
+   canonical Knowledge record (`lib/platform/knowledge/`), under the Principal's standing
+   rule: the Client's word on record is Confirmed, anything a Specialist or Core introduces
+   is Proposed, and an override by the Principal is recorded as one. Review-round facts now
+   go there as Proposed instead of the workflow's own `businessFacts` copy; later AI steps
+   receive each Fact with its standing. A Specialist can enter a Client's email: it is kept
+   as Evidence, the Client's quoted words go in as Confirmed and any rewording as Proposed,
+   and the sender must be one of the Account's Client people. My Business lists the
+   Proposed facts waiting for the Client. Accounts still being set up (C0 on protected
+   Core) write through their bound foundation, Facts only.
+   Still to do in this step: the Client confirming a Proposed fact (in My Business, and in
+   the Publish approval); report corrections as Requests and Facts; supplying the Account's
+   Client people on protected Core; a Specialist screen or worker command for entering an
+   email.
 4. **One set of Work products.** The AI workflow's pages and plan become versions of the
    canonical Page, Section, Navigation and Asset identities. Delivery already speaks
    their language.

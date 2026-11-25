@@ -24,6 +24,7 @@ import { createResponsesPresenceWorkflow } from "../../lib/platform/intake/prese
 import { initializeResponsesUsageLedger } from "../../lib/platform/intake/intelligent-responses";
 import { reviewSummaryPage, workflowNativeReviewCandidate } from "../../lib/platform/intake/presence-workflow-delivery";
 import { roundOutcome } from "../../lib/platform/intake/review-round-changes";
+import { readMyBusiness } from "../../lib/platform/intake/my-business";
 import { timeline } from "../../lib/platform/change/model";
 import { observeDelivery } from "../../lib/platform/measurement/observation-beacon";
 import { accountTasks, queue } from "../../lib/platform/work/tasks";
@@ -195,7 +196,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
           output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(output) }] }] };
         return { body: response, rawBody: Buffer.from(JSON.stringify(response)) };
       } } });
-    const operations = { ...provider, requiresResearch: true };
+    const operations = { ...provider, requiresResearch: true, clientPeople: async () => ["owner@c0.example"] };
     const workflow = new PresenceWorkflow(setup.pool, operations);
     const actor = { id: "dry-run", authority: "test-only", role: "operator", simulated: false } as const;
     await workflow.start(context);
@@ -349,7 +350,12 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     note(602, 0, "Approve");
     check = await readBackOperatorSite(config, fetcher);
     revised = (await decideFromWordPress(check.readback, revised))!;
-    assert.deepEqual(revised.businessFacts!.map(fact => fact.source.path), ["/service"], "The confirmed fact is in Core's knowledge");
+    // The fact goes into the one Knowledge (the record My Business shows), Proposed: a Specialist introduced it.
+    assert.equal(revised.businessFacts, undefined, "No separate copy of facts in the workflow");
+    assert.deepEqual(revised.facts!.map(fact => [fact.status, fact.said.kind, fact.source]), [["proposed", "specialist", round.id + ":F1"]]);
+    const knownAfterReview = await readMyBusiness(setup.pool, context.scope.webPresenceId);
+    assert.deepEqual(knownAfterReview.proposed.map(item => [item.value, item.from]), [[revised.facts![0].statement, "Specialist"]],
+      "The Client sees it in My Business, waiting for confirmation");
     assert.deepEqual(roundOutcome(revised.changes!, round.id).changes.map(item => item.path), ["/start"], "The change marked No is left out");
     assert.equal(revised.reviewRounds!.at(-1)!.decision, undefined, "What was decided lives in the Change ledger only");
     assert.deepEqual(statuses(revised, round.id), { E1: "applied", F1: "applied", C1: "approved", C2: "declined" }, "The ledger decides");
@@ -370,7 +376,28 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.equal(statuses(revised, round.id).C1, "applied", "The approved change is applied once Core has written it");
 
     const factRequest = requests.slice(requestsBefore).find(row => row.name === "presence_workflow_page");
-    assert.ok(factRequest?.body.includes("businessFacts"), "Later AI steps receive the confirmed fact");
+    assert.ok(factRequest?.body.includes("businessFacts"), "Later AI steps receive the fact");
+    assert.ok(factRequest?.body.includes('\\"status\\":\\"proposed\\"'), "with its standing");
+
+    // A Client emails changes; the Specialist enters the email. Quoted facts are the Client's word.
+    const emailId = randomUUID();
+    const email = { id: emailId, from: "owner@c0.example", sentAt: "2026-11-24T09:00:00.000Z",
+      text: "Hi, two updates. We now answer enquiries within one working day. Thanks!", facts: [
+        { statement: "We now answer enquiries within one working day.", publicUse: true },
+        { statement: "Replies are guaranteed within 24 hours.", publicUse: true }] };
+    await assert.rejects(workflow.recordClientEmail(context, revised.version, actor, { ...email, from: "someone@else.example" }), /unavailable/,
+      "Only a person who speaks for the Client can give the Client's word");
+    revised = (await workflow.recordClientEmail(context, revised.version, actor, email))!;
+    const fromEmail = revised.facts!.filter(fact => fact.source === "client-email:" + emailId);
+    assert.deepEqual(fromEmail.map(fact => [fact.status, fact.said.kind]), [["confirmed", "client"], ["proposed", "specialist"]],
+      "The Client's own words are Confirmed; the Specialist's rewording stays Proposed");
+    const emailRequest = revised.changes!.requests.find(item => item.id === emailId + ":email")!;
+    assert.deepEqual([emailRequest.origin.kind, emailRequest.origin.channel, emailRequest.origin.enteredBy?.id], ["customer", "email", actor.id]);
+    assert.equal(revised.clientStatements!.at(-1)!.text, email.text, "The email is kept as Evidence");
+    const known = await readMyBusiness(setup.pool, context.scope.webPresenceId);
+    assert.ok(known.facts.some(item => item.value === email.facts[0].statement && item.source === "customer"), "My Business shows the Client's confirmed fact");
+    assert.equal(known.proposed.length, 2);
+    assert.deepEqual((await workflow.recordClientEmail(context, revised.version - 1, actor, email))!.version, revised.version, "Entering it twice is the same as once");
 
     // The next delivery replaces exactly what Core read back, answers and resolves the Notes, and
     // retires the Review summary page.
