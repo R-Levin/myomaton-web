@@ -96,7 +96,8 @@ function checked(input: WriteInput, output: unknown, sources: PresenceEvidence[]
       const blueprint = readBlueprint(output, ids, true, true);
       // Each page keeps the decision brief that says what it must achieve; Core writes the page from it.
       const plan: SitePlan = { pages: blueprint.pages.map(page => ({ path: page.path, label: page.label, purpose: page.purpose,
-        inMenu: blueprint.navigation.includes(page.path), ...("decisionBrief" in page && { decisionBrief: page.decisionBrief }) })) };
+        inMenu: blueprint.navigation.includes(page.path), sourceIds: page.sourceIds,
+        ...("decisionBrief" in page && { decisionBrief: page.decisionBrief }) })) };
       if (!plan.pages.some(page => page.path === "/")) throw Error("The Site plan needs a Home page");
       return plan;
     }

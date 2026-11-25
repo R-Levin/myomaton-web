@@ -117,5 +117,15 @@ something always runs end to end. Git keeps its history.
   identity. Read-back turns open Notes and hand edits into Requests on their pages; delivery
   waits until hand edits are worked in, so they are never overwritten, and the next delivery
   answers and resolves each Note that was carried out.
-  Still to do in milestone 1: Publish as a
-  labelled Beacon; then the end-to-end run moves onto this engine and the old workflow retires.
+  Publish: the Client alone approves publishing the site exactly as it stands; the request lists
+  the Proposed facts the site rests on, and approving confirms them in Knowledge as the Client's
+  word. Public delivery itself is a labelled Beacon until milestone 5.
+- *Nov 25, milestone 1 accepted locally:* `tests/integration/service-launch.test.ts` runs C0 on the
+  rebuilt Core from its imported onboarding through Launch, WordPress drafts and a Review Round to
+  the Client's Publish approval, saved at every step, with the old workflow used nowhere. AI calls
+  go through the metered connection over an offline stand-in; no paid call has been made.
+  Carried into milestone 2 (they belong with the screens): Report corrections stating facts in the
+  new engine, Client email entry and the people list wired to it, and a hand edit taken in as the
+  Specialist's own Change rather than as a Request for Core to rework. The old workflow keeps
+  serving protected Core and today's screens until milestones 2 and 4 replace them; it is
+  removed then.

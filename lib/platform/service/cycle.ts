@@ -24,7 +24,13 @@ export type ProductVersion = {
 };
 
 /** An Account's service record: its Change record and every Version of its Work products. */
-export type ServiceRecord = { account: { webPresenceId: string; managedSiteId: string }; version: number; ledger: ChangeLedger; products: ProductVersion[] };
+export type ServiceRecord = { account: { webPresenceId: string; managedSiteId: string }; version: number; ledger: ChangeLedger; products: ProductVersion[];
+  /** Approved Publishes. Until public delivery is built (milestone 5) each is a labelled Beacon: approved, not yet public. */
+  publications?: Publication[] };
+
+/** A Publish the Client approved: exactly which Page Versions, and the Proposed facts the approval confirmed. */
+export type Publication = { changeId: string; at: string; by: Person; pages: { id: string; path: string; version: number }[];
+  confirms: { key: string; statement: string }[]; beacon: "public delivery not built yet" };
 
 /** What Core gives its writer (the AI, or a labelled Beacon standing in for it) for one Work product. */
 export type WriteInput = {
@@ -92,7 +98,11 @@ export function tasks(record: ServiceRecord): Task[] {
     what: `Write the ${label(requests[0])}`, requestIds: requests.map(request => request.id) }));
   const reviewing = record.ledger.changes.filter(change => change.status === "proposed").map(change => ({ id: "review:" + change.id,
     who: change.consequence === "customer-approval" ? "client" as const : "specialist" as const, what: `Review ${change.difference.summary}`, changeId: change.id }));
-  return [...writing, ...reviewing];
+  // A Request on the site as a whole (such as the Client's reason for not publishing yet) is the Specialist's to answer.
+  const answering = record.ledger.requests.filter(request => request.status === "open" && request.target.grain === "site" &&
+    !record.ledger.changes.some(change => change.requestIds.includes(request.id))).map(request => ({ id: "answer:" + request.id,
+    who: "specialist" as const, what: `Answer: ${request.words}`, requestIds: [request.id] }));
+  return [...writing, ...reviewing, ...answering];
 }
 const label = (request: Request) => request.target.grain === "site-plan" ? "Site plan" : request.target.grain === "page" || request.target.grain === "new-page"
   ? `page ${request.target.name ?? request.target.path}` : request.target.grain === "report" ? "Report" : "Direction";
@@ -152,6 +162,7 @@ function versionedPage(record: ServiceRecord, id: string, page: PageContent) {
  * Correct declines it and raises a Request, in the reviewer's words, for Core to rework it.
  */
 export function respond(record: ServiceRecord, changeId: string, by: Person, response: "approve" | "correct" | "decline", at: string, words?: string): ServiceRecord {
+  if (changeId.startsWith("publish:")) return respondToPublish(record, changeId, by, response, at, words);
   const proposed = record.products.find(item => item.changeId === changeId);
   if (!proposed) throw new CycleError("not-found", "No such proposed Version");
   if (proposed.status !== "proposed") throw new CycleError("not-open", "That Version is not waiting for Review");
@@ -189,4 +200,60 @@ export function currentSite(record: ServiceRecord) {
   const pages = plan.pages.map(entry => current(record, pageIdentity(record.account.managedSiteId, entry.path)));
   return { plan, pages: pages.filter(Boolean).map(item => item!.content as PageContent & { id: string; version: number }),
     complete: pages.every(Boolean), menu: plan.pages.filter(entry => entry.inMenu).map(entry => entry.path) };
+}
+
+/**
+ * Ask the Client to approve publishing the site exactly as it now stands. Publishing always needs
+ * the Client's approval. The request lists the Proposed facts the site relies on: Core may use
+ * them in drafts, and the Client confirms them at the latest here (Principal, Nov 24).
+ */
+export function proposePublish(record: ServiceRecord, input: { at: string; by: Person; relies: { key: string; statement: string }[] }): ServiceRecord {
+  const site = currentSite(record);
+  if (!site?.complete) throw new CycleError("invalid", "Every page needs an approved Version before the site can be published");
+  if (record.ledger.changes.some(change => change.id.startsWith("publish:") && change.status === "proposed")) throw new CycleError("not-open", "A Publish is already waiting for the Client");
+  const id = `publish:${record.version}:${input.at}`, requestId = id + ":request";
+  const pages = site.pages.map(page => ({ id: page.id, path: page.path, version: page.version }));
+  let ledger = takeIn(record.ledger, { id, at: input.at, by: input.by }, [{ id: requestId, at: input.at,
+    origin: { kind: input.by.role === "core" ? "core" : "operator", by: input.by, channel: "core-screen" }, target: { grain: "site" }, words: "Publish the site." }]);
+  const confirms = input.relies.length ? " Approving also confirms, as true and fit for the website: " + input.relies.map(fact => `"${fact.statement}"`).join("; ") + "." : "";
+  ledger = decide(ledger, { id: id + ":decision", at: input.at, by: core, requestIds: [requestId], outcome: "change", reasoning: "The site is complete and reviewed." },
+    [{ id, label: "Publish", at: input.at, requestIds: [requestId], target: { grain: "site" }, base: { version: record.version, digest: fingerprint(pages) },
+      difference: { summary: `publishing the site: ${pages.length} pages` + confirms, after: JSON.stringify({ pages, confirms: input.relies }) },
+      preserve: [], consequence: "customer-approval" }]);
+  return { ...record, ledger };
+}
+
+function respondToPublish(record: ServiceRecord, changeId: string, by: Person, response: "approve" | "correct" | "decline", at: string, words?: string): ServiceRecord {
+  const change = record.ledger.changes.find(item => item.id === changeId);
+  if (!change) throw new CycleError("not-found", "No such Publish");
+  const { pages, confirms } = JSON.parse(change.difference.after!) as { pages: Publication["pages"]; confirms: Publication["confirms"] };
+  // The approval holds only for the site exactly as it was asked about.
+  const now = currentSite(record)?.pages.map(page => ({ id: page.id, path: page.path, version: page.version }));
+  if (response === "approve" && fingerprint(now) !== fingerprint(pages)) throw new CycleError("not-open", "The site changed since the Publish was asked for; ask again");
+  let ledger: ChangeLedger;
+  try { ledger = reviewChange(record.ledger, changeId, { at, by, response: response === "approve" ? "approve" : "decline", ...(words && { words }) }); }
+  catch (error) { throw new CycleError("not-permitted", (error as Error).message); }
+  if (response !== "approve") {
+    const declined = { ...record, ledger };
+    // The Client's reason goes to the Specialist as a Request on the site.
+    return response === "correct" && words?.trim() ? { ...declined, ledger: takeIn(declined.ledger, { id: `${changeId}:correction:${at}`, at, by },
+      [{ id: `${changeId}:correction:${at}:request`, at, origin: { kind: by.role === "customer" ? "customer" : "operator", by, channel: "core-screen" },
+        target: { grain: "site" }, words: words.trim() }]) } : declined;
+  }
+  ledger = markApplied(ledger, [changeId], at, record.version + 1);
+  const publication: Publication = { changeId, at, by, pages, confirms, beacon: "public delivery not built yet" };
+  return { ...record, ledger, publications: [...record.publications ?? [], publication] };
+}
+
+/**
+ * The Knowledge the current site rests on: what its pages' Sections cite, and what the Site plan
+ * cites for each page and its decision brief. This is what a Publish relies on.
+ */
+export function citedBySite(record: ServiceRecord): Set<string> {
+  const site = currentSite(record);
+  const ids = (value: unknown) => Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+  const fromPages = (site?.pages ?? []).flatMap(page => page.sections.flatMap(section => ids((section as { sourceIds?: unknown }).sourceIds)));
+  const fromPlan = (site?.plan.pages ?? []).flatMap(entry => [...ids((entry as { sourceIds?: unknown }).sourceIds),
+    ...ids((entry as { decisionBrief?: { claimIds?: unknown } }).decisionBrief?.claimIds)]);
+  return new Set([...fromPages, ...fromPlan]);
 }
