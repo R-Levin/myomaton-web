@@ -100,7 +100,10 @@ something always runs end to end. Git keeps its history.
   (Direction, Site plan, one Request per page); Pages and Sections keep their identities and
   Versions; a later Request on a page is the same cycle at a smaller grain. It runs end to end
   with a labelled Beacon in place of the AI.
-  Still to do in milestone 1: keep the record in the database; give Core the Account's
-  Knowledge (C0's imported); the real AI writer, reusing the kept AI connection and
+  Each Account's service record is now kept in the database as append-only versions; a save
+  from a stale read is refused, so two people never overwrite each other. Core reads the
+  Account's Knowledge from the one Knowledge record, with each item's standing and whether it
+  may appear on the website.
+  Still to do in milestone 1: C0's onboarding imported as Knowledge; the real AI writer, reusing the kept AI connection and
   instructions; delivery to WordPress drafts and read-back of Notes as Requests; Publish as a
   labelled Beacon; then the end-to-end run moves onto this engine and the old workflow retires.
