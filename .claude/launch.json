@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "workspace-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["tsx", "scripts/service/workspace-preview.ts"],
+      "port": 4480
+    }
+  ]
+}

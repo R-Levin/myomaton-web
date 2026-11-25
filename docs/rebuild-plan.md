@@ -129,3 +129,28 @@ something always runs end to end. Git keeps its history.
   Specialist's own Change rather than as a Request for Core to rework. The old workflow keeps
   serving protected Core and today's screens until milestones 2 and 4 replace them; it is
   removed then.
+
+## Milestone 2 screens (plan, Nov 25)
+
+Plain server-rendered pages, one form per action, every action checking who is acting.
+- **Specialist workspace** (`/workspace`): the **Queue**, every Task across Accounts with who
+  must act; each Account's page shows where Launch stands, its Work products and their current
+  Versions, the **Proposed changes** waiting (each readable in full, with Approve, Correct in
+  your own words, or Decline), Core's work waiting to run, the Account's Knowledge, its Client
+  people, and Client email entry.
+- **Client Portal** (`/portal`): what needs the Client (the Report to confirm, a Publish to
+  approve, Proposed facts), and My Business.
+- Locally, a preview command sets up a throwaway database with C0 as an Account and a choice of
+  who you are (a Specialist, or one of C0's Client people). Core's AI is the labelled stand-in
+  there; the real AI needs the Principal's approval (milestone 3). Sign-in on protected Core
+  comes with milestone 4; until then these pages refuse to run anywhere but locally.
+- *Nov 25, milestone 2 first slice (local preview):* `npx tsx scripts/service/workspace-preview.ts`
+  starts the Specialist workspace (`/workspace`) and Client Portal (`/portal`) against a throwaway
+  database holding C0. Checked in the browser: a Specialist starts Launch and lets Core (the
+  labelled Beacon) write the Report; the Client reads it in full in their portal and corrects it
+  in their own words, and sees their request listed as being worked on. Also built: Proposed
+  changes with Approve / Correct / Decline, Publish approval (which confirms the Proposed facts the
+  site relies on), Proposed facts the Client confirms, corrects or declines, Specialist facts, and
+  the Client people list. Still to do: Client email entry on the engine, WordPress delivery and
+  Notes from the workspace, Report corrections that state facts, and a full walk-through to Publish.
+
