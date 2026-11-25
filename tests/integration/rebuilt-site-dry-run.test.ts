@@ -52,7 +52,11 @@ function simulatedAnswer(name: string, schema: Schema, instructions: string) {
   const stage = name.replace("presence_workflow_", "");
   if (stage === "report") {
     const ids = enumAt(schema, "findings", "[]", "sourceIds");
-    return { title: "Business understanding (simulated)", summary: "Simulated summary.", findings: [
+    // With an open correction, Core asks for the facts it states: one in the Client's words, one reworded.
+    const corrected = schema.properties?.correctionFacts ? { correctionFacts: [
+      { findingId: "audience", statement: "We serve owner-led UK businesses.", publicUse: true },
+      { findingId: "audience", statement: "Clients are UK firms run by their owners.", publicUse: true }] } : {};
+    return { ...corrected, title: "Business understanding (simulated)", summary: "Simulated summary.", findings: [
       { id: "offer", heading: "One managed service", body: "Simulated finding about the offer.", status: "proposed", sourceIds: ids.slice(0, 1) },
       { id: "audience", heading: "Who it serves", body: "Simulated finding about the audience.", status: "proposed", sourceIds: ids.slice(0, 1) }] };
   }
@@ -169,6 +173,8 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
       outputPerMillion: 4_500_000, cacheWritePerMillion: 0, countMicros: 0 };
     await initializeResponsesUsageLedger(root, rates);
     const grant = { contextDigest: fingerprint(context), approvedSources: sources, approvedCorrections: [], marketingAuthority: authority,
+      // The Account's consent to use the Client's material with the AI: no per-item listing (Principal, Nov 25).
+      accountConsent: { reference: "Dry-run service agreement", by: "principal", at: "2026-11-25T00:00:00.000Z" },
       nativeComponents: 2 as const, siteComposition: "managed-v1" as const, reviewSequence: "site-first" as const, maxRetries: 1, maxEditorialRevisions: 1,
       researchSources: [{ id: "research:peer", url: "https://peer.example/", label: "Simulated peer" }],
       researchResponseBytes: 100_000, expiresAt: Date.now() + 600_000, maxOutputTokens: 20_000,
@@ -208,12 +214,28 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     const actor = { id: "dry-run", authority: "test-only", role: "operator", simulated: false } as const;
     await workflow.start(context);
     let view = (await workPresenceCase(workflow, context))!;
-    for (let step = 0; step < 6 && view.next !== "complete" && !view.pages.length; step++) {
-      if (view.report && !view.confirmation) view = (await workflow.confirmReport(context, view.version, actor, true))!;
+    const clientPerson = { id: "owner@c0.example", role: "customer", simulated: false } as const;
+    let reportCorrected = false;
+    for (let step = 0; step < 8 && view.next !== "complete" && !view.pages.length; step++) {
+      // The Client corrects the Report once; Core rewrites it and lists the facts the correction states.
+      if (view.report && !view.confirmation && !reportCorrected) {
+        view = (await workflow.correctReport(context, view.version, "audience", "Not quite. We serve owner-led UK businesses. Your wording is too broad.", clientPerson))!;
+        reportCorrected = true;
+      } else if (view.report && !view.confirmation) view = (await workflow.confirmReport(context, view.version, actor, true))!;
       view = (await workPresenceCase(workflow, context))!;
     }
     assert.equal(view.failure, null, JSON.stringify({ failure: view.failure, issue: (view as { artifactIssue?: unknown }).artifactIssue, next: view.next, requests: requests.map(r => r.name), report: Boolean(view.report), direction: Boolean(view.direction), blueprint: Boolean(view.blueprint) }));
     assert.deepEqual(view.pages.map(page => page.path), ["/", "/service", "/start"]);
+    // The Report correction was a Client Request; Core's Decision on it recorded the facts it states.
+    assert.ok(reportCorrected);
+    const correctionRequest = view.changes!.requests.find(item => item.target.grain === "report")!;
+    assert.deepEqual([correctionRequest.origin.kind, correctionRequest.target.path, correctionRequest.status], ["customer", "audience", "decided"]);
+    assert.deepEqual(view.facts!.map(fact => [fact.statement, fact.status, fact.said.kind]), [
+      ["We serve owner-led UK businesses.", "confirmed", "client"], ["Clients are UK firms run by their owners.", "proposed", "core"]],
+      "The Client's own words are Confirmed; Core's rewording is Proposed");
+    assert.ok(requests.some(row => row.name === "presence_workflow_report" && row.instructions.includes("correctionFacts")));
+    assert.ok(requests.some(row => row.name === "presence_workflow_direction" && row.body.includes("We serve owner-led UK businesses.")),
+      "Later steps receive the confirmed fact");
     const design = view.direction?.design;
     assert.ok(design, "The Direction carries Core's chosen design");
     assert.equal(design.typography.headingFamily, "fraunces");
@@ -367,9 +389,10 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     revised = (await decideFromWordPress(check.readback, revised))!;
     // The fact goes into the one Knowledge (the record My Business shows), Proposed: a Specialist introduced it.
     assert.equal(revised.businessFacts, undefined, "No separate copy of facts in the workflow");
-    assert.deepEqual(revised.facts!.map(fact => [fact.status, fact.said.kind, fact.source]), [["proposed", "specialist", round.id + ":F1"]]);
+    const fromRound = revised.facts!.filter(fact => fact.source.startsWith(round.id));
+    assert.deepEqual(fromRound.map(fact => [fact.status, fact.said.kind, fact.source]), [["proposed", "specialist", round.id + ":F1"]]);
     const knownAfterReview = await readMyBusiness(setup.pool, context.scope.webPresenceId);
-    assert.deepEqual(knownAfterReview.proposed.map(item => [item.value, item.from]), [[revised.facts![0].statement, "Specialist"]],
+    assert.deepEqual(knownAfterReview.proposed.filter(item => item.from === "Specialist").map(item => item.value), [fromRound[0].statement],
       "The Client sees it in My Business, waiting for confirmation");
     assert.deepEqual(roundOutcome(revised.changes!, round.id).changes.map(item => item.path), ["/start"], "The change marked No is left out");
     assert.equal(revised.reviewRounds!.at(-1)!.decision, undefined, "What was decided lives in the Change ledger only");
@@ -431,7 +454,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.equal(revised.clientStatements!.at(-1)!.text, email.text, "The email is kept as Evidence");
     const known = await readMyBusiness(setup.pool, context.scope.webPresenceId);
     assert.ok(known.facts.some(item => item.value === email.facts[0].statement && item.source === "customer"), "My Business shows the Client's confirmed fact");
-    assert.equal(known.proposed.length, 2);
+    assert.equal(known.proposed.filter(item => item.from === "Specialist").length, 2);
     assert.deepEqual((await workflow.recordClientEmail(context, revised.version - 1, actor, email))!.version, revised.version, "Entering it twice is the same as once");
     // Someone removed from the list no longer speaks for the Client; what they said before stays.
     assert.deepEqual(await removeClientPerson(setup.pool, context.scope.webPresenceId, person.id, principal, "Left the business"), []);
@@ -441,8 +464,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.equal(readded.id, person.id, "Added again, the same Person keeps their history");
 
     // The Client answers the Proposed facts in My Business: their word settles each one.
-    const clientPerson = { id: "owner@c0.example", role: "customer", simulated: false } as const;
-    const [reviewFactKey, rewordedKey] = known.proposed.map(item => item.key);
+    const [reviewFactKey, rewordedKey] = known.proposed.filter(item => item.from === "Specialist").map(item => item.key);
     const answer = (response: string, key: string, extra: object = {}) => ({ requestId: randomUUID(), key, response, ...extra });
     await assert.rejects(workflow.reviewFact(context, revised.version, answer("confirm", reviewFactKey), actor), /unavailable/,
       "A Specialist cannot confirm on the Client's behalf");
@@ -451,7 +473,8 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.equal((await workflow.reviewFact(context, revised.version - 1, corrected, clientPerson))!.version, revised.version, "Answering twice is the same as once");
     revised = (await workflow.reviewFact(context, revised.version, answer("decline", rewordedKey), clientPerson))!;
     const settled = await readMyBusiness(setup.pool, context.scope.webPresenceId);
-    assert.equal(settled.proposed.length, 0, "Nothing waits for the Client now");
+    assert.deepEqual(settled.proposed.map(item => [item.value, item.from]), [["Clients are UK firms run by their owners.", "Core"]],
+      "Only Core's rewording of the Report correction still waits for the Client");
     assert.ok(settled.facts.some(item => item.value === "Open weekdays from 9." && item.source === "customer"), "The Client's wording is the Fact");
     assert.ok(!revised.facts!.some(item => item.key === rewordedKey), "A Fact the Client says is not true leaves Knowledge");
     assert.deepEqual(revised.facts!.find(item => item.key === reviewFactKey)!.said.kind, "client");

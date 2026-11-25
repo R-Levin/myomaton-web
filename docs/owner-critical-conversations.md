@@ -1323,3 +1323,11 @@ call per email); the email service is chosen when it is connected; by default th
 copied on every Client email and notice, and the Principal on administrative reports only,
 adjustable per Account. Connecting the service remains a hosted change for the Principal's
 go-ahead; each paid call still follows the usual approval for provider spending.
+
+**Nov 25: safeguards review accepted (Principal).** On `docs/safeguards-review.md` the
+Principal accepted both recommendations: (1) AI use is approved per Account — consent once to use
+the Client's own material with the AI, and a spending budget per Account that the Principal sets —
+instead of hand-issued files listing every item the AI may read; during development each paid
+call is still put to the Principal first; (2) make the local simplifications now, and apply the
+protected-database parts (rules per Account, one update sequence) at the next deploy the
+Principal approves.

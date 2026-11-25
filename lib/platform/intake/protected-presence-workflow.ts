@@ -1,3 +1,4 @@
+import { wellFormedRates } from "./intelligent-responses";
 import { access, lstat, open, readFile, realpath, readdir } from "node:fs/promises";
 import { basename, join } from "node:path";
 import type { Pool } from "pg";
@@ -196,8 +197,7 @@ function composeBoundPresenceCase(pool: Pool, context: () => Promise<WorkflowCon
       if (!permitted(current, grant)) throw Error("Workflow source binding refused");
       const rates = capability.kind === "offline-test" ? capability.rates : (await privateWorkflowFile<{ rateCard: ResponsesRates }>(
         join(workspace.ledgerDirectory, "onboarding-usage.json"), workspace.root)).rateCard;
-      if (rates.model !== "gpt-5.4-mini-2026-03-17" || rates.inputPerMillion !== 750_000 || rates.cachedPerMillion !== 75_000 ||
-          rates.outputPerMillion !== 4_500_000 || rates.cacheWritePerMillion !== 0 || rates.countMicros !== 0) throw Error("Pinned workflow rates refused");
+      if (!wellFormedRates(rates)) throw Error("Workflow rate card refused");
       async function noOutbound(): Promise<never> { throw new WorkflowBlocked("The worker owns provider dispatch"); }
       const isolatedCommercialWorker = boundary === "disposable" && capability.kind === "worker" && capability.resumeMarketResearch === true;
       const transport = capability.kind === "worker" ? responsesHttps(capability.apiKey, grant.expiresAt, grant.ledger.inputBytes + 48_000,

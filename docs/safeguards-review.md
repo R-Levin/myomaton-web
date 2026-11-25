@@ -1,7 +1,7 @@
 # Safeguards review — for the Principal (Nov 25)
 
-Status: **proposed**. Asked for by the Principal on Nov 25: "a safe, but not overweening
-system" (baseline Part 1, #22). Nothing here has been changed yet.
+Status: **accepted** by the Principal on Nov 25 (both recommendations). Asked for on Nov 25:
+"a safe, but not overweening system" (baseline Part 1, #22). Work is in progress locally.
 
 ## The short version
 
@@ -74,6 +74,19 @@ the people list); **remove** what is left over from Codex's rehearsals.
 
 Each step lands with the tests still passing. The tests that only prove a removed check still
 refuses things go with it, and none of the safeguards in "Keep" is weakened.
+
+## Progress
+
+- *Nov 25, item 1 (local):* the AI authorization takes an Account consent. With it, Client
+  corrections, Specialist notes and feedback no longer need listing in advance, and all of the
+  Account's own material may be used; the usage ledger's cap is the Account's budget. Without
+  it, the old per-item lists still apply, so existing authorizations on protected Core keep
+  working unchanged. The full run now includes a Client correcting the Report, which the old
+  lists blocked.
+- *Nov 25, item 4 (local):* the AI model and prices are no longer written into the code (five
+  places). A rate card only has to be well formed; the ledger still prices every call from it.
+- Next: item 5 (internal fingerprints), item 6 (one path, C0 as data), removing leftovers; items
+  2 and 3 prepared for the next approved deploy.
 
 ## Decisions for the Principal
 

@@ -39,6 +39,13 @@ export type PresenceWorkflowGrant = {
   approvedSources: readonly string[];
   marketingAuthority?: MarketingAuthority;
   approvedCorrections: readonly string[];
+  /**
+   * Consent, once per Account, to use the Client's own material with the AI (Principal, Nov 25).
+   * With it, Client corrections, Specialist notes and feedback need no per-item listing in this
+   * file; the usage ledger's cap is the Account's spending budget. Without it, the per-item lists
+   * still apply, as before.
+   */
+  accountConsent?: { reference: string; by: string; at: string };
   /** Development egress pins, not a permanent per-answer approval requirement. */
   approvedKnowledgeReassessments?: readonly string[];
   /** Exact added evidence pins, separately distinguished from original context. */
@@ -235,6 +242,13 @@ export function projectKnowledgeReassessment(run: WorkflowRun) {
   } };
 }
 
+/** The Account's consent to use the Client's material with the AI, when it is complete. */
+function accountConsent(grant: PresenceWorkflowGrant) {
+  const consent = grant.accountConsent;
+  return Boolean(consent && [consent.reference, consent.by, consent.at].every(item => typeof item === "string" && item.trim()) &&
+    Number.isFinite(Date.parse(consent.at)));
+}
+
 function approvedProjection(run: WorkflowRun, grant: PresenceWorkflowGrant) {
   const { evidence, research, corrections, report, direction, blueprint, entry, limitations, conflicts, pages, revisionRequest } = run.input;
   if (run.work.reviewStage || run.input.reviewStage) {
@@ -244,28 +258,30 @@ function approvedProjection(run: WorkflowRun, grant: PresenceWorkflowGrant) {
         fingerprint(run.work.reviewStage) !== fingerprint(run.input.reviewStage) ||
         run.input.pages.length !== 1 || run.input.pages[0].path !== "/") throw new WorkflowBlocked("Exact concept critique scope required");
   }
-  const selected = evidence.filter(source => grant.approvedSources.includes(fingerprint(source)));
+  const consent = accountConsent(grant);
+  const selected = consent ? evidence : evidence.filter(source => grant.approvedSources.includes(fingerprint(source)));
   const reassessment = run.input.knowledgeReassessment;
   const confirmed = reassessment && confirmedKnowledgeEvidence(reassessment.confirmations);
-  if (reassessment && grant.approvedKnowledgeSources &&
+  if (!consent && reassessment && grant.approvedKnowledgeSources &&
     fingerprint([...grant.approvedKnowledgeSources].sort())!==fingerprint(confirmed!.map(fingerprint).sort())) {
     throw new WorkflowBlocked("Exact knowledge source authorization required");
   }
-  if (reassessment && (!grant.approvedKnowledgeReassessments?.includes(fingerprint(reassessment)) ||
+  if (!consent && reassessment && (!grant.approvedKnowledgeReassessments?.includes(fingerprint(reassessment)) ||
       confirmed!.some(source => !grant.approvedSources.includes(fingerprint(source))))) throw new WorkflowBlocked("Exact knowledge reassessment authorization required");
   const fictional = run.context.evaluation?.scenario === "c2" && selected.length > 0 && selected.every(source =>
     source.kind !== "owner-confirmed" && source.reference.startsWith("Fictional C2 fixture: "));
   if (fingerprint(run.context) !== grant.contextDigest || fingerprint(run.input) !== run.work.inputDigest ||
       fingerprint(evidence) !== fingerprint(confirmed ? [...run.context.evidence, ...confirmed] : run.context.evidence) ||
-      (!fictional && !selected.some(source => source.kind === "owner-confirmed")) || selected.length !== grant.approvedSources.length ||
-      corrections.some(correction => !grant.approvedCorrections.includes(fingerprint(correction))) ||
-      (revisionRequest?.source === "home-concept" && revisionRequest.audit.concerns.some(item =>
+      (!fictional && !selected.some(source => source.kind === "owner-confirmed")) ||
+      (!consent && selected.length !== grant.approvedSources.length) ||
+      (!consent && corrections.some(correction => !grant.approvedCorrections.includes(fingerprint(correction)))) ||
+      (!consent && revisionRequest?.source === "home-concept" && revisionRequest.audit.concerns.some(item =>
         !grant.approvedHomeFeedback?.includes(fingerprint(item.concern))))) {
     throw new WorkflowBlocked("Exact evidence authorization required");
   }
   if (grant.marketingAuthority) {
     const allowed = grant.approvedRevisionFeedback;
-    if (revisionRequest?.source === "operator-editorial" &&
+    if (!consent && revisionRequest?.source === "operator-editorial" &&
         revisionRequest.audit.concerns.some(item => !allowed?.includes(fingerprint(item.concern)))) {
       throw new WorkflowBlocked("Exact Operator feedback authorization required");
     }
@@ -413,7 +429,7 @@ export function createResponsesPresenceWorkflow(config: {
   }
   function citationIds(run: WorkflowRun) {
     if (grant.marketingAuthority) return marketingCitationIds(run, grant.marketingAuthority);
-    const sources = [...run.input.evidence.filter(source => grant.approvedSources.includes(fingerprint(source))), ...run.input.research ?? []];
+    const sources = [...run.input.evidence.filter(source => accountConsent(grant) || grant.approvedSources.includes(fingerprint(source))), ...run.input.research ?? []];
     const excluded = new Set(run.work.operation === "page" ? confirmedKnowledgeEvidence((run.input.knowledgeReassessment?.confirmations ?? []).filter(item => !item.publicUse)).map(source => source.id) : []);
     return [...new Set(sources.map(source => source.id).filter(id => !excluded.has(id)))];
   }

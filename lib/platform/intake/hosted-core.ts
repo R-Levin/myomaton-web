@@ -1,3 +1,4 @@
+import { wellFormedRates } from "./intelligent-responses";
 import { randomBytes } from "node:crypto";
 import { lstat, realpath, readFile } from "node:fs/promises";
 import { fingerprint, uuid } from "../canonical/model";
@@ -122,9 +123,7 @@ async function openCore() {
         !Array.isArray(grant.approvedAnswerDigests) || grant.approvedAnswerDigests.some(value => !/^[a-f0-9]{64}$/.test(value)) ||
         !Number.isSafeInteger(grant.maxRequests) || grant.maxRequests > 20 || !Number.isSafeInteger(grant.capMicros) ||
         grant.capMicros > 500_000 || grant.expiresAt > Date.now() + 86_400_000 ||
-        grant.rates.model !== "gpt-5.4-mini-2026-03-17" || grant.rates.inputPerMillion !== 750_000 ||
-        grant.rates.cachedPerMillion !== 75_000 || grant.rates.outputPerMillion !== 4_500_000 ||
-        grant.rates.countMicros !== 0) throw Error("Protected AI scope refused");
+        !wellFormedRates(grant.rates)) throw Error("Protected AI scope refused");
     const ledger = await lstat(grant.ledgerDirectory);
     const home = await realpath(process.env.HOME ?? "");
     if (!ledger.isDirectory() || ledger.uid !== process.getuid?.() || (ledger.mode & 0o777) !== 0o700 ||

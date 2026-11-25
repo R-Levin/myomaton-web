@@ -1,3 +1,4 @@
+import { wellFormedModel } from "./intelligent-responses";
 import { createHash } from "node:crypto";
 import { fingerprint, object, uuid } from "../canonical/model";
 import { c0DisclosureManifest } from "./c0-workflow-knowledge";
@@ -63,7 +64,7 @@ export function c0HostedRunGrant(context: WorkflowContext, bytes: Buffer, approv
     if (typeof value !== "number" || !Number.isSafeInteger(value) || value < min || value > max) throw Error("Hosted usage bound refused");
     return value;
   };
-  if (provider.model !== "gpt-5.4-mini-2026-03-17" || provider.store !== false || provider.automaticRetries !== 0 ||
+  if (!wellFormedModel(provider.model) || provider.store !== false || provider.automaticRetries !== 0 ||
       (provider.siteComposition !== undefined && provider.siteComposition !== "managed-v1")) throw Error("Hosted provider scope refused");
   const generations = bound(provider.generations, 1, 128);
   const requests = bound(provider.requests, generations * 2, 256);
@@ -117,7 +118,7 @@ export function c0ActivationGrant(context: WorkflowContext, manifestBytes: Buffe
     research: { roots: PublicResearchSource[]; discovery: ResearchDiscovery; readsMaximum: number; maxSourceBytes: number };
   };
   const { provider, research } = plan;
-  if (provider.model !== "gpt-5.4-mini-2026-03-17" || provider.store !== false || provider.tools.length || provider.automaticRetries !== 0 ||
+  if (!wellFormedModel(provider.model) || provider.store !== false || provider.tools.length || provider.automaticRetries !== 0 ||
       provider.expiryHours !== 24 || provider.additionalCapUsd !== "1.00" ||
       provider.maximumGenerations !== 12 || provider.maximumTotalRequests !== 24 || provider.maximumDeliberateRetries !== 2 ||
       provider.maximumEditorialRevisions !== 1 || provider.maxInputTokens !== 32_000 || provider.maxOutputTokens !== 12_000) {

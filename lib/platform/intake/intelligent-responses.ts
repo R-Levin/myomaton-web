@@ -17,6 +17,17 @@ export type ResponsesRates = {
   countMicros: number;
 };
 type Rates = ResponsesRates;
+/**
+ * The AI model and its prices are settings, not code (Principal, Nov 25): a new model or price is
+ * a change to the rate card the usage ledger reads, never a redeploy. A rate card only has to be
+ * well formed; the ledger still prices every call from it and stops at its cap.
+ */
+export const wellFormedModel = (model: unknown): model is string => typeof model === "string" && /^[a-z0-9][a-z0-9.\-]{2,80}$/u.test(model);
+export function wellFormedRates(rates: Partial<ResponsesRates> | undefined): rates is ResponsesRates {
+  const price = (value: unknown) => typeof value === "number" && Number.isSafeInteger(value) && value >= 0 && value <= 1_000_000_000;
+  return Boolean(rates && wellFormedModel(rates.model) && price(rates.inputPerMillion) && price(rates.cachedPerMillion) &&
+    price(rates.outputPerMillion) && price(rates.cacheWritePerMillion ?? 0) && price(rates.countMicros));
+}
 export type ResponsesTransport = {
   /** `started` is called once the provider has begun the answer, before it is complete. */
   send(path: "/v1/responses/input_tokens" | "/v1/responses", request: object,
@@ -225,8 +236,7 @@ export function protectedSitePlanningProvider(directory: string, rates: Rates, t
   if (comparisonAttempt !== undefined && !outcome) throw Error("Comparison attempt refused");
   if (comparisonId !== undefined && (!compact ||
       expiresAt > 1794677438521 || expiresAt > Date.now() + 86_400_000 ||
-      rates.model !== "gpt-5.4-mini-2026-03-17" || rates.countMicros !== 0 ||
-      rates.inputPerMillion !== 750_000 || rates.cachedPerMillion !== 75_000 || rates.outputPerMillion !== 4_500_000 ||
+      !wellFormedRates(rates) ||
       ![comparison.c0, comparison.c2].some(digest => digest === inputDigest) ||
       retainedReservation !== comparison.retainedReservation)) throw Error("Invalid compact comparison authorization");
   if (outcome) {
@@ -606,7 +616,7 @@ export function meteredPresenceWorkflow(directory: string, rates: Rates, transpo
   if (Boolean(scope.stages) !== Boolean(stageName) || (stageName && researchCalls !== undefined && stageName !== "research")) {
     throw Error("Exact workflow stage required");
   }
-  if (researchCalls !== undefined && (rates.model !== "gpt-5.4-mini-2026-03-17" ||
+  if (researchCalls !== undefined && (!wellFormedModel(rates.model) ||
       !Number.isSafeInteger(researchCalls) || researchCalls < 1 || researchCalls > 10)) throw Error("Research tool budget refused");
   if (researchPass && (stageName !== "research" || researchCalls === undefined || !scope.stages?.research ||
       !Number.isSafeInteger(researchPass.inputTokens) || researchPass.inputTokens < 1 || researchPass.inputTokens > scope.stages.research.requestInputTokens ||
