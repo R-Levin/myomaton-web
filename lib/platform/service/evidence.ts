@@ -59,6 +59,14 @@ function sectionText(text: string, heading: string) {
 }
 const slug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/gu, "-").replace(/^-|-$/gu, "");
 
+/**
+ * The record with the Client's own Evidence set to exactly these items (their materials as they now
+ * list them); gathered Evidence, such as research, stays.
+ */
+export function withClientEvidence(record: ServiceRecord, items: readonly Evidence[]): ServiceRecord {
+  return withEvidence({ ...record, evidence: (record.evidence ?? []).filter(item => item.standing !== "client") }, items);
+}
+
 /** The record with these Evidence items added, each replacing any earlier item with the same id. */
 export function withEvidence(record: ServiceRecord, items: readonly Evidence[]): ServiceRecord {
   const ids = new Set(items.map(item => item.id));

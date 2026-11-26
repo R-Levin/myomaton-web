@@ -8,6 +8,7 @@ import { resolveDesignConfiguration } from "../design-systems/configuration";
 import { validateDirection } from "../presentation/plan";
 import { contrast, validatePalette } from "../presentation/tokens";
 import { densities, designProjection, paletteRoles, radii, siteFonts } from "../design-systems/site-design";
+import { readSiteStylesheet } from "../design-systems/site-stylesheet";
 
 type ReviewedLogo = { assetId: string; usageId: string; sha256: string; alt: string };
 
@@ -16,8 +17,9 @@ type CoreDesignProjection = ReturnType<typeof designProjection>;
 /** The design Core's AI chose for a site (brand projection design version 4), checked
  * with the same rules the WordPress plugin applies before the theme renders it. */
 export function coreDesignProjection(value: unknown): CoreDesignProjection {
-  const design = object(value, ["grammar", "version", "motion", "palette", "typography", "shape", "density"]);
-  if (design.grammar !== "core-designed" || design.version !== 4 || design.motion !== "minimal") throw Error("Core design identity refused");
+  const withSheet = (value as { version?: unknown } | null)?.version === 5;
+  const design = object(value, ["grammar", "version", "motion", "palette", "typography", "shape", "density", ...(withSheet ? ["stylesheet"] : [])]);
+  if (design.grammar !== "core-designed" || (design.version !== 4 && design.version !== 5) || design.motion !== "minimal") throw Error("Core design identity refused");
   const colour = (input: unknown) => {
     if (typeof input !== "string" || !/^#[0-9a-f]{6}$/iu.test(input)) throw Error("Core design colour refused");
     return input;
@@ -47,7 +49,8 @@ export function coreDesignProjection(value: unknown): CoreDesignProjection {
   if (!radii.includes(design.shape as typeof radii[number]) || !densities.includes(design.density as typeof densities[number])) {
     throw Error("Core design shape or density refused");
   }
-  return { grammar: "core-designed", version: 4, motion: "minimal", palette,
+  const sheet = withSheet ? { version: 5 as const, stylesheet: readSiteStylesheet(design.stylesheet) } : { version: 4 as const };
+  return { grammar: "core-designed", ...sheet, motion: "minimal", palette,
     typography: { headingFamily: font(type.headingFamily), bodyFamily: font(type.bodyFamily), baseSize: range(type.baseSize, 15, 20),
       headingScale: range(type.headingScale, 1.6, 3.4), lineHeight: range(type.lineHeight, 1.35, 1.85), headingWeight: type.headingWeight as number },
     shape: design.shape as CoreDesignProjection["shape"], density: design.density as CoreDesignProjection["density"] };

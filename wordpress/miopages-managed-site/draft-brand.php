@@ -11,7 +11,13 @@ function miopages_draft_brand(): ?array {
     $binding = $signed['projection'] ?? (defined('MIOPAGES_NATIVE_DRAFT_IDENTITY')
         ? null : get_post_meta($post->ID, '_miopages_draft_brand', true));
     if (!is_array($binding) || ($binding['version'] ?? null) !== 1) return null;
-    $designed = ($binding['design']['grammar'] ?? null) === 'core-designed' && ($binding['design']['version'] ?? null) === 4;
+    $designed = ($binding['design']['grammar'] ?? null) === 'core-designed' && in_array($binding['design']['version'] ?? null, [4, 5], true);
+    // Version 5: the site's own stylesheet, checked by Core and again by the delivery plugin.
+    $stylesheet = $designed && ($binding['design']['version'] ?? null) === 5 ? ($binding['design']['stylesheet'] ?? null) : null;
+    if ($stylesheet !== null) {
+        if (!class_exists('MioPages_Native_Draft_Brand')) return null;
+        try { MioPages_Native_Draft_Brand::stylesheet($stylesheet); } catch (InvalidArgumentException) { return null; }
+    }
     if (!$designed && (($binding['design']['grammar'] ?? null) !== 'service-led' ||
         !in_array($binding['design']['version'] ?? null, [1, 2, 3], true))) return null;
     $palette = $binding['design']['palette'] ?? [];
@@ -65,7 +71,7 @@ function miopages_draft_brand(): ?array {
     if ($size === false || $size['mime'] !== 'image/png') return null;
     return $cache[$post->ID] = ['palette' => $palette, 'typography' => $typography, 'designed' => $designed,
         'shape' => $designed ? $binding['design']['shape'] : null, 'density' => $designed ? $binding['design']['density'] : null,
-        'motion' => ($binding['design']['motion'] ?? null) === 'off' ? 'off' : 'minimal',
+        'motion' => ($binding['design']['motion'] ?? null) === 'off' ? 'off' : 'minimal', 'stylesheet' => $stylesheet,
         'body' => $body, 'heading' => $heading, 'alt' => $alt, 'bytes' => $bytes, 'size' => $size];
 }
 

@@ -38,6 +38,7 @@ export function simulatedAnswer(name: string, schema: Schema, instructions: stri
           brand: pair("#9fd3bf", "#ffffff"), supporting: pair("#dbe8e1", "#123528"), contrast: pair("#14201b", "#f5efe4"), border: "#d8cdbd", muted: "#5a5247" },
         typography: { headingFamily: "fraunces", bodyFamily: "work-sans", baseSize: 17, headingScale: 3, lineHeight: 1.6, headingWeight: 600 },
         shape: "soft", density: "airy", imagery: { style: "illustration", direction: "Simulated art direction." },
+        stylesheet: ".miopages-draft-hero h1 { font-size: clamp(2.4rem, 6vw, 4.8rem); } nav.miopages-draft-nav a[aria-current=\"page\"] { text-decoration: underline; }",
         rationale: "Simulated rationale.", sourceIds: ids.filter(id => id.startsWith("research:")).slice(0, 1) } };
   }
   if (stage === "blueprint") {

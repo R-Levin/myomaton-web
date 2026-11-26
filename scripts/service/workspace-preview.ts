@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
-import { evidenceFrom, withEvidence, type EvidenceSpec } from "../../lib/platform/service/evidence";
+import { evidenceFrom, withClientEvidence, type EvidenceSpec } from "../../lib/platform/service/evidence";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { Pool } from "pg";
@@ -53,7 +53,7 @@ async function main() {
   const spec = JSON.parse(await readFile("scripts/customer-initializers/miopages-c0-evidence.json", "utf8")) as EvidenceSpec;
   const evidence = evidenceFrom(spec, file => readFileSync(file, "utf8"));
   const withC0Evidence = await store.read(account);
-  await store.save(withC0Evidence, withEvidence(withC0Evidence, evidence));
+  await store.save(withC0Evidence, withClientEvidence(withC0Evidence, evidence));
   console.log(`C0's Evidence: ${evidence.length} sections from ${spec.documents.length} documents.`);
   // The run's Knowledge, as corrected during the run, replaces the freshly imported onboarding.
   if (runDirectory && existsSync(join(runDirectory, "knowledge.json"))) {

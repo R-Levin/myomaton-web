@@ -45,6 +45,8 @@ add_action('wp_enqueue_scripts', static function (): void {
     $css = '';
     foreach ($vars as $name => $value) $css .= $name . ':' . $value . ';';
     wp_add_inline_style('miopages-managed-site', 'body.miopages-branded-draft{' . $css . '}');
+    // The site's own look, designed by Core (projection v5), after the base styling it replaces.
+    if (is_string($brand['stylesheet'] ?? null)) wp_add_inline_style('miopages-managed-site', $brand['stylesheet']);
 });
 add_filter('body_class', static function (array $classes): array {
     $brand = miopages_draft_brand();

@@ -1453,3 +1453,9 @@ Principal approves.
   removed from what Core reads, since no new Client has one; Core gets real authority over each
   site's layout and look; Core redesigns C0 with the current page content kept; Claude reviews the
   rendered site as a Client would see it before showing the Principal.
+
+- **Nov 26 — "I never said jettison what was good … Continue for now. Use whatever credit is
+  available on OpenAI."** Keep what is good; Core decides what of the current design to keep. The
+  approved R3 copy (C0's facts and voice) stays as Evidence; only the old site's screenshots and
+  design notes are out. Spending: the Principal released any available OpenAI credit to get past
+  this; Claude keeps working within the run's cap unless more is truly needed.

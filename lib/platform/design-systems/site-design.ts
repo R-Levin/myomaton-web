@@ -8,23 +8,10 @@
  * records the adjustment, rather than discarding the AI's design.
  */
 import { contrast, luminance } from "../presentation/tokens";
+import { readSiteStylesheet, stylesheetContract } from "./site-stylesheet";
 
-/** Self-hosted in the WordPress theme (wordpress/miopages-managed-site/fonts), SIL OFL 1.1. */
-export const siteFonts = {
-  "inter": { label: "Inter", category: "sans" },
-  "manrope": { label: "Manrope", category: "sans" },
-  "dm-sans": { label: "DM Sans", category: "sans" },
-  "work-sans": { label: "Work Sans", category: "sans" },
-  "space-grotesk": { label: "Space Grotesk", category: "sans" },
-  "plus-jakarta-sans": { label: "Plus Jakarta Sans", category: "sans" },
-  "source-sans-3": { label: "Source Sans 3", category: "sans" },
-  "fraunces": { label: "Fraunces", category: "serif" },
-  "source-serif-4": { label: "Source Serif 4", category: "serif" },
-  "lora": { label: "Lora", category: "serif" },
-  "playfair-display": { label: "Playfair Display", category: "serif" },
-  "newsreader": { label: "Newsreader", category: "serif" },
-  "jetbrains-mono": { label: "JetBrains Mono", category: "mono" },
-} as const;
+export { siteFonts } from "./site-fonts";
+import { siteFonts } from "./site-fonts";
 export type SiteFont = keyof typeof siteFonts;
 const fontIds = Object.keys(siteFonts) as SiteFont[];
 
@@ -60,6 +47,7 @@ export const siteDesignSchema = shape({
   density: { type: "string", enum: densities, description: "Overall spacing between and within sections." },
   imagery: shape({ style: { type: "string", enum: imageryStyles }, direction: { type: "string",
     description: "Art direction every image brief should follow." } }),
+  stylesheet: { type: "string", description: stylesheetContract },
   rationale: { type: "string", description: "Why this design fits the business and how the research shaped it." },
   sourceIds: { type: "array", items: { type: "string" } },
 });
@@ -70,6 +58,8 @@ export type SiteDesign = {
   shape: typeof radii[number];
   density: typeof densities[number];
   imagery: { style: typeof imageryStyles[number]; direction: string };
+  /** The site's own stylesheet: its actual look (checked and rebuilt by readSiteStylesheet). Absent in designs from before Nov 26. */
+  stylesheet?: string;
   rationale: string;
   sourceIds: string[];
   /** Accessibility repairs Core made to the AI's colours, for transparency. */
@@ -117,7 +107,9 @@ function repair(colourValue: string, backgrounds: string[]): string | null {
 }
 
 export function readSiteDesign(value: unknown, sourceIds: readonly string[]): SiteDesign {
-  const row = record(value, ["palette", "typography", "shape", "density", "imagery", "rationale", "sourceIds"], "Site design");
+  // The AI is always asked for a stylesheet; designs read back from before Nov 26 have none.
+  const sheet = Boolean(value) && typeof value === "object" && "stylesheet" in (value as object);
+  const row = record(value, ["palette", "typography", "shape", "density", "imagery", ...(sheet ? ["stylesheet"] : []), "rationale", "sourceIds"], "Site design");
   const adjustments: string[] = [];
   const paletteRow = record(row.palette, [...paletteRoles, "border", "muted"], "Palette");
   const chosenText: Record<string, string> = {};
@@ -167,6 +159,7 @@ export function readSiteDesign(value: unknown, sourceIds: readonly string[]): Si
     shape: choice(row.shape, radii, "Shape"),
     density: choice(row.density, densities, "Density"),
     imagery: { style: choice(imageryRow.style, imageryStyles, "Imagery style"), direction: prose(imageryRow.direction, "Imagery direction") },
+    ...(sheet && { stylesheet: readSiteStylesheet(row.stylesheet) }),
     // Room for the reasons behind every choice and the research that shaped it (Part 1 #10); bounded only as a safeguard.
     rationale: prose(row.rationale, "Design rationale", 16_000),
     sourceIds: [...new Set(row.sourceIds as string[])],
@@ -174,8 +167,10 @@ export function readSiteDesign(value: unknown, sourceIds: readonly string[]): Si
   };
 }
 
-/** Data-only projection the WordPress theme renders (brand projection design version 4). */
+/** Data-only projection the WordPress theme renders (brand projection design version 4, or 5 with the stylesheet). */
 export function designProjection(design: SiteDesign) {
-  return { grammar: "core-designed" as const, version: 4 as const, motion: "minimal" as const,
+  const base = { grammar: "core-designed" as const, motion: "minimal" as const,
     palette: design.palette, typography: design.typography, shape: design.shape, density: design.density };
+  // Version 5 carries the site's own stylesheet; earlier designs stay version 4.
+  return design.stylesheet ? { ...base, version: 5 as const, stylesheet: design.stylesheet } : { ...base, version: 4 as const };
 }

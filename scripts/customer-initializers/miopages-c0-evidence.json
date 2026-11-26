@@ -87,23 +87,6 @@
           "forWebsite": false
         }
       ]
-    },
-    {
-      "file": "docs/miopages-business-focus.md",
-      "id": "accepted-site",
-      "label": "The earlier accepted MioPages site (A Business in Focus): a reference and precedent for taste, not a template",
-      "date": "2026-11-07",
-      "standing": "client",
-      "sections": [
-        {
-          "heading": "Authority and scope",
-          "forWebsite": false
-        },
-        {
-          "heading": "Capabilities and page behavior",
-          "forWebsite": false
-        }
-      ]
     }
   ],
   "assets": [
@@ -120,30 +103,6 @@
         {
           "file": "brand/miopages/MioM-sq500.png",
           "caption": "The square M mark"
-        }
-      ]
-    },
-    {
-      "id": "reference:accepted-site-screens",
-      "label": "The earlier accepted MioPages site, as rendered: a reference and precedent for taste, not a template",
-      "date": "2026-10-08",
-      "content": "Screenshots of the earlier accepted MioPages site (A Business in Focus). Its illustrations and the Review outline are FPO preview fixtures. Kept outside Git, in runtime-content/references.",
-      "images": [
-        {
-          "file": "runtime-content/references/accepted-site/miopages-desktop-home.png",
-          "caption": "Home, desktop"
-        },
-        {
-          "file": "runtime-content/references/accepted-site/miopages-mobile-home.png",
-          "caption": "Home, mobile"
-        },
-        {
-          "file": "runtime-content/references/accepted-site/miopages-desktop-service.png",
-          "caption": "Service, desktop"
-        },
-        {
-          "file": "runtime-content/references/accepted-site/miopages-desktop-review.png",
-          "caption": "Review, desktop"
         }
       ]
     },

@@ -49,11 +49,11 @@ final class MioPages_Native_Draft_Brand
     public const FONTS = ['inter','manrope','dm-sans','work-sans','space-grotesk','plus-jakarta-sans','source-sans-3',
         'fraunces','source-serif-4','lora','playfair-display','newsreader','jetbrains-mono'];
 
-    /** Historical service-led designs (v1-3) or a design Core's AI chose for the site (v4). */
+    /** Historical service-led designs (v1-3) or a design Core's AI chose for the site (v4; v5 adds its own stylesheet). */
     private static function designIdentity(array $design): bool
     {
-        if (($design['grammar'] ?? null) === 'core-designed') return count($design) === 7 && ($design['version'] ?? null) === 4
-            && ($design['motion'] ?? null) === 'minimal';
+        if (($design['grammar'] ?? null) === 'core-designed') return ($design['motion'] ?? null) === 'minimal' &&
+            ((count($design) === 7 && ($design['version'] ?? null) === 4) || (count($design) === 8 && ($design['version'] ?? null) === 5));
         return count($design) === 5 && ($design['grammar'] ?? null) === 'service-led' && in_array($design['version'] ?? null, [1, 2, 3], true);
     }
 
@@ -105,11 +105,25 @@ final class MioPages_Native_Draft_Brand
         }
         self::color($palette['border'] ?? null);
         self::color($palette['muted'] ?? null);
+        if (($design['version'] ?? null) === 5) self::stylesheet($design['stylesheet'] ?? null);
         foreach (['baseSize' => [15, 20], 'headingScale' => [1.6, 3.4], 'lineHeight' => [1.35, 1.85]] as $key => [$min, $max]) {
             $number = $type[$key] ?? null;
             if ((!is_int($number) && !is_float($number)) || !is_finite($number) || $number < $min || $number > $max) {
                 throw new InvalidArgumentException('Native draft brand type scale refused.');
             }
+        }
+    }
+
+    /**
+     * Core checked and rebuilt the stylesheet (lib/platform/design-systems/site-stylesheet.ts) and the
+     * projection is signed. Checked again here: scoped to the site, nothing that loads or runs.
+     */
+    public static function stylesheet(mixed $value): void
+    {
+        if (!is_string($value) || $value === '' || strlen($value) > 60000 ||
+            preg_match('/<|\x5c|url\s*\(|@import|@font-face|expression\s*\(|javascript:|behavior\s*:|-moz-binding|position\s*:\s*fixed/i', $value) ||
+            (!str_starts_with($value, 'body.miopages-designed:not(#mp-core-design)') && !str_starts_with($value, '@'))) {
+            throw new InvalidArgumentException('Native draft brand stylesheet refused.');
         }
     }
 

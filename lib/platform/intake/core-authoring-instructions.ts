@@ -107,7 +107,11 @@ const stages: Record<AuthoringStage, string> = {
     "accessible contrast and tell you). Base it on the business, its customers and what the research shows " +
     "about credible, current sites in this field, using the customer's brand assets as inputs. Explain the " +
     "reasoning in rationale and cite the research that shaped it. Aim for something distinctive and right for " +
-    "this business, not a generic template.",
+    "this business, not a generic template. Finally write stylesheet: the site's complete look as a visitor sees " +
+    "it, on desktop and phone (header and menu, section compositions and rhythm, headings, cards, lists, " +
+    "buttons, image and FPO treatment), applying what the peer sites and current best practice show works. " +
+    "The renderer's base styling is only a plain fallback; your stylesheet is the design. Keep whatever in a " +
+    "previous version serves the business and change what does not.",
   blueprint:
     "Task: plan the complete site. Let the business and its visitors decide which Pages exist; there is no fixed " +
     "number. Put Home first. Give every Page a distinct job and a decision brief tracing it to report findings, " +
