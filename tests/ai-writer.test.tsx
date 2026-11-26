@@ -49,3 +49,36 @@ test("the real writer runs Launch through the metered AI connection, citing only
     assert.equal(site!.pages[0].path, "/");
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test("a refused answer is kept and Core gets one more attempt, told why it was refused", async () => {
+  const root = await mkdtemp(join(tmpdir(), "miopages-ai-writer-retry-"));
+  try {
+    await initializeResponsesUsageLedger(root, rates);
+    const budget = { id: fingerprint("ai-writer-retry-test"), startingLedger: createHash("sha256").update(await readFile(join(root, "onboarding-usage.json"))).digest("hex"),
+      baselineAttempts: 0, requests: 40, generations: 20, inputTokens: 100_000, inputBytes: 5_000_000, capMicros: 5_000_000 };
+    const offline = offlineAi(rates.model);
+    let generations = 0;
+    // The first answer comes back empty, which the check refuses; the second is the usual answer.
+    const transport = { async send(path: string, body: unknown, ...rest: unknown[]) {
+      const reply = await (offline.transport.send as (...args: unknown[]) => Promise<{ body: unknown; rawBody?: Buffer }>)(path, body, ...rest);
+      if (path.endsWith("/input_tokens") || generations++ > 0) return reply;
+      const response = structuredClone(reply.body) as { output: { content: { text: string }[] }[] };
+      response.output[0].content[0].text = "{}";
+      return { body: response, rawBody: Buffer.from(JSON.stringify(response)) };
+    } } as typeof offline.transport;
+    const kept: { digest?: string; answer: unknown }[] = [];
+    const writer = createAiWriter({ account, ledgerDirectory: root, rates, transport, budget, outputLimit: 20_000,
+      retain: async entry => { kept.push(entry); },
+      refusals: async digest => kept.filter(entry => entry.digest === digest && (entry.answer as { refused?: string }).refused).length });
+    const specialist = { id: "specialist", role: "operator" as const };
+    let record: ServiceRecord = startLaunch(openRecord(account), "2026-11-25T12:00:00.000Z", specialist);
+    const [task] = tasks(record).filter(item => item.who === "core");
+    record = await work(record, task!, writer, knowledge, "2026-11-25T12:10:00.000Z");
+    assert.equal(kept.length, 2, "The refused answer and the accepted one are both kept");
+    assert.ok((kept[0].answer as { refused?: string }).refused, "The first answer is kept as refused, with its reason");
+    assert.equal(offline.sent.length, 2, "One retry, no more");
+    assert.doesNotMatch(offline.sent[0].instructions, /was refused/);
+    assert.match(offline.sent[1].instructions, /Your previous answer to this was refused by Core's check: .+/);
+    assert.ok(tasks(record).some(item => item.who !== "core"), "The Report now waits for review");
+  } finally { await rm(root, { recursive: true, force: true }); }
+});

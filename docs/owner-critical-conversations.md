@@ -1403,3 +1403,18 @@ Principal approves.
   precedent, not a template (Part 1 #9, #11, #13). The Specialist's review corrected Direction v1
   (imagery too diagram-only for Part 1 #12; the accepted site not yet used as precedent); Core's
   v2 met both, and the Specialist approved it.
+
+- **Nov 26 — go-ahead for the Site plan and pages, without reviewing Direction v2 first.** Asked
+  whether to review the Direction before answering, the Principal accepted the Specialist's
+  approval and said to go ahead. Core wrote the Site plan (10 pages, approved by the Specialist)
+  and all 10 pages.
+
+- **Nov 26 — run safety settings adjusted, $15 cap unchanged.** The run's own safeguards (set by
+  Claude, not the Principal) reserved about $10.48 per AI call against the cap, so Core stopped
+  at $3.46 of $15. The Principal approved ("Yes, adjust them"): each call now reserves at most
+  about $1 (still above the largest real call) and the run allows up to 90 AI answers instead of
+  45. The $15 cap is the Principal's and did not change.
+
+- **Nov 26 — the Principal asked for typical AI cost per Client** (onboarding to a site ready for
+  approval, building the site, and monthly account activity), understanding this run is
+  development, not production. A question, not a decision; answered from this run's ledger.

@@ -45,7 +45,8 @@ const composedPage = shape({
     visual: shape({ purpose: string, brief: string, altIntent: string, status: options(visualStates) }),
   })),
   actions: array(shape({ label: string, kind: options(actionKinds), destination: nullableString,
-    sectionIndex: { type: ["integer", "null"] } })),
+    sectionIndex: { type: ["integer", "null"], description: "Zero-based index of the section that shows this action as a button. " +
+      "Buttons show only in the opening section (role hero) or a section with role cta, so the index must point to one of those." } })),
 });
 
 export const composedArtifactSchemas = { ...artifactSchemas, page: composedPage };

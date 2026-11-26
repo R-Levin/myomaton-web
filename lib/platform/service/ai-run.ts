@@ -65,7 +65,8 @@ async function connection(run: AiRun, key: string) {
   catch {
     await initializeResponsesUsageLedger(run.directory, run.rates);
     budget = { id: fingerprint(run.name), startingLedger: createHash("sha256").update(await readFile(join(run.directory, "onboarding-usage.json"))).digest("hex"),
-      baselineAttempts: 0, requests: 100, generations: 45, inputTokens: 4_000_000, inputBytes: 20_000_000, capMicros: run.capMicros - before };
+      // inputTokens is each call's input ceiling, and every call reserves its worst case against the cap; 250k is well above any real call.
+      baselineAttempts: 0, requests: 200, generations: 90, inputTokens: 250_000, inputBytes: 20_000_000, capMicros: run.capMicros - before };
     await writeFile(scopeFile, JSON.stringify(budget, null, 2));
   }
   if (budget.capMicros !== run.capMicros - before || budget.capMicros <= 0) throw Error("This run's cap differs from the one it started with, or is used up");

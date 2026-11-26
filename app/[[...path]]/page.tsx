@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 
 import { ManagedSitePageView } from "@/components/managed-sites/managed-site-page";
@@ -21,6 +21,8 @@ const getPage = cache(async (webPresenceId: string, managedSiteId: string, hostn
 
 async function requestPage(path: string | null) {
   await connection();
+  // The local workspace preview serves no Client site of its own: its front door is the workspace.
+  if (process.env.NODE_ENV !== "production" && process.env.MIOPAGES_WORKSPACE === "local-preview" && !process.env.WEB_PRESENCE_ID) redirect("/workspace");
   const tenant = await deploymentContext().catch(error => { if (error instanceof UnavailableHostname) notFound(); throw error; });
   return { tenant, result: await getPage(tenant.webPresenceId, tenant.managedSiteId, tenant.hostname, path) };
 }

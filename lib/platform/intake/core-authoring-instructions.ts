@@ -25,7 +25,9 @@ const honesty =
   "(reference need-testimonial, need-price, need-result, need-case-study, need-credential, need-guarantee, " +
   "need-contact, need-team or need-detail), with text saying precisely what is needed and why, e.g. \"A recent " +
   "client describing how onboarding went\". The site shows it as a clearly marked notice and Core asks the " +
-  "customer for it. Never leave the spot out just because the material is missing.";
+  "customer for it. Never leave the spot out just because the material is missing. The marked placeholder speaks " +
+  "for itself: headings and copy around it address the visitor about the offer, and never discuss what is missing, " +
+  "unconfirmed or still being prepared.";
 
 /** Images and FPO (Part 1 #12). Rights review on real images stays (licence/legal). */
 const imagery =

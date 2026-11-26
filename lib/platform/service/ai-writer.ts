@@ -81,15 +81,22 @@ export function createAiWriter(config: AiWriterConfig): Writer {
       const request = { model: config.rates.model, instructions,
         input: images.length ? [{ role: "user" as const, content: [{ type: "input_text" as const, text: JSON.stringify(payload) }, ...images] }] : JSON.stringify(payload),
         text: { format: { type: "json_schema", name: "core_" + stage[input.kind], strict: true, schema: bindCitations(schema, ids) } } };
-      const digest = fingerprint({ kind: input.kind, payload }), retry = await config.refusals?.(digest) ?? 0;
-      const output = await dispatch({ ownerDigest, workDigest: retry ? fingerprint({ digest, retry }) : digest }, request);
-      let answer: unknown;
-      // A refused answer was still paid for: keep it with the reason, so it can be looked at rather than lost.
-      try { answer = checked(input, output, sources, ids, paths); }
-      catch (error) {
-        await config.retain?.({ at: new Date().toISOString(), kind: input.kind, ...(input.page && { path: input.page.path }), requests: input.requests,
-          digest, answer: { refused: error instanceof Error ? error.message : "refused", output } });
-        throw error;
+      const digest = fingerprint({ kind: input.kind, payload });
+      let answer: unknown, refusal = "";
+      // A refused answer gets one more attempt, told why it was refused (as a reviewer would say).
+      for (let attempt = 0; ; attempt++) {
+        const retry = await config.refusals?.(digest) ?? 0;
+        const asked = refusal ? { ...request, instructions: request.instructions + "\n\nYour previous answer to this was refused by Core's check: " +
+          refusal + ". Return the complete answer again with that corrected." } : request;
+        const output = await dispatch({ ownerDigest, workDigest: retry ? fingerprint({ digest, retry }) : digest }, asked);
+        // A refused answer was still paid for: keep it with the reason, so it can be looked at rather than lost.
+        try { answer = checked(input, output, sources, ids, paths); break; }
+        catch (error) {
+          refusal = error instanceof Error ? error.message : "refused";
+          await config.retain?.({ at: new Date().toISOString(), kind: input.kind, ...(input.page && { path: input.page.path }), requests: input.requests,
+            digest, answer: { refused: refusal, output } });
+          if (attempt >= 1 || !config.refusals) throw error;
+        }
       }
       await config.retain?.({ at: new Date().toISOString(), kind: input.kind, ...(input.page && { path: input.page.path }), requests: input.requests, answer });
       return answer;
@@ -117,7 +124,11 @@ function sitePlanSchema(input: WriteInput) {
   const report = input.report as { findings?: { id: string }[] } | undefined, direction = input.direction as { visitorDecisions?: string[] } | undefined;
   if (!report?.findings?.length || !direction?.visitorDecisions?.length) throw Error("The Site plan needs the confirmed Report and Direction");
   const schema = structuredClone(strategyBlueprintSchema) as unknown as { properties: { pages: { items: { properties: {
-    decisionBrief: { properties: Record<string, unknown> } } } } } };
+    decisionBrief: { properties: Record<string, unknown> } } } }; navigation: Record<string, unknown>;
+    articles: { items: { properties: { target: Record<string, unknown> } } } } };
+  // Say what each reference must be: the checker accepts only a path the plan itself declares.
+  schema.properties.navigation.description = "The menu, in order: each the path of a page in pages.";
+  schema.properties.articles.items.properties.target.description = "The path of the one page in pages that answers this question: a single path, never several.";
   const fields = schema.properties.pages.items.properties.decisionBrief.properties;
   schema.properties.pages.items.properties.decisionBrief.properties = { ...fields,
     findingIds: { type: "array", description: "Use IDs from report.findings.", items: { type: "string", enum: report.findings.map(item => item.id) } },
