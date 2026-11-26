@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { Pool } from "pg";
 import { readOperatorSiteConfig } from "../wordpress-delivery/operator-review";
 import type { Person } from "../change/model";
-import { aiRunSpent, aiRunWriter, type AiRun } from "./ai-run";
+import { aiRunSpent, aiRunWriter, type AiRun, approvedRateCard } from "./ai-run";
 import { beaconWriter } from "./beacon-writer";
 import type { Writer } from "./cycle";
 import { ServiceStore } from "./store";
@@ -42,8 +42,7 @@ function aiRun(): AiRun | null {
   const { MIOPAGES_PREVIEW_AI_RUN: name, MIOPAGES_PREVIEW_AI_DIR: directory, MIOPAGES_PREVIEW_AI_CAP: cap } = process.env;
   if (!name || !directory || !cap) return null;
   // The rate card the Principal approved for C0 on Nov 19.
-  return { name, directory, capMicros: Number(cap), rates: { model: "gpt-5.4-2026-03-05", verifiedOn: "2026-11-19", inputPerMillion: 2_500_000,
-    cachedPerMillion: 250_000, outputPerMillion: 15_000_000, cacheWritePerMillion: 0, countMicros: 0 } };
+  return { name, directory, capMicros: Number(cap), rates: approvedRateCard };
 }
 
 /** Who is acting, as chosen on the local preview's sign-in. Every action checks it again. */

@@ -167,7 +167,8 @@ export function readSiteDesign(value: unknown, sourceIds: readonly string[]): Si
     shape: choice(row.shape, radii, "Shape"),
     density: choice(row.density, densities, "Density"),
     imagery: { style: choice(imageryRow.style, imageryStyles, "Imagery style"), direction: prose(imageryRow.direction, "Imagery direction") },
-    rationale: prose(row.rationale, "Design rationale", 4_000),
+    // Room for the reasons behind every choice and the research that shaped it (Part 1 #10); bounded only as a safeguard.
+    rationale: prose(row.rationale, "Design rationale", 16_000),
     sourceIds: [...new Set(row.sourceIds as string[])],
     adjustments,
   };

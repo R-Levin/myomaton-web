@@ -1393,3 +1393,13 @@ Principal approves.
   Understanding Report, version 4 ("Approve version 4"). Recorded in the local preview's Client
   Portal, so v4 is C0's current Report and the Direction is next. Peer research and brand assets
   are still to be connected before it.
+
+- **Nov 26 — go-ahead for peer research, brand assets and the Direction.** Asked whether to
+  connect peer-website research and the brand assets, then have Core write the Direction, the
+  Principal said "Yes". Done in the approved run: Core searched for comparable businesses from the
+  approved Report, captured 7 peer sites (desktop and mobile) and analysed each; they are gathered
+  Evidence, never site copy. The MioPages logo, the earlier accepted site (A Business in Focus,
+  with screenshots) and its R3 copy were added as C0's own Evidence, labelled as reference and
+  precedent, not a template (Part 1 #9, #11, #13). The Specialist's review corrected Direction v1
+  (imagery too diagram-only for Part 1 #12; the accepted site not yet used as precedent); Core's
+  v2 met both, and the Specialist approved it.

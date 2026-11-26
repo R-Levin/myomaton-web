@@ -2,36 +2,158 @@
   "about": "C0's Evidence: the sections of MioPages' own approved documents and the Principal's standing direction that Core reads with C0's Knowledge. Development notes in the same documents are left out. Dates let later direction override earlier.",
   "documents": [
     {
-      "file": "MIOPAGES-BASELINE.md", "id": "principal-direction", "label": "The Principal's standing direction on the MioPages service",
-      "date": "2026-11-24", "standing": "client",
-      "sections": [{ "heading": "The product", "forWebsite": false }]
-    },
-    {
-      "file": "docs/miopages-c0-product-model.md", "id": "product-model", "label": "C0 product model", "date": null, "standing": "client",
+      "file": "MIOPAGES-BASELINE.md",
+      "id": "principal-direction",
+      "label": "The Principal's standing direction on the MioPages service",
+      "date": "2026-11-24",
+      "standing": "client",
       "sections": [
-        { "heading": "Founder-led transition to the managed service", "date": "2026-11-09", "forWebsite": false },
-        { "heading": "Initial customer hypothesis", "date": "2026-11-09" },
-        { "heading": "Positioning and intended outcome", "date": "2026-11-06" },
-        { "heading": "Design serves the business" },
-        { "heading": "Continuing value after launch" },
-        { "heading": "Launch and Ongoing customer deliverable summary" },
-        { "heading": "Brief historical lineage", "forWebsite": false }
+        {
+          "heading": "The product",
+          "forWebsite": false
+        }
       ]
     },
     {
-      "file": "docs/miopages-c0-business-brief.md", "id": "business-brief", "label": "C0 business brief (approved provisional discovery)",
-      "date": "2026-10-06", "standing": "client",
+      "file": "docs/miopages-c0-product-model.md",
+      "id": "product-model",
+      "label": "C0 product model",
+      "date": null,
+      "standing": "client",
       "sections": [
-        { "heading": "Business, customer and geography" },
-        { "heading": "Launch and Ongoing offer" },
-        { "heading": "Web Presence Review" },
-        { "heading": "Self-service and smallest useful intake" },
-        { "heading": "Commercial hypothesis and first cohort" },
-        { "heading": "Proof and trust", "forWebsite": false },
-        { "heading": "Real service identity and infrastructure" },
-        { "heading": "Integrations and measurement boundaries" },
-        { "heading": "Proof status and non-blocking unresolved items", "forWebsite": false }
+        {
+          "heading": "Founder-led transition to the managed service",
+          "date": "2026-11-09",
+          "forWebsite": false
+        },
+        {
+          "heading": "Initial customer hypothesis",
+          "date": "2026-11-09"
+        },
+        {
+          "heading": "Positioning and intended outcome",
+          "date": "2026-11-06"
+        },
+        {
+          "heading": "Design serves the business"
+        },
+        {
+          "heading": "Continuing value after launch"
+        },
+        {
+          "heading": "Launch and Ongoing customer deliverable summary"
+        },
+        {
+          "heading": "Brief historical lineage",
+          "forWebsite": false
+        }
       ]
+    },
+    {
+      "file": "docs/miopages-c0-business-brief.md",
+      "id": "business-brief",
+      "label": "C0 business brief (approved provisional discovery)",
+      "date": "2026-10-06",
+      "standing": "client",
+      "sections": [
+        {
+          "heading": "Business, customer and geography"
+        },
+        {
+          "heading": "Launch and Ongoing offer"
+        },
+        {
+          "heading": "Web Presence Review"
+        },
+        {
+          "heading": "Self-service and smallest useful intake"
+        },
+        {
+          "heading": "Commercial hypothesis and first cohort"
+        },
+        {
+          "heading": "Proof and trust",
+          "forWebsite": false
+        },
+        {
+          "heading": "Real service identity and infrastructure"
+        },
+        {
+          "heading": "Integrations and measurement boundaries"
+        },
+        {
+          "heading": "Proof status and non-blocking unresolved items",
+          "forWebsite": false
+        }
+      ]
+    },
+    {
+      "file": "docs/miopages-business-focus.md",
+      "id": "accepted-site",
+      "label": "The earlier accepted MioPages site (A Business in Focus): a reference and precedent for taste, not a template",
+      "date": "2026-11-07",
+      "standing": "client",
+      "sections": [
+        {
+          "heading": "Authority and scope",
+          "forWebsite": false
+        },
+        {
+          "heading": "Capabilities and page behavior",
+          "forWebsite": false
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "brand:logo",
+      "label": "MioPages' own logo",
+      "date": "2026-11-10",
+      "content": "MioPages' brand assets as the Principal supplied them (brand/miopages): the horizontal wordmark and the square M mark. They are the business's own logo, used as supplied.",
+      "images": [
+        {
+          "file": "brand/miopages/MioPagesDV.png",
+          "caption": "The horizontal MioPages wordmark"
+        },
+        {
+          "file": "brand/miopages/MioM-sq500.png",
+          "caption": "The square M mark"
+        }
+      ]
+    },
+    {
+      "id": "reference:accepted-site-screens",
+      "label": "The earlier accepted MioPages site, as rendered: a reference and precedent for taste, not a template",
+      "date": "2026-10-08",
+      "content": "Screenshots of the earlier accepted MioPages site (A Business in Focus). Its illustrations and the Review outline are FPO preview fixtures. Kept outside Git, in runtime-content/references.",
+      "images": [
+        {
+          "file": "runtime-content/references/accepted-site/miopages-desktop-home.png",
+          "caption": "Home, desktop"
+        },
+        {
+          "file": "runtime-content/references/accepted-site/miopages-mobile-home.png",
+          "caption": "Home, mobile"
+        },
+        {
+          "file": "runtime-content/references/accepted-site/miopages-desktop-service.png",
+          "caption": "Service, desktop"
+        },
+        {
+          "file": "runtime-content/references/accepted-site/miopages-desktop-review.png",
+          "caption": "Review, desktop"
+        }
+      ]
+    },
+    {
+      "id": "reference:r3-copy",
+      "label": "The human-reviewed R3 copy of the earlier accepted site: a reference for voice and approved facts, not a template",
+      "date": "2026-10-12",
+      "content": "The pages of the earlier accepted MioPages site as the Principal reviewed them (MioPages-R3). Later direction overrides it where they differ.",
+      "contentFile": "scripts/customer-previews/miopages-editorial-r3.json",
+      "contentField": "pages",
+      "forWebsite": true
     }
   ]
 }

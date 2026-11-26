@@ -67,16 +67,19 @@ export async function beginLaunch(webPresenceId: string) {
 }
 
 /** Run Core's waiting work with the configured writer (locally, the labelled Beacon). */
-export async function runCore(webPresenceId: string) {
+export async function runCore(webPresenceId: string) { await shown(webPresenceId, async () => {
   const ctx = await context(webPresenceId, "specialist");
   const known = await accountKnowledge(ctx.pool, ctx.account.webPresenceId);
   const knowledge = [...known.items, ...known.offerings];
-  for (const task of tasks(await ctx.store.read(ctx.account)).filter(item => item.who === "core")) {
-    const read = await ctx.store.read(ctx.account);
-    await ctx.store.save(read, await work(read, task, ctx.writer, knowledge, now()));
-  }
-  refresh(webPresenceId);
-}
+  try {
+    for (const task of tasks(await ctx.store.read(ctx.account)).filter(item => item.who === "core")) {
+      const read = await ctx.store.read(ctx.account);
+      await ctx.store.save(read, await work(read, task, ctx.writer, knowledge, now()));
+    }
+  } catch (error) {
+    throw Error("Core's answer was not accepted: " + (error instanceof Error ? error.message : "it failed"));
+  } finally { refresh(webPresenceId); }
+}); }
 
 /** A person's Review of a Proposed change, from the workspace or the portal. */
 export async function review(webPresenceId: string, changeId: string, form: FormData) {

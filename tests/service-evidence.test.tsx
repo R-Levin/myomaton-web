@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { evidenceSources } from "../lib/platform/service/ai-writer";
+import { evidenceImagesFor, evidenceSources } from "../lib/platform/service/ai-writer";
+import { peerEvidence, peersFrom } from "../lib/platform/service/research";
 import { openRecord, startLaunch, tasks, work, type WriteInput, type Writer } from "../lib/platform/service/cycle";
 import { evidenceFrom, withEvidence, type EvidenceSpec } from "../lib/platform/service/evidence";
 
@@ -37,4 +38,26 @@ test("C0's Evidence specification names real sections of C0's own documents", ()
   const items = evidenceFrom(c0, file => readFileSync(file, "utf8"));
   assert.ok(items.length >= 10);
   assert.ok(items.some(item => item.content.includes("Startups remain an important market")));
+});
+
+test("Peer research keeps each named business once, from its own public homepage, and never the Client's own site", () => {
+  const answer = { output: [{ type: "web_search_call" }, { type: "message", content: [{ type: "output_text", text:
+    "Findings...\nPEER | https://www.example-agency.com/pricing | Managed sites for trades\nPEER | https://example-agency.com/ | duplicate\n" +
+    "PEER | http://insecure.example/ | refused\nPEER | https://miopages.com/ | the Client\nPEER | https://other.example). | Website subscription" }] }] };
+  assert.deepEqual(peersFrom(answer, ["miopages.com"]).map(peer => [peer.url, peer.host]),
+    [["https://www.example-agency.com/", "example-agency.com"], ["https://other.example/", "other.example"]]);
+  const item = peerEvidence({ url: "https://other.example/", host: "other.example", why: "Website subscription" }, { business: "b", terminology: ["care plan"],
+    offerAndPricing: "o", trustSignals: "t", visualDesign: { palette: "p", typography: "ty", imagery: "i", layout: "l", impression: "im" },
+    strengths: ["s"], weaknesses: ["w"], implications: ["x"] }, "2026-11-26", [{ file: "a.jpg", caption: "desktop" }]);
+  assert.deepEqual([item.id, item.standing, item.forWebsite, item.images?.length], ["research:other-example", "gathered", false, 1]);
+  assert.match(item.content, /Terminology: care plan/);
+});
+
+test("A brand asset is the Client's own Evidence, and its images go to the AI labelled with that Evidence", async () => {
+  const spec2: EvidenceSpec = { documents: [], assets: [{ id: "brand:logo", label: "Logo", date: null, content: "The logo.", images: [{ file: "logo.png", caption: "Wordmark" }] }] };
+  const [logo] = evidenceFrom(spec2, () => "");
+  assert.deepEqual([logo!.id, logo!.standing, logo!.forWebsite], ["brand:logo", "client", false]);
+  const parts = await evidenceImagesFor([logo!], async () => Buffer.from("png"));
+  assert.deepEqual(parts.map(part => part.type), ["input_text", "input_image"]);
+  assert.match((parts[1] as { image_url: string }).image_url, /^data:image\/png;base64,/u);
 });

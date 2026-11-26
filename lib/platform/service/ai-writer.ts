@@ -20,8 +20,15 @@ export type AiWriterConfig = {
   /** The Account's budget: requests, generations, tokens and money, enforced at every call. */
   budget: WorkflowUsageScope; outputLimit: number;
   /** Keeps each checked answer (outside Git), so the run's work survives the preview it ran in. */
-  retain?: (entry: { at: string; kind: string; path?: string; requests: string[]; answer: unknown }) => Promise<void>;
+  retain?: (entry: { at: string; kind: string; path?: string; requests: string[]; answer: unknown; digest?: string }) => Promise<void>;
+  /** How many answers to this same work were refused before. Each retry is new work for the ledger, which refuses paying twice for the same. */
+  refusals?: (digest: string) => Promise<number>;
+  /** Reads an Evidence image (a brand asset, a peer site's screenshot). Without it Core reads Evidence as text only. */
+  readImage?: (file: string) => Promise<Buffer>;
 };
+
+/** The stages that look at Evidence images: the Direction sets the visual design, from the brand and the peer sites. */
+const seesImages = new Set<WriteInput["kind"]>(["direction"]);
 
 /** The Account's Knowledge as the sources the AI may cite: the Client's confirmed word, or proposed. */
 export function knowledgeSources(knowledge: readonly unknown[]): PresenceEvidence[] {
@@ -56,7 +63,8 @@ export function createAiWriter(config: AiWriterConfig): Writer {
       const schema = input.kind === "report" ? artifactSchemas.report : input.kind === "direction" ? designedDirectionSchema
         : input.kind === "site-plan" ? sitePlanSchema(input) : pageSchema(input.page!.path);
       const payload = { knowledge: known.map(({ id, kind, label, content }) => ({ id, standing: kind === "owner-confirmed" ? "confirmed" : "proposed", label, content })),
-        ...(gathered.length && { evidence: gathered.map(({ id, kind, label, date, content }) => ({ id, standing: kind === "owner-confirmed" ? "client-approved" : "gathered", date, label, content })) }),
+        ...(gathered.length && { evidence: gathered.map(({ id, kind, label, date, content }, index) => ({ id, standing: kind === "owner-confirmed" ? "client-approved" : "gathered", date, label, content,
+          ...(input.evidence![index]!.images?.length && seesImages.has(input.kind) && config.readImage && { images: input.evidence![index]!.images!.map(image => image.caption) }) })) }),
         ...(input.report !== undefined && { report: input.report }), ...(input.direction !== undefined && { direction: input.direction }),
         ...(plan && { sitePlan: plan }), ...(input.page && { page: input.page }),
         ...(input.previous !== undefined && { previous: input.previous }), ...(input.requests.length && { requests: input.requests }) };
@@ -69,14 +77,36 @@ export function createAiWriter(config: AiWriterConfig): Writer {
         "Knowledge or evidence not for the website informs your understanding but must not appear in site copy.",
         input.requests.length ? "Rework the previous version to answer each request, in the requester's own words where they give them; keep what is still right." : "",
         input.page ? `Write only the page ${JSON.stringify(input.page.path)}: ${input.page.purpose}` : ""].filter(Boolean).join("\n\n");
-      const request = { model: config.rates.model, instructions, input: JSON.stringify(payload),
+      const images = seesImages.has(input.kind) && config.readImage ? await evidenceImagesFor(input.evidence ?? [], config.readImage) : [];
+      const request = { model: config.rates.model, instructions,
+        input: images.length ? [{ role: "user" as const, content: [{ type: "input_text" as const, text: JSON.stringify(payload) }, ...images] }] : JSON.stringify(payload),
         text: { format: { type: "json_schema", name: "core_" + stage[input.kind], strict: true, schema: bindCitations(schema, ids) } } };
-      const output = await dispatch({ ownerDigest, workDigest: fingerprint({ kind: input.kind, payload }) }, request);
-      const answer = checked(input, output, sources, ids, paths);
+      const digest = fingerprint({ kind: input.kind, payload }), retry = await config.refusals?.(digest) ?? 0;
+      const output = await dispatch({ ownerDigest, workDigest: retry ? fingerprint({ digest, retry }) : digest }, request);
+      let answer: unknown;
+      // A refused answer was still paid for: keep it with the reason, so it can be looked at rather than lost.
+      try { answer = checked(input, output, sources, ids, paths); }
+      catch (error) {
+        await config.retain?.({ at: new Date().toISOString(), kind: input.kind, ...(input.page && { path: input.page.path }), requests: input.requests,
+          digest, answer: { refused: error instanceof Error ? error.message : "refused", output } });
+        throw error;
+      }
       await config.retain?.({ at: new Date().toISOString(), kind: input.kind, ...(input.page && { path: input.page.path }), requests: input.requests, answer });
       return answer;
     },
   };
+}
+
+/** Each Evidence image, labelled with the Evidence it belongs to, as the AI's image input. */
+export async function evidenceImagesFor(evidence: readonly Evidence[], read: (file: string) => Promise<Buffer>) {
+  const parts: ({ type: "input_text"; text: string } | { type: "input_image"; image_url: string; detail: "high" })[] = [];
+  for (const item of evidence) for (const image of item.images ?? []) {
+    const type = /.png$/iu.test(image.file) ? "image/png" : /.jpe?g$/iu.test(image.file) ? "image/jpeg" : null;
+    if (!type) throw Error("Evidence images are PNG or JPEG: " + image.file);
+    parts.push({ type: "input_text", text: `Image from evidence:${item.id}: ${image.caption}` },
+      { type: "input_image", image_url: `data:${type};base64,${(await read(image.file)).toString("base64")}`, detail: "high" });
+  }
+  return parts;
 }
 
 /**

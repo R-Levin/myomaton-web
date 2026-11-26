@@ -12,15 +12,29 @@ export type Evidence = {
   standing: "client" | "gathered";
   /** False when it informs Core's understanding but must not appear in site copy. */
   forWebsite: boolean;
+  /** Images Core looks at with the text, such as a brand asset or a peer site's screenshots: a file and what it shows. */
+  images?: { file: string; caption: string }[];
 };
 
 /** Where an Account's documents are, and which sections of each are Evidence. Kept as the Client's data, never in code. */
 export type EvidenceSpec = { documents: { file: string; id: string; label: string; date: string | null; standing: Evidence["standing"];
-  sections: { heading: string; date?: string; forWebsite?: boolean }[] }[] };
+  sections: { heading: string; date?: string; forWebsite?: boolean }[] }[];
+  /** The Client's own assets, such as their logo: each an Evidence item Core sees as images. */
+  assets?: { id: string; label: string; date: string | null; content: string; images?: { file: string; caption: string }[];
+    /** The asset's text, from a file (and, for JSON, one field of it), added after `content`. */
+    contentFile?: string; contentField?: string; forWebsite?: boolean }[] };
 
 /** The named sections of each document, word for word. A missing or empty section is refused rather than skipped. */
 export function evidenceFrom(spec: EvidenceSpec, read: (file: string) => string): Evidence[] {
-  return spec.documents.flatMap(document => {
+  const assets = (spec.assets ?? []).map(asset => {
+    const from = asset.contentFile ? read(asset.contentFile) : "";
+    const text = asset.contentFile && asset.contentField ? JSON.stringify((JSON.parse(from) as Record<string, unknown>)[asset.contentField]) : from;
+    if (asset.contentFile && !text) throw Error(`Nothing in ${asset.contentFile}${asset.contentField ? " " + asset.contentField : ""}`);
+    return { id: asset.id, label: asset.label, reference: [asset.contentFile, ...(asset.images ?? []).map(image => image.file)].filter(Boolean).join(", "),
+      date: asset.date, content: [asset.content, text].filter(Boolean).join("\n\n"), standing: "client" as const, forWebsite: asset.forWebsite ?? false,
+      ...(asset.images?.length && { images: asset.images }) };
+  });
+  return [...spec.documents.flatMap(document => {
     const text = read(document.file).replace(/\r\n/g, "\n");
     return document.sections.map(section => {
       const content = sectionText(text, section.heading);
@@ -28,7 +42,7 @@ export function evidenceFrom(spec: EvidenceSpec, read: (file: string) => string)
       return { id: `${document.id}:${slug(section.heading)}`, label: `${document.label}: ${section.heading}`, reference: `${document.file} (${section.heading})`,
         date: section.date ?? document.date, content, standing: document.standing, forWebsite: section.forWebsite ?? true };
     });
-  });
+  }), ...assets];
 }
 
 /** The body under a Markdown heading, up to the next heading of the same or a higher level. */
