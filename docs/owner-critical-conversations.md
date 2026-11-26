@@ -1459,3 +1459,13 @@ Principal approves.
   approved R3 copy (C0's facts and voice) stays as Evidence; only the old site's screenshots and
   design notes are out. Spending: the Principal released any available OpenAI credit to get past
   this; Claude keeps working within the run's cap unless more is truly needed.
+
+- **Nov 26 — pictures "from our free resource".** The Principal approved replacing FPO frames with
+  real pictures from Pixabay, asked Claude to read the credentials file for its key (it held no
+  usable key), then the Principal saved the key in an ignored private file. Core chose a search phrase
+  per frame, searched Pixabay (responses kept 24 hours, local copies as its terms require), looked
+  at the candidates and chose one or none; each picture is used once. The Specialist reviewed all
+  40 choices and rejected 6 (clip-art arrows, a calculator with figures, an empty folder, clashing
+  flat illustrations). 34 pictures are placed; frames needing a labelled diagram stay marked FPO.
+  Under the Principal's earlier release of OpenAI credit, the run's answer count was raised from
+  90 to 160; the $15 cap is unchanged.

@@ -214,3 +214,13 @@ Plain server-rendered pages, one form per action, every action checking who is a
   images in place of the FPO frames (the largest remaining visual gap); "Content needed" badge
   contrast slightly low; uneven right margin on phones; the readability and phone checks should
   become part of the Specialist review rather than ad-hoc scripts.
+
+- *Nov 26, pictures (local preview, about $9.5 of $15):* Assets: Core chooses real pictures for the
+  Sections that ask for one (scripts/service/choose-pictures.ts; Pixabay, the Principal's free
+  source), recorded with source and creator. Review drafts now carry them: each picture goes to
+  WordPress through a signed upload (/miopages/v1/media) bound to the draft's authorization, then
+  appears in its exact Section in place of the FPO frame. The plugin's private-media path now works
+  on Windows (local preview); Linux keeps its owner and permission checks. 34 of 72 frames hold a
+  picture. Open: frames that need labelled diagrams (Core could draw them as SVG, or an image
+  generator could make them); the pictures lean on desk-and-documents scenes; credits page for
+  Pixabay creators before any public release.

@@ -68,8 +68,8 @@ export async function enrolReviewSite(args: string[], env: Record<string, string
 // MioPages review drafts and read-back for ${name} (${origin}). Created ${new Date().toISOString()}.
 // Private: keep outside the web root, mode 0600; require from wp-config.php. Core holds the signing key.
 define('MIOPAGES_NATIVE_DRAFT_IDENTITY', [${Object.entries(identity).map(([key, value]) => php(key) + " => " + php(value)).join(", ")}]);
-define('MIOPAGES_PRIVATE_PULL', ['secretHex' => ${php(config.receiptSecretHex)}, 'identity' => ['installationId' => ${php(config.installationId)}]]);
-`;
+define('MIOPAGES_PRIVATE_PULL', ['secretHex' => ${php(config.receiptSecretHex)}, 'identity' => ['installationId' => ${php(config.installationId)}]${env.MIOPAGES_DOCUMENT_ROOT ? ", 'documentRoot' => " + php(env.MIOPAGES_DOCUMENT_ROOT) : ""}]);
+${env.MIOPAGES_DRAFT_MEDIA_DIRECTORY ? "define('MIOPAGES_NATIVE_DRAFT_MEDIA_DIRECTORY', " + php(env.MIOPAGES_DRAFT_MEDIA_DIRECTORY) + ");\n" : ""}`;
   await writePrivate(join(directory, name + ".json"), JSON.stringify(config, null, 2) + "\n");
   await writePrivate(join(directory, name + "-wordpress-config.php"), wordpress);
   if (gateLine) await writePrivate(join(directory, name + "-gate-htpasswd-line.txt"), gateLine);

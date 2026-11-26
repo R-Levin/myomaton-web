@@ -51,6 +51,17 @@ final class MioPages_Native_Draft_Media
         }
     }
 
+    /** Windows (a local preview) has no Unix owner or permission bits; everywhere else both are enforced. */
+    private static function posix(): bool
+    {
+        return PHP_OS_FAMILY !== 'Windows';
+    }
+
+    private static function same(string|false $a, string $b): bool
+    {
+        return $a !== false && str_replace('\\', '/', $a) === str_replace('\\', '/', $b);
+    }
+
     private static function file(array $item): string
     {
         $directory = defined('MIOPAGES_NATIVE_DRAFT_MEDIA_DIRECTORY') ? MIOPAGES_NATIVE_DRAFT_MEDIA_DIRECTORY : '';
@@ -59,14 +70,17 @@ final class MioPages_Native_Draft_Media
         $wp = realpath(ABSPATH);
         $owner = function_exists('posix_geteuid') ? posix_geteuid() : null;
         $directoryInfo = is_string($directory) && $directory !== '' ? @lstat($directory) : false;
-        if ($owner === null || !is_string($directory) || !$directoryInfo || !is_dir($directory)
-            || realpath($directory) !== $directory || $directoryInfo['uid'] !== $owner || ($directoryInfo['mode'] & 0777) !== 0700
+        if (($owner === null && self::posix()) || !is_string($directory) || !$directoryInfo || !is_dir($directory)
+            || !self::same(realpath($directory), $directory)
+            || (self::posix() && ($directoryInfo['uid'] !== $owner || ($directoryInfo['mode'] & 0777) !== 0700))
             || empty($pull['documentRoot']) || $doc === false || $wp === false
             || !preg_match('/^[a-f0-9]{64}$/D', $item['copyDigest'] ?? '')) {
             throw new RuntimeException('Private draft media location refused.');
         }
+        $slashed = str_replace('\\', '/', $directory);
         foreach ([$doc, $wp] as $root) {
-            if ($root === $directory || str_starts_with($directory, $root . '/') || str_starts_with($root, $directory . '/')) {
+            $root = rtrim(str_replace('\\', '/', $root), '/');
+            if ($root === $slashed || str_starts_with($slashed, $root . '/') || str_starts_with($root, $slashed . '/')) {
                 throw new RuntimeException('Private draft media must be outside web roots.');
             }
         }
@@ -76,11 +90,12 @@ final class MioPages_Native_Draft_Media
     public static function bytes(array $item): string
     {
         $file = self::file($item);
-        $owner = posix_geteuid();
+        $owner = self::posix() ? posix_geteuid() : null;
         clearstatcache(true, $file);
         $before = @lstat($file);
-        if (!$before || !is_file($file) || realpath($file) !== $file || $before['uid'] !== $owner
-            || ($before['mode'] & 0777) !== 0600 || $before['nlink'] !== 1 || $before['size'] < 1 || $before['size'] > self::LIMIT) {
+        if (!$before || !is_file($file) || !self::same(realpath($file), $file)
+            || (self::posix() && ($before['uid'] !== $owner || ($before['mode'] & 0777) !== 0600)) || $before['nlink'] !== 1
+            || $before['size'] < 1 || $before['size'] > self::LIMIT) {
             throw new RuntimeException('Private draft media file refused.');
         }
         $handle = @fopen($file, 'rb');
@@ -90,7 +105,7 @@ final class MioPages_Native_Draft_Media
         try {
             $opened = fstat($handle);
             $bytes = stream_get_contents($handle, self::LIMIT + 1);
-            if (!$opened || $opened['dev'] !== $before['dev'] || $opened['ino'] !== $before['ino']
+            if (!$opened || (self::posix() && ($opened['dev'] !== $before['dev'] || $opened['ino'] !== $before['ino']))
                 || !is_string($bytes) || strlen($bytes) !== $before['size']) {
                 throw new RuntimeException('Private draft media copy changed.');
             }
@@ -102,9 +117,10 @@ final class MioPages_Native_Draft_Media
     }
 
     /** Store only a copy identified by a valid apply envelope. Safe to repeat. */
-    public static function stage(string $wire, array $identity): string
+    public static function stage(string $wire, array $identity, bool $web = false): string
     {
-        if (!defined('WP_CLI') || !WP_CLI || !current_user_can('edit_pages') || !current_user_can('upload_files') || strlen($wire) > 3800000) {
+        // From the command line, or from Core's web endpoint as the delivery account; either way the signed envelope is the authority.
+        if ((!$web && (!defined('WP_CLI') || !WP_CLI)) || !current_user_can('edit_pages') || !current_user_can('upload_files') || strlen($wire) > 3800000) {
             throw new RuntimeException('Native draft media requires scoped CLI composition.');
         }
         $input = json_decode($wire, true, 60, JSON_THROW_ON_ERROR);
@@ -183,6 +199,8 @@ final class MioPages_Native_Draft_Media
             // A later authorized release can export the verified local copy.
             $id = wp_insert_attachment(['post_title' => 'MioPages provisional image', 'post_mime_type' => 'image/webp',
                 'post_status' => 'private'], self::file($item), $postId, true, false);
+            // WordPress unslashes stored meta; a Windows path keeps its backslashes only when slashed first (no effect elsewhere).
+            if (is_int($id) && $id > 0) update_post_meta($id, '_wp_attached_file', wp_slash(self::file($item)));
             if (!is_int($id) || $id < 1 || !update_post_meta($id, '_miopages_private_draft', '1')
                 || !update_post_meta($id, '_wp_attachment_image_alt', wp_slash($item['alt']))
                 || !wp_update_attachment_metadata($id, self::metadata($item))) {
@@ -200,7 +218,7 @@ final class MioPages_Native_Draft_Media
         if (!$post || $post->post_type !== 'attachment' || $post->post_status !== 'private'
             || (int) $post->post_parent !== $attachment['postId'] || $post->post_mime_type !== 'image/webp'
             || get_post_meta($attachment['id'], '_miopages_private_draft', true) !== '1'
-            || get_attached_file($attachment['id'], true) !== self::file($attachment['media'])
+            || !self::same(get_attached_file($attachment['id'], true), self::file($attachment['media']))
             || wp_get_attachment_metadata($attachment['id'], true) !== self::metadata($attachment['media'])
             || get_post_meta($attachment['id'], '_wp_attachment_image_alt', true) !== $attachment['media']['alt']) {
             throw new RuntimeException('Private draft attachment readback failed.');

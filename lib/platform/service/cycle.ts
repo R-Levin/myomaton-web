@@ -2,6 +2,7 @@ import { decide, emptyLedger, markApplied, review as reviewChange, takeIn, type 
   type Grain, type Person, type Request } from "../change/model";
 import type { Delivery } from "./delivery";
 import type { Evidence } from "./evidence";
+import type { Asset } from "./assets";
 import { fingerprint } from "../canonical/model";
 import { directionIdentity, pageIdentity, reportIdentity, sitePlanIdentity, versionPages } from "../work-products/pages";
 
@@ -32,7 +33,9 @@ export type ServiceRecord = { account: { webPresenceId: string; managedSiteId: s
   /** Each review draft sent to the Account's WordPress, latest last (service/delivery.ts). */
   deliveries?: Delivery[];
   /** The Account's Evidence: its documents, direction and research, which Core reads with the Knowledge (service/evidence.ts). */
-  evidence?: Evidence[] };
+  evidence?: Evidence[];
+  /** Pictures chosen for the Sections that asked for one (service/assets.ts). */
+  assets?: Asset[] };
 
 /** A Publish the Client approved: exactly which Page Versions, and the Proposed facts the approval confirmed. */
 export type Publication = { changeId: string; at: string; by: Person; pages: { id: string; path: string; version: number }[];

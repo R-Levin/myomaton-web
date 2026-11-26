@@ -22,6 +22,22 @@ export function draftEndpoint(target: WordPressTarget) {
   return new URL("/?rest_route=/miopages/v1/draft", url);
 }
 
+/**
+ * One picture for a signed draft, sent before the draft itself: WordPress keeps it only when the
+ * signed draft names exactly these bytes (copyDigest) for a Section it places.
+ */
+export async function sendDraftMedia(target: WordPressTarget, envelope: unknown, copy: { bytes: Buffer; copyDigest: string },
+  fetcher: typeof fetch = fetch, timeoutMs = 60_000) {
+  const headers: Record<string, string> = { "Content-Type": "application/json", Accept: "application/json" };
+  if (target.gate) headers.Authorization = "Basic " + Buffer.from(target.gate.user + ":" + target.gate.password, "utf8").toString("base64");
+  const url = new URL(draftEndpoint(target).toString().replace("/miopages/v1/draft", "/miopages/v1/media"));
+  const response = await fetcher(url, { method: "POST", headers, redirect: "error", signal: AbortSignal.timeout(timeoutMs),
+    body: JSON.stringify({ envelope, bytesBase64: copy.bytes.toString("base64"), copyDigest: copy.copyDigest }) });
+  const text = await response.text();
+  if (response.status !== 200 || (JSON.parse(text) as { copyDigest?: string }).copyDigest !== copy.copyDigest)
+    throw Error(`WordPress refused a draft picture (HTTP ${response.status})`);
+}
+
 export async function sendSignedDraft(target: WordPressTarget, envelope: unknown, receiptSecret: Buffer,
   expected: NativeDraftReceiptExpectation, fetcher: typeof fetch = fetch, timeoutMs = 60_000) {
   const headers: Record<string, string> = { "Content-Type": "application/json", Accept: "application/json" };

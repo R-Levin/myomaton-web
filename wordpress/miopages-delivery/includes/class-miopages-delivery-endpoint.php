@@ -56,6 +56,16 @@ final class MioPages_Delivery_Endpoint
                     return new WP_REST_Response($body, $status);
                 },
             ]);
+            // One picture for a signed draft, sent just before it: kept only when that draft names these exact bytes.
+            register_rest_route(self::NAMESPACE, '/media', [
+                'methods' => 'POST',
+                'permission_callback' => '__return_true',
+                'callback' => static function (WP_REST_Request $request) {
+                    nocache_headers();
+                    [$status, $body] = self::media($request->get_body(), MIOPAGES_NATIVE_DRAFT_IDENTITY);
+                    return new WP_REST_Response($body, $status);
+                },
+            ]);
             // Read-only: the delivered pages as they are now, and their Notes.
             register_rest_route(self::NAMESPACE, '/readback', [
                 'methods' => 'POST',
@@ -94,7 +104,26 @@ final class MioPages_Delivery_Endpoint
             $applied = MioPages_Native_Draft_Writer::apply($wire, $identity, true);
             return [200, MioPages_Native_Draft_Receipt::create($applied, hex2bin($key))];
         } catch (Throwable $error) {
-            // No detail leaves the site; Core keeps its own record of what it sent.
+            // No detail leaves the site; Core keeps its own record of what it sent. The site's own log keeps the reason.
+            error_log('MioPages draft refused: ' . $error->getMessage());
+            return [422, ['error' => 'refused']];
+        }
+    }
+
+    /** Stage one picture named by a Core-signed apply envelope; [HTTP status, response body]. */
+    public static function media(string $wire, array $identity): array
+    {
+        try {
+            if ($wire === '' || strlen($wire) > 3800000) {
+                return [413, ['error' => 'refused']];
+            }
+            $user = get_user_by('login', (string) ($identity['deliveryUser'] ?? ''));
+            if (!$user) {
+                return [503, ['error' => 'delivery-unavailable']];
+            }
+            wp_set_current_user($user->ID);
+            return [200, ['copyDigest' => MioPages_Native_Draft_Media::stage($wire, $identity, true)]];
+        } catch (Throwable $error) {
             return [422, ['error' => 'refused']];
         }
     }

@@ -1,6 +1,6 @@
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { randomBytes, randomUUID } from "node:crypto";
-import { cp, mkdir, writeFile } from "node:fs/promises";
+import { cp, mkdir, realpath, writeFile } from "node:fs/promises";
 import { join, relative, sep } from "node:path";
 import sharp from "sharp";
 import { enrolReviewSite } from "../wordpress-enrol-review-site";
@@ -53,7 +53,9 @@ export async function previewWordPress(input: { root: string; source: string; po
   else await sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="480" height="96"><rect width="480" height="96" fill="#ffffff"/>
     <text x="16" y="60" font-family="Arial" font-size="34" fill="#1f1f1f">${input.siteName.replace(/[<&>]/gu, "")} (stand-in)</text></svg>`)).png().toFile(wordmark);
   const enrolled = await enrolReviewSite([secrets, "preview", origin, input.organizationId, input.account.webPresenceId, input.account.managedSiteId,
-    "core-delivery", wordmark, randomUUID(), randomUUID(), input.siteName], {});
+    "core-delivery", wordmark, randomUUID(), randomUUID(), input.siteName],
+    // Draft pictures are kept privately outside the web root, next to the site's other private files.
+    { MIOPAGES_DOCUMENT_ROOT: site, MIOPAGES_DRAFT_MEDIA_DIRECTORY: await mkdir(join(secrets, "media"), { recursive: true }).then(() => realpath(join(secrets, "media"))) });
 
   const database = await throwawayMariaDB(input.mysqlBin, root, input.databasePort);
   const salts = ["AUTH_KEY", "SECURE_AUTH_KEY", "LOGGED_IN_KEY", "NONCE_KEY", "AUTH_SALT", "SECURE_AUTH_SALT", "LOGGED_IN_SALT", "NONCE_SALT"]
@@ -111,7 +113,8 @@ if (is_string($file) && is_dir($file) && is_file($file . DIRECTORY_SEPARATOR . '
 chdir(__DIR__ . '/wordpress');
 require __DIR__ . '/wordpress/index.php';
 `);
-  const server: ChildProcess = spawn(php, [...phpFlags, "-S", `127.0.0.1:${port}`, "-t", site, join(root, "router.php")], { stdio: "ignore", cwd: site });
+  // The site's own error log stays in the preview's folder (a refused draft says why there, never to the caller).
+  const server: ChildProcess = spawn(php, [...phpFlags, "-d", "log_errors=1", "-d", `error_log=${slash(join(root, "php-error.log"))}`, "-S",`127.0.0.1:${port}`, "-t", site, join(root, "router.php")], { stdio: "ignore", cwd: site });
   const stop = () => { server.kill(); database.server.kill(); };
   return { origin, stop, config: join(secrets, enrolled.files[0]), login: join(root, "WORDPRESS-LOGIN.txt").split(sep).join("/") };
 }

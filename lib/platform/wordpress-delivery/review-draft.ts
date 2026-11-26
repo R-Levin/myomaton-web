@@ -2,7 +2,8 @@ import { fingerprint, object, text, uuid } from "../canonical/model";
 import type { workflowNativeReviewCandidate } from "../intake/presence-workflow-delivery";
 import { validatePages, type Site } from "./authority";
 import { readSignedDraftBrand } from "./draft-brand";
-import { nativeDraftBaseline } from "./site-draft";
+import { readNativeDraftMedia, type NativeDraftMedia } from "./native-draft-media";
+import { nativeDraftBaseline, verifyNativeMediaPlacements } from "./site-draft";
 
 /**
  * A review draft: Core's current site for a case, delivered as private draft pages to
@@ -31,6 +32,8 @@ export function bindReviewDraft(input: {
   readBack?: { revision: number; pages: { path: string; contentSha256: string; title: string }[] };
   /** Core's reply to each Note it acted on; WordPress adds it to the thread and resolves the Note. */
   answeredNotes?: { id: number; reply: string }[];
+  /** Pictures placed in Sections (Assets); each picture's bytes go separately and must match. */
+  media?: NativeDraftMedia[];
 }) {
   const scope = { organizationId: uuid(input.site.organizationId), webPresenceId: uuid(input.site.webPresenceId),
     managedSiteId: uuid(input.site.managedSiteId) };
@@ -52,6 +55,7 @@ export function bindReviewDraft(input: {
     navigation: [...input.review.candidate.navigation],
     actions: structuredClone(input.review.candidate.actions),
     unresolvedActions: structuredClone(input.review.unresolvedActions ?? []),
+    ...(input.media?.length && { media: structuredClone(input.media) }),
   };
   readReviewDraftCandidate(candidate);
   return { candidate, digest: fingerprint(candidate) };
@@ -64,7 +68,8 @@ export function readReviewDraftCandidate(value: unknown) {
     ...(Object.hasOwn(value as object, "brand") ? ["brand"] : []),
     ...(Object.hasOwn(value as object, "baselinePages") ? ["baselinePages"] : []),
     ...(Object.hasOwn(value as object, "readBack") ? ["readBack"] : []),
-    ...(Object.hasOwn(value as object, "answeredNotes") ? ["answeredNotes"] : [])]);
+    ...(Object.hasOwn(value as object, "answeredNotes") ? ["answeredNotes"] : []),
+    ...(Object.hasOwn(value as object, "media") ? ["media"] : [])]);
   const scope = object(candidate.scope, ["organizationId", "webPresenceId", "managedSiteId"]) as Site;
   const pages = candidate.pages as Parameters<typeof validatePages>[0];
   validatePages(pages, true, true);
@@ -108,6 +113,10 @@ export function readReviewDraftCandidate(value: unknown) {
       const page = object(value, ["path", "contentSha256", "title"]);
       if (typeof page.path !== "string" || !hash(page.contentSha256) || typeof page.title !== "string") throw Error("Review draft read-back refused");
     }
+  }
+  if (candidate.media !== undefined) {
+    if (!Array.isArray(candidate.media) || !candidate.media.length) throw Error("Review draft pictures refused");
+    verifyNativeMediaPlacements(candidate.media.map(readNativeDraftMedia), pages as never);
   }
   if (candidate.answeredNotes !== undefined) {
     if (!Array.isArray(candidate.answeredNotes) || !candidate.answeredNotes.length) throw Error("Review draft Note answers refused");

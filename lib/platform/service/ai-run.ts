@@ -51,6 +51,14 @@ export async function aiRunResearch(run: AiRun, account: { webPresenceId: string
   };
 }
 
+/** One of Core's checked answers outside the Work product stages (such as choosing pictures), under the same ledger and cap. */
+export async function aiRunCall(run: AiRun, account: { webPresenceId: string; managedSiteId: string }, key: string, outputLimit = 8_000) {
+  const { budget, transport } = await connection(run, key);
+  const ownerDigest = fingerprint(account);
+  const dispatch = meteredPresenceWorkflow(run.directory, run.rates, transport, budget, outputLimit);
+  return (request: ResponsesRequest, work: string) => dispatch({ ownerDigest, workDigest: fingerprint({ work, input: request.input }) }, request);
+}
+
 /** Evidence images are read only from inside the project (brand assets, the run's own screenshots). */
 function inside(file: string) {
   const path = resolve(process.cwd(), file), within = relative(process.cwd(), path);

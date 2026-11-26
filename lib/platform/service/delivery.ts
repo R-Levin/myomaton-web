@@ -5,7 +5,10 @@ import { draftBrand } from "../wordpress-delivery/draft-brand";
 import { reviewDraftEnvelope } from "../wordpress-delivery/native-draft-envelope";
 import { deliveryTarget, readBackOperatorSite, samePaths, signingKey, type OperatorSiteConfig } from "../wordpress-delivery/operator-review";
 import type { Readback } from "../wordpress-delivery/readback";
-import { sendSignedDraft } from "../wordpress-delivery/review-delivery";
+import { sendDraftMedia, sendSignedDraft } from "../wordpress-delivery/review-delivery";
+import { readNativeDraftMedia } from "../wordpress-delivery/native-draft-media";
+import { fingerprint } from "../canonical/model";
+import { deliveryCopy } from "./assets";
 import { bindReviewDraft } from "../wordpress-delivery/review-draft";
 import { directionIdentity, logicalId, pageIdentity } from "../work-products/pages";
 import { ask, current, currentSite, edit, type ServiceRecord } from "./cycle";
@@ -93,17 +96,29 @@ export async function deliverDraft(input: { config: OperatorSiteConfig; record: 
   const brand = { ...draftBrand({ scope: site, coreDesign: review.design,
     logo: { assetId: config.logo.assetId, usageId: config.logo.usageId, sha256: config.logo.sha256, alt: config.logo.alt } }), pngBase64: logoPng.toString("base64") };
   const answeredNotes = answered(record, previous);
+  // Each chosen picture goes in the exact Section it was chosen for; a Section since reworked keeps its FPO frame.
+  const placed = (record.assets ?? []).flatMap(asset => {
+    const page = review.candidate.pages.find(item => item.path === asset.path);
+    return page?.sections.some(section => section.id === asset.sectionId) ? [{ asset, pageId: page.id }] : [];
+  });
+  const copies = await Promise.all(placed.map(async ({ asset, pageId }) => {
+    const copy = await deliveryCopy(asset, file => readFile(file));
+    return { copy, descriptor: readNativeDraftMedia({ pageId, sectionId: asset.sectionId, assetId: asset.id, usageId: asset.usageId,
+      masterDigest: asset.sha256, evidenceDigest: fingerprint(asset.source), copyDigest: copy.copyDigest, width: copy.width, height: copy.height, alt: asset.alt }) };
+  }));
   const draft = bindReviewDraft({ site, installationId: config.installationId, streamId: config.streamId,
     revision: (previous?.revision ?? 0) + 1, previousDigest: previous?.digest ?? null,
     // The draft's source is the Account's service record at this version.
     source: { intakeId: record.account.webPresenceId, workflowVersion: Math.max(1, record.version) },
-    review: review as never, brand, ...(answeredNotes.length && { answeredNotes }),
+    review: review as never, brand, ...(answeredNotes.length && { answeredNotes }), ...(copies.length && { media: copies.map(item => item.descriptor) }),
     ...(acknowledged.length && { readBack: { revision: previous!.revision, pages: acknowledged } }),
     ...(previous && !samePaths(previous.pages, review.candidate.pages) && { baselinePages: previous.pages }) });
   const wire = reviewDraftEnvelope(draft, config.keyId, config.publicKeyBase64, signingKey(config));
+  for (const { copy } of copies) await sendDraftMedia(deliveryTarget(config), wire, copy, fetcher);
   const receipt = await sendSignedDraft(deliveryTarget(config), wire, Buffer.from(config.receiptSecretHex, "hex"), {
     installationId: config.installationId, siteProposalId: config.streamId, operation: "apply", requestedDigest: draft.digest, appliedDigest: draft.digest,
-    revision: draft.candidate.revision, paths: draft.candidate.pages.map(page => page.path), brandDigest: brand.digest }, fetcher);
+    revision: draft.candidate.revision, paths: draft.candidate.pages.map(page => page.path), brandDigest: brand.digest,
+    ...(copies.length && { media: copies.map(item => item.descriptor), pageIds: draft.candidate.pages.map(page => page.id) }) }, fetcher);
   const delivery: Delivery = { site: config.name, installationId: config.installationId, streamId: config.streamId, revision: receipt.revision,
     digest: receipt.appliedDigest, recordVersion: record.version, pages: draft.candidate.pages.map(page => ({ path: page.path, id: page.id })),
     at: (input.now ?? new Date()).toISOString(), answeredNotes: [...previous?.answeredNotes ?? [], ...answeredNotes.map(note => note.id)] };
