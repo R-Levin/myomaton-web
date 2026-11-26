@@ -1,6 +1,7 @@
 import { decide, emptyLedger, markApplied, review as reviewChange, takeIn, type Change, type ChangeLedger, type Consequence,
   type Grain, type Person, type Request } from "../change/model";
 import type { Delivery } from "./delivery";
+import type { Evidence } from "./evidence";
 import { fingerprint } from "../canonical/model";
 import { directionIdentity, pageIdentity, reportIdentity, sitePlanIdentity, versionPages } from "../work-products/pages";
 
@@ -29,7 +30,9 @@ export type ServiceRecord = { account: { webPresenceId: string; managedSiteId: s
   /** Approved Publishes. Until public delivery is built (milestone 5) each is a labelled Beacon: approved, not yet public. */
   publications?: Publication[];
   /** Each review draft sent to the Account's WordPress, latest last (service/delivery.ts). */
-  deliveries?: Delivery[] };
+  deliveries?: Delivery[];
+  /** The Account's Evidence: its documents, direction and research, which Core reads with the Knowledge (service/evidence.ts). */
+  evidence?: Evidence[] };
 
 /** A Publish the Client approved: exactly which Page Versions, and the Proposed facts the approval confirmed. */
 export type Publication = { changeId: string; at: string; by: Person; pages: { id: string; path: string; version: number }[];
@@ -37,7 +40,7 @@ export type Publication = { changeId: string; at: string; by: Person; pages: { i
 
 /** What Core gives its writer (the AI, or a labelled Beacon standing in for it) for one Work product. */
 export type WriteInput = {
-  kind: Kind; knowledge: readonly unknown[]; report?: unknown; direction?: unknown; sitePlan?: SitePlan; page?: PlanEntry;
+  kind: Kind; knowledge: readonly unknown[]; evidence?: readonly Evidence[]; report?: unknown; direction?: unknown; sitePlan?: SitePlan; page?: PlanEntry;
   /** The current Version being reworked, and the words of each Request asking for the rework. */
   previous?: unknown; requests: string[];
 };
@@ -142,7 +145,7 @@ function inputFor(record: ServiceRecord, kind: Kind, knowledge: readonly unknown
   // The Version being reworked: the current one, or the latest draft when a first draft was corrected.
   const id = identity(record, kind, path);
   const previous = got(id) ?? record.products.findLast(item => item.id === id)?.content;
-  return { kind, knowledge,
+  return { kind, knowledge, ...(record.evidence?.length && { evidence: record.evidence }),
     ...(kind !== "report" && { report: got(reportIdentity(site)) }),
     ...((kind === "site-plan" || kind === "page") && { direction: got(directionIdentity(site)) }),
     ...(kind === "page" && plan && { sitePlan: plan, page: plan.pages.find(entry => entry.path === path) }),

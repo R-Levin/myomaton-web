@@ -675,14 +675,15 @@
         {
           "key": "audience",
           "kind": "audience",
-          "value": "Established expertise-led small service or technical businesses with real expertise and customers.",
+          "value": "Startups remain an important market, alongside established local service and trade companies, professional firms, technical businesses and other small organizations with real expertise. The initial target segments are marketing and learning priorities, not exclusions by industry, age, size or business maturity.",
           "evidence": {
-            "sourceKind": "operator",
-            "sourceReference": "docs/miopages-c0-business-brief.md; customer-approved C0 discovery",
+            "sourceKind": "customer",
+            "sourceReference": "docs/miopages-c0-product-model.md, Initial customer hypothesis (Principal's correction, Nov 9, 2026; restated on reading Report v1, Nov 25, 2026)",
             "confirmation": "confirmed",
             "visibility": "public",
-            "confirmedBy": "operator:approved-c0-discovery",
-            "confirmedAt": "2026-10-07T01:06:33.315Z"
+            "confirmedBy": "principal",
+            "confirmedAt": "2026-11-09T12:00:00.000Z",
+            "correction": "Replaces the October 7 wording 'Established expertise-led small service or technical businesses with real expertise and customers', which left startups out."
           }
         },
         {
@@ -1029,7 +1030,7 @@
       "summary": "Establish a professional managed Web Presence and continue improving it through Ongoing service.",
       "detail": "Supporting infrastructure may be coordinated but is not the product. Customers supply business truth, goals, preferences, assets and approval; the platform/operator determines the bounded implementation. This is provisional product-definition state, not final marketing copy or an operational service promise.",
       "audiences": [
-        "Established expertise-led small service or technical businesses with real expertise and customers."
+        "Startups and established small businesses with real expertise: local service and trade companies, professional firms, technical businesses and other small organizations."
       ],
       "outcomes": [
         "Clarity",

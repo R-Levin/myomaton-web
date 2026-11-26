@@ -46,9 +46,11 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
           {!started && <form action={beginLaunch.bind(null, id)}><button className={primary}>Start Launch</button></form>}
           {waiting.some(task => task.who === "core") && (
             <form action={runCore.bind(null, id)}><button className={primary}>Let Core do its waiting work</button>
-              <p className="mt-1 text-xs text-neutral-600">Locally Core&apos;s AI is a {runtime.writerLabel}; it writes labelled stand-in content.</p></form>)}
+              <p className="mt-1 text-xs text-neutral-600">{runtime.spent ? `Writer: ${runtime.writerLabel}. Spent so far: $${(await runtime.spent()).toFixed(2)}.`
+                : <>Locally Core&apos;s AI is a {runtime.writerLabel}; it writes labelled stand-in content.</>}</p></form>)}
           {site?.complete && !publishWaiting && waiting.length === 0 && <form action={askPublish.bind(null, id)}><button className={button}>Ask the Client to approve Publish</button></form>}
         </div>
+        {runtime.spent && <p className="mt-2 text-sm text-neutral-700">{runtime.writerLabel}: ${(await runtime.spent()).toFixed(2)} spent so far.</p>}
         {waiting.length > 0 && <ul className="mt-3 space-y-1">{waiting.map(task => <li key={task.id}>{task.what} <span className="text-xs text-neutral-500">({task.who})</span></li>)}</ul>}
       </Section>
 
@@ -136,6 +138,12 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="publicUse" defaultChecked /> May appear on the website</label>
           <button className={button}>Add as a Proposed fact</button>
         </form>
+      </Section>
+
+      <Section title="Evidence" note={record.evidence?.length ? `${record.evidence.length} items Core reads with the Knowledge; later direction overrides earlier.` : "None yet."}>
+        {record.evidence?.length ? <ul className="list-disc space-y-1 pl-6 text-sm">{record.evidence.map(item => (
+          <li key={item.id}>{item.label} <span className="text-xs text-neutral-500">({item.date ?? "undated"}{item.standing === "client" ? ", the Client's own" : ", gathered"}
+            {item.forWebsite ? "" : ", not for the website"})</span></li>))}</ul> : null}
       </Section>
 
       <Section title="Client people" note="Who speaks for the Client. Only their word, or their email, counts as the Client's.">

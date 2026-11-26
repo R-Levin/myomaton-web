@@ -10,6 +10,20 @@
       ],
       "port": 4480,
       "url": "http://127.0.0.1:4480"
+    },
+    {
+      "name": "workspace-ai-c0-milestone-3",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "tsx",
+        "scripts/service/workspace-preview.ts",
+        "--ai-run",
+        "c0-milestone-3",
+        "--cap",
+        "15"
+      ],
+      "port": 4480,
+      "url": "http://127.0.0.1:4480"
     }
   ]
 }

@@ -1,0 +1,37 @@
+{
+  "about": "C0's Evidence: the sections of MioPages' own approved documents and the Principal's standing direction that Core reads with C0's Knowledge. Development notes in the same documents are left out. Dates let later direction override earlier.",
+  "documents": [
+    {
+      "file": "MIOPAGES-BASELINE.md", "id": "principal-direction", "label": "The Principal's standing direction on the MioPages service",
+      "date": "2026-11-24", "standing": "client",
+      "sections": [{ "heading": "The product", "forWebsite": false }]
+    },
+    {
+      "file": "docs/miopages-c0-product-model.md", "id": "product-model", "label": "C0 product model", "date": null, "standing": "client",
+      "sections": [
+        { "heading": "Founder-led transition to the managed service", "date": "2026-11-09", "forWebsite": false },
+        { "heading": "Initial customer hypothesis", "date": "2026-11-09" },
+        { "heading": "Positioning and intended outcome", "date": "2026-11-06" },
+        { "heading": "Design serves the business" },
+        { "heading": "Continuing value after launch" },
+        { "heading": "Launch and Ongoing customer deliverable summary" },
+        { "heading": "Brief historical lineage", "forWebsite": false }
+      ]
+    },
+    {
+      "file": "docs/miopages-c0-business-brief.md", "id": "business-brief", "label": "C0 business brief (approved provisional discovery)",
+      "date": "2026-10-06", "standing": "client",
+      "sections": [
+        { "heading": "Business, customer and geography" },
+        { "heading": "Launch and Ongoing offer" },
+        { "heading": "Web Presence Review" },
+        { "heading": "Self-service and smallest useful intake" },
+        { "heading": "Commercial hypothesis and first cohort" },
+        { "heading": "Proof and trust", "forWebsite": false },
+        { "heading": "Real service identity and infrastructure" },
+        { "heading": "Integrations and measurement boundaries" },
+        { "heading": "Proof status and non-blocking unresolved items", "forWebsite": false }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import { artifactSchemas, creativePageSchema, designedDirectionSchema, readBluep
 import { bindCitations } from "../intake/presence-workflow-provider";
 import type { KnownItem, KnownOffering } from "../knowledge/account";
 import type { PageContent, SitePlan, WriteInput, Writer } from "./cycle";
+import type { Evidence } from "./evidence";
 
 /**
  * The engine's real writer (rebuild plan, milestone 1): Core's AI, through the kept Responses
@@ -18,6 +19,8 @@ export type AiWriterConfig = {
   ledgerDirectory: string; rates: ResponsesRates; transport: ResponsesTransport;
   /** The Account's budget: requests, generations, tokens and money, enforced at every call. */
   budget: WorkflowUsageScope; outputLimit: number;
+  /** Keeps each checked answer (outside Git), so the run's work survives the preview it ran in. */
+  retain?: (entry: { at: string; kind: string; path?: string; requests: string[]; answer: unknown }) => Promise<void>;
 };
 
 /** The Account's Knowledge as the sources the AI may cite: the Client's confirmed word, or proposed. */
@@ -34,6 +37,12 @@ export function knowledgeSources(knowledge: readonly unknown[]): PresenceEvidenc
   });
 }
 
+/** The Account's Evidence as sources the AI may cite. Only the Client's own approved word can support an established finding. */
+export function evidenceSources(evidence: readonly Evidence[]): PresenceEvidence[] {
+  return evidence.map(item => ({ id: "evidence:" + item.id, kind: item.standing === "client" ? "owner-confirmed" as const : "service-direction" as const,
+    label: item.label + (item.forWebsite ? "" : " (not for the website)"), reference: item.reference, date: item.date, content: item.content }));
+}
+
 const stage = { report: "report", direction: "direction", "site-plan": "blueprint", page: "page" } as const;
 
 export function createAiWriter(config: AiWriterConfig): Writer {
@@ -41,23 +50,31 @@ export function createAiWriter(config: AiWriterConfig): Writer {
   const ownerDigest = fingerprint(config.account);
   return {
     async write(input: WriteInput) {
-      const sources = knowledgeSources(input.knowledge), ids = sources.map(source => source.id);
+      const known = knowledgeSources(input.knowledge), gathered = evidenceSources(input.evidence ?? []);
+      const sources = [...known, ...gathered], ids = sources.map(source => source.id);
       const plan = input.sitePlan, paths = plan?.pages.map(entry => entry.path) ?? [];
       const schema = input.kind === "report" ? artifactSchemas.report : input.kind === "direction" ? designedDirectionSchema
         : input.kind === "site-plan" ? sitePlanSchema(input) : pageSchema(input.page!.path);
-      const payload = { knowledge: sources.map(({ id, kind, label, content }) => ({ id, standing: kind === "owner-confirmed" ? "confirmed" : "proposed", label, content })),
+      const payload = { knowledge: known.map(({ id, kind, label, content }) => ({ id, standing: kind === "owner-confirmed" ? "confirmed" : "proposed", label, content })),
+        ...(gathered.length && { evidence: gathered.map(({ id, kind, label, date, content }) => ({ id, standing: kind === "owner-confirmed" ? "client-approved" : "gathered", date, label, content })) }),
         ...(input.report !== undefined && { report: input.report }), ...(input.direction !== undefined && { direction: input.direction }),
         ...(plan && { sitePlan: plan }), ...(input.page && { page: input.page }),
         ...(input.previous !== undefined && { previous: input.previous }), ...(input.requests.length && { requests: input.requests }) };
       const instructions = [coreAuthoringInstructions(stage[input.kind]),
-        "Cite only the supplied knowledge ids. Knowledge marked proposed is not yet confirmed by the Client: never present it as established.",
-        "Knowledge not for the website informs your understanding but must not appear in site copy.",
+        "Cite only the supplied knowledge and evidence ids. Knowledge marked proposed is not yet confirmed by the Client: never present it as established.",
+        gathered.length ? "Evidence is the Client's fuller material: their approved documents and recorded direction, each dated. Use all of it, not only the short Knowledge entries. " +
+          "Later direction from the Client overrides earlier material, and the Knowledge is their current word: where sources disagree, follow the latest and do not repeat the superseded view. " +
+          "Describe the business as it stands now; do not narrate earlier versions, corrections or how the understanding changed. " +
+          "Evidence marked gathered is not the Client's confirmed word." : "",
+        "Knowledge or evidence not for the website informs your understanding but must not appear in site copy.",
         input.requests.length ? "Rework the previous version to answer each request, in the requester's own words where they give them; keep what is still right." : "",
         input.page ? `Write only the page ${JSON.stringify(input.page.path)}: ${input.page.purpose}` : ""].filter(Boolean).join("\n\n");
       const request = { model: config.rates.model, instructions, input: JSON.stringify(payload),
         text: { format: { type: "json_schema", name: "core_" + stage[input.kind], strict: true, schema: bindCitations(schema, ids) } } };
       const output = await dispatch({ ownerDigest, workDigest: fingerprint({ kind: input.kind, payload }) }, request);
-      return checked(input, output, sources, ids, paths);
+      const answer = checked(input, output, sources, ids, paths);
+      await config.retain?.({ at: new Date().toISOString(), kind: input.kind, ...(input.page && { path: input.page.path }), requests: input.requests, answer });
+      return answer;
     },
   };
 }
@@ -74,7 +91,8 @@ function sitePlanSchema(input: WriteInput) {
   const fields = schema.properties.pages.items.properties.decisionBrief.properties;
   schema.properties.pages.items.properties.decisionBrief.properties = { ...fields,
     findingIds: { type: "array", description: "Use IDs from report.findings.", items: { type: "string", enum: report.findings.map(item => item.id) } },
-    claimIds: { type: "array", description: "Use only the supplied knowledge ids.", items: { type: "string", enum: knowledgeSources(input.knowledge).map(item => item.id) } },
+    claimIds: { type: "array", description: "Use only the supplied knowledge and evidence ids.", items: { type: "string",
+      enum: [...knowledgeSources(input.knowledge), ...evidenceSources(input.evidence ?? [])].map(item => item.id) } },
     directionSteps: { type: "array", description: "Use zero-based indices into direction.visitorDecisions.",
       items: { type: "integer", enum: direction.visitorDecisions.map((_, index) => index) } } };
   return schema;

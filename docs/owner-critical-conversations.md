@@ -1354,3 +1354,30 @@ Principal approves.
   can take drafts the way the hosted one does (the delivery plugin needs MySQL), the Principal
   said "Yes, download it". Downloaded 11.4.14 (checksum checked) to the Principal's computer,
   outside the repository; it runs only while the preview runs, on this computer only.
+
+- **Nov 25 — milestone 3 approved: one local real-AI run on C0, capped at $15.** Asked to approve
+  one run of the rebuilt Core with the real AI on this computer, sending C0's Knowledge
+  (MioPages' own business information) to OpenAI, with a hard $15 cap, the Principal said
+  "Approved". Model and rate card as approved for C0 on Nov 19 (gpt-5.4-2026-03-05). Not
+  included: protected Core, hosted systems or the public site. The run's spending ledger, the AI's
+  answers and the service record are kept outside Git in `runtime-content/ai-runs/c0-milestone-3`.
+
+- **Nov 25 — Report v1 read: good, but "not for startups" is a regression.** Reading C0's Report
+  v1, the Principal found it "quite good with interesting inferences", with one concern: it said,
+  with some force, that the service is not for startups, which is a regression. Cause: the
+  rebuilt Core imported C0's Oct 7 onboarding ("established ... businesses") and never carried in
+  the Principal's Nov 9 correction (startups remain an important market, alongside established
+  businesses; target segments are priorities, not exclusions; see
+  `docs/miopages-c0-product-model.md`). C0's Knowledge now carries the Nov 9 correction, the
+  Principal's concern was entered as the Client's correction of Report v1, and Core wrote Report
+  v2 from the corrected Knowledge. Standing requirement unchanged (baseline Part 1 #8).
+
+- **Nov 25 — "Choose whatever provides the most accurate and up to date basis."** Told that the
+  startups gap was a symptom (Core had been given only C0's 25 short onboarding entries, not the
+  full approved C0 material Part 1 #9 requires), and asked whether to connect the full material,
+  peer research and brand assets before Core goes further, the Principal answered with this.
+  Meaning: give Core everything that makes its basis most accurate and current. Done for the
+  Report: C0's Evidence (business brief, product model and Part 1's product direction, dated, with
+  later direction overriding earlier) now goes to Core with the Knowledge; Report v3 was written
+  from it. Peer research and brand assets follow before the Direction and site. Sending the full C0
+  documents to OpenAI falls within this instruction and the $15 cap.

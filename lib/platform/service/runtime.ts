@@ -4,7 +4,9 @@ import { readFile } from "node:fs/promises";
 import { Pool } from "pg";
 import { readOperatorSiteConfig } from "../wordpress-delivery/operator-review";
 import type { Person } from "../change/model";
+import { aiRunSpent, aiRunWriter, type AiRun } from "./ai-run";
 import { beaconWriter } from "./beacon-writer";
+import type { Writer } from "./cycle";
 import { ServiceStore } from "./store";
 
 /**
@@ -13,6 +15,7 @@ import { ServiceStore } from "./store";
  * the preview's own throwaway database. Anywhere else they do not exist.
  */
 let pool: Pool | undefined;
+let writer: Promise<Writer> | undefined;
 
 export async function serviceRuntime() {
   const host = (await headers()).get("host") ?? "";
@@ -22,7 +25,25 @@ export async function serviceRuntime() {
   // The preview's own throwaway WordPress, enrolled like any review site; its keys stay on the server.
   const wordpressFile = process.env.MIOPAGES_PREVIEW_WORDPRESS;
   const wordpress = wordpressFile ? async () => readOperatorSiteConfig(JSON.parse(await readFile(wordpressFile, "utf8"))) : null;
-  return { pool, store: new ServiceStore(pool), writer: beaconWriter, writerLabel: "Beacon (stand-in for Core's AI)", wordpress };
+  // Core's real AI, only for a run the Principal approved (milestone 3): its name, folder and cap come from the preview.
+  const ai = aiRun();
+  if (ai) {
+    const [first] = await accounts(pool);
+    if (!first || !process.env.OPENAI_API_KEY) throw Error("The approved AI run needs its Account and the AI key");
+    writer ??= aiRunWriter(ai, first.account, process.env.OPENAI_API_KEY);
+    return { pool, store: new ServiceStore(pool), writer: await writer, writerLabel: `Core's real AI (approved run, capped at $${ai.capMicros / 1_000_000})`,
+      spent: () => aiRunSpent(ai), wordpress };
+  }
+  return { pool, store: new ServiceStore(pool), writer: beaconWriter as Writer, writerLabel: "Beacon (stand-in for Core's AI)", spent: null, wordpress };
+}
+
+/** The approved AI run the preview was started with, if any. */
+function aiRun(): AiRun | null {
+  const { MIOPAGES_PREVIEW_AI_RUN: name, MIOPAGES_PREVIEW_AI_DIR: directory, MIOPAGES_PREVIEW_AI_CAP: cap } = process.env;
+  if (!name || !directory || !cap) return null;
+  // The rate card the Principal approved for C0 on Nov 19.
+  return { name, directory, capMicros: Number(cap), rates: { model: "gpt-5.4-2026-03-05", verifiedOn: "2026-11-19", inputPerMillion: 2_500_000,
+    cachedPerMillion: 250_000, outputPerMillion: 15_000_000, cacheWritePerMillion: 0, countMicros: 0 } };
 }
 
 /** Who is acting, as chosen on the local preview's sign-in. Every action checks it again. */
