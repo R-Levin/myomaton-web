@@ -72,7 +72,7 @@ async function main() {
   const mysqlBin = process.env.MIOPAGES_PREVIEW_MYSQL ?? join(homedir(), "tools", "mariadb-11.4.14-winx64", "bin");
   const wordpress = existsSync(join(mysqlBin, "mariadbd.exe")) ? await previewWordPress({ root, port: Number(process.env.WORDPRESS_PORT ?? 4481), databasePort: Number(process.env.WORDPRESS_DATABASE_PORT ?? 4482),
     mysqlBin, organizationId: organization,
-    account: { webPresenceId, managedSiteId }, siteName: "MioPages (C0)",
+    account: { webPresenceId, managedSiteId }, siteName: "MioPages (C0)", ...(spec.logo && { logo: join(process.cwd(), spec.logo) }),
     source: process.env.WORDPRESS_SOURCE ?? "../p022-wp-validation/wordpress" }) : null;
   console.log(`Workspace preview: http://127.0.0.1:${port}/workspace`);
   console.log(wordpress ? `Its WordPress: ${wordpress.origin}/wp-admin (login in ${wordpress.login})` : "No WordPress: set MIOPAGES_PREVIEW_MYSQL to a local MariaDB to add one.");

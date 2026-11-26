@@ -1,5 +1,6 @@
 {
   "about": "C0's Evidence: the sections of MioPages' own approved documents and the Principal's standing direction that Core reads with C0's Knowledge. Development notes in the same documents are left out. Dates let later direction override earlier.",
+  "logo": "brand/miopages/MioPagesDV.png",
   "documents": [
     {
       "file": "MIOPAGES-BASELINE.md",

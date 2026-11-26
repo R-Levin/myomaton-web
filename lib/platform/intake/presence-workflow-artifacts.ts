@@ -208,6 +208,13 @@ export function readSectionRevision(value: unknown, previous: WorkflowPage, inde
   return { page: { ...previous, sections }, widerChange: wider.needed ? reason.trim() : null };
 }
 
+/** The indices of the sections whose composed block shows the action with this reference. */
+function sectionsHolding(sections: unknown, reference: string) {
+  const holds = (node: unknown): boolean => Array.isArray(node) ? node.some(holds) : Boolean(node) && typeof node === "object" &&
+    ((node as { kind?: unknown }).kind === "action" && (node as { reference?: unknown }).reference === reference || Object.values(node as object).some(holds));
+  return Array.isArray(sections) ? sections.flatMap((section, index) => holds((section as { block?: unknown } | null)?.block) ? [index] : []) : [];
+}
+
 export function readPage(value: unknown, exactPath: string, paths: readonly string[], ids: readonly string[],
   destinations: Partial<Record<Exclude<typeof actionKinds[number], "navigate">, string>>, normalizeProviderReferences = false,
   evaluationPlacement = false, semanticBlocks = false) {
@@ -221,7 +228,9 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
   const otherPaths = paths.filter(candidate => candidate !== exactPath);
   const actions = list<PageAction>(page.actions, value => {
     const action = object(value, composition ? ["label", "kind", "destination", "sectionIndex"] : ["label", "kind", "destination"]);
-    const index = action.sectionIndex;
+    // Where the page's own section composition holds this action as a button, that section is its placement.
+    const holders = normalizeProviderReferences ? sectionsHolding(page.sections, "action-" + (page.actions as unknown[]).indexOf(value)) : [];
+    const index = holders.length === 1 ? holders[0] : action.sectionIndex;
     const validIndex = typeof index === "number" && Number.isSafeInteger(index) && Boolean(sections[index]);
     // An already authorized link in a real Intro stays contextual. Recovery
     // must not promote it to a different section or invent a destination.

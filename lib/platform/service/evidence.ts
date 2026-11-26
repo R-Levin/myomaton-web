@@ -17,7 +17,10 @@ export type Evidence = {
 };
 
 /** Where an Account's documents are, and which sections of each are Evidence. Kept as the Client's data, never in code. */
-export type EvidenceSpec = { documents: { file: string; id: string; label: string; date: string | null; standing: Evidence["standing"];
+export type EvidenceSpec = {
+  /** The Client's own logo (a PNG among its brand assets), shown wherever their site shows a logo (Part 1 #13). */
+  logo?: string;
+  documents:{ file: string; id: string; label: string; date: string | null; standing: Evidence["standing"];
   sections: { heading: string; date?: string; forWebsite?: boolean }[] }[];
   /** The Client's own assets, such as their logo: each an Evidence item Core sees as images. */
   assets?: { id: string; label: string; date: string | null; content: string; images?: { file: string; caption: string }[];

@@ -190,3 +190,15 @@ Plain server-rendered pages, one form per action, every action checking who is a
   edit that cannot be read that way (an added block, a removed section, structured parts) still
   goes to Core as a Request to work in, so no hand edit is lost. Next: milestone 3, the real AI on
   C0, which needs the Principal's spending approval.
+
+- *Nov 26, milestone 3 (local preview, real AI, $15 cap, about $6.76 spent):* Core wrote C0's
+  Report (v4 approved by the Client), researched 7 peer sites, and wrote the Direction (v2), the
+  Site plan (10 pages) and all 10 pages, each reviewed by the Specialist against Part 1. Nine pages
+  were corrected once for internal language around placeholders (#14); Proof twice. Review draft 1
+  is in the local preview WordPress with the real MioPages logo (#13). Fixed on the way: Core is
+  now told the checker's rules, retries once when refused (told why), and button placement follows
+  the section that holds the button; each AI call reserves its own worst case, not the whole run's;
+  each WordPress site keeps its own delivery history. Still open: page titles in WordPress come
+  from each page's headline (inconsistent); the mobile menu is a grid of buttons rather than a
+  collapsible menu; forms are disabled in drafts until Publish (milestone 5); no real images yet,
+  only marked FPO frames (#12). Next: the Principal reviews draft 1; then milestone 4.

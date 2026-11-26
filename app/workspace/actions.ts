@@ -160,7 +160,10 @@ export async function sendDrafts(webPresenceId: string) { await shown(webPresenc
   const ctx = await context(webPresenceId, "specialist");
   if (!ctx.wordpress) throw Error("No WordPress is connected");
   const read = await ctx.store.read(ctx.account);
-  const { delivery } = await deliverDraft({ config: await ctx.wordpress(), record: read, previous: read.deliveries?.at(-1) ?? null });
+  // Each WordPress site has its own delivery history: the next draft follows the last one sent to this site.
+  const config = await ctx.wordpress();
+  const previous = read.deliveries?.filter(item => item.installationId === config.installationId && item.streamId === config.streamId).at(-1) ?? null;
+  const { delivery } = await deliverDraft({ config, record: read, previous });
   await ctx.store.save(read, { ...read, deliveries: [...read.deliveries ?? [], delivery] });
   refresh(webPresenceId);
 }); }

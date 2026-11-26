@@ -36,7 +36,7 @@ async function throwawayMariaDB(mysqlBin: string, root: string, port: number) {
 }
 
 export async function previewWordPress(input: { root: string; source: string; port: number; databasePort: number; mysqlBin: string; organizationId: string;
-  account: { webPresenceId: string; managedSiteId: string }; siteName: string }) {
+  account: { webPresenceId: string; managedSiteId: string }; siteName: string; logo?: string }) {
   const { root, port } = input, origin = `http://127.0.0.1:${port}`;
   const site = join(root, "wordpress"), secrets = join(root, "private");
   // WordPress itself, without the source site's content, local helpers or older copies of MioPages' plugin and theme.
@@ -47,9 +47,10 @@ export async function previewWordPress(input: { root: string; source: string; po
   await mkdir(join(site, "wp-content/uploads"), { recursive: true });
   await mkdir(secrets, { recursive: true });
 
-  // A labelled stand-in wordmark: the Client's real one is a Work product, not part of the preview.
+  // The Client's own logo when they have supplied one (Part 1 #13); otherwise a labelled stand-in wordmark.
   const wordmark = join(root, "wordmark.png");
-  await sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="480" height="96"><rect width="480" height="96" fill="#ffffff"/>
+  if (input.logo) await cp(input.logo, wordmark);
+  else await sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="480" height="96"><rect width="480" height="96" fill="#ffffff"/>
     <text x="16" y="60" font-family="Arial" font-size="34" fill="#1f1f1f">${input.siteName.replace(/[<&>]/gu, "")} (stand-in)</text></svg>`)).png().toFile(wordmark);
   const enrolled = await enrolReviewSite([secrets, "preview", origin, input.organizationId, input.account.webPresenceId, input.account.managedSiteId,
     "core-delivery", wordmark, randomUUID(), randomUUID(), input.siteName], {});
