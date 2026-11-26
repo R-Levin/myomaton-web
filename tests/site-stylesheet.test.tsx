@@ -22,6 +22,7 @@ test("Core's stylesheet designs the whole page and is scoped to the site's own p
   assert.ok(css.includes("@media (max-width: 680px){" + scope + " nav.miopages-draft-nav{display:flex"));
   assert.ok(css.includes("@keyframes mp-rise{from{opacity:0"));
   assert.ok(!css.includes("/*"), "the sheet is rebuilt from what passed");
+  assert.equal(readSiteStylesheet(css), css, "checking a rebuilt sheet again (at delivery) leaves it unchanged");
 });
 
 test("anything that loads, runs, hides content or hides the FPO and placeholder marks is refused", () => {

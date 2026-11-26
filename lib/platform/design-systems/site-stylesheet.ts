@@ -17,7 +17,7 @@ export const stylesheetContract = [
   "Page frame: header.wp-block-template-part (the site header holding the logo, .miopages-draft-wordmark img); footer.wp-block-template-part; main; .wp-block-post-content (the page column).",
   "Menu: nav.miopages-draft-nav holds the page links (a; the current page has [aria-current=\"page\"]); .miopages-draft-related is the footer link row. On phones the menu must stay usable: style it as a compact row, a scrolling strip or similar, not a wall of buttons.",
   "Sections, in page order: section.miopages-draft-section, with .miopages-draft-hero (the opening), .miopages-draft-intro (body sections) or .miopages-draft-cta (closing call to action); .miopages-authored-section when you composed it; .miopages-draft-with-image when it holds an image; .miopages-draft-copy is its text column; .miopages-native-component is your composed block, with .miopages-component-<name> using the name you gave it.",
-  "Inside composed blocks: .miopages-node is every element; .miopages-node-columns and .miopages-node-row are your layouts; .miopages-node-surface-light|brand|tonal|strong|supporting|contrast are your surfaces; .miopages-node-type-display|lead|body|small are your type levels; .miopages-node-border and .miopages-node-rounded are your framed elements (cards); .miopages-semantic-group and .miopages-semantic-grid are grouped items.",
+  "Inside composed blocks: .miopages-node is every element; .miopages-node-columns lays its children out in the column proportions you chose when composing the page, given as var(--mp-columns): keep grid-template-columns: var(--mp-columns) on wider screens (you may stack the columns on phones), and never impose a fixed column count, since each child is one column; .miopages-node-row is a row of items; .miopages-node-surface-light|brand|tonal|strong|supporting|contrast are your surfaces; .miopages-node-type-display|lead|body|small are your type levels; .miopages-node-border and .miopages-node-rounded are your framed elements (cards); .miopages-semantic-group and .miopages-semantic-grid are grouped items.",
   "Actions: .wp-block-buttons, .wp-block-button, a.wp-block-button__link (buttons); .miopages-pending-action (an action not yet connected).",
   "Images: figure.wp-block-image and img; figure.miopages-fpo is a marked FPO frame (.miopages-fpo-badge, .miopages-fpo-label, .miopages-fpo-brief); aside.miopages-placeholder is a marked notice of missing material (.miopages-placeholder-badge, .miopages-placeholder-label, .miopages-placeholder-text). Style them to fit the design, but they must stay clearly visible and recognisable: you cannot hide, shrink, move or clip them.",
   "Use the design's colours and fonts through var(--wp--preset--color--surface), var(--wp--preset--color--ink), var(--wp--preset--color--brand), var(--wp--preset--color--on-brand), var(--wp--preset--color--support), var(--miopages-tonal-ink), var(--miopages-accent-surface), var(--miopages-accent-ink), var(--miopages-supporting-surface), var(--miopages-supporting-ink), var(--miopages-contrast-surface), var(--miopages-contrast-ink), var(--miopages-border), var(--miopages-muted), var(--miopages-heading-font), var(--miopages-body-font); you may also write colours directly, keeping text readable.",
@@ -29,7 +29,7 @@ const scope = "body.miopages-designed:not(#mp-core-design)";
 
 const elements = new Set(["a", "p", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li", "img", "figure", "figcaption", "header", "footer", "main",
   "nav", "section", "div", "span", "aside", "strong", "em", "small", "blockquote", "hr", "details", "summary", "button", "svg", "table", "tr", "td", "th"]);
-const classPrefixes = /^(miopages-|wp-block-|wp-element-|has-|is-layout-|wp-container-|align(wide|full)$|mp-)/u;
+const classPrefixes = /^(miopages-|wp-block-|wp-element-|has-|is-layout-|is-style-|is-content-|wp-container-|align(wide|full|left|right|center)$|mp-)/u;
 const pseudoClasses = new Set(["hover", "focus", "focus-visible", "focus-within", "active", "visited", "first-child", "last-child", "only-child",
   "first-of-type", "last-of-type", "empty", "nth-child", "nth-of-type", "nth-last-child", "not", "is", "where", "has"]);
 const pseudoElements = new Set(["before", "after", "marker", "first-line", "first-letter", "placeholder", "selection"]);
@@ -44,7 +44,9 @@ const properties = new RegExp("^(" + [
   "overflow(-x|-y)?", "opacity", "transform(-origin|-style)?", "translate", "rotate", "scale", "transition(-[a-z-]+)?", "animation(-[a-z-]+)?",
   "filter", "backdrop-filter", "clip-path", "object-(fit|position)", "list-style(-[a-z]+)?", "content", "counter-(reset|increment|set)",
   "columns", "column-(count|width|rule|rule-[a-z]+|span|fill)", "isolation", "mix-blend-mode", "cursor", "accent-color", "caret-color",
-  "scroll-(margin|padding|behavior|snap-type|snap-align)(-[a-z-]+)?", "float", "clear", "quotes", "--mp-[a-z0-9-]+", "text-wrap-style", "font-kerning",
+  "scroll-(margin|padding|behavior|snap-type|snap-align)(-[a-z-]+)?", "float", "clear", "quotes", "--mp-[a-z0-9-]+", "text-wrap-style", "font-kerning", "font-synthesis", "will-change", "touch-action", "pointer-events", "user-select", "contain", "text-decoration-skip-ink",
+  "inset-inline(-[a-z]+)?", "inset-block(-[a-z]+)?", "overscroll-behavior(-[xy])?", "line-break", "tab-size",
+  "-webkit-font-smoothing", "scrollbar-(width|color|gutter)", "-moz-osx-font-smoothing", "(-webkit-)?text-size-adjust", "-webkit-tap-highlight-color", "-webkit-backdrop-filter",
 ].join("|") + ")$", "u");
 const functions = new Set(["var", "calc", "min", "max", "clamp", "rgb", "rgba", "hsl", "hsla", "color-mix", "linear-gradient", "radial-gradient",
   "conic-gradient", "repeating-linear-gradient", "repeating-radial-gradient", "repeating-conic-gradient", "cubic-bezier", "steps", "translate",
@@ -52,8 +54,10 @@ const functions = new Set(["var", "calc", "min", "max", "clamp", "rgb", "rgba", 
   "minmax", "repeat", "fit-content", "blur", "brightness", "contrast", "drop-shadow", "grayscale", "saturate", "sepia", "opacity", "hue-rotate",
   "invert", "polygon", "circle", "ellipse", "inset", "counter", "counters", "oklch", "oklab", "lab", "lch", "hwb"]);
 /** The marked FPO frames and missing-material notices stay visible where they are (Part 1 #12). */
-const protectedParts = /(fpo|placeholder|pending)/u;
-const notOnProtected = /^(position|inset.*|top|right|bottom|left|transform.*|translate|rotate|scale|clip-path|(min-|max-)?(width|height)|overflow.*|font-size|opacity|filter|z-index|margin.*|float)$/u;
+const protectedParts = /(fpo|placeholder)/u;
+// They may be restyled and sized up, never shrunk to nothing, faded, clipped or transformed away.
+const notOnProtected = /^(clip-path)$/u;
+const sizeOnProtected = /^(max-)?(width|height|inline-size|block-size)$|^font-size$/u;
 // Built on first use: site-design imports this module too.
 let fontNameSet: Set<string> | undefined;
 const fontNames = () => fontNameSet ??= new Set([...Object.values(siteFonts).map(font => "mp " + font.label.toLowerCase()),
@@ -74,7 +78,8 @@ function block(css: string, open: number) {
 function selector(raw: string): string {
   const value = raw.trim().replace(/\s+/gu, " ");
   if (!value) refuse("empty selector");
-  const rest = value.replace(/^(body|:root)(?=$|[\s>+~.:[])/u, "");
+  // A sheet this check already rebuilt (checked again at delivery) starts with the site scope itself.
+  const rest = value.startsWith(scope) ? value.slice(scope.length) : value.replace(/^(body|:root)(?=$|[\s>+~.:[])/u, "");
   const scoped = rest.length < value.length;
   // Each piece: an element, class, allowed attribute, pseudo-class (with checked argument), pseudo-element, combinator or *.
   const piece = /^(?:\s*[>+~]\s*|\s+|\*|[a-z][a-z0-9]*|\.[a-z0-9_-]+|\[(?:aria-current(?:="page")?|open|aria-expanded(?:="(?:true|false)")?)\]|::?[a-z-]+(?:\([^()]*(?:\([^()]*\)[^()]*)*\))?)/u;
@@ -125,6 +130,12 @@ function declarations(body: string, protectedRule: boolean, inKeyframes: boolean
     if (name === "position" && /fixed/u.test(lower)) refuse("position: fixed");
     if (name === "opacity" && !inKeyframes && Number.parseFloat(lower) < 0.35) refuse("near-invisible content");
     if (protectedRule && notOnProtected.test(name)) refuse(`${name} on an FPO frame or placeholder notice`);
+    // A bare length under 12px (or zero) would shrink the mark away; percentages, rem and functions are sizing, not hiding.
+    if (protectedRule && sizeOnProtected.test(name) && /^(0|[0-9.]+px)$/u.test(lower) && Number.parseFloat(lower) < 12)
+      refuse(`${name} shrinks an FPO frame or placeholder notice`);
+    if (protectedRule && /^(transform|scale)$/u.test(name) && (/scale[xyz3d]*\(\s*0*\.?[0-4]?\d*\s*[,)]/u.test(lower) && !/scale[xyz3d]*\(\s*(0?\.[5-9]|[1-9])/u.test(lower) || /^0*\.?[0-4]\d*$/u.test(lower)))
+      refuse(`${name} shrinks an FPO frame or placeholder notice`);
+    if (protectedRule && name === "opacity" && Number.parseFloat(lower) < 0.85) refuse("a faded FPO frame or placeholder notice");
     out.push(`${name}:${value}${important ? " !important" : ""}`);
   }
   return out.join(";");
@@ -173,7 +184,7 @@ export function readSiteStylesheet(value: unknown): string {
   if (typeof value !== "string" || !value.trim()) refuse("empty");
   if (value.length > maximumLength) refuse("too long");
   const css = value.replace(/\/\*[\s\S]*?\*\//gu, "");
-  if (/[<\\]|url\s*\(|@import|@font-face|@charset|@namespace|expression\s*\(|javascript:|behavior\s*:|-moz-binding|image-set|element\s*\(|attr\s*\(/iu.test(css))
+  if (/[<\\]|url\s*\(|@import|@font-face|@charset|@namespace|expression\s*\(|javascript:|(?<![a-z-])behavior\s*:|-moz-binding|image-set|(?<![a-z-])element\s*\(|(?<![a-z-])attr\s*\(/iu.test(css))
     refuse("it loads, runs or reads something");
   const out = rules(css, 0);
   if (!out) refuse("no rules");

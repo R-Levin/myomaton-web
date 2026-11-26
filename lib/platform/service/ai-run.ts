@@ -25,7 +25,10 @@ export async function aiRunWriter(run: AiRun, account: { webPresenceId: string; 
     retain: async entry => { await appendFile(join(run.directory, "answers.jsonl"), JSON.stringify(entry) + "\n"); },
     readImage: file => readFile(inside(file)),
     refusals: async digest => (await readFile(join(run.directory, "answers.jsonl"), "utf8").catch(() => "")).split("\n").filter(Boolean)
-      .map(line => JSON.parse(line) as { digest?: string; answer?: { refused?: string } }).filter(entry => entry.digest === digest && entry.answer?.refused).length });
+      .map(line => JSON.parse(line) as { digest?: string; answer?: { refused?: string } }).filter(entry => entry.digest === digest && entry.answer?.refused).length,
+    refused: async digest => (await readFile(join(run.directory, "answers.jsonl"), "utf8").catch(() => "")).split("\n").filter(Boolean)
+      .map(line => JSON.parse(line) as { digest?: string; answer?: { refused?: string; output?: unknown } })
+      .filter(entry => entry.digest === digest && entry.answer?.refused && entry.answer.output !== undefined).map(entry => entry.answer!.output) });
 }
 
 /**

@@ -185,6 +185,16 @@ function about(value: string): { kind: Kind | "site"; path?: string } {
   return { kind: kind as Kind | "site", ...(path && { path }) };
 }
 
+/** A Specialist asks Core for a change to a Work product in their own words: a Request from the Specialist. */
+export async function specialistRequest(webPresenceId: string, form: FormData) { await shown(webPresenceId, async () => {
+  const words = text(form, "words");
+  if (!words) throw Error("Say what Core should change");
+  await change(webPresenceId, "specialist", (record, ctx) => {
+    const at = now();
+    return ask(record, { id: `specialist:${ctx.person.id}:${at}`, at, by: ctx.person, ...about(text(form, "about")), words: words.slice(0, 20_000) });
+  });
+}); }
+
 /**
  * A Specialist enters an email from the Client (until the email service is connected). It counts
  * as the Client's Request only when the sender is on the Account's list of Client people.

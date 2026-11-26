@@ -4,7 +4,7 @@ import { clientPeople } from "@/lib/platform/accounts/people";
 import { readMyBusiness } from "@/lib/platform/intake/my-business";
 import { currentSite, tasks } from "@/lib/platform/service/cycle";
 import { accounts, acting, serviceRuntime } from "@/lib/platform/service/runtime";
-import { addPerson, askPublish, beginLaunch, directRequest, enterEmail, proposeFact, readBack, removePerson, review, runCore, sendDrafts } from "../actions";
+import { addPerson, askPublish, beginLaunch, directRequest, enterEmail, proposeFact, readBack, removePerson, review, runCore, sendDrafts, specialistRequest } from "../actions";
 import { Content, Frame, ReviewForm, Section, button, field, primary, productName } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -113,6 +113,16 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
         {currentProducts.length ? currentProducts.map(item => (
           <details key={item.changeId} className="mb-2 rounded border border-neutral-200 p-3"><summary className="cursor-pointer font-medium">{productName(item)}, version {item.version}</summary>
             <div className="mt-2"><Content item={item} /></div></details>)) : <p className="text-neutral-600">None yet.</p>}
+      </Section>
+
+      <Section title="Ask Core for a change" note="Your own request as Specialist, on a Work product. Core reworks it and the new version comes back for review.">
+        <form action={specialistRequest.bind(null, id)} className="space-y-2">
+          <textarea name="words" rows={4} className={field} placeholder="What Core should change, in your words" required />
+          <div className="flex flex-wrap items-center gap-2">
+            <select name="about" className="rounded border border-neutral-300 px-2 py-1.5 text-sm">{targets.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select>
+            <button className={button}>Ask Core</button>
+          </div>
+        </form>
       </Section>
 
       <Section title="Client email" note="Enter an email the Client sent (until Core receives email itself). It counts as the Client's word only from someone on the Client people list.">

@@ -202,3 +202,15 @@ Plain server-rendered pages, one form per action, every action checking who is a
   from each page's headline (inconsistent); the mobile menu is a grid of buttons rather than a
   collapsible menu; forms are disabled in drafts until Publish (milestone 5); no real images yet,
   only marked FPO frames (#12). Next: the Principal reviews draft 1; then milestone 4.
+
+- *Nov 26, later: Core designs the look (local preview, ~$8.25 of $15):* the Direction's design
+  now includes the site's own stylesheet (projection v5), checked by Core and again by the
+  delivery plugin; the theme's styling is only a fallback. C0 runs as an ordinary test Client (the
+  old site's screenshots and design notes are no longer Evidence). Core's Direction went to v6
+  through Specialist requests (new "Ask Core for a change" in the workspace): the first stylesheet
+  broke multi-column blocks, the next had unreadable text on light cards, the next ran off phone
+  screens; each was caught by rendering and measuring (readability and phone-width checks) before
+  showing the Principal. Refused paid answers are re-checked before paying again. Open: real
+  images in place of the FPO frames (the largest remaining visual gap); "Content needed" badge
+  contrast slightly low; uneven right margin on phones; the readability and phone checks should
+  become part of the Specialist review rather than ad-hoc scripts.

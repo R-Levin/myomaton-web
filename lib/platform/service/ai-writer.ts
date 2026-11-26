@@ -23,6 +23,8 @@ export type AiWriterConfig = {
   retain?: (entry: { at: string; kind: string; path?: string; requests: string[]; answer: unknown; digest?: string }) => Promise<void>;
   /** How many answers to this same work were refused before. Each retry is new work for the ledger, which refuses paying twice for the same. */
   refusals?: (digest: string) => Promise<number>;
+  /** The outputs of earlier refused answers to this same work, oldest first, re-checked before paying again. */
+  refused?: (digest: string) => Promise<unknown[]>;
   /** Reads an Evidence image (a brand asset, a peer site's screenshot). Without it Core reads Evidence as text only. */
   readImage?: (file: string) => Promise<Buffer>;
 };
@@ -82,6 +84,14 @@ export function createAiWriter(config: AiWriterConfig): Writer {
         input: images.length ? [{ role: "user" as const, content: [{ type: "input_text" as const, text: JSON.stringify(payload) }, ...images] }] : JSON.stringify(payload),
         text: { format: { type: "json_schema", name: "core_" + stage[input.kind], strict: true, schema: bindCitations(schema, ids) } } };
       const digest = fingerprint({ kind: input.kind, payload });
+      // A paid answer refused only by a check that has since been corrected is taken, not bought again.
+      for (const output of [...await config.refused?.(digest) ?? []].reverse()) {
+        try {
+          const reused = checked(input, output, sources, ids, paths);
+          await config.retain?.({ at: new Date().toISOString(), kind: input.kind, ...(input.page && { path: input.page.path }), requests: input.requests, answer: reused });
+          return reused;
+        } catch { /* still refused */ }
+      }
       let answer: unknown, refusal = "";
       // A refused answer gets one more attempt, told why it was refused (as a reviewer would say).
       for (let attempt = 0; ; attempt++) {
