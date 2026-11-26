@@ -1435,3 +1435,10 @@ Principal approves.
   newly designed and visibly shaped by research, never like the earlier site; nothing is called
   done or shown until the rendered site has been looked at and compared. Go-ahead taken for giving
   Core real design authority and redesigning C0, keeping the current page content.
+
+- **Nov 26 — correction: the old site is not the yardstick.** Claude had framed #16c and the
+  redesign around C0's earlier site ("must not look like it", "compare with it"). The Principal:
+  that is off base; for every Client but C0 there is no old site (unless the separate product
+  still in discussion, which starts from an existing site). Claude was "swirling around the same
+  failure mode" and missing nuance in the discussion. #16c reworded without the old-site clause;
+  the build was paused to confirm what the Principal is looking for before going further.
