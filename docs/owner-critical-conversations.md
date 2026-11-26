@@ -1469,3 +1469,11 @@ Principal approves.
   flat illustrations). 34 pictures are placed; frames needing a labelled diagram stay marked FPO.
   Under the Principal's earlier release of OpenAI credit, the run's answer count was raised from
   90 to 160; the $15 cap is unchanged.
+
+- **Nov 26 — an inflection point.** After seeing the draft with real pictures, the Principal said
+  that for the first time this is a site that might work in production, though it still looks
+  similar to earlier versions; leave it as it is. Before Claude changed anything over visual load,
+  the Principal said stop: they needed to see Core's original proposal first. The Principal asked
+  to stop and assess carefully, covering the site, how Claude Code should work with the Principal,
+  and other elements, captured as an important review for the next tasks:
+  `docs/review-2026-11-26-inflection-point.md`. Nothing in it is decided yet.
