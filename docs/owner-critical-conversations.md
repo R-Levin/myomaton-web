@@ -1388,3 +1388,8 @@ Principal approves.
   earlier versions), and cover Specialist work as a costed part of delivery, the real service
   functions, the retired legacy offers (HostShop sign-in kept), the 5-10 Client first cohort and
   new businesses sometimes being simpler to launch. Core wrote Report v4 with all of them.
+
+- **Nov 26 — Report v4 approved as C0's Client.** The Principal approved the Business
+  Understanding Report, version 4 ("Approve version 4"). Recorded in the local preview's Client
+  Portal, so v4 is C0's current Report and the Direction is next. Peer research and brand assets
+  are still to be connected before it.

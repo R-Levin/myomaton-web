@@ -274,7 +274,9 @@ export function outcome(record: ServiceRecord, request: Request): { state: "work
   const product = applied && record.products.find(item => item.changeId === applied.id);
   if (applied) return { state: "done", words: product ? `Done: in the ${product.kind === "page" ? `page ${product.path}` : label({ target: { grain: grainOf[product.kind] } } as Request)}, version ${product.version}.` : "Done." };
   if (changes.some(change => change.status === "proposed")) return { state: "review", words: "Done; waiting for review." };
-  // Declined: a correction raised the next Request, so the work goes on.
+  // Corrected: the correction raised the next Request, so this one ends where that one does.
+  const correction = record.ledger.requests.filter(item => changes.some(change => item.id.startsWith(change.id + ":correction:"))).at(-1);
+  if (correction) return outcome(record, correction);
   return changes.some(change => change.reviews.some(review => review.response === "decline" && review.words)) ? { state: "working", words: "Being reworked." }
     : { state: "declined", words: "Not taken up." };
 }

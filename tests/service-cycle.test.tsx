@@ -54,6 +54,8 @@ test("one engine runs Launch from the start of the Stage to a complete site, on 
   record = respond(record, reviewTask(record, "client")[0].changeId!, client, "approve", at(4));
   const report = record.products.filter(item => item.id === reportIdentity(account.managedSiteId));
   assert.deepEqual(report.map(item => [item.version, item.status]), [[1, "declined"], [2, "current"]]);
+  const corrected = record.ledger.requests.find(item => record.ledger.changes.find(change => change.id === first.changeId)!.requestIds.includes(item.id))!;
+  assert.equal(outcome(record, corrected).words, "Done: in the Report, version 2.", "A corrected Request ends where its correction does");
 
   // Each approval raises what builds on it: Direction, then the Site plan, then one Request per page.
   for (let minute = 5; minute < 12 && !currentSite(record)?.complete; minute += 2) {
