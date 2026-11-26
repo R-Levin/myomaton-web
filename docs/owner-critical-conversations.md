@@ -1418,3 +1418,12 @@ Principal approves.
 - **Nov 26 — the Principal asked for typical AI cost per Client** (onboarding to a site ready for
   approval, building the site, and monthly account activity), understanding this run is
   development, not production. A question, not a decision; answered from this run's ledger.
+
+- **Nov 26 — "it looks exactly the same" as the site from two months ago.** On seeing review
+  draft 1 in the preview WordPress, the Principal objected that after repeated time and money it
+  still looks pretty much like the original accepted site. Meaning: a new site from Core must look
+  newly designed for the business, not like the old site re-skinned. Causes found: the WordPress
+  theme still sets the layout and look (Core chooses only colours, fonts, corners and spacing);
+  the Specialist's correction to the Direction steered it to keep the old site's look; and no real
+  images yet. Proposal put to the Principal: give Core real design authority over each site's
+  layout and look, then have Core redesign C0.
