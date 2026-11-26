@@ -1427,3 +1427,11 @@ Principal approves.
   the Specialist's correction to the Direction steered it to keep the old site's look; and no real
   images yet. Proposal put to the Principal: give Core real design authority over each site's
   layout and look, then have Core redesign C0.
+
+- **Nov 26 — "we are looking for what Cx will see."** The Principal, frustrated that clear
+  direction keeps failing to take hold, said to keep the content (not yet reviewed) but to show
+  real value from the work and the external best practice, judged by what the Client will see.
+  Recorded as Part 1 #16c: Core designs each site's actual look and layout; a new site must look
+  newly designed and visibly shaped by research, never like the earlier site; nothing is called
+  done or shown until the rendered site has been looked at and compared. Go-ahead taken for giving
+  Core real design authority and redesigning C0, keeping the current page content.

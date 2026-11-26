@@ -93,6 +93,12 @@ nothing below came from an assistant proposal unless it says so.
     sections. Captured for the future; not yet built. *(Nov 22)*
 16b. **Humans review real WordPress sites** (20i Reseller hosting), not screenshots;
     screenshots are only an AI input. *(Nov 22)*
+16c. **A site is judged by what the Client will see.** Core designs each site's actual look and
+    layout, not only its colours and fonts; a new site must look newly designed for that business,
+    shaped visibly by the research, and must not look like the earlier accepted site or any fixed
+    template. Nothing is called done, or shown to the Principal, until the rendered site has been
+    looked at and compared with the earlier site and the peers. *(Nov 26: "we are looking for what
+    Cx will see")*
 
 ### How development must work
 17. **Outcome first.** Tests are part of engineering, not product progress. Never
