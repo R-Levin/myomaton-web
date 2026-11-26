@@ -1381,3 +1381,10 @@ Principal approves.
   later direction overriding earlier) now goes to Core with the Knowledge; Report v3 was written
   from it. Peer research and brand assets follow before the Direction and site. Sending the full C0
   documents to OpenAI falls within this instruction and the $15 cap.
+
+- **Nov 25 — corrections on Report v3 approved.** Asked whether Claude should send its review
+  corrections on Report v3 as C0's Client, the Principal said "Approved". Sent, labelled as the
+  Specialist's review approved by the Principal: describe the business as it stands (no talk of
+  earlier versions), and cover Specialist work as a costed part of delivery, the real service
+  functions, the retired legacy offers (HostShop sign-in kept), the 5-10 Client first cohort and
+  new businesses sometimes being simpler to launch. Core wrote Report v4 with all of them.
