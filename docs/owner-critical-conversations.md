@@ -1442,3 +1442,14 @@ Principal approves.
   still in discussion, which starts from an existing site). Claude was "swirling around the same
   failure mode" and missing nuance in the discussion. #16c reworded without the old-site clause;
   the build was paused to confirm what the Principal is looking for before going further.
+
+- **Nov 26 — "C0 as a legitimate model for us to complete building the product."** The Principal
+  said repeated substitution of agreed direction is unacceptable and that Claude must do the work
+  without asking questions the Principal has no basis to answer. Claude re-read the Principal's
+  own words of Nov 22-25 and found the direction already given: jettison every rule that keeps
+  sites looking the same (fonts, colours, layouts were never permanent; Nov 22), and use C0 as an
+  ordinary test Client, special only where it is part of the product (Nov 25). Action: C0 runs as
+  any new Client would: the earlier MioPages site (screenshots, authority notes, R3 copy) is
+  removed from what Core reads, since no new Client has one; Core gets real authority over each
+  site's layout and look; Core redesigns C0 with the current page content kept; Claude reviews the
+  rendered site as a Client would see it before showing the Principal.
