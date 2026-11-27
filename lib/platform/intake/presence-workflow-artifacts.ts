@@ -20,6 +20,11 @@ const shape = <T extends Record<string, unknown>>(properties: T) => ({
 });
 const options = (values: readonly string[]) => ({ type: "string", enum: values });
 const cited = { sourceIds: array(string) };
+const visualShape = shape({ purpose: string, brief: string, altIntent: string, status: options(visualStates) });
+/** Further pictures in one section (design rules: Core decides how many pictures, and where). */
+const moreVisuals = { ...array(visualShape), description: "Further pictures for this section beyond visual (a gallery, a second image), usually none. " +
+  "Place picture n (counting from 1) with an image node whose reference is section-<sectionIndex>-<n>; one that is not placed follows the section's content. " +
+  "Each must carry its own idea: a visitor can take in only so much on one page." };
 
 export const artifactSchemas = {
   report: shape({ title: string, summary: string, findings: array(shape({ id: string, heading: string, body: string, status: options(findingStates), ...cited })) }),
@@ -42,7 +47,7 @@ const composedPage = shape({
   ...artifactSchemas.page.properties, composition: options(["managed-v1"]),
   sections: array(shape({
     heading: string, body: string, ...cited, role: options(sectionRoles),
-    visual: shape({ purpose: string, brief: string, altIntent: string, status: options(visualStates) }),
+    visual: visualShape, moreVisuals,
   })),
   actions: array(shape({ label: string, kind: options(actionKinds), destination: nullableString,
     sectionIndex: { type: ["integer", "null"], description: "Zero-based index of the section that shows this action as a button. " +
@@ -52,7 +57,7 @@ const composedPage = shape({
 export const composedArtifactSchemas = { ...artifactSchemas, page: composedPage };
 export const strategyPageSchema = shape({ ...composedPage.properties,
   sections: array(shape({ heading: string, body: string, ...cited, role: options(sectionRoles),
-    visual: shape({ purpose: string, brief: string, altIntent: string, status: options(visualStates) }),
+    visual: visualShape, moreVisuals,
     block: { anyOf: [semanticBlockSchema, { type: "null" }] } })) });
 export const creativePageSchema = {
   ...strategyPageSchema, $defs: nativeComponentSchema.$defs,
@@ -163,9 +168,14 @@ type PageAction = { label: string; kind: typeof actionKinds[number]; destination
 /** One Page section from provider output. `actions` is the Page's raw Action list (for provider reference recovery). */
 export function readSection(value: unknown, composed: boolean, ids: readonly string[], actions: unknown,
   normalizeProviderReferences = false, semanticBlocks = false) {
-  const section = object(value, composed ? ["heading", "body", "sourceIds", "visual", "role", ...(semanticBlocks ? ["block"] : [])] : ["heading", "body", "sourceIds", "visual"]);
+  const section = object(value, composed ? ["heading", "body", "sourceIds", "visual", "moreVisuals", "role", ...(semanticBlocks ? ["block"] : [])] : ["heading", "body", "sourceIds", "visual"]);
   const role = composed ? choice(section.role, sectionRoles) : undefined;
-  const visual = object(section.visual, ["purpose", "brief", "altIntent", "status"]);
+  const readVisual = (raw: unknown) => {
+    const visual = object(raw, ["purpose", "brief", "altIntent", "status"]);
+    return { purpose: copy(visual.purpose), brief: copy(visual.brief), altIntent: copy(visual.altIntent), status: choice(visual.status, visualStates) };
+  };
+  if (section.moreVisuals !== undefined && !Array.isArray(section.moreVisuals)) throw Error("Expected further pictures as a list");
+  const more = ((section.moreVisuals ?? []) as unknown[]).map(readVisual).filter(visual => visual.status !== "text-only");
   const block = section.block == null ? undefined : readSemanticBlock(
     normalizeProviderReferences && semanticBlocks ? recoverProviderNativeComponent(section.block, actions) : section.block,
     normalizeProviderReferences && semanticBlocks);
@@ -176,7 +186,8 @@ export function readSection(value: unknown, composed: boolean, ids: readonly str
   sourceIds: citedSources(section.sourceIds, ids, normalizeProviderReferences, false),
     ...(role && { role }),
     ...(block && { block }),
-    visual: { purpose: copy(visual.purpose), brief: copy(visual.brief), altIntent: copy(visual.altIntent), status: choice(visual.status, visualStates) } };
+    visual: readVisual(section.visual),
+    ...(more.length && { moreVisuals: more }) };
 }
 
 /**
@@ -193,7 +204,7 @@ export function readSectionRevision(value: unknown, previous: WorkflowPage, inde
   const rawActions = previous.actions.map(action => ({ label: action.label, kind: action.kind, destination: action.destination,
     sectionIndex: action.sectionIndex ?? null }));
   for (const raw of output.sections) {
-    const { index, ...rest } = object(raw, ["index", "heading", "body", "sourceIds", "visual", "role", ...(semanticBlocks ? ["block"] : [])]) as Record<string, unknown>;
+    const { index, ...rest } = object(raw, ["index", "heading", "body", "sourceIds", "visual", "moreVisuals", "role", ...(semanticBlocks ? ["block"] : [])]) as Record<string, unknown>;
     if (typeof index !== "number" || !indexes.includes(index) || seen.has(index)) throw new ArtifactValidationError("page-binding", "Revised section is outside the noted sections");
     seen.add(index);
     const section = readSection(rest, Boolean(previous.composition), ids, rawActions, normalizeProviderReferences, semanticBlocks);

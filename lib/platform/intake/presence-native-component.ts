@@ -36,7 +36,7 @@ export const nativeComponentSchema = {
       level: kind === "heading" ? { type: "integer", enum: [1, 2, 3, 4, 5, 6] } : { type: "null" },
       items: { type: "array", items: { type: "string" }, ...(kind === "list" ? { minItems: 1 } : kind === "quote" ? { maxItems: 1, description: "Optional: who said it, exactly as in the Evidence." } : { maxItems: 0 }) },
       ordered: { type: "boolean" },
-      reference: ["image", "action", "placeholder"].includes(kind) ? { type: "string", pattern: kind === "image" ? "^section-(0|[1-9][0-9]*)$"
+      reference: ["image", "action", "placeholder"].includes(kind) ? { type: "string", pattern: kind === "image" ? "^section-(0|[1-9][0-9]*)(-[1-9][0-9]*)?$"
         : kind === "action" ? "^action-(0|[1-9][0-9]*)$" : placeholderPattern } : { type: "null" },
       layout: { $ref: "#/$defs/nativeLayout" },
       children: { type: "array", items: { $ref: "#/$defs/nativeNode" }, ...(["group", "details"].includes(kind) ? { minItems: 1 } : { maxItems: 0 }) },

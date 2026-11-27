@@ -7,7 +7,7 @@ import { readSemanticBlock, type SemanticBlock } from "../intake/presence-semant
 
 export type Site = { organizationId: string; webPresenceId: string; managedSiteId: string };
 type Page = { id: string; path: string; title: string; composition?: "managed-v1"; navigationLabel?: string; sections: {
-  id: string; type: string; content: { heading: string; text: string }; block?: SemanticBlock; visual?: SectionVisual;
+  id: string; type: string; content: { heading: string; text: string }; block?: SemanticBlock; visual?: SectionVisual; moreVisuals?: (SectionVisual & { id: string })[];
 }[] };
 /** Core's own per-section visual intent. "asset-needed"/"rights-review" without an
  * approved acquired image renders as a clearly marked FPO frame in drafts only. */
@@ -51,10 +51,14 @@ export function validatePages(pages: Page[], nativeDraft = false, localSemanticB
       page.sections.some(section => !["hero", "intro", "cta"].includes(section.type)))) throw Error("Composed Page sections refused");
     paths.add(page.path);
     pageIds.add(page.id);
-    for (const { id: sectionId, type, content, block, visual, ...extra } of page.sections) {
-      if (visual !== undefined && (!composed || !exact(visual, "altIntent,brief,purpose,status") ||
-        !["text-only", "asset-needed", "rights-review"].includes(visual.status) ||
-        !text(visual.purpose, 2000) || !text(visual.brief, 4000) || !text(visual.altIntent, 1000))) throw Error("Projection section visual refused");
+    for (const { id: sectionId, type, content, block, visual, moreVisuals, ...extra } of page.sections) {
+      const visualRefused = (item: SectionVisual) => !["text-only", "asset-needed", "rights-review"].includes(item.status) ||
+        !text(item.purpose, 2000) || !text(item.brief, 4000) || !text(item.altIntent, 1000);
+      if (visual !== undefined && (!composed || !exact(visual, "altIntent,brief,purpose,status") || visualRefused(visual))) throw Error("Projection section visual refused");
+      // Further pictures in the section, each with its own frame identity (design rules: Core decides how many).
+      if (moreVisuals !== undefined && (!composed || !Array.isArray(moreVisuals) || !moreVisuals.length || moreVisuals.some(item =>
+        !exact(item, "altIntent,brief,id,purpose,status") || !id(item.id) || sectionIds.has(item.id) || visualRefused(item)))) throw Error("Projection section visual refused");
+      for (const item of moreVisuals ?? []) sectionIds.add(item.id);
       if (block !== undefined) {
         if (!composed || !localSemanticBlocks) throw Error("Projection semantic block requires the local draft renderer");
         const component = readSemanticBlock(block);

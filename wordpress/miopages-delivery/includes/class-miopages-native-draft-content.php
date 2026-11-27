@@ -154,6 +154,13 @@ final class MioPages_Native_Draft_Content
             if (isset($attachments[$section['id']])) $componentImages['section-' . $index] = $attachments[$section['id']];
             elseif (self::wantsFpo($section)) $componentImages['section-' . $index] = ['fpo'=>$section['visual']];
             elseif ($reviewDraft) $componentImages['section-' . $index] = ['pending'=>true];
+            // Further pictures Core asked for in this section, each in its own frame.
+            foreach (self::moreVisuals($section) as $n => $visual) {
+                $key = 'section-' . $index . '-' . ($n + 1);
+                if (isset($attachments[$visual['id']])) $componentImages[$key] = $attachments[$visual['id']];
+                elseif (in_array($visual['status'], ['asset-needed','rights-review'], true)) $componentImages[$key] = ['fpo'=>array_diff_key($visual, ['id'=>true])];
+                elseif ($reviewDraft) $componentImages[$key] = ['pending'=>true];
+            }
         }
         $componentActions = [];
         if ($reviewDraft && $actions === []) {
@@ -201,10 +208,11 @@ final class MioPages_Native_Draft_Content
                 // Core requested an image for this section but authored no placement:
                 // place the acquired image, or its FPO frame, beside the authored content.
                 $aside = '';
-                if (!MioPages_Native_Component::hasImage($section['block']['root'])) {
+                if (!MioPages_Native_Component::hasImage($section['block']['root'], 'section-' . $index)) {
                     if (isset($attachments[$id])) $aside = self::image($attachments[$id]);
                     elseif (self::wantsFpo($section)) $aside = MioPages_Native_Component::fpo($section['visual']);
                 }
+                $aside .= self::unplaced($section, $index, $componentImages);
                 $class = 'miopages-draft-section miopages-draft-' . $type . ' miopages-authored-section' . ($aside !== '' ? ' miopages-draft-with-image' : '');
                 if ($aside !== '') $authored = '<!-- wp:group {"className":"miopages-draft-copy"} --><div class="wp-block-group miopages-draft-copy">' . $authored . '</div><!-- /wp:group -->' . $aside;
                 $blocks[] = '<!-- wp:group {"tagName":"section","className":"' . $class . '"} -->'
@@ -223,13 +231,14 @@ final class MioPages_Native_Draft_Content
             }
             if (array_key_exists('block', $section)) $content .= self::semanticBlock($section['block'], $type === 'hero' ? 2 : 3, $componentImages, $componentActions, $postIds, $origin);
             $media = $attachments[$id] ?? null;
-            $fpo = !$media && self::wantsFpo($section) && !(array_key_exists('block', $section) && MioPages_Native_Component::hasImage($section['block']['root'] ?? null));
+            $fpo = !$media && self::wantsFpo($section) && !(array_key_exists('block', $section) && MioPages_Native_Component::hasImage($section['block']['root'] ?? null, 'section-' . $index));
+            $more = self::unplaced($section, $index, $componentImages);
             $style = $type === 'cta' && empty($placedActions[$id]) ? 'intro' : $type;
             $class = 'miopages-draft-section miopages-draft-' . $style . ($media || $fpo ? ' miopages-draft-with-image' : '');
             $blocks[] = '<!-- wp:group {"tagName":"section","className":"' . $class . '"} -->'
                 . '<section class="wp-block-group ' . $class . '">'
                 . '<!-- wp:group {"className":"miopages-draft-copy"} --><div class="wp-block-group miopages-draft-copy">'
-                . $content . '</div><!-- /wp:group -->' . ($media ? self::image($media) : ($fpo ? MioPages_Native_Component::fpo($section['visual']) : '')) . '</section><!-- /wp:group -->';
+                . $content . '</div><!-- /wp:group -->' . ($media ? self::image($media) : ($fpo ? MioPages_Native_Component::fpo($section['visual']) : '')) . $more . '</section><!-- /wp:group -->';
         }
         if ($related !== []) {
             $blocks[] = '<!-- wp:html --><nav class="miopages-draft-related" aria-label="Related pages">'
@@ -308,6 +317,34 @@ final class MioPages_Native_Draft_Content
         return '<!-- wp:image {"id":' . $id . '} --><figure class="wp-block-image">'
             . '<img src="' . MioPages_Native_Component::href(MioPages_Native_Draft_Media::url($id)) . '" alt="' . htmlspecialchars($image['alt'], ENT_COMPAT | ENT_SUBSTITUTE, 'UTF-8')
             . '" class="wp-image-' . $id . '"/></figure><!-- /wp:image -->';
+    }
+
+    /** A section's further pictures (design rules: Core decides how many), each with its frame identity. */
+    private static function moreVisuals(array $section): array
+    {
+        $more = $section['moreVisuals'] ?? [];
+        if (!is_array($more) || !array_is_list($more)) throw new InvalidArgumentException('Native draft pictures refused.');
+        foreach ($more as $visual) {
+            if (!is_array($visual) || !is_string($visual['id'] ?? null) || !is_string($visual['brief'] ?? null) || !is_string($visual['purpose'] ?? null)
+                || !is_string($visual['altIntent'] ?? null) || !in_array($visual['status'] ?? null, ['text-only','asset-needed','rights-review'], true)) {
+                throw new InvalidArgumentException('Native draft pictures refused.');
+            }
+        }
+        return $more;
+    }
+
+    /** Further pictures Core's block did not place: they follow the section's content. */
+    private static function unplaced(array $section, int $index, array $images): string
+    {
+        $html = '';
+        foreach (self::moreVisuals($section) as $n => $visual) {
+            $key = 'section-' . $index . '-' . ($n + 1);
+            if (isset($section['block']['root']) && MioPages_Native_Component::hasImage($section['block']['root'], $key)) continue;
+            $image = $images[$key] ?? null;
+            if (isset($image['fpo'])) $html .= MioPages_Native_Component::fpo($image['fpo']);
+            elseif (isset($image['id'])) $html .= self::image($image);
+        }
+        return $html;
     }
 
     /** Core asked for an image (asset-needed / rights-review) in its section visual. */

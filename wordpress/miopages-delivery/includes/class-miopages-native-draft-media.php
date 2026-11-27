@@ -42,7 +42,8 @@ final class MioPages_Native_Draft_Media
             }
             $pages = array_values(array_filter($candidate['pages'], static fn($page) => ($page['id'] ?? null) === $item['pageId']));
             $targets = array_filter($pages[0]['sections'] ?? [], static fn($section) =>
-                ($section['id'] ?? null) === $item['sectionId'] && in_array($section['type'] ?? null, ['hero', 'intro', 'relationship', 'collection', 'cta'], true));
+                (($section['id'] ?? null) === $item['sectionId'] || in_array($item['sectionId'], array_column($section['moreVisuals'] ?? [], 'id'), true))
+                && in_array($section['type'] ?? null, ['hero', 'intro', 'relationship', 'collection', 'cta'], true));
             if (count($pages) !== 1 || count($targets) !== 1) {
                 throw new InvalidArgumentException('Native draft media placement mismatch.');
             }

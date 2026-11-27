@@ -24,7 +24,8 @@ export function verifyNativeMediaPlacements(media: readonly NativeDraftMedia[], 
   const sectionIds = new Set<string>(), usages = new Set<string>();
   for (const item of media) {
     if (sectionIds.has(item.sectionId) || usages.has(item.usageId) || !pages.some(page => page.id === item.pageId &&
-      page.sections.some(section => section.id === item.sectionId && ["hero", "intro", "relationship", "collection", "cta"].includes(section.type)))) {
+      page.sections.some(section => (section.id === item.sectionId || (section.moreVisuals ?? []).some(frame => frame.id === item.sectionId))
+        && ["hero", "intro", "relationship", "collection", "cta"].includes(section.type)))) {
       throw Error("Draft media placement differs from reviewed Section");
     }
     sectionIds.add(item.sectionId);

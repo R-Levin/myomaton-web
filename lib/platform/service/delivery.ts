@@ -8,7 +8,7 @@ import type { Readback } from "../wordpress-delivery/readback";
 import { sendDraftMedia, sendSignedDraft } from "../wordpress-delivery/review-delivery";
 import { readNativeDraftMedia } from "../wordpress-delivery/native-draft-media";
 import { fingerprint } from "../canonical/model";
-import { deliveryCopy } from "./assets";
+import { deliveryCopy, pictureFrameId } from "./assets";
 import { bindReviewDraft } from "../wordpress-delivery/review-draft";
 import { directionIdentity, logicalId, pageIdentity } from "../work-products/pages";
 import { ask, current, currentSite, edit, type ServiceRecord } from "./cycle";
@@ -21,7 +21,8 @@ import { ask, current, currentSite, edit, type ServiceRecord } from "./cycle";
 export type Delivery = { site: string; installationId: string; streamId: string; revision: number; digest: string;
   recordVersion: number; pages: { path: string; id: string }[]; at: string; answeredNotes: number[] };
 
-type Section = { id: string; heading: string; body: string; role?: string; block?: unknown; visual?: { purpose: string; brief: string; altIntent: string; status: string } };
+type Visual = { purpose: string; brief: string; altIntent: string; status: string };
+type Section = { id: string; heading: string; body: string; role?: string; block?: unknown; visual?: Visual; moreVisuals?: Visual[] };
 type Page = { id: string; path: string; heading: string; composition?: string; sections: Section[];
   actions?: { label: string; kind: string; destination: string | null; sectionIndex?: number }[]; internalLinks?: string[] };
 
@@ -37,7 +38,9 @@ export function draftCandidate(record: ServiceRecord) {
     sections: page.sections.map(section => ({ id: section.id, type: section.role ?? "intro", content: { heading: section.heading, text: section.body },
       ...(section.block !== undefined && section.block !== null && { block: section.block }),
       ...(page.composition && section.visual && { visual: { purpose: section.visual.purpose, brief: section.visual.brief, altIntent: section.visual.altIntent,
-        status: section.visual.status } }) })) }));
+        status: section.visual.status } }),
+      ...(page.composition && section.moreVisuals?.length && { moreVisuals: section.moreVisuals.map((visual, n) => ({ id: pictureFrameId(section.id, n + 1),
+        purpose: visual.purpose, brief: visual.brief, altIntent: visual.altIntent, status: visual.status })) }) })) }));
   // Home is reachable from the Menu; when the plan leaves it out (the logo often links home), it goes first.
   const navigation = site.menu.includes("/") ? site.menu : ["/", ...site.menu];
   const paths = site.plan.pages.map(entry => entry.path);
@@ -99,7 +102,8 @@ export async function deliverDraft(input: { config: OperatorSiteConfig; record: 
   // Each chosen picture goes in the exact Section it was chosen for; a Section since reworked keeps its FPO frame.
   const placed = (record.assets ?? []).flatMap(asset => {
     const page = review.candidate.pages.find(item => item.path === asset.path);
-    return page?.sections.some(section => section.id === asset.sectionId) ? [{ asset, pageId: page.id }] : [];
+    return page?.sections.some(section => section.id === asset.sectionId ||
+      (section.moreVisuals ?? []).some((_, n) => pictureFrameId(section.id, n + 1) === asset.sectionId)) ? [{ asset, pageId: page.id }] : [];
   });
   const copies = await Promise.all(placed.map(async ({ asset, pageId }) => {
     const copy = await deliveryCopy(asset, file => readFile(file));

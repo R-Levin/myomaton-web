@@ -254,3 +254,20 @@ test("a pull quote carries approved words and, optionally, who said them; WordPr
   assert.equal(html.status, 0, html.stderr);
   assert.match(html.stdout, /<blockquote class="wp-block-quote miopages-node[^"]*miopages-node-order-1[^"]*"><!-- wp:paragraph --><p>We learn your business first\.<\/p><!-- \/wp:paragraph --><cite>MioPages<\/cite><\/blockquote>/u);
 });
+
+test("Core may ask for further pictures in a section: placed where its block says, or after the content", () => {
+  const visual = (brief: string) => ({ purpose: "Show the work", brief, altIntent: "The work", status: "asset-needed" });
+  const full = readNativeComponent({ ...component, mode: "section", root: node("group", { children: [
+    node("heading", { text: "Exact fixture opening", level: 1 }),
+    node("image", { reference: "section-0-1" }),
+  ] }) });
+  const candidate = { pages: [{ path: "/", title: "Fixture", composition: "managed-v1", navigationLabel: "Home", sections: [
+    { id: "fixture-hero", type: "hero", content: { heading: "Exact fixture opening", text: "" }, block: full, visual: visual("Main picture"),
+      moreVisuals: [{ id: "frame-1", ...visual("Placed by the block") }, { id: "frame-2", ...visual("Follows the content") }] },
+  ] }], navigation: ["/"], actions: [] };
+  const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/native-component.php"],
+    { input: JSON.stringify({ candidate, postIds: { "/": 99 } }), encoding: "utf8" });
+  assert.equal(php.status, 0, php.stderr);
+  const briefs = [...php.stdout.matchAll(/miopages-fpo-brief" aria-hidden="true">([^<]+)/gu)].map(match => match[1]);
+  assert.deepEqual(briefs, ["Placed by the block", "Main picture", "Follows the content"], "the block placed picture 1; the unplaced main picture and picture 2 follow the content");
+});

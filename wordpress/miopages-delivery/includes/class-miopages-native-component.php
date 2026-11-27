@@ -69,11 +69,12 @@ final class MioPages_Native_Component
             . '</figure><!-- /wp:html -->';
     }
 
-    public static function hasImage(mixed $node): bool
+    /** Whether the block places an image (or, given a reference, that exact image). */
+    public static function hasImage(mixed $node, ?string $reference = null): bool
     {
         if (!is_array($node)) return false;
-        if (($node['kind'] ?? null) === 'image') return true;
-        foreach (($node['children'] ?? []) as $child) if (self::hasImage($child)) return true;
+        if (($node['kind'] ?? null) === 'image' && ($reference === null || ($node['reference'] ?? null) === $reference)) return true;
+        foreach (($node['children'] ?? []) as $child) if (self::hasImage($child, $reference)) return true;
         return false;
     }
 

@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import sharp from "sharp";
+import { logicalId } from "../work-products/pages";
 import { currentSite, type ServiceRecord } from "./cycle";
 
 /**
@@ -11,7 +12,8 @@ import { currentSite, type ServiceRecord } from "./cycle";
  */
 export type Asset = {
   id: string; usageId: string;
-  /** The Page and Section the picture is for. A reworked Section with a new identity goes back to its FPO frame. */
+  /** The Page and the frame the picture fills: a Section's own picture (the Section's id) or one of its further
+   * pictures (pictureFrameId). A reworked Section with a new identity goes back to its FPO frames. */
   path: string; sectionId: string;
   /** The kept local copy (inside the project, outside Git) and its fingerprint. */
   file: string; sha256: string; width: number; height: number; alt: string;
@@ -24,15 +26,21 @@ export type PictureFrame = { path: string; sectionId: string; heading: string; p
 
 const placeable = new Set(["hero", "intro", "relationship", "collection", "cta"]);
 
-/** Each Section of the current site that asks for an image, with what the image must do. */
+/** The frame of a Section's further picture n (counting from 1): its own stable identity. */
+export const pictureFrameId = (sectionId: string, n: number) => logicalId({ section: sectionId, picture: n });
+
+type Visual = { purpose: string; brief: string; altIntent: string; status: string };
+
+/** Each frame of the current site where Core asked for an image, with what the image must do. */
 export function pictureFrames(record: ServiceRecord): PictureFrame[] {
   const site = currentSite(record);
   if (!site) return [];
-  return (site.pages as unknown as { path: string; sections: { id: string; heading: string; role?: string;
-    visual?: { purpose: string; brief: string; altIntent: string; status: string } }[] }[])
-    .flatMap(page => page.sections.filter(section => section.visual?.status === "asset-needed" && placeable.has(section.role ?? "intro"))
-      .map(section => ({ path: page.path, sectionId: section.id, heading: section.heading, purpose: section.visual!.purpose,
-        brief: section.visual!.brief, altIntent: section.visual!.altIntent })));
+  return (site.pages as unknown as { path: string; sections: { id: string; heading: string; role?: string; visual?: Visual; moreVisuals?: Visual[] }[] }[])
+    .flatMap(page => page.sections.filter(section => placeable.has(section.role ?? "intro")).flatMap(section =>
+      [[section.id, section.visual] as const, ...(section.moreVisuals ?? []).map((visual, n) => [pictureFrameId(section.id, n + 1), visual] as const)]
+        .filter(([, visual]) => visual?.status === "asset-needed")
+        .map(([sectionId, visual]) => ({ path: page.path, sectionId, heading: section.heading, purpose: visual!.purpose,
+          brief: visual!.brief, altIntent: visual!.altIntent }))));
 }
 
 /** Core's search phrase for each frame: a short, literal description of a photograph that could do the frame's job. */
