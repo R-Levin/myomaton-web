@@ -1540,3 +1540,7 @@ Principal approves.
 - **Nov 27 — pending buttons shown simply.** The Principal: simplify how pending items like buttons
   are shown; make them ordinary buttons with a "#" link and a short temporary note below, such as
   "Buttons not active". Also: fix the remaining readability issues.
+
+- **Nov 27 — U.S. English is a primary directive.** The Principal had to repeat it: Claude kept
+  writing "colour" in messages after the earlier instruction. Now the first rule in CLAUDE.md:
+  U.S. English in everything, checked before every message.

@@ -2,6 +2,12 @@
 
 # MioPages — working rules for Claude
 
+## Primary directive: U.S. English, always
+Write U.S. English in everything: messages to the Principal, documents, code, comments, Core's
+instructions and anything public ("color", "recognize", "license", "center", "gray", "analyze";
+never "colour", "recognise", "licence", "centre", "grey", "analyse"). Check every message before
+sending it. The Principal should never have to repeat this. (Nov 27)
+
 ## Roles
 - **Principal (Project Manager):** product direction, priorities, acceptance and the
   consequential gates listed below.
