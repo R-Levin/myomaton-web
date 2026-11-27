@@ -239,7 +239,8 @@ final class MioPages_Native_Component
         if ($kind === 'image') {
             $image = $images[$reference] ?? null;
             if (isset($image['fpo'])) return self::fpo($image['fpo'], $class);
-            if ($reviewDraft && ($image['pending'] ?? false) === true) {
+            // In a review draft, a picture Core placed but the page does not supply shows as awaiting, not a refused draft.
+            if ($reviewDraft && ($image === null || ($image['pending'] ?? false) === true)) {
                 return '<!-- wp:paragraph {"className":"miopages-pending-media"} --><p class="miopages-pending-media">Image placement awaiting asset review.</p><!-- /wp:paragraph -->';
             }
             if (!$image || !is_int($image['id']) || $image['id'] < 1) throw new InvalidArgumentException('Native component media is unbound.');

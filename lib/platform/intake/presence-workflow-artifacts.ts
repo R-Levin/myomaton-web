@@ -175,7 +175,8 @@ export function readSection(value: unknown, composed: boolean, ids: readonly str
     return { purpose: copy(visual.purpose), brief: copy(visual.brief), altIntent: copy(visual.altIntent), status: choice(visual.status, visualStates) };
   };
   if (section.moreVisuals !== undefined && !Array.isArray(section.moreVisuals)) throw Error("Expected further pictures as a list");
-  const more = ((section.moreVisuals ?? []) as unknown[]).map(readVisual).filter(visual => visual.status !== "text-only");
+  // Every further picture is kept, "text-only" ones included, so section-N-n keeps pointing at the picture Core meant.
+  const more = ((section.moreVisuals ?? []) as unknown[]).map(readVisual);
   const block = section.block == null ? undefined : readSemanticBlock(
     normalizeProviderReferences && semanticBlocks ? recoverProviderNativeComponent(section.block, actions) : section.block,
     normalizeProviderReferences && semanticBlocks);
@@ -236,6 +237,20 @@ export function readPage(value: unknown, exactPath: string, paths: readonly stri
   if (composition && (sections[0].role !== "hero" || sections.slice(1).some(section => section.role === "hero"))) {
     throw Error("Composed page needs one opening Hero");
   }
+  // A placed picture must be one the page asks for: section-N is section N's own picture, section-N-n its further picture n.
+  sections.forEach((section, index) => {
+    const visit = (node: { kind?: string; reference?: string | null; children?: unknown[] } | undefined) => {
+      if (!node || typeof node !== "object") return;
+      if (node.kind === "image") {
+        const match = /^section-(\d+)(?:-(\d+))?$/u.exec(node.reference ?? "");
+        const target = match ? sections[Number(match[1])] : undefined;
+        if (!target || (match![2] !== undefined && Number(match![2]) > (target.moreVisuals?.length ?? 0)))
+          throw Error(`Section ${index} places picture ${node.reference}, which the page does not ask for: add it to that section's moreVisuals, or place another`);
+      }
+      (node.children ?? []).forEach(child => visit(child as never));
+    };
+    if (section.block && "root" in section.block) visit(section.block.root as never);
+  });
   const otherPaths = paths.filter(candidate => candidate !== exactPath);
   const actions = list<PageAction>(page.actions, value => {
     const action = object(value, composition ? ["label", "kind", "destination", "sectionIndex"] : ["label", "kind", "destination"]);

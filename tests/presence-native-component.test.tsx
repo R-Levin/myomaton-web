@@ -271,3 +271,17 @@ test("Core may ask for further pictures in a section: placed where its block say
   const briefs = [...php.stdout.matchAll(/miopages-fpo-brief" aria-hidden="true">([^<]+)/gu)].map(match => match[1]);
   assert.deepEqual(briefs, ["Placed by the block", "Main picture", "Follows the content"], "the block placed picture 1; the unplaced main picture and picture 2 follow the content");
 });
+
+test("a page may not place a further picture it does not ask for; Core is told why and can retry", async () => {
+  const { readPage } = await import("../lib/platform/intake/presence-workflow-artifacts");
+  const visual = { purpose: "Show it", brief: "A photo", altIntent: "It", status: "asset-needed" };
+  const block = (reference: string) => ({ ...component, mode: "supplement", root: node("image", { reference }) });
+  const page = (moreVisuals: unknown[], reference: string) => ({ path: "/", heading: "Home", searchTitle: "Home", searchDescription: "Home page.",
+    composition: "managed-v1", internalLinks: [],
+    actions: [{ kind: "request-review", label: "Review", destination: "/review", sectionIndex: 0 }],
+    sections: [{ heading: "Home", body: "Opening.", sourceIds: ["offer"], role: "hero", visual, moreVisuals, block: block(reference) }] });
+  const read = (value: unknown) => readPage(value, "/", ["/", "/review"], ["offer"], { "request-review": "/review" }, false, true, true);
+  assert.throws(() => read(page([], "section-0-1")), /does not ask for/u);
+  const kept = read(page([{ ...visual, status: "text-only" }, visual], "section-0-2")) as unknown as { sections: { moreVisuals?: unknown[] }[] };
+  assert.equal(kept.sections[0].moreVisuals?.length, 2, "a text-only further picture keeps its place, so numbering holds");
+});

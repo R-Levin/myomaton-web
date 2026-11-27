@@ -127,3 +127,5 @@ tasks from that. Until then the site stays exactly as it is.
 - **Costs, development vs production (Nov 27):** the Principal cannot tell what costs what and why.
   Needed: one simple view of each step's development cost and what the same step costs a real
   Client in production, and every spending update stating both.
+- **Processing time (Nov 27):** worth a look closer to production; Core took about 12 minutes for
+  eight pages today, one after another. Show time alongside cost.
