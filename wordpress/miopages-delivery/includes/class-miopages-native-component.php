@@ -70,6 +70,15 @@ final class MioPages_Native_Component
     }
 
     /** Whether the block places an image (or, given a reference, that exact image). */
+    /** The note under buttons that are not connected yet (review drafts only). */
+    public const PENDING_NOTE = '<!-- wp:paragraph {"className":"miopages-pending-note"} --><p class="miopages-pending-note">Buttons not active in this preview</p><!-- /wp:paragraph -->';
+
+    /** One note for a run of unconnected buttons: drop a note that another unconnected button follows. */
+    public static function oneNotePerRun(string $html): string
+    {
+        return preg_replace('#' . preg_quote(self::PENDING_NOTE, '#') . '(\s*(?:<!-- /?wp:group[^>]*-->|</?div[^>]*>|\s)*<!-- wp:buttons \{"className":"miopages-pending-buttons"\})#', '$1', $html) ?? $html;
+    }
+
     public static function hasImage(mixed $node, ?string $reference = null): bool
     {
         if (!is_array($node)) return false;
@@ -251,7 +260,11 @@ final class MioPages_Native_Component
         }
         $action = $actions[$reference] ?? null;
         if ($reviewDraft && ($action['pending'] ?? false) === true) {
-            return '<!-- wp:paragraph ' . self::json(self::origin($id) + ['className'=>'miopages-pending-action']) . ' --><p class="miopages-pending-action"><span aria-disabled="true">' . $copy . ' — preview only; submissions disabled</span></p><!-- /wp:paragraph -->';
+            // An action not yet connected is an ordinary button going nowhere, with a short note below
+            // (the Principal, Nov 27); a run of such buttons shares one note.
+            return '<!-- wp:buttons {"className":"miopages-pending-buttons"} --><div class="wp-block-buttons miopages-pending-buttons"><!-- wp:button ' . $named . ' --><div' . $attrs
+                . '><a class="wp-block-button__link wp-element-button" href="#" aria-disabled="true">' . $copy . '</a></div><!-- /wp:button --></div><!-- /wp:buttons -->'
+                . self::PENDING_NOTE;
         }
         if (!$action || !isset($postIds[$action['destination']])) throw new InvalidArgumentException('Native component Action is unbound.');
         return '<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button ' . $named . ' --><div' . $attrs

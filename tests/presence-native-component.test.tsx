@@ -160,7 +160,8 @@ test("an unresolved Action slot cannot shift later Direct Start and Review bindi
  const result=run();assert.equal(result.status,0,result.stderr);
  assert.match(result.stdout,/<a[^>]*page_id=101[^>]*>Direct Start<\/a>/);
  assert.match(result.stdout,/<a[^>]*page_id=102[^>]*>Free Review<\/a>/);
- assert.match(result.stdout,/Unavailable — preview only; submissions disabled/);
+ assert.match(result.stdout,/<a class="wp-block-button__link wp-element-button" href="#" aria-disabled="true">Unavailable<\/a>/,"an unconnected action is an ordinary button going nowhere");
+ assert.equal((result.stdout.match(/Buttons not active in this preview/g)??[]).length,1,"with one short note");
  assert.equal(run({pendingActions:[]}).status,1,"Unknown Action still refuses");
  assert.equal(run({localSemanticBlocks:false}).status,1,"Private references stay unavailable to signed delivery");
  assert.equal(run({pendingActions:[{from:"/",reference:"action-1",label:"Conflict"}]}).status,1);

@@ -1536,3 +1536,7 @@ Principal approves.
   throughout the project's own text (code identifiers and database values kept where renaming
   would break them), and Core is told to write U.S. English in everything it produces. C0's site
   copy was already U.S. English.
+
+- **Nov 27 — pending buttons shown simply.** The Principal: simplify how pending items like buttons
+  are shown; make them ordinary buttons with a "#" link and a short temporary note below, such as
+  "Buttons not active". Also: fix the remaining readability issues.

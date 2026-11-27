@@ -246,8 +246,8 @@ final class MioPages_Native_Draft_Content
                 . implode('', $related) . '</nav><!-- /wp:html -->';
         }
         $siteClass = 'miopages-composed' . ($reviewDraft ? ' miopages-draft-creative' : '');
-        return '<!-- wp:group {"className":"' . $siteClass . '"} --><div class="wp-block-group ' . $siteClass . '">'
-            . implode("\n", $blocks) . '</div><!-- /wp:group -->';
+        return MioPages_Native_Component::oneNotePerRun('<!-- wp:group {"className":"' . $siteClass . '"} --><div class="wp-block-group ' . $siteClass . '">'
+            . implode("\n", $blocks) . '</div><!-- /wp:group -->');
     }
 
     private static function semanticText(mixed $text, int $bytes): string

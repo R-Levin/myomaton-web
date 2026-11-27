@@ -54,6 +54,8 @@ export function textUnits(content: string): Unit[] {
   for (let match = opener.exec(content); match; match = opener.exec(content)) {
     const name = match[1].replace(/^core\//u, "");
     if (!["heading", "paragraph", "list-item", "button", "details"].includes(name) || match[3]) continue;
+    // The note under unconnected buttons is the renderer's, not Core's text or an Operator's.
+    if (name === "paragraph" && match[2]?.includes('"miopages-pending-note"')) continue;
     let origin: string | null = null;
     if (match[2]) {
       try { const mio = JSON.parse(match[2]).metadata?.mio; origin = typeof mio === "string" ? mio : null; } catch { origin = null; }

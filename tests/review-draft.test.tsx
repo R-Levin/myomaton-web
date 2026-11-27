@@ -89,7 +89,8 @@ test("a Core-signed review draft reaches WordPress with Core's design, FPO, plac
   assert.match(homeHtml, /miopages-fpo/, "The requested image appears as a marked FPO frame");
   assert.match(homeHtml, /Customer testimonial needed/, "Missing material appears as a visible placeholder");
   assert.match(homeHtml, /<a class="wp-block-button__link wp-element-button" href="[^"]*page_id=\d+&amp;preview=true">Start now<\/a>/);
-  assert.match(startHtml, /Begin the fixture start — preview only; submissions disabled/);
+  assert.match(startHtml, /href="#" aria-disabled="true">Begin the fixture start<\/a>/);
+  assert.match(startHtml, /<p class="miopages-pending-note">Buttons not active in this preview<\/p>/);
 });
 
 test("the next review draft follows its predecessor; a stale, foreign or reshaped package is refused", () => {
@@ -180,7 +181,7 @@ test("Core reads back the Operator's edits and Notes, each Note tied to its bloc
   const [note] = summary.openNotes;
   assert.equal(note.path, "/start");
   assert.equal(note.text, "Connect this to the real Direct Start form.");
-  assert.deepEqual(note.block, { name: "paragraph", text: "Begin the fixture start — preview only; submissions disabled" });
+  assert.deepEqual(note.block, { name: "button", text: "Begin the fixture start" });
   assert.equal(note.replies[0].text, "Form is not built yet; keep the notice for now.");
   assert.equal(summary.resolvedNotes.length, 1);
   // A forged or replayed answer is refused; so is a request Core did not sign.

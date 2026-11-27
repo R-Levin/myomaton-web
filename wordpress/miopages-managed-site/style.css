@@ -261,7 +261,8 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
 .miopages-native-component .wp-block-list { padding-inline-start: 1.25rem; }
 .miopages-native-component .wp-block-list > li + li { margin-block-start: .35rem; }
 .miopages-native-component .miopages-pending-media,
-.miopages-native-component .miopages-pending-action { padding: .75rem; border: 1px dashed currentColor; font-size: 1rem; }
+/* A button not connected yet looks like any other; one small note below says so (the Principal, Nov 27). */
+.miopages-pending-note { margin: .35rem 0 0; font-size: .85rem; font-style: italic; opacity: .9; }
 
 /* A native Action has one visible button, even when its authored node carries
    surface/inset tokens. Context defaults keep it legible on a brand surface. */
