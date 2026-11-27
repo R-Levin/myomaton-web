@@ -1486,3 +1486,11 @@ Principal approves.
   (4) arbitrary restrictions on building the best-looking, contemporary, appropriate and
   research-informed layout must be removed; (5) Clients should be able to give two kinds of
   external links for Core to review and use: competitors, and sites whose design they like.
+
+- **Nov 27 — design limits first.** Both kinds of limit (the checker on Core's styling, and the
+  page builder's fixed structure) have no provenance known to the Principal, bring no clear
+  benefit and seriously limit the result even when Core is clearly instructed; they are to be
+  fixed. Rules are fine, but not these: the aim is the best result, neither these limits nor no
+  rules at all. Whatever set of design rules results must be reviewable by a person in plain
+  language (it need not be consulted often). Iterate to something that works, efficiently in
+  cost and time.
