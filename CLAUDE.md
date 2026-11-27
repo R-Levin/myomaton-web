@@ -24,6 +24,26 @@
    `claude/rebuild-2026-11-22` (based on `codex/first-operational-cycle-2026-11-12`) in this worktree. **Never merge, reset
    or fast-forward `main` or the root branch into it.**
 
+## Check before acting (every session, and again after any context summary)
+The Principal should never have to chase these (Nov 27, after a day of avoidable mistakes):
+1. **Re-read the record before doing anything** after a session start *or a context summary*:
+   this file, the top of `runtime-content/chat-recovery.md`, `docs/what-lives-where.md`, and the
+   latest entries of `docs/owner-critical-conversations.md`. A summary loses details; the record
+   does not.
+2. **Know where the Principal looks.** Drafts for the Principal go to the protected review
+   WordPress, **miopages.org**, the one place they review on any device. The local preview on
+   this PC is a development workbench, never the review place. PDFs are a supplement at most.
+3. **Do what was agreed, in the agreed order.** A question from the Principal is an invitation to
+   talk, not a new direction: answer it, give a view, and ask before acting. If a request is
+   unclear, ask; the Principal is present. Before starting any build that was not agreed, say it
+   in one line and wait. Fixing a defect in agreed work needs no permission, but say what it was.
+4. **No new rules, limits or checks without a reason the Principal can see:** tie each to Part 1
+   or the design rules, and say so when adding it. Don't change consistent conventions (layouts,
+   numbering, names) without a stated reason.
+5. **Build and test on the free stand-in first; spend in one clean pass.** Before any paid step,
+   state its development cost and what the same step costs a real Client in production.
+6. **Keep messages short, plain and in U.S. English.**
+
 ## Object orientation (Principal's fundamental principle, Nov 24)
 - `docs/service-object-model.md` defines the shared objects (Account, Knowledge,
   Evidence, Work product, Request, Decision, Change, Review, Delivery, Observation,
