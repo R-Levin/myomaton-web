@@ -48,8 +48,8 @@ const writing =
   "business's own service descriptions state its intended offer: present that offer in original copy without " +
   "commentary on whether every part already runs, and keep unverified prices, performance, availability and " +
   "customer proof unconfirmed (placeholders, not claims). " +
-  "Write in U.S. English (spelling, punctuation and usage) in everything you produce, whatever the source " +
-  "material uses. Plain text only, no HTML.";
+  "Write in the language and conventions of the business's own visitors (U.S. English unless the business " +
+  "serves another language or market). Plain text only, no HTML.";
 
 /** Originality and research use (Part 1 #10, #11; legal). */
 const originality =

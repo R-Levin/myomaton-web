@@ -1544,3 +1544,11 @@ Principal approves.
 - **Nov 27 — U.S. English is a primary directive.** The Principal had to repeat it: Claude kept
   writing "colour" in messages after the earlier instruction. Now the first rule in CLAUDE.md:
   U.S. English in everything, checked before every message.
+
+- **Nov 27 — proportion on language; raise the cap to $18; tidy the process.** The Principal: no
+  British English, but not a hard rule to compensate; other languages will come; apply
+  proportionality. Now: Claude writes to the Principal in U.S. English (an ordinary line in
+  CLAUDE.md, not a "primary directive"); Core writes each site in the language and conventions of
+  its Client's visitors, U.S. English by default. The Principal also raised the milestone 3 cap to
+  $18 to finish the current design correction, and asked to tidy the process that produced so many
+  odd errors (proposal to follow: build and test on the free stand-in, then one clean scripted run).
