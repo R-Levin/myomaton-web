@@ -70,9 +70,27 @@ function inspect() {
       const s = getComputedStyle(node);
       const bg = parse(s.backgroundColor);
       if (s.backgroundImage.includes("url(")) { onPicture = true; break; }
-      const stops = s.backgroundImage === "none" ? [] : (s.backgroundImage.match(/rgba?\([^)]*\)/gu) ?? []).map(parse);
-      if (stops.length) { layers.push(stops); if (stops.every(stop => stop.a >= 1)) break; }
-      if (bg.a > 0) { layers.push([bg]); if (bg.a >= 1 && !stops.length) break; }
+      // An element's background images are painted top first, each over the next, then over its
+      // background color; a fully opaque one hides everything beneath it.
+      const images: string[] = [];
+      if (s.backgroundImage !== "none") {
+        let depth = 0, start = 0;
+        for (let i = 0; i < s.backgroundImage.length; i++) {
+          const ch = s.backgroundImage[i];
+          if (ch === "(") depth++; else if (ch === ")") depth--;
+          else if (ch === "," && depth === 0) { images.push(s.backgroundImage.slice(start, i)); start = i + 1; }
+        }
+        images.push(s.backgroundImage.slice(start));
+      }
+      let covered = false;
+      for (const image of images) {
+        const stops = (image.match(/(rgba?|color)\([^()]*\)/gu) ?? []).map(parse);
+        if (!stops.length) continue;
+        layers.push(stops);
+        if (stops.every(stop => stop.a >= 1)) { covered = true; break; }
+      }
+      if (covered) break;
+      if (bg.a > 0) { layers.push([bg]); if (bg.a >= 1) break; }
       node = node.parentElement;
     }
     if (onPicture) { unmeasured++; continue; }
