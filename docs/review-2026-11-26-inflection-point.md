@@ -112,3 +112,15 @@ showing; recording decisions as they happen; PDFs for reading on the phone.
 
 The Principal and Claude go through sections 3 to 5, decide what to do, and fine-tune the next
 tasks from that. Until then the site stays exactly as it is.
+
+## 7. The Principal's notes after reading this review (Nov 27)
+
+- The site review covers **design and content**, done conversationally: agree first, then change.
+- **Mobile menu:** restore or recreate the earlier decent mobile menu.
+- **Menu switch point:** the text menu becomes the mobile menu at the width where it would wrap
+  to two lines.
+- **Rounded corners:** are the strong rounded edges too extreme, or up to date?
+- **Restrictions:** arbitrary restrictions on building the best-looking, contemporary,
+  appropriate, research-informed layout must be removed.
+- **Client links:** Clients can give two kinds of external links for Core to review and use:
+  competitors, and sites whose design they like.

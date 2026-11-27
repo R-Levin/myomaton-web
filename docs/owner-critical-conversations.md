@@ -1477,3 +1477,12 @@ Principal approves.
   to stop and assess carefully, covering the site, how Claude Code should work with the Principal,
   and other elements, captured as an important review for the next tasks:
   `docs/review-2026-11-26-inflection-point.md`. Nothing in it is decided yet.
+
+- **Nov 27 — notes on the review; how to proceed.** After reading the review, the Principal added:
+  the site review covers design and content, and is done *conversationally*: nothing is changed
+  without agreement. Specific site points: (1) the earlier decent mobile menu should be restored
+  or recreated; (2) the text menu must switch to the mobile menu at the width where it would wrap
+  to two lines; (3) are the strong rounded corners too extreme, or current design? Overall:
+  (4) arbitrary restrictions on building the best-looking, contemporary, appropriate and
+  research-informed layout must be removed; (5) Clients should be able to give two kinds of
+  external links for Core to review and use: competitors, and sites whose design they like.
