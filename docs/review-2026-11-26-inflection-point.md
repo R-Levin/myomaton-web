@@ -15,7 +15,7 @@ Claude's observations.
 - **The site:** C0's 10 pages, written by Core from the approved Report, the Direction and the
   research, and approved page by page by the Specialist. The look is Core's own design (its own
   stylesheet), checked for readability and phone layout. It has 34 real photographs from Pixabay,
-  each chosen by Core, used once and reviewed by the Specialist. 38 frames that need labelled
+  each chosen by Core, used once and reviewed by the Specialist. 38 frames that need labeled
   diagrams stay marked FPO. The content has not yet been reviewed by the Principal.
 - **Where it lives:** the local preview WordPress on this computer (drafts only, nothing published).
   PDF: `runtime-content/ai-runs/c0-milestone-3/site-draft-5/miopages-with-pictures-desktop.pdf`.
@@ -52,7 +52,7 @@ Claude's observations.
   5 to 16 boxed cards per page. On a phone each visual is most of a screen. Idea discussed but not
   applied: Core sets an *attention budget* per page (one strong image, a few that each carry a
   distinct idea, very few diagrams), the Site plan states it, and the Specialist checks it.
-- **Diagrams.** 38 frames ask for labelled diagrams a photo library cannot supply. Options: Core
+- **Diagrams.** 38 frames ask for labeled diagrams a photo library cannot supply. Options: Core
   draws them (SVG), an image generator, or fewer diagrams.
 - **Pictures.** Many are similar desk-and-documents scenes. A credits page for Pixabay creators is
   needed before anything public.
@@ -65,7 +65,7 @@ Claude's observations.
 
 - **Judged the wrong thing.** Claude approved pages on their words and never looked at the
   rendered site, as a Client would see it, before showing it.
-- **Left inherited limits in place.** The theme fixed the layout and Core chose only colours and
+- **Left inherited limits in place.** The theme fixed the layout and Core chose only colors and
   fonts, contrary to Part 1 and the Principal's Nov 22 words. Claude delivered the easier thing
   without saying so.
 - **Steered toward the old site,** then over-corrected into "must not look like the old site".

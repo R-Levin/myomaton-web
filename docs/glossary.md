@@ -26,7 +26,7 @@ screens use ordinary sentence case.
 | **Web Presence** | Everything through which a Client is found and chosen online. The website is the main part today. | "presence", "site" (when the whole is meant) |
 | **Stage** | Where an Account is: **Prospect**, **Onboarding** (learning the business in depth), **Launch** (building the first site and taking it live) or **Ongoing** (the continuing service). A Prospect may take the **Free Review** or a **Direct Start** (paid service without it). Used for nothing else. | "intake", "discovery", "Creation"; "stage" for AI steps |
 | **Free Review** | The free, short assessment offered to Prospects. Always called by its full name. | "Review" on its own, "Web Presence Review" |
-| **Beacon** | A clearly labelled stand-in for a part of Core that isn't built yet, so the whole cycle can still run end to end (Baseline #19). | "fixture", "stub", "simulation" (in Principal-facing text) |
+| **Beacon** | A clearly labeled stand-in for a part of Core that isn't built yet, so the whole cycle can still run end to end (Baseline #19). | "fixture", "stub", "simulation" (in Principal-facing text) |
 | **C0, C2** | C0 is MioPages itself as a real Client. C2 is a fictional test business. Their data never mixes, and neither is ever code. | |
 
 MioPages is its own Client (C0), so a Lead on miopages.com is a Prospect for MioPages: the
@@ -41,7 +41,7 @@ same funnel, at two levels.
 | **Offering** | A service or product the Client sells, with what it includes and its pricing policy. A kind of Knowledge. | |
 | **My Business** | The Client's view of their Knowledge, where they see, correct and add to it. | "Knowledge Base", "KB" (fine in conversation) |
 | **Evidence** | Material gathered that is not itself Knowledge: the Client's documents and answers, research, peer website observations, Free Review findings, and what Read-back found. | "source material", "originals", "research" (when the material is meant) |
-| **Confirm** | The Client (or an authorised Specialist) states that a Fact is true. Confirming a Fact is not approving a Change. | "attest" |
+| **Confirm** | The Client (or an authorized Specialist) states that a Fact is true. Confirming a Fact is not approving a Change. | "attest" |
 
 ## What the service makes
 
@@ -56,7 +56,7 @@ same funnel, at two levels.
 | **Action** | Something a Visitor can do: a button, link or form. | "CTA" |
 | **Menu** | The site's navigation. | "navigation" (fine in code) |
 | **Article** | A blog or content piece written for Ongoing. | "post", "blog" |
-| **Design** | The visual system Core decides for a site: type, colour, layout and components. | "design system", "theme", "brand" (brand assets are Knowledge) |
+| **Design** | The visual system Core decides for a site: type, color, layout and components. | "design system", "theme", "brand" (brand assets are Knowledge) |
 | **Placeholder** | A visible marker where real material belongs but doesn't exist yet: an **FPO image**, or a pending testimonial, price or result. Never a gap, never an invention. | "pending notice" |
 | **Version** | One saved state of a Work product. "Version 3 of the site" means the site as a whole at that point. | "candidate", "revision" (as a state), "source97" and the like |
 

@@ -71,7 +71,7 @@ export function takeInRound(ledger: ChangeLedger | undefined, round: ReviewRound
 export function analysedRound(ledger: ChangeLedger, round: ReviewRound, version: number, pages: readonly Page[], at: string,
   sitePlan?: { id: string; version: number }): ChangeLedger {
   const analysis = round.analysis;
-  if (!analysis) throw Error("The round has not been analysed");
+  if (!analysis) throw Error("The round has not been analyzed");
   const digest = (path: string) => { const page = pages.find(item => item.path === path); return page ? workDigest(page) : undefined; };
   // The Page and Sections each revision is made against, by identity and version.
   const workProduct = (path: string, indexes: readonly number[]) => {

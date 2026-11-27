@@ -57,7 +57,7 @@ Each module exposes a small interface, and the rest of its code is private to it
 
 **How it applies.** This is the technical form of the owner's position: WordPress is one
 delivery mechanism and stays out of the service's definition, while still sitting at the
-centre in practice.
+center in practice.
 - Delivery already works this way, through signed packages and the plugin.
 - OpenAI, Pixabay, 20i, Search Console and a future Claude model would each be adapters.
 - The Nov 23 option of trying Claude as the AI becomes an adapter swap, not a rewrite.
@@ -250,5 +250,5 @@ The practices confirm the model and add five concrete refinements:
   interface.
 - Domain-Driven Design (Eric Evans), modular monolith, ports and adapters (Alistair
   Cockburn), ITIL change types, OMG's CMMN case management and pull-request or plan/apply
-  practice are long-established. They are summarised here from general knowledge
+  practice are long-established. They are summarized here from general knowledge
   rather than from a specific page.

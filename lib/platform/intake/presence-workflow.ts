@@ -1127,15 +1127,15 @@ export class PresenceWorkflow {
         }
         case "review-analysis": {
           const round = state.reviewRounds?.at(-1);
-          if (round?.status !== "analysing") throw Error("No review round is being analysed");
+          if (round?.status !== "analysing") throw Error("No review round is being analyzed");
           const { untraced, skipped, refusedPages, refusedNotes, ...analysis } = readReviewAnalysis(output, round, state.pages, paths);
-          const analysed: ReviewRound = { ...round, status: "summary", analysis,
+          const analyzed: ReviewRound = { ...round, status: "summary", analysis,
             ...((untraced || skipped || refusedPages) && { analysisNotes: { untracedFacts: untraced, skippedRevisions: skipped,
               ...(refusedPages && { refusedPages, refusedPageNotes: refusedNotes }) } }) };
           // Core's analysis is its Decision on the round's Requests: the Changes it proposes, each made against these pages.
           const taken = roundLedger(state.changes, { ...round, analysis: undefined }, state.version, state.pages);
-          next = { ...state, reviewRounds: [...state.reviewRounds!.slice(0, -1), analysed],
-            changes: analysedRound(taken, analysed, state.version, state.pages, new Date(this.clock()).toISOString(),
+          next = { ...state, reviewRounds: [...state.reviewRounds!.slice(0, -1), analyzed],
+            changes: analysedRound(taken, analyzed, state.version, state.pages, new Date(this.clock()).toISOString(),
               state.workProducts?.plan && { id: state.workProducts.plan.id, version: state.workProducts.plan.version }) };
           break;
         }

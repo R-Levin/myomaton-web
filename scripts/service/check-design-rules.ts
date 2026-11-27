@@ -46,8 +46,14 @@ function inspect() {
   }
   for (const img of document.querySelectorAll("img")) if (!img.getAttribute("alt")?.trim() && !img.closest(".miopages-draft-wordmark, #wpadminbar")) say(3, `picture without a description: ${img.src.slice(-40)}`);
 
-  // Rule 4, readable: contrast against the solid colour behind the text; body text size on phones.
-  const parse = (value: string) => { const m = value.match(/[\d.]+/gu)?.map(Number) ?? []; return { r: m[0] ?? 0, g: m[1] ?? 0, b: m[2] ?? 0, a: m.length > 3 ? m[3]! : 1 }; };
+  // Rule 4, readable: contrast against the solid color behind the text; body text size on phones.
+  // Any CSS color (rgb, color(srgb …), oklch, color-mix results) read back as the pixel the browser paints.
+  const pixel = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
+  const parse = (value: string) => {
+    pixel.clearRect(0, 0, 1, 1); pixel.fillStyle = "#000"; pixel.fillStyle = value; pixel.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = pixel.getImageData(0, 0, 1, 1).data;
+    return { r: r!, g: g!, b: b!, a: a! / 255 };
+  };
   const lum = (c: { r: number; g: number; b: number }) => { const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
   const blend = (top: { r: number; g: number; b: number; a: number }, under: { r: number; g: number; b: number }) =>
     ({ r: top.r * top.a + under.r * (1 - top.a), g: top.g * top.a + under.g * (1 - top.a), b: top.b * top.a + under.b * (1 - top.a) });
@@ -56,7 +62,7 @@ function inspect() {
     .filter(el => visible(el) && [...el.childNodes].some(n => n.nodeType === 3 && n.textContent!.trim()));
   for (const el of textNodes) {
     const style = getComputedStyle(el);
-    // The colours behind the text, nearest first. A gradient is judged at its worst colour stop;
+    // The colors behind the text, nearest first. A gradient is judged at its worst color stop;
     // text over a photograph is listed for a person to look at.
     const layers: { r: number; g: number; b: number; a: number }[][] = [];
     let node: Element | null = el, onPicture = false;

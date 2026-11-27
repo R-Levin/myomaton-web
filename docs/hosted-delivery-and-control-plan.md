@@ -33,7 +33,7 @@ the development PC.
    verdict. That is a release gate, applied before the review it should follow.
 2. **Core's design is refused.** Codex limited Core's own page designs (custom
    layouts, FPO frames, "content needed" notices) and the design Core's AI chose
-   (fonts, colours, shape, spacing) to the local install. The hosted path would refuse
+   (fonts, colors, shape, spacing) to the local install. The hosted path would refuse
    the accepted baseline site outright. The WordPress side already understands the
    chosen design; the refusals sit in Core's checks and in the renderer.
 
@@ -89,7 +89,7 @@ the development PC.
 5. ~~Core's control: send a review draft for a case from Core, with the site's
    settings in Core's protected configuration.~~ Done Nov 22: Core server commands
    `deliver-review` and `read-back`, settings in `wordpress-sites/<site>.json` on the
-   Core server, enrolment tool `scripts/wordpress-enrol-review-site.ts`. The same
+   Core server, enrollment tool `scripts/wordpress-enroll-review-site.ts`. The same
    functions will serve the Operator portal once its interface is rebuilt.
 6. ~~Read-back: pages and Notes.~~ Done Nov 22. Core gets each delivered page as it
    is now, whether it was edited, and every Note with its block, replies and status.
@@ -108,7 +108,7 @@ the development PC.
    but its receipt never reached Core (Core then refuses further deliveries, safely).
 
 **Then one owner approval covering:**
-- running the enrolment for miopages.org (creates its keys);
+- running the enrollment for miopages.org (creates its keys);
 - a dedicated WordPress account for Core's delivery on miopages.org (or using the
   existing admin account);
 - adding the site's new private settings to miopages.org's configuration, and

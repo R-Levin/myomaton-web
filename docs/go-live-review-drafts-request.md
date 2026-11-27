@@ -28,7 +28,7 @@ and stop at the first problem. Claude reports after each stage in plain terms.
 |---|---|---|---|
 | 1 | GitHub | Push branch `claude/rebuild-2026-11-22` (the code is ready and tested; this session's tool settings blocked the push, so it is listed here). GitHub then builds the Core package. | Nothing to undo; `main` is untouched. |
 | 2 | Protected Core (wp-acceptance.miopages.com/core) | Install that package with the existing installer (`core-update.py`), which verifies every file, keeps the current version as `app-before-…`, restarts once and checks `/core`. | `core-update.py rollback app-before-…` (one command; the same installer used for the Nov 22 deployment). |
-| 3 | Protected Core | **Enrol miopages.org (creates credentials):** a new key pair (Core keeps the signing half), a receipt key, and a login for Core through miopages.org's password gate (random; Core keeps it in its protected settings; miopages.org only gets its scrambled form). Writes `wordpress-sites/miopages-org.json` in Core's protected folder. | Delete that settings file; the keys then work nowhere. |
+| 3 | Protected Core | **Enroll miopages.org (creates credentials):** a new key pair (Core keeps the signing half), a receipt key, and a login for Core through miopages.org's password gate (random; Core keeps it in its protected settings; miopages.org only gets its scrambled form). Writes `wordpress-sites/miopages-org.json` in Core's protected folder. | Delete that settings file; the keys then work nowhere. |
 | 4 | miopages.org | **A WordPress account for Core** (`miopages-core`, Editor role: it can edit and publish pages and posts and manage comments, but cannot change settings, plugins, themes or users; Core only ever writes drafts with it). Random password that nobody uses; it is never used to log in. | Delete the account. |
 | 5 | miopages.org | **Password gate:** add Core's gate login (scrambled form) to the site's existing password file. Your own gate login is unchanged. | Remove that one line. |
 | 6 | miopages.org | **Configuration:** the site's settings now name the new review setup instead of Codex's old release setup. The old settings are kept in a dated copy of the configuration file. | Put the dated copy back. |
@@ -39,7 +39,7 @@ and stop at the first problem. Claude reports after each stage in plain terms.
 
 They stay as they are: same text, still drafts, nothing deleted. But they belong to
 Codex's old release setup, which step 6 replaces. They will no longer show their branded
-preview (colours and wordmark) and will look like plain theme pages. They can be
+preview (colors and wordmark) and will look like plain theme pages. They can be
 archived later if you want only the current site there (your earlier open choice).
 Restoring the dated configuration copy brings their old look back.
 

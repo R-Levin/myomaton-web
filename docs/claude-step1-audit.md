@@ -65,7 +65,7 @@ P = partly justified (over-broad).
 |---|---|---|---|
 | 1 | provider.ts:551 | No placeholder images; no extra illustrations; use native blocks instead | F (#12) |
 | 2 | provider.ts:551 | "Keep the conceptual service-led Hero" | F (#11, #15) |
-| 3 | review-instructions.ts:9 | Stock optional; any content change voids the placement review | P (licence real; per-change re-review too strict for private preview) |
+| 3 | review-instructions.ts:9 | Stock optional; any content change voids the placement review | P (license real; per-change re-review too strict for private preview) |
 | 4 | fpo.ts / plan.ts | FPO only in disposable preview schema; refused elsewhere | F (#12) |
 | 5 | WP native-component.php:142 | Unbound image node throws | F (should render FPO) |
 | 6 | local-packet.ts:34 | Stock reuse only if Home identical to v64 | F |
@@ -89,7 +89,7 @@ That fits Part 2's "process overhead" pattern and probably explains the long, pr
 ## Design path
 Palette and typography come from fixed approved brand config (draft-brand.ts). The page
 writer controls only layout primitives (arrangement/columns/surface/typeScale) in
-presence-native-component.ts. Peer visual research can't change typography, colour use or
+presence-native-component.ts. Peer visual research can't change typography, color use or
 imagery; the visual vocabulary is fixed. This partly blocks #10 and #11.
 
 ## Server instability

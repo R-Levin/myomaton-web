@@ -34,7 +34,7 @@ export function workflowEvaluationPreviewInput(context: WorkflowContext, view: P
 export function workflowLocalDraftInput(context: WorkflowContext, view: PresenceWorkflowView) {
   const blueprint = view.blueprint;
   const beforeCritique = view.canRenderForEditorial === true && view.next === "editorial";
-  // While an Operator review round is analysed or awaits its decision, the site stays deliverable.
+  // While an Operator review round is analyzed or awaits its decision, the site stays deliverable.
   const reviewing = ["review-analysis", "review-summary"].includes(view.next);
   if (!context.evaluation || view.contextDigest !== fingerprint(context) || !blueprint || (!view.editorial && !beforeCritique && !reviewing) || view.failure ||
       (!beforeCritique && !reviewing && !["editorial-review", "operator-review", "review-complete"].includes(view.next)) ||

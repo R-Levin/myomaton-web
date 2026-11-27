@@ -56,7 +56,7 @@ reuses everything listed under "Keep" in `docs/claude-service-inventory.md`.
 - No invented testimonials, results, prices, credentials or claims presented as real.
   Use a placeholder instead.
 - No copying of competitors' wording or distinctive design.
-- Image licence and rights review for real images.
+- Image license and rights review for real images.
 - Accessibility: readable contrast, the same reading order on mobile, alt text.
 - No raw code from the AI into live sites.
 - Spending stops at the approved budget.
@@ -68,7 +68,7 @@ reuses everything listed under "Keep" in `docs/claude-service-inventory.md`.
    with recorded AI responses (no spend). *Visible:* an explanation, with examples, of
    what Core is now told and allowed to do.
 2. **Design system:** Visual Direction, design settings, theme, and new layout patterns.
-   *Visible:* the existing content rendered locally in two or three clearly labelled
+   *Visible:* the existing content rendered locally in two or three clearly labeled
    test designs, proving the site can look genuinely different.
 3. **Ceremony simplified:** one budget approval, a plain cost log, no hash-locked grants.
 4. **One properly funded full round** (owner approves the budget). Core runs research →

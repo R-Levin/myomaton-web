@@ -8,7 +8,7 @@ const client = { id: "client@example.test", role: "customer" as const };
 const specialist = { id: "specialist", role: "operator" as const };
 const at = (minute: number) => new Date(Date.UTC(2026, 10, 25, 12, minute)).toISOString();
 
-/** A labelled Beacon standing in for Core's AI: it records what it was given and writes plain stand-in content. */
+/** A labeled Beacon standing in for Core's AI: it records what it was given and writes plain stand-in content. */
 function beacon() {
   const seen: WriteInput[] = [];
   const writer: Writer = { async write(input) {

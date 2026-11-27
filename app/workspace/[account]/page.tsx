@@ -47,7 +47,7 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
           {waiting.some(task => task.who === "core") && (
             <form action={runCore.bind(null, id)}><button className={primary}>Let Core do its waiting work</button>
               <p className="mt-1 text-xs text-neutral-600">{runtime.spent ? `Writer: ${runtime.writerLabel}. Spent so far: $${(await runtime.spent()).toFixed(2)}.`
-                : <>Locally Core&apos;s AI is a {runtime.writerLabel}; it writes labelled stand-in content.</>}</p></form>)}
+                : <>Locally Core&apos;s AI is a {runtime.writerLabel}; it writes labeled stand-in content.</>}</p></form>)}
           {site?.complete && !publishWaiting && waiting.length === 0 && <form action={askPublish.bind(null, id)}><button className={button}>Ask the Client to approve Publish</button></form>}
         </div>
         {runtime.spent && <p className="mt-2 text-sm text-neutral-700">{runtime.writerLabel}: ${(await runtime.spent()).toFixed(2)} spent so far.</p>}

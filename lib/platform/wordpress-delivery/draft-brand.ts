@@ -20,17 +20,17 @@ export function coreDesignProjection(value: unknown): CoreDesignProjection {
   const withSheet = (value as { version?: unknown } | null)?.version === 5;
   const design = object(value, ["grammar", "version", "motion", "palette", "typography", "shape", "density", ...(withSheet ? ["stylesheet"] : [])]);
   if (design.grammar !== "core-designed" || (design.version !== 4 && design.version !== 5) || design.motion !== "minimal") throw Error("Core design identity refused");
-  const colour = (input: unknown) => {
-    if (typeof input !== "string" || !/^#[0-9a-f]{6}$/iu.test(input)) throw Error("Core design colour refused");
+  const color = (input: unknown) => {
+    if (typeof input !== "string" || !/^#[0-9a-f]{6}$/iu.test(input)) throw Error("Core design color refused");
     return input;
   };
   const paletteRow = object(design.palette, [...paletteRoles, "border", "muted"]);
   const palette = Object.fromEntries([
     ...paletteRoles.map(role => {
       const pair = object(paletteRow[role], ["background", "text"]);
-      return [role, { background: colour(pair.background), text: colour(pair.text) }];
+      return [role, { background: color(pair.background), text: color(pair.text) }];
     }),
-    ["border", colour(paletteRow.border)], ["muted", colour(paletteRow.muted)],
+    ["border", color(paletteRow.border)], ["muted", color(paletteRow.muted)],
   ]) as CoreDesignProjection["palette"];
   if (contrast(palette.brand.background, palette.light.background) < 4.5 ||
       contrast(palette.brand.background, palette.tonal.background) < 4.5) {

@@ -47,7 +47,7 @@ other:
 | Database | Accounts, Web Presences, sites, Pages, Sections, Assets, Actions, Menus, Knowledge and Offering with immutable revisions; the schema and migrations |
 | Shared objects | Change record (`change/`), Knowledge and Facts (`knowledge/`), Work product identities and versions (`work-products/`), Client people (`accounts/`), Tasks (`work/`) |
 | AI connection | The Responses transport, its usage ledger, spending cap and rate card; the instructions that produced the Report the Principal judged broadly accurate |
-| WordPress | The delivery plugin and theme, enrolment, signed drafts, receipts, read-back, Notes |
+| WordPress | The delivery plugin and theme, enrollment, signed drafts, receipts, read-back, Notes |
 | Design and media | Design projection and rendering, FPO, stock search and per-placement rights, Asset provenance |
 | Contact and measurement | Contact definitions and submissions, Lead outcomes, the first-party measurement ledger |
 | Operations | Sign-in and permissions, backup and recovery, the protected update sequence |
@@ -70,7 +70,7 @@ something always runs end to end. Git keeps its history.
 
 1. **One Core on the objects (local).** One engine runs the cycle above from the start of the
    service to WordPress drafts: Report, Direction, Site plan, Pages, a Review Round and a
-   Publish approval (Publish itself stays a Beacon), with labelled stand-in AI answers. C0's
+   Publish approval (Publish itself stays a Beacon), with labeled stand-in AI answers. C0's
    imported Knowledge is the test case. *Acceptance:* the end-to-end run passes on the new
    engine, and the old workflow is no longer used by it.
 2. **The Specialist workspace and Client Portal** on that Core: the Queue, Proposed changes and
@@ -99,7 +99,7 @@ something always runs end to end. Git keeps its history.
   their words, and Core reworks from the draft. Each approval raises what builds on it
   (Direction, Site plan, one Request per page); Pages and Sections keep their identities and
   Versions; a later Request on a page is the same cycle at a smaller grain. It runs end to end
-  with a labelled Beacon in place of the AI.
+  with a labeled Beacon in place of the AI.
   Each Account's service record is now kept in the database as append-only versions; a save
   from a stale read is refused, so two people never overwrite each other. Core reads the
   Account's Knowledge from the one Knowledge record, with each item's standing and whether it
@@ -119,7 +119,7 @@ something always runs end to end. Git keeps its history.
   answers and resolves each Note that was carried out.
   Publish: the Client alone approves publishing the site exactly as it stands; the request lists
   the Proposed facts the site rests on, and approving confirms them in Knowledge as the Client's
-  word. Public delivery itself is a labelled Beacon until milestone 5.
+  word. Public delivery itself is a labeled Beacon until milestone 5.
 - *Nov 25, milestone 1 accepted locally:* `tests/integration/service-launch.test.ts` runs C0 on the
   rebuilt Core from its imported onboarding through Launch, WordPress drafts and a Review Round to
   the Client's Publish approval, saved at every step, with the old workflow used nowhere. AI calls
@@ -141,13 +141,13 @@ Plain server-rendered pages, one form per action, every action checking who is a
 - **Client Portal** (`/portal`): what needs the Client (the Report to confirm, a Publish to
   approve, Proposed facts), and My Business.
 - Locally, a preview command sets up a throwaway database with C0 as an Account and a choice of
-  who you are (a Specialist, or one of C0's Client people). Core's AI is the labelled stand-in
+  who you are (a Specialist, or one of C0's Client people). Core's AI is the labeled stand-in
   there; the real AI needs the Principal's approval (milestone 3). Sign-in on protected Core
   comes with milestone 4; until then these pages refuse to run anywhere but locally.
 - *Nov 25, milestone 2 first slice (local preview):* `npx tsx scripts/service/workspace-preview.ts`
   starts the Specialist workspace (`/workspace`) and Client Portal (`/portal`) against a throwaway
   database holding C0. Checked in the browser: a Specialist starts Launch and lets Core (the
-  labelled Beacon) write the Report; the Client reads it in full in their portal and corrects it
+  labeled Beacon) write the Report; the Client reads it in full in their portal and corrects it
   in their own words, and sees their request listed as being worked on. Also built: Proposed
   changes with Approve / Correct / Decline, Publish approval (which confirms the Proposed facts the
   site relies on), Proposed facts the Client confirms, corrects or declines, Specialist facts, and
@@ -221,6 +221,6 @@ Plain server-rendered pages, one form per action, every action checking who is a
   WordPress through a signed upload (/miopages/v1/media) bound to the draft's authorization, then
   appears in its exact Section in place of the FPO frame. The plugin's private-media path now works
   on Windows (local preview); Linux keeps its owner and permission checks. 34 of 72 frames hold a
-  picture. Open: frames that need labelled diagrams (Core could draw them as SVG, or an image
+  picture. Open: frames that need labeled diagrams (Core could draw them as SVG, or an image
   generator could make them); the pictures lean on desk-and-documents scenes; credits page for
   Pixabay creators before any public release.

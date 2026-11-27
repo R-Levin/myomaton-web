@@ -1,5 +1,5 @@
 <?php
-/** Local-only: swap the brand design on the local source-aware draft pages for a labelled test fixture, or restore. */
+/** Local-only: swap the brand design on the local source-aware draft pages for a labeled test fixture, or restore. */
 declare(strict_types=1);
 [$self, $root, $mode] = $argv + [null, null, null];
 $root = realpath($root); if (!$root || basename($root) !== 'p022-wp-validation') exit(2);

@@ -107,7 +107,7 @@ export type Change = {
 };
 
 /** A batch of Requests taken in together and reviewed together. */
-export type Round = { id: string; at: string; by: Person; requestIds: string[]; status: "taken-in" | "analysed" | "decided" | "withdrawn" };
+export type Round = { id: string; at: string; by: Person; requestIds: string[]; status: "taken-in" | "analyzed" | "decided" | "withdrawn" };
 
 export type ChangeLedger = { requests: Request[]; decisions: Decision[]; changes: Change[]; rounds: Round[] };
 

@@ -237,7 +237,7 @@ Each step keeps the current system working on protected Core and miopages.org. T
 at every step. Nothing hosted changes without the Principal's approval.
 
 From step 2 onward, the **whole cycle runs end to end** (Baseline #19). Every object that
-isn't built yet appears as a clearly labelled placeholder at its exact place: Observation,
+isn't built yet appears as a clearly labeled placeholder at its exact place: Observation,
 Task and the Queue at first. Each later step then replaces a placeholder with the
 real object. The steps are an order of replacement, not a queue in which Ongoing waits
 until the end.
@@ -262,7 +262,7 @@ until the end.
    longer keeps its own copy of what was decided (the Reviews in the ledger are the record).
    The round still keeps the Notes, edits and Core's raw analysis, because the AI's input
    and its output checks read them; they move when the AI works per Request (the Decision
-   section above). The cycle now closes end to end with labelled Beacons
+   section above). The cycle now closes end to end with labeled Beacons
    (`lib/platform/measurement/observation-beacon.ts`, `lib/platform/work/tasks.ts`): after a
    Delivery, a stand-in Observation raises a Request that Core decides to watch, and the
    work waiting on each Account shows as Tasks in a Queue, each marked as a Beacon. Nothing
@@ -327,7 +327,7 @@ until the end.
 5. **Task and Cost as shared objects.** Specialist work becomes visible and costed, and the
    Queue becomes a view.
 6. **Observation feeds Requests.** Inquiries and first-party measurement create
-   Requests. This closes the cycle end to end (Baseline #19), at first with labelled
+   Requests. This closes the cycle end to end (Baseline #19), at first with labeled
    placeholders.
 7. **Interfaces.** Build Specialist and Client views over the shared objects, choosing
    Core, portal or WordPress per view.

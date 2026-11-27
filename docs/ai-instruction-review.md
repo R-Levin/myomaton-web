@@ -13,7 +13,7 @@ Every AI request carries three layers:
    Nov 22 from Part 1. These cover the role, honesty with placeholders, imagery and FPO, writing,
    originality, design, format, and one task paragraph per stage. They are in good shape: plain, short,
    and each one traces to a requirement.
-2. **Case rules** labelled "Owner instruction", stored with the case's approved authority. Six of them
+2. **Case rules** labeled "Owner instruction", stored with the case's approved authority. Six of them
    are sent with every request in this case.
 3. **Framing text inside the data**: an "interpretation" paragraph, and the business knowledge, research,
    report, Direction, plan and the previous page.
@@ -39,7 +39,7 @@ Page." That told the AI to rewrite the page. Your Note asked for one paragraph t
 - Also cheaper and faster: the AI writes one section, not 10,000–15,000 words.
 
 ### 3. Six old case rules rode along on every request. **Done Nov 23: all six retired on protected Core; the lasting one is in Core's writing instruction**
-They come from the Codex-era Nov 21 "customer-facing correction round" and are labelled "Owner
+They come from the Codex-era Nov 21 "customer-facing correction round" and are labeled "Owner
 instruction":
 
 | Rule (shortened) | Problem |

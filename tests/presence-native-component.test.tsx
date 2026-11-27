@@ -43,9 +43,9 @@ test("original component structure survives Core validation and native WordPress
   assert.throws(()=>readNativeComponent({...component,name:"Unsafe <component>"},true));
   const labelledList={...component,root:node("list",{text:"Choices explained",items:["First","Second"]})};
   assert.equal(readNativeComponent(labelledList).root.text,"Choices explained");
-  const labelled=spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php",["wordpress/miopages-delivery/tests/native-component.php"],{input:JSON.stringify(labelledList),encoding:"utf8"});
-  assert.equal(labelled.status,0,labelled.stderr);
-  assert.match(labelled.stdout,/Choices explained/);
+  const labeled=spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php",["wordpress/miopages-delivery/tests/native-component.php"],{input:JSON.stringify(labelledList),encoding:"utf8"});
+  assert.equal(labeled.status,0,labeled.stderr);
+  assert.match(labeled.stdout,/Choices explained/);
   assert.deepEqual(parsed.root.layout.columns, [2, 1]);
   assert.equal(parsed.root.children[0].children[2].kind, "details");
   const pages = [{ id: "11111111-1111-4111-8111-111111111111", path: "/", title: "Fixture", composition: "managed-v1" as const,

@@ -129,7 +129,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     const design = view.direction?.design;
     assert.ok(design, "The Direction carries Core's chosen design");
     assert.equal(design.typography.headingFamily, "fraunces");
-    assert.ok(design.adjustments.length >= 2, "Unreadable simulated colours were repaired and recorded");
+    assert.ok(design.adjustments.length >= 2, "Unreadable simulated colors were repaired and recorded");
     const placeholders = view.pages.flatMap(page => page.sections.flatMap(section =>
       section.block && section.block.version === 2 ? pendingContent(section.block) : []));
     assert.equal(placeholders.length, 3);
@@ -451,7 +451,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.match(String(recorded[0][1]), /include this when it writes the page/);
     const thirdState = fourth;
 
-    // The cycle closes at its exact places, with labelled Beacons where pieces are unbuilt:
+    // The cycle closes at its exact places, with labeled Beacons where pieces are unbuilt:
     // Delivery → Observation → Request → Decision ("watch"), and the work waiting shows as Tasks in the Queue.
     const observed = observeDelivery(revised.changes!, { account: context.intakeId, at: "2026-11-24T13:00:00.000Z", version: revised.version });
     assert.match(observed.observation.beacon!, /^Beacon:/);
@@ -459,7 +459,7 @@ test("rebuilt site creation runs end to end: design chosen, placeholders and FPO
     assert.equal(observed.ledger.decisions.at(-1)!.outcome, "watch");
     assert.equal(observed.ledger.changes.length, revised.changes!.changes.length, "Watching proposes no Change");
     const open = queue(accountTasks(context.intakeId, { ...revised, changes: observed.ledger }, "2026-11-24T13:00:00.000Z"));
-    assert.ok(open.length > 0 && open.every(task => /^Beacon:/.test(task.beacon)), "Every waiting Task is shown, and labelled a Beacon");
+    assert.ok(open.length > 0 && open.every(task => /^Beacon:/.test(task.beacon)), "Every waiting Task is shown, and labeled a Beacon");
 
     // A change the Operator makes after Core took the review in is never overwritten unread.
     wordpress({ mode: "operator", edits: { "/": ["</h1>", " again</h1>"] } });

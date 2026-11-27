@@ -47,7 +47,7 @@ export async function previewWordPress(input: { root: string; source: string; po
   await mkdir(join(site, "wp-content/uploads"), { recursive: true });
   await mkdir(secrets, { recursive: true });
 
-  // The Client's own logo when they have supplied one (Part 1 #13); otherwise a labelled stand-in wordmark.
+  // The Client's own logo when they have supplied one (Part 1 #13); otherwise a labeled stand-in wordmark.
   const wordmark = join(root, "wordmark.png");
   if (input.logo) await cp(input.logo, wordmark);
   else await sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="480" height="96"><rect width="480" height="96" fill="#ffffff"/>

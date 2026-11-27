@@ -69,7 +69,7 @@ export function simulatedAnswer(name: string, schema: Schema, instructions: stri
       revisions: [{ path: "/", sectionIndex: 1, reason: "Point people to the new Contact page.", factIds: [], newPageIds: ["P1"] }] };
   }
   if (stage === "review-analysis") {
-    assert.match(instructions, /analyse the Operator's review/);
+    assert.match(instructions, /analyze the Operator's review/);
     return { summary: "One fact in your Service edit; Home should mention it.",
       facts: [{ statement: "The Service page heading is as the Operator wrote it.", publicUse: true, sourcePath: "/service",
         sourceText: "Simulated heading for /service (edited by the Operator)" },

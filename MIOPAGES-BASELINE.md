@@ -33,7 +33,7 @@ nothing below came from an assistant proposal unless it says so.
 3. **Core is the system of record.** It owns knowledge, workflow, proposals, approvals,
    revisions and history. In principle WordPress is one delivery mechanism and stays out
    of the overarching definition of the MioPages service. In practice it removes a
-   massive development hurdle, so it sits at the centre of what is being built now
+   massive development hurdle, so it sits at the center of what is being built now
    (owner, Nov 24). The resources to hand are WordPress, the cloud server running Core,
    and the 20i Reseller account where its use makes sense. Hosting providers (including
    20i) remain replaceable; 20i-only is an option under discussion, not a decision.
@@ -95,7 +95,7 @@ nothing below came from an assistant proposal unless it says so.
     screenshots are only an AI input. *(Nov 22)*
 16c. **A site is judged by what the Client will see.** Core designs each site's actual look and
     layout for that business, visibly shaped by the research and external best practice, not a
-    fixed template with new colours. Nothing is called done, or shown to the Principal, until the
+    fixed template with new colors. Nothing is called done, or shown to the Principal, until the
     rendered site has been looked at as a Client would see it. *(Nov 26: "we are looking for what
     Cx will see")*
 16d. **Design rules are few, justified and readable.** The only limits on how Core designs a site

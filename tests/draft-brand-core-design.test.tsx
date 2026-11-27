@@ -41,7 +41,7 @@ test("an altered or unreadable chosen design is refused before signing", () => {
   assert.throws(() => coreDesignProjection({ ...design, shape: "blob" }));
   assert.throws(() => coreDesignProjection({ ...design, typography: { ...design.typography, bodyFamily: "comic-sans" } }));
   assert.throws(() => coreDesignProjection({ ...design, extra: true }));
-  // A brand colour that cannot serve as a readable link colour on the light surface.
+  // A brand color that cannot serve as a readable link color on the light surface.
   assert.throws(() => coreDesignProjection({ ...design, palette: { ...design.palette, brand: { background: "#f0f0f0", text: "#000000" } } }), /contrast/);
   const brand = draftBrand({ scope, logo, coreDesign: design });
   const tampered = { ...brand, projection: { ...brand.projection, design: { ...design, density: "airy" } }, pngBase64: png.toString("base64") };

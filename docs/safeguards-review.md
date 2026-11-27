@@ -87,7 +87,7 @@ refuses things go with it, and none of the safeguards in "Keep" is weakened.
   places). A rate card only has to be well formed; the ledger still prices every call from it.
 - *Nov 25, items 2 and 3 (prepared, not installed):* the protected database is one ordered update
   sequence (`scripts/db/protected-account-updates.ts`). Each update is applied once and recorded
-  with its checksum, and the sequence recognises what protected Core already has. Update 0005
+  with its checksum, and the sequence recognizes what protected Core already has. Update 0005
   makes the rules cover every Account in scope instead of naming C0's records. It goes on at
   the next deploy the Principal approves.
 - *Nov 25, leftovers:* six one-off proof scripts referenced nowhere were removed (Git keeps their

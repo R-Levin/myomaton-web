@@ -47,14 +47,14 @@ async function main() {
       try {
         const seen = await capture(browser, peer, folder);
         const images = seen.shots.map(shot => ({ file: relative(process.cwd(), shot.file).replaceAll("\\", "/"), caption: `${peer.host}, ${shot.viewport}` }));
-        const analysis = await research.analyse({ model: approvedRateCard.model, instructions: peerAnalysisInstructions,
+        const analysis = await research.analyze({ model: approvedRateCard.model, instructions: peerAnalysisInstructions,
           input: [{ role: "user", content: [{ type: "input_text", text: JSON.stringify({ customer: { business: report.title, summary: report.summary },
             peer: { url: peer.url, whyComparable: peer.why, ...seen.text } }) },
             ...seen.shots.flatMap(shot => [{ type: "input_text" as const, text: `Screenshot: ${shot.viewport}` },
               { type: "input_image" as const, image_url: "data:image/jpeg;base64," + shot.bytes.toString("base64"), detail: "high" as const }])] }],
           text: { format: { type: "json_schema", name: "core_peer_analysis", strict: true, schema: peerAnalysisSchema } } }, peer.url) as PeerAnalysis;
         gathered.push(peerEvidence(peer, analysis, today, images));
-        console.log(`Analysed ${peer.host}`);
+        console.log(`Analyzed ${peer.host}`);
       } catch (error) { console.log(`Skipped ${peer.host}: ${error instanceof Error ? error.message.split("\n")[0] : "failed"}`); }
     }
   } finally { await browser.close(); }

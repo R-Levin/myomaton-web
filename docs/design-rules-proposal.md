@@ -15,7 +15,7 @@ None trace to a Part 1 requirement.
 |---|---|---|---|
 | A1 | Every page is a fixed stack: one opening section, body sections, a closing section | Every page has the same rhythm | **Change.** Keep the roles (one opening, one page title) but let Core order, group and lay out sections freely |
 | A2 | Each section gets at most one picture, placed beside the text or where Core points | Can't do a full-width picture, a picture behind text, a gallery, or a section with no frame | **Remove.** Core decides how many pictures, and where |
-| A3 | Sections sit inside a fixed-width page column | Can't do edge-to-edge bands, colour fields or full-width pictures | **Remove.** Core chooses width per section |
+| A3 | Sections sit inside a fixed-width page column | Can't do edge-to-edge bands, color fields or full-width pictures | **Remove.** Core chooses width per section |
 | A4 | Core builds with only 9 kinds of element (group, heading, paragraph, list, image, button, divider, expandable, placeholder) | Missing pull quotes, figures with captions, statistics, tables, logo rows, comparison layouts | **Change.** Add the missing kinds that ordinary business sites use |
 | A5 | Phones always show blocks in the desktop order | Can't put the picture after the text on phones, for example | **Remove** |
 | A6 | Spacing, surfaces and sizes come from short fixed lists (3 sizes, 7 surfaces, 4 widths) | Pushes every site toward the same look | **Change.** Core may use the lists or its own values in its stylesheet |
@@ -58,12 +58,12 @@ visitor sees instead of guessing from the code.
 6. **Fits the phone.** No sideways scrolling of the page; nothing pinned covers more than a small
    part of a phone screen; buttons and links are big enough to tap. *(Visitors.)*
 7. **Honest about gaps.** FPO frames and missing-material notices stay clearly visible and
-   recognisable. *(Part 1 #12.)*
+   recognizable. *(Part 1 #12.)*
 8. **Licensed.** Fonts and pictures come from licensed sources, with credits recorded. *(Legal.)*
 9. **Respectful of motion.** Animation stops for visitors who ask their device for reduced
    motion. *(Accessibility.)*
 
-What's **not** a rule: colour choices, corner shapes, layout, section order, density, number of
+What's **not** a rule: color choices, corner shapes, layout, section order, density, number of
 pictures, typefaces within the licensed set. Those are Core's design decisions, informed by its
 research and the Client's taste, and reviewable by the Specialist and the Client like any other
 design choice.

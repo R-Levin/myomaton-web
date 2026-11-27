@@ -29,7 +29,7 @@ export type ProductVersion = {
 
 /** An Account's service record: its Change record and every Version of its Work products. */
 export type ServiceRecord = { account: { webPresenceId: string; managedSiteId: string }; version: number; ledger: ChangeLedger; products: ProductVersion[];
-  /** Approved Publishes. Until public delivery is built (milestone 5) each is a labelled Beacon: approved, not yet public. */
+  /** Approved Publishes. Until public delivery is built (milestone 5) each is a labeled Beacon: approved, not yet public. */
   publications?: Publication[];
   /** Each review draft sent to the Account's WordPress, latest last (service/delivery.ts). */
   deliveries?: Delivery[];
@@ -42,7 +42,7 @@ export type ServiceRecord = { account: { webPresenceId: string; managedSiteId: s
 export type Publication = { changeId: string; at: string; by: Person; pages: { id: string; path: string; version: number }[];
   confirms: { key: string; statement: string }[]; beacon: "public delivery not built yet" };
 
-/** What Core gives its writer (the AI, or a labelled Beacon standing in for it) for one Work product. */
+/** What Core gives its writer (the AI, or a labeled Beacon standing in for it) for one Work product. */
 export type WriteInput = {
   kind: Kind; knowledge: readonly unknown[]; evidence?: readonly Evidence[]; report?: unknown; direction?: unknown; sitePlan?: SitePlan; page?: PlanEntry;
   /** The current Version being reworked, and the words of each Request asking for the rework. */

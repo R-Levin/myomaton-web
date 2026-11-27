@@ -53,7 +53,7 @@ test("Peer research keeps each named business once, from its own public homepage
   assert.match(item.content, /Terminology: care plan/);
 });
 
-test("A brand asset is the Client's own Evidence, and its images go to the AI labelled with that Evidence", async () => {
+test("A brand asset is the Client's own Evidence, and its images go to the AI labeled with that Evidence", async () => {
   const spec2: EvidenceSpec = { documents: [], assets: [{ id: "brand:logo", label: "Logo", date: null, content: "The logo.", images: [{ file: "logo.png", caption: "Wordmark" }] }] };
   const [logo] = evidenceFrom(spec2, () => "");
   assert.deepEqual([logo!.id, logo!.standing, logo!.forWebsite], ["brand:logo", "client", false]);

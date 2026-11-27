@@ -115,7 +115,7 @@ export function createAiWriter(config: AiWriterConfig): Writer {
   };
 }
 
-/** Each Evidence image, labelled with the Evidence it belongs to, as the AI's image input. */
+/** Each Evidence image, labeled with the Evidence it belongs to, as the AI's image input. */
 export async function evidenceImagesFor(evidence: readonly Evidence[], read: (file: string) => Promise<Buffer>) {
   const parts: ({ type: "input_text"; text: string } | { type: "input_image"; image_url: string; detail: "high" })[] = [];
   for (const item of evidence) for (const image of item.images ?? []) {

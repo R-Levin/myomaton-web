@@ -103,7 +103,7 @@ test("protected inactive C0 account: existing canonical writer, exact grants, no
    assert.equal((await installer.query("SELECT count(*)::int n FROM miopages_wp.wordpress_operator_grants")).rows[0].n,2);
    // Installed as protected Core is today (the approved policy with the mandate amendment)...
    await installer.query("BEGIN");await installer.query(sql.forward.replaceAll(protectedAccountFoundation.caseId,owner.caseId));await installer.query("COMMIT");
-   // ...then the one update sequence: it recognises what is there and applies only what is new.
+   // ...then the one update sequence: it recognizes what is there and applies only what is new.
    const updates=await protectedAccountUpdates();
    await installer.query("BEGIN");
    assert.deepEqual(await applyProtectedUpdates(installer,updates,text=>text.replaceAll(protectedAccountFoundation.caseId,owner.caseId)),["0004-client-people","0005-rules-per-account"]);

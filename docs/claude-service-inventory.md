@@ -32,7 +32,7 @@ The damage sits in five layers on top of working machinery:
      alone.
    - Per-run manifests, receipts and hash-locked grants that make every step slow
      and brittle.
-3. **Fixed design.** One brand record, one theme and seven fixed colours. The AI can
+3. **Fixed design.** One brand record, one theme and seven fixed colors. The AI can
    only rearrange blocks, so every candidate looks the same.
 4. **Core's interface.** The hosted Core page is a C0-specific development console.
    Its client lives under `scripts/intake/*.tsx`. The owner rejected it as unusable
@@ -47,7 +47,7 @@ The damage sits in five layers on top of working machinery:
 | miopages.com | Public MioPages WordPress on 20i shared (Reseller) hosting. Its links go to the 20i customer portal at my.miopages.com. |
 | miopages.org | Password-protected development WordPress, also on 20i shared hosting. It holds draft **revision 6**: 13 pages, 2 images and 35 actions, Delivery plugin 0.0.12 (R), theme 0.1.0 (R). |
 | wp-acceptance.miopages.com/core | Protected Core on a 20i cloud server, deployed build `2809543` (13 commits behind the active branch). A private PostgreSQL on the same host holds evaluation case databases. The main database is Supabase. Restored 2026-11-22 after the memory-guard outage. |
-| runtime.miopages.com (+ domain-test) | Separate package on the same server. It runs an **older public Next.js MioPages build**: Home, Service, Experience and a Free Review page, publicly reachable and linked from nowhere. Its account is also the **operator workspace**: database setup, WordPress enrolment and staging scripts were run from it. |
+| runtime.miopages.com (+ domain-test) | Separate package on the same server. It runs an **older public Next.js MioPages build**: Home, Service, Experience and a Free Review page, publicly reachable and linked from nowhere. Its account is also the **operator workspace**: database setup, WordPress enrollment and staging scripts were run from it. |
 | Local | WordPress at 127.0.0.1:4474, with copied plugin and theme. Local PostgreSQL is used for tests. |
 
 ## Service stages
@@ -60,7 +60,7 @@ The damage sits in five layers on top of working machinery:
 | **Report and Presence Direction** | Genuine hosted Business Understanding Report (owner: broadly accurate, P0-12) and Direction. Correction path. | Works. The Direction is prose only: no structured visual decisions. (V) | Moderate. |
 | **Site creation** | Workflow engine (`presence-workflow.ts`, 1,143 lines): research → report → Direction → blueprint → pages → editorial critique → revision, with retries and recovery. Native component vocabulary. All candidates retained (41/6 hosted, 97, 106, 113, 129). | Works technically; output rejected (F, D−, "near usable", then 129 rejected). (V) | **Heavy.** Prompts, validators, fixed design, small revision caps, and a citation rule that forces hedged copy. Step 2 fixed the worst conflicts. |
 | **Media** | Pixabay search, download and per-placement rights review. OpenAI image-generation contract. Customer uploads and supplied media. Asset and AssetUsage records with provenance. FPO in Next.js and, since Step 2, in WordPress. | Works. (V) | Light: placement rules were tied to unchanged Home content (fixed in Step 2). |
-| **WordPress delivery** | Plugin `miopages-delivery` 0.0.13 and block theme `miopages-managed-site`:<br>• site enrolment with keys, rotation and revocation (DB migrations 0016–0019);<br>• Ed25519-signed releases pulled over authenticated HTTPS, staged privately, with signed receipts back to Core;<br>• `wp miopages native-draft`: creates and updates real WordPress pages as drafts with stable IDs, blocks, navigation and actions, revisions, rollback and signed receipts;<br>• private media staging and attachment with protected preview;<br>• signed brand projection, scoped DB roles, environment diagnostics. | Works on miopages.org (revision 6, R). The older release path is text-only and limited to 16 pages; the native-draft path carries media. **Not built:** WordPress edits flowing back to Core, publishing live, visitor measurement in WordPress, working forms. (V) | Ceremony is heavy in the operator scripts (hash-pinned one-off staging scripts). The machinery itself is sound. |
+| **WordPress delivery** | Plugin `miopages-delivery` 0.0.13 and block theme `miopages-managed-site`:<br>• site enrollment with keys, rotation and revocation (DB migrations 0016–0019);<br>• Ed25519-signed releases pulled over authenticated HTTPS, staged privately, with signed receipts back to Core;<br>• `wp miopages native-draft`: creates and updates real WordPress pages as drafts with stable IDs, blocks, navigation and actions, revisions, rollback and signed receipts;<br>• private media staging and attachment with protected preview;<br>• signed brand projection, scoped DB roles, environment diagnostics. | Works on miopages.org (revision 6, R). The older release path is text-only and limited to 16 pages; the native-draft path carries media. **Not built:** WordPress edits flowing back to Core, publishing live, visitor measurement in WordPress, working forms. (V) | Ceremony is heavy in the operator scripts (hash-pinned one-off staging scripts). The machinery itself is sound. |
 | **Existing (non-20i) WordPress (P0-6)** | Design for an opt-in mode: read-only audit first, allowlisted page ownership, outbound pull, no forced host, DNS or mail move. The environment diagnostic already separates an existing-host audit from a controlled install. | Planned; **not proven off-host**. The planned proof: the same plugin on a second host, a signed synthetic release, a receipt, then a bounded draft and rollback. (V) | None. |
 | **Next.js managed-site renderer** | `components/managed-sites`, `app/[[...path]]`, design tokens, FPO visual, contact form. | The older delivery path; it serves runtime.miopages.com. (V) | Fixed design tokens. |
 | **Accounts, roles, portal** | Protected owner login. Customer binding, activation and roles. Account work view with corrections, review activity and inquiries. | Technically works; owner rejected the usability (Nov 20). (V) | Heavy: C0-specific console. |
@@ -106,7 +106,7 @@ The ones that shape the rebuild:
 - workflow persistence and recovery;
 - research capture;
 - media acquisition and rights;
-- the whole WordPress delivery stack (enrolment, signing, pull, native drafts, media,
+- the whole WordPress delivery stack (enrollment, signing, pull, native drafts, media,
   rollback, receipts);
 - contact, measurement and Ongoing foundations;
 - backups;

@@ -2,7 +2,7 @@
  * Observation (Measurement area; docs/glossary.md, docs/service-object-model.md).
  *
  * BEACON. First-party measurement does not yet feed the cycle (step 6). Until it does, each
- * Delivery is followed by a labelled stand-in Observation that says nothing has been measured,
+ * Delivery is followed by a labeled stand-in Observation that says nothing has been measured,
  * so the cycle still closes at its exact place: the Observation raises a Request in the Change
  * area, and Core's Decision on it is "watch" (leave it, look again), which proposes no Change,
  * runs no AI and touches nothing.

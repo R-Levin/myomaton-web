@@ -29,7 +29,7 @@ const honesty =
   "for itself: headings and copy around it address the visitor about the offer, and never discuss what is missing, " +
   "unconfirmed or still being prepared.";
 
-/** Images and FPO (Part 1 #12). Rights review on real images stays (licence/legal). */
+/** Images and FPO (Part 1 #12). Rights review on real images stays (license/legal). */
 const imagery =
   "Imagery: make the site visually rich. Plan an image wherever it helps a visitor understand, compare or trust " +
   "the offer, including the Hero. When a suitable acquired image is supplied in availableMedia, you may place it " +
@@ -48,7 +48,8 @@ const writing =
   "business's own service descriptions state its intended offer: present that offer in original copy without " +
   "commentary on whether every part already runs, and keep unverified prices, performance, availability and " +
   "customer proof unconfirmed (placeholders, not claims). " +
-  "Plain text only, no HTML.";
+  "Write in U.S. English (spelling, punctuation and usage) in everything you produce, whatever the source " +
+  "material uses. Plain text only, no HTML.";
 
 /** Originality and research use (Part 1 #10, #11; legal). */
 const originality =
@@ -83,7 +84,7 @@ const design =
   "section surfaces (light, brand, tonal, strong, supporting, contrast) deliberately to give the page shape. Make " +
   "every image brief follow the Direction's imagery direction. Existing section roles are semantic jobs, not fixed layouts. If an idea " +
   "cannot be expressed with the available components, describe the needed component in the visual brief so it " +
-  "can be built, rather than settling for a generic layout. The customer's brand assets (logo, name, colours) " +
+  "can be built, rather than settling for a generic layout. The customer's brand assets (logo, name, colors) " +
   "are inputs to use; you may recommend changing them in the Direction, but never silently drop them.";
 
 const stages: Record<AuthoringStage, string> = {
@@ -95,15 +96,15 @@ const stages: Record<AuthoringStage, string> = {
     "corrections explicitly.",
   direction:
     "Task: write the Presence Direction: positioning, the decisions visitors are making and the paths that serve " +
-    "them, search and ongoing content opportunities, and the visual direction (tone, typography character, colour " +
+    "them, search and ongoing content opportunities, and the visual direction (tone, typography character, color " +
     "use, imagery style and layout rhythm) with the research findings and brand reasons behind each choice. " +
     "Distinguish what the business already delivers, including by people, from what still depends on launch work. " +
     "Then fill the design object: this is the site's actual visual design, rendered exactly as you specify. Choose " +
-    "a palette for the six surface roles (light is the main page; brand is the primary accent and link colour; " +
+    "a palette for the six surface roles (light is the main page; brand is the primary accent and link color; " +
     "strong, tonal and supporting are alternative section surfaces; contrast is the boldest band) with a text " +
-    "colour for each, a border and a muted text colour; a heading and body font from the listed families; the type " +
+    "color for each, a border and a muted text color; a heading and body font from the listed families; the type " +
     "scale, line height and heading weight; corner shape; spacing density; and the imagery style with art " +
-    "direction every image brief will follow. Keep text readable (Core will adjust any colour that falls below " +
+    "direction every image brief will follow. Keep text readable (Core will adjust any color that falls below " +
     "accessible contrast and tell you). Base it on the business, its customers and what the research shows " +
     "about credible, current sites in this field, using the customer's brand assets as inputs. Explain the " +
     "reasoning in rationale and cite the research that shaped it. Aim for something distinctive and right for " +
@@ -151,7 +152,7 @@ const stages: Record<AuthoringStage, string> = {
   // Owner decision, Nov 23: facts in Operator edits reach Core's knowledge, and only the sections
   // they affect are revised, after the Operator confirms a Review summary.
   "review-analysis":
-    "Task: analyse the Operator's review of the site (reviewRound) before anything is changed. First, the " +
+    "Task: analyze the Operator's review of the site (reviewRound) before anything is changed. First, the " +
     "Operator's edits: an edit that only improves wording is not a fact. An edit that states something about the " +
     "business (who it serves, what is included, how it works, a price, a policy, a commitment) is a proposed " +
     "business fact: state it as one short plain sentence in the business's terms, give the page path and the " +

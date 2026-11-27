@@ -52,15 +52,15 @@ test("older layout blocks map to Core's text; unlabelled blocks Core already has
       groups: [{ heading: "Usually a good fit", body: "Built for managed work.", items: ["Real customers", "Clear goals"] }] } }] }] };
   const page = (content: string) => ({ installationId: "i", revision: 1, digest: "d", siteProposalId: "s",
     pages: [{ path: "/q", id: 5, title: "Q", content, edited: true, contentSha256: "a".repeat(64) }], notes: [] });
-  // Delivered before older blocks were labelled, then one list item rewritten by the Operator.
+  // Delivered before older blocks were labeled, then one list item rewritten by the Operator.
   const unlabelled = '<!-- wp:heading {"level":1,"metadata":{"mio":"s1:heading"}} --><h1 class="wp-block-heading">Questions</h1><!-- /wp:heading -->'
     + '<!-- wp:heading {"level":3} --><h3 class="wp-block-heading">Usually a good fit</h3><!-- /wp:heading -->'
     + '<!-- wp:paragraph --><p>Built for managed work.</p><!-- /wp:paragraph -->'
     + '<!-- wp:list --><ul class="wp-block-list"><!-- wp:list-item --><li>Real customers</li><!-- /wp:list-item --><!-- wp:list-item --><li>Clear goals</li><!-- /wp:list-item --></ul><!-- /wp:list -->';
   assert.deepEqual(operatorFeedbackFromCandidate(candidate, page(unlabelled) as never).structural, [], "Untouched text is neither new nor removed");
-  // Labelled delivery: an edit inside the older block is a precise, kept edit.
-  const labelled = unlabelled.replace('<!-- wp:list-item --><li>Clear goals', '<!-- wp:list-item {"metadata":{"mio":"s1:g0/i1"}} --><li>Clear, written goals');
-  const feedback = operatorFeedbackFromCandidate(candidate, page(labelled) as never);
+  // Labeled delivery: an edit inside the older block is a precise, kept edit.
+  const labeled = unlabelled.replace('<!-- wp:list-item --><li>Clear goals', '<!-- wp:list-item {"metadata":{"mio":"s1:g0/i1"}} --><li>Clear, written goals');
+  const feedback = operatorFeedbackFromCandidate(candidate, page(labeled) as never);
   assert.deepEqual(feedback.edits.map(edit => [edit.origin, edit.before, edit.after]), [["s1:g0/i1", "Clear goals", "Clear, written goals"]]);
   assert.deepEqual(feedback.structural, []);
 });

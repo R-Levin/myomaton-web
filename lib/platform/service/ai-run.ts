@@ -46,7 +46,7 @@ export async function aiRunResearch(run: AiRun, account: { webPresenceId: string
         await mkdir(join(run.directory, "research"), { recursive: true });
         await writeFile(join(run.directory, "research", "search-answer.json"), raw);
       }),
-    analyse: (request: ResponsesRequest, about: string) =>
+    analyze: (request: ResponsesRequest, about: string) =>
       analysing({ ownerDigest, workDigest: fingerprint({ research: "peer-analysis", about, input: request.input }) }, request),
   };
 }

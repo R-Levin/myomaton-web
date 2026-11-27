@@ -159,7 +159,7 @@ export function operatorFeedbackFromCandidate(candidate: { pages: { path: string
     if (!page.edited) continue;
     if (page.title !== undefined && page.title !== core.title) titles.push({ path: page.path, before: core.title, after: page.title });
     // Safety net: a block without Core's identifier whose text Core already has on this page
-    // (for example from a delivery made before that block type was labelled) is not new.
+    // (for example from a delivery made before that block type was labeled) is not new.
     const known = new Set(core.sections.flatMap(section => originsOf(section)).map(origin => coreText(core.sections, origin))
       .filter((text): text is string => Boolean(text)).map(normal));
     const present = new Set(units.map(unit => normal(unit.text)));

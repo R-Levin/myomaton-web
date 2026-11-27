@@ -9,7 +9,7 @@ MioPages brand), #15 (new blocks and layouts allowed), #23 (critique before show
 
 Core's AI already sees peer websites, including desktop and mobile screenshots. But the
 only design levers it controls are section layout primitives: columns, spacing, surface
-colour, text size. Palette, fonts, shape, imagery style and page rhythm come from a fixed
+color, text size. Palette, fonts, shape, imagery style and page rhythm come from a fixed
 brand record and a fixed theme. The Presence Direction is prose (positioning, approach,
 visitor decisions), with no structured visual decisions that anything downstream reads.
 So however good the visual research is, it can't change how the site looks beyond
@@ -18,15 +18,15 @@ rearranging blocks. That is why every candidate looks like the same template.
 ## What changes (end to end)
 
 1. **Visual research findings (structured).** Research produces, per peer: layout
-   density, hero pattern, imagery type, typography class, colour use, trust/proof
-   patterns and mobile behaviour. Each finding cites its screenshot. The synthesis says
+   density, hero pattern, imagery type, typography class, color use, trust/proof
+   patterns and mobile behavior. Each finding cites its screenshot. The synthesis says
    which conventions buyers expect, which are tired, and where MioPages can be
    distinctive. *Reuses* the existing peer capture and research custody.
 2. **Visual Direction (new structured part of the Direction).** Core's AI proposes a
    site design system *within brand guardrails*, and each choice cites a research
    finding or a brand reason:
-   - type pairing and scale, chosen from a curated, licence-checked font set;
-   - density and spacing rhythm, corner shape, how much of each brand colour is used
+   - type pairing and scale, chosen from a curated, license-checked font set;
+   - density and spacing rhythm, corner shape, how much of each brand color is used
      and where;
    - imagery style (photography, illustration or diagram) with art-direction notes;
    - section rhythm (e.g. full-bleed bands, overlaps, media-led hero) and motion level.
@@ -49,7 +49,7 @@ rearranging blocks. That is why every candidate looks like the same template.
    path.
 
 ## Guardrails kept
-- The purple wordmark and approved brand colours stay as anchors (Part 1 #13).
+- The purple wordmark and approved brand colors stay as anchors (Part 1 #13).
 - Never copy a peer's distinctive design (legal); research informs, it doesn't template.
 - Accessibility: contrast, same visual and reading order on mobile, alt text.
 - No raw CSS, HTML or script from the model; every token is validated server-side.
@@ -58,7 +58,7 @@ rearranging blocks. That is why every candidate looks like the same template.
 | Phase | Work | Spend | Gate |
 |---|---|---|---|
 | A | Schemas for visual findings and Visual Direction; token projection into theme and Core preview; curated fonts; new layout patterns; tests | none | none (local) |
-| B | Local proof: render the *existing* 129 content under two or three hand-entered token sets, to prove the system can produce visibly different, on-brand designs. These are test fixtures only and are labelled as such; they are not Core's design and not a candidate. | none | none |
+| B | Local proof: render the *existing* 129 content under two or three hand-entered token sets, to prove the system can produce visibly different, on-brand designs. These are test fixtures only and are labeled as such; they are not Core's design and not a candidate. | none | none |
 | C | Step 3 paid round: Core produces research → Visual Direction → tokens and compositions → images or FPO → critique and revision | paid | owner budget decision |
 
 Phase A+B is roughly several focused working sessions. I'll report actual progress
@@ -66,9 +66,9 @@ rather than estimate further before you approve the scope.
 
 ## Decisions I need from you
 1. **Brand flexibility.** May Core's design add tints, shades and one or two supporting
-   accent colours derived from the approved palette? Or must it use only the current
-   seven palette colours?
-2. **Fonts.** Is a curated set of open-licence fonts, self-hosted (e.g. 6–10 families),
+   accent colors derived from the approved palette? Or must it use only the current
+   seven palette colors?
+2. **Fonts.** Is a curated set of open-license fonts, self-hosted (e.g. 6–10 families),
    acceptable, or should typography stay with the current Source Serif and Source Sans?
 3. **Images in Step 3.** Should the paid round include AI-generated illustrations, or
    licensed stock plus FPO only?

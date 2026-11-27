@@ -107,7 +107,7 @@ for (const includeOriginals of [false,true]) test("actual metered request carrie
    assert.ok(!knowledge.includes(internal)&&!knowledge.includes(processing));
    assert.ok(request.instructions.includes(processing));
    assert.deepEqual(request.reasoning,includeOriginals?{effort:"medium"}:undefined);
-   assert.match(request.instructions,/brand assets \(logo, name, colours\) are inputs to use/);
+   assert.match(request.instructions,/brand assets \(logo, name, colors\) are inputs to use/);
    assert.match(request.instructions,/another business's wording, branding or distinctive design/);
    assert.match(request.instructions,/earlier site and materials are theirs to reuse: keep what is strong/);
    assert.match(request.instructions,/When a suitable acquired image is supplied in availableMedia, you may place it/);

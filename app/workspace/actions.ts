@@ -66,7 +66,7 @@ export async function beginLaunch(webPresenceId: string) {
   await change(webPresenceId, "specialist", (record, ctx) => startLaunch(record, now(), ctx.person));
 }
 
-/** Run Core's waiting work with the configured writer (locally, the labelled Beacon). */
+/** Run Core's waiting work with the configured writer (locally, the labeled Beacon). */
 export async function runCore(webPresenceId: string) { await shown(webPresenceId, async () => {
   const ctx = await context(webPresenceId, "specialist");
   const known = await accountKnowledge(ctx.pool, ctx.account.webPresenceId);

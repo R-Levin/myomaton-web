@@ -3,8 +3,8 @@
  *
  * The AI decides palette, type, shape, density and imagery as part of the Presence
  * Direction. Nothing here is a house style: the only rules are readable contrast
- * (accessibility) and a curated set of self-hosted, open-licence fonts (licensing and
- * page performance). Where contrast falls short, Core repairs the colour minimally and
+ * (accessibility) and a curated set of self-hosted, open-license fonts (licensing and
+ * page performance). Where contrast falls short, Core repairs the color minimally and
  * records the adjustment, rather than discarding the AI's design.
  */
 import { contrast, luminance } from "../presentation/tokens";
@@ -15,9 +15,9 @@ import { siteFonts } from "./site-fonts";
 export type SiteFont = keyof typeof siteFonts;
 const fontIds = Object.keys(siteFonts) as SiteFont[];
 
-/** Colour roles the theme paints. light = main page; brand = primary accent surface and
- * link colour; strong/tonal/supporting = alternative section surfaces; contrast = the
- * boldest band (e.g. dark). Each role pairs a background with its text colour. */
+/** Color roles the theme paints. light = main page; brand = primary accent surface and
+ * link color; strong/tonal/supporting = alternative section surfaces; contrast = the
+ * boldest band (e.g. dark). Each role pairs a background with its text color. */
 export const paletteRoles = ["light", "strong", "tonal", "brand", "supporting", "contrast"] as const;
 export const radii = ["square", "soft", "round"] as const;
 export const densities = ["compact", "balanced", "airy"] as const;
@@ -62,7 +62,7 @@ export type SiteDesign = {
   stylesheet?: string;
   rationale: string;
   sourceIds: string[];
-  /** Accessibility repairs Core made to the AI's colours, for transparency. */
+  /** Accessibility repairs Core made to the AI's colors, for transparency. */
   adjustments: string[];
 };
 
@@ -74,8 +74,8 @@ function record(value: unknown, keys: readonly string[], label: string) {
   if (Object.keys(row).some(key => !keys.includes(key)) || keys.some(key => !(key in row))) throw Error(label + " fields refused");
   return row;
 }
-function colour(value: unknown, label: string) {
-  if (typeof value !== "string" || !/^#[0-9a-f]{6}$/iu.test(value)) throw Error(label + " must be a #rrggbb colour");
+function color(value: unknown, label: string) {
+  if (typeof value !== "string" || !/^#[0-9a-f]{6}$/iu.test(value)) throw Error(label + " must be a #rrggbb color");
   return value.toLowerCase();
 }
 function choice<T extends string>(value: unknown, options: readonly T[], label: string): T {
@@ -91,7 +91,7 @@ function prose(value: unknown, label: string, max = 2_000) {
   return value.trim();
 }
 
-/** Move a colour toward black or white in small steps until it reaches the needed
+/** Move a color toward black or white in small steps until it reaches the needed
  * contrast against every given background. Returns null if no step works. */
 function repair(colourValue: string, backgrounds: string[]): string | null {
   const ok = (value: string) => backgrounds.every(background => contrast(value, background) >= minimumContrast);
@@ -106,7 +106,7 @@ function repair(colourValue: string, backgrounds: string[]): string | null {
   return null;
 }
 
-/** Which palette colour each style variable holds (the theme sets them from the palette). */
+/** Which palette color each style variable holds (the theme sets them from the palette). */
 const paletteVariables = (palette: SiteDesign["palette"]): Record<string, string> => ({
   "--wp--preset--color--surface": palette.light.background, "--wp--preset--color--ink": palette.light.text,
   "--wp--preset--color--brand": palette.brand.background, "--wp--preset--color--on-brand": palette.brand.text,
@@ -117,7 +117,7 @@ const paletteVariables = (palette: SiteDesign["palette"]): Record<string, string
   "--miopages-border": palette.border, "--miopages-muted": palette.muted,
 });
 
-/** A solid colour as #rrggbb, or null when it cannot be known from the value alone (gradients, transparency, mixes). */
+/** A solid color as #rrggbb, or null when it cannot be known from the value alone (gradients, transparency, mixes). */
 function solid(value: string, variables: Record<string, string>): string | null {
   const v = value.trim().toLowerCase().replace(/\s*!important$/u, "");
   const variable = /^var\(\s*(--[a-z0-9-]+)\s*(?:,[^)]*)?\)$/u.exec(v);
@@ -132,8 +132,8 @@ function solid(value: string, variables: Record<string, string>): string | null 
 
 /**
  * Design rule 4 (Readable), checked where it can be known from the stylesheet itself: a rule that
- * sets both a solid background and a text colour must make them readable together. Anything else
- * (inherited colours, gradients, pictures) is checked on the rendered page.
+ * sets both a solid background and a text color must make them readable together. Anything else
+ * (inherited colors, gradients, pictures) is checked on the rendered page.
  */
 function checkReadablePairs(css: string, palette: SiteDesign["palette"]) {
   const variables = paletteVariables(palette);
@@ -147,7 +147,7 @@ function checkReadablePairs(css: string, palette: SiteDesign["palette"]) {
     if (ratio < minimumContrast) {
       const where = selector!.replace(/body\.miopages-designed:not\(#mp-core-design\)\s*/gu, "").trim().slice(0, 140);
       throw Error(`Stylesheet text is unreadable (design rule 4): "${where}" sets text ${text} on background ${background} (contrast ${ratio.toFixed(2)}, needs ${minimumContrast}). ` +
-        "Pair each background with its own text colour: the variables come in pairs (see the stylesheet instructions).");
+        "Pair each background with its own text color: the variables come in pairs (see the stylesheet instructions).");
     }
   }
 }
@@ -161,28 +161,28 @@ export function readSiteDesign(value: unknown, sourceIds: readonly string[]): Si
   const chosenText: Record<string, string> = {};
   const palette = Object.fromEntries(paletteRoles.map(role => {
     const pairRow = record(paletteRow[role], ["background", "text"], "Palette " + role);
-    const background = colour(pairRow.background, role + " background");
-    const chosen = colour(pairRow.text, role + " text");
+    const background = color(pairRow.background, role + " background");
+    const chosen = color(pairRow.text, role + " text");
     chosenText[role] = chosen;
     const text = repair(chosen, [background]);
     if (!text) throw Error("Palette " + role + " text cannot be made readable");
     if (text !== chosen) adjustments.push(`${role} text ${chosen} → ${text} for readable contrast`);
     return [role, { background, text }];
   })) as unknown as SiteDesign["palette"];
-  // The brand colour is also the link colour on the main and tonal surfaces.
+  // The brand color is also the link color on the main and tonal surfaces.
   const brand = palette.brand.background;
   const link = repair(brand, [palette.light.background, palette.tonal.background]);
-  if (!link) throw Error("Brand colour cannot be made readable as a link colour");
+  if (!link) throw Error("Brand color cannot be made readable as a link color");
   if (link !== brand) {
     adjustments.push(`brand ${brand} → ${link} so links stay readable on light and tonal surfaces`);
-    // Re-derive the text on the adjusted brand colour from the AI's own choice.
+    // Re-derive the text on the adjusted brand color from the AI's own choice.
     palette.brand = { background: link, text: repair(chosenText.brand, [link]) ?? (luminance(link) > 0.179 ? "#000000" : "#ffffff") };
   }
-  const mutedChosen = colour(paletteRow.muted, "muted");
+  const mutedChosen = color(paletteRow.muted, "muted");
   const muted = repair(mutedChosen, [palette.light.background]);
   if (!muted) throw Error("Muted text cannot be made readable");
   if (muted !== mutedChosen) adjustments.push(`muted ${mutedChosen} → ${muted} for readable contrast`);
-  palette.border = colour(paletteRow.border, "border");
+  palette.border = color(paletteRow.border, "border");
   palette.muted = muted;
 
   const type = record(row.typography, ["headingFamily", "bodyFamily", "baseSize", "headingScale", "lineHeight", "headingWeight"], "Typography");

@@ -7,7 +7,7 @@ import { accountTasks, queue } from "../lib/platform/work/tasks";
 const at = "2026-11-24T12:00:00.000Z";
 const operator: Person = { id: "op", role: "operator" };
 
-test("a Delivery is followed by a labelled stand-in Observation that Core decides to watch", () => {
+test("a Delivery is followed by a labeled stand-in Observation that Core decides to watch", () => {
   const { observation, ledger } = observeDelivery(emptyLedger(), { account: "a", at, version: 4 });
   assert.match(observation.beacon!, /^Beacon:/);
   assert.deepEqual(ledger.requests.map(item => [item.origin.kind, item.origin.channel, item.target.grain, item.status]),
@@ -16,7 +16,7 @@ test("a Delivery is followed by a labelled stand-in Observation that Core decide
   assert.throws(() => observeDelivery(ledger, { account: "a", at, version: 4 }), /already taken in/, "One Observation per Delivered Version");
 });
 
-test("open work shows as labelled Tasks, and the Queue orders them across Accounts", () => {
+test("open work shows as labeled Tasks, and the Queue orders them across Accounts", () => {
   let ledger = takeIn(emptyLedger(), { id: "R", at, by: operator },
     [{ id: "r1", at, origin: { kind: "operator", by: operator, channel: "core-screen" }, target: { grain: "page", path: "/" }, words: "Publish" }]);
   ledger = decide(ledger, { id: "D", at, by: { id: "core", role: "core" }, requestIds: ["r1"], outcome: "change", reasoning: "" },

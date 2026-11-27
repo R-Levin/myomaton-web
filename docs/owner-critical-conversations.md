@@ -950,7 +950,7 @@ and Git history on branch `claude/rebuild-2026-11-22`.
 - **Nothing in the design is fixed by rule, not even the logo or name.** The owner's
   earlier question was why the logo disappeared, not a demand to freeze it. Brand assets
   are inputs Core uses, never drops silently, and may recommend changing; the owner or
-  customer decides (Nov 22). Fixed fonts, colours and layouts were Codex scaffolding and
+  customer decides (Nov 22). Fixed fonts, colors and layouts were Codex scaffolding and
   are jettisoned (Nov 22).
 - **Humans review real WordPress sites, not screenshots.** Development and customer
   sites belong on 20i Reseller WordPress hosting. Screenshots remain an AI input
@@ -1065,7 +1065,7 @@ exact spot.
 
 **Nov 22, late: go-live approved.** The owner approved all eight steps of
 `docs/go-live-review-drafts-request.md` as written: push the branch; deploy the current
-Core to protected Core; enrol miopages.org (new keys, Core's own gate login); a
+Core to protected Core; enroll miopages.org (new keys, Core's own gate login); a
 dedicated `miopages-core` WordPress account (Editor); add Core's gate login; switch
 miopages.org's settings to the review setup (the 16 old Codex drafts keep their text but
 lose their branded preview); update the plugin (0.1.0) and theme and archive the two
@@ -1201,7 +1201,7 @@ meaning:
   Clarified by the owner the same day: philosophically nothing has changed. WordPress is one of
   the delivery mechanisms and stays out of the overarching view and development of what the
   MioPages service is. Practically, it removes a massive development hurdle, so it sits at the
-  centre of what is being built now. Three resources are at our disposal: WordPress, the cloud
+  center of what is being built now. Three resources are at our disposal: WordPress, the cloud
   server running Core, and the 20i Reseller account where its use makes sense. (Claude had first
   recorded this as "the service is WordPress-based"; corrected. Baseline Part 1 #3 reflects it.)
   The owner also noted that Claude does not have the whole development record in mind.
@@ -1268,7 +1268,7 @@ code change as the owner corrects the glossary.
 
 **Nov 24: carry on with the rest of step 2 (Principal).** "OK, carry on with the rest of step 2":
 draw the Review summary from the Changes, remove the round's duplicate record of what was decided,
-and add the labelled Beacons (Observation, Task, Queue) so the cycle runs end to end.
+and add the labeled Beacons (Observation, Task, Queue) so the cycle runs end to end.
 
 **Nov 24: who may confirm a Fact (Principal).** For step 3 (One Knowledge) the Principal set the
 condition that "the stature/standing of the entity introducing the change must pass any
@@ -1383,7 +1383,7 @@ Principal approves.
   documents to OpenAI falls within this instruction and the $15 cap.
 
 - **Nov 25 — corrections on Report v3 approved.** Asked whether Claude should send its review
-  corrections on Report v3 as C0's Client, the Principal said "Approved". Sent, labelled as the
+  corrections on Report v3 as C0's Client, the Principal said "Approved". Sent, labeled as the
   Specialist's review approved by the Principal: describe the business as it stands (no talk of
   earlier versions), and cover Specialist work as a costed part of delivery, the real service
   functions, the retired legacy offers (HostShop sign-in kept), the 5-10 Client first cohort and
@@ -1397,9 +1397,9 @@ Principal approves.
 - **Nov 26 — go-ahead for peer research, brand assets and the Direction.** Asked whether to
   connect peer-website research and the brand assets, then have Core write the Direction, the
   Principal said "Yes". Done in the approved run: Core searched for comparable businesses from the
-  approved Report, captured 7 peer sites (desktop and mobile) and analysed each; they are gathered
+  approved Report, captured 7 peer sites (desktop and mobile) and analyzed each; they are gathered
   Evidence, never site copy. The MioPages logo, the earlier accepted site (A Business in Focus,
-  with screenshots) and its R3 copy were added as C0's own Evidence, labelled as reference and
+  with screenshots) and its R3 copy were added as C0's own Evidence, labeled as reference and
   precedent, not a template (Part 1 #9, #11, #13). The Specialist's review corrected Direction v1
   (imagery too diagram-only for Part 1 #12; the accepted site not yet used as precedent); Core's
   v2 met both, and the Specialist approved it.
@@ -1423,7 +1423,7 @@ Principal approves.
   draft 1 in the preview WordPress, the Principal objected that after repeated time and money it
   still looks pretty much like the original accepted site. Meaning: a new site from Core must look
   newly designed for the business, not like the old site re-skinned. Causes found: the WordPress
-  theme still sets the layout and look (Core chooses only colours, fonts, corners and spacing);
+  theme still sets the layout and look (Core chooses only colors, fonts, corners and spacing);
   the Specialist's correction to the Direction steered it to keep the old site's look; and no real
   images yet. Proposal put to the Principal: give Core real design authority over each site's
   layout and look, then have Core redesign C0.
@@ -1447,7 +1447,7 @@ Principal approves.
   said repeated substitution of agreed direction is unacceptable and that Claude must do the work
   without asking questions the Principal has no basis to answer. Claude re-read the Principal's
   own words of Nov 22-25 and found the direction already given: jettison every rule that keeps
-  sites looking the same (fonts, colours, layouts were never permanent; Nov 22), and use C0 as an
+  sites looking the same (fonts, colors, layouts were never permanent; Nov 22), and use C0 as an
   ordinary test Client, special only where it is part of the product (Nov 25). Action: C0 runs as
   any new Client would: the earlier MioPages site (screenshots, authority notes, R3 copy) is
   removed from what Core reads, since no new Client has one; Core gets real authority over each
@@ -1466,7 +1466,7 @@ Principal approves.
   per frame, searched Pixabay (responses kept 24 hours, local copies as its terms require), looked
   at the candidates and chose one or none; each picture is used once. The Specialist reviewed all
   40 choices and rejected 6 (clip-art arrows, a calculator with figures, an empty folder, clashing
-  flat illustrations). 34 pictures are placed; frames needing a labelled diagram stay marked FPO.
+  flat illustrations). 34 pictures are placed; frames needing a labeled diagram stay marked FPO.
   Under the Principal's earlier release of OpenAI credit, the run's answer count was raised from
   90 to 160; the $15 cap is unchanged.
 
@@ -1529,3 +1529,10 @@ Principal approves.
   process, with its safety rails) and what production will actually look like for a Client.
   Claude proposed: a one-page cost sheet after this run (each step: what development cost, what
   the same step would cost a real Client), and every spending update stating both in one line.
+
+- **Nov 27 — U.S. English everywhere.** The Principal: use U.S. language in all cases, especially
+  anything that might be seen publicly ("Colour, etc., where did that come from?"). The British
+  spellings came from Claude's own writing, not the Principal or the product. Done: U.S. spelling
+  throughout the project's own text (code identifiers and database values kept where renaming
+  would break them), and Core is told to write U.S. English in everything it produces. C0's site
+  copy was already U.S. English.

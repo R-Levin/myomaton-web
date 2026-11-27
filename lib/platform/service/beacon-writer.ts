@@ -2,7 +2,7 @@ import type { SiteDesign } from "../design-systems/site-design";
 import type { PageContent, SitePlan, WriteInput, Writer } from "./cycle";
 
 /**
- * A Beacon (glossary): a clearly labelled stand-in for Core's AI, so the whole cycle can run on
+ * A Beacon (glossary): a clearly labeled stand-in for Core's AI, so the whole cycle can run on
  * screens without spending. Everything it writes says it is a stand-in. Its content is drawn
  * from the Account's own Knowledge, so a person can follow the cycle; it is never presented as
  * Core's real work.
@@ -11,14 +11,14 @@ const label = "Beacon (stand-in for Core's AI)";
 
 type Item = { key?: string; kind?: string; value?: string; name?: string; summary?: string; status?: string; forWebsite?: boolean };
 
-/** Deliberately plain greys, so no one mistakes the Beacon's design for Core's. */
+/** Deliberately plain grays, so no one mistakes the Beacon's design for Core's. */
 const pair = (background: string, text: string) => ({ background, text });
 const beaconDesign: SiteDesign = {
   palette: { light: pair("#ffffff", "#1f1f1f"), strong: pair("#e6e6e6", "#1f1f1f"), tonal: pair("#f2f2f2", "#1f1f1f"), brand: pair("#4d4d4d", "#ffffff"),
     supporting: pair("#d9d9d9", "#1f1f1f"), contrast: pair("#1f1f1f", "#ffffff"), border: "#cccccc", muted: "#595959" },
   typography: { headingFamily: "work-sans", bodyFamily: "work-sans", baseSize: 17, headingScale: 2.5, lineHeight: 1.6, headingWeight: 600 },
   shape: "square", density: "balanced", imagery: { style: "photography", direction: "Placeholder until Core's real design." },
-  rationale: `${label}: plain greys, not a design.`, sourceIds: [], adjustments: [] };
+  rationale: `${label}: plain grays, not a design.`, sourceIds: [], adjustments: [] };
 
 export const beaconWriter: Writer = {
   async write(input: WriteInput) {

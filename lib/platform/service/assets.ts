@@ -65,10 +65,10 @@ export const pictureChoiceSchema = { type: "object", additionalProperties: false
 
 export const pictureChoiceInstructions = "You are MioPages Core's designer choosing photographs for the business's website. For each frame you see its purpose and " +
   "art direction, then numbered candidate photographs. Choose the one that best does the frame's job, fits the site's design and looks credible and " +
-  "current. Refuse (null) any candidate with visible logos or brands, legible third-party text, a recognisable public figure, anything implying an " +
+  "current. Refuse (null) any candidate with visible logos or brands, legible third-party text, a recognizable public figure, anything implying an " +
   "endorsement, a result or a real client, or an obviously staged cliché. The briefs were written before the pictures came from a stock library, so judge " +
   "each candidate by the frame's purpose rather than the letter of its brief: a credible photograph or illustration that does the job is better " +
-  "than an empty frame. Choose null only when the frame truly needs a specific labelled diagram or artifact, or no candidate is acceptable.";
+  "than an empty frame. Choose null only when the frame truly needs a specific labeled diagram or artifact, or no candidate is acceptable.";
 
 /** The web copy delivery sends for one Asset: WebP within 1600px, its fingerprint and size. */
 export async function deliveryCopy(asset: Asset, read: (file: string) => Promise<Buffer>) {
