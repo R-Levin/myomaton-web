@@ -1503,3 +1503,12 @@ Principal approves.
 - **Nov 27 — the footer is part of the Site plan.** Core writes the site's footer (its content,
   within the business's facts: contact details, legal links and the like) as part of the Site plan,
   approved with the plan like everything else; Core's stylesheet designs how it looks.
+
+- **Nov 27 — Client links: optional, and how they weigh.** The Principal has no links to send for
+  C0 and asked whether that matters. It doesn't: Core's own research finds the field's sites.
+  Agreed ("Yes, excellent"): Clients may name competitors and sites whose look they like, asked
+  once in onboarding and never required. Competitors join the research (always included, to
+  understand and differ from, never to copy); liked sites guide the look, and Core says what it
+  took from each. The Client's business leads on facts and content, the Client's taste on the
+  look, research on what works for visitors; where taste and research conflict, Core says so and
+  the Client decides, within the design rules. Recorded in the baseline as #16d and #16e.

@@ -98,6 +98,17 @@ nothing below came from an assistant proposal unless it says so.
     fixed template with new colours. Nothing is called done, or shown to the Principal, until the
     rendered site has been looked at as a Client would see it. *(Nov 26: "we are looking for what
     Cx will see")*
+16d. **Design rules are few, justified and readable.** The only limits on how Core designs a site
+    are the nine rules in `docs/design-rules.md` (safe, faithful, structured, readable, reachable,
+    fits the phone, honest about gaps, licensed, respectful of motion), each with its reason and
+    reviewable by a person. Everything else is Core's design decision. *(Nov 27)*
+16e. **Clients may name competitors and sites whose look they like.** Optional, asked once in
+    onboarding; most will send none and Core's own research covers it. Competitors join the
+    research (always included; understood and differed from, never copied). Liked sites guide the
+    look, and Core says what it took from each. Weighting: the Client's own business leads on
+    facts and content, the Client's taste leads on the look, research decides what works for
+    their visitors; where taste and research conflict, Core says so plainly and the Client
+    decides, within the design rules. Both are Client-supplied Evidence. *(Nov 27)*
 
 ### How development must work
 17. **Outcome first.** Tests are part of engineering, not product progress. Never
