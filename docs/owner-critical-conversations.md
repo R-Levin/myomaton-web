@@ -1512,3 +1512,8 @@ Principal approves.
   took from each. The Client's business leads on facts and content, the Client's taste on the
   look, research on what works for visitors; where taste and research conflict, Core says so and
   the Client decides, within the design rules. Recorded in the baseline as #16d and #16e.
+
+- **Nov 27 — redesign run approved.** The Principal approved Core's paid redesign of C0 with the
+  new design rules (styling, Site plan with footer, page layouts, pictures), within the milestone 3
+  run (about $5.60 left of $15); Claude stops and asks before going past the cap. No Client links
+  for C0: Core uses its own research.

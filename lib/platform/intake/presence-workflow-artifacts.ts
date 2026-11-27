@@ -24,7 +24,7 @@ const visualShape = shape({ purpose: string, brief: string, altIntent: string, s
 /** Further pictures in one section (design rules: Core decides how many pictures, and where). */
 const moreVisuals = { ...array(visualShape), description: "Further pictures for this section beyond visual (a gallery, a second image), usually none. " +
   "Place picture n (counting from 1) with an image node whose reference is section-<sectionIndex>-<n>; one that is not placed follows the section's content. " +
-  "Each must carry its own idea: a visitor can take in only so much on one page." };
+  "Each must carry its own idea." };
 
 export const artifactSchemas = {
   report: shape({ title: string, summary: string, findings: array(shape({ id: string, heading: string, body: string, status: options(findingStates), ...cited })) }),
