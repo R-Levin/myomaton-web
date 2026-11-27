@@ -67,15 +67,39 @@ export async function beginLaunch(webPresenceId: string) {
   await change(webPresenceId, "specialist", (record, ctx) => startLaunch(record, now(), ctx.person));
 }
 
-/** Run Core's waiting work with the configured writer (locally, the labeled Beacon). */
+/** How many times Core may revise a proposed design against the rendered-page check before a Specialist sees it. */
+const designRetries = 2;
+
+/**
+ * Run Core's waiting work with the configured writer (locally, the labeled Beacon). A design Core
+ * proposes is then checked on the rendered pages against the design rules before anyone sees it;
+ * when the check finds problems, Core gets the findings and revises, up to designRetries times.
+ * Core stays free to design as it judges best; only the design rules decide pass or fail.
+ */
 export async function runCore(webPresenceId: string) { await shown(webPresenceId, async () => {
   const ctx = await context(webPresenceId, "specialist");
   const known = await accountKnowledge(ctx.pool, ctx.account.webPresenceId);
   const knowledge = [...known.items, ...known.offerings];
-  try {
+  const coreWork = async () => {
     for (const task of tasks(await ctx.store.read(ctx.account)).filter(item => item.who === "core")) {
       const read = await ctx.store.read(ctx.account);
       await ctx.store.save(read, await work(read, task, ctx.writer, knowledge, now()));
+    }
+  };
+  try {
+    await coreWork();
+    const configFile = process.env.MIOPAGES_PREVIEW_WORDPRESS;
+    if (!ctx.wordpress || !configFile || !(await ctx.store.read(ctx.account)).deliveries?.length) return;
+    for (let round = 0; ; round++) {
+      const read = await ctx.store.read(ctx.account);
+      const proposal = read.products.find(item => item.kind === "direction" && item.status === "proposed");
+      const stylesheet = (proposal?.content as { design?: { stylesheet?: string } } | undefined)?.design?.stylesheet;
+      if (!proposal || !stylesheet) return;
+      const check = await runRenderedCheck({ webPresenceId, key: proposal.changeId, configFile, stylesheet,
+        subject: `your proposed design (Direction version ${proposal.version})` });
+      if (!check.findings.length || round >= designRetries) return;
+      await ctx.store.save(read, respond(read, proposal.changeId, ctx.person, "correct", now(), findingsForCore(check)));
+      await coreWork();
     }
   } catch (error) {
     throw Error("Core's answer was not accepted: " + (error instanceof Error ? error.message : "it failed"));
