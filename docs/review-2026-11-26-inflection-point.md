@@ -129,3 +129,7 @@ tasks from that. Until then the site stays exactly as it is.
   Client in production, and every spending update stating both.
 - **Processing time (Nov 27):** worth a look closer to production; Core took about 12 minutes for
   eight pages today, one after another. Show time alongside cost.
+- **Core never sees its rendered page (Nov 27):** most of today's readability rounds came from Core
+  styling blind; asking again in words did not converge (pull quotes inside a dark section still
+  inherit light text). Next: give Core its own rendered page and the rules check's findings,
+  including which of its rules won, before a Specialist reviews.
