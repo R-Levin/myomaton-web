@@ -1,6 +1,6 @@
 import { choice, object, text } from "../canonical/model";
 
-const kinds = ["group", "heading", "paragraph", "list", "image", "action", "separator", "details", "placeholder"] as const;
+const kinds = ["group", "heading", "paragraph", "list", "image", "action", "separator", "details", "placeholder", "quote"] as const;
 /** What a placeholder stands in for. Core places a visible notice where the plan calls
  * for material that does not exist yet, instead of inventing it or leaving a gap. */
 export const placeholderNeeds = ["testimonial", "price", "result", "case-study", "credential", "guarantee", "contact", "team", "detail"] as const;
@@ -16,7 +16,8 @@ const options = (values: readonly string[]) => ({ type: "string", enum: values }
 
 const layoutFields = { gap: options(sizes), inset: options(sizes), surface: options(surfaces), align: options(alignments),
   measure: options(["narrow", "reading", "wide", "full"]), typeScale: options(["small", "body", "lead", "display"]),
-  span: { type: "integer", minimum: 1, maximum: 12 }, mobileOrder: { type: "integer", enum: [0] },
+  span: { type: "integer", minimum: 1, maximum: 12 },
+  mobileOrder: { type: "integer", minimum: 0, maximum: 12, description: "On phones, siblings show in ascending order of this number (equal numbers keep the desktop order); leave all at 0 to keep the desktop order." },
   border: { type: "boolean" }, rounded: { type: "boolean" } };
 /** The wire enforces kind-specific structure, rather than inviting output the compiler must reject. */
 export const nativeComponentSchema = {
@@ -30,9 +31,10 @@ export const nativeComponentSchema = {
     nativeNode: { anyOf: kinds.map(kind => shape({
       kind: options([kind]),
       text: ["heading", "paragraph", "details", "placeholder"].includes(kind) ? { type: "string" }
+        : kind === "quote" ? { type: "string", description: "A pull quote of approved copy from this page or the Evidence; never an invented testimonial (use a placeholder for those)." }
         : ["action", "image", "list"].includes(kind) ? nullableText : { type: "null" },
       level: kind === "heading" ? { type: "integer", enum: [1, 2, 3, 4, 5, 6] } : { type: "null" },
-      items: { type: "array", items: { type: "string" }, ...(kind === "list" ? { minItems: 1 } : { maxItems: 0 }) },
+      items: { type: "array", items: { type: "string" }, ...(kind === "list" ? { minItems: 1 } : kind === "quote" ? { maxItems: 1, description: "Optional: who said it, exactly as in the Evidence." } : { maxItems: 0 }) },
       ordered: { type: "boolean" },
       reference: ["image", "action", "placeholder"].includes(kind) ? { type: "string", pattern: kind === "image" ? "^section-(0|[1-9][0-9]*)$"
         : kind === "action" ? "^action-(0|[1-9][0-9]*)$" : placeholderPattern } : { type: "null" },
@@ -91,19 +93,19 @@ export function readNativeComponent(value: unknown, normalizeProviderName = fals
         typeof layout.border !== "boolean" || typeof layout.rounded !== "boolean" ||
         !Array.isArray(layout.columns) || layout.columns.some(width => typeof width !== "number" || !Number.isFinite(width) || width <= 0 || width > 12) ||
         !Number.isSafeInteger(layout.span) || Number(layout.span) < 1 || Number(layout.span) > 12 ||
-        !Number.isSafeInteger(layout.mobileOrder) || Number(layout.mobileOrder) !== 0) throw Error("Native component layout refused");
+        !Number.isSafeInteger(layout.mobileOrder) || Number(layout.mobileOrder) < 0 || Number(layout.mobileOrder) > 12) throw Error("Native component layout refused");
     const arrangement = choice(layout.arrangement, arrangements);
     if (arrangement === "columns" && (layout.columns.length < 2 || layout.columns.length > 12) ||
         arrangement !== "columns" && layout.columns.length ||
         !["group", "details"].includes(kind) && row.children.length ||
         kind === "group" && !row.children.length ||
         kind === "details" && (insideDetails || !row.children.length) ||
-        kind !== "list" && row.items.length ||
+        kind !== "list" && kind !== "quote" && row.items.length || kind === "quote" && row.items.length > 1 ||
         kind === "list" && !row.items.length) throw Error("Native component structure refused");
     const copy = row.text === null ? null : plain(row.text);
     const reference = row.reference === null ? null : text(row.reference, 160);
     if ((kind === "heading" ? !Number.isSafeInteger(row.level) || Number(row.level) < 1 || Number(row.level) > 6 : row.level !== null) ||
-        (["heading", "paragraph", "action", "details", "placeholder"].includes(kind) ? !copy : ["image", "list"].includes(kind) ? false : copy !== null) ||
+        (["heading", "paragraph", "action", "details", "placeholder", "quote"].includes(kind) ? !copy : ["image", "list"].includes(kind) ? false : copy !== null) ||
         (kind === "placeholder" ? !reference || !new RegExp(placeholderPattern, "u").test(reference)
           : ["image", "action"].includes(kind) ? !reference || !/^[a-zA-Z0-9][a-zA-Z0-9:_-]*$/u.test(reference) : reference !== null)) {
       throw Error("Native component content or reference refused");
@@ -114,7 +116,7 @@ export function readNativeComponent(value: unknown, normalizeProviderName = fals
         surface: choice(layout.surface, surfaces), align: choice(layout.align, alignments),
         measure: choice(layout.measure, ["narrow", "reading", "wide", "full"] as const),
         typeScale: choice(layout.typeScale, ["small", "body", "lead", "display"] as const), span: Number(layout.span),
-        mobileOrder: 0, border: layout.border, rounded: layout.rounded },
+        mobileOrder: Number(layout.mobileOrder), border: layout.border, rounded: layout.rounded },
       children: row.children.map(child => node(child, depth + 1, insideDetails || kind === "details")) };
   }
   return { version: 2, name, purpose: plain(component.purpose), mode: choice(component.mode, ["supplement", "section"] as const), root: node(component.root, 0) };

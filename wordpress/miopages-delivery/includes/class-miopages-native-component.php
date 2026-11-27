@@ -143,7 +143,7 @@ final class MioPages_Native_Component
         if ($depth > 24) throw new InvalidArgumentException('Native component nesting refused.');
         self::keys($node, ['kind','text','level','items','ordered','reference','layout','children']);
         $kind = $node['kind'];
-        if (!in_array($kind, ['group','heading','paragraph','list','image','action','separator','details','placeholder'], true)
+        if (!in_array($kind, ['group','heading','paragraph','list','image','action','separator','details','placeholder','quote'], true)
             || !is_array($node['items']) || !array_is_list($node['items'])
             || !is_array($node['children']) || !array_is_list($node['children']) || !is_bool($node['ordered'])) {
             throw new InvalidArgumentException('Native component structure refused.');
@@ -157,7 +157,8 @@ final class MioPages_Native_Component
             || !in_array($layout['align'], ['start','center','end','stretch'], true)
             || !in_array($layout['measure'], ['narrow','reading','wide','full'], true)
             || !in_array($layout['typeScale'], ['small','body','lead','display'], true)
-            || !is_int($layout['span']) || $layout['span'] < 1 || $layout['span'] > 12 || $layout['mobileOrder'] !== 0
+            || !is_int($layout['span']) || $layout['span'] < 1 || $layout['span'] > 12
+            || !is_int($layout['mobileOrder']) || $layout['mobileOrder'] < 0 || $layout['mobileOrder'] > 12
             || !is_bool($layout['border']) || !is_bool($layout['rounded'])
             || !is_array($layout['columns']) || !array_is_list($layout['columns'])) {
             throw new InvalidArgumentException('Native component style refused.');
@@ -174,10 +175,11 @@ final class MioPages_Native_Component
             || (!in_array($kind, ['group','details'], true) && $node['children'] !== [])
             || ($kind === 'group' && $node['children'] === [])
             || ($kind === 'details' && ($insideDetails || $node['children'] === []))
-            || ($kind !== 'list' && $node['items'] !== []) || ($kind === 'list' && $node['items'] === [])) {
+            || (!in_array($kind, ['list','quote'], true) && $node['items'] !== []) || ($kind === 'list' && $node['items'] === [])
+            || ($kind === 'quote' && count($node['items']) > 1)) {
             throw new InvalidArgumentException('Native component child contract refused.');
         }
-        $hasText = in_array($kind, ['heading','paragraph','action','details','placeholder'], true);
+        $hasText = in_array($kind, ['heading','paragraph','action','details','placeholder','quote'], true);
         $copy = $hasText ? self::copy($node['text']) : '';
         // Image text is retained planning intent, never approved alt text or visitor copy.
         if (in_array($kind, ['image','list'], true) && $node['text'] !== null) self::copy($node['text']);
@@ -191,7 +193,7 @@ final class MioPages_Native_Component
         $nativeClass = match ($kind) {
             'group'=>'wp-block-group', 'heading'=>'wp-block-heading', 'list'=>'wp-block-list',
             'details'=>'wp-block-details', 'separator'=>'wp-block-separator has-alpha-channel-opacity',
-            'image'=>'wp-block-image', 'action'=>'wp-block-button', default=>'',
+            'image'=>'wp-block-image', 'action'=>'wp-block-button', 'quote'=>'wp-block-quote', default=>'',
         };
         $class = trim($nativeClass . ' miopages-node miopages-node-' . $layout['arrangement'])
             . ' miopages-node-gap-' . $layout['gap'] . ' miopages-node-inset-' . $layout['inset']
@@ -201,7 +203,7 @@ final class MioPages_Native_Component
             // Layout travels as classes, not inline style: WordPress's editor keeps a block's
             // classes through edits but rejects markup its own save cannot reproduce.
             // The theme turns these classes into the grid (miopages_layout_css()).
-            . ' miopages-span-' . $layout['span'] . ($columns ? ' ' . self::COLUMNS_CLASS . implode('-', $columns) : '');
+            . ' miopages-span-' . $layout['span'] . ($layout['mobileOrder'] > 0 ? ' miopages-node-order-' . $layout['mobileOrder'] : '') . ($columns ? ' ' . self::COLUMNS_CLASS . implode('-', $columns) : '');
         $attrs = ' class="' . $class . '"';
         $block = self::json(['className'=>$class]);
         $named = self::json(self::origin($id) + ['className'=>$class]);
@@ -227,6 +229,9 @@ final class MioPages_Native_Component
         }
         if ($kind === 'details') return '<!-- wp:details ' . $named . ' --><details' . $attrs . '><summary>' . $copy . '</summary>'
             . $children . '</details><!-- /wp:details -->';
+        // A pull quote of approved copy, with who said it when the Evidence names them.
+        if ($kind === 'quote') return '<!-- wp:quote ' . $named . ' --><blockquote' . $attrs . '><!-- wp:paragraph --><p>' . nl2br($copy, false) . '</p><!-- /wp:paragraph -->'
+            . ($node['items'] !== [] ? '<cite>' . self::copy($node['items'][0]) . '</cite>' : '') . '</blockquote><!-- /wp:quote -->';
         if ($kind === 'placeholder') return self::placeholder($node['reference'], $copy, $class);
         if ($kind === 'separator') return '<!-- wp:separator ' . $block . ' --><hr' . $attrs . '/><!-- /wp:separator -->';
         $reference = $node['reference'];

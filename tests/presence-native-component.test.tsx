@@ -73,11 +73,13 @@ test("original component structure survives Core validation and native WordPress
   assert.match(html, /metadata.*fixture-decision-map/);
 });
 
-test("unknown executable fields, foreign resources, reordered mobile content and malformed native nodes refuse", () => {
+test("unknown executable fields, foreign resources, out-of-range phone order and malformed native nodes refuse", () => {
   assert.throws(() => readNativeComponent({ ...component, script: "alert(1)" }));
   assert.throws(() => readNativeComponent({ ...component, root: node("paragraph", { text: "<iframe>" }) }));
   assert.throws(() => readNativeComponent({ ...component, root: node("image", { reference: "https://foreign.test/image.png" }) }));
-  assert.throws(() => readNativeComponent({ ...component, root: { ...component.root, layout: { ...component.root.layout, mobileOrder: 1 } } }));
+  // Core may choose a phone order (design rules: layout is Core's decision); only out-of-range values refuse.
+  assert.equal(readNativeComponent({ ...component, root: { ...component.root, layout: { ...component.root.layout, mobileOrder: 2 } } }).root.layout.mobileOrder, 2);
+  assert.throws(() => readNativeComponent({ ...component, root: { ...component.root, layout: { ...component.root.layout, mobileOrder: 13 } } }));
   const intent = { ...component, root: node("image", { reference: "section-0", text: "Proposed explanatory illustration; not an acquired Asset." }) };
   assert.equal(readNativeComponent(intent).root.text, intent.root.text);
   assert.throws(() => readNativeComponent({ ...intent, root: { ...intent.root, text: "<script>unsafe</script>" } }));
@@ -240,4 +242,15 @@ test("missing material becomes a visible, categorized placeholder rather than a 
   const refused = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/native-component.php"],
     { input: JSON.stringify(bad({ reference: "need-anything", text: "x" })), encoding: "utf8" });
   assert.notEqual(refused.status, 0);
+});
+
+test("a pull quote carries approved words and, optionally, who said them; WordPress renders its own quote block", () => {
+  const quote = { ...component, root: node("quote", { text: "We learn your business first.", items: ["MioPages"], layout: { ...component.root.layout, mobileOrder: 1 } }) };
+  assert.equal(readNativeComponent(quote).root.items[0], "MioPages");
+  assert.throws(() => readNativeComponent({ ...quote, root: { ...quote.root, items: ["One", "Two"] } }));
+  assert.throws(() => readNativeComponent({ ...quote, root: { ...quote.root, text: null } }));
+  const html = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/native-component.php"],
+    { input: JSON.stringify(quote), encoding: "utf8" });
+  assert.equal(html.status, 0, html.stderr);
+  assert.match(html.stdout, /<blockquote class="wp-block-quote miopages-node[^"]*miopages-node-order-1[^"]*"><!-- wp:paragraph --><p>We learn your business first\.<\/p><!-- \/wp:paragraph --><cite>MioPages<\/cite><\/blockquote>/u);
 });

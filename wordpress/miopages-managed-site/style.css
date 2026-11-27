@@ -397,3 +397,11 @@ body.miopages-designed { font-family: var(--miopages-body-font); color: var(--wp
 .miopages-native-component .miopages-node-surface-supporting { background: var(--miopages-supporting-surface, var(--wp--preset--color--support)); color: var(--miopages-supporting-ink, inherit); }
 .miopages-native-component .miopages-node-surface-contrast { background: var(--miopages-contrast-surface, var(--wp--preset--color--ink)); color: var(--miopages-contrast-ink, var(--wp--preset--color--surface)); }
 .miopages-designed .miopages-native-component .miopages-node-surface-contrast a { color: inherit; }
+
+/* Phone order Core chose for a block's children (mobileOrder); 0 keeps the desktop order. */
+@media (max-width: 700px) {
+  .miopages-node-order-1 { order: 1; } .miopages-node-order-2 { order: 2; } .miopages-node-order-3 { order: 3; }
+  .miopages-node-order-4 { order: 4; } .miopages-node-order-5 { order: 5; } .miopages-node-order-6 { order: 6; }
+  .miopages-node-order-7 { order: 7; } .miopages-node-order-8 { order: 8; } .miopages-node-order-9 { order: 9; }
+  .miopages-node-order-10 { order: 10; } .miopages-node-order-11 { order: 11; } .miopages-node-order-12 { order: 12; }
+}
