@@ -48,6 +48,8 @@
   });
   window.addEventListener("resize", schedule);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+  // Measure again once everything (fonts, pictures, the site's own styling) has settled.
+  window.addEventListener("load", schedule);
   header.classList.add("miopages-menu-ready");
   update();
 })();

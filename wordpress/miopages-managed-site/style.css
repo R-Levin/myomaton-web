@@ -1,7 +1,7 @@
 /*
 Theme Name: MioPages Managed Site
 Description: Reusable block presentation for Core-managed Web Presence sites.
-Version: 0.1.3
+Version: 0.1.4
 Requires at least: 6.6
 Requires PHP: 8.0
 Text Domain: miopages-managed-site
@@ -323,6 +323,19 @@ header.miopages-menu-compact.miopages-menu-open nav.miopages-draft-nav > * {
   white-space: normal; border: 0; border-bottom: 1px solid var(--miopages-border, #ddd); border-radius: 0; background: transparent; box-shadow: none;
 }
 html.miopages-menu-locked { overflow: hidden; }
+/* Which state shows is a function, not a look (design rule 5): these win over any styling, so the
+   button shows only when the links would wrap, and the links hide only behind the button. */
+html body header:not(.miopages-menu-compact) .miopages-menu-toggle:not(#miopages-a):not(#miopages-b) { display: none !important; }
+html body header.miopages-menu-compact:not(.miopages-menu-open) nav.miopages-draft-nav:not(#miopages-a):not(#miopages-b) { display: none !important; }
+html body header.miopages-menu-compact.miopages-menu-open nav.miopages-draft-nav:not(#miopages-a):not(#miopages-b) { display: flex !important; }
+html body header.miopages-menu-measuring nav.miopages-draft-nav:not(#miopages-a):not(#miopages-b) { display: flex !important; }
+/* While the phone menu is open, nothing on the header may trap the full-screen panel inside it
+   (a blur, transform or filter makes the header the panel's frame). */
+html body header.miopages-menu-open:not(#miopages-a):not(#miopages-b) { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; transform: none !important; filter: none !important; contain: none !important; }
+html body header.miopages-menu-compact.miopages-menu-open nav.miopages-draft-nav:not(#miopages-a):not(#miopages-b) {
+  position: fixed !important; inset: var(--mp-menu-top, 4.5rem) 0 0 0 !important; width: auto !important; max-width: none !important; height: auto !important; max-height: none !important;
+  flex-direction: column !important; flex-wrap: nowrap !important; overflow-y: auto !important; transform: none !important; z-index: 1000 !important;
+}
 /* While menu.js measures: the links as plain text on wrapping lines, the button out of the way. */
 header.miopages-menu-measuring .miopages-menu-toggle { display: none !important; }
 header.miopages-menu-measuring nav.miopages-draft-nav {
