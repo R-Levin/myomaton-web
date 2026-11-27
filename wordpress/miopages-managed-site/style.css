@@ -1,7 +1,7 @@
 /*
 Theme Name: MioPages Managed Site
 Description: Reusable block presentation for Core-managed Web Presence sites.
-Version: 0.1.2
+Version: 0.1.3
 Requires at least: 6.6
 Requires PHP: 8.0
 Text Domain: miopages-managed-site
@@ -292,24 +292,44 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
    Otherwise inline-size containment can shrink a comparison to its padding. */
 .miopages-native-component .miopages-node-columns { inline-size: 100%; }
 
-/* Native draft navigation stays readable and comfortably tappable on small screens. */
-@media (max-width: 680px) {
-  .miopages-branded-draft .miopages-draft-nav {
-    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: .5rem; padding-block: .75rem;
-  }
-  .miopages-branded-draft .miopages-draft-nav a,
-  .miopages-branded-draft .miopages-draft-nav > [aria-current] {
-    display: flex; align-items: center; box-sizing: border-box; min-height: 44px;
-    padding: .65rem .75rem; font-size: 1rem; line-height: 1.35;
-    border: 1px solid var(--miopages-border); border-radius: .3rem;
-    text-decoration: none;
-  }
-  .miopages-branded-draft .miopages-draft-nav [aria-current] {
-    background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand);
-  }
-  .miopages-branded-draft .miopages-draft-nav a:last-child:nth-child(odd) { grid-column: 1 / -1; }
+/* The site menu (design rule 5). Text links in the header; when they would wrap to two lines,
+   menu.js adds .miopages-menu-compact and the button opens them as a full-screen list.
+   A plain default: Core's stylesheet designs how both states look. */
+.miopages-menu { display: flex; align-items: center; justify-content: flex-end; flex: 1 1 auto; min-width: 0; }
+header .wp-block-group:has(> .miopages-menu) { flex: 1 1 auto; min-width: 0; }
+.miopages-menu nav.miopages-draft-nav { padding-block: 0; }
+.miopages-menu-toggle { display: none; }
+header.miopages-menu-compact .miopages-menu-toggle {
+  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+  width: 48px; height: 48px; padding: 0; margin: 0; cursor: pointer;
+  border: 1px solid currentColor; border-radius: .5rem; background: transparent; color: inherit;
 }
+.miopages-menu-toggle:focus-visible { outline: 3px solid var(--wp--preset--color--brand, currentColor); outline-offset: 2px; }
+.miopages-menu-icon { display: grid; gap: 5px; width: 22px; }
+.miopages-menu-icon > span { display: block; height: 2px; border-radius: 1px; background: currentColor; transition: transform .2s ease, opacity .2s ease; }
+header.miopages-menu-open .miopages-menu-icon > span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+header.miopages-menu-open .miopages-menu-icon > span:nth-child(2) { opacity: 0; }
+header.miopages-menu-open .miopages-menu-icon > span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+header.miopages-menu-compact nav.miopages-draft-nav { display: none !important; }
+header.miopages-menu-compact.miopages-menu-open nav.miopages-draft-nav {
+  display: flex !important; flex-direction: column; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start;
+  position: fixed !important; inset: var(--mp-menu-top, 4.5rem) 0 0 0 !important; z-index: 1000;
+  width: auto !important; max-width: none !important; margin: 0 !important; gap: 0; overflow-y: auto; overflow-x: hidden;
+  padding: 1rem clamp(1rem, 5vw, 2rem) 2rem; background: var(--wp--preset--color--surface, #fff); color: var(--wp--preset--color--ink, #111);
+  border-radius: 0; box-shadow: none;
+}
+header.miopages-menu-compact.miopages-menu-open nav.miopages-draft-nav > * {
+  display: flex; align-items: center; min-height: 52px; padding: .75rem 0; font-size: 1.3rem; line-height: 1.3;
+  white-space: normal; border: 0; border-bottom: 1px solid var(--miopages-border, #ddd); border-radius: 0; background: transparent; box-shadow: none;
+}
+html.miopages-menu-locked { overflow: hidden; }
+/* While menu.js measures: the links as plain text on wrapping lines, the button out of the way. */
+header.miopages-menu-measuring .miopages-menu-toggle { display: none !important; }
+header.miopages-menu-measuring nav.miopages-draft-nav {
+  display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; overflow: visible !important; position: static !important; transform: none !important; max-height: none !important;
+}
+header.miopages-menu-measuring nav.miopages-draft-nav > * { white-space: nowrap !important; }
+@media (prefers-reduced-motion: reduce) { .miopages-menu-icon > span { transition: none; } }
 
 /* FPO (for-position-only) frame: Core requested an image and no approved acquired
    asset is bound yet. Deliberately reads as a placeholder, never as real media. */

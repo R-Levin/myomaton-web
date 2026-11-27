@@ -1494,3 +1494,8 @@ Principal approves.
   rules at all. Whatever set of design rules results must be reviewable by a person in plain
   language (it need not be consulted often). Iterate to something that works, efficiently in
   cost and time.
+
+- **Nov 27 — design rules approved.** The Principal read `docs/design-rules-proposal.md` and is in
+  broad agreement; the limits it lists were never justified to them. Approved to build: the nine
+  plain rules replace the page builder's fixed structure and the stylesheet allow-lists; everything
+  else is Core's design decision. This issue is decided for now.

@@ -74,3 +74,35 @@ add_filter('render_block_core/post-title', static function (string $html): strin
         && str_contains($post->post_content, 'miopages-native-component')) return '';
     return $html;
 });
+
+/* The site menu (design rule 5: it works by touch and keyboard on every screen). The page's menu
+   sits in the header where visitors expect it; it shows as text links and switches to a phone
+   menu (a button that opens the list) when the links would wrap to two lines (the Principal,
+   Nov 27). Core designs how both states look. Without JavaScript the text links stay. */
+function miopages_draft_menu(): ?string
+{
+    static $menu = false;
+    if ($menu !== false) return $menu;
+    $menu = null;
+    $post = get_queried_object();
+    if ($post instanceof WP_Post && preg_match('#<nav class="miopages-draft-nav"[^>]*>.*?</nav>#s', $post->post_content, $found)) {
+        $menu = str_replace('<nav class="miopages-draft-nav"', '<nav id="miopages-site-menu" class="miopages-draft-nav"', $found[0]);
+    }
+    return $menu;
+}
+add_filter('render_block_core/navigation', static function (string $html): string {
+    $menu = miopages_draft_menu();
+    if ($menu === null) return $html;
+    return '<div class="miopages-menu"><button type="button" class="miopages-menu-toggle" aria-controls="miopages-site-menu"'
+        . ' aria-expanded="false" aria-label="' . esc_attr__('Open menu', 'miopages-managed-site') . '">'
+        . '<span class="miopages-menu-icon" aria-hidden="true"><span></span><span></span><span></span></span></button>' . $menu . '</div>';
+});
+add_filter('render_block_core/post-content', static function (string $html): string {
+    if (miopages_draft_menu() === null) return $html;
+    return preg_replace('#<nav class="miopages-draft-nav"[^>]*>.*?</nav>#s', '', $html, 1) ?? $html;
+});
+add_action('wp_enqueue_scripts', static function (): void {
+    if (miopages_draft_menu() === null) return;
+    wp_enqueue_script('miopages-menu', get_theme_file_uri('menu.js'), [], wp_get_theme()->get('Version'), ['strategy' => 'defer', 'in_footer' => true]);
+    wp_localize_script('miopages-menu', 'miopagesMenu', ['open' => __('Open menu', 'miopages-managed-site'), 'close' => __('Close menu', 'miopages-managed-site')]);
+});

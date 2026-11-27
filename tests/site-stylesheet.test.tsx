@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
+import { designRules } from "../lib/platform/design-systems/design-rules";
 import { readSiteStylesheet } from "../lib/platform/design-systems/site-stylesheet";
+
+const scope = "body.miopages-designed:not(#mp-core-design)";
 
 test("Core's stylesheet designs the whole page and is scoped to the site's own pages", () => {
   const css = readSiteStylesheet(`
@@ -16,7 +20,6 @@ test("Core's stylesheet designs the whole page and is scoped to the site's own p
     @keyframes mp-rise { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
     @media (prefers-reduced-motion: no-preference) { .miopages-draft-section { animation: mp-rise .6s ease-out both; } }
   `);
-  const scope = "body.miopages-designed:not(#mp-core-design)";
   assert.ok(css.startsWith(scope + "{background:"), "body itself becomes the site's scope");
   assert.ok(css.includes(scope + " header.wp-block-template-part{position:sticky"));
   assert.ok(css.includes("@media (max-width: 680px){" + scope + " nav.miopages-draft-nav{display:flex"));
@@ -25,22 +28,41 @@ test("Core's stylesheet designs the whole page and is scoped to the site's own p
   assert.equal(readSiteStylesheet(css), css, "checking a rebuilt sheet again (at delivery) leaves it unchanged");
 });
 
-test("anything that loads, runs, hides content or hides the FPO and placeholder marks is refused", () => {
+test("ordinary contemporary CSS is Core's to use: menus that hide, pinned headers, queries, new properties", () => {
+  const css = readSiteStylesheet(`
+    header.miopages-menu-compact nav.miopages-draft-nav { display: none; }
+    header.miopages-menu-open nav.miopages-draft-nav { display: grid; position: fixed; inset: 4rem 0 auto; }
+    details:not([open]) > .panel { visibility: hidden; }
+    .miopages-draft-section { container-type: inline-size; grid-template-areas: "copy media"; text-wrap: pretty; }
+    @supports (display: grid) { @container (min-width: 40rem) { .miopages-node-columns { grid-template-columns: 2fr 1fr; } } }
+    .alignfull > section, section.custom-band { margin-inline: calc(50% - 50vw); }
+    html body p { hanging-punctuation: first; }
+  `);
+  assert.ok(css.includes(scope + " header.miopages-menu-compact nav.miopages-draft-nav{display:none}"));
+  assert.ok(css.includes("@supports (display: grid){@container (min-width: 40rem){"));
+  assert.ok(css.includes(scope + " p{hanging-punctuation:first}"));
+  assert.equal(readSiteStylesheet(css), css);
+});
+
+test("only the design rules refuse: loading anything, words added by styling, hidden gap marks, unlicensed fonts, admin", () => {
   const refused = [
-    "body { background: url(https://example.com/x.png); }",
-    "@import 'https://example.com/a.css';",
-    ".miopages-draft-hero { display: none; }",
-    ".miopages-draft-section { visibility: hidden; }",
-    "figure.miopages-fpo { height: 0; }",
-    "aside.miopages-placeholder { transform: scale(0); }",
-    ".miopages-placeholder-label { opacity: .1; }",
-    "header.wp-block-template-part { position: fixed; }",
-    ".miopages-draft-hero::after { content: 'Guaranteed results'; }",
-    "#wpadminbar { color: red; }",
-    ".x { color: red; }",
-    "h1 { font-family: 'Comic Sans MS'; }",
-    "h1 { color: red; } </style><script>alert(1)</script>",
-    "@supports (display: grid) { h1 { color: red; } }",
+    "body { background: url(https://example.com/x.png); }",          // rule 1
+    "@import 'https://example.com/a.css';",                           // rule 1
+    "h1 { color: red; } </style><script>alert(1)</script>",           // rule 1
+    "#wpadminbar { color: red; }",                                    // rule 1
+    ".miopages-draft-hero::after { content: 'Guaranteed results'; }", // rule 2
+    "figure.miopages-fpo { height: 0; }",                             // rule 7
+    "figure.miopages-fpo { display: none; }",                         // rule 7
+    "aside.miopages-placeholder { transform: scale(0); }",            // rule 7
+    ".miopages-placeholder-label { opacity: .1; }",                   // rule 7
+    "h1 { font-family: 'Comic Sans MS'; }",                           // rule 8
   ];
   for (const css of refused) assert.throws(() => readSiteStylesheet(css), /Site stylesheet refused/u, css);
+});
+
+test("the design rules people review and the rules in code are the same list", () => {
+  const doc = readFileSync("docs/design-rules.md", "utf8");
+  for (const r of designRules)
+    assert.ok(doc.includes(`${r.number}. **${r.name}.** ${r.rule} *Why: ${r.reason}*`), `rule ${r.number} differs from docs/design-rules.md`);
+  assert.equal((doc.match(/^\d+\. \*\*/gmu) ?? []).length, designRules.length, "the document lists exactly the rules in code");
 });

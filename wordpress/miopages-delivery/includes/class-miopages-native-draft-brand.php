@@ -121,7 +121,7 @@ final class MioPages_Native_Draft_Brand
     public static function stylesheet(mixed $value): void
     {
         if (!is_string($value) || $value === '' || strlen($value) > 60000 ||
-            preg_match('/<|\x5c|url\s*\(|@import|@font-face|expression\s*\(|javascript:|(?<![a-z-])behavior\s*:|-moz-binding|position\s*:\s*fixed/i', $value) ||
+            preg_match('/<|\x5c|url\s*\(|@import|@font-face|expression\s*\(|javascript:|(?<![a-z-])behavior\s*:|-moz-binding|image-set|(?<![a-z-])attr\s*\(/i', $value) ||
             (!str_starts_with($value, 'body.miopages-designed:not(#mp-core-design)') && !str_starts_with($value, '@'))) {
             throw new InvalidArgumentException('Native draft brand stylesheet refused.');
         }
