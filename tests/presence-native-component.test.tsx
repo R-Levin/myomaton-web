@@ -244,15 +244,14 @@ test("missing material becomes a visible, categorized placeholder rather than a 
   assert.notEqual(refused.status, 0);
 });
 
-test("a pull quote carries approved words and, optionally, who said them; WordPress renders its own quote block", () => {
-  const quote = { ...component, root: node("quote", { text: "We learn your business first.", items: ["MioPages"], layout: { ...component.root.layout, mobileOrder: 1 } }) };
-  assert.equal(readNativeComponent(quote).root.items[0], "MioPages");
-  assert.throws(() => readNativeComponent({ ...quote, root: { ...quote.root, items: ["One", "Two"] } }));
+test("a pull quote carries the page's own words with no credit line; WordPress renders its own quote block", () => {
+  const quote = { ...component, root: node("quote", { text: "We learn your business first.", items: ["evidence:product-model:x"], layout: { ...component.root.layout, mobileOrder: 1 } }) };
+  assert.deepEqual(readNativeComponent(quote).root.items, [], "a credit line sent earlier is dropped, never shown");
   assert.throws(() => readNativeComponent({ ...quote, root: { ...quote.root, text: null } }));
   const html = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/native-component.php"],
     { input: JSON.stringify(quote), encoding: "utf8" });
   assert.equal(html.status, 0, html.stderr);
-  assert.match(html.stdout, /<blockquote class="wp-block-quote miopages-node[^"]*miopages-node-order-1[^"]*"><!-- wp:paragraph --><p>We learn your business first\.<\/p><!-- \/wp:paragraph --><cite>MioPages<\/cite><\/blockquote>/u);
+  assert.match(html.stdout, /<blockquote class="wp-block-quote miopages-node[^"]*miopages-node-order-1[^"]*"><!-- wp:paragraph --><p>We learn your business first\.<\/p><!-- \/wp:paragraph --><\/blockquote>/u);
 });
 
 test("Core may ask for further pictures in a section: placed where its block says, or after the content", () => {

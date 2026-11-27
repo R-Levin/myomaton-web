@@ -230,9 +230,9 @@ final class MioPages_Native_Component
         }
         if ($kind === 'details') return '<!-- wp:details ' . $named . ' --><details' . $attrs . '><summary>' . $copy . '</summary>'
             . $children . '</details><!-- /wp:details -->';
-        // A pull quote of approved copy, with who said it when the Evidence names them.
+        // A pull quote of the page's own approved words; it has no credit line (Nov 27).
         if ($kind === 'quote') return '<!-- wp:quote ' . $named . ' --><blockquote' . $attrs . '><!-- wp:paragraph --><p>' . nl2br($copy, false) . '</p><!-- /wp:paragraph -->'
-            . ($node['items'] !== [] ? '<cite>' . self::copy($node['items'][0]) . '</cite>' : '') . '</blockquote><!-- /wp:quote -->';
+            . '</blockquote><!-- /wp:quote -->';
         if ($kind === 'placeholder') return self::placeholder($node['reference'], $copy, $class);
         if ($kind === 'separator') return '<!-- wp:separator ' . $block . ' --><hr' . $attrs . '/><!-- /wp:separator -->';
         $reference = $node['reference'];

@@ -31,10 +31,10 @@ export const nativeComponentSchema = {
     nativeNode: { anyOf: kinds.map(kind => shape({
       kind: options([kind]),
       text: ["heading", "paragraph", "details", "placeholder"].includes(kind) ? { type: "string" }
-        : kind === "quote" ? { type: "string", description: "A pull quote of approved copy from this page or the Evidence; never an invented testimonial (use a placeholder for those)." }
+        : kind === "quote" ? { type: "string", description: "A pull quote: a short passage of this page's own approved words, set large for emphasis. It has no credit line. Never an invented testimonial (use a placeholder for those)." }
         : ["action", "image", "list"].includes(kind) ? nullableText : { type: "null" },
       level: kind === "heading" ? { type: "integer", enum: [1, 2, 3, 4, 5, 6] } : { type: "null" },
-      items: { type: "array", items: { type: "string" }, ...(kind === "list" ? { minItems: 1 } : kind === "quote" ? { maxItems: 1, description: "Optional: who said it, exactly as in the Evidence." } : { maxItems: 0 }) },
+      items: { type: "array", items: { type: "string" }, ...(kind === "list" ? { minItems: 1 } : kind === "quote" ? { maxItems: 0 } : { maxItems: 0 }) },
       ordered: { type: "boolean" },
       reference: ["image", "action", "placeholder"].includes(kind) ? { type: "string", pattern: kind === "image" ? "^section-(0|[1-9][0-9]*)(-[1-9][0-9]*)?$"
         : kind === "action" ? "^action-(0|[1-9][0-9]*)$" : placeholderPattern } : { type: "null" },
@@ -111,7 +111,8 @@ export function readNativeComponent(value: unknown, normalizeProviderName = fals
       throw Error("Native component content or reference refused");
     }
     return { kind, text: copy, reference, level: row.level as number | null, ordered: row.ordered,
-      items: row.items.map(item => plain(item)),
+      // A pull quote has no credit line; one sent before that rule (Nov 27) is dropped, never shown.
+      items: kind === "quote" ? [] : row.items.map(item => plain(item)),
       layout: { arrangement, columns: layout.columns as number[], gap: choice(layout.gap, sizes), inset: choice(layout.inset, sizes),
         surface: choice(layout.surface, surfaces), align: choice(layout.align, alignments),
         measure: choice(layout.measure, ["narrow", "reading", "wide", "full"] as const),
