@@ -1552,3 +1552,12 @@ Principal approves.
   its Client's visitors, U.S. English by default. The Principal also raised the milestone 3 cap to
   $18 to finish the current design correction, and asked to tidy the process that produced so many
   odd errors (proposal to follow: build and test on the free stand-in, then one clean scripted run).
+
+- **Nov 27 — stop reintroducing problems; no unconsidered rules.** On hearing that Core rewrites
+  its whole stylesheet each time and so brings old problems back, the Principal: why are such
+  foolish rules in place this late; fix all of these; they are tired of asking; unconsidered new
+  rules keep being added; is there no way around it. Claude's account: the whole rewrite was not
+  a deliberate rule but how Claude built the design step; several of today's checks were added
+  reactively to gaps Claude had left. Proposed fix: a correction changes only the rules behind
+  each finding, the result is checked on the rendered pages automatically before anyone sees it,
+  and the best checked version is kept.
