@@ -49,3 +49,13 @@ test("a Direction may carry the site design; older Directions without one still 
   assert.equal(readDirection({ ...base, design: exampleDesign() }, ["peer-1"]).design?.density, "airy");
   assert.throws(() => readDirection({ ...base, design: { ...exampleDesign(), shape: "blob" } }, ["peer-1"]), /Site design refused/);
 });
+
+test("design rule 4 in the stylesheet: a background and text set together must read together", () => {
+  const withSheet = (stylesheet: string) => ({ ...exampleDesign(), stylesheet });
+  // The contrast pair is dark: its own text reads; another pair's dark text on it does not.
+  assert.ok(readSiteDesign(withSheet(".miopages-node-surface-tonal { background: var(--miopages-contrast-surface); color: var(--miopages-contrast-ink); }"), ["peer-1"]).stylesheet);
+  assert.throws(() => readSiteDesign(withSheet(".miopages-node-surface-tonal { background: var(--miopages-contrast-surface); color: rgb(36, 31, 75); }"), ["peer-1"]),
+    /unreadable \(design rule 4\).*surface-tonal.*#241f4b on background #14201b/u);
+  // What cannot be known from the sheet alone (gradients, transparency, inherited text) is left to the rendered-page check.
+  assert.ok(readSiteDesign(withSheet(".a { background: linear-gradient(#000, #111); color: #000; } .b { background: rgba(0,0,0,.5); color: #000; } .c { background: #000; }"), ["peer-1"]).stylesheet);
+});

@@ -106,6 +106,52 @@ function repair(colourValue: string, backgrounds: string[]): string | null {
   return null;
 }
 
+/** Which palette colour each style variable holds (the theme sets them from the palette). */
+const paletteVariables = (palette: SiteDesign["palette"]): Record<string, string> => ({
+  "--wp--preset--color--surface": palette.light.background, "--wp--preset--color--ink": palette.light.text,
+  "--wp--preset--color--brand": palette.brand.background, "--wp--preset--color--on-brand": palette.brand.text,
+  "--wp--preset--color--support": palette.tonal.background, "--miopages-tonal-ink": palette.tonal.text,
+  "--miopages-accent-surface": palette.strong.background, "--miopages-accent-ink": palette.strong.text,
+  "--miopages-supporting-surface": palette.supporting.background, "--miopages-supporting-ink": palette.supporting.text,
+  "--miopages-contrast-surface": palette.contrast.background, "--miopages-contrast-ink": palette.contrast.text,
+  "--miopages-border": palette.border, "--miopages-muted": palette.muted,
+});
+
+/** A solid colour as #rrggbb, or null when it cannot be known from the value alone (gradients, transparency, mixes). */
+function solid(value: string, variables: Record<string, string>): string | null {
+  const v = value.trim().toLowerCase().replace(/\s*!important$/u, "");
+  const variable = /^var\(\s*(--[a-z0-9-]+)\s*(?:,[^)]*)?\)$/u.exec(v);
+  if (variable) return variables[variable[1]!] ?? null;
+  const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/u.exec(v);
+  if (hex) return "#" + (hex[1]!.length === 3 ? [...hex[1]!].map(c => c + c).join("") : hex[1]);
+  const rgb = /^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)\s*(?:[,/]\s*([\d.]+%?))?\s*\)$/u.exec(v);
+  if (rgb && (rgb[4] === undefined || Number.parseFloat(rgb[4]) >= (rgb[4].endsWith("%") ? 100 : 1)))
+    return "#" + [rgb[1], rgb[2], rgb[3]].map(n => Math.min(255, Number(n)).toString(16).padStart(2, "0")).join("");
+  return null;
+}
+
+/**
+ * Design rule 4 (Readable), checked where it can be known from the stylesheet itself: a rule that
+ * sets both a solid background and a text colour must make them readable together. Anything else
+ * (inherited colours, gradients, pictures) is checked on the rendered page.
+ */
+function checkReadablePairs(css: string, palette: SiteDesign["palette"]) {
+  const variables = paletteVariables(palette);
+  for (const [, selector, body] of css.matchAll(/([^{}]+)\{([^{}]*)\}/gu)) {
+    const declarations = Object.fromEntries(body!.split(";").map(d => d.split(/:([\s\S]*)/u)).filter(d => d.length > 1).map(([k, v]) => [k!.trim(), v!.trim()]));
+    const backgroundValue = declarations["background-color"] ?? declarations["background"];
+    if (!backgroundValue || !declarations.color) continue;
+    const background = solid(backgroundValue, variables), text = solid(declarations.color, variables);
+    if (!background || !text) continue;
+    const ratio = contrast(text, background);
+    if (ratio < minimumContrast) {
+      const where = selector!.replace(/body\.miopages-designed:not\(#mp-core-design\)\s*/gu, "").trim().slice(0, 140);
+      throw Error(`Stylesheet text is unreadable (design rule 4): "${where}" sets text ${text} on background ${background} (contrast ${ratio.toFixed(2)}, needs ${minimumContrast}). ` +
+        "Pair each background with its own text colour: the variables come in pairs (see the stylesheet instructions).");
+    }
+  }
+}
+
 export function readSiteDesign(value: unknown, sourceIds: readonly string[]): SiteDesign {
   // The AI is always asked for a stylesheet; designs read back from before Nov 26 have none.
   const sheet = Boolean(value) && typeof value === "object" && "stylesheet" in (value as object);
@@ -159,7 +205,7 @@ export function readSiteDesign(value: unknown, sourceIds: readonly string[]): Si
     shape: choice(row.shape, radii, "Shape"),
     density: choice(row.density, densities, "Density"),
     imagery: { style: choice(imageryRow.style, imageryStyles, "Imagery style"), direction: prose(imageryRow.direction, "Imagery direction") },
-    ...(sheet && { stylesheet: readSiteStylesheet(row.stylesheet) }),
+    ...(sheet && { stylesheet: (sheetCss => (checkReadablePairs(sheetCss, palette), sheetCss))(readSiteStylesheet(row.stylesheet)) }),
     // Room for the reasons behind every choice and the research that shaped it (Part 1 #10); bounded only as a safeguard.
     rationale: prose(row.rationale, "Design rationale", 16_000),
     sourceIds: [...new Set(row.sourceIds as string[])],
