@@ -128,3 +128,11 @@ add_filter('render_block_core/template-part', static function (string $html, arr
     $at = strrpos($html, '</footer>');
     return $at === false ? $html . $footer : substr($html, 0, $at) . $footer . substr($html, $at);
 }, 10, 2);
+
+/* Design rule 4 (Readable) is guaranteed by the theme on every site Core designs: text that would
+   not read on its background takes the site's own dark or light text color (readable.js). */
+add_action('wp_enqueue_scripts', static function (): void {
+    $brand = miopages_draft_brand();
+    if (!$brand || !$brand['designed']) return;
+    wp_enqueue_script('miopages-readable', get_theme_file_uri('readable.js'), [], wp_get_theme()->get('Version'), ['strategy' => 'defer', 'in_footer' => true]);
+});
