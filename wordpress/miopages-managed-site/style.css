@@ -1,7 +1,7 @@
 /*
 Theme Name: MioPages Managed Site
 Description: Reusable block presentation for Core-managed Web Presence sites.
-Version: 0.1.5
+Version: 0.1.6
 Requires at least: 6.6
 Requires PHP: 8.0
 Text Domain: miopages-managed-site
@@ -179,7 +179,11 @@ body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordma
 /* Native layout owns its spacing. Gutenberg's flow margins must not offset
    later grid cells or button wrappers inside an authored row. */
 .miopages-native-component { font-size: max(1rem, var(--miopages-body-size, 1rem)); }
-.miopages-native-component .miopages-node { box-sizing: border-box; min-width: 0; max-inline-size: 100%; grid-column: span var(--mp-span, 1); }
+.miopages-native-component .miopages-node { box-sizing: border-box; min-width: 0; max-inline-size: 100%; }
+/* In Core's rows and columns each block takes one place; a full-width block (span 12) takes the
+   whole row. (An older 12-column span made blocks stretch across Core's own columns and left
+   empty zero-width ones.) */
+.miopages-native-component :is(.miopages-node-columns, .miopages-node-row) > .miopages-span-12 { grid-column: 1 / -1; }
 .miopages-native-component .wp-block-group.miopages-node > * { margin-block: 0; }
 .miopages-native-component .miopages-node > :first-child { margin-block-start: 0; }
 .miopages-native-component .miopages-node > :last-child { margin-block-end: 0; }
@@ -428,3 +432,23 @@ body.miopages-designed { font-family: var(--miopages-body-font); color: var(--wp
 .miopages-footer-links { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
 .miopages-footer-links a { display: inline-flex; align-items: center; min-height: 32px; }
 .miopages-footer-note { margin: 1.5rem 0 0; font-size: .9rem; color: var(--miopages-muted, inherit); }
+
+/* The design rules the theme guarantees itself, whatever a site's design says (design-rules.ts),
+   so a first draft meets them without rounds of correction. Core designs the look; these hold. */
+/* Rule 6, fits the phone: nothing makes the page scroll sideways; media keep within the page. */
+html body.miopages-designed { overflow-x: clip !important; }
+body.miopages-designed main :is(img, video, iframe, svg, table, figure):not(#miopages-a) { max-width: 100% !important; }
+/* Rule 6, big enough to tap: buttons and menu links. */
+body.miopages-designed :is(a.wp-block-button__link, .miopages-menu-toggle, nav.miopages-draft-nav > a):not(#miopages-a) { min-height: 44px !important; }
+/* Rule 7, honest about gaps: FPO frames and missing-material notices are always shown at a readable size. */
+body.miopages-designed :is(figure.miopages-fpo, aside.miopages-placeholder):not(#miopages-a):not(#miopages-b) {
+  display: flex !important; visibility: visible !important; opacity: 1 !important; clip-path: none !important;
+  min-width: min(100%, 16rem) !important; box-sizing: border-box !important;
+}
+body.miopages-designed figure.miopages-fpo:not(#miopages-a):not(#miopages-b) { min-height: 8rem !important; }
+/* Rule 9, motion: everything holds still for visitors who ask for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  body.miopages-designed *, body.miopages-designed *::before, body.miopages-designed *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important;
+  }
+}

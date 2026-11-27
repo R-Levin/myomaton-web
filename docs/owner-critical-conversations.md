@@ -1562,3 +1562,10 @@ Principal approves.
   the rules behind each finding, is checked on the rendered pages before anyone sees it, and the
   best checked version is kept. Nothing decided. (The Principal, after: a question is an invitation
   to conversation, not a new direction.)
+
+- **Nov 27 — out of redesign rounds; focus on the longer term.** The Principal: everything that
+  needs fixing must be fixed; stop rearranging deck chairs and focus on the longer-term goals;
+  work out how to get out of site-redesign rounds, and make what comes of it useful for first
+  drafts that come out right with less difficulty (as said earlier today: Core designs, the system
+  guarantees the mechanics); no arbitrary judgements; the Principal is present, so ask when
+  something is unclear. Credits added.
