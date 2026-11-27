@@ -1522,3 +1522,10 @@ Principal approves.
   sets aside its worst case (about $2.50) though real pages cost about $0.27. Asked to choose, the
   Principal raised the milestone 3 run's cap from $15 to $17 (expected real total about $13.50 for
   the pages, plus about $0.50–1 if pictures are chosen later).
+
+- **Nov 27 — costs must be understandable from both sides.** The Principal approved the higher cap
+  to get through, but is at a loss to understand what costs what and why. Requirement: a simple,
+  clear view of what we are doing and why, from two perspectives: development (this iterative
+  process, with its safety rails) and what production will actually look like for a Client.
+  Claude proposed: a one-page cost sheet after this run (each step: what development cost, what
+  the same step would cost a real Client), and every spending update stating both in one line.

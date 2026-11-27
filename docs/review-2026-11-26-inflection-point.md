@@ -124,3 +124,6 @@ tasks from that. Until then the site stays exactly as it is.
   appropriate, research-informed layout must be removed.
 - **Client links:** Clients can give two kinds of external links for Core to review and use:
   competitors, and sites whose design they like.
+- **Costs, development vs production (Nov 27):** the Principal cannot tell what costs what and why.
+  Needed: one simple view of each step's development cost and what the same step costs a real
+  Client in production, and every spending update stating both.
