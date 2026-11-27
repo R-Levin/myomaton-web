@@ -106,3 +106,25 @@ add_action('wp_enqueue_scripts', static function (): void {
     wp_enqueue_script('miopages-menu', get_theme_file_uri('menu.js'), [], wp_get_theme()->get('Version'), ['strategy' => 'defer', 'in_footer' => true]);
     wp_localize_script('miopages-menu', 'miopagesMenu', ['open' => __('Open menu', 'miopages-managed-site'), 'close' => __('Close menu', 'miopages-managed-site')]);
 });
+
+/* The site's footer, written by Core in the Site plan (the Principal, Nov 27). It travels with each
+   page's content; the theme shows it in the site footer, after the logo. */
+function miopages_draft_footer(): ?string
+{
+    static $footer = false;
+    if ($footer !== false) return $footer;
+    $footer = null;
+    $post = get_queried_object();
+    if ($post instanceof WP_Post && preg_match('#<!-- miopages-site-footer -->(.*?)<!-- /miopages-site-footer -->#s', $post->post_content, $found)) $footer = $found[1];
+    return $footer;
+}
+add_filter('render_block_core/post-content', static function (string $html): string {
+    if (miopages_draft_footer() === null) return $html;
+    return preg_replace('#<!-- miopages-site-footer -->.*?<!-- /miopages-site-footer -->#s', '', $html, 1) ?? $html;
+});
+add_filter('render_block_core/template-part', static function (string $html, array $block): string {
+    $footer = miopages_draft_footer();
+    if ($footer === null || ($block['attrs']['slug'] ?? null) !== 'footer') return $html;
+    $at = strrpos($html, '</footer>');
+    return $at === false ? $html . $footer : substr($html, 0, $at) . $footer . substr($html, $at);
+}, 10, 2);

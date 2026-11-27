@@ -4,6 +4,7 @@ import { meteredPresenceWorkflow, type ResponsesRates, type ResponsesTransport, 
 import { artifactSchemas, creativePageSchema, designedDirectionSchema, readBlueprint, readDirection, readPage, readReport, strategyBlueprintSchema,
   type PresenceEvidence } from "../intake/presence-workflow-artifacts";
 import { bindCitations } from "../intake/presence-workflow-provider";
+import { readSiteFooter, siteFooterSchema } from "./site-footer";
 import type { KnownItem, KnownOffering } from "../knowledge/account";
 import type { PageContent, SitePlan, WriteInput, Writer } from "./cycle";
 import type { Evidence } from "./evidence";
@@ -138,6 +139,10 @@ function sitePlanSchema(input: WriteInput) {
     articles: { items: { properties: { target: Record<string, unknown> } } } } };
   // Say what each reference must be: the checker accepts only a path the plan itself declares.
   schema.properties.navigation.description = "The menu, in order: each the path of a page in pages.";
+  // The footer is part of the plan (the Principal, Nov 27).
+  const plan = schema as unknown as { properties: Record<string, unknown>; required: string[] };
+  plan.properties.footer = siteFooterSchema;
+  plan.required = [...plan.required, "footer"];
   schema.properties.articles.items.properties.target.description = "The path of the one page in pages that answers this question: a single path, never several.";
   const fields = schema.properties.pages.items.properties.decisionBrief.properties;
   schema.properties.pages.items.properties.decisionBrief.properties = { ...fields,
@@ -162,11 +167,13 @@ function checked(input: WriteInput, output: unknown, sources: PresenceEvidence[]
     case "report": return readReport(output, sources, true);
     case "direction": return readDirection(output, ids, true);
     case "site-plan": {
-      const blueprint = readBlueprint(output, ids, true, true);
+      const { footer, ...rest } = output as Record<string, unknown>;
+      const blueprint = readBlueprint(rest, ids, true, true);
       // Each page keeps the decision brief that says what it must achieve; Core writes the page from it.
       const plan: SitePlan = { pages: blueprint.pages.map(page => ({ path: page.path, label: page.label, purpose: page.purpose,
         inMenu: blueprint.navigation.includes(page.path), sourceIds: page.sourceIds,
-        ...("decisionBrief" in page && { decisionBrief: page.decisionBrief }) })) };
+        ...("decisionBrief" in page && { decisionBrief: page.decisionBrief }) })),
+        footer: readSiteFooter(footer, blueprint.pages.map(page => page.path)) };
       if (!plan.pages.some(page => page.path === "/")) throw Error("The Site plan needs a Home page");
       return plan;
     }

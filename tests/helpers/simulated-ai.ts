@@ -52,7 +52,8 @@ export function simulatedAnswer(name: string, schema: Schema, instructions: stri
       avoid: [] });
     const ids = enumAt(schema, "pages", "[]", "sourceIds").slice(0, 1);
     return { pages: [["/", "Home"], ["/service", "Service"], ["/start", "Start"]].map(([path, label]) =>
-      ({ path, label, purpose: "Simulated purpose.", sourceIds: ids, decisionBrief: brief(path) })), navigation: ["/service", "/start"], articles: [] }; // Home left out of the menu, as Core did in the first real run
+      ({ path, label, purpose: "Simulated purpose.", sourceIds: ids, decisionBrief: brief(path) })), navigation: ["/service", "/start"], articles: [],
+      footer: { columns: [{ heading: "Simulated", text: "A simulated line.", links: ["/service", "/start"] }], note: null } }; // Home left out of the menu, as Core did in the first real run
   }
   if (stage === "review-analysis" && schema.properties?.newPages) {
     // Second round: the Operator asked for a page the site does not have.

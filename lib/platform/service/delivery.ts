@@ -61,7 +61,7 @@ export function draftCandidate(record: ServiceRecord) {
   });
   const unresolvedActions = (site.pages as unknown as Page[]).flatMap(page => (page.actions ?? []).flatMap((action, index) =>
     !action.destination ? [{ from: page.path, reference: "action-" + index, label: action.label }] : []));
-  return { candidate: { pages, navigation, actions }, unresolvedActions, design: designProjection(design) };
+  return { candidate: { pages, navigation, actions, ...(site.footer && { footer: site.footer }) }, unresolvedActions, design: designProjection(design) };
 }
 
 /** Notes Core has answered since the last delivery: the Request each one raised was carried out. */

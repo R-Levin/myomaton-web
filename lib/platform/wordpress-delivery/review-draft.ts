@@ -4,6 +4,7 @@ import { validatePages, type Site } from "./authority";
 import { readSignedDraftBrand } from "./draft-brand";
 import { readNativeDraftMedia, type NativeDraftMedia } from "./native-draft-media";
 import { nativeDraftBaseline, verifyNativeMediaPlacements } from "./site-draft";
+import { readSiteFooter, type SiteFooter } from "../service/site-footer";
 
 /**
  * A review draft: Core's current site for a case, delivered as private draft pages to
@@ -12,7 +13,7 @@ import { nativeDraftBaseline, verifyNativeMediaPlacements } from "./site-draft";
  * page designs, its chosen design, and the Actions not yet connected. It is signed by
  * Core like every delivery and is never public.
  */
-type Review = ReturnType<typeof workflowNativeReviewCandidate>;
+type Review = ReturnType<typeof workflowNativeReviewCandidate> & { candidate: { footer?: SiteFooter } };
 type SignedBrand = ReturnType<typeof readSignedDraftBrand>;
 
 const hash = (value: unknown) => typeof value === "string" && /^[a-f0-9]{64}$/u.test(value);
@@ -54,6 +55,7 @@ export function bindReviewDraft(input: {
     pages: structuredClone(input.review.candidate.pages),
     navigation: [...input.review.candidate.navigation],
     actions: structuredClone(input.review.candidate.actions),
+    ...(input.review.candidate.footer && { footer: structuredClone(input.review.candidate.footer) }),
     unresolvedActions: structuredClone(input.review.unresolvedActions ?? []),
     ...(input.media?.length && { media: structuredClone(input.media) }),
   };
@@ -69,7 +71,8 @@ export function readReviewDraftCandidate(value: unknown) {
     ...(Object.hasOwn(value as object, "baselinePages") ? ["baselinePages"] : []),
     ...(Object.hasOwn(value as object, "readBack") ? ["readBack"] : []),
     ...(Object.hasOwn(value as object, "answeredNotes") ? ["answeredNotes"] : []),
-    ...(Object.hasOwn(value as object, "media") ? ["media"] : [])]);
+    ...(Object.hasOwn(value as object, "media") ? ["media"] : []),
+    ...(Object.hasOwn(value as object, "footer") ? ["footer"] : [])]);
   const scope = object(candidate.scope, ["organizationId", "webPresenceId", "managedSiteId"]) as Site;
   const pages = candidate.pages as Parameters<typeof validatePages>[0];
   validatePages(pages, true, true);
@@ -78,6 +81,7 @@ export function readReviewDraftCandidate(value: unknown) {
   const navigation = candidate.navigation;
   if (!Array.isArray(navigation) || !navigation.includes("/") || new Set(navigation).size !== navigation.length ||
       navigation.some(path => !paths.has(path))) throw Error("Review draft navigation refused");
+  if (candidate.footer !== undefined) readSiteFooter(candidate.footer, [...paths]);
   if (!Array.isArray(candidate.actions)) throw Error("Review draft Actions refused");
   const ids = new Set<string>();
   for (const value of candidate.actions) {

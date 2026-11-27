@@ -46,9 +46,17 @@ export function Content({ item }: { item: ProductVersion }) {
       <p className="font-medium">What a visitor decides</p><ol className="list-decimal pl-6">{direction.visitorDecisions.map(step => <li key={step}>{step}</li>)}</ol></div>);
   }
   if (item.kind === "site-plan") {
-    const plan = value as { pages: { path: string; label: string; purpose: string; inMenu: boolean }[] };
-    return (<ul className="space-y-1">{plan.pages.map(page => (<li key={page.path}><span className="font-medium">{page.label}</span> ({page.path}
-      {page.inMenu ? ", in the Menu" : ", linked from other pages"}): {page.purpose}</li>))}</ul>);
+    const plan = value as { pages: { path: string; label: string; purpose: string; inMenu: boolean }[];
+      footer?: { columns: { heading: string | null; text: string | null; links: string[] }[]; note: string | null } };
+    const label = (path: string) => plan.pages.find(page => page.path === path)?.label ?? path;
+    return (<div className="space-y-3"><ul className="space-y-1">{plan.pages.map(page => (<li key={page.path}><span className="font-medium">{page.label}</span> ({page.path}
+      {page.inMenu ? ", in the Menu" : ", linked from other pages"}): {page.purpose}</li>))}</ul>
+      {plan.footer && <div><p className="font-medium">Footer, on every page</p>
+        <ul className="space-y-1 pl-4">{plan.footer.columns.map((column, index) => (<li key={index}>
+          {column.heading && <span className="font-medium">{column.heading}: </span>}
+          {column.text && <span className="whitespace-pre-line">{column.text} </span>}
+          {column.links.length > 0 && <span>Links: {column.links.map(label).join(", ")}</span>}</li>))}</ul>
+        {plan.footer.note && <p className="pl-4 text-sm">{plan.footer.note}</p>}</div>}</div>);
   }
   const page = value as { heading: string; sections: { heading: string; body: string; visual?: { status: string; brief: string } }[] };
   return (<div><p className="font-medium">{page.heading}</p>{page.sections.map((section, index) => (

@@ -88,7 +88,8 @@ final class MioPages_Native_Draft_Content
                 $posts[$path] = [
                     'ID' => $postIds[$path], 'post_type' => 'page', 'post_status' => 'draft',
                     'post_title' => $page['title'],
-                    'post_content' => self::composed($page, $postIds, $navigation, $labels, $actions, $attachments, $reviewDraft, $pendingActions),
+                    'post_content' => self::composed($page, $postIds, $navigation, $labels, $actions, $attachments, $reviewDraft, $pendingActions)
+                        . self::footer($candidate['footer'] ?? null, $postIds, $labels),
                 ];
                 continue;
             }
@@ -317,6 +318,37 @@ final class MioPages_Native_Draft_Content
         return '<!-- wp:image {"id":' . $id . '} --><figure class="wp-block-image">'
             . '<img src="' . MioPages_Native_Component::href(MioPages_Native_Draft_Media::url($id)) . '" alt="' . htmlspecialchars($image['alt'], ENT_COMPAT | ENT_SUBSTITUTE, 'UTF-8')
             . '" class="wp-image-' . $id . '"/></figure><!-- /wp:image -->';
+    }
+
+    /**
+     * The site's footer, written by Core in the Site plan (the Principal, Nov 27). It travels with every
+     * page; the theme shows it in the site footer. Marked so the theme can find it.
+     */
+    private static function footer(mixed $footer, array $postIds, array $labels): string
+    {
+        if ($footer === null) return '';
+        if (!is_array($footer) || !is_array($footer['columns'] ?? null) || !array_is_list($footer['columns'])
+            || !(is_string($footer['note'] ?? null) || ($footer['note'] ?? null) === null)) throw new InvalidArgumentException('Native draft footer refused.');
+        $html = '';
+        foreach ($footer['columns'] as $column) {
+            $heading = $column['heading'] ?? null; $text = $column['text'] ?? null; $links = $column['links'] ?? null;
+            if (!(is_string($heading) || $heading === null) || !(is_string($text) || $text === null) || !is_array($links) || !array_is_list($links)) {
+                throw new InvalidArgumentException('Native draft footer refused.');
+            }
+            $items = '';
+            foreach ($links as $path) {
+                if (!is_string($path) || !isset($postIds[$path], $labels[$path])) throw new InvalidArgumentException('Native draft footer link refused.');
+                $items .= '<li>' . self::link($postIds[$path], $labels[$path]) . '</li>';
+            }
+            $html .= '<div class="miopages-footer-column">'
+                . ($heading !== null ? '<p class="miopages-footer-heading">' . MioPages_Native_Component::text($heading) . '</p>' : '')
+                . ($text !== null ? '<p class="miopages-footer-text">' . nl2br(MioPages_Native_Component::text($text), false) . '</p>' : '')
+                . ($items !== '' ? '<ul class="miopages-footer-links">' . $items . '</ul>' : '') . '</div>';
+        }
+        $note = $footer['note'] !== null ? '<p class="miopages-footer-note">' . MioPages_Native_Component::text($footer['note']) . '</p>' : '';
+        return "
+" . '<!-- wp:html --><!-- miopages-site-footer --><div class="miopages-site-footer"><div class="miopages-footer-columns">'
+            . $html . '</div>' . $note . '</div><!-- /miopages-site-footer --><!-- /wp:html -->';
     }
 
     /** A section's further pictures (design rules: Core decides how many), each with its frame identity. */

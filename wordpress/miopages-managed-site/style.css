@@ -405,3 +405,12 @@ body.miopages-designed { font-family: var(--miopages-body-font); color: var(--wp
   .miopages-node-order-7 { order: 7; } .miopages-node-order-8 { order: 8; } .miopages-node-order-9 { order: 9; }
   .miopages-node-order-10 { order: 10; } .miopages-node-order-11 { order: 11; } .miopages-node-order-12 { order: 12; }
 }
+
+/* The site's footer Core wrote (a plain default; Core's stylesheet designs it). */
+.miopages-site-footer { box-sizing: border-box; width: min(100% - 2rem, 72rem); margin: 0 auto; padding: 1.5rem 0 2rem; }
+.miopages-footer-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1.5rem 2rem; }
+.miopages-footer-heading { font-weight: 700; margin: 0 0 .4rem; }
+.miopages-footer-text { margin: 0 0 .5rem; }
+.miopages-footer-links { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+.miopages-footer-links a { display: inline-flex; align-items: center; min-height: 32px; }
+.miopages-footer-note { margin: 1.5rem 0 0; font-size: .9rem; color: var(--miopages-muted, inherit); }

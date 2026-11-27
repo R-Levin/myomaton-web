@@ -1499,3 +1499,7 @@ Principal approves.
   broad agreement; the limits it lists were never justified to them. Approved to build: the nine
   plain rules replace the page builder's fixed structure and the stylesheet allow-lists; everything
   else is Core's design decision. This issue is decided for now.
+
+- **Nov 27 — the footer is part of the Site plan.** Core writes the site's footer (its content,
+  within the business's facts: contact details, legal links and the like) as part of the Site plan,
+  approved with the plan like everything else; Core's stylesheet designs how it looks.

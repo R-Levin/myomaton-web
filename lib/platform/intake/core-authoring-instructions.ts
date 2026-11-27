@@ -117,7 +117,8 @@ const stages: Record<AuthoringStage, string> = {
     "number. Put Home first. Give every Page a distinct job and a decision brief tracing it to report findings, " +
     "Direction decisions and business claims, plus any research that shaped it; across the plan, the research " +
     "must visibly shape the site. Home must offer both entry paths (Free Review and Direct Start) where the " +
-    "business has them. Plan useful Article topics linked to the Pages they support.",
+    "business has them. Plan useful Article topics linked to the Pages they support. Write the site's footer " +
+    "too: what visitors look for at the bottom of a site like this, using only supplied facts.",
   page:
     "Task: write and design the one requested Page completely: copy, section composition, images or FPO, " +
     "placeholders, Actions, internal links and search metadata. Open with a specific, grounded value to the " +

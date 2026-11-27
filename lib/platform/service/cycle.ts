@@ -3,6 +3,7 @@ import { decide, emptyLedger, markApplied, review as reviewChange, takeIn, type 
 import type { Delivery } from "./delivery";
 import type { Evidence } from "./evidence";
 import type { Asset } from "./assets";
+import type { SiteFooter } from "./site-footer";
 import { fingerprint } from "../canonical/model";
 import { directionIdentity, pageIdentity, reportIdentity, sitePlanIdentity, versionPages } from "../work-products/pages";
 
@@ -17,7 +18,7 @@ import { directionIdentity, pageIdentity, reportIdentity, sitePlanIdentity, vers
 /** The Work products Core writes in Launch, in the order each one builds on the last. */
 export type Kind = "report" | "direction" | "site-plan" | "page";
 export type PlanEntry = { path: string; label: string; purpose: string; inMenu: boolean };
-export type SitePlan = { pages: PlanEntry[] };
+export type SitePlan = { pages: PlanEntry[]; footer?: SiteFooter };
 export type PageContent = { path: string; heading: string; sections: { heading: string; body: string; [key: string]: unknown }[]; [key: string]: unknown };
 
 /** One saved state of a Work product. A proposed Version becomes current only when its Change is approved. */
@@ -290,7 +291,7 @@ export function currentSite(record: ServiceRecord) {
   if (!plan) return null;
   const pages = plan.pages.map(entry => current(record, pageIdentity(record.account.managedSiteId, entry.path)));
   return { plan, pages: pages.filter(Boolean).map(item => item!.content as PageContent & { id: string; version: number }),
-    complete: pages.every(Boolean), menu: plan.pages.filter(entry => entry.inMenu).map(entry => entry.path) };
+    complete: pages.every(Boolean), menu: plan.pages.filter(entry => entry.inMenu).map(entry => entry.path), footer: plan.footer };
 }
 
 /**
