@@ -4,7 +4,8 @@ import { clientPeople } from "@/lib/platform/accounts/people";
 import { readMyBusiness } from "@/lib/platform/intake/my-business";
 import { currentSite, tasks } from "@/lib/platform/service/cycle";
 import { accounts, acting, serviceRuntime } from "@/lib/platform/service/runtime";
-import { addPerson, askPublish, beginLaunch, directRequest, enterEmail, proposeFact, readBack, removePerson, review, runCore, sendDrafts, specialistRequest } from "../actions";
+import { addPerson, askPublish, beginLaunch, checkRendered, directRequest, enterEmail, proposeFact, readBack, removePerson, review, runCore, sendDrafts, sendFindings, specialistRequest } from "../actions";
+import { checkSummary, findingsForCore, lastRenderedCheck, type RenderedCheck } from "@/lib/platform/service/rendered-check";
 import { Content, Frame, ReviewForm, Section, button, field, primary, productName } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +31,9 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
   const wordpress = runtime.wordpress ? (await runtime.wordpress()).origin : null;
   const delivered = record.deliveries?.at(-1);
   const { problem } = await searchParams;
+  // The last rendered-page check of the current draft and of each proposed design.
+  const checks = Object.fromEntries(await Promise.all(["current", ...proposed.filter(item => item.kind === "direction").map(item => item.changeId)]
+    .map(async key => [key, await lastRenderedCheck(id, key)] as const))) as Record<string, RenderedCheck | null>;
   // What a Request can be about: the site as a whole, or one Work product.
   const targets = [{ value: "report", label: "The Business Understanding Report" }, { value: "direction", label: "The Presence Direction" },
     { value: "site-plan", label: "The Site plan" }, ...(site?.plan.pages ?? []).map(entry => ({ value: `page:${entry.path}`, label: `Page ${entry.label} (${entry.path})` }))];
@@ -83,6 +87,9 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
               <article key={item.changeId} className="mb-4 rounded border border-neutral-200 p-4">
                 <h3 className="font-semibold">{productName(item)}, version {item.version}</h3>
                 <Content item={item} />
+                {item.kind === "direction" && wordpress && delivered && <CheckPanel check={checks[item.changeId] ?? null}
+                  run={checkRendered.bind(null, id, item.changeId)} send={sendFindings.bind(null, id, item.changeId)}
+                  runLabel="Check this design on the rendered pages" sendLabel="Send the findings to Core (correct it)" />}
                 {forClient ? <p className="mt-3 text-sm text-neutral-600">This one is the Client&apos;s to approve, in their portal.</p>
                   : <ReviewForm action={review.bind(null, id, item.changeId)} />}
               </article>
@@ -103,6 +110,8 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
             {delivered && <form action={readBack.bind(null, id)}><button className={button}>Read back Notes and edits</button></form>}
             <a className="underline" href={`${wordpress}/wp-admin/edit.php?post_type=page`} target="_blank" rel="noreferrer">Open WordPress</a>
           </div>
+          {delivered && <CheckPanel check={checks.current ?? null} run={checkRendered.bind(null, id, null)} send={sendFindings.bind(null, id, null)}
+            runLabel="Check the rendered draft against the design rules" sendLabel="Ask Core to fix these" />}
           {fromWordPress.length > 0 && <ul className="mt-3 list-disc space-y-1 pl-6">{fromWordPress.map(request => (
             <li key={request.id}>{request.target.path}: {request.words.slice(0, 200)} <span className="text-xs text-neutral-500">
               ({request.origin.channel === "hand-edit" ? "hand edit" : "Note"}, {request.status === "open" ? "Core to work in" : "worked in"})</span></li>))}</ul>}
@@ -165,5 +174,21 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
         </form>
       </Section>
     </Frame>
+  );
+}
+
+/** The last rendered-page check, with a button to run it again and one to send its findings to Core. */
+function CheckPanel({ check, run, send, runLabel, sendLabel }: { check: RenderedCheck | null; run: () => Promise<void>; send: () => Promise<void>; runLabel: string; sendLabel: string }) {
+  return (
+    <div className="mt-3 rounded border border-neutral-200 p-3 text-sm">
+      {check ? <p><span className="font-medium">{checkSummary(check)}</span> <span className="text-neutral-500">(checked {check.at.slice(0, 16).replace("T", " ")} UTC)</span></p>
+        : <p className="text-neutral-600">Not checked yet. The check opens every page on desktop and phone and takes a few minutes.</p>}
+      {check && check.findings.length > 0 && <details className="mt-2"><summary className="cursor-pointer">What Core would be told</summary>
+        <p className="mt-2 whitespace-pre-wrap text-xs">{findingsForCore(check)}</p></details>}
+      <div className="mt-2 flex flex-wrap gap-2">
+        <form action={run}><button className={button}>{runLabel}</button></form>
+        {check && check.findings.length > 0 && <form action={send}><button className={primary}>{sendLabel}</button></form>}
+      </div>
+    </div>
   );
 }

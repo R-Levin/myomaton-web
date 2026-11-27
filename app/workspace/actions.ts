@@ -10,6 +10,7 @@ import { currentFacts, recordFacts } from "@/lib/platform/knowledge/store";
 import { ask, citedBySite, direct, proposePublish, respond, startLaunch, tasks, work, type Kind, type ServiceRecord } from "@/lib/platform/service/cycle";
 import { deliverDraft, takeInReadBack } from "@/lib/platform/service/delivery";
 import { readBackOperatorSite } from "@/lib/platform/wordpress-delivery/operator-review";
+import { findingsForCore, lastRenderedCheck, runRenderedCheck } from "@/lib/platform/service/rendered-check";
 import { accounts, actAs, acting, serviceRuntime, type Acting } from "@/lib/platform/service/runtime";
 
 /**
@@ -259,3 +260,35 @@ export async function answerReport(webPresenceId: string, changeId: string, form
   await ctx.store.save(read, respond(read, changeId, ctx.person, response, at, words || undefined));
   refresh(webPresenceId);
 }
+
+/**
+ * A Specialist checks the rendered draft against the design rules: the current one, or a design
+ * Core has proposed (shown on the real pages before anyone approves it). The result is kept for
+ * the Account page; it changes nothing by itself.
+ */
+export async function checkRendered(webPresenceId: string, changeId: string | null) { await shown(webPresenceId, async () => {
+  const ctx = await context(webPresenceId, "specialist");
+  const configFile = process.env.MIOPAGES_PREVIEW_WORDPRESS;
+  if (!ctx.wordpress || !configFile) throw Error("No WordPress is connected");
+  const read = await ctx.store.read(ctx.account);
+  if (!read.deliveries?.length) throw Error("Send the drafts to WordPress first");
+  const proposal = changeId ? read.products.find(item => item.changeId === changeId && item.status === "proposed") : undefined;
+  if (changeId && !proposal) throw Error("That proposal is no longer waiting");
+  const stylesheet = proposal ? (proposal.content as { design?: { stylesheet?: string } }).design?.stylesheet : undefined;
+  if (proposal && (proposal.kind !== "direction" || !stylesheet)) throw Error("Only a proposed design can be checked on the pages");
+  await runRenderedCheck({ webPresenceId, key: changeId ?? "current", configFile, stylesheet,
+    subject: proposal ? `your proposed design (Direction version ${proposal.version})` : "the current draft" });
+  refresh(webPresenceId);
+}); }
+
+/** Send a check's findings to Core: as the correction of the proposal it checked, or as a Request on the Direction. */
+export async function sendFindings(webPresenceId: string, changeId: string | null) { await shown(webPresenceId, async () => {
+  const check = await lastRenderedCheck(webPresenceId, changeId ?? "current");
+  if (!check?.findings.length) throw Error("There are no findings to send");
+  const words = findingsForCore(check);
+  await change(webPresenceId, "specialist", (record, ctx) => {
+    const at = now();
+    return changeId ? respond(record, changeId, ctx.person, "correct", at, words)
+      : ask(record, { id: `specialist:${ctx.person.id}:${at}`, at, by: ctx.person, kind: "direction", words });
+  });
+}); }

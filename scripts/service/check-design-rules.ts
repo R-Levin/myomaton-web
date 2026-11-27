@@ -22,14 +22,35 @@ const arg = (name: string, fallback?: string) => {
 };
 const base = arg("base", "http://127.0.0.1:4481").replace(/\/$/u, "");
 const out = arg("out", "runtime-content/design-rules-check");
+const overrideAt = process.argv.indexOf("--stylesheet");
+const overrideFile = overrideAt > 0 ? process.argv[overrideAt + 1] : undefined;
 
-type Finding = { rule: number; page: string; view: string; issue: string };
+type Finding = { rule: number; page: string; view: string; issue: string; trace?: string };
 const views = [["desktop", 1440, 1000], ["phone", 390, 844]] as const;
 
 /** Runs in the page: everything a visitor would meet that the rules speak to. */
 function inspect() {
-  const findings: { rule: number; issue: string }[] = [];
-  const say = (rule: number, issue: string) => findings.push({ rule, issue });
+  const findings: { rule: number; issue: string; trace?: string }[] = [];
+  const say = (rule: number, issue: string, trace?: string) => findings.push({ rule, issue, ...(trace && { trace }) });
+  // Which of Core's own style rules set a property on an element, in source order (the later or more specific one wins).
+  const coreRules: CSSStyleRule[] = [];
+  const coreSheet = [...document.styleSheets].find(sheet => (sheet.ownerNode as Element | null)?.id === "miopages-managed-site-inline-css");
+  const collect = (rules: CSSRuleList) => { for (const r of [...rules]) {
+    if (r instanceof CSSMediaRule) { if (matchMedia(r.media.mediaText).matches) collect(r.cssRules); }
+    else if (r instanceof CSSStyleRule && r.selectorText.includes("miopages-designed")) coreRules.push(r);
+    else if ("cssRules" in r && (r as CSSGroupingRule).cssRules) collect((r as CSSGroupingRule).cssRules);
+  } };
+  if (coreSheet) collect(coreSheet.cssRules);
+  const short = (selector: string) => selector.replace(/body\.miopages-designed:not\(#mp-core-design\)\s*/gu, "").trim().slice(0, 150);
+  const setting = (el: Element, ...props: string[]) => coreRules.filter(r => { try { return el.matches(r.selectorText) && props.some(p => r.style.getPropertyValue(p)); } catch { return false; } })
+    .map(r => `${short(r.selectorText)} { ${props.filter(p => r.style.getPropertyValue(p)).map(p => `${p}: ${r.style.getPropertyValue(p)}`).join("; ")} }`);
+  const source = (el: Element, ...props: string[]) => {
+    for (let n: Element | null = el; n; n = n.parentElement) {
+      const rules = setting(n, ...props);
+      if (rules.length) return `${n === el ? "on the element" : "inherited from " + label(n)}: ${rules.slice(-3).join(" then ")}`;
+    }
+    return "not set by your stylesheet";
+  };
   const label = (el: Element) => (el.tagName.toLowerCase() + (el.className && typeof el.className === "string" ? "." + el.className.trim().split(/\s+/u).slice(0, 2).join(".") : "")
     + ' "' + (el.textContent ?? "").trim().replace(/\s+/gu, " ").slice(0, 50) + '"');
   const visible = (el: Element) => (el as HTMLElement).checkVisibility?.({ opacityProperty: true, visibilityProperty: true }) ?? true;
@@ -65,7 +86,7 @@ function inspect() {
     // The colors behind the text, nearest first. A gradient is judged at its worst color stop;
     // text over a photograph is listed for a person to look at.
     const layers: { r: number; g: number; b: number; a: number }[][] = [];
-    let node: Element | null = el, onPicture = false;
+    let node: Element | null = el, onPicture = false, backgroundAt: Element | null = null;
     while (node) {
       const s = getComputedStyle(node);
       const bg = parse(s.backgroundColor);
@@ -89,8 +110,8 @@ function inspect() {
         layers.push(stops);
         if (stops.every(stop => stop.a >= 1)) { covered = true; break; }
       }
-      if (covered) break;
-      if (bg.a > 0) { layers.push([bg]); if (bg.a >= 1) break; }
+      if (covered) { backgroundAt = node; break; }
+      if (bg.a > 0) { layers.push([bg]); backgroundAt = node; if (bg.a >= 1) break; }
       node = node.parentElement;
     }
     if (onPicture) { unmeasured++; continue; }
@@ -104,7 +125,14 @@ function inspect() {
       const [a, b] = [lum(fore) + 0.05, lum(back) + 0.05];
       return Math.max(a, b) / Math.min(a, b);
     }));
-    if (ratio < needed) { lowContrast++; say(4, `contrast ${ratio.toFixed(2)} (needs ${needed}): ${label(el)}`); }
+    if (ratio < needed) {
+      lowContrast++;
+      const fore = parse(style.color);
+      const trace = `text ${style.color} (${source(el, "color")}); background behind it from ${backgroundAt ? label(backgroundAt) : "the page"}` +
+        (backgroundAt ? ` (${source(backgroundAt, "background", "background-color", "background-image")})` : "");
+      void fore;
+      say(4, `contrast ${ratio.toFixed(2)} (needs ${needed}): ${label(el)}`, trace);
+    }
   }
   if (innerWidth < 600) for (const p of main.querySelectorAll("p")) {
     if (visible(p) && p.textContent!.trim().length > 80 && parseFloat(getComputedStyle(p).fontSize) < 15) { say(4, `body text under 15px on a phone: ${label(p)}`); break; }
@@ -154,6 +182,7 @@ function inspect() {
 }
 
 async function main() {
+const override = overrideFile ? await readFile(overrideFile, "utf8") : undefined;
 const login = await readFile(arg("login", "runtime-content/preview-wordpress-login.txt"), "utf8");
 const user = /^User:\s*(.+)$/mu.exec(login)?.[1]?.trim(), password = /^Password:\s*(.+)$/mu.exec(login)?.[1]?.trim();
 if (!user || !password || !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/u.test(base)) throw Error("A local preview address and its login file are required");
@@ -168,8 +197,9 @@ try {
   await page.fill("#user_pass", password);
   await Promise.all([page.waitForNavigation(), page.click("#wp-submit")]);
   await page.goto(base + "/wp-admin/edit.php?post_type=page&post_status=draft");
-  const pages = await page.$$eval("a.row-title", links => links.map(a => ({ title: a.textContent!.trim(),
-    href: (a.closest("tr")!.querySelector(".view a, .preview a") as HTMLAnchorElement | null)?.href })).filter(p => p.href));
+  // Only the pages Core delivered: WordPress's own sample pages are not part of the site.
+  const pages = await page.$$eval("a.row-title", links => links.filter(a => !/^(Privacy Policy|Sample Page)$/u.test(a.textContent!.trim()))
+    .map(a => ({ title: a.textContent!.trim(), href: (a.closest("tr")!.querySelector(".view a, .preview a") as HTMLAnchorElement | null)?.href })).filter(p => p.href));
   const state = await signIn.storageState();
   await signIn.close();
   await mkdir(out, { recursive: true });
@@ -181,10 +211,24 @@ try {
       const tab: Page = await context.newPage();
       for (const { title, href } of pages) {
         await tab.goto(href!, { waitUntil: "networkidle" });
+        // Checking a proposed design: Core's current stylesheet (after the theme's color variables) is swapped for it.
+        if (override !== undefined) {
+          const swapped = await tab.evaluate((css: string) => {
+            const style = document.getElementById("miopages-managed-site-inline-css");
+            const text = style?.textContent ?? "", start = text.indexOf("body.miopages-branded-draft{");
+            const end = start < 0 ? -1 : text.indexOf("}", start);
+            if (!style || end < 0) return false;
+            style.textContent = text.slice(0, end + 1) + String.fromCharCode(10) + css;
+            return true;
+          }, override);
+          if (!swapped) throw Error("Could not find the site's stylesheet to swap in the proposed one");
+          await tab.evaluate(() => window.dispatchEvent(new Event("resize")));
+          await tab.waitForTimeout(300);
+        }
         await tab.evaluate(async () => { await document.fonts.ready; });
         const result = await tab.evaluate(inspect);
         for (const finding of result.findings) if (motion === "reduce" ? finding.rule === 9 : finding.rule !== 9)
-          findings.push({ rule: finding.rule, page: title, view, issue: finding.issue });
+          findings.push({ rule: finding.rule, page: title, view, issue: finding.issue, ...(finding.trace && { trace: finding.trace }) });
         if (motion === "no-preference" && result.unmeasured) notes.push(`${title} (${view}): ${result.unmeasured} text elements sit on a photograph; contrast there needs a look`);
         // The phone menu: opens, shows every link, closes with Escape.
         if (motion === "no-preference" && await tab.locator(".miopages-menu-toggle").isVisible()) {
@@ -202,14 +246,15 @@ try {
 
 const summary = designRules.filter(rule => [3, 4, 5, 6, 7, 9].includes(rule.number)).map(rule => {
   // The same issue on several pages or screen sizes is one line, with where it occurs.
-  const grouped = new Map<string, { pages: Set<string>; views: Set<string>; times: number }>();
+  const grouped = new Map<string, { pages: Set<string>; views: Set<string>; times: number; trace?: string }>();
   for (const f of findings.filter(f => f.rule === rule.number)) {
-    const entry = grouped.get(f.issue) ?? { pages: new Set(), views: new Set(), times: 0 };
+    const entry = grouped.get(f.issue) ?? { pages: new Set(), views: new Set(), times: 0, trace: f.trace };
     entry.pages.add(f.page); entry.views.add(f.view); entry.times++;
     grouped.set(f.issue, entry);
   }
   return `${rule.number}. ${rule.name}: ${grouped.size ? grouped.size + " issue" + (grouped.size > 1 ? "s" : "") : "passes"}`
-    + [...grouped].map(([issue, { pages, views, times }]) => `\n   - ${issue} (${times}x, ${pages.size} page${pages.size > 1 ? "s" : ""}, ${[...views].join(" and ")})`).join("");
+    + [...grouped].map(([issue, { pages, views, times, trace }]) => `\n   - ${issue} (${times}x, ${[...pages].join(", ")}; ${[...views].join(" and ")})`
+      + (trace ? `\n     why: ${trace}` : "")).join("");
 }).join("\n");
 const report = `Design rules check, ${new Date().toISOString().slice(0, 16)} (${base})\nRules 1, 2 and 8 are enforced in code before delivery.\n\n${summary}\n`
   + (notes.length ? `\nNot measured automatically:\n${notes.map(n => "- " + n).join("\n")}\n` : "");
