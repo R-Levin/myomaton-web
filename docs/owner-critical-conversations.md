@@ -1517,3 +1517,8 @@ Principal approves.
   new design rules (styling, Site plan with footer, page layouts, pictures), within the milestone 3
   run (about $5.60 left of $15); Claude stops and asks before going past the cap. No Client links
   for C0: Core uses its own research.
+
+- **Nov 27 — run cap raised to $17.** Core's last two pages were blocked because each page call
+  sets aside its worst case (about $2.50) though real pages cost about $0.27. Asked to choose, the
+  Principal raised the milestone 3 run's cap from $15 to $17 (expected real total about $13.50 for
+  the pages, plus about $0.50–1 if pictures are chosen later).
