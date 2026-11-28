@@ -12,7 +12,7 @@ We are in milestone 3, one real AI run on C0, accepted against baseline Part 1 (
 holds the agreed near-term work under that plan.
 
 **Where the Principal looks:** miopages.org (password-protected review WordPress), drafts only.
-**Spending:** C0 milestone 3 run, $15.80 of an $18 cap. Ask before any paid step, and state both
+**Spending:** C0 milestone 3 run, $15.80 of a $21 cap. Ask before any paid step, and state both
 the development cost and the production equivalent.
 
 ## Now
@@ -34,8 +34,10 @@ the development cost and the production equivalent.
    - Step 1 done: a login for Claude's checks (approved), and the drafts seen on miopages.org.
    - Step 2 found: the overlapping comes from Core's own design stylesheet (pictures pushed over
      the text panels, boxes inside boxes), not today's theme changes; the redesign removes it.
-   - Step 3: design brief `docs/design-brief-c0-2026-11-27.md`, waiting on the Principal's OK
-     and a cap raise to about $21.
+   - Step 3 done: design brief approved, cap raised to $21. "How much per page should
+     ultimately be driven by need. Neither extravagant nor too constricted. Use your limit for
+     now." (Nov 27)
+   - Step 4: one Core pass to the brief (design, then the ten pages, words unchanged): in progress.
 
 ## Next (agreed, in order)
 

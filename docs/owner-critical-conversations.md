@@ -1582,3 +1582,9 @@ Principal approves.
   to track our tasks, and reference it before every response. Done: `docs/tasks.md` holds the
   agreed tasks with the Principal's own words, and a Claude Code hook shows it with every message.
   CLAUDE.md requires checking each response against it and updating it in the same turn.
+
+- **Nov 27 — design brief approved; cap $21.** The Principal approved the design brief
+  (`docs/design-brief-c0-2026-11-27.md`) and raising the milestone 3 cap to $21. On how much goes
+  on a page: "should ultimately be driven by need. Neither extravagant nor too constricted. Use
+  your limit for now if that is easier." Claude's numbers are a rough ceiling for this pass, never
+  a target, and not a standing rule.

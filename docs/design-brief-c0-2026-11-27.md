@@ -1,4 +1,4 @@
-# Design brief for C0's redesign (for the Principal's approval)
+# Design brief for C0's redesign (approved by the Principal, Nov 27)
 
 What Core is asked to do in one clean pass. Each line comes from the Principal's own words, or is
 marked as a proposal for the Principal to change.
@@ -22,7 +22,10 @@ marked as a proposal for the Principal to change.
 - **Buttons go somewhere.** "Free Review" and "Direct Start" go to those pages until the service
   forms exist.
 
-## How much goes on a page (proposal: change any number)
+## How much goes on a page
+
+Driven by need: "neither extravagant nor too constricted" (the Principal, Nov 27). For this pass
+the numbers below are a rough ceiling, never a target; use fewer wherever the page needs fewer.
 - **Pictures:** one main picture per page, plus at most two more where they show something the
   words can't. Today it's 7–18 per page.
 - **Diagrams and charts:** only where the page explains a process or a comparison; at most one

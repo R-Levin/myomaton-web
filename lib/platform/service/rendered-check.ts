@@ -16,9 +16,11 @@ export type RenderedCheck = { at: string; subject: string; findings: RenderedFin
 const folder = (webPresenceId: string) => join(tmpdir(), "miopages-rendered-checks", webPresenceId.replace(/[^a-z0-9-]/giu, ""));
 const fileFor = (webPresenceId: string, key: string) => join(folder(webPresenceId), key.replace(/[^a-z0-9.-]/giu, "_") + ".json");
 
-/** The preview WordPress and its throwaway login, from the delivery configuration the preview was started with. */
+/** The WordPress the drafts go to (miopages.org, or the local preview) and the login for checking it. */
 async function previewSite(configFile: string) {
-  const login = join(dirname(dirname(configFile)), "WORDPRESS-LOGIN.txt");
+  // The review site keeps its check login beside its settings (<name>-login.txt); the local preview keeps WORDPRESS-LOGIN.txt.
+  const beside = configFile.replace(/\.json$/u, "-login.txt");
+  const login = (await readFile(beside, "utf8").then(() => true, () => false)) ? beside : join(dirname(dirname(configFile)), "WORDPRESS-LOGIN.txt");
   const base = /https?:\/\/[^/\s]+/u.exec(await readFile(login, "utf8"))?.[0];
   if (!base) throw Error("The preview WordPress login file names no address");
   return { base, login };
