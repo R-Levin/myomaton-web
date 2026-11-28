@@ -1607,3 +1607,8 @@ Principal approves.
   Clients still approving whole pages. The Principal: "OK, let's proceed and revisit this exact
   conversation. Please record it for that purpose." Recorded in
   `docs/conversation-2026-11-28-words-and-layout.md`; to be revisited (tasks 1a and 14).
+
+- **Nov 28 — cap raised to $28 for C0's layouts with the words kept apart.** After the separation of
+  words and layout was built and tested on the free stand-in, the Principal approved raising the
+  milestone 3 cap from $24 to $28 and running the C0 pass ("Yes"): restore the Nov 27 words where
+  they drifted (free), then one layout change per page to the design brief (about $3.50).

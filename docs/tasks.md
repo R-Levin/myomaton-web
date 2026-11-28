@@ -12,7 +12,7 @@ We are in milestone 3, one real AI run on C0, accepted against baseline Part 1 (
 holds the agreed near-term work under that plan.
 
 **Where the Principal looks:** miopages.org (password-protected review WordPress), drafts only.
-**Spending:** C0 milestone 3 run, $20.70 of a $24 cap. Ask before any paid step, and state both
+**Spending:** C0 milestone 3 run, $20.70 of a $28 cap. Ask before any paid step, and state both
 the development cost and the production equivalent.
 
 ## Now
@@ -69,8 +69,8 @@ the development cost and the production equivalent.
    - Built and tested on the free stand-in (Nov 28): words and layout grains in the engine and Core's
      writer; a layout that changes, drops or invents a word is refused; going back to any earlier page
      version (no AI); "Words unchanged" or the exact changed lines on each proposed page. All ten real
-     C0 pages pass offline. Next, for C0 (paid, to ask): restore the Nov 27 words where they drifted,
-     then one layout change per page to the brief.
+     C0 pages pass offline. Cap raised to $28 ("Yes", Nov 28). In progress: restore the Nov 27 words
+     where they drifted, then one layout change per page to the brief.
 
 ## Next (agreed, in order)
 
