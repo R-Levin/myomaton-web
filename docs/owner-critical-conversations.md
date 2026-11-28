@@ -1631,3 +1631,11 @@ Principal approves.
   ridiculous stuff at me like you just did with stuff we already discussed. Get going. No more talking
   tonight." Meaning: no menus of known options; a real review of everything, starting from the decent
   site of about mid-October and why it worked, then a genuinely new idea. Work quietly until there is one.
+
+- **Nov 28 — where the bloat came from; the flaw is in how Claude thinks.** On Core's instructions
+  ("use all of it", "make the site visually rich", "never leave the spot out"): "where did insanity like
+  this come from? This is the whole point the AI keeps adding stuff that isn't asked for ... You need to
+  simplify, stop adding useless and crazy direction and stay focused on what was asked for ... figure out
+  how we lost, how things like that sneak in ... stop making little fixes when there's a gigantic flaw in
+  the way you are thinking." Found: Claude wrote all of those lines itself, in one commit on Nov 22
+  (09191ce), turning the Principal's remarks into absolute commands, and kept adding after every failure.
