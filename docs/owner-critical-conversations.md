@@ -1612,3 +1612,12 @@ Principal approves.
   words and layout was built and tested on the free stand-in, the Principal approved raising the
   milestone 3 cap from $24 to $28 and running the C0 pass ("Yes"): restore the Nov 27 words where
   they drifted (free), then one layout change per page to the design brief (about $3.50).
+
+- **Nov 28 — stop, review everything, rethink.** After the C0 pass was reported done (words kept, layouts
+  leaner, sent to miopages.org), the Principal: "Archive what you can. However, this is just another moment
+  in a litany cascade of atrocious failure. You need to stop right now. Then you need to review everything
+  that you can through the entire project and rethink this, because this was an incredible, just an
+  incredible, unbelievable failure. I am shocked." Done at once: the nine old Nov 23 drafts (pages 53-61)
+  copied in full (server `~/miopages-private/archive-nov28-old-drafts`, and locally) and moved to
+  WordPress's trash; the paid workspace stopped. No further building or spending until the review is
+  discussed.

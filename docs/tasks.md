@@ -17,6 +17,11 @@ the development cost and the production equivalent.
 
 ## Now
 
+**STOPPED (Nov 28).** "You need to stop right now. Then you need to review everything that you can
+through the entire project and rethink this." No building or spending. The one task now: the
+project-wide review (`docs/review-2026-11-28-stop.md`), then discuss it with the Principal. Everything
+below is on hold until then.
+
 0. **Triage, then decide the path.** "Start with that. But first record everything into logical
    containers so we might go back to one of the old states." (Nov 27)
    - Done: states A and B recorded (`docs/states.md`, tags `c0-state-a-2026-11-26` and
@@ -114,7 +119,7 @@ the development cost and the production equivalent.
 10. Renaming page addresses in a redesign (Nov 27).
 11. The review document's sections 3–5 (`docs/review-2026-11-26-inflection-point.md`).
 12. Processing time closer to production (Nov 27).
-13. The 9 old Nov 23 drafts on miopages.org (pages 53–61): leave them, or archive them?
+13. Done Nov 28: the 9 old Nov 23 drafts (pages 53–61) archived ("Archive what you can"): copied, then trashed.
 14. **Revisit the Nov 28 words-and-layout conversation** with the Principal
     (`docs/conversation-2026-11-28-words-and-layout.md`): did the separation work, do C0's words
     stand, and design quality (which the separation doesn't solve).
