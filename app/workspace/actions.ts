@@ -7,7 +7,7 @@ import { accountKnowledge } from "@/lib/platform/knowledge/account";
 import { factKey } from "@/lib/platform/knowledge/facts";
 import { confirmOnPublish, factsToConfirmOnPublish } from "@/lib/platform/knowledge/publish";
 import { currentFacts, recordFacts } from "@/lib/platform/knowledge/store";
-import { ask, citedBySite, direct, proposePublish, respond, restore, startLaunch, tasks, work, type Kind, type ServiceRecord } from "@/lib/platform/service/cycle";
+import { ask, citedBySite, currentSite, direct, proposePublish, respond, restore, startLaunch, tasks, work, type Kind, type ServiceRecord } from "@/lib/platform/service/cycle";
 import { deliverDraft, takeInReadBack } from "@/lib/platform/service/delivery";
 import { readBackOperatorSite } from "@/lib/platform/wordpress-delivery/operator-review";
 import { findingsForCore, lastRenderedCheck, runRenderedCheck } from "@/lib/platform/service/rendered-check";
@@ -200,13 +200,18 @@ export async function specialistRequest(webPresenceId: string, form: FormData) {
   if (!words) throw Error("Say what Core should change");
   await change(webPresenceId, "specialist", (record, ctx) => {
     const at = now();
-    const target = about(text(form, "about"));
-    // For a page: the whole page, only its words, or only its layout (task 1a); a layout may follow an earlier version.
+    // For a page: the whole page, only its content, or only its layout. "Every page" asks the same of each page
+    // (several pages at once); a redesign is a request on the Direction, and every page re-renders from it.
     const grain = text(form, "grain");
     if (grain && !["page", "page-words", "page-layout"].includes(grain)) throw Error("Choose what changes");
-    const pageGrain = target.kind === "page" && grain ? grain as "page" | "page-words" | "page-layout" : undefined;
-    return ask(record, { id: `specialist:${ctx.person.id}:${at}`, at, by: ctx.person, ...target, words: words.slice(0, 20_000),
-      ...(pageGrain && pageGrain !== "page" && { grain: pageGrain }) });
+    const every = text(form, "about") === "pages:all";
+    const targets = every ? (currentSite(record)?.plan.pages ?? []).map(entry => ({ kind: "page" as const, path: entry.path })) : [about(text(form, "about"))];
+    if (!targets.length) throw Error("The site has no pages yet");
+    return targets.reduce((next, target, index) => {
+      const pageGrain = target.kind === "page" && grain ? grain as "page" | "page-words" | "page-layout" : undefined;
+      return ask(next, { id: `specialist:${ctx.person.id}:${at}${every ? ":" + index : ""}`, at, by: ctx.person, ...target, words: words.slice(0, 20_000),
+        ...(pageGrain && pageGrain !== "page" && { grain: pageGrain }) });
+    }, record);
   });
 }); }
 

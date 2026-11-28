@@ -39,6 +39,8 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
   // What a Request can be about: the site as a whole, or one Work product.
   const targets = [{ value: "report", label: "The Business Understanding Report" }, { value: "direction", label: "The Presence Direction" },
     { value: "site-plan", label: "The Site plan" }, ...(site?.plan.pages ?? []).map(entry => ({ value: `page:${entry.path}`, label: `Page ${entry.label} (${entry.path})` }))];
+  // Asking Core for a change may also reach every page at once.
+  const askTargets = [...targets, ...(site ? [{ value: "pages:all", label: "Every page" }] : [])];
   const toDirect = record.ledger.requests.filter(request => request.status === "open" && request.target.grain === "site" &&
     !record.ledger.changes.some(change => change.requestIds.includes(request.id)));
   const fromWordPress = record.ledger.requests.filter(request => request.origin.channel === "wordpress-note" || request.origin.channel === "hand-edit");
@@ -131,7 +133,7 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
         <form action={specialistRequest.bind(null, id)} className="space-y-2">
           <textarea name="words" rows={4} className={field} placeholder="What Core should change, in your words" required />
           <div className="flex flex-wrap items-center gap-2">
-            <select name="about" className="rounded border border-neutral-300 px-2 py-1.5 text-sm">{targets.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select>
+            <select name="about" className="rounded border border-neutral-300 px-2 py-1.5 text-sm">{askTargets.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select>
             <select name="grain" aria-label="For a page, what changes" className="rounded border border-neutral-300 px-2 py-1.5 text-sm">
               <option value="page">For a page: the whole page</option>
               <option value="page-words">For a page: only its content (the layout stays)</option>
