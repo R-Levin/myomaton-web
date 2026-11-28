@@ -1639,3 +1639,12 @@ Principal approves.
   how we lost, how things like that sneak in ... stop making little fixes when there's a gigantic flaw in
   the way you are thinking." Found: Claude wrote all of those lines itself, in one commit on Nov 22
   (09191ce), turning the Principal's remarks into absolute commands, and kept adding after every failure.
+
+- **Nov 28 — document everything, then build the simplified version.** "The first thing you're going to
+  do is document everything and then put it in a proper document that I can use to move on if I have to ...
+  Then ... you are going to not look at what has happened before, and you are going to create a simplified
+  version that you do not add your opinions on. You're going to follow my direction and build something
+  that makes a nice site using the AI research and puts it together and places it on WordPress and allows
+  me to look at it. And you're going to make it so that the words and the layout can be managed in a
+  logical way that doesn't handcuff us ... ask yourself, as much as you need to, am I adding bloat here? Am
+  I creating rules? ... Get started, no more."

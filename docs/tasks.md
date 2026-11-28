@@ -17,19 +17,17 @@ the development cost and the production equivalent.
 
 ## Now
 
-**STOPPED (Nov 28).** "You need to stop right now. Then you need to review everything that you can
-through the entire project and rethink this." No building or spending. The one task now: the
-project-wide review (`docs/review-2026-11-28-stop.md`), then discuss it with the Principal. Everything
-below is on hold until then.
-- Nov 28, later: that review was rejected: "rehashed ideas ... think from a blank sheet of paper ... a
-  pretty decent website was built a month and a half ago without all this bloated overload so just
-  start there and just keep working until you have some kind of an idea ... No more talking tonight."
-  Now: find the mid-October site, learn how and why it worked, review everything since, and think
-  from a blank sheet. Work quietly; no spending, no hosted changes.
-- Done Nov 28: `docs/rethink-2026-11-28.md`. The Oct 12 site (7 pages, ~300-600 words, 4 section kinds,
-  no pictures or placeholders, people editing) worked; Core's instructions mandate the bloat ("use all
-  of it", "visually rich", "never leave the spot out") and nothing subtracts. Idea: make Core work the
-  way October was made. Waiting for the Principal.
+Nov 28: "The first thing you're going to do is document everything and then put it in a proper document
+that I can use to move on if I have to ... Then ... create a simplified version that you do not add your
+opinions on ... a nice site using the AI research ... places it on WordPress and allows me to look at it
+... the words and the layout can be managed in a logical way that doesn't handcuff us."
+
+A. **Handoff document** (`docs/HANDOFF.md`): everything someone needs to carry on without Claude.
+B. **Simplified version:** AI research → a nice site → WordPress (miopages.org) for the Principal to
+   look at; words and layout managed separately and simply. Check every step: am I adding bloat, rules,
+   or my own opinions? Paid AI calls still need the Principal's OK.
+
+Everything below is history and on hold.
 
 0. **Triage, then decide the path.** "Start with that. But first record everything into logical
    containers so we might go back to one of the old states." (Nov 27)
