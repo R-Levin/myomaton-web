@@ -8,7 +8,8 @@
  * records the adjustment, rather than discarding the AI's design.
  */
 import { contrast, luminance } from "../presentation/tokens";
-import { readSiteStylesheet, stylesheetContract } from "./site-stylesheet";
+import { readSiteStylesheet } from "./site-stylesheet";
+import { componentNames, components, type ComponentName } from "../site/components";
 
 export { siteFonts } from "./site-fonts";
 import { siteFonts } from "./site-fonts";
@@ -47,7 +48,8 @@ export const siteDesignSchema = shape({
   density: { type: "string", enum: densities, description: "Overall spacing between and within sections." },
   imagery: shape({ style: { type: "string", enum: imageryStyles }, direction: { type: "string",
     description: "Art direction every image brief should follow." } }),
-  stylesheet: { type: "string", description: stylesheetContract },
+  components: shape(Object.fromEntries(componentNames.map(name => [name, shape({ variant: { type: "string", enum: components[name].variants } })])) as
+    unknown as Record<ComponentName, ReturnType<typeof shape>>),
   rationale: { type: "string", description: "Why this design fits the business and how the research shaped it." },
   sourceIds: { type: "array", items: { type: "string" } },
 });
@@ -58,6 +60,8 @@ export type SiteDesign = {
   shape: typeof radii[number];
   density: typeof densities[number];
   imagery: { style: typeof imageryStyles[number]; direction: string };
+  /** The site's choice for each component: the variant a section uses unless it chooses another (docs/rendering-design.md). */
+  components?: Record<ComponentName, { variant: string }>;
   /** The site's own stylesheet: its actual look (checked and rebuilt by readSiteStylesheet). Absent in designs from before Nov 26. */
   stylesheet?: string;
   rationale: string;
@@ -107,9 +111,10 @@ function repair(colourValue: string, backgrounds: string[]): string | null {
 }
 
 export function readSiteDesign(value: unknown, sourceIds: readonly string[]): SiteDesign {
-  // The AI is always asked for a stylesheet; designs read back from before Nov 26 have none.
+  // Designs from Nov 26–28 carried a raw stylesheet (kept readable as history); designs from Nov 29 carry component choices.
   const sheet = Boolean(value) && typeof value === "object" && "stylesheet" in (value as object);
-  const row = record(value, ["palette", "typography", "shape", "density", "imagery", ...(sheet ? ["stylesheet"] : []), "rationale", "sourceIds"], "Site design");
+  const chosen = Boolean(value) && typeof value === "object" && "components" in (value as object);
+  const row = record(value, ["palette", "typography", "shape", "density", "imagery", ...(sheet ? ["stylesheet"] : []), ...(chosen ? ["components"] : []), "rationale", "sourceIds"], "Site design");
   const adjustments: string[] = [];
   const paletteRow = record(row.palette, [...paletteRoles, "border", "muted"], "Palette");
   const chosenText: Record<string, string> = {};
@@ -160,6 +165,7 @@ export function readSiteDesign(value: unknown, sourceIds: readonly string[]): Si
     density: choice(row.density, densities, "Density"),
     imagery: { style: choice(imageryRow.style, imageryStyles, "Imagery style"), direction: prose(imageryRow.direction, "Imagery direction") },
     ...(sheet && { stylesheet: readSiteStylesheet(row.stylesheet) }),
+    ...(chosen && { components: readComponentChoices(row.components) }),
     // Room for the reasons behind every choice and the research that shaped it (Part 1 #10); bounded only as a safeguard.
     rationale: prose(row.rationale, "Design rationale", 16_000),
     sourceIds: [...new Set(row.sourceIds as string[])],
@@ -167,10 +173,25 @@ export function readSiteDesign(value: unknown, sourceIds: readonly string[]): Si
   };
 }
 
-/** Data-only projection the WordPress theme renders (brand projection design version 4, or 5 with the stylesheet). */
+function readComponentChoices(value: unknown): Record<ComponentName, { variant: string }> {
+  const row = record(value, componentNames, "Component choices");
+  return Object.fromEntries(componentNames.map(name => {
+    const choiceRow = record(row[name], ["variant"], name + " choice");
+    return [name, { variant: choice(choiceRow.variant, components[name].variants, name + " variant") }];
+  })) as Record<ComponentName, { variant: string }>;
+}
+
+/** The variant a component takes on this site when a section doesn't choose one. */
+export function defaultVariant(design: SiteDesign | undefined, name: ComponentName) {
+  return design?.components?.[name]?.variant ?? components[name].variants[0]!;
+}
+
+/**
+ * Data-only projection the WordPress theme renders: the design's tokens (version 4). The site's look
+ * comes from the theme's one stylesheet reading these tokens and the component classes in each page;
+ * a raw stylesheet from an older design is no longer sent.
+ */
 export function designProjection(design: SiteDesign) {
-  const base = { grammar: "core-designed" as const, motion: "minimal" as const,
+  return { grammar: "core-designed" as const, motion: "minimal" as const, version: 4 as const,
     palette: design.palette, typography: design.typography, shape: design.shape, density: design.density };
-  // Version 5 carries the site's own stylesheet; earlier designs stay version 4.
-  return design.stylesheet ? { ...base, version: 5 as const, stylesheet: design.stylesheet } : { ...base, version: 4 as const };
 }

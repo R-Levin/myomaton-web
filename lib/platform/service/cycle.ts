@@ -5,8 +5,9 @@ import type { Evidence } from "./evidence";
 import type { Asset } from "./assets";
 import type { SiteFooter } from "./site-footer";
 import { fingerprint } from "../canonical/model";
-import { directionIdentity, pageIdentity, reportIdentity, sitePlanIdentity, versionPages } from "../work-products/pages";
-import { arrangementOf, compareWords, fillLayout, layoutFromExample, mendLayout, pageWords, type Piece } from "./page-words";
+import { directionIdentity, pageIdentity, reportIdentity, sitePlanIdentity } from "../work-products/pages";
+import { checkPage, type ContentItem } from "../site/components";
+import type { SitePageWithSources } from "../site/page-schema";
 
 /**
  * Core's one engine (rebuild plan, milestone 1). Every piece of work is the same cycle of shared
@@ -20,7 +21,8 @@ import { arrangementOf, compareWords, fillLayout, layoutFromExample, mendLayout,
 export type Kind = "report" | "direction" | "site-plan" | "page";
 export type PlanEntry = { path: string; label: string; purpose: string; inMenu: boolean };
 export type SitePlan = { pages: PlanEntry[]; footer?: SiteFooter };
-export type PageContent = { path: string; heading: string; sections: { heading: string; body: string; [key: string]: unknown }[]; [key: string]: unknown };
+/** A page: its content and its layout, each its own (docs/rendering-design.md). */
+export type PageContent = SitePageWithSources;
 
 /** One saved state of a Work product. A proposed Version becomes current only when its Change is approved. */
 export type ProductVersion = {
@@ -48,11 +50,10 @@ export type WriteInput = {
   kind: Kind; knowledge: readonly unknown[]; evidence?: readonly Evidence[]; report?: unknown; direction?: unknown; sitePlan?: SitePlan; page?: PlanEntry;
   /** The current Version being reworked, and the words of each Request asking for the rework. */
   previous?: unknown; requests: string[];
-  /** For a page: the whole page, only its words, or only its layout (task 1a). For the words or the layout,
-   * Core is given the page's words as numbered pieces and its arrangement with the numbers in place of text. */
-  grain?: PageGrain; words?: Piece[]; arrangement?: PageContent;
-  /** An earlier Version a layout change should follow where it can (the Request names it). */
-  example?: unknown;
+  /** For a page: the whole page, only its content (words), or only its layout. */
+  grain?: PageGrain;
+  /** The site's other pages as they stand, so each page is written knowing the whole site. */
+  pages?: PageContent[];
 };
 export type PageGrain = "page" | "page-words" | "page-layout";
 export interface Writer { write(input: WriteInput): Promise<unknown> }
@@ -164,11 +165,14 @@ function inputFor(record: ServiceRecord, kind: Kind, knowledge: readonly unknown
   const pageGrain = kind === "page" && (grain === "page-words" || grain === "page-layout") ? grain : undefined;
   const previous = pageGrain ? got(id) : got(id) ?? record.products.findLast(item => item.id === id)?.content;
   if (pageGrain && previous === undefined) throw new CycleError("invalid", "A page's words or layout change needs an approved Version of the page");
-  const example = pageGrain === "page-layout" && requests[0]?.target.example
-    ? record.products.find(item => item.id === id && item.version === requests[0]!.target.example)?.content : undefined;
+  // The site's other pages: their approved Version, or the latest draft of a page not yet approved.
+  const pages = kind === "page" && plan ? plan.pages.filter(entry => entry.path !== path).flatMap(entry => {
+    const other = pageIdentity(site, entry.path);
+    const found = got(other) ?? record.products.findLast(item => item.id === other && item.status !== "declined")?.content;
+    return found ? [found as PageContent] : [];
+  }) : [];
   return { kind, knowledge, ...(record.evidence?.length && { evidence: record.evidence }),
-    ...(pageGrain && { grain: pageGrain, words: pageWords(previous as PageContent), arrangement: arrangementOf(previous as PageContent),
-      ...(example !== undefined && { example }) }),
+    ...(pageGrain && { grain: pageGrain }), ...(pages.length && { pages }),
     ...(kind !== "report" && { report: got(reportIdentity(site)) }),
     ...((kind === "site-plan" || kind === "page") && { direction: got(directionIdentity(site)) }),
     ...(kind === "page" && plan && { sitePlan: plan, page: plan.pages.find(entry => entry.path === path) }),
@@ -187,14 +191,20 @@ export async function work(record: ServiceRecord, task: Task, writer: Writer, kn
   if (requests.some(request => !request)) throw new CycleError("not-open", "The Task's Requests are no longer open");
   const first = requests[0]!, kind = kindOf(first.target.grain)!, path = first.target.path;
   const given = inputFor(record, kind, knowledge, requests as Request[], path);
-  const content = await writer.write(given);
+  const written = await writer.write(given);
   const id = identity(record, kind, path);
-  // The guarantee of a layout change, whatever wrote it: the page's words read back exactly as they were.
-  if (given.grain === "page-layout" && !compareWords(given.previous as PageContent, content as PageContent).unchanged)
-    throw new CycleError("invalid", "A layout change may not change the page's words");
+  // A change to only a page's layout keeps its content as it was, and a change to only its content
+  // keeps its layout: whatever wrote the answer, the other part is the approved Version's own.
+  const before = given.previous as PageContent | undefined;
+  const content = given.grain === "page-layout" ? { ...before!, layout: (written as PageContent).layout }
+    : given.grain === "page-words" ? { ...(written as PageContent), layout: before!.layout } : written;
+  if (given.grain) {
+    const { problems } = checkPage(content as PageContent, (currentSite(record)?.plan.pages ?? []).map(entry => entry.path));
+    if (problems.length) throw new CycleError("invalid", "The change doesn't fit the page: " + problems.join("; "));
+  }
   const base = current(record, id);
   const version = Math.max(0, ...record.products.filter(item => item.id === id).map(item => item.version)) + 1;
-  const stored = kind === "page" ? versionedPage(record, id, content as PageContent) : content;
+  const stored = content;
   const changeId = `${id}:v${version}`;
   const change: Omit<Change, "status" | "reviews" | "decisionId"> = { id: changeId, label: `${kind}-v${version}`, at, requestIds: requests.map(request => request!.id),
     target: { grain: given.grain ?? grainOf[kind], ...(path && { path }), workProduct: { id, version: base?.version ?? 0 } },
@@ -215,20 +225,25 @@ export async function work(record: ServiceRecord, task: Task, writer: Writer, kn
  * becomes current at once. Only a Specialist (or the Principal) edits pages by hand.
  */
 export function edit(record: ServiceRecord, input: { id: string; at: string; by: Person; path: string; words: string;
-  sections: { id: string; heading?: string; body?: string }[]; channel: Request["origin"]["channel"]; channelRef?: string }): ServiceRecord {
+  items: { id: string; fields: Record<string, string> }[]; channel: Request["origin"]["channel"]; channelRef?: string }): ServiceRecord {
   if (input.by.role !== "operator" && input.by.role !== "owner") throw new CycleError("not-permitted", "Only a Specialist edits pages by hand");
   const id = pageIdentity(record.account.managedSiteId, input.path), base = current(record, id);
   if (!base) throw new CycleError("not-found", "No approved Version of that page to edit");
   if (record.ledger.requests.some(request => request.id === input.id + ":request")) return record;
-  const before = base.content as PageContent & { sections: { id: string; heading: string; body: string }[] };
-  for (const section of input.sections) if (!before.sections.some(item => item.id === section.id)) throw new CycleError("invalid", "That section is not on the page");
-  const sections = before.sections.map(section => { const edited = input.sections.find(item => item.id === section.id);
-    return edited ? { ...section, ...(edited.heading !== undefined && { heading: edited.heading }), ...(edited.body !== undefined && { body: edited.body }) } : section; });
+  // A hand edit changes the content items it touched, field by field; the layout stays as it is.
+  const before = base.content as PageContent;
+  for (const edited of input.items) if (!before.content.some(item => item.id === edited.id)) throw new CycleError("invalid", "That content is not on the page");
+  const contentItems = before.content.map(item => {
+    const edited = input.items.find(entry => entry.id === item.id);
+    if (!edited) return item;
+    const fields = Object.fromEntries(Object.entries(edited.fields).filter(([key, value]) => key in item && key !== "id" && key !== "type" && typeof value === "string"));
+    return { ...item, ...fields } as ContentItem;
+  });
   const requestId = input.id + ":request";
   let ledger = takeIn(record.ledger, { id: input.id, at: input.at, by: input.by }, [{ id: requestId, at: input.at,
     origin: { kind: "operator", by: input.by, channel: input.channel }, target: { grain: "page", path: input.path }, words: input.words,
     ...(input.channelRef && { channelRef: input.channelRef }) }]);
-  const unchanged = fingerprint(sections) === fingerprint(before.sections);
+  const unchanged = fingerprint(contentItems) === fingerprint(before.content);
   if (unchanged) return { ...record, ledger: decide(ledger, { id: input.id + ":decision", at: input.at, by: input.by, requestIds: [requestId], outcome: "maintain",
     reasoning: "The edit leaves the page as it is." }, []) };
   const version = Math.max(0, ...record.products.filter(item => item.id === id).map(item => item.version)) + 1, changeId = `${id}:v${version}`;
@@ -238,7 +253,7 @@ export function edit(record: ServiceRecord, input: { id: string; at: string; by:
       difference: { summary: `the page ${input.path}, version ${version} (edited by hand)` }, preserve: [], consequence: "operator-review" }]);
   const products = record.products.map(item => item.id === id && item.status === "proposed" ? { ...item, status: "superseded" as const } : item);
   const proposed = { ...record, ledger, products: [...products, { id, kind: "page" as const, version, path: input.path,
-    content: versionedPage(record, id, { ...before, sections }), changeId, at: input.at, status: "proposed" as const }] };
+    content: { ...before, content: contentItems }, changeId, at: input.at, status: "proposed" as const }] };
   return respond(proposed, changeId, input.by, "approve", input.at);
 }
 
@@ -264,40 +279,8 @@ export function restore(record: ServiceRecord, input: { id: string; at: string; 
       difference: { summary: `the page ${input.path}, version ${version} (version ${earlier.version} restored)` }, preserve: [], consequence: "operator-review" }]);
   const products = record.products.map(item => item.id === id && item.status === "proposed" ? { ...item, status: "superseded" as const } : item);
   const proposed = { ...record, ledger, products: [...products, { id, kind: "page" as const, version, path: input.path,
-    content: versionedPage(record, id, structuredClone(earlier.content) as PageContent), changeId, at: input.at, status: "proposed" as const }] };
+    content: structuredClone(earlier.content) as PageContent, changeId, at: input.at, status: "proposed" as const }] };
   return respond(proposed, changeId, input.by, "approve", input.at);
-}
-
-/**
- * A Specialist proposes an earlier version's layout for a page, holding its current, approved words
- * (layoutFromExample): no AI, a layout change like any other, shown for Review with its words check.
- */
-export function adoptLayout(record: ServiceRecord, input: { id: string; at: string; by: Person; path: string; version: number }): ServiceRecord {
-  if (input.by.role !== "operator" && input.by.role !== "owner") throw new CycleError("not-permitted", "Only a Specialist proposes a page's layout");
-  const id = pageIdentity(record.account.managedSiteId, input.path), base = current(record, id);
-  const example = record.products.find(item => item.id === id && item.version === input.version);
-  if (!base || !example) throw new CycleError("not-found", "No such version of that page");
-  if (record.ledger.requests.some(request => request.id === input.id + ":request")) return record;
-  const before = base.content as PageContent;
-  const content = fillLayout(before, mendLayout(before, layoutFromExample(before, example.content as PageContent)).layout);
-  if (!compareWords(before, content).unchanged) throw new CycleError("invalid", "That layout would change the page's words");
-  const requestId = input.id + ":request", words = `Use the layout of version ${example.version} of the page ${input.path}, with its current words.`;
-  let ledger = takeIn(record.ledger, { id: input.id, at: input.at, by: input.by }, [{ id: requestId, at: input.at,
-    origin: { kind: "operator", by: input.by, channel: "core-screen" }, target: { grain: "page-layout", path: input.path, example: example.version }, words }]);
-  const version = Math.max(0, ...record.products.filter(item => item.id === id).map(item => item.version)) + 1, changeId = `${id}:v${version}`;
-  ledger = decide(ledger, { id: changeId + ":decision", at: input.at, by: input.by, requestIds: [requestId], outcome: "change", reasoning: words },
-    [{ id: changeId, label: `page-v${version}`, at: input.at, requestIds: [requestId],
-      target: { grain: "page-layout", path: input.path, workProduct: { id, version: base.version } }, base: { version: record.version, digest: fingerprint(base.content) },
-      difference: { summary: `the layout of the page ${input.path}, version ${version} (the layout of version ${example.version})` }, preserve: [], consequence: "operator-review" }]);
-  const products = record.products.map(item => item.id === id && item.status === "proposed" ? { ...item, status: "superseded" as const } : item);
-  return { ...record, ledger, products: [...products, { id, kind: "page" as const, version, path: input.path,
-    content: versionedPage(record, id, content), changeId, at: input.at, status: "proposed" as const }] };
-}
-
-/** A Page's Sections keep their identities across Versions, as delivery has always given them. */
-function versionedPage(record: ServiceRecord, id: string, page: PageContent) {
-  const before = current(record, id)?.content as PageContent | undefined;
-  return versionPages(record.account.managedSiteId, before ? [before] : [], [page]).pages[0];
 }
 
 /**
@@ -423,7 +406,7 @@ function respondToPublish(record: ServiceRecord, changeId: string, by: Person, r
 export function citedBySite(record: ServiceRecord): Set<string> {
   const site = currentSite(record);
   const ids = (value: unknown) => Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
-  const fromPages = (site?.pages ?? []).flatMap(page => page.sections.flatMap(section => ids((section as { sourceIds?: unknown }).sourceIds)));
+  const fromPages = (site?.pages ?? []).flatMap(page => ids((page as { sourceIds?: unknown }).sourceIds));
   const fromPlan = (site?.plan.pages ?? []).flatMap(entry => [...ids((entry as { sourceIds?: unknown }).sourceIds),
     ...ids((entry as { decisionBrief?: { claimIds?: unknown } }).decisionBrief?.claimIds)]);
   return new Set([...fromPages, ...fromPlan]);

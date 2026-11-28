@@ -79,3 +79,12 @@ export function checkPage(page: SitePage, paths: readonly string[]) {
   if (!page.layout.length) problems.push("The page has no sections");
   return { problems, unused: page.content.filter(item => !used.has(item.id)).map(item => item.id) };
 }
+
+/** What changed in a page's content between two versions, item by item, for a person to see. */
+export function compareContent(before: SitePage, after: SitePage) {
+  const words = (item: ContentItem) => Object.entries(item).filter(([key]) => key !== "id" && key !== "type").map(([, value]) => value).join(" — ");
+  const was = new Map(before.content.map(item => [item.id, words(item)])), now = new Map(after.content.map(item => [item.id, words(item)]));
+  const gone = [...was].filter(([id, text]) => now.get(id) !== text).map(([, text]) => text);
+  const added = [...now].filter(([id, text]) => was.get(id) !== text).map(([, text]) => text);
+  return { unchanged: !gone.length && !added.length, gone, added };
+}

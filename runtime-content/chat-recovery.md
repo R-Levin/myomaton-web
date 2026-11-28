@@ -1,3 +1,6 @@
+## Nov 29: recovery program approved and under way (docs/recovery-program-2026-11-29.md, docs/rendering-design.md)
+Done: CLAUDE.md plan-before-work + plan mode default; step 1 components+render (lib/platform/site, tests pass incl. WordPress parser); step 2 in progress: design holds component choices (no raw stylesheet), pages are SitePage {content, layout} in cycle/ai-writer/beacon/workspace, instructions rewritten, page-words removed. NEXT: delivery.ts (send Core-rendered block markup; edit() now takes content items), plugin check of blocks + read-back by mp:<id>, theme one stylesheet, fix tests (page-grains, service-cycle, ai-writer, integration), change scopes, removals, then stand-in run to miopages.org (Look 1).
+
 ## Nov 28 ~07:30 UTC: HANDOFF.md written; simplified version built and tried (stand-in)
 Next on the Principal's OK: npx tsx scripts/simple-site/write.ts --ai-run c0-milestone-3 --cap 28 --out runtime-content/simple-site/c0 ; then to-wordpress.ts --site runtime-content/simple-site/c0 ; then look.ts and judge by eye. Theme miopages-simple is active on miopages.org.
 

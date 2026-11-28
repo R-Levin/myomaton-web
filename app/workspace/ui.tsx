@@ -1,3 +1,4 @@
+import type { ContentItem, SitePage } from "@/lib/platform/site/components";
 import type { ReactNode } from "react";
 import type { ProductVersion } from "@/lib/platform/service/cycle";
 
@@ -58,10 +59,18 @@ export function Content({ item }: { item: ProductVersion }) {
           {column.links.length > 0 && <span>Links: {column.links.map(label).join(", ")}</span>}</li>))}</ul>
         {plan.footer.note && <p className="pl-4 text-sm">{plan.footer.note}</p>}</div>}</div>);
   }
-  const page = value as { heading: string; sections: { heading: string; body: string; visual?: { status: string; brief: string } }[] };
-  return (<div><p className="font-medium">{page.heading}</p>{page.sections.map((section, index) => (
-    <div key={index} className="mt-2 border-l-2 border-neutral-200 pl-3"><p className="font-medium">{section.heading}</p><p>{section.body}</p>
-      {section.visual?.status === "asset-needed" && <p className="text-xs text-neutral-600">Image needed (FPO in the draft): {section.visual.brief}</p>}</div>))}</div>);
+  // A page: its layout (sections, with the component and band each uses) and the content laid into it.
+  const page = value as SitePage;
+  if (!Array.isArray(page.layout)) return <p className="text-sm text-neutral-600">A page in the earlier format (before Nov 29).</p>;
+  const byId = new Map(page.content.map(item => [item.id, item]));
+  const shown = (item: ContentItem) => item.type === "heading" || item.type === "text" ? item.text : item.type === "item" ? `${item.title}: ${item.text}`
+    : item.type === "question" ? `${item.question} ${item.answer}` : item.type === "picture" ? `Picture: ${item.shows}` : item.type === "action" ? `Button: ${item.label} → ${item.page}`
+    : `Content needed: ${item.need}. ${item.text}`;
+  return (<div><p className="font-medium">{page.title}</p>{page.layout.map(section => (
+    <div key={section.id} className="mt-2 border-l-2 border-neutral-200 pl-3">
+      <p className="text-xs uppercase text-neutral-500">{section.component}{section.variant ? `, ${section.variant}` : ""} · {section.band}</p>
+      {Object.values(section.slots).flat().map(id => byId.get(id)).filter(Boolean).map(item => <p key={item!.id} className={item!.type === "heading" ? "font-medium" : ""}>{shown(item!)}</p>)}
+    </div>))}</div>);
 }
 
 /** Approve, correct in your own words, or decline a Proposed change. */

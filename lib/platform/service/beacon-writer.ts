@@ -1,6 +1,5 @@
 import type { SiteDesign } from "../design-systems/site-design";
 import type { PageContent, SitePlan, WriteInput, Writer } from "./cycle";
-import { applyWordEdits, fillLayout, type Layout } from "./page-words";
 
 /**
  * A Beacon (glossary): a clearly labeled stand-in for Core's AI, so the whole cycle can run on
@@ -19,6 +18,8 @@ const beaconDesign: SiteDesign = {
     supporting: pair("#d9d9d9", "#1f1f1f"), contrast: pair("#1f1f1f", "#ffffff"), border: "#cccccc", muted: "#595959" },
   typography: { headingFamily: "work-sans", bodyFamily: "work-sans", baseSize: 17, headingScale: 2.5, lineHeight: 1.6, headingWeight: 600 },
   shape: "square", density: "balanced", imagery: { style: "photography", direction: "Placeholder until Core's real design." },
+  components: { opening: { variant: "split" }, text: { variant: "single" }, "text-picture": { variant: "picture-right" }, points: { variant: "columns" },
+    steps: { variant: "row" }, questions: { variant: "folded" }, gallery: { variant: "grid" }, call: { variant: "band" } },
   rationale: `${label}: plain grays, not a design.`, sourceIds: [], adjustments: [] };
 
 export const beaconWriter: Writer = {
@@ -47,49 +48,33 @@ export const beaconWriter: Writer = {
         return plan;
       }
       case "page": {
-        // A words or layout change: the stand-in keeps the arrangement and the words, and says so in the one word it may change.
-        if (input.grain === "page-layout") return fillLayout(input.previous as PageContent, sameArrangement(input.arrangement!));
-        if (input.grain === "page-words") return applyWordEdits(input.previous as PageContent,
-          { change: [{ id: input.words![0]!.id, text: `${input.words![0]!.text} (${label}${answering ? ":" + answering : ""})` }] });
+        const previous = input.previous as PageContent | undefined;
+        // A layout-only change: the stand-in flips the first section's variant; a content-only change: it marks the first heading.
+        if (input.grain === "page-layout") return { ...previous!, layout: previous!.layout.map((section, index) => index === 0
+          ? { ...section, variant: section.variant === "centered" ? "split" : "centered" } : section) };
+        if (input.grain === "page-words") return { ...previous!, content: previous!.content.map((item, index) => index === 0 && item.type === "heading"
+          ? { ...item, text: `${item.text} (${label}${answering ? ":" + answering : ""})` } : item) };
         const page = input.page!;
+        const home = page.path === "/", next = home ? "/start" : "/";
         // A few confirmed facts, and any Proposed ones meant for the website (Core may use them in drafts), each cited.
         const shown = [...facts.filter(item => item.status !== "proposed").slice(0, 2), ...facts.filter(item => item.status === "proposed")];
-        const content: PageContent = { path: page.path, heading: `${page.label}`, composition: "managed-v1",
-          sections: [
-            { heading: page.label, body: `${label}. ${page.purpose}${answering}`, role: "hero", sourceIds: [],
-              visual: { purpose: "Show the service at work", brief: "Placeholder until real imagery is chosen", altIntent: "The service", status: "asset-needed" } },
-            { heading: "What the business knows", body: shown.map(item => item.value).join(" ") || "To be written from Knowledge.", role: "intro",
-              sourceIds: shown.filter(item => item.key).map(item => "knowledge:" + item.key),
-              visual: { purpose: "", brief: "", altIntent: "", status: "text-only" } }],
-          actions: [], internalLinks: [] };
+        const content: PageContent = { path: page.path, title: page.label, menuLabel: page.label, searchTitle: page.label, searchDescription: page.purpose,
+          sourceIds: shown.filter(item => item.key).map(item => "knowledge:" + item.key),
+          content: [
+            { id: "c1", type: "heading", text: page.label },
+            { id: "c2", type: "text", text: `${label}. ${page.purpose}${answering}` },
+            { id: "c3", type: "picture", shows: "The service at work (placeholder until real imagery is chosen)", alt: "The service" },
+            { id: "c4", type: "action", label: home ? "Get started" : "Home", page: next },
+            { id: "c5", type: "heading", text: "What the business knows" },
+            ...shown.slice(0, 3).map((item, index) => ({ id: `c${6 + index}`, type: "item" as const, title: item.kind ?? "Fact", text: item.value ?? "" })),
+          ],
+          layout: [
+            { id: "s1", component: "opening", variant: null, band: "contrast", slots: { heading: ["c1"], text: ["c2"], picture: ["c3"], actions: ["c4"] } },
+            ...(shown.length ? [{ id: "s2", component: "points" as const, variant: null, band: "light" as const,
+              slots: { heading: ["c5"], items: shown.slice(0, 3).map((_, index) => `c${6 + index}`) } }] : []),
+          ] };
         return content;
       }
     }
   },
 };
-
-type Node = { kind: string; text: string | null; level: number | null; items: string[]; children: Node[]; [key: string]: unknown };
-const plain = { arrangement: "flow", columns: [], gap: "medium", inset: "none", surface: "none", align: "start", measure: "reading",
-  typeScale: "body", span: 12, mobileOrder: 0, border: false, rounded: false };
-const node = (kind: string, text: string | null, extra: Partial<Node> = {}): Node =>
-  ({ kind, text, level: null, items: [], ordered: false, reference: null, layout: plain, children: [], ...extra });
-const opening = (n: Node): string => n.kind === "heading" && (n.level === 1 || n.level === 2) ? n.text! : n.children.map(opening).find(Boolean) ?? "";
-
-/** The stand-in's layout: the same arrangement, each section as a designed component (no design of its own). */
-function sameArrangement(arrangement: PageContent): Layout {
-  return { sections: arrangement.sections.map(raw => {
-    const s = raw as { heading: string; body: string; role: string; visual: unknown; moreVisuals?: unknown;
-      block?: { version?: number; mode?: string; root: Node; groups?: { heading: string; body: string; items: string[] }[] } };
-    if (s.block?.version === 2 && s.block.mode === "section") return { heading: opening(s.block.root), role: s.role, visual: s.visual, moreVisuals: s.moreVisuals ?? [], block: s.block };
-    const pieces = (text: string) => String(text).split(/\n\s*\n/u).map(part => part.trim()).filter(part => /^w\d+$/u.test(part));
-    const children = [node("heading", s.heading, { level: s.role === "hero" ? 1 : 2 }), ...pieces(s.body).map(id => node("paragraph", id))];
-    for (const group of s.block?.groups ?? []) {
-      if (/^w\d+$/u.test(group.heading)) children.push(node("heading", group.heading, { level: 3 }));
-      children.push(...pieces(group.body).map(id => node("paragraph", id)));
-      if (group.items.length) children.push(node("list", null, { items: group.items }));
-    }
-    if (s.block?.version === 2) children.push(s.block.root);
-    return { heading: s.heading, role: s.role, visual: s.visual, moreVisuals: s.moreVisuals ?? [],
-      block: { version: 2, name: "beacon-section", purpose: label, mode: "section", root: node("group", null, { children }) } };
-  }) };
-}

@@ -4,8 +4,8 @@ import { clientPeople } from "@/lib/platform/accounts/people";
 import { readMyBusiness } from "@/lib/platform/intake/my-business";
 import { currentSite, tasks } from "@/lib/platform/service/cycle";
 import { accounts, acting, serviceRuntime } from "@/lib/platform/service/runtime";
-import { addPerson, askPublish, beginLaunch, checkRendered, directRequest, enterEmail, proposeFact, readBack, removePerson, adoptPageLayout, restorePage, review, runCore, sendDrafts, sendFindings, specialistRequest } from "../actions";
-import { compareWords } from "@/lib/platform/service/page-words";
+import { addPerson, askPublish, beginLaunch, checkRendered, directRequest, enterEmail, proposeFact, readBack, removePerson, restorePage, review, runCore, sendDrafts, sendFindings, specialistRequest } from "../actions";
+import { compareContent as compareWords } from "@/lib/platform/site/components";
 import type { PageContent, ProductVersion } from "@/lib/platform/service/cycle";
 import { checkSummary, findingsForCore, lastRenderedCheck, type RenderedCheck } from "@/lib/platform/service/rendered-check";
 import { Content, Frame, ReviewForm, Section, button, field, primary, productName } from "../ui";
@@ -88,7 +88,7 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
             return (
               <article key={item.changeId} className="mb-4 rounded border border-neutral-200 p-4">
                 <h3 className="font-semibold">{productName(item)}, version {item.version}
-                  {change.target.grain === "page-words" ? " (its words only)" : change.target.grain === "page-layout" ? " (its layout only)" : ""}</h3>
+                  {change.target.grain === "page-words" ? " (its content only)" : change.target.grain === "page-layout" ? " (its layout only)" : ""}</h3>
                 {item.kind === "page" && <WordsCheck proposed={item} current={currentProducts.find(entry => entry.id === item.id)} />}
                 <Content item={item} />
                 {item.kind === "direction" && wordpress && delivered && <CheckPanel check={checks[item.changeId] ?? null}
@@ -127,7 +127,7 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
           <details key={item.changeId} className="mb-2 rounded border border-neutral-200 p-3"><summary className="cursor-pointer font-medium">{productName(item)}, version {item.version}</summary>
             <div className="mt-2"><Content item={item} /></div>
             {item.kind === "page" && <EarlierVersions item={item} versions={record.products.filter(entry => entry.id === item.id && entry.version !== item.version)}
-              restore={version => restorePage.bind(null, id, item.path!, version)} adopt={version => adoptPageLayout.bind(null, id, item.path!, version)} />}</details>)) : <p className="text-neutral-600">None yet.</p>}
+              restore={version => restorePage.bind(null, id, item.path!, version)} />}</details>)) : <p className="text-neutral-600">None yet.</p>}
       </Section>
 
       <Section title="Ask Core for a change" note="Your own request as Specialist, on a Work product. Core reworks it and the new version comes back for review.">
@@ -137,10 +137,8 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
             <select name="about" className="rounded border border-neutral-300 px-2 py-1.5 text-sm">{targets.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select>
             <select name="grain" aria-label="For a page, what changes" className="rounded border border-neutral-300 px-2 py-1.5 text-sm">
               <option value="page">For a page: the whole page</option>
-              <option value="page-words">For a page: only its words (the layout stays)</option>
-              <option value="page-layout">For a page: only its layout (every word stays)</option></select>
-            <input name="example" type="number" min={1} className="w-48 rounded border border-neutral-300 px-2 py-1.5 text-sm" aria-label="Layout: follow version"
-              placeholder="Layout: follow version (optional)" />
+              <option value="page-words">For a page: only its content (the layout stays)</option>
+              <option value="page-layout">For a page: only its layout (the content stays)</option></select>
             <button className={button}>Ask Core</button>
           </div>
         </form>
@@ -209,18 +207,17 @@ function CheckPanel({ check, run, send, runLabel, sendLabel }: { check: Rendered
 function WordsCheck({ proposed, current }: { proposed: ProductVersion; current?: ProductVersion }) {
   if (!current) return null;
   const diff = compareWords(current.content as PageContent, proposed.content as PageContent);
-  if (diff.unchanged) return <p className="my-2 text-sm font-medium text-green-800">Words unchanged from the approved version {current.version}.</p>;
+  if (diff.unchanged) return <p className="my-2 text-sm font-medium text-green-800">Content unchanged from the approved version {current.version}.</p>;
   return (
     <details className="my-2 rounded border border-amber-300 bg-amber-50 p-2 text-sm">
-      <summary className="cursor-pointer font-medium text-amber-900">Words changed from the approved version {current.version}: {lines(diff.gone.length)} gone or reworded, {diff.added.length} new</summary>
+      <summary className="cursor-pointer font-medium text-amber-900">Content changed from the approved version {current.version}: {lines(diff.gone.length)} gone or reworded, {diff.added.length} new</summary>
       <ul className="mt-2 space-y-1">{diff.gone.map((line, n) => <li key={"g" + n} className="text-red-800">− {line}</li>)}
         {diff.added.map((line, n) => <li key={"a" + n} className="text-green-800">+ {line}</li>)}</ul>
     </details>);
 }
 
 /** Every earlier version of a page is kept; a Specialist can make one current again (going back, no AI). */
-function EarlierVersions({ item, versions, restore, adopt }: { item: ProductVersion; versions: ProductVersion[]; restore: (version: number) => () => Promise<void>;
-  adopt: (version: number) => () => Promise<void> }) {
+function EarlierVersions({ item, versions, restore }: { item: ProductVersion; versions: ProductVersion[]; restore: (version: number) => () => Promise<void> }) {
   if (!versions.length) return null;
   return (
     <div className="mt-3 border-t border-neutral-200 pt-2 text-sm">
@@ -228,9 +225,8 @@ function EarlierVersions({ item, versions, restore, adopt }: { item: ProductVers
       <ul className="mt-1 space-y-1">{[...versions].sort((a, b) => b.version - a.version).map(entry => {
         const diff = compareWords(item.content as PageContent, entry.content as PageContent);
         return (<li key={entry.changeId} className="flex flex-wrap items-center gap-2">
-          <span>Version {entry.version}, {entry.at.slice(0, 16).replace("T", " ")} UTC, {entry.status}; {diff.unchanged ? "same words" : `${lines(diff.gone.length + diff.added.length)} differ`}</span>
-          <form action={restore(entry.version)}><button className="rounded border border-neutral-300 px-2 py-0.5 text-xs">Make it current again</button></form>
-          {!diff.unchanged && <form action={adopt(entry.version)}><button className="rounded border border-neutral-300 px-2 py-0.5 text-xs">Use its layout with the current words</button></form>}</li>);
+          <span>Version {entry.version}, {entry.at.slice(0, 16).replace("T", " ")} UTC, {entry.status}; {diff.unchanged ? "same content" : `${lines(diff.gone.length + diff.added.length)} differ`}</span>
+          <form action={restore(entry.version)}><button className="rounded border border-neutral-300 px-2 py-0.5 text-xs">Make it current again</button></form></li>);
       })}</ul>
     </div>);
 }
