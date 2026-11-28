@@ -65,7 +65,7 @@ the development cost and the production equivalent.
      as a whole. No new object.
    - Engineering only, no AI spending; built and tested on the free stand-in first. Then C0's
      ten layouts in one paid pass (about $3.50; cap to about $28, to be asked then).
-   - In progress: studying how pages are built, stored and shown; a plan next.
+   - Plan: `docs/plan-words-and-layout.md` (Nov 28). Next: build it on the free stand-in.
 
 ## Next (agreed, in order)
 

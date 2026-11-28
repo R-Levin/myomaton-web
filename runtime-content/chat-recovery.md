@@ -1,3 +1,6 @@
+## Nov 28 ~03:40 UTC: task 1a agreed (separate words from layout); plan written
+Conversation recorded (docs/conversation-2026-11-28-words-and-layout.md) to revisit. Plan: docs/plan-words-and-layout.md. Next: build on the free stand-in; then ask about cap ~$28 for C0's ten layouts.
+
 ## Nov 28 ~03:00 UTC: three proposals checked, not approved; words drift on all pages
 Visible-text compare (scratchpad vis.js) vs approved Nov 27 text: Scope & Fit v6, Review v6, Start v5 rewrote many lines; approved 7 pages lost a few lines each. Nothing sent to miopages.org. Proposed a word lock in the engine; waiting for the Principal.
 
