@@ -93,9 +93,30 @@ export function simulatedAnswer(name: string, schema: Schema, instructions: stri
           block: { version: 2, name: "simulated-proof", purpose: "Simulated proof", mode: "section", root: node("group", { children: [
             node("heading", { level: 2, text: "What clients say" }), node("paragraph", { text: "Revised proof section." })] }) } }) };
   }
+  if (stage === "page" && schema.properties?.layout) {
+    // A page as its content and its layout (docs/rendering-design.md).
+    const path = enumAt(schema, "path")[0]!;
+    assert.match(instructions, /put a placeholder item where it belongs/);
+    const other = path === "/" ? "/service" : "/";
+    return { path, title: "Simulated heading for " + path, menuLabel: path === "/" ? "Home" : "Service", searchTitle: "Simulated", searchDescription: "Simulated description.",
+      sourceIds: enumAt(schema, "sourceIds").slice(0, 1),
+      content: [
+        { id: "h1", type: "heading", text: "Simulated heading for " + path },
+        { id: "t1", type: "text", text: "Simulated opening." },
+        { id: "p1", type: "picture", shows: "Simulated picture brief.", alt: "Simulated alt" },
+        { id: "a1", type: "action", label: "See how it works", page: other },
+        { id: "h2", type: "heading", text: "What clients say" },
+        { id: "x1", type: "placeholder", need: "A client testimonial", text: "A recent client describing how onboarding went." },
+      ],
+      layout: [
+        { id: "s1", component: "opening", variant: null, band: "contrast", slots: [{ slot: "heading", ids: ["h1"] }, { slot: "text", ids: ["t1"] },
+          { slot: "picture", ids: ["p1"] }, { slot: "actions", ids: ["a1"] }] },
+        { id: "s2", component: "points", variant: "cards", band: "light", slots: [{ slot: "heading", ids: ["h2"] }, { slot: "items", ids: ["x1"] }] },
+      ] };
+  }
   if (stage === "page") {
     const path = enumAt(schema, "path")[0];
-    assert.match(instructions, /place a placeholder node exactly where it belongs/);
+    assert.match(instructions, /put a placeholder item where it belongs/);
     assert.ok(!/Never turn internal proof-policy/.test(instructions), "Old warning blocks are gone");
     const hero = { version: 2, name: "simulated-opening", purpose: "Simulated hero", mode: "section", root: node("group", {
       layout: { ...layout, arrangement: "columns", columns: [3, 2], gap: "large" }, children: [

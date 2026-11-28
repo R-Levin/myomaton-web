@@ -119,3 +119,9 @@ function wp_save_post_revision(int $id): int
     $wpdb->history[$revisionId] = $revision;
     return $revisionId;
 }
+
+// WordPress functions the draft menu uses (MioPages_Native_Draft_Writer::navigation).
+if (!function_exists('wp_json_encode')) { function wp_json_encode(mixed $value): string|false { return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); } }
+if (!function_exists('update_option')) { function update_option(string $key, mixed $value, mixed $autoload = null): bool { $GLOBALS['harness_options'][$key] = $value; return true; } }
+if (!function_exists('get_post_type')) { function get_post_type(int $id): string|false { return get_post($id)->post_type ?? false; } }
+if (!function_exists('wp_update_post')) { function wp_update_post(array $post, ...$args): int { global $wpdb; $wpdb->pages[$post['ID']] = [...($wpdb->pages[$post['ID']] ?? []), ...$post]; return $post['ID']; } }

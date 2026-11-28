@@ -110,8 +110,8 @@ for (const includeOriginals of [false,true]) test("actual metered request carrie
    assert.match(request.instructions,/brand assets \(logo, name, colors\) are inputs to use/);
    assert.match(request.instructions,/another business's wording, branding or distinctive design/);
    assert.match(request.instructions,/earlier site and materials are theirs to reuse: keep what is strong/);
-   assert.match(request.instructions,/When a suitable acquired image is supplied in availableMedia, you may place it/);
-   assert.match(request.instructions,/place a placeholder node exactly where it belongs/);
+   assert.match(request.instructions,/make the site visually rich, with pictures where they help/);
+   assert.match(request.instructions,/put a placeholder item where it belongs/);
    assert.doesNotMatch(request.instructions,/requires both selected photographs/);
    if(Array.isArray(request.input))assert.match(JSON.parse(request.input[0].content[0].text!).interpretation,/permitted customer-owned brand assets/);
    const encoded=JSON.stringify(request.text.format.schema);

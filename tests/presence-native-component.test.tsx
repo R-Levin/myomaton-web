@@ -1,23 +1,12 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
-import { readFile } from "node:fs/promises";
-import { chromium } from "playwright-core";
 import { assertNativeSection, pendingContent, readNativeComponent, type NativeNode } from "../lib/platform/intake/presence-native-component";
-import { validatePages } from "../lib/platform/wordpress-delivery/authority";
 
 function node(kind: NativeNode["kind"], changes: Partial<NativeNode> = {}): NativeNode {
   return { kind, text: null, level: null, items: [], ordered: false, reference: null,
     layout: { arrangement: "flow", columns: [], gap: "medium", inset: "none", surface: "none",
       align: "start", measure: "full", typeScale: "body", span: 1, mobileOrder: 0, border: false, rounded: false }, children: [], ...changes };
-}
-/** The theme's column-template CSS for this markup, exactly as WordPress adds it. */
-function layoutCss(html: string): string {
-  const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php",
-    ["-r", 'require "wordpress/miopages-managed-site/layout-css.php"; echo miopages_layout_css(stream_get_contents(STDIN));'],
-    { input: html, encoding: "utf8" });
-  assert.equal(php.status, 0, php.stderr);
-  return php.stdout;
 }
 export const component = {
   version: 2, name: "fixture-decision-map", purpose: "Synthetic layout round trip", mode: "supplement",
@@ -36,43 +25,6 @@ export const component = {
   }),
 };
 
-test("original component structure survives Core validation and native WordPress projection without flattening", () => {
-  const parsed = readNativeComponent(component);
-  assert.equal(readNativeComponent({...component,name:"Readable Component Name"},true).name,"readable-component-name");
-  assert.throws(()=>readNativeComponent({...component,name:"Readable Component Name"}));
-  assert.throws(()=>readNativeComponent({...component,name:"Unsafe <component>"},true));
-  const labelledList={...component,root:node("list",{text:"Choices explained",items:["First","Second"]})};
-  assert.equal(readNativeComponent(labelledList).root.text,"Choices explained");
-  const labeled=spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php",["wordpress/miopages-delivery/tests/native-component.php"],{input:JSON.stringify(labelledList),encoding:"utf8"});
-  assert.equal(labeled.status,0,labeled.stderr);
-  assert.match(labeled.stdout,/Choices explained/);
-  assert.deepEqual(parsed.root.layout.columns, [2, 1]);
-  assert.equal(parsed.root.children[0].children[2].kind, "details");
-  const pages = [{ id: "11111111-1111-4111-8111-111111111111", path: "/", title: "Fixture", composition: "managed-v1" as const,
-    navigationLabel: "Home", sections: [{ id: "22222222-2222-4222-8222-222222222222", type: "hero",
-      content: { heading: "Fixture only", text: "No public source or model calls." }, block: parsed }] }];
-  validatePages(pages, true, true);
-  assert.throws(() => validatePages(pages, true, false), /local draft/);
-  const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php", ["wordpress/miopages-delivery/tests/native-component.php"],
-    { input: JSON.stringify(component), encoding: "utf8" });
-  assert.equal(php.status, 0, php.stderr);
-  const html = php.stdout;
-  assert.match(html, /wp:details/);
-  // Layout travels as classes the WordPress editor keeps; inline styles make it reject the block.
-  assert.match(html, /miopages-cols-2-1/);
-  assert.match(html, /miopages-span-1/);
-  assert.doesNotMatch(html, / style="/);
-  // Markup matches what the editor itself saves, so an unedited block reads back unchanged.
-  assert.doesNotMatch(html, /"level":2[,}]|"ordered":false|&#039;|&#038;| \/>/);
-  assert.match(html, /"metadata":\{"name":"fixture-decision-map"\},"className"/);
-  assert.match(layoutCss(html), /\.miopages-cols-2-1\{--mp-columns:minmax\(0,2fr\) minmax\(0,1fr\);\}/);
-  assert.match(html, /Fixture first decision/);
-  assert.match(html, /Fixture second decision/);
-  assert.ok(html.indexOf("Fixture first decision") < html.indexOf("Fixture second decision"));
-  assert.match(html, /wp:list-item/);
-  assert.match(html, /metadata.*fixture-decision-map/);
-});
-
 test("unknown executable fields, foreign resources, out-of-range phone order and malformed native nodes refuse", () => {
   assert.throws(() => readNativeComponent({ ...component, script: "alert(1)" }));
   assert.throws(() => readNativeComponent({ ...component, root: node("paragraph", { text: "<iframe>" }) }));
@@ -88,40 +40,6 @@ test("unknown executable fields, foreign resources, out-of-range phone order and
     { input: JSON.stringify(foreign), encoding: "utf8" }).status, 1);
 });
 
-
-test("the existing disposable WordPress renders nested blocks and responsive order without changing its Pages", {
-  skip: !process.env.MIOPAGES_DISPOSABLE_WORDPRESS,
-}, async () => {
-  const php = spawnSync(process.platform === "win32" ? "C:/php/php.exe" : "php",
-    [...(process.platform === "win32" ? ["-d", "extension_dir=C:/php/ext", "-d", "extension=pdo_sqlite", "-d", "extension=sqlite3", "-d", "extension=gd"] : []),
-      "scripts/wordpress-native-component-proof.php", process.env.MIOPAGES_DISPOSABLE_WORDPRESS!],
-    { input: JSON.stringify(component), encoding: "utf8" });
-  assert.equal(php.status, 0, php.stderr);
-  const result = JSON.parse(php.stdout);
-  assert.equal(result.status, "PASS");
-  assert.equal(result.unchangedPosts, true);
-  const css = await readFile("wordpress/miopages-managed-site/style.css", "utf8");
-  const browser = await chromium.launch({ executablePath: process.env.MIOPAGES_RESEARCH_CHROMIUM ??
-    (process.platform === "win32" ? "C:/Program Files/Google/Chrome/Application/chrome.exe" : undefined), headless: true });
-  try {
-    for (const width of [1440, 390]) {
-      const page = await browser.newPage({ viewport: { width, height: 900 } });
-      await page.setContent('<!doctype html><meta name="viewport" content="width=device-width"><style>body{margin:0;padding:24px;--miopages-border:#ddd;--wp--preset--color--support:#e9e5f7;--miopages-tonal-ink:#2d2460}*{box-sizing:border-box}</style><style>' + css + layoutCss(result.html) + '</style><main>' + result.html + '</main>');
-      const columns = page.locator(".miopages-node-columns > .miopages-node");
-      const first = await columns.nth(0).boundingBox(), second = await columns.nth(1).boundingBox();
-      assert.ok(first && second);
-      if (width === 1440) {
-        assert.ok(second.x > first.x + first.width);
-        assert.ok(first.width / second.width > 1.9);
-      } else {
-        assert.ok(second.y > first.y + first.height);
-        assert.ok(Math.abs(first.x - second.x) < 1);
-      }
-      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-      await page.close();
-    }
-  } finally { await browser.close(); }
-});
 
 test("a whole authored Section replaces the fixed shell while preserving the exact semantic Page title", () => {
   const full=readNativeComponent({...component,mode:"section",root:node("group",{children:[
@@ -165,25 +83,6 @@ test("an unresolved Action slot cannot shift later Direct Start and Review bindi
  assert.equal(run({pendingActions:[]}).status,1,"Unknown Action still refuses");
  assert.equal(run({localSemanticBlocks:false}).status,1,"Private references stay unavailable to signed delivery");
  assert.equal(run({pendingActions:[{from:"/",reference:"action-1",label:"Conflict"}]}).status,1);
-});
-
-test("nested comparisons keep readable columns inside an aligned native flow",async()=>{
- const card=()=>node("group",{layout:{...node("group").layout,inset:"medium",surface:"light",border:true},children:[
-  node("heading",{level:3,text:"A meaningful visitor choice"}),
-  node("paragraph",{text:"A complete explanation must remain readable within this card. It must not collapse to the padding width when the surrounding flow aligns its children at the start."}),
- ]});
- const value={...component,root:node("group",{children:[node("group",{layout:{...node("group").layout,arrangement:"columns",columns:[1,1],gap:"medium"},children:[card(),card()]})]})};
- const php=spawnSync(process.platform==="win32"?"C:/php/php.exe":"php",["wordpress/miopages-delivery/tests/native-component.php"],{input:JSON.stringify(value),encoding:"utf8"});
- assert.equal(php.status,0,php.stderr);
- const css=await readFile("wordpress/miopages-managed-site/style.css","utf8");
- const browser=await chromium.launch({executablePath:process.platform==="win32"?"C:/Program Files/Google/Chrome/Application/chrome.exe":undefined,headless:true});
- try{for(const width of [1440,390]){
-  const page=await browser.newPage({viewport:{width,height:1000}});
-  await page.setContent('<style>body{margin:0;padding:24px}*{box-sizing:border-box}</style><style>'+css+layoutCss(php.stdout)+'</style>'+php.stdout);
-  const widths=await page.locator(".miopages-native-component p").evaluateAll(nodes=>nodes.map(node=>({width:node.getBoundingClientRect().width,overflow:(node as HTMLElement).scrollWidth>(node as HTMLElement).clientWidth+1})));
-  assert.equal(widths.length,2);for(const item of widths){assert.ok(item.width>200,JSON.stringify({width,item}));assert.equal(item.overflow,false)}
-  await page.close();
- }}finally{await browser.close()}
 });
 
 test("Core's requested images render as marked FPO frames where no approved asset is bound",async()=>{

@@ -19,8 +19,11 @@ function beacon() {
       case "direction": return { positioning: "Beacon Direction", basedOn: (input.report as { title: string }).title };
       case "site-plan": return { pages: [{ path: "/", label: "Home", purpose: "Introduce the service", inMenu: true },
         { path: "/start", label: "Start", purpose: "Begin onboarding", inMenu: true }] };
-      case "page": return { path: input.page!.path, heading: input.page!.label + note,
-        sections: [{ heading: "Opening", body: "Beacon copy for " + input.page!.purpose }, { heading: "Next", body: "Beacon next step" }] };
+      case "page": return { path: input.page!.path, title: input.page!.label + note, menuLabel: input.page!.label, searchTitle: input.page!.label, searchDescription: "Beacon", sourceIds: [],
+        content: [{ id: "c1", type: "heading", text: "Opening" }, { id: "c2", type: "text", text: "Beacon copy for " + input.page!.purpose + note },
+          { id: "c3", type: "heading", text: "Next" }, { id: "c4", type: "text", text: "Beacon next step" }],
+        layout: [{ id: "s1", component: "opening", variant: null, band: "light", slots: { heading: ["c1"], text: ["c2"] } },
+          { id: "s2", component: "text", variant: null, band: "tonal", slots: { heading: ["c3"], text: ["c4"] } }] };
     }
   } };
   return { writer, seen };
@@ -64,8 +67,9 @@ test("one engine runs Launch from the start of the Stage to a complete site, on 
   }
   const site = currentSite(record)!;
   assert.ok(site.complete);
-  assert.deepEqual(site.pages.map(page => [page.path, page.id, page.version]), [["/", pageIdentity(account.managedSiteId, "/"), 1],
-    ["/start", pageIdentity(account.managedSiteId, "/start"), 1]], "Pages are Work products with the identities delivery uses");
+  assert.deepEqual(site.pages.map(page => page.path), ["/", "/start"]);
+  assert.deepEqual(record.products.filter(item => item.kind === "page" && item.status === "current").map(item => [item.path, item.id, item.version]),
+    [["/", pageIdentity(account.managedSiteId, "/"), 1], ["/start", pageIdentity(account.managedSiteId, "/start"), 1]], "Pages are Work products with the identities delivery uses");
   assert.deepEqual(site.menu, ["/", "/start"]);
   assert.equal(seen.find(input => input.kind === "direction")!.report && (seen.find(input => input.kind === "direction")!.report as { title: string }).title,
     "Beacon Report (answering: We serve owner-led businesses.)", "The Direction is written from the confirmed Report");
@@ -78,11 +82,10 @@ test("one engine runs Launch from the start of the Stage to a complete site, on 
   assert.equal(proposed.status, "proposed");
   const before = currentSite(record)!.pages.find(page => page.path === "/start")!;
   const after = proposed.content as typeof before;
-  assert.deepEqual(after.sections.map(section => section.id), before.sections.map(section => section.id), "Sections keep their identities");
-  assert.deepEqual(after.sections.map(section => section.version), [1, 1], "Unchanged Sections keep their Versions");
-  assert.equal(after.version, 2, "The page is its next Version");
+  assert.deepEqual(after.layout.map(section => section.id), before.layout.map(section => section.id), "Its sections keep their identities");
+  assert.equal(proposed.version, 2, "The page is its next Version");
   record = respond(record, proposed.changeId, specialist, "approve", at(22));
-  assert.match(currentSite(record)!.pages.find(page => page.path === "/start")!.heading, /Make the first step shorter/);
+  assert.ok(currentSite(record)!.pages.find(page => page.path === "/start")!.content.some(item => item.type === "text" && /Make the first step shorter/.test(item.text)));
   const change = record.ledger.changes.find(item => item.id === proposed.changeId)!;
   assert.deepEqual([change.status, change.target.workProduct], ["applied", { id: pageIdentity(account.managedSiteId, "/start"), version: 1 }],
     "The Change names the Version it was made against");
