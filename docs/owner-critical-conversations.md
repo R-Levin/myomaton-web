@@ -1661,3 +1661,12 @@ Principal approves.
 - **Nov 28 — think first; agree before working.** "When we resume I expect you to spend more than three
   seconds thinking and actually apply some of the intelligence that you are supposed to provide before
   doing work and making sure you're doing what we agree is going to be done."
+
+- **Nov 29 — plan before work; plan mode on.** Working through the review: "more, never less" and "use all of
+  it" were AI inventions, banished permanently ("visually rich" and placeholders for needed material are
+  fine). The node-by-node layout trees are removed completely: a whole-site design first, then logical
+  reusable components (like Gutenberg blocks or block groups) to build pages; content separate as source,
+  laid into the layout; no invented methods, no patches. Design is one logical process that also serves
+  Ongoing. Then: the project instructions must make Claude follow agreed work. Approved: CLAUDE.md now
+  requires plan mode and the Principal's approval before building or changing anything, and "conversation
+  only" means no actions; sessions start in plan mode (`.claude/settings.json`).

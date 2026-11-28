@@ -47,6 +47,8 @@ The Principal should never have to chase these (Nov 27, after a day of avoidable
 5. **Build and test on the free stand-in first; spend in one clean pass.** Before any paid step,
    state its development cost and what the same step costs a real Client in production.
 6. **Keep messages short, plain and in U.S. English.**
+7. **Conversation only means no actions.** When the Principal says a conversation is
+   conversation only, take no actions until told otherwise.
 
 ## Object orientation (Principal's fundamental principle, Nov 24)
 - `docs/service-object-model.md` defines the shared objects (Account, Knowledge,
@@ -59,10 +61,11 @@ The Principal should never have to chase these (Nov 27, after a day of avoidable
 - Use the names in `docs/glossary.md` in conversation, documents, screens and code. A
   retired word is not reused for that thing.
 
-## Work without asking
-Do ordinary local engineering on your own: reading, searching, editing code, running
-tests and builds, local WordPress previews, diagnosing failures and retrying. Don't ask
-permission for routine steps, and don't invent approval gates.
+## Plan before work (Principal, Nov 29)
+Reading, searching and diagnosing need no approval. Building or changing anything (code,
+content, settings, WordPress, paid calls) starts in plan mode: say what will be done, what's
+kept, what's removed and what it costs, and wait for the Principal's approval. No work begins
+otherwise. Sessions start in plan mode (`.claude/settings.json`).
 
 ## Stop and ask the Principal (one clear question, precise scope)
 - Any paid AI/provider call, or sending protected business data to a provider
