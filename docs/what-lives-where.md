@@ -13,6 +13,17 @@ and every page's content and layout, in Core's own format. WordPress shows that 
 people and lets them edit and comment. If WordPress were replaced, Core would not change;
 only the translator described below would. *(Baseline Part 1, item 3)*
 
+## Update, Nov 27: miopages.org is connected to the new Core
+
+The Principal reviews every draft on **miopages.org** (password-protected), nowhere else. On Nov 27
+it was re-connected from the old protected Core (Codex-era engine, Nov 23 drafts, pages 53–61) to
+the **new Core** this branch builds, which for now runs in the workspace on the development PC
+(`launch.json`: `--review-site runtime-content/private/review-sites/new/miopages-org.json`; the
+signing key stays on the PC until milestone 4 moves Core to the server). Plugin 0.1.5, theme 0.1.6;
+private picture folder `~/miopages-private/draft-media`. Old plugin, theme and settings are archived
+in `~/miopages-private/archive-nov27-*` on miopages.org. Current C0 draft: pages 82–91 (revision 1
+of the new connection). The old Core can no longer deliver to miopages.org.
+
 ## Where each part runs
 
 | Part | Today | Planned |

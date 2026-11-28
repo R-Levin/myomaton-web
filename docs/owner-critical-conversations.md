@@ -1569,3 +1569,11 @@ Principal approves.
   drafts that come out right with less difficulty (as said earlier today: Core designs, the system
   guarantees the mechanics); no arbitrary judgements; the Principal is present, so ask when
   something is unclear. Credits added.
+
+- **Nov 27 — one place to look: miopages.org, re-connected to the new Core.** The Principal had no
+  clean way to see the work; miopages.org was already set up for exactly that and Claude had lost
+  track of it. Approved and done: miopages.org re-connected to the new Core (new delivery keys;
+  old settings, plugin 0.1.4 and theme 0.1.2 archived), plugin 0.1.5 and theme 0.1.6 installed,
+  a private picture folder added, and C0's current draft sent (pages 82–91, with its 34 pictures).
+  Standing directions added to CLAUDE.md so the record is re-read before acting, including after
+  a context summary.
