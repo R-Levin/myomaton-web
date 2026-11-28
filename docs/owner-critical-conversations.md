@@ -1650,3 +1650,10 @@ Principal approves.
   I creating rules? ... Get started, no more."
 
 - **Nov 28 — one paid call for the simplified site approved.** "Yes" to Core writing C0's site in one call inside the $28 cap. Cost $0.12; run total $24.75.
+
+- **Nov 28 — the simplified site regressed; not what was asked.** "I told you not to go back to October,
+  very clearly. I said start over, but I didn't say throw away all the added things that were making the
+  sites more like a professional site ... I just wanted you to get rid of the stuff you put in that was
+  broken and mischaracterized what I directed. I wanted to get back to a clear understanding of what we are
+  looking for ... You've regressed to what already existed." The Principal will look in the morning. The
+  five simplified drafts (pages 154-158) stay on miopages.org for that look; no further work until then.

@@ -32,7 +32,9 @@ B. **Simplified version:** AI research → a nice site → WordPress (miopages.o
      `wordpress/miopages-simple` (October colors, WordPress's own menu; now active on miopages.org).
      Tried end to end with a free stand-in (then trashed). Paid call approved ("Yes", Nov 28): $0.12.
      Core wrote 5 pages (Home, Service, Why MioPages, Free Review, Getting Started; ~240-350 words
-     each), now drafts on miopages.org (pages 154-158). Waiting for the Principal's look.
+     each), now drafts on miopages.org (pages 154-158). The Principal: this regressed to October; what was
+     wanted was removing the broken things Claude added, keeping what made sites professional, and a clear
+     understanding of what we are looking for. STOPPED until the Principal looks in the morning.
 
 Everything below is history and on hold.
 
