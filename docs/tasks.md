@@ -16,6 +16,13 @@ the development cost and the production equivalent.
 
 ## Now
 
+0. **Triage, then decide the path.** "Start with that. But first record everything into logical
+   containers so we might go back to one of the old states." (Nov 27)
+   - Done: states A and B recorded (`docs/states.md`, tags `c0-state-a-2026-11-26` and
+     `c0-state-b-2026-11-27`, a private record snapshot, a miopages.org database export).
+   - Done: triage in `docs/triage-2026-11-27.md`. Waiting on the Principal's decision on its
+     recommended path.
+
 1. **Fix what Claude broke in C0's current draft on miopages.org.**
    - "Things are laying on top of other things, there are tons of FPO boxes." "A bloated,
      inexplicable deformed clone." (Nov 27)
