@@ -80,11 +80,16 @@ export async function runCore(webPresenceId: string) { await shown(webPresenceId
   const ctx = await context(webPresenceId, "specialist");
   const known = await accountKnowledge(ctx.pool, ctx.account.webPresenceId);
   const knowledge = [...known.items, ...known.offerings];
+  // One refused answer doesn't hold up the rest: each Task is tried, and what was refused is reported together.
+  // A refused Task's Request stays open, so the next run tries it again.
   const coreWork = async () => {
+    const refused: string[] = [];
     for (const task of tasks(await ctx.store.read(ctx.account)).filter(item => item.who === "core")) {
       const read = await ctx.store.read(ctx.account);
-      await ctx.store.save(read, await work(read, task, ctx.writer, knowledge, now()));
+      try { await ctx.store.save(read, await work(read, task, ctx.writer, knowledge, now())); }
+      catch (error) { refused.push(`${task.what}: ${error instanceof Error ? error.message : "it failed"}`); }
     }
+    if (refused.length) throw Error(refused.join("; "));
   };
   try {
     await coreWork();

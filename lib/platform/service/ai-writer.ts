@@ -165,7 +165,10 @@ const layoutInstructions = (input: WriteInput) => "This is a layout change. The 
   "places every piece exactly once, by its number, in a designed component for each section (version 2, mode section). A section is named by the number of " +
   "its heading, and its component's own opening heading uses that same number. Headings take heading pieces; paragraphs, list items, quotes, details, " +
   "captions and placeholder notes take text pieces. Buttons take no text: their labels come from the page's Actions. You cannot add, change, shorten or " +
-  "drop a word; arrange, group, order, style and illustrate them as the design needs. Pictures and their frames are yours to decide." +
+  "drop a word; arrange, group, order, style and illustrate them as the design needs. Pictures and their frames are yours to decide, but a picture is " +
+  "placed only where its section asks for it: image node section-N is that section's visual (N is the section's position, from 0), and section-N-k is the " +
+  "k-th entry (from 1) of its moreVisuals; a section whose visual is text-only has no section-N picture. Before answering, check that every piece " +
+  "number appears exactly once." +
   (input.example !== undefined ? " example is an earlier version of this page whose arrangement the requester liked: follow it where the same words appear." : "");
 const wordsInstructions = "This is a word change. The page's layout stays as it is: you receive its words as numbered pieces (words: w1, w2, …) and its " +
   "arrangement with those numbers in place of the text. Return only the pieces you change (change: their number and new text), remove (remove: their numbers) " +
