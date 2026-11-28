@@ -3,7 +3,8 @@
 The one list of what the Principal and Claude have agreed to do. It's shown to Claude
 automatically with every message (`.claude/settings.json`). Claude checks each response against it
 and updates it in the same turn whenever a task is added, changed, started or finished. Each task
-records the Principal's own words and the date. Nothing gets built that isn't on this list or agreed
+records the Principal's own words and the date. The Principal's examples illustrate a point; they
+aren't separate tasks unless agreed. Nothing gets built that isn't on this list or agreed
 in conversation first.
 
 **The roadmap is `docs/rebuild-plan.md`** (the Principal's direction, Nov 25): milestones 1–5.
@@ -23,11 +24,12 @@ the development cost and the production equivalent.
    - Done: triage in `docs/triage-2026-11-27.md`. Waiting on the Principal's decision on its
      recommended path.
 
-1. **Fix what Claude broke in C0's current draft on miopages.org.**
-   - "Things are laying on top of other things, there are tons of FPO boxes." "A bloated,
-     inexplicable deformed clone." (Nov 27)
-   - "Only buttons that don't work should have that [note]." (Nov 27)
-   - Status: not started. First, Claude sees the drafts on miopages.org exactly as the Principal does.
+1. **The presentation of C0's draft is broken throughout; replace it, keeping the content.**
+   - "A bloated, inexplicable deformed clone." "One example out of a thousand broken shards of
+     glass." (Nov 27) The Principal's examples (overlapping boxes, scores of FPO frames, button
+     notes) illustrate the whole; they aren't a checklist. Keep perspective.
+   - Status: the path is in the triage (keep the content, redo the presentation once to an agreed
+     brief); waiting on the Principal's decision.
 
 ## Next (agreed, in order)
 
