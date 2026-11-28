@@ -1,3 +1,6 @@
+## Nov 28 ~03:30 UTC: C0 layout pass running (cap $28, approved)
+Restored Nov 27 words on /, how-it-works, service, pricing, ownership-and-exit, proof (free). Nine layout-only requests queued with examples (/ 4, how 3, service 4, pricing 4, ownership 4, proof 5, scope 6, review 6, start 5); FAQ unchanged. Core running (watch: ledger attempts to 159). Then: check words (workspace 'Words unchanged'), layout counts, approve, send to miopages.org, check there.
+
 ## Nov 28 ~03:05 UTC: task 1a built and tested on the stand-in (no spending)
 page-words.ts, page grains in cycle/ai-writer/beacon, workspace grain choice + words check + 'Make it current again'. 652 tests, 649 pass, 3 skipped. Stand-in preview (workspace-preview) running; paid C0 preview stopped. Next: ask the Principal about the C0 pass (restore Nov 27 words on 7 pages, then 10 layout changes ~$3.50, cap ~$28).
 
