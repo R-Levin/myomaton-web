@@ -1,3 +1,6 @@
+## Nov 28 ~03:00 UTC: three proposals checked, not approved; words drift on all pages
+Visible-text compare (scratchpad vis.js) vs approved Nov 27 text: Scope & Fit v6, Review v6, Start v5 rewrote many lines; approved 7 pages lost a few lines each. Nothing sent to miopages.org. Proposed a word lock in the engine; waiting for the Principal.
+
 ## Nov 28 ~02:30 UTC: Core's last correction of three pages done ($20.70 of $24); PC restart
 Scope & Fit, Free Review, Direct Start proposals waiting in the workspace, not yet checked. After restart: start preview 'workspace-ai-c0-milestone-3', check words unchanged + layout to the brief, approve, Send the latest drafts to miopages.org, run check-design-rules and draft-pdf there, verify phone menu and corners, show the Principal, then discuss brand color and font.
 

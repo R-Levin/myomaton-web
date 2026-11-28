@@ -49,7 +49,13 @@ the development cost and the production equivalent.
      pages, deliver to miopages.org, then discuss the brand color and font.
    - Nov 28: the three pages came back with every word right, but Scope & Fit and Free Review
      reverted to the old bloated layout, and Direct Start nests boxes. One more correction to the
-     brief is done ($20.70 spent); the three proposals wait to be checked after the PC restart.
+     brief is done ($20.70 spent). Checked Nov 28: the layouts follow the brief, but Core rewrote the
+     words (Scope & Fit lost 45 of 145 lines, Review 25 of 110, Direct Start 37 of 133). Not approved.
+     A closer check also found the seven approved pages lost a few lines each (Home lost "A tangled
+     web behind the scenes. A beautifully simple experience for the customer."); Claude's earlier
+     "words unchanged" was wrong. Cause: each layout call rewrites the whole page, words included.
+     Proposed (awaiting the Principal): lock the approved words in the engine so a layout call can
+     only arrange them, test free, then one pass of all ten pages (about $3.50; cap to about $28).
 
 ## Next (agreed, in order)
 
