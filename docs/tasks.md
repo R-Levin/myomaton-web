@@ -12,7 +12,7 @@ We are in milestone 3, one real AI run on C0, accepted against baseline Part 1 (
 holds the agreed near-term work under that plan.
 
 **Where the Principal looks:** miopages.org (password-protected review WordPress), drafts only.
-**Spending:** C0 milestone 3 run, $19.67 of a $24 cap. Ask before any paid step, and state both
+**Spending:** C0 milestone 3 run, $20.70 of a $24 cap. Ask before any paid step, and state both
 the development cost and the production equivalent.
 
 ## Now
@@ -49,7 +49,7 @@ the development cost and the production equivalent.
      pages, deliver to miopages.org, then discuss the brand color and font.
    - Nov 28: the three pages came back with every word right, but Scope & Fit and Free Review
      reverted to the old bloated layout, and Direct Start nests boxes. One more correction to the
-     brief is running (about $0.90).
+     brief is done ($20.70 spent); the three proposals wait to be checked after the PC restart.
 
 ## Next (agreed, in order)
 
