@@ -13,6 +13,8 @@ const arg = (name: string, fallback: string) => { const at = process.argv.indexO
 
 async function main() {
   const base = arg("base", "http://127.0.0.1:4481").replace(/\/$/u, ""), out = arg("out", "runtime-content/draft-pdf");
+  const overrideAt = process.argv.indexOf("--stylesheet");
+  const override = overrideAt > 0 ? await readFile(process.argv[overrideAt + 1]!, "utf8") : undefined;
   const login = await readFile(arg("login", "runtime-content/preview-wordpress-login.txt"), "utf8");
   const user = /^User:\s*(.+)$/mu.exec(login)?.[1]?.trim(), password = /^Password:\s*(.+)$/mu.exec(login)?.[1]?.trim();
   // The review site's password gate, when the login file names one (miopages.org); never printed.
@@ -43,6 +45,18 @@ async function main() {
     const shots: { title: string; png: string; counts: { pictures: number; fpo: number; awaiting: number } }[] = [];
     for (const [index, url] of sorted.entries()) {
       await page.goto(url, { waitUntil: "networkidle" });
+      // --stylesheet <file>: show a proposed design in place of the current one; pages without the current design are left out.
+      if (override !== undefined) {
+        const swapped = await page.evaluate((css: string) => {
+          const style = document.getElementById("miopages-managed-site-inline-css");
+          const text = style?.textContent ?? "", start = text.indexOf("body.miopages-branded-draft{"), end = start < 0 ? -1 : text.indexOf("}", start);
+          if (!style || end < 0) return false;
+          style.textContent = text.slice(0, end + 1) + String.fromCharCode(10) + css;
+          return true;
+        }, override);
+        if (!swapped) continue;
+        await page.evaluate(() => window.dispatchEvent(new Event("resize")));
+      }
       await page.evaluate(async () => { await document.fonts.ready; for (const img of [...document.images]) { img.loading = "eager"; try { await img.decode(); } catch { /* shown as is */ } } });
       await page.addStyleTag({ content: "#wpadminbar{display:none!important} html{margin-top:0!important}" });
       const info = await page.evaluate(() => ({ title: document.querySelector("main h1")?.textContent?.trim() ?? document.title,

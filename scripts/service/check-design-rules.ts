@@ -225,7 +225,8 @@ try {
             style.textContent = text.slice(0, end + 1) + String.fromCharCode(10) + css;
             return true;
           }, override);
-          if (!swapped) throw Error("Could not find the site's stylesheet to swap in the proposed one");
+          // A page without the current design (an older draft on the same WordPress) isn't part of this check.
+          if (!swapped) { if (view === "desktop" && motion === "no-preference") notes.push(`${title}: skipped (not a page of the current design)`); continue; }
           await tab.evaluate(() => window.dispatchEvent(new Event("resize")));
           await tab.waitForTimeout(300);
         }
