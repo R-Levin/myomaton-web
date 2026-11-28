@@ -230,7 +230,7 @@ function checked(input: WriteInput, output: unknown, sources: PresenceEvidence[]
       const page = input.grain === "page-layout" ? fillLayout(input.previous as PageContent, output as Layout)
         : input.grain === "page-words" ? applyWordEdits(input.previous as PageContent, output as WordEdits) : output;
       // The stored page's identities are the engine's to keep (versionedPage), not part of what is checked.
-      const bare = (item: Record<string, unknown>) => { const { id: _id, version: _version, ...rest } = item; return rest; };
+      const bare = (item: Record<string, unknown>) => { const rest = { ...item }; delete rest.id; delete rest.version; return rest; };
       const checkable = page === output ? page : { ...bare(page as Record<string, unknown>),
         sections: (page as PageContent).sections.map(section => bare(section)),
         // A stored Action without a placement had none (null), as Core answered it.

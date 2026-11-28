@@ -240,6 +240,32 @@ export function edit(record: ServiceRecord, input: { id: string; at: string; by:
   return respond(proposed, changeId, input.by, "approve", input.at);
 }
 
+/**
+ * Going back: a Specialist makes an earlier Version of a page current again, as it was. Every Version
+ * is kept, so this is a new Version with the earlier content, the Specialist's own Decision and
+ * Change, approved as they make it (as with a hand edit). No AI is involved.
+ */
+export function restore(record: ServiceRecord, input: { id: string; at: string; by: Person; path: string; version: number }): ServiceRecord {
+  if (input.by.role !== "operator" && input.by.role !== "owner") throw new CycleError("not-permitted", "Only a Specialist restores a page");
+  const id = pageIdentity(record.account.managedSiteId, input.path), base = current(record, id);
+  const earlier = record.products.find(item => item.id === id && item.version === input.version);
+  if (!base || !earlier) throw new CycleError("not-found", "No such version of that page");
+  if (earlier.version === base.version) throw new CycleError("invalid", "That version is already current");
+  if (record.ledger.requests.some(request => request.id === input.id + ":request")) return record;
+  const requestId = input.id + ":request", words = `Go back to version ${earlier.version} of the page ${input.path}.`;
+  let ledger = takeIn(record.ledger, { id: input.id, at: input.at, by: input.by }, [{ id: requestId, at: input.at,
+    origin: { kind: "operator", by: input.by, channel: "core-screen" }, target: { grain: "page", path: input.path }, words }]);
+  const version = Math.max(0, ...record.products.filter(item => item.id === id).map(item => item.version)) + 1, changeId = `${id}:v${version}`;
+  ledger = decide(ledger, { id: changeId + ":decision", at: input.at, by: input.by, requestIds: [requestId], outcome: "change", reasoning: words },
+    [{ id: changeId, label: `page-v${version}`, at: input.at, requestIds: [requestId],
+      target: { grain: "page", path: input.path, workProduct: { id, version: base.version } }, base: { version: record.version, digest: fingerprint(base.content) },
+      difference: { summary: `the page ${input.path}, version ${version} (version ${earlier.version} restored)` }, preserve: [], consequence: "operator-review" }]);
+  const products = record.products.map(item => item.id === id && item.status === "proposed" ? { ...item, status: "superseded" as const } : item);
+  const proposed = { ...record, ledger, products: [...products, { id, kind: "page" as const, version, path: input.path,
+    content: versionedPage(record, id, structuredClone(earlier.content) as PageContent), changeId, at: input.at, status: "proposed" as const }] };
+  return respond(proposed, changeId, input.by, "approve", input.at);
+}
+
 /** A Page's Sections keep their identities across Versions, as delivery has always given them. */
 function versionedPage(record: ServiceRecord, id: string, page: PageContent) {
   const before = current(record, id)?.content as PageContent | undefined;

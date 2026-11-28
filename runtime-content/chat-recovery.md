@@ -1,3 +1,6 @@
+## Nov 28 ~03:05 UTC: task 1a built and tested on the stand-in (no spending)
+page-words.ts, page grains in cycle/ai-writer/beacon, workspace grain choice + words check + 'Make it current again'. 652 tests, 649 pass, 3 skipped. Stand-in preview (workspace-preview) running; paid C0 preview stopped. Next: ask the Principal about the C0 pass (restore Nov 27 words on 7 pages, then 10 layout changes ~$3.50, cap ~$28).
+
 ## Nov 28 ~03:40 UTC: task 1a agreed (separate words from layout); plan written
 Conversation recorded (docs/conversation-2026-11-28-words-and-layout.md) to revisit. Plan: docs/plan-words-and-layout.md. Next: build on the free stand-in; then ask about cap ~$28 for C0's ten layouts.
 

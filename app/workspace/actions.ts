@@ -7,7 +7,7 @@ import { accountKnowledge } from "@/lib/platform/knowledge/account";
 import { factKey } from "@/lib/platform/knowledge/facts";
 import { confirmOnPublish, factsToConfirmOnPublish } from "@/lib/platform/knowledge/publish";
 import { currentFacts, recordFacts } from "@/lib/platform/knowledge/store";
-import { ask, citedBySite, direct, proposePublish, respond, startLaunch, tasks, work, type Kind, type ServiceRecord } from "@/lib/platform/service/cycle";
+import { ask, citedBySite, direct, proposePublish, respond, restore, startLaunch, tasks, work, type Kind, type ServiceRecord } from "@/lib/platform/service/cycle";
 import { deliverDraft, takeInReadBack } from "@/lib/platform/service/delivery";
 import { readBackOperatorSite } from "@/lib/platform/wordpress-delivery/operator-review";
 import { findingsForCore, lastRenderedCheck, runRenderedCheck } from "@/lib/platform/service/rendered-check";
@@ -216,7 +216,21 @@ export async function specialistRequest(webPresenceId: string, form: FormData) {
   if (!words) throw Error("Say what Core should change");
   await change(webPresenceId, "specialist", (record, ctx) => {
     const at = now();
-    return ask(record, { id: `specialist:${ctx.person.id}:${at}`, at, by: ctx.person, ...about(text(form, "about")), words: words.slice(0, 20_000) });
+    const target = about(text(form, "about"));
+    // For a page: the whole page, only its words, or only its layout (task 1a); a layout may follow an earlier version.
+    const grain = text(form, "grain"), example = Number(text(form, "example")) || undefined;
+    if (grain && !["page", "page-words", "page-layout"].includes(grain)) throw Error("Choose what changes");
+    const pageGrain = target.kind === "page" && grain ? grain as "page" | "page-words" | "page-layout" : undefined;
+    return ask(record, { id: `specialist:${ctx.person.id}:${at}`, at, by: ctx.person, ...target, words: words.slice(0, 20_000),
+      ...(pageGrain && pageGrain !== "page" && { grain: pageGrain }), ...(pageGrain === "page-layout" && example && { example }) });
+  });
+}); }
+
+/** Going back: a Specialist makes an earlier version of a page current again (no AI). */
+export async function restorePage(webPresenceId: string, path: string, version: number) { await shown(webPresenceId, async () => {
+  await change(webPresenceId, "specialist", (record, ctx) => {
+    const at = now();
+    return restore(record, { id: `restore:${ctx.person.id}:${at}`, at, by: ctx.person, path, version });
   });
 }); }
 

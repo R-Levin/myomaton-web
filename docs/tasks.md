@@ -65,7 +65,12 @@ the development cost and the production equivalent.
      as a whole. No new object.
    - Engineering only, no AI spending; built and tested on the free stand-in first. Then C0's
      ten layouts in one paid pass (about $3.50; cap to about $28, to be asked then).
-   - Plan: `docs/plan-words-and-layout.md` (Nov 28). Next: build it on the free stand-in.
+   - Plan: `docs/plan-words-and-layout.md` (Nov 28).
+   - Built and tested on the free stand-in (Nov 28): words and layout grains in the engine and Core's
+     writer; a layout that changes, drops or invents a word is refused; going back to any earlier page
+     version (no AI); "Words unchanged" or the exact changed lines on each proposed page. All ten real
+     C0 pages pass offline. Next, for C0 (paid, to ask): restore the Nov 27 words where they drifted,
+     then one layout change per page to the brief.
 
 ## Next (agreed, in order)
 

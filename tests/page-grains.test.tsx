@@ -7,7 +7,7 @@ import test from "node:test";
 import { fingerprint } from "../lib/platform/canonical/model";
 import { initializeResponsesUsageLedger, type ResponsesTransport } from "../lib/platform/intake/intelligent-responses";
 import { createAiWriter } from "../lib/platform/service/ai-writer";
-import { ask, current, currentSite, openRecord, respond, startLaunch, tasks, work, type PageContent, type ServiceRecord } from "../lib/platform/service/cycle";
+import { ask, current, currentSite, openRecord, respond, restore, startLaunch, tasks, work, type PageContent, type ServiceRecord } from "../lib/platform/service/cycle";
 import { compareWords } from "../lib/platform/service/page-words";
 import { pageIdentity } from "../lib/platform/work-products/pages";
 import { offlineAi } from "./helpers/simulated-ai";
@@ -90,7 +90,8 @@ test("a layout change rearranges the page and its words come back exactly, throu
   const root = await mkdtemp(join(tmpdir(), "miopages-page-layout-"));
   try {
     const ai = aiFor();
-    let { record, writer } = await launched(root, ai.transport);
+    const launch = await launched(root, ai.transport), writer = launch.writer;
+    let record = launch.record;
     const before = servicePage(record);
     record = ask(record, { id: "layout-1", at: "2026-11-28T11:00:00.000Z", by: specialist, kind: "page", path: "/service", grain: "page-layout",
       words: "Lay this page out to the design brief." });
@@ -119,7 +120,8 @@ test("a layout that changes a word is refused, sent back once with the reason, a
   try {
     const ai = aiFor(answer => { answer.sections[0]!.block.root.children.push(node("paragraph", "A sentence Core made up.")); });
     const kept: { digest?: string; answer: unknown }[] = [];
-    let { record, writer } = await launched(root, ai.transport, kept);
+    const launch = await launched(root, ai.transport, kept), writer = launch.writer;
+    let record = launch.record;
     record = ask(record, { id: "layout-2", at: "2026-11-28T11:00:00.000Z", by: specialist, kind: "page", path: "/service", grain: "page-layout", words: "Again." });
     const task = tasks(record).find(item => item.who === "core")!;
     await assert.rejects(work(record, task, writer, knowledge, "2026-11-28T11:01:00.000Z"));
@@ -133,7 +135,8 @@ test("a word change edits only the words asked for; the layout stays", async () 
   const root = await mkdtemp(join(tmpdir(), "miopages-page-words-"));
   try {
     const ai = aiFor();
-    let { record, writer } = await launched(root, ai.transport);
+    const launch = await launched(root, ai.transport), writer = launch.writer;
+    let record = launch.record;
     const before = servicePage(record);
     record = ask(record, { id: "words-1", at: "2026-11-28T11:00:00.000Z", by: specialist, kind: "page", path: "/service", grain: "page-words", words: "Reword the first line." });
     record = await work(record, tasks(record).find(item => item.who === "core")!, writer, knowledge, "2026-11-28T11:01:00.000Z");
@@ -142,5 +145,26 @@ test("a word change edits only the words asked for; the layout stays", async () 
     assert.equal(diff.gone.length, 1);
     assert.deepEqual(diff.added, ["Reworded by request."]);
     assert.equal(ai.sent[0]!.name, "core_page_words");
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("going back: an earlier version of a page becomes current again, exactly, with no AI", async () => {
+  const root = await mkdtemp(join(tmpdir(), "miopages-page-restore-"));
+  try {
+    const ai = aiFor();
+    const launch = await launched(root, ai.transport), writer = launch.writer;
+    let record = launch.record;
+    const first = servicePage(record);
+    record = ask(record, { id: "words-2", at: "2026-11-28T11:00:00.000Z", by: specialist, kind: "page", path: "/service", grain: "page-words", words: "Reword it." });
+    record = await work(record, tasks(record).find(item => item.who === "core")!, writer, knowledge, "2026-11-28T11:01:00.000Z");
+    record = respond(record, record.products.find(item => item.status === "proposed")!.changeId, specialist, "approve", "2026-11-28T11:02:00.000Z");
+    assert.equal(compareWords(first.content as PageContent, servicePage(record).content as PageContent).unchanged, false);
+    const sent = ai.sent.length;
+    record = restore(record, { id: "restore-1", at: "2026-11-28T11:03:00.000Z", by: specialist, path: "/service", version: first.version });
+    const now = servicePage(record);
+    assert.ok(now.version > first.version, "a new version, every earlier one kept");
+    assert.equal(compareWords(first.content as PageContent, now.content as PageContent).unchanged, true);
+    assert.equal(ai.sent.length, sent, "no AI call");
+    assert.throws(() => restore(record, { id: "restore-2", at: "2026-11-28T11:04:00.000Z", by: client, path: "/service", version: first.version }), /Only a Specialist/u);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
