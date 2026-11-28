@@ -1,0 +1,51 @@
+/*
+Theme Name: MioPages Simple
+Description: Plain, readable sections for MioPages sites: opening, text, points and call, in light, tint or dark bands.
+Version: 0.1.0
+Requires at least: 6.6
+License: GPL-2.0-or-later
+*/
+@font-face { font-family: "Source Sans 3"; src: url("fonts/source-sans-3.woff2") format("woff2"); font-weight: 200 900; font-display: swap; }
+
+:root { --mp-ink: #2a2733; --mp-cream: #fbf7ee; --mp-tint: #e6e2f1; --mp-indigo: #2f3373; --mp-night: #221d33; --mp-accent: #e9b48c; }
+body { margin: 0; background: var(--mp-cream); color: var(--mp-ink); font-family: "Source Sans 3", system-ui, sans-serif; font-size: 18px; line-height: 1.6; }
+h1, h2, h3 { font-weight: 600; line-height: 1.15; margin: 0 0 .6em; letter-spacing: 0; }
+h1 { font-size: clamp(2.1rem, 4.5vw, 3.2rem); max-width: 18ch; }
+h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); max-width: 26ch; }
+h3 { font-size: 1.15rem; }
+p { margin: 0 0 1em; max-width: 68ch; }
+a { color: inherit; }
+
+/* Header and footer */
+.mp-header { background: var(--mp-cream); padding: 1rem 1.5rem; border-bottom: 1px solid rgba(42, 39, 51, .08); }
+.mp-header .wp-block-site-logo img { height: 44px; width: auto; }
+.mp-header .wp-block-navigation { font-weight: 600; font-size: 1rem; gap: 1.6rem; }
+.mp-header .wp-block-navigation a { text-decoration: none; }
+.mp-header .wp-block-navigation a:hover { text-decoration: underline; }
+.mp-footer { background: var(--mp-night); color: #ece9f3; padding: 3rem 1.5rem; font-size: .95rem; }
+.mp-footer .wp-block-navigation a { text-decoration: none; }
+
+/* Sections */
+.mp-section { padding: clamp(3rem, 7vw, 5.5rem) 1.5rem; margin: 0 !important; }
+.mp-section > * { max-width: 1120px; margin-left: auto !important; margin-right: auto !important; }
+.mp-tone-light { background: var(--mp-cream); }
+.mp-tone-tint { background: var(--mp-tint); color: var(--mp-indigo); }
+.mp-tone-dark { background: var(--mp-indigo); color: #f7f6f1; }
+.mp-opening h1 { margin-bottom: .5em; }
+.mp-opening p { font-size: 1.12rem; }
+
+/* A set of points: short items side by side, each under a thin rule */
+.mp-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem 2rem; margin-top: 1.5rem !important; margin-bottom: 1.5rem !important; }
+.mp-item { border-top: 2px solid currentColor; padding-top: .9rem; }
+.mp-item > * { opacity: 1; }
+.mp-tone-light .mp-item { border-color: rgba(47, 51, 115, .45); }
+.mp-item p { font-size: 1rem; }
+
+/* Buttons */
+.wp-block-button__link { background: var(--mp-accent) !important; color: #2e191e !important; border-radius: 4px; padding: .8rem 1.3rem; font-weight: 600; text-decoration: none; }
+.wp-block-buttons { margin-top: 1.5rem; }
+
+@media (max-width: 600px) {
+  body { font-size: 17px; }
+  .mp-section { padding: 2.6rem 1.15rem; }
+}
