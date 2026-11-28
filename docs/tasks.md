@@ -44,8 +44,9 @@ the development cost and the production equivalent.
      $24 ("Yes, raise to $24", Nov 27); in progress.
    - Paused: "If there are brand colors, they need to be discussed, not overridden." (Nov 27)
      The brief's "no indigo opening band" (Claude's wording) led v16 to use the brand indigo
-     once; the heading font also changed. Waiting on the Principal: how the brand color and font
-     should be used. The two page corrections are queued, Core not yet run.
+     once; the heading font also changed. "Not enough information at this point to decide.
+     Let's see what Core delivers, but we will discuss after." (Nov 27) So: finish the three
+     pages, deliver to miopages.org, then discuss the brand color and font.
 
 ## Next (agreed, in order)
 
