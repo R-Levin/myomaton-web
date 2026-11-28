@@ -46,7 +46,7 @@ the development cost and the production equivalent.
    - Approach: a short design brief agreed with the Principal (a clearly different look, how much
      goes on a page, how many pictures). Then one clean Core pass to that brief, checked on
      miopages.org before the Principal sees it.
-   - Status: not started. Needs a spending OK (about $3–4; the cap has $2.20 left).
+   - Status: being done as task 1, step 4 (brief approved, cap $21).
 3. **Pages not bloated.** "A natural limit to what a visitor can comprehend on a page." (Nov 26)
    Settled inside the design brief (task 2); not a fixed rule.
 4. **Phone menu and switch point.** "Restore or recreate the mobile menu." "Text menu must go to
