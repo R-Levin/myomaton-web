@@ -6,6 +6,10 @@ and updates it in the same turn whenever a task is added, changed, started or fi
 records the Principal's own words and the date. Nothing gets built that isn't on this list or agreed
 in conversation first.
 
+**The roadmap is `docs/rebuild-plan.md`** (the Principal's direction, Nov 25): milestones 1–5.
+We are in milestone 3, one real AI run on C0, accepted against baseline Part 1 (#9–#16). This list
+holds the agreed near-term work under that plan.
+
 **Where the Principal looks:** miopages.org (password-protected review WordPress), drafts only.
 **Spending:** C0 milestone 3 run, $15.80 of an $18 cap. Ask before any paid step, and state both
 the development cost and the production equivalent.
@@ -45,8 +49,8 @@ the development cost and the production equivalent.
 
 8. **Client links in onboarding.** Competitors and sites they like; optional; weighting in
    baseline #16e. (Nov 27)
-9. **Milestones.** Close 3 (C0 accepted), then 4 (protected Core runs the new Core), then 5
-   (publish plus email). Proposed Nov 27; not yet confirmed by the Principal.
+9. **Milestones 4 and 5** (rebuild plan, agreed Nov 25): 4, the rebuilt Core on protected Core;
+   5, Publish to WordPress plus email in and out. After milestone 3 is accepted.
 
 ## Open questions (for discussion, nothing decided)
 
