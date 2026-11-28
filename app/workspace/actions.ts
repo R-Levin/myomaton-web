@@ -11,6 +11,7 @@ import { ask, citedBySite, currentSite, direct, proposePublish, respond, restore
 import { deliverDraft, takeInReadBack } from "@/lib/platform/service/delivery";
 import { readBackOperatorSite } from "@/lib/platform/wordpress-delivery/operator-review";
 import { findingsForCore, lastRenderedCheck, runRenderedCheck } from "@/lib/platform/service/rendered-check";
+import { migrateSite } from "@/lib/platform/service/migrate-site";
 import { accounts, actAs, acting, serviceRuntime, type Acting } from "@/lib/platform/service/runtime";
 
 /**
@@ -212,6 +213,14 @@ export async function specialistRequest(webPresenceId: string, form: FormData) {
       return ask(next, { id: `specialist:${ctx.person.id}:${at}${every ? ":" + index : ""}`, at, by: ctx.person, ...target, words: words.slice(0, 20_000),
         ...(pageGrain && pageGrain !== "page" && { grain: pageGrain }) });
     }, record);
+  });
+}); }
+
+/** An existing site moves to the component format: the same words, laid out with the site's components (no AI). */
+export async function moveToComponents(webPresenceId: string) { await shown(webPresenceId, async () => {
+  await change(webPresenceId, "specialist", (record, ctx) => {
+    const at = now();
+    return migrateSite(record, { id: `move:${ctx.person.id}:${at}`, at, by: ctx.person });
   });
 }); }
 

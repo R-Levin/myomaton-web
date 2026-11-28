@@ -4,7 +4,7 @@ import { clientPeople } from "@/lib/platform/accounts/people";
 import { readMyBusiness } from "@/lib/platform/intake/my-business";
 import { currentSite, tasks } from "@/lib/platform/service/cycle";
 import { accounts, acting, serviceRuntime } from "@/lib/platform/service/runtime";
-import { addPerson, askPublish, beginLaunch, checkRendered, directRequest, enterEmail, proposeFact, readBack, removePerson, restorePage, review, runCore, sendDrafts, sendFindings, specialistRequest } from "../actions";
+import { addPerson, askPublish, beginLaunch, checkRendered, directRequest, enterEmail, proposeFact, readBack, removePerson, moveToComponents, restorePage, review, runCore, sendDrafts, sendFindings, specialistRequest } from "../actions";
 import { compareContent as compareWords } from "@/lib/platform/site/components";
 import type { PageContent, ProductVersion } from "@/lib/platform/service/cycle";
 import { checkSummary, findingsForCore, lastRenderedCheck, type RenderedCheck } from "@/lib/platform/service/rendered-check";
@@ -57,6 +57,8 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
               <p className="mt-1 text-xs text-neutral-600">{runtime.spent ? `Writer: ${runtime.writerLabel}. Spent so far: $${(await runtime.spent()).toFixed(2)}.`
                 : <>Locally Core&apos;s AI is a {runtime.writerLabel}; it writes labeled stand-in content.</>}</p></form>)}
           {site?.complete && !publishWaiting && waiting.length === 0 && <form action={askPublish.bind(null, id)}><button className={button}>Ask the Client to approve Publish</button></form>}
+          {site?.pages.some(page => !Array.isArray((page as { layout?: unknown }).layout)) && <form action={moveToComponents.bind(null, id)}>
+            <button className={button}>Move the site to the component format (same words, no AI)</button></form>}
         </div>
         {runtime.spent && <p className="mt-2 text-sm text-neutral-700">{runtime.writerLabel}: ${(await runtime.spent()).toFixed(2)} spent so far.</p>}
         {waiting.length > 0 && <ul className="mt-3 space-y-1">{waiting.map(task => <li key={task.id}>{task.what} <span className="text-xs text-neutral-500">({task.who})</span></li>)}</ul>}

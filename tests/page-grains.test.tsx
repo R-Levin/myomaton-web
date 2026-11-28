@@ -83,3 +83,29 @@ test("a correction keeps its scope; going back restores an earlier version exact
   assert.deepEqual(page(record, "/service"), first, "the earlier version, exactly");
   assert.throws(() => restore(record, { id: "restore-2", at: at(26), by: client, path: "/service", version: 1 }), /Only a Specialist/u);
 });
+
+test("an existing site moves to the component format with the same words and no AI; every earlier version stays", async () => {
+  // A site whose pages were written in the earlier format (before Nov 29).
+  const earlier: Writer = { write: async input => input.kind === "page"
+    ? { path: input.page!.path, heading: input.page!.label, searchTitle: input.page!.label, searchDescription: "Earlier", composition: "managed-v1",
+      sections: [{ id: "a1b2c3d4-0000-4000-8000-000000000001", heading: input.page!.label, body: "Opening words.\n\nSecond paragraph.", role: "hero", sourceIds: [],
+        visual: { purpose: "Show it", brief: "A person at work", altIntent: "Person at work", status: "asset-needed" } },
+        { id: "a1b2c3d4-0000-4000-8000-000000000002", heading: "What you get", body: "Everything that matters.", role: "intro", sourceIds: [],
+          visual: { purpose: "", brief: "", altIntent: "", status: "text-only" },
+          block: { version: 1, name: "points", purpose: "Points", layout: "grid", groups: [{ heading: "Clarity", body: "Plain words.", items: [] }, { heading: "Care", body: "Ongoing work.", items: ["Updates"] }] } }],
+      actions: [], internalLinks: [] }
+    : beaconWriter.write(input) };
+  let record = await launched(earlier);
+  const before = page(record, "/");
+  const { migrateSite } = await import("../lib/platform/service/migrate-site");
+  record = migrateSite(record, { id: "move-1", at: at(30), by: specialist });
+  const moved = page(record, "/");
+  assert.ok(Array.isArray(moved.layout) && moved.layout.length >= 2, "laid out with components");
+  const text = JSON.stringify(moved.content);
+  for (const words of ["Opening words.", "Second paragraph.", "What you get", "Everything that matters.", "Clarity", "Plain words.", "Care", "Ongoing work.", "Updates"])
+    assert.ok(text.includes(words), `"${words}" carried over`);
+  assert.ok(moved.content.some(item => item.type === "picture" && item.shows === "A person at work"), "the picture frame carried over");
+  assert.throws(() => migrateSite(record, { id: "move-2", at: at(31), by: client }), /Only a Specialist/u);
+  record = restore(record, { id: "back-1", at: at(32), by: specialist, path: "/", version: 1 });
+  assert.deepEqual(page(record, "/"), before, "the earlier version is still there");
+});
