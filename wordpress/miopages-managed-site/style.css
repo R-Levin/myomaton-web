@@ -1,454 +1,113 @@
 /*
 Theme Name: MioPages Managed Site
-Description: Reusable block presentation for Core-managed Web Presence sites.
-Version: 0.1.6
+Description: The one stylesheet for MioPages sites: every component and variant, drawn from the site's design (docs/rendering-design.md).
+Version: 0.2.0
 Requires at least: 6.6
 Requires PHP: 8.0
 Text Domain: miopages-managed-site
 */
 
-body:has(.miopages-composed) main > .wp-block-post-title,
-body:has(.miopages-composed) header .wp-block-navigation { display: none; }
-
-body:has(.miopages-composed) main.wp-block-group { padding-top: clamp(.75rem, 2vw, 2rem) !important; }
-body:has(.miopages-composed) main.wp-block-group > .wp-block-post-content { max-width: 72rem; }
-main .wp-block-post-content > .miopages-composed { max-width: 72rem; }
-.miopages-draft-nav, .miopages-draft-related { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; padding: 1.1rem 0; }
-.miopages-draft-nav [aria-current] { font-weight: 700; }
-.miopages-draft-section { padding: clamp(1.5rem, 5vw, 4rem); margin-block: 1.3rem; }
-.miopages-draft-section .miopages-draft-copy { min-width: 0; }
-.miopages-draft-section h1 { max-width: 18ch; font-size: clamp(1.95rem, 4vw, 3.75rem); letter-spacing: -.035em; text-wrap: balance; }
-.miopages-draft-hero .miopages-draft-copy > p { font-size: clamp(1rem, 1.5vw, 1.2rem); }
-.miopages-draft-section p { max-width: 60ch; }
-.miopages-draft-hero { background: var(--wp--preset--color--support); border-radius: 1.25rem; }
-.miopages-draft-intro { padding-block: clamp(1.3rem, 3vw, 2.5rem); border-block-end: 1px solid #ded8e7; }
-.miopages-draft-cta { background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand); border-radius: 1.25rem; }
-.miopages-draft-cta .wp-block-button__link { background: var(--wp--preset--color--on-brand); color: var(--wp--preset--color--brand); }
-.miopages-draft-with-image { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center; gap: clamp(1rem, 3vw, 3rem); }
-.miopages-draft-with-image figure { margin: 0; min-width: 0; }
-.miopages-draft-with-image img { display: block; width: 100%; height: auto; border-radius: .8rem; }
-.miopages-composed :focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
-@media (max-width: 680px) { .miopages-draft-with-image { grid-template-columns: minmax(0, 1fr); } }
-
+/* The site's design arrives as variables (draft-brand.php): palette pairs, fonts, sizes, corners, spacing. */
 body.miopages-branded-draft {
+  margin: 0;
   background: var(--wp--preset--color--surface);
   color: var(--wp--preset--color--ink);
   font-family: var(--miopages-body-font);
   font-size: var(--miopages-body-size);
   line-height: var(--miopages-body-leading);
+  --mp-gap: calc(1.5rem * var(--mp-space, 1));
+  --mp-pad: calc(clamp(2.75rem, 7vw, 5.5rem) * var(--mp-space, 1));
+  --mp-width: 72rem;
 }
-.miopages-branded-draft h1, .miopages-branded-draft h2 { font-family: var(--miopages-heading-font); }
-.miopages-branded-draft .miopages-draft-section h1 { font-size: clamp(2rem, 5vw, var(--miopages-title-size)); }
-.miopages-draft-wordmark { display: inline-block; line-height: 0; }
-.miopages-draft-wordmark img { display: block; width: clamp(9rem, 18vw, 13rem); height: auto; }
-.miopages-branded-draft .miopages-draft-hero {
-  background: var(--wp--preset--color--brand);
-  color: var(--wp--preset--color--on-brand);
-  border-radius: .4rem;
+.miopages-branded-draft h1, .miopages-branded-draft h2, .miopages-branded-draft h3, .miopages-branded-draft h4 {
+  font-family: var(--miopages-heading-font); font-weight: var(--miopages-heading-weight, 600); line-height: 1.15; margin: 0 0 .55em; text-wrap: balance;
 }
-.miopages-branded-draft .miopages-draft-hero h1,
-.miopages-branded-draft .miopages-draft-cta h2 { color: inherit; }
-.miopages-branded-draft .miopages-draft-hero .wp-block-button__link {
-  background: var(--miopages-accent-surface);
-  color: var(--miopages-accent-ink);
-}
-.miopages-branded-draft .miopages-draft-hero .wp-block-button + .wp-block-button .wp-block-button__link {
-  color: var(--wp--preset--color--on-brand);
-  background: transparent;
-  box-shadow: inset 0 0 0 1px currentColor;
-}
-.miopages-branded-draft .miopages-draft-intro { border-color: var(--miopages-border); }
-.miopages-branded-draft .miopages-draft-cta {
-  background: var(--wp--preset--color--support);
-  color: var(--miopages-tonal-ink);
-  border-radius: .4rem;
-}
-.miopages-branded-draft .miopages-draft-cta .wp-block-button__link {
-  background: var(--wp--preset--color--brand);
-  color: var(--wp--preset--color--on-brand);
-}
-.miopages-semantic {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: clamp(1rem, 3vw, 2rem);
-  margin-block: 1.25rem 0;
-}
-@media (min-width: 760px) {
-  .miopages-semantic-grid { grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); }
-}
-.miopages-semantic > .miopages-semantic-group { margin-block: 0; border-block-start: 2px solid currentColor; padding-block-start: .9rem; }
-.miopages-semantic-group :is(h2, h3) { margin-block: 0 .5rem; }
-.miopages-semantic-group p, .miopages-semantic-group ol, .miopages-semantic-group ul { margin-block: .5rem 0; }
-.miopages-motion-off *, .miopages-motion-off *::before, .miopages-motion-off *::after {
-  animation: none !important;
-  transition: none !important;
-}
+.miopages-branded-draft h1 { font-size: clamp(2rem, 4.6vw, var(--miopages-title-size, 3.2rem)); max-width: 20ch; }
+.miopages-branded-draft h2 { font-size: clamp(1.55rem, 3vw, calc(var(--miopages-title-size, 3.2rem) * .66)); max-width: 28ch; }
+.miopages-branded-draft h3 { font-size: 1.15em; }
+.miopages-branded-draft p { margin: 0 0 1em; max-width: 68ch; }
+.miopages-branded-draft a { color: inherit; }
+.miopages-branded-draft :focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 
-/* The creative layout is emitted only by the disposable native draft projector. */
-body.miopages-branded-draft:has(.miopages-draft-creative) :is(header, footer) > .wp-block-group {
-  background: transparent !important;
-  border-block: 1px solid var(--miopages-border);
-}
-body.miopages-branded-draft:has(.miopages-draft-creative) main.wp-block-group {
-  margin-block-start: 0;
-  padding-top: .75rem !important;
-}
-body.miopages-branded-draft:has(.miopages-draft-creative) .miopages-draft-wordmark img {
-  width: clamp(8rem, 15vw, 11rem);
-}
-.miopages-branded-draft .miopages-draft-creative .miopages-draft-nav {
-  border-block-end: 1px solid var(--miopages-border);
-  padding-block: .6rem .9rem;
-  gap: .55rem 1.5rem;
-}
-.miopages-draft-creative .miopages-draft-nav a {
-  color: var(--wp--preset--color--brand);
-  text-underline-offset: .25em;
-}
-.miopages-draft-creative .miopages-draft-nav [aria-current="page"] {
-  color: var(--wp--preset--color--brand);
-}
-.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero {
-  color: var(--wp--preset--color--ink);
-  background: transparent;
-  margin-block: 0;
-  border-block-end: 1px solid var(--miopages-border);
-  border-radius: 0;
-  padding: clamp(1.5rem, 3.5vw, 3rem) 0;
-}
-.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero h1 {
-  color: var(--wp--preset--color--brand);
-  font-size: clamp(2rem, 5vw, 4.25rem);
-  max-width: 17ch;
-  line-height: 1.04;
-  margin-block: 0 1rem;
-  text-wrap: pretty;
-}
-.miopages-draft-creative .miopages-draft-hero .miopages-draft-copy > p {
-  text-wrap: pretty;
-  max-width: 48ch;
-}
-.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero:not(.miopages-draft-with-image) h1 { max-width: 25ch; }
-.miopages-draft-creative .miopages-draft-hero:not(.miopages-draft-with-image) .miopages-draft-copy > p { max-width: 61ch; }
-.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero figure {
-  padding: clamp(.5rem, 1.2vw, 1rem);
-  background: var(--wp--preset--color--support);
-  border-radius: .6rem;
-  border: 1px solid var(--miopages-border);
-}
-.miopages-branded-draft .miopages-draft-creative .wp-block-button__link,
-.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero .wp-block-button__link {
-  border-radius: .4rem;
-  padding: .7rem 1.1rem;
-  font-weight: 650;
-  font-size: .95rem;
-  background: var(--wp--preset--color--brand);
-  color: var(--wp--preset--color--on-brand);
-}
-.miopages-branded-draft .miopages-draft-creative .miopages-draft-hero .wp-block-button + .wp-block-button .wp-block-button__link {
-  background: transparent;
-  color: var(--wp--preset--color--brand);
-}
-.miopages-draft-creative .miopages-draft-intro {
-  padding-inline: 0;
-}
-.miopages-draft-creative .miopages-draft-intro h2 {
-  font-size: clamp(1.4rem, 2.8vw, 2.45rem);
-  letter-spacing: -.025em;
-  text-wrap: balance;
-}
-.miopages-draft-creative .miopages-semantic-group {
-  background: var(--wp--preset--color--support);
-  color: var(--miopages-tonal-ink);
-  border-block-start: 3px solid var(--wp--preset--color--brand);
-  padding: clamp(.85rem, 2vw, 1.4rem);
-  border-radius: 0 0 .45rem .45rem;
-}
-.miopages-draft-creative .miopages-semantic-stack {
-  max-width: 66ch;
-  gap: 1rem;
-}
-.miopages-draft-creative .miopages-semantic-stack > .miopages-semantic-group {
-  background: transparent;
-  border-block-start: 0;
-  border-inline-start: 3px solid var(--miopages-border);
-  border-radius: 0;
-  padding-block: .35rem;
-}
-.miopages-draft-creative .miopages-draft-related { border-block-start: 1px solid var(--miopages-border); }
-/* Native layout owns its spacing. Gutenberg's flow margins must not offset
-   later grid cells or button wrappers inside an authored row. */
-.miopages-native-component { font-size: max(1rem, var(--miopages-body-size, 1rem)); }
-.miopages-native-component .miopages-node { box-sizing: border-box; min-width: 0; max-inline-size: 100%; }
-/* In Core's rows and columns each block takes one place; a full-width block (span 12) takes the
-   whole row. (An older 12-column span made blocks stretch across Core's own columns and left
-   empty zero-width ones.) */
-.miopages-native-component :is(.miopages-node-columns, .miopages-node-row) > .miopages-span-12 { grid-column: 1 / -1; }
-.miopages-native-component .wp-block-group.miopages-node > * { margin-block: 0; }
-.miopages-native-component .miopages-node > :first-child { margin-block-start: 0; }
-.miopages-native-component .miopages-node > :last-child { margin-block-end: 0; }
-.miopages-native-component .miopages-node-flow { display: block; }
-.miopages-native-component .miopages-node-row { display: flex; flex-wrap: wrap; }
-.miopages-native-component .miopages-node-columns { display: grid; grid-template-columns: var(--mp-columns); }
-/* Layout arrives as classes (editor-safe). Column templates come from miopages_layout_css(). */
-.miopages-span-1 { --mp-span: 1; }
-.miopages-span-2 { --mp-span: 2; }
-.miopages-span-3 { --mp-span: 3; }
-.miopages-span-4 { --mp-span: 4; }
-.miopages-span-5 { --mp-span: 5; }
-.miopages-span-6 { --mp-span: 6; }
-.miopages-span-7 { --mp-span: 7; }
-.miopages-span-8 { --mp-span: 8; }
-.miopages-span-9 { --mp-span: 9; }
-.miopages-span-10 { --mp-span: 10; }
-.miopages-span-11 { --mp-span: 11; }
-.miopages-span-12 { --mp-span: 12; }
-.miopages-native-component .miopages-node-gap-none { gap: 0; }
-.miopages-native-component .miopages-node-gap-small { gap: .75rem; }
-.miopages-native-component .miopages-node-gap-medium { gap: 1.25rem; }
-.miopages-native-component .miopages-node-gap-large { gap: clamp(1.5rem, 2.5vw, 2.5rem); }
-.miopages-native-component .miopages-node-inset-none { padding: 0; }
-.miopages-native-component .miopages-node-inset-small { padding: .75rem; }
-.miopages-native-component .miopages-node-inset-medium { padding: clamp(1rem, 2vw, 1.75rem); }
-.miopages-native-component .miopages-node-inset-large { padding: clamp(1.25rem, 3vw, 3rem); }
-.miopages-native-component .miopages-node-surface-light { background: var(--wp--preset--color--surface); color: var(--wp--preset--color--ink); }
-.miopages-native-component .miopages-node-surface-brand { background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand); }
-.miopages-native-component .miopages-node-surface-tonal { background: var(--wp--preset--color--support); color: var(--miopages-tonal-ink); }
-.miopages-native-component .miopages-node-surface-strong { background: var(--miopages-accent-surface); color: var(--miopages-accent-ink); }
-.miopages-native-component .miopages-node-align-start { align-items: start; }
-.miopages-native-component .miopages-node-align-center { align-items: center; }
-.miopages-native-component .miopages-node-align-end { align-items: end; }
-.miopages-native-component .miopages-node-align-stretch { align-items: stretch; }
-.miopages-native-component .miopages-node-border { border: 1px solid var(--miopages-border); }
-.miopages-native-component .miopages-node-rounded { border-radius: .75rem; }
-.miopages-native-component :is(h2,h3,h4,h5,h6) { color: inherit; }
-.miopages-native-component details summary { cursor: pointer; font-weight: 650; padding-block: .65rem; }
-.miopages-native-component .miopages-node-measure-narrow { max-width: 28ch; }
-.miopages-native-component .miopages-node-measure-reading { max-width: 61ch; }
-.miopages-native-component .miopages-node-measure-wide { max-width: 82ch; }
-.miopages-native-component .miopages-node-type-small { font-size: max(1rem, calc(var(--miopages-body-size, 1rem) * .9)); line-height: 1.6; }
-.miopages-native-component .miopages-node-type-body { font-size: max(1rem, var(--miopages-body-size, 1rem)); line-height: 1.6; }
-.miopages-native-component .miopages-node-type-lead { font-size: clamp(1.125rem, 1.5vw, 1.3rem); line-height: 1.5; }
-.miopages-native-component .miopages-node-type-display { font-size: clamp(2rem, 3.5vw, 3.5rem); line-height: 1.12; letter-spacing: -.025em; }
-.miopages-branded-draft .miopages-authored-section .miopages-native-component h1.miopages-node { font-size: clamp(2rem, 3.5vw, 3.5rem); line-height: 1.12; max-width: 24ch; text-wrap: balance; }
-.miopages-branded-draft .miopages-authored-section .miopages-native-component h2.miopages-node { font-size: clamp(1.5rem, 2.5vw, 2.25rem); line-height: 1.2; letter-spacing: -.02em; }
-.miopages-native-component h3.miopages-node { font-size: 1.125rem; line-height: 1.35; }
-.miopages-branded-draft .miopages-draft-creative .miopages-authored-section { padding: 0; background: transparent; border: 0; color: inherit; }
-.miopages-native-component figure { margin: 0; }
-.miopages-native-component img { display: block; max-width: 100%; height: auto; }
-@media (max-width: 900px) {
-  .miopages-native-component .miopages-node-columns { grid-template-columns: minmax(0, 1fr); }
-  .miopages-native-component .miopages-node { grid-column: auto; }
-}
-@media (min-width: 900px) {
-  .miopages-draft-creative .miopages-draft-with-image { grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); }
-}
-@media (max-width: 680px) {
-  .miopages-branded-draft .miopages-draft-creative .miopages-draft-nav {
-    gap: .55rem 1rem;
-    font-size: .875rem;
-  }
-  .miopages-branded-draft .miopages-draft-creative .miopages-draft-hero { gap: 1.2rem; }
-}
+/* Header and menu: the logo, and WordPress's own navigation (it becomes a menu button on phones). */
+.miopages-branded-draft header .wp-block-group { padding-inline: 1.5rem; }
+.miopages-branded-draft header .wp-block-navigation { font-weight: 600; gap: .4rem 1.6rem; }
+.miopages-branded-draft header .wp-block-navigation a { text-decoration: none; }
+.miopages-branded-draft header .wp-block-navigation a:hover { text-decoration: underline; }
+.miopages-draft-wordmark img { height: 44px; width: auto; display: block; }
 
-/* Authored components own their hierarchy; legacy Hero colors/widths must not
-   conceal a title on a model-selected brand surface. */
-.miopages-branded-draft .miopages-draft-creative .miopages-authored-section .miopages-native-component :is(h1,h2,h3,h4,h5,h6) { color: inherit; }
-.miopages-native-component .wp-block-group.miopages-node-measure-wide { max-width: 100%; }
-.miopages-native-component .wp-block-group.miopages-node-flow { display: flex; flex-direction: column; }
-.miopages-authored-section { margin-block: 0; }
-.miopages-authored-section > .miopages-native-component > .wp-block-group.miopages-node {
-  padding: clamp(1.5rem, 3vw, 3rem) clamp(1.25rem, 3vw, 3rem);
-}
-/* Hero side panels keep their natural height; they are not empty equal-height cards. */
-.miopages-authored-section.miopages-draft-hero > .miopages-native-component > .miopages-node-columns > .wp-block-group { align-self: start; }
-.miopages-native-component .wp-block-list { padding-inline-start: 1.25rem; }
-.miopages-native-component .wp-block-list > li + li { margin-block-start: .35rem; }
-.miopages-native-component .miopages-pending-media,
-/* A button not connected yet looks like any other; one small note below says so (the Principal, Nov 27). */
-.miopages-pending-note { margin: .35rem 0 0; font-size: .85rem; font-style: italic; opacity: .9; }
+/* The page: sections are full-width bands, their content kept to a readable width. */
+.miopages-branded-draft main.wp-block-group { padding: 0 !important; margin: 0; }
+.miopages-branded-draft main .wp-block-post-content > * { margin-block: 0; }
+.mp-section { padding: var(--mp-pad) 1.5rem; margin: 0 !important; }
+.mp-section > * { max-width: var(--mp-width); margin-inline: auto !important; }
+.mp-section > * + * { margin-top: var(--mp-gap); }
 
-/* A native Action has one visible button, even when its authored node carries
-   surface/inset tokens. Context defaults keep it legible on a brand surface. */
-.miopages-native-component { --mp-action-bg: var(--wp--preset--color--brand); --mp-action-ink: var(--wp--preset--color--on-brand); }
-.miopages-native-component .miopages-node-surface-brand { --mp-action-bg: var(--wp--preset--color--on-brand); --mp-action-ink: var(--wp--preset--color--brand); }
-.miopages-native-component :is(.miopages-node-surface-light,.miopages-node-surface-tonal) { --mp-action-bg: var(--wp--preset--color--brand); --mp-action-ink: var(--wp--preset--color--on-brand); }
-.miopages-native-component .wp-block-button.miopages-node { background: transparent; color: inherit; border: 0; padding: 0; border-radius: 0; }
-.miopages-native-component .wp-block-button__link { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 44px; max-width: 100%; padding: .75rem 1rem; font-size: 1rem; line-height: 1.35; background: var(--mp-action-bg); color: var(--mp-action-ink); border: 1px solid currentColor; }
-.miopages-authored-section .miopages-native-component .wp-block-button.miopages-node > .wp-block-button__link { padding: .75rem 1rem; font-size: 1rem; line-height: 1.35; }
-.miopages-native-component .wp-block-button.miopages-node-surface-brand > a { background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand); }
-.miopages-native-component .wp-block-button.miopages-node-surface-light > a { background: var(--wp--preset--color--surface); color: var(--wp--preset--color--ink); }
-.miopages-authored-section.miopages-draft-hero .miopages-native-component .wp-block-list {
-  list-style: none; padding-inline-start: 0; display: grid; gap: .5rem;
-}
-.miopages-authored-section.miopages-draft-hero .miopages-native-component .wp-block-list > li {
-  margin: 0; padding-block: .35rem; border-block-end: 1px solid currentColor;
-}
+/* Bands: each is one of the design's palette pairs. */
+.mp-band-light { background: var(--wp--preset--color--surface); color: var(--wp--preset--color--ink); }
+.mp-band-tonal { background: var(--wp--preset--color--support); color: var(--miopages-tonal-ink, var(--wp--preset--color--ink)); }
+.mp-band-strong { background: var(--miopages-accent-surface); color: var(--miopages-accent-ink); }
+.mp-band-brand { background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand); }
+.mp-band-supporting { background: var(--miopages-supporting-surface, var(--wp--preset--color--support)); color: var(--miopages-supporting-ink, var(--wp--preset--color--ink)); }
+.mp-band-contrast { background: var(--miopages-contrast-surface, var(--wp--preset--color--brand)); color: var(--miopages-contrast-ink, var(--wp--preset--color--on-brand)); }
 
-/* Nested comparisons respond to their actual column, not only the viewport. */
-.miopages-native-component,
-.miopages-native-component .miopages-node-columns > .wp-block-group.miopages-node { container-type: inline-size; }
-@container (max-width: 38rem) {
-  .miopages-native-component .miopages-node-columns { grid-template-columns: minmax(0, 1fr); }
-  .miopages-native-component .miopages-node { grid-column: auto; }
-}
+/* Buttons take the brand pair; on a brand or contrast band they reverse so they stay visible. */
+.mp-section .wp-block-buttons { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: var(--mp-gap); }
+.mp-section .wp-block-button__link { display: inline-block; background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand);
+  border-radius: var(--mp-radius-sm, 4px); padding: .8em 1.3em; font-weight: 600; text-decoration: none; min-height: 44px; box-sizing: border-box; }
+.mp-band-brand .wp-block-button__link, .mp-band-contrast .wp-block-button__link { background: currentColor; }
+.mp-band-brand .wp-block-button__link { color: var(--wp--preset--color--brand); }
+.mp-band-contrast .wp-block-button__link { color: var(--miopages-contrast-surface, var(--wp--preset--color--brand)); }
 
-/* Authored columns inside an align-start flow still fill the available measure.
-   Otherwise inline-size containment can shrink a comparison to its padding. */
-.miopages-native-component .miopages-node-columns { inline-size: 100%; }
+/* Pictures, and the marked frames for pictures and material still to come (Part 1 #12). */
+.mp-picture { margin: 0; }
+.mp-picture img { display: block; width: 100%; height: auto; border-radius: var(--mp-radius-md, 8px); }
+.mp-fpo, .mp-placeholder { border: 2px dashed currentColor; border-radius: var(--mp-radius-md, 8px); padding: 1.25rem; opacity: .9; }
+.mp-fpo { min-height: 12rem; display: flex; flex-direction: column; justify-content: center; }
+.mp-fpo-label, .mp-placeholder-label { font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-bottom: .4em; }
+.mp-fpo-brief, .mp-placeholder-text { font-size: .95em; margin: 0; }
+.mp-placeholder-need { font-weight: 600; margin-bottom: .3em; }
 
-/* The site menu (design rule 5). Text links in the header; when they would wrap to two lines,
-   menu.js adds .miopages-menu-compact and the button opens them as a full-screen list.
-   A plain default: Core's stylesheet designs how both states look. */
-.miopages-menu { display: flex; align-items: center; justify-content: flex-end; flex: 1 1 auto; min-width: 0; }
-header .wp-block-group:has(> .miopages-menu) { flex: 1 1 auto; min-width: 0; }
-.miopages-menu nav.miopages-draft-nav { padding-block: 0; }
-.miopages-menu-toggle { display: none; }
-header.miopages-menu-compact .miopages-menu-toggle {
-  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
-  width: 48px; height: 48px; padding: 0; margin: 0; cursor: pointer;
-  border: 1px solid currentColor; border-radius: .5rem; background: transparent; color: inherit;
-}
-.miopages-menu-toggle:focus-visible { outline: 3px solid var(--wp--preset--color--brand, currentColor); outline-offset: 2px; }
-.miopages-menu-icon { display: grid; gap: 5px; width: 22px; }
-.miopages-menu-icon > span { display: block; height: 2px; border-radius: 1px; background: currentColor; transition: transform .2s ease, opacity .2s ease; }
-header.miopages-menu-open .miopages-menu-icon > span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-header.miopages-menu-open .miopages-menu-icon > span:nth-child(2) { opacity: 0; }
-header.miopages-menu-open .miopages-menu-icon > span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-header.miopages-menu-compact nav.miopages-draft-nav { display: none !important; }
-header.miopages-menu-compact.miopages-menu-open nav.miopages-draft-nav {
-  display: flex !important; flex-direction: column; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start;
-  position: fixed !important; inset: var(--mp-menu-top, 4.5rem) 0 0 0 !important; z-index: 1000;
-  width: auto !important; max-width: none !important; margin: 0 !important; gap: 0; overflow-y: auto; overflow-x: hidden;
-  padding: 1rem clamp(1rem, 5vw, 2rem) 2rem; background: var(--wp--preset--color--surface, #fff); color: var(--wp--preset--color--ink, #111);
-  border-radius: 0; box-shadow: none;
-}
-header.miopages-menu-compact.miopages-menu-open nav.miopages-draft-nav > * {
-  display: flex; align-items: center; min-height: 52px; padding: .75rem 0; font-size: 1.3rem; line-height: 1.3;
-  white-space: normal; border: 0; border-bottom: 1px solid var(--miopages-border, #ddd); border-radius: 0; background: transparent; box-shadow: none;
-}
-html.miopages-menu-locked { overflow: hidden; }
-/* Which state shows is a function, not a look (design rule 5): these win over any styling, so the
-   button shows only when the links would wrap, and the links hide only behind the button. */
-html body header:not(.miopages-menu-compact) .miopages-menu-toggle:not(#miopages-a):not(#miopages-b) { display: none !important; }
-html body header.miopages-menu-compact:not(.miopages-menu-open) nav.miopages-draft-nav:not(#miopages-a):not(#miopages-b) { display: none !important; }
-html body header.miopages-menu-compact.miopages-menu-open nav.miopages-draft-nav:not(#miopages-a):not(#miopages-b) { display: flex !important; }
-html body header.miopages-menu-measuring nav.miopages-draft-nav:not(#miopages-a):not(#miopages-b) { display: flex !important; }
-/* While the phone menu is open, nothing on the header may trap the full-screen panel inside it
-   (a blur, transform or filter makes the header the panel's frame). */
-html body header.miopages-menu-open:not(#miopages-a):not(#miopages-b) { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; transform: none !important; filter: none !important; contain: none !important; }
-html body header.miopages-menu-compact.miopages-menu-open nav.miopages-draft-nav:not(#miopages-a):not(#miopages-b) {
-  position: fixed !important; inset: var(--mp-menu-top, 4.5rem) 0 0 0 !important; width: auto !important; max-width: none !important; height: auto !important; max-height: none !important;
-  flex-direction: column !important; flex-wrap: nowrap !important; overflow-y: auto !important; transform: none !important; z-index: 1000 !important;
-}
-/* While menu.js measures: the links as plain text on wrapping lines, the button out of the way. */
-header.miopages-menu-measuring .miopages-menu-toggle { display: none !important; }
-header.miopages-menu-measuring nav.miopages-draft-nav {
-  display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; overflow: visible !important; position: static !important; transform: none !important; max-height: none !important;
-}
-header.miopages-menu-measuring nav.miopages-draft-nav > * { white-space: nowrap !important; }
-@media (prefers-reduced-motion: reduce) { .miopages-menu-icon > span { transition: none; } }
+/* Opening and text with picture: words beside the picture (split), centered, or over a banner. */
+.mp-split { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: calc(var(--mp-gap) * 2); align-items: center; }
+.mp-words > :last-child { margin-bottom: 0; }
+.mp-v-picture-left .mp-split > .mp-visual { order: -1; }
+.mp-v-centered { text-align: center; }
+.mp-v-centered h1, .mp-v-centered h2, .mp-v-centered p { margin-inline: auto; }
+.mp-v-centered .wp-block-buttons { justify-content: center; }
+.mp-v-centered .mp-split { grid-template-columns: minmax(0, 1fr); }
+.mp-v-banner .mp-split { grid-template-columns: minmax(0, 1fr); }
+.mp-v-banner .mp-visual { order: -1; }
+.mp-c-opening p { font-size: 1.1em; }
 
-/* FPO (for-position-only) frame: Core requested an image and no approved acquired
-   asset is bound yet. Deliberately reads as a placeholder, never as real media. */
-.miopages-fpo {
-  position: relative; display: flex; flex-direction: column; justify-content: flex-start; gap: .5rem;
-  box-sizing: border-box; width: 100%; aspect-ratio: 3 / 2; margin: 0; padding: clamp(1rem, 2.5vw, 1.5rem);
-  overflow: hidden; border: 2px dashed var(--wp--preset--color--brand); border-radius: .8rem;
-  color: var(--wp--preset--color--brand);
-  background:
-    repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--wp--preset--color--brand) 9%, transparent) 14px 15px),
-    color-mix(in srgb, var(--wp--preset--color--support) 70%, #fff);
-}
-.miopages-fpo-badge {
-  align-self: flex-start; padding: .2rem .55rem; border-radius: .3rem;
-  background: var(--wp--preset--color--brand); color: var(--wp--preset--color--on-brand);
-  font: 700 .8rem/1.2 ui-monospace, Consolas, monospace; letter-spacing: .12em;
-}
-.miopages-fpo-label { font-weight: 700; font-size: .85rem; letter-spacing: .02em; text-transform: uppercase; }
-.miopages-fpo-brief {
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden;
-  font-size: .95rem; line-height: 1.45; color: var(--wp--preset--color--ink, #222);
-}
-.miopages-draft-hero .miopages-fpo { aspect-ratio: 4 / 3; }
-@media (max-width: 680px) { .miopages-fpo { aspect-ratio: 4 / 3; } .miopages-fpo-brief { -webkit-line-clamp: 4; } }
+/* Text: one readable column, or a wider one. */
+.mp-v-wide p { max-width: 80ch; }
 
-/* Content placeholder: Core marked material as still needed (testimonial, price, result...).
-   A visible notice, never presented as the material itself. */
-.miopages-placeholder, .miopages-native-component aside.miopages-placeholder {
-  display: flex; flex-direction: column; gap: .35rem; box-sizing: border-box; margin: 0;
-  padding: clamp(.9rem, 2vw, 1.25rem); border: 2px dashed var(--wp--preset--color--brand); border-radius: .8rem;
-  background: color-mix(in srgb, var(--wp--preset--color--support) 55%, #fff); color: var(--wp--preset--color--ink, #222);
-}
-.miopages-placeholder-badge {
-  align-self: flex-start; padding: .2rem .55rem; border-radius: .3rem; background: var(--wp--preset--color--brand);
-  color: var(--wp--preset--color--on-brand); font: 700 .75rem/1.2 ui-monospace, Consolas, monospace; letter-spacing: .08em; text-transform: uppercase;
-}
-.miopages-placeholder-label { font-weight: 700; color: var(--wp--preset--color--brand); }
-.miopages-placeholder-text { font-size: .95rem; line-height: 1.45; }
+/* Sets of items: points, steps, questions, pictures. */
+.mp-set { display: grid; gap: var(--mp-gap) calc(var(--mp-gap) * 1.4); }
+.mp-v-columns .mp-set, .mp-v-cards .mp-set, .mp-v-row .mp-set, .mp-v-grid .mp-set { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+.mp-item > :last-child { margin-bottom: 0; }
+.mp-v-columns .mp-item { border-top: 2px solid currentColor; padding-top: .9rem; }
+.mp-v-cards .mp-item { background: var(--wp--preset--color--surface); color: var(--wp--preset--color--ink); border: 1px solid var(--miopages-border, #ddd);
+  border-radius: var(--mp-radius-md, 8px); padding: 1.25rem; }
+.mp-v-list .mp-set { grid-template-columns: minmax(0, 1fr); max-width: 52rem; }
+.mp-v-list .mp-item { border-bottom: 1px solid var(--miopages-border, #ddd); padding-bottom: 1rem; }
+.mp-c-steps .mp-set { counter-reset: mp-step; }
+.mp-c-steps .mp-item { counter-increment: mp-step; }
+.mp-c-steps .mp-item h3::before { content: counter(mp-step) ". "; }
+.mp-question { border-bottom: 1px solid var(--miopages-border, #ddd); padding: .75rem 0; }
+.mp-question summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+.mp-v-row.mp-c-gallery .mp-set { grid-auto-flow: column; grid-auto-columns: minmax(16rem, 1fr); overflow-x: auto; }
 
-/* Inside authored components, generic node layout classes (flow, inset-none) must not
-   flatten the FPO frame or placeholder notice. */
-.miopages-native-component figure.miopages-fpo { display: flex; padding: clamp(1rem, 2.5vw, 1.5rem); }
+/* Call to action: a full band, or a card within it. */
+.mp-v-card > .mp-words, .mp-c-call.mp-v-card > :not(.wp-block-buttons) { max-width: 46rem; }
+.mp-c-call.mp-v-card { padding-inline: max(1.5rem, calc((100% - 46rem) / 2)); }
 
-/* ===== Core-designed sites (brand projection v4) =====
-   Everything below applies only when Core's AI chose this site's design. Values come
-   from the signed projection as CSS variables; older candidates are unaffected. */
-body.miopages-designed { font-family: var(--miopages-body-font); color: var(--wp--preset--color--ink); }
-.miopages-designed h1, .miopages-designed h2, .miopages-designed h3, .miopages-designed h4 {
-  font-family: var(--miopages-heading-font); font-weight: var(--miopages-heading-weight); }
-.miopages-designed .miopages-draft-section h1,
-.miopages-designed .miopages-authored-section .miopages-native-component h1.miopages-node {
-  font-size: clamp(2rem, 5vw, var(--miopages-title-size)); max-width: 22ch; }
-.miopages-designed h2 { font-size: clamp(1.45rem, 3vw, calc(var(--miopages-title-size) * .62)); }
-.miopages-designed .miopages-draft-section { padding: calc(clamp(1.5rem, 5vw, 4rem) * var(--mp-space)); margin-block: calc(1.3rem * var(--mp-space)); }
-.miopages-designed .miopages-draft-intro { padding-block: calc(clamp(1.3rem, 3vw, 2.5rem) * var(--mp-space)); }
-.miopages-designed .miopages-draft-hero, .miopages-designed .miopages-draft-cta { border-radius: var(--mp-radius-lg); }
-.miopages-designed .miopages-draft-with-image img, .miopages-designed .miopages-native-component .miopages-node-rounded,
-.miopages-designed .miopages-native-component figure.miopages-fpo, .miopages-designed .miopages-native-component aside.miopages-placeholder,
-.miopages-designed figure.miopages-fpo, .miopages-designed aside.miopages-placeholder { border-radius: var(--mp-radius-md); }
-.miopages-designed .wp-block-button__link { border-radius: var(--mp-radius-sm); }
-.miopages-designed .miopages-native-component .miopages-node-gap-medium { gap: calc(1rem * var(--mp-space)); }
-.miopages-designed .miopages-native-component .miopages-node-gap-large { gap: calc(2rem * var(--mp-space)); }
-.miopages-designed .miopages-native-component .miopages-node-inset-medium { padding: calc(1.25rem * var(--mp-space)); }
-.miopages-designed .miopages-native-component .miopages-node-inset-large { padding: calc(2.25rem * var(--mp-space)); }
-.miopages-native-component .miopages-node-surface-supporting { background: var(--miopages-supporting-surface, var(--wp--preset--color--support)); color: var(--miopages-supporting-ink, inherit); }
-.miopages-native-component .miopages-node-surface-contrast { background: var(--miopages-contrast-surface, var(--wp--preset--color--ink)); color: var(--miopages-contrast-ink, var(--wp--preset--color--surface)); }
-.miopages-designed .miopages-native-component .miopages-node-surface-contrast a { color: inherit; }
+/* Footer: Core's footer from the Site plan, after the logo. */
+.miopages-branded-draft footer { padding: 2.5rem 1.5rem; }
 
-/* Phone order Core chose for a block's children (mobileOrder); 0 keeps the desktop order. */
-@media (max-width: 700px) {
-  .miopages-node-order-1 { order: 1; } .miopages-node-order-2 { order: 2; } .miopages-node-order-3 { order: 3; }
-  .miopages-node-order-4 { order: 4; } .miopages-node-order-5 { order: 5; } .miopages-node-order-6 { order: 6; }
-  .miopages-node-order-7 { order: 7; } .miopages-node-order-8 { order: 8; } .miopages-node-order-9 { order: 9; }
-  .miopages-node-order-10 { order: 10; } .miopages-node-order-11 { order: 11; } .miopages-node-order-12 { order: 12; }
+@media (max-width: 760px) {
+  .mp-split { grid-template-columns: minmax(0, 1fr); }
+  .mp-section { padding: calc(var(--mp-pad) * .7) 1.15rem; }
 }
-
-/* The site's footer Core wrote (a plain default; Core's stylesheet designs it). */
-.miopages-site-footer { box-sizing: border-box; width: min(100% - 2rem, 72rem); margin: 0 auto; padding: 1.5rem 0 2rem; }
-.miopages-footer-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1.5rem 2rem; }
-.miopages-footer-heading { font-weight: 700; margin: 0 0 .4rem; }
-.miopages-footer-text { margin: 0 0 .5rem; }
-.miopages-footer-links { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
-.miopages-footer-links a { display: inline-flex; align-items: center; min-height: 32px; }
-.miopages-footer-note { margin: 1.5rem 0 0; font-size: .9rem; color: var(--miopages-muted, inherit); }
-
-/* The design rules the theme guarantees itself, whatever a site's design says (design-rules.ts),
-   so a first draft meets them without rounds of correction. Core designs the look; these hold. */
-/* Rule 6, fits the phone: nothing makes the page scroll sideways; media keep within the page. */
-html body.miopages-designed { overflow-x: clip !important; }
-body.miopages-designed main :is(img, video, iframe, svg, table, figure):not(#miopages-a) { max-width: 100% !important; }
-/* Rule 6, big enough to tap: buttons and menu links. */
-body.miopages-designed :is(a.wp-block-button__link, .miopages-menu-toggle, nav.miopages-draft-nav > a):not(#miopages-a) { min-height: 44px !important; }
-/* Rule 7, honest about gaps: FPO frames and missing-material notices are always shown at a readable size. */
-body.miopages-designed :is(figure.miopages-fpo, aside.miopages-placeholder):not(#miopages-a):not(#miopages-b) {
-  display: flex !important; visibility: visible !important; opacity: 1 !important; clip-path: none !important;
-  min-width: min(100%, 16rem) !important; box-sizing: border-box !important;
-}
-body.miopages-designed figure.miopages-fpo:not(#miopages-a):not(#miopages-b) { min-height: 8rem !important; }
-/* Rule 9, motion: everything holds still for visitors who ask for reduced motion. */
-@media (prefers-reduced-motion: reduce) {
-  body.miopages-designed *, body.miopages-designed *::before, body.miopages-designed *::after {
-    animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important;
-  }
-}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }

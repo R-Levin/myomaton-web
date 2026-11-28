@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { designProjection, type SiteDesign } from "../design-systems/site-design";
+import { defaultVariant, designProjection, type SiteDesign } from "../design-systems/site-design";
+import { renderPage } from "../site/render";
+import type { SitePage } from "../site/components";
 import { draftBrand } from "../wordpress-delivery/draft-brand";
 import { reviewDraftEnvelope } from "../wordpress-delivery/native-draft-envelope";
 import { deliveryTarget, readBackOperatorSite, samePaths, signingKey, type OperatorSiteConfig } from "../wordpress-delivery/operator-review";
@@ -11,7 +13,7 @@ import { fingerprint } from "../canonical/model";
 import { deliveryCopy, pictureFrameId } from "./assets";
 import { bindReviewDraft } from "../wordpress-delivery/review-draft";
 import { directionIdentity, logicalId, pageIdentity } from "../work-products/pages";
-import { ask, current, currentSite, edit, type ServiceRecord } from "./cycle";
+import { ask, current, currentSite, edit, type PageContent, type ServiceRecord } from "./cycle";
 
 /**
  * Delivery (rebuild plan, milestone 1): the engine's current Pages, Menu and Design go to WordPress
@@ -33,19 +35,29 @@ export function draftCandidate(record: ServiceRecord) {
   const design = (current(record, directionIdentity(record.account.managedSiteId))?.content as { design?: SiteDesign } | undefined)?.design;
   if (!design) throw Error("The approved Direction carries Core's design; it is required for a draft");
   const managedSiteId = record.account.managedSiteId;
-  const pages = (site.pages as unknown as Page[]).map(page => ({ id: page.id, path: page.path, title: page.heading, composition: page.composition,
+  // Pages in the components format (from Nov 29) are rendered here by Core; pages written before keep the earlier format.
+  const rendered = (site.pages as unknown as SitePage[]).filter(page => Array.isArray(page.layout)).map(page => ({
+    id: pageIdentity(managedSiteId, page.path), path: page.path, title: page.title, composition: "components-v1" as const,
+    navigationLabel: site.plan.pages.find(entry => entry.path === page.path)!.label,
+    markup: renderPage(page, { link: path => `miopages:page:${path}`, defaultVariant: name => defaultVariant(design, name),
+      picture: contentId => {
+        const frame = pictureFrameId(page.path, contentId), asset = (record.assets ?? []).find(item => item.sectionId === frame);
+        return asset ? { url: `miopages:media:${frame}`, width: asset.width, height: asset.height } : null;
+      } }) }));
+  const earlier = (site.pages as unknown as Page[]).filter(page => !Array.isArray((page as unknown as SitePage).layout)).map(page => ({ id: page.id, path: page.path, title: page.heading, composition: page.composition,
     navigationLabel: site.plan.pages.find(entry => entry.path === page.path)!.label,
     sections: page.sections.map(section => ({ id: section.id, type: section.role ?? "intro", content: { heading: section.heading, text: section.body },
       ...(section.block !== undefined && section.block !== null && { block: section.block }),
       ...(page.composition && section.visual && { visual: { purpose: section.visual.purpose, brief: section.visual.brief, altIntent: section.visual.altIntent,
         status: section.visual.status } }),
-      ...(page.composition && section.moreVisuals?.length && { moreVisuals: section.moreVisuals.map((visual, n) => ({ id: pictureFrameId(section.id, n + 1),
+      ...(page.composition && section.moreVisuals?.length && { moreVisuals: section.moreVisuals.map((visual, n) => ({ id: logicalId({ section: section.id, picture: n + 1 }),
         purpose: visual.purpose, brief: visual.brief, altIntent: visual.altIntent, status: visual.status })) }) })) }));
+  const pages = [...rendered, ...earlier];
   // Home is reachable from the Menu; when the plan leaves it out (the logo often links home), it goes first.
   const navigation = site.menu.includes("/") ? site.menu : ["/", ...site.menu];
   const paths = site.plan.pages.map(entry => entry.path);
-  const actions = (site.pages as unknown as Page[]).flatMap(page => {
-    const own = pages.find(item => item.path === page.path)!;
+  const actions = (site.pages as unknown as Page[]).filter(page => !Array.isArray((page as unknown as SitePage).layout)).flatMap(page => {
+    const own = earlier.find(item => item.path === page.path)!;
     const chosen = (page.actions ?? []).map((action, index) => ({ ...action, index }))
       .filter(action => action.destination && action.destination !== page.path && paths.includes(action.destination) &&
         (action.kind === "navigate" || page.composition && action.kind !== "existing-account"))
@@ -59,7 +71,7 @@ export function draftCandidate(record: ServiceRecord) {
     }
     return chosen;
   });
-  const unresolvedActions = (site.pages as unknown as Page[]).flatMap(page => (page.actions ?? []).flatMap((action, index) =>
+  const unresolvedActions = (site.pages as unknown as Page[]).filter(page => !Array.isArray((page as unknown as SitePage).layout)).flatMap(page => (page.actions ?? []).flatMap((action, index) =>
     !action.destination ? [{ from: page.path, reference: "action-" + index, label: action.label }] : []));
   return { candidate: { pages, navigation, actions, ...(site.footer && { footer: site.footer }) }, unresolvedActions, design: designProjection(design) };
 }
@@ -102,8 +114,8 @@ export async function deliverDraft(input: { config: OperatorSiteConfig; record: 
   // Each chosen picture goes in the exact Section it was chosen for; a Section since reworked keeps its FPO frame.
   const placed = (record.assets ?? []).flatMap(asset => {
     const page = review.candidate.pages.find(item => item.path === asset.path);
-    return page?.sections.some(section => section.id === asset.sectionId ||
-      (section.moreVisuals ?? []).some((_, n) => pictureFrameId(section.id, n + 1) === asset.sectionId)) ? [{ asset, pageId: page.id }] : [];
+    // A picture goes where its frame is in the rendered page; a picture item since removed falls away.
+    return page && "markup" in page && page.markup.includes(`src="miopages:media:${asset.sectionId}"`) ? [{ asset, pageId: page.id }] : [];
   });
   const copies = await Promise.all(placed.map(async ({ asset, pageId }) => {
     const copy = await deliveryCopy(asset, file => readFile(file));
@@ -165,6 +177,41 @@ export function editedSections(content: string, sectionIds: readonly string[]) {
 }
 
 /**
+ * A hand-edited Core-rendered page, item by item: each block named mp:<id> is read back into that
+ * content item's fields. When the edit can't be read that way (a block someone added without a
+ * name, an item removed), null: the edit goes to Core as a Request to work in, so it is never lost.
+ */
+export function editedItems(content: string, page: SitePage) {
+  const found = new Map<string, { headings: string[]; paragraphs: string[]; buttons: string[]; summary?: string }>();
+  const entry = (id: string) => { let item = found.get(id); if (!item) found.set(id, item = { headings: [], paragraphs: [], buttons: [] }); return item; };
+  for (const match of content.matchAll(/<!-- wp:(heading|paragraph|button|details)(?: (\{.*?\}))? \/?-->([\s\S]*?)(?=<!-- \/?wp:)/gu)) {
+    let attrs: { metadata?: { name?: string }; summary?: string; className?: string } = {};
+    try { attrs = match[2] ? JSON.parse(match[2]) : {}; } catch { return null; }
+    const id = /^mp:(.+)$/u.exec(attrs.metadata?.name ?? "")?.[1];
+    const text = plain(match[3]);
+    if (!id) { if (text) return null; continue; }
+    if (/mp-(fpo|placeholder)-/u.test(attrs.className ?? "")) continue;
+    const item = entry(id);
+    if (match[1] === "heading") item.headings.push(text);
+    else if (match[1] === "paragraph") item.paragraphs.push(text);
+    else if (match[1] === "button") item.buttons.push(text);
+    else item.summary = attrs.summary ?? plain(/<summary>([\s\S]*?)<\/summary>/u.exec(match[3])?.[1] ?? "");
+  }
+  const items: { id: string; fields: Record<string, string> }[] = [];
+  for (const item of page.content) {
+    if (item.type === "picture" || item.type === "placeholder") continue;
+    const read = found.get(item.id);
+    if (!read) { if (page.layout.some(section => Object.values(section.slots).flat().includes(item.id))) return null; continue; }
+    const paragraphs = read.paragraphs.join("\n\n");
+    const fields: Record<string, string> = item.type === "heading" ? { text: read.headings.join(" ") } : item.type === "text" ? { text: paragraphs }
+      : item.type === "item" ? { title: read.headings.join(" "), text: paragraphs } : item.type === "question" ? { question: read.summary ?? item.question, answer: paragraphs }
+      : { label: read.buttons.join(" ") };
+    items.push({ id: item.id, fields });
+  }
+  return items;
+}
+
+/**
  * Read-back: each open Note in WordPress becomes a Request on its page, in the person's own words,
  * for Core to handle like any other. A hand edit is the Specialist's own: read section by section,
  * it becomes the page's next Version directly; when it cannot be read that way it becomes a
@@ -180,11 +227,11 @@ export function takeInReadBack(record: ServiceRecord, readback: Readback, by: { 
   for (const page of readback.pages.filter(item => item.edited && !item.missing)) {
     const channelRef = `${page.path}:${page.contentSha256}`;
     if (record.ledger.requests.some(request => request.channelRef === channelRef)) continue;
-    const delivered = current(record, pageIdentity(record.account.managedSiteId, page.path))?.content as { sections?: { id: string }[] } | undefined;
-    const sections = by.role === "operator" && delivered?.sections && page.content ? editedSections(page.content, delivered.sections.map(section => section.id)) : null;
-    if (sections) {
-      record = edit(record, { id: `wp-edit:${channelRef}`, at, by, path: page.path, sections, channel: "hand-edit", channelRef,
-        words: "Hand edit in WordPress, taken in section by section." });
+    const delivered = current(record, pageIdentity(record.account.managedSiteId, page.path))?.content as PageContent | undefined;
+    const items = by.role === "operator" && delivered && Array.isArray(delivered.layout) && page.content ? editedItems(page.content, delivered) : null;
+    if (items) {
+      record = edit(record, { id: `wp-edit:${channelRef}`, at, by, path: page.path, items, channel: "hand-edit", channelRef,
+        words: "Hand edit in WordPress, taken in item by item." });
       continue;
     }
     record = ask(record, { id: `wp-edit:${page.path}:${page.contentSha256}`, at, by, kind: "page", path: page.path, channel: "hand-edit",

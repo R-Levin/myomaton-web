@@ -41,6 +41,15 @@ final class MioPages_Native_Draft_Media
                 throw new InvalidArgumentException('Native draft media placement refused.');
             }
             $pages = array_values(array_filter($candidate['pages'], static fn($page) => ($page['id'] ?? null) === $item['pageId']));
+            // A Core-rendered page places a picture by reference in its markup.
+            if (count($pages) === 1 && ($pages[0]['composition'] ?? null) === 'components-v1') {
+                if (!str_contains((string) ($pages[0]['markup'] ?? ''), 'src="miopages:media:' . $item['sectionId'] . '"')) {
+                    throw new InvalidArgumentException('Native draft media placement mismatch.');
+                }
+                $usedSections[$item['sectionId']] = true;
+                $usages[$item['usageId']] = true;
+                continue;
+            }
             $targets = array_filter($pages[0]['sections'] ?? [], static fn($section) =>
                 (($section['id'] ?? null) === $item['sectionId'] || in_array($item['sectionId'], array_column($section['moreVisuals'] ?? [], 'id'), true))
                 && in_array($section['type'] ?? null, ['hero', 'intro', 'relationship', 'collection', 'cta'], true));

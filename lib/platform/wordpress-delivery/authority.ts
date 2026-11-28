@@ -6,7 +6,7 @@ import { assertNativeSection } from "../intake/presence-native-component";
 import { readSemanticBlock, type SemanticBlock } from "../intake/presence-semantic-block";
 
 export type Site = { organizationId: string; webPresenceId: string; managedSiteId: string };
-type Page = { id: string; path: string; title: string; composition?: "managed-v1"; navigationLabel?: string; sections: {
+type Page = { id: string; path: string; title: string; composition?: "managed-v1" | "components-v1"; markup?: string; navigationLabel?: string; sections: {
   id: string; type: string; content: { heading: string; text: string }; block?: SemanticBlock; visual?: SectionVisual; moreVisuals?: (SectionVisual & { id: string })[];
 }[] };
 /** Core's own per-section visual intent. "asset-needed"/"rights-review" without an
@@ -40,6 +40,19 @@ export function validatePages(pages: Page[], nativeDraft = false, localSemanticB
   const paths = new Set<string>(), pageIds = new Set<string>(), sectionIds = new Set<string>();
   if (!Array.isArray(pages) || pages.length < 1 || (!nativeDraft && pages.length > 16)) throw Error("Projection pages refused");
   for (const page of pages) {
+    // A page Core rendered from the site's components (docs/rendering-design.md): review drafts only.
+    if (nativeDraft && page.composition === "components-v1") {
+      const markup = (page as { markup?: unknown }).markup;
+      if (!exact(page, "composition,id,markup,navigationLabel,path,title") || !id(page.id) || !text(page.title, 160) || !page.title.trim()
+        || !text(page.navigationLabel!, 100) || !page.navigationLabel!.trim() || typeof markup !== "string" || !markup.trim() || markup.length > 2_000_000
+        || /<script|<iframe|<object|\son[a-z]+=|javascript:/iu.test(markup)
+        || !/^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*\/?)?$/.test(page.path) || paths.has(page.path) || pageIds.has(page.id)) {
+        throw Error("Projection page refused");
+      }
+      paths.add(page.path);
+      pageIds.add(page.id);
+      continue;
+    }
     const composed = nativeDraft && page.composition === "managed-v1";
     if (!exact(page, composed ? "composition,id,navigationLabel,path,sections,title" : "id,path,sections,title") || !id(page.id) || !text(page.title, 160) || !page.title.trim()
       || !text(page.path, 160) || !/^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*\/?)?$/.test(page.path)

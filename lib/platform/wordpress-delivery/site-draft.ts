@@ -24,8 +24,10 @@ export function verifyNativeMediaPlacements(media: readonly NativeDraftMedia[], 
   const sectionIds = new Set<string>(), usages = new Set<string>();
   for (const item of media) {
     if (sectionIds.has(item.sectionId) || usages.has(item.usageId) || !pages.some(page => page.id === item.pageId &&
+      // A Core-rendered page places a picture by reference in its markup.
+      ((page as { composition?: string }).composition === "components-v1" ? String((page as { markup?: unknown }).markup).includes(`src="miopages:media:${item.sectionId}"`) :
       page.sections.some(section => (section.id === item.sectionId || (section.moreVisuals ?? []).some(frame => frame.id === item.sectionId))
-        && ["hero", "intro", "relationship", "collection", "cta"].includes(section.type)))) {
+        && ["hero", "intro", "relationship", "collection", "cta"].includes(section.type))))) {
       throw Error("Draft media placement differs from reviewed Section");
     }
     sectionIds.add(item.sectionId);

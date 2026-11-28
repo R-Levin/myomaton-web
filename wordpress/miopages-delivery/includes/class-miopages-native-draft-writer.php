@@ -129,6 +129,7 @@ final class MioPages_Native_Draft_Writer
                 self::updateDraft($post, $priorPosts[$path] ?? null);
             }
             unset($post);
+            if ($review) self::navigation($candidate, $ids);
             $next = ['siteProposalId' => $candidate['siteProposalId'], 'revision' => $candidate['revision'],
                 'digest' => $digest, 'posts' => $posts, 'logicalPageIds' => $logicalIds];
             if (isset($candidate['brand'])) $next['brand'] = $candidate['brand'];
@@ -155,6 +156,30 @@ final class MioPages_Native_Draft_Writer
         }
         return ['operation' => 'apply', 'installationId' => $candidate['installationId'],
             'requestedDigest' => $digest, 'applied' => $applied];
+    }
+
+    /**
+     * The site's menu as WordPress's own navigation: one menu (wp_navigation) with a link to each
+     * draft page, in the site's order. The theme's header shows it; WordPress makes it a phone menu.
+     */
+    private static function navigation(array $candidate, array $ids): void
+    {
+        $labels = [];
+        foreach ($candidate['pages'] as $page) $labels[$page['path']] = $page['navigationLabel'] ?? $page['title'];
+        $links = '';
+        foreach ($candidate['navigation'] as $path) {
+            if (!isset($ids[$path])) continue;
+            $links .= '<!-- wp:navigation-link ' . wp_json_encode(['label' => $labels[$path], 'url' => home_url('/?page_id=' . $ids[$path] . '&preview=true'), 'kind' => 'custom']) . ' /-->';
+        }
+        $existing = (int) get_option('miopages_draft_navigation_id', 0);
+        $menu = ['post_type' => 'wp_navigation', 'post_status' => 'publish', 'post_title' => 'Site menu', 'post_content' => $links];
+        if ($existing > 0 && get_post_type($existing) === 'wp_navigation') {
+            $result = wp_update_post(['ID' => $existing] + $menu, true);
+        } else {
+            $result = wp_insert_post($menu, true);
+            if (!is_wp_error($result)) update_option('miopages_draft_navigation_id', (int) $result, false);
+        }
+        if (is_wp_error($result)) throw new RuntimeException('Native draft menu could not be saved.');
     }
 
     private static function restore(array $candidate, string $digest): array

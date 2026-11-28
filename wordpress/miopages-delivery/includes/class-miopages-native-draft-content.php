@@ -65,7 +65,7 @@ final class MioPages_Native_Draft_Content
         $titles = array_column($pages, 'title', 'path');
         $labels = $titles;
         foreach ($pages as $page) {
-            if (($page['composition'] ?? null) === 'managed-v1') {
+            if (in_array($page['composition'] ?? null, ['managed-v1', 'components-v1'], true)) {
                 $label = $page['navigationLabel'] ?? null;
                 if (!is_string($label) || trim($label) === '' || strlen($label) > 100) {
                     throw new InvalidArgumentException('Invalid managed navigation label.');
@@ -76,6 +76,15 @@ final class MioPages_Native_Draft_Content
         $posts = [];
         foreach ($pages as $page) {
             $path = $page['path'];
+            // Core's own rendering of the page's components (docs/rendering-design.md): review drafts only.
+            if (($page['composition'] ?? null) === 'components-v1') {
+                if (!$reviewDraft) throw new InvalidArgumentException('Core-rendered pages belong only in review drafts.');
+                $posts[$path] = [
+                    'ID' => $postIds[$path], 'post_type' => 'page', 'post_status' => 'draft', 'post_title' => $page['title'],
+                    'post_content' => self::components($page, $postIds, $attachments) . self::footer($candidate['footer'] ?? null, $postIds, $labels),
+                ];
+                continue;
+            }
             foreach ($page['sections'] as $section) {
                 if (array_key_exists('block', $section) && (!$reviewDraft || ($page['composition'] ?? null) !== 'managed-v1')) {
                     throw new InvalidArgumentException('Core-designed blocks belong only in review drafts.');
@@ -126,6 +135,41 @@ final class MioPages_Native_Draft_Content
             ];
         }
         return $posts;
+    }
+
+    /** The blocks a Core-rendered page may use: ordinary WordPress core blocks only. */
+    private const COMPONENT_BLOCKS = ['core/group', 'core/heading', 'core/paragraph', 'core/image', 'core/buttons', 'core/button', 'core/details'];
+
+    /**
+     * A page Core rendered from the site's components. Only ordinary core blocks are accepted; links to
+     * the site's pages and its pictures arrive as references and are filled in here; WordPress's own
+     * filter (wp_kses_post) then cleans the result. The menu is WordPress's own navigation (the theme).
+     */
+    private static function components(array $page, array $postIds, array $attachments): string
+    {
+        $markup = $page['markup'] ?? null;
+        if (!is_string($markup) || trim($markup) === '' || strlen($markup) > 2000000) throw new InvalidArgumentException('Core-rendered page refused.');
+        $walk = static function (array $blocks) use (&$walk): void {
+            foreach ($blocks as $block) {
+                if ($block['blockName'] === null) {
+                    if (trim((string) $block['innerHTML']) !== '') throw new InvalidArgumentException('Core-rendered page has content outside blocks.');
+                    continue;
+                }
+                if (!in_array($block['blockName'], self::COMPONENT_BLOCKS, true)) throw new InvalidArgumentException('Core-rendered page uses a block that is not allowed.');
+                $walk($block['innerBlocks']);
+            }
+        };
+        $walk(parse_blocks($markup));
+        $markup = preg_replace_callback('/href="miopages:page:(\/[^"]*)"/', static function (array $m) use ($postIds): string {
+            if (!isset($postIds[$m[1]])) throw new InvalidArgumentException('Core-rendered page links to an unknown page.');
+            return 'href="' . esc_url(home_url('/?page_id=' . $postIds[$m[1]] . '&preview=true')) . '"';
+        }, $markup);
+        $markup = preg_replace_callback('/src="miopages:media:([0-9a-f-]{36})"/', static function (array $m) use ($attachments): string {
+            if (!isset($attachments[$m[1]])) throw new InvalidArgumentException('Core-rendered page places an unknown picture.');
+            return 'src="' . esc_url(MioPages_Native_Draft_Media::url($attachments[$m[1]]['id'])) . '"';
+        }, $markup);
+        if (str_contains($markup, 'miopages:')) throw new InvalidArgumentException('Core-rendered page has an unresolved reference.');
+        return wp_kses_post($markup);
     }
 
     private static function composed(array $page, array $postIds, array $navigation, array $titles, array $actions, array $attachments, bool $reviewDraft, array $pendingActions = []): string
