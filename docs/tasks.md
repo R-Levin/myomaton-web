@@ -54,8 +54,18 @@ the development cost and the production equivalent.
      A closer check also found the seven approved pages lost a few lines each (Home lost "A tangled
      web behind the scenes. A beautifully simple experience for the customer."); Claude's earlier
      "words unchanged" was wrong. Cause: each layout call rewrites the whole page, words included.
-     Proposed (awaiting the Principal): lock the approved words in the engine so a layout call can
-     only arrange them, test free, then one pass of all ten pages (about $3.50; cap to about $28).
+     Paused for task 1a, which replaces the word-lock idea.
+
+1a. **Separate a page's words from its layout in Core.** "I don't know if the word lock makes
+   sense or a redesign that fixes the melding of the words and design as seen in core." Then:
+   "OK, let's proceed and revisit this exact conversation. Please record it for that purpose."
+   (Nov 28; recorded in `docs/conversation-2026-11-28-words-and-layout.md`.)
+   - Object: the page Work product, with words and layout as two grains (each versioned and
+     approved); the layout only places the words by reference. Clients still approve the page
+     as a whole. No new object.
+   - Engineering only, no AI spending; built and tested on the free stand-in first. Then C0's
+     ten layouts in one paid pass (about $3.50; cap to about $28, to be asked then).
+   - In progress: studying how pages are built, stored and shown; a plan next.
 
 ## Next (agreed, in order)
 
@@ -93,6 +103,9 @@ the development cost and the production equivalent.
 11. The review document's sections 3–5 (`docs/review-2026-11-26-inflection-point.md`).
 12. Processing time closer to production (Nov 27).
 13. The 9 old Nov 23 drafts on miopages.org (pages 53–61): leave them, or archive them?
+14. **Revisit the Nov 28 words-and-layout conversation** with the Principal
+    (`docs/conversation-2026-11-28-words-and-layout.md`): did the separation work, do C0's words
+    stand, and design quality (which the separation doesn't solve).
 
 ## Done (kept for the record)
 

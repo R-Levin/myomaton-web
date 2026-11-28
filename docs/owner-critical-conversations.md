@@ -1598,3 +1598,12 @@ Principal approves.
   wording was Claude's, not the Principal's. The indigo is still the palette's brand color
   (#433C9F), but v16 uses it once; the heading font also changed (Source Sans to Space Grotesk).
   Both are for the Principal to decide. Core paused until then.
+
+- **Nov 28 — separate a page's words from its layout.** Core rewrote the approved words whenever
+  it changed a layout (and brought back the old layout when told to keep the words); Claude's
+  earlier "words unchanged" for seven pages was wrong. The Principal questioned whether a word
+  lock or a redesign of Core's melding of words and design was right; Claude recommended the
+  redesign (words and layout as two grains of the page, the layout only placing the words), with
+  Clients still approving whole pages. The Principal: "OK, let's proceed and revisit this exact
+  conversation. Please record it for that purpose." Recorded in
+  `docs/conversation-2026-11-28-words-and-layout.md`; to be revisited (tasks 1a and 14).
