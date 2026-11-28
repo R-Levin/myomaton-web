@@ -42,6 +42,10 @@ the development cost and the production equivalent.
      Left: Scope & Fit (Core dropped a section) and Free Review (rewrote the headline) go back to
      Core with "keep every word"; Direct Start's layout was blocked by the cap. Cap raised to
      $24 ("Yes, raise to $24", Nov 27); in progress.
+   - Paused: "If there are brand colors, they need to be discussed, not overridden." (Nov 27)
+     The brief's "no indigo opening band" (Claude's wording) led v16 to use the brand indigo
+     once; the heading font also changed. Waiting on the Principal: how the brand color and font
+     should be used. The two page corrections are queued, Core not yet run.
 
 ## Next (agreed, in order)
 

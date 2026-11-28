@@ -1591,3 +1591,10 @@ Principal approves.
 
 - **Nov 27 — cap raised to $24.** For the last three page layouts (Scope & Fit and Free Review
   corrected to keep every word; Direct Start blocked by the cap). About $0.85 expected.
+
+- **Nov 27 — brand colors are discussed, not overridden.** On learning that the redesign brief's
+  "no indigo opening band" led the new design (Direction v16) to all but drop the MioPages indigo,
+  the Principal: "If there are brand colors, they need to be discussed, not overridden." That
+  wording was Claude's, not the Principal's. The indigo is still the palette's brand color
+  (#433C9F), but v16 uses it once; the heading font also changed (Source Sans to Space Grotesk).
+  Both are for the Principal to decide. Core paused until then.
