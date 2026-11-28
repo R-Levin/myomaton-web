@@ -1657,3 +1657,7 @@ Principal approves.
   broken and mischaracterized what I directed. I wanted to get back to a clear understanding of what we are
   looking for ... You've regressed to what already existed." The Principal will look in the morning. The
   five simplified drafts (pages 154-158) stay on miopages.org for that look; no further work until then.
+
+- **Nov 28 — think first; agree before working.** "When we resume I expect you to spend more than three
+  seconds thinking and actually apply some of the intelligence that you are supposed to provide before
+  doing work and making sure you're doing what we agree is going to be done."
