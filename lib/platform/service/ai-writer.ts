@@ -5,7 +5,7 @@ import { artifactSchemas, creativePageSchema, designedDirectionSchema, readBluep
   type PresenceEvidence } from "../intake/presence-workflow-artifacts";
 import { bindCitations } from "../intake/presence-workflow-provider";
 import { readSiteFooter, siteFooterSchema } from "./site-footer";
-import { applyWordEdits, fillLayout, type Layout, type Piece, type WordEdits } from "./page-words";
+import { applyWordEdits, fillLayout, mendLayout, type Layout, type Piece, type WordEdits } from "./page-words";
 import { nativeComponentSchema } from "../intake/presence-native-component";
 import type { KnownItem, KnownOffering } from "../knowledge/account";
 import type { PageContent, SitePlan, WriteInput, Writer } from "./cycle";
@@ -233,7 +233,10 @@ function checked(input: WriteInput, output: unknown, sources: PresenceEvidence[]
     }
     case "page": {
       // A layout places the page's own pieces; a word change edits them in place. Either way the result is a whole page, checked as one.
-      const page = input.grain === "page-layout" ? fillLayout(input.previous as PageContent, output as Layout)
+      // A designer's slips in placing the pieces are mended without touching a word (mendLayout); new words are still refused.
+      const mended = input.grain === "page-layout" ? mendLayout(input.previous as PageContent, output as Layout) : undefined;
+      if (mended?.mended.length) console.log(`Layout of ${input.page!.path} mended: ${mended.mended.join("; ")}`);
+      const page = mended ? fillLayout(input.previous as PageContent, mended.layout)
         : input.grain === "page-words" ? applyWordEdits(input.previous as PageContent, output as WordEdits) : output;
       // The stored page's identities are the engine's to keep (versionedPage), not part of what is checked.
       const bare = (item: Record<string, unknown>) => { const rest = { ...item }; delete rest.id; delete rest.version; return rest; };

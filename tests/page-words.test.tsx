@@ -98,3 +98,22 @@ test("restoring the words of an earlier version", () => {
   assert.deepEqual(restore.gone, ["Two decades of experience."]);
   assert.deepEqual(restore.added, ["Twenty years in the trade."]);
 });
+
+test("mending a designer's slips: a left-out piece goes back after its neighbor, a mis-set heading gets a heading slot, a repeat keeps its first place", async () => {
+  const { mendLayout } = await import("../lib/platform/service/page-words");
+  const before = page(), next = sameLayout(before);
+  const root = (i: number) => (next.sections[i]!.block as { root: { children: Record<string, unknown>[] } }).root;
+  root(0).children.splice(1, 1);                                         // w2 left out
+  root(2).children[1]!.kind = "heading"; root(2).children[1]!.level = 3; // text set as a heading
+  root(1).children.push(node("paragraph", "w6"));                       // w6 placed again (it's in the list)
+  assert.throws(() => fillLayout(before, next), "unmended, it is refused");
+  const { layout: mended, mended: notes } = mendLayout(before, next);
+  const after = fillLayout(before, mended);
+  assert.equal(compareWords(before, after).unchanged, true);
+  assert.equal(notes.length, 3);
+  const first = (after.sections[0]!.block as { root: { children: { kind: string; text: string }[] } }).root.children;
+  assert.deepEqual(first.slice(0, 2).map(n => n.text), ["We fix bicycles", "Same-day repairs in town."], "put back right after its neighbor");
+  // New words are never mended in.
+  root(0).children.push(node("paragraph", "A line Core made up."));
+  assert.throws(() => fillLayout(before, mendLayout(before, next).layout), /not one of the page's pieces/u);
+});

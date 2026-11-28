@@ -91,6 +91,97 @@ export type LayoutSection = { heading: string; role: string; visual: unknown; mo
 export type Layout = { sections: LayoutSection[] };
 
 /**
+ * Mend the slips a designer makes placing a hundred numbered pieces, without touching a word: a
+ * piece left out goes back right after the piece it followed on the page; a heading set in a text
+ * slot (or text in a heading slot) gets the slot that fits it; a piece used twice keeps its first
+ * place. A number that isn't one of the page's pieces is still refused: that would be new words.
+ * Returns the mended layout and, in plain words, what was mended.
+ */
+export function mendLayout(previous: PageContent, layout: Layout): { layout: Layout; mended: string[] } {
+  const pieces = pageWords(previous), byId = new Map(pieces.map((piece, index) => [piece.id, { ...piece, index }]));
+  const wasItem = new Set(spots(previous).flatMap((spot, index) => spot.at.item !== undefined ? [pieceId(index)] : []));
+  const out = structuredClone(layout) as Layout, mended: string[] = [];
+  if (!Array.isArray(out?.sections)) return { layout: out, mended };
+  type Place = { id: string; section: number; node?: NativeNode; parent?: NativeNode; item?: number; header?: true };
+  const known = (id: unknown) => typeof id === "string" && byId.has(id.trim());
+  const blank = (kind: NativeNode["kind"], text: string, like?: NativeNode, level: number | null = null): NativeNode =>
+    ({ kind, text, level, items: [], ordered: false, reference: null, children: [],
+      layout: like ? { ...like.layout, arrangement: "flow", columns: [] } : { arrangement: "flow", columns: [], gap: "medium", inset: "none", surface: "none",
+        align: "start", measure: "reading", typeScale: "body", span: 12, mobileOrder: 0, border: false, rounded: false } });
+  const seen = new Set<string>(), places = new Map<string, Place>(), lost: string[] = [];
+  out.sections.forEach((section, s) => {
+    const block = section.block as NativeComponent | undefined;
+    if (!known(section.heading) || !isNative(block)) return; // refused as it is by fillLayout
+    section.heading = String(section.heading).trim();
+    seen.add(section.heading);
+    let header: NativeNode | undefined;
+    const visit = (node: NativeNode, parent?: NativeNode) => {
+      if (node.kind !== "action" && typeof node.text === "string") {
+        const id = node.text.trim();
+        if (!header && node.kind === "heading" && id === section.heading) { header = node; places.set(id, { id, section: s, node, parent, header: true }); }
+        else if (known(id)) {
+          const piece = byId.get(id)!;
+          if (seen.has(id)) { node.text = null; (node as { drop?: true }).drop = true; mended.push(`${id} was placed twice; kept its first place`); }
+          else if (piece.kind === "heading" && node.kind !== "heading" && node.kind !== "details") {
+            if (node.kind === "image") { node.text = null; lost.push(id); }
+            else { node.kind = "heading"; node.level = 3; node.items = []; node.reference = null; node.text = id; mended.push(`${id} is a heading: set as one`); }
+          } else if (piece.kind === "text" && node.kind === "heading") { node.kind = "paragraph"; node.level = null; mended.push(`${id} is text: set as a paragraph`); }
+          if (node.text !== null) { seen.add(id); places.set(id, { id, section: s, node, parent }); }
+        }
+      }
+      if (node.kind === "list") node.items = node.items.filter((item, i) => {
+        const id = String(item).trim();
+        if (!known(id)) return true; // refused by fillLayout
+        if (seen.has(id)) { mended.push(`${id} was placed twice; kept its first place`); return false; }
+        if (byId.get(id)!.kind === "heading") { lost.push(id); return false; }
+        seen.add(id); places.set(id, { id, section: s, node, parent, item: i }); return true;
+      }).map(item => String(item).trim());
+      // A picture goes only where its section asks for one: section-N is this section's visual, section-N-k its k-th further picture.
+      if (node.kind === "image") {
+        const ref = /^section-(\d+)(?:-(\d+))?$/u.exec(node.reference ?? "");
+        const visual = section.visual as { status?: string } | undefined, more = Array.isArray(section.moreVisuals) ? section.moreVisuals as { status?: string }[] : [];
+        const asked = ref && Number(ref[1]) === s && (ref[2] === undefined ? visual?.status !== undefined && visual.status !== "text-only"
+          : more[Number(ref[2]) - 1] !== undefined && more[Number(ref[2]) - 1]!.status !== "text-only");
+        if (!asked) { (node as { drop?: true }).drop = true; if (node.text) lost.push(String(node.text).trim()); mended.push(`picture ${node.reference} isn't one section ${s + 1} asks for; left out`); }
+      }
+      node.children.forEach(child => visit(child, node));
+      node.children = node.children.filter(child => !(child as { drop?: true }).drop);
+      // A list or group left empty by these mends goes too.
+      if (parent && ((node.kind === "list" && !node.items.length) || ((node.kind === "group" || node.kind === "details") && !node.children.length)))
+        (node as { drop?: true }).drop = true;
+    };
+    visit(block.root);
+    if (!header) { // the section's own heading heads its component
+      block.root.children.unshift(blank("heading", section.heading, undefined, section.role === "hero" ? 1 : 2));
+      mended.push(`section ${s + 1} was missing its heading; added it at the top`);
+    }
+  });
+  // Each piece left out goes back after the piece that came before it on the page.
+  const missing = [...new Set([...lost, ...pieces.map(piece => piece.id).filter(id => !seen.has(id))])]
+    .sort((a, b) => byId.get(a)!.index - byId.get(b)!.index);
+  for (const id of missing) {
+    const piece = byId.get(id)!;
+    const anchor = pieces.slice(0, piece.index).reverse().map(earlier => places.get(earlier.id)).find(Boolean)
+      ?? [...places.values()].find(place => place.header);
+    if (!anchor?.node) continue; // nothing to anchor to: fillLayout refuses it
+    if (anchor.item !== undefined && wasItem.has(id) && piece.kind === "text") {
+      anchor.node.items.splice(anchor.item + 1, 0, id);
+      // later items in that list move one place
+      for (const place of places.values()) if (place.node === anchor.node && place.item !== undefined && place.item > anchor.item) place.item++;
+      places.set(id, { id, section: anchor.section, node: anchor.node, parent: anchor.parent, item: anchor.item + 1 });
+    } else {
+      const fresh = blank(piece.kind === "heading" ? "heading" : "paragraph", id, anchor.node, piece.kind === "heading" ? 3 : null);
+      const parent = anchor.item !== undefined || anchor.node.kind !== "group" ? anchor.parent : anchor.node;
+      if (!parent) continue;
+      parent.children.splice(parent === anchor.node ? 0 : parent.children.indexOf(anchor.node) + 1, 0, fresh);
+      places.set(id, { id, section: anchor.section, node: fresh, parent });
+    }
+    mended.push(`${id} was left out; put back after the piece before it`);
+  }
+  return { layout: out, mended };
+}
+
+/**
  * Fill a layout change with the page's own words. Every piece must be placed exactly once (a
  * section's heading piece also heads its component); an unknown number, or a piece left out, is
  * refused. Everything that isn't arrangement (the page title, search text, Actions, links) stays
