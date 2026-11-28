@@ -25,8 +25,8 @@ export type Origin = {
   enteredBy?: Person;
 };
 
-/** How much a Change touches (glossary: Grain). */
-export type Grain = "fact" | "section" | "page" | "new-page" | "menu" | "design" | "site" | "report" | "direction" | "site-plan";
+/** How much a Change touches (glossary: Grain). A page's words and its layout are grains of their own (task 1a): a change to one leaves the other as it is. */
+export type Grain = "fact" | "section" | "page" | "page-words" | "page-layout" | "new-page" | "menu" | "design" | "site" | "report" | "direction" | "site-plan";
 
 /** What a Request or Change is about: one object of Knowledge or a Work product. */
 export type Target = {
@@ -37,6 +37,8 @@ export type Target = {
   sections?: number[];
   /** The name people see, where the target is new (a new Page's label). */
   name?: string;
+  /** For a page's layout: an earlier Version of the page whose arrangement to follow where it can. */
+  example?: number;
   /** The exact Page Work product, and its Sections, at the versions the Change is made against (step 4). */
   workProduct?: { id: string; version: number; sections?: { id: string; version: number }[] };
 };

@@ -29,7 +29,8 @@ function sameLayout(p: PageContent): Layout {
     const s = section as Record<string, unknown> & { block?: { root: unknown } };
     if (index < 2) return { heading: firstHeading(s.block!.root), role: s.role as string, visual: s.visual, block: s.block };
     const [a, b] = String(s.body).split("\n\n");
-    return { heading: s.heading, role: "intro", visual: s.visual, block: component(node("heading", s.heading, { level: 2 }), node("paragraph", a!), node("paragraph", b!)) };
+    const heading = String(s.heading);
+    return { heading, role: "intro", visual: s.visual, block: component(node("heading", heading, { level: 2 }), node("paragraph", a!), node("paragraph", b!)) };
   }) };
 }
 const firstHeading = (root: unknown): string => {
@@ -57,7 +58,7 @@ test("a layout change can move and restyle pieces, and the words come back exact
   assert.equal((after.actions as { label: string; sectionIndex: number }[])[0]!.sectionIndex, 0, "the button's section is found from its placement");
   assert.equal(after.heading, "Service");
   assert.equal(after.searchDescription, "What we do");
-  assert.deepEqual((after.sections[1] as { sourceIds: string[] }).sourceIds, ["knowledge:a"], "a section keeps its sources by its heading");
+  assert.deepEqual((after.sections[1] as unknown as { sourceIds: string[] }).sourceIds, ["knowledge:a"], "a section keeps its sources by its heading");
 });
 
 test("a layout change can't change, drop, repeat or invent a word", () => {

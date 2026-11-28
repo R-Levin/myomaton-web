@@ -5,6 +5,8 @@ import { artifactSchemas, creativePageSchema, designedDirectionSchema, readBluep
   type PresenceEvidence } from "../intake/presence-workflow-artifacts";
 import { bindCitations } from "../intake/presence-workflow-provider";
 import { readSiteFooter, siteFooterSchema } from "./site-footer";
+import { applyWordEdits, fillLayout, type Layout, type Piece, type WordEdits } from "./page-words";
+import { nativeComponentSchema } from "../intake/presence-native-component";
 import type { KnownItem, KnownOffering } from "../knowledge/account";
 import type { PageContent, SitePlan, WriteInput, Writer } from "./cycle";
 import type { Evidence } from "./evidence";
@@ -64,13 +66,16 @@ export function createAiWriter(config: AiWriterConfig): Writer {
       const sources = [...known, ...gathered], ids = sources.map(source => source.id);
       const plan = input.sitePlan, paths = plan?.pages.map(entry => entry.path) ?? [];
       const schema = input.kind === "report" ? artifactSchemas.report : input.kind === "direction" ? designedDirectionSchema
-        : input.kind === "site-plan" ? sitePlanSchema(input) : pageSchema(input.page!.path);
+        : input.kind === "site-plan" ? sitePlanSchema(input) : input.grain === "page-layout" ? layoutSchema(input.words!)
+        : input.grain === "page-words" ? wordsSchema(input.words!) : pageSchema(input.page!.path);
       const payload = { knowledge: known.map(({ id, kind, label, content }) => ({ id, standing: kind === "owner-confirmed" ? "confirmed" : "proposed", label, content })),
         ...(gathered.length && { evidence: gathered.map(({ id, kind, label, date, content }, index) => ({ id, standing: kind === "owner-confirmed" ? "client-approved" : "gathered", date, label, content,
           ...(input.evidence![index]!.images?.length && seesImages.has(input.kind) && config.readImage && { images: input.evidence![index]!.images!.map(image => image.caption) }) })) }),
         ...(input.report !== undefined && { report: input.report }), ...(input.direction !== undefined && { direction: input.direction }),
         ...(plan && { sitePlan: plan }), ...(input.page && { page: input.page }),
-        ...(input.previous !== undefined && { previous: input.previous }), ...(input.requests.length && { requests: input.requests }) };
+        // A words or layout change sees the page as numbered pieces and their arrangement, not the page itself.
+        ...(input.grain && input.grain !== "page" ? { words: input.words, arrangement: input.arrangement, ...(input.example !== undefined && { example: input.example }) }
+          : input.previous !== undefined && { previous: input.previous }), ...(input.requests.length && { requests: input.requests }) };
       const instructions = [coreAuthoringInstructions(stage[input.kind]),
         "Cite only the supplied knowledge and evidence ids. Knowledge marked proposed is not yet confirmed by the Client: never present it as established.",
         gathered.length ? "Evidence is the Client's fuller material: their approved documents and recorded direction, each dated. Use all of it, not only the short Knowledge entries. " +
@@ -79,11 +84,12 @@ export function createAiWriter(config: AiWriterConfig): Writer {
           "Evidence marked gathered is not the Client's confirmed word." : "",
         "Knowledge or evidence not for the website informs your understanding but must not appear in site copy.",
         input.requests.length ? "Rework the previous version to answer each request, in the requester's own words where they give them; keep what is still right." : "",
-        input.page ? `Write only the page ${JSON.stringify(input.page.path)}: ${input.page.purpose}` : ""].filter(Boolean).join("\n\n");
+        input.page ? `Write only the page ${JSON.stringify(input.page.path)}: ${input.page.purpose}` : "",
+        input.grain === "page-layout" ? layoutInstructions(input) : input.grain === "page-words" ? wordsInstructions : ""].filter(Boolean).join("\n\n");
       const images = seesImages.has(input.kind) && config.readImage ? await evidenceImagesFor(input.evidence ?? [], config.readImage) : [];
       const request = { model: config.rates.model, instructions,
         input: images.length ? [{ role: "user" as const, content: [{ type: "input_text" as const, text: JSON.stringify(payload) }, ...images] }] : JSON.stringify(payload),
-        text: { format: { type: "json_schema", name: "core_" + stage[input.kind], strict: true, schema: bindCitations(schema, ids) } } };
+        text: { format: { type: "json_schema", name: "core_" + (input.grain && input.grain !== "page" ? input.grain.replace("-", "_") : stage[input.kind]), strict: true, schema: bindCitations(schema, ids) } } };
       const digest = fingerprint({ kind: input.kind, payload });
       // A paid answer refused only by a check that has since been corrected is taken, not bought again.
       for (const output of [...await config.refused?.(digest) ?? []].reverse()) {
@@ -154,6 +160,48 @@ function sitePlanSchema(input: WriteInput) {
   return schema;
 }
 
+const layoutInstructions = (input: WriteInput) => "This is a layout change. The page's words are approved and fixed: you receive them as numbered pieces " +
+  "(words: w1, w2, …) and the page's current arrangement with those numbers in place of the text (arrangement). Return a new arrangement of the page that " +
+  "places every piece exactly once, by its number, in a designed component for each section (version 2, mode section). A section is named by the number of " +
+  "its heading, and its component's own opening heading uses that same number. Headings take heading pieces; paragraphs, list items, quotes, details, " +
+  "captions and placeholder notes take text pieces. Buttons take no text: their labels come from the page's Actions. You cannot add, change, shorten or " +
+  "drop a word; arrange, group, order, style and illustrate them as the design needs. Pictures and their frames are yours to decide." +
+  (input.example !== undefined ? " example is an earlier version of this page whose arrangement the requester liked: follow it where the same words appear." : "");
+const wordsInstructions = "This is a word change. The page's layout stays as it is: you receive its words as numbered pieces (words: w1, w2, …) and its " +
+  "arrangement with those numbers in place of the text. Return only the pieces you change (change: their number and new text), remove (remove: their numbers) " +
+  "or add (add: the piece to add it after, its text, and whether it is a paragraph, a heading or a list item). Change only what the requests ask for; " +
+  "every other word stays exactly as it is.";
+
+/** A layout change: each section names its heading piece, and every text in its component is a piece number (task 1a). */
+function layoutSchema(words: Piece[]) {
+  const ids = (kind: Piece["kind"]) => words.filter(piece => piece.kind === kind).map(piece => piece.id);
+  const one = (kind: Piece["kind"], nullable = false) => ids(kind).length
+    ? nullable ? { type: ["string", "null"], enum: [...ids(kind), null] } : { type: "string", enum: ids(kind) } : { type: "null" };
+  const defs = structuredClone(nativeComponentSchema.$defs) as unknown as { nativeNode: { anyOf: { properties: Record<string, unknown> }[] } } & Record<string, unknown>;
+  for (const shape of defs.nativeNode.anyOf) {
+    const kind = (shape.properties.kind as { enum: string[] }).enum[0]!;
+    shape.properties.text = kind === "heading" ? one("heading") : ["paragraph", "details", "placeholder", "quote"].includes(kind) ? one("text")
+      : kind === "image" ? one("text", true) : { type: "null" };
+    const items = shape.properties.items as Record<string, unknown>;
+    shape.properties.items = { ...items, items: kind === "list" ? one("text") : { type: "string" } };
+  }
+  const page = creativePageSchema.properties.sections.items.properties;
+  const component = { type: "object", additionalProperties: false, required: ["version", "name", "purpose", "mode", "root"],
+    properties: { ...nativeComponentSchema.properties, version: { type: "integer", enum: [2] }, mode: { type: "string", enum: ["section"] } } };
+  return { type: "object", additionalProperties: false, required: ["sections"], $defs: defs,
+    properties: { sections: { type: "array", items: { type: "object", additionalProperties: false, required: ["heading", "role", "visual", "moreVisuals", "block"],
+      properties: { heading: one("heading"), role: page.role, visual: page.visual, moreVisuals: page.moreVisuals, block: component } } } } };
+}
+
+/** A word change: only the pieces it changes, removes or adds (task 1a). */
+function wordsSchema(words: Piece[]) {
+  const id = { type: "string", enum: words.map(piece => piece.id) };
+  const list = (properties: Record<string, unknown>) => ({ type: "array", items: { type: "object", additionalProperties: false, required: Object.keys(properties), properties } });
+  return { type: "object", additionalProperties: false, required: ["change", "remove", "add"], properties: {
+    change: list({ id, text: { type: "string" } }), remove: { type: "array", items: id },
+    add: list({ after: id, text: { type: "string" }, as: { type: "string", enum: ["paragraph", "heading", "item"] } }) } };
+}
+
 /** A page in Core's block format, fixed to the one page asked for. */
 function pageSchema(path: string) {
   const schema = structuredClone(creativePageSchema) as unknown as { properties: Record<string, unknown> };
@@ -177,6 +225,17 @@ function checked(input: WriteInput, output: unknown, sources: PresenceEvidence[]
       if (!plan.pages.some(page => page.path === "/")) throw Error("The Site plan needs a Home page");
       return plan;
     }
-    case "page": return readPage(output, input.page!.path, paths, ids, {}, true, false, true) as unknown as PageContent;
+    case "page": {
+      // A layout places the page's own pieces; a word change edits them in place. Either way the result is a whole page, checked as one.
+      const page = input.grain === "page-layout" ? fillLayout(input.previous as PageContent, output as Layout)
+        : input.grain === "page-words" ? applyWordEdits(input.previous as PageContent, output as WordEdits) : output;
+      // The stored page's identities are the engine's to keep (versionedPage), not part of what is checked.
+      const bare = (item: Record<string, unknown>) => { const { id: _id, version: _version, ...rest } = item; return rest; };
+      const checkable = page === output ? page : { ...bare(page as Record<string, unknown>),
+        sections: (page as PageContent).sections.map(section => bare(section)),
+        // A stored Action without a placement had none (null), as Core answered it.
+        actions: ((page as PageContent).actions as Record<string, unknown>[] | undefined)?.map(action => ({ sectionIndex: null, ...action })) };
+      return readPage(checkable, input.page!.path, paths, ids, {}, true, false, true) as unknown as PageContent;
+    }
   }
 }

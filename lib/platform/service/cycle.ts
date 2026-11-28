@@ -6,6 +6,7 @@ import type { Asset } from "./assets";
 import type { SiteFooter } from "./site-footer";
 import { fingerprint } from "../canonical/model";
 import { directionIdentity, pageIdentity, reportIdentity, sitePlanIdentity, versionPages } from "../work-products/pages";
+import { arrangementOf, compareWords, pageWords, type Piece } from "./page-words";
 
 /**
  * Core's one engine (rebuild plan, milestone 1). Every piece of work is the same cycle of shared
@@ -47,7 +48,13 @@ export type WriteInput = {
   kind: Kind; knowledge: readonly unknown[]; evidence?: readonly Evidence[]; report?: unknown; direction?: unknown; sitePlan?: SitePlan; page?: PlanEntry;
   /** The current Version being reworked, and the words of each Request asking for the rework. */
   previous?: unknown; requests: string[];
+  /** For a page: the whole page, only its words, or only its layout (task 1a). For the words or the layout,
+   * Core is given the page's words as numbered pieces and its arrangement with the numbers in place of text. */
+  grain?: PageGrain; words?: Piece[]; arrangement?: PageContent;
+  /** An earlier Version a layout change should follow where it can (the Request names it). */
+  example?: unknown;
 };
+export type PageGrain = "page" | "page-words" | "page-layout";
 export interface Writer { write(input: WriteInput): Promise<unknown> }
 
 export type Task = { id: string; who: "core" | "specialist" | "client"; what: string; requestIds?: string[]; changeId?: string };
@@ -57,7 +64,7 @@ const core: Person = { id: "core", role: "core" };
 const consequence: Record<Kind, Consequence> = { report: "customer-approval", direction: "operator-review", "site-plan": "operator-review", page: "operator-review" };
 const grainOf: Record<Kind, Grain> = { report: "report", direction: "direction", "site-plan": "site-plan", page: "page" };
 const kindOf = (grain: Grain): Kind | undefined => (Object.entries(grainOf).find(([, value]) => value === grain)?.[0] as Kind | undefined)
-  ?? (grain === "new-page" ? "page" : undefined);
+  ?? (grain === "new-page" || grain === "page-words" || grain === "page-layout" ? "page" : undefined);
 
 export class CycleError extends Error { constructor(readonly code: "not-found" | "not-open" | "not-permitted" | "invalid", message: string) { super(message); } }
 
@@ -89,13 +96,14 @@ export function startLaunch(record: ServiceRecord, at: string, by: Person): Serv
  * "site" is a Request on the site as a whole, for a Specialist to direct (`direct`).
  */
 export function ask(record: ServiceRecord, request: { id: string; at: string; by: Person; kind: Kind | "site"; path?: string; words: string;
-  channel?: Request["origin"]["channel"]; channelRef?: string; enteredBy?: Person }): ServiceRecord {
+  channel?: Request["origin"]["channel"]; channelRef?: string; enteredBy?: Person; grain?: PageGrain; example?: number }): ServiceRecord {
   if (!request.words.trim()) throw new CycleError("invalid", "A Request needs its words");
   if (record.ledger.requests.some(item => item.id === request.id + ":request")) return record;
   const origin = request.by.role === "customer" ? "customer" : request.by.role === "core" ? "core" : "operator";
   return { ...record, ledger: takeIn(record.ledger, { id: request.id, at: request.at, by: request.enteredBy ?? request.by }, [{ id: request.id + ":request", at: request.at,
     origin: { kind: origin, by: request.by, channel: request.channel ?? "core-screen", ...(request.enteredBy && { enteredBy: request.enteredBy }) },
-    target: { grain: request.kind === "site" ? "site" : grainOf[request.kind], ...(request.path && { path: request.path }) }, words: request.words.trim(),
+    target: { grain: request.kind === "site" ? "site" : request.kind === "page" && request.grain ? request.grain : grainOf[request.kind],
+      ...(request.path && { path: request.path }), ...(request.example && { example: request.example }) }, words: request.words.trim(),
     ...(request.channelRef && { channelRef: request.channelRef }) }]) };
 }
 
@@ -139,7 +147,8 @@ export function tasks(record: ServiceRecord): Task[] {
   return [...writing, ...reviewing, ...answering];
 }
 const label = (request: Request) => request.target.grain === "site-plan" ? "Site plan" : request.target.grain === "page" || request.target.grain === "new-page"
-  ? `page ${request.target.name ?? request.target.path}` : request.target.grain === "report" ? "Report" : "Direction";
+  ? `page ${request.target.name ?? request.target.path}` : request.target.grain === "page-words" ? `words of the page ${request.target.path}`
+  : request.target.grain === "page-layout" ? `layout of the page ${request.target.path}` : request.target.grain === "report" ? "Report" : "Direction";
 
 /** Knowledge, and the current Work products each kind builds on. */
 function inputFor(record: ServiceRecord, kind: Kind, knowledge: readonly unknown[], requests: Request[], path?: string): WriteInput {
@@ -148,8 +157,16 @@ function inputFor(record: ServiceRecord, kind: Kind, knowledge: readonly unknown
   const plan = got(sitePlanIdentity(site)) as SitePlan | undefined;
   // The Version being reworked: the current one, or the latest draft when a first draft was corrected.
   const id = identity(record, kind, path);
-  const previous = got(id) ?? record.products.findLast(item => item.id === id)?.content;
+  const grain = requests[0]?.target.grain;
+  // A change to a page's words or layout is always made on its approved Version.
+  const pageGrain = kind === "page" && (grain === "page-words" || grain === "page-layout") ? grain : undefined;
+  const previous = pageGrain ? got(id) : got(id) ?? record.products.findLast(item => item.id === id)?.content;
+  if (pageGrain && previous === undefined) throw new CycleError("invalid", "A page's words or layout change needs an approved Version of the page");
+  const example = pageGrain === "page-layout" && requests[0]?.target.example
+    ? record.products.find(item => item.id === id && item.version === requests[0]!.target.example)?.content : undefined;
   return { kind, knowledge, ...(record.evidence?.length && { evidence: record.evidence }),
+    ...(pageGrain && { grain: pageGrain, words: pageWords(previous as PageContent), arrangement: arrangementOf(previous as PageContent),
+      ...(example !== undefined && { example }) }),
     ...(kind !== "report" && { report: got(reportIdentity(site)) }),
     ...((kind === "site-plan" || kind === "page") && { direction: got(directionIdentity(site)) }),
     ...(kind === "page" && plan && { sitePlan: plan, page: plan.pages.find(entry => entry.path === path) }),
@@ -167,16 +184,21 @@ export async function work(record: ServiceRecord, task: Task, writer: Writer, kn
   const requests = task.requestIds.map(id => record.ledger.requests.find(request => request.id === id && request.status === "open"));
   if (requests.some(request => !request)) throw new CycleError("not-open", "The Task's Requests are no longer open");
   const first = requests[0]!, kind = kindOf(first.target.grain)!, path = first.target.path;
-  const content = await writer.write(inputFor(record, kind, knowledge, requests as Request[], path));
+  const given = inputFor(record, kind, knowledge, requests as Request[], path);
+  const content = await writer.write(given);
   const id = identity(record, kind, path);
+  // The guarantee of a layout change, whatever wrote it: the page's words read back exactly as they were.
+  if (given.grain === "page-layout" && !compareWords(given.previous as PageContent, content as PageContent).unchanged)
+    throw new CycleError("invalid", "A layout change may not change the page's words");
   const base = current(record, id);
   const version = Math.max(0, ...record.products.filter(item => item.id === id).map(item => item.version)) + 1;
   const stored = kind === "page" ? versionedPage(record, id, content as PageContent) : content;
   const changeId = `${id}:v${version}`;
   const change: Omit<Change, "status" | "reviews" | "decisionId"> = { id: changeId, label: `${kind}-v${version}`, at, requestIds: requests.map(request => request!.id),
-    target: { grain: grainOf[kind], ...(path && { path }), workProduct: { id, version: base?.version ?? 0 } },
+    target: { grain: given.grain ?? grainOf[kind], ...(path && { path }), workProduct: { id, version: base?.version ?? 0 } },
     base: { version: record.version, digest: fingerprint(base?.content ?? null) },
-    difference: { summary: `${kind === "page" ? "the page " + path : kind === "site-plan" ? "the Site plan" : "the " + kind[0].toUpperCase() + kind.slice(1)}, version ${version}` },
+    difference: { summary: `${given.grain === "page-words" ? "the words of the page " + path : given.grain === "page-layout" ? "the layout of the page " + path
+      : kind === "page" ? "the page " + path : kind === "site-plan" ? "the Site plan" : "the " + kind[0].toUpperCase() + kind.slice(1)}, version ${version}` },
     preserve: [], consequence: consequence[kind] };
   const ledger = decide(record.ledger, { id: changeId + ":decision", at, by: core, requestIds: change.requestIds, outcome: "change",
     reasoning: base ? "A new Version answering the Requests on the current one." : "The first Version." }, [change]);
@@ -238,7 +260,10 @@ export function respond(record: ServiceRecord, changeId: string, by: Person, res
   catch (error) { throw new CycleError("not-permitted", (error as Error).message); }
   if (response !== "approve") {
     const declined = { ...record, ledger, products: record.products.map(item => item.changeId === changeId ? { ...item, status: "declined" as const } : item) };
-    return response === "correct" ? ask(declined, { id: `${changeId}:correction:${at}`, at, by, kind: proposed.kind, path: proposed.path, words: words ?? "" }) : declined;
+    const target = record.ledger.changes.find(change => change.id === changeId)?.target;
+    const grain = target?.grain === "page-words" || target?.grain === "page-layout" ? target.grain : undefined;
+    return response === "correct" ? ask(declined, { id: `${changeId}:correction:${at}`, at, by, kind: proposed.kind, path: proposed.path, words: words ?? "",
+      ...(grain && { grain }) }) : declined;
   }
   ledger = markApplied(ledger, [changeId], at, record.version + 1);
   const products = record.products.map(item => item.changeId === changeId ? { ...item, status: "current" as const }

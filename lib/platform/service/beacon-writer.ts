@@ -1,5 +1,6 @@
 import type { SiteDesign } from "../design-systems/site-design";
 import type { PageContent, SitePlan, WriteInput, Writer } from "./cycle";
+import { applyWordEdits, fillLayout, type Layout } from "./page-words";
 
 /**
  * A Beacon (glossary): a clearly labeled stand-in for Core's AI, so the whole cycle can run on
@@ -46,6 +47,10 @@ export const beaconWriter: Writer = {
         return plan;
       }
       case "page": {
+        // A words or layout change: the stand-in keeps the arrangement and the words, and says so in the one word it may change.
+        if (input.grain === "page-layout") return fillLayout(input.previous as PageContent, sameArrangement(input.arrangement!));
+        if (input.grain === "page-words") return applyWordEdits(input.previous as PageContent,
+          { change: [{ id: input.words![0]!.id, text: `${input.words![0]!.text} (${label}${answering ? ":" + answering : ""})` }] });
         const page = input.page!;
         // A few confirmed facts, and any Proposed ones meant for the website (Core may use them in drafts), each cited.
         const shown = [...facts.filter(item => item.status !== "proposed").slice(0, 2), ...facts.filter(item => item.status === "proposed")];
@@ -62,3 +67,29 @@ export const beaconWriter: Writer = {
     }
   },
 };
+
+type Node = { kind: string; text: string | null; level: number | null; items: string[]; children: Node[]; [key: string]: unknown };
+const plain = { arrangement: "flow", columns: [], gap: "medium", inset: "none", surface: "none", align: "start", measure: "reading",
+  typeScale: "body", span: 12, mobileOrder: 0, border: false, rounded: false };
+const node = (kind: string, text: string | null, extra: Partial<Node> = {}): Node =>
+  ({ kind, text, level: null, items: [], ordered: false, reference: null, layout: plain, children: [], ...extra });
+const opening = (n: Node): string => n.kind === "heading" && (n.level === 1 || n.level === 2) ? n.text! : n.children.map(opening).find(Boolean) ?? "";
+
+/** The stand-in's layout: the same arrangement, each section as a designed component (no design of its own). */
+function sameArrangement(arrangement: PageContent): Layout {
+  return { sections: arrangement.sections.map(raw => {
+    const s = raw as { heading: string; body: string; role: string; visual: unknown; moreVisuals?: unknown;
+      block?: { version?: number; mode?: string; root: Node; groups?: { heading: string; body: string; items: string[] }[] } };
+    if (s.block?.version === 2 && s.block.mode === "section") return { heading: opening(s.block.root), role: s.role, visual: s.visual, moreVisuals: s.moreVisuals ?? [], block: s.block };
+    const pieces = (text: string) => String(text).split(/\n\s*\n/u).map(part => part.trim()).filter(part => /^w\d+$/u.test(part));
+    const children = [node("heading", s.heading, { level: s.role === "hero" ? 1 : 2 }), ...pieces(s.body).map(id => node("paragraph", id))];
+    for (const group of s.block?.groups ?? []) {
+      if (/^w\d+$/u.test(group.heading)) children.push(node("heading", group.heading, { level: 3 }));
+      children.push(...pieces(group.body).map(id => node("paragraph", id)));
+      if (group.items.length) children.push(node("list", null, { items: group.items }));
+    }
+    if (s.block?.version === 2) children.push(s.block.root);
+    return { heading: s.heading, role: s.role, visual: s.visual, moreVisuals: s.moreVisuals ?? [],
+      block: { version: 2, name: "beacon-section", purpose: label, mode: "section", root: node("group", null, { children }) } };
+  }) };
+}
