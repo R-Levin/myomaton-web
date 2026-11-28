@@ -8,7 +8,6 @@
  * records the adjustment, rather than discarding the AI's design.
  */
 import { contrast, luminance } from "../presentation/tokens";
-import { readSiteStylesheet } from "./site-stylesheet";
 import { componentNames, components, type ComponentName } from "../site/components";
 
 export { siteFonts } from "./site-fonts";
@@ -164,7 +163,8 @@ export function readSiteDesign(value: unknown, sourceIds: readonly string[]): Si
     shape: choice(row.shape, radii, "Shape"),
     density: choice(row.density, densities, "Density"),
     imagery: { style: choice(imageryRow.style, imageryStyles, "Imagery style"), direction: prose(imageryRow.direction, "Imagery direction") },
-    ...(sheet && { stylesheet: readSiteStylesheet(row.stylesheet) }),
+    // An older design's raw stylesheet is kept as it was, as history; it is no longer checked, sent or used.
+    ...(sheet && typeof row.stylesheet === "string" && { stylesheet: row.stylesheet }),
     ...(chosen && { components: readComponentChoices(row.components) }),
     // Room for the reasons behind every choice and the research that shaped it (Part 1 #10); bounded only as a safeguard.
     rationale: prose(row.rationale, "Design rationale", 16_000),

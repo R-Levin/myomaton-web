@@ -67,15 +67,7 @@ export async function beginLaunch(webPresenceId: string) {
   await change(webPresenceId, "specialist", (record, ctx) => startLaunch(record, now(), ctx.person));
 }
 
-/** How many times Core may revise a proposed design against the rendered-page check before a Specialist sees it. */
-const designRetries = 2;
-
-/**
- * Run Core's waiting work with the configured writer (locally, the labeled Beacon). A design Core
- * proposes is then checked on the rendered pages against the design rules before anyone sees it;
- * when the check finds problems, Core gets the findings and revises, up to designRetries times.
- * Core stays free to design as it judges best; only the design rules decide pass or fail.
- */
+/** Run Core's waiting work with the configured writer (locally, the labeled Beacon). */
 export async function runCore(webPresenceId: string) { await shown(webPresenceId, async () => {
   const ctx = await context(webPresenceId, "specialist");
   const known = await accountKnowledge(ctx.pool, ctx.account.webPresenceId);
@@ -93,19 +85,6 @@ export async function runCore(webPresenceId: string) { await shown(webPresenceId
   };
   try {
     await coreWork();
-    const configFile = process.env.MIOPAGES_PREVIEW_WORDPRESS;
-    if (!ctx.wordpress || !configFile || !(await ctx.store.read(ctx.account)).deliveries?.length) return;
-    for (let round = 0; ; round++) {
-      const read = await ctx.store.read(ctx.account);
-      const proposal = read.products.find(item => item.kind === "direction" && item.status === "proposed");
-      const stylesheet = (proposal?.content as { design?: { stylesheet?: string } } | undefined)?.design?.stylesheet;
-      if (!proposal || !stylesheet) return;
-      const check = await runRenderedCheck({ webPresenceId, key: proposal.changeId, configFile, stylesheet,
-        subject: `your proposed design (Direction version ${proposal.version})` });
-      if (!check.findings.length || round >= designRetries) return;
-      await ctx.store.save(read, respond(read, proposal.changeId, ctx.person, "correct", now(), findingsForCore(check)));
-      await coreWork();
-    }
   } catch (error) {
     throw Error("Core's answer was not accepted: " + (error instanceof Error ? error.message : "it failed"));
   } finally { refresh(webPresenceId); }
@@ -305,9 +284,8 @@ export async function answerReport(webPresenceId: string, changeId: string, form
 }
 
 /**
- * A Specialist checks the rendered draft against the design rules: the current one, or a design
- * Core has proposed (shown on the real pages before anyone approves it). The result is kept for
- * the Account page; it changes nothing by itself.
+ * A Specialist checks the rendered draft on WordPress against the design rules. The result is
+ * information for the Specialist, kept for the Account page; it changes nothing by itself.
  */
 export async function checkRendered(webPresenceId: string, changeId: string | null) { await shown(webPresenceId, async () => {
   const ctx = await context(webPresenceId, "specialist");
@@ -315,12 +293,8 @@ export async function checkRendered(webPresenceId: string, changeId: string | nu
   if (!ctx.wordpress || !configFile) throw Error("No WordPress is connected");
   const read = await ctx.store.read(ctx.account);
   if (!read.deliveries?.length) throw Error("Send the drafts to WordPress first");
-  const proposal = changeId ? read.products.find(item => item.changeId === changeId && item.status === "proposed") : undefined;
-  if (changeId && !proposal) throw Error("That proposal is no longer waiting");
-  const stylesheet = proposal ? (proposal.content as { design?: { stylesheet?: string } }).design?.stylesheet : undefined;
-  if (proposal && (proposal.kind !== "direction" || !stylesheet)) throw Error("Only a proposed design can be checked on the pages");
-  await runRenderedCheck({ webPresenceId, key: changeId ?? "current", configFile, stylesheet,
-    subject: proposal ? `your proposed design (Direction version ${proposal.version})` : "the current draft" });
+  if (changeId) throw Error("Only the delivered draft can be checked");
+  await runRenderedCheck({ webPresenceId, key: "current", configFile, subject: "the current draft" });
   refresh(webPresenceId);
 }); }
 

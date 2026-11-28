@@ -91,9 +91,6 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
                   {change.target.grain === "page-words" ? " (its content only)" : change.target.grain === "page-layout" ? " (its layout only)" : ""}</h3>
                 {item.kind === "page" && <WordsCheck proposed={item} current={currentProducts.find(entry => entry.id === item.id)} />}
                 <Content item={item} />
-                {item.kind === "direction" && wordpress && delivered && <CheckPanel check={checks[item.changeId] ?? null}
-                  run={checkRendered.bind(null, id, item.changeId)} send={sendFindings.bind(null, id, item.changeId)}
-                  runLabel="Check this design on the rendered pages" sendLabel="Send the findings to Core (correct it)" />}
                 {forClient ? <p className="mt-3 text-sm text-neutral-600">This one is the Client&apos;s to approve, in their portal.</p>
                   : <ReviewForm action={review.bind(null, id, item.changeId)} />}
               </article>

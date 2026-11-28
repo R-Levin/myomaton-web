@@ -27,16 +27,11 @@ async function previewSite(configFile: string) {
 }
 
 /** Run the check (minutes: every page, desktop and phone) and keep its result under `key`. */
-export async function runRenderedCheck(input: { webPresenceId: string; key: string; subject: string; configFile: string; stylesheet?: string }): Promise<RenderedCheck> {
+export async function runRenderedCheck(input: { webPresenceId: string; key: string; subject: string; configFile: string }): Promise<RenderedCheck> {
   const { base, login } = await previewSite(input.configFile);
   const out = join(folder(input.webPresenceId), "run-" + input.key.replace(/[^a-z0-9-]/giu, "_"));
   await mkdir(out, { recursive: true });
   const args = ["node_modules/tsx/dist/cli.mjs", "scripts/service/check-design-rules.ts", "--base", base, "--login", login, "--out", out];
-  if (input.stylesheet !== undefined) {
-    const sheet = join(out, "proposed.css");
-    await writeFile(sheet, input.stylesheet);
-    args.push("--stylesheet", sheet);
-  }
   const failure = await new Promise<string | null>(resolve => {
     const child = spawn(process.execPath, args, { cwd: process.cwd(), windowsHide: true });
     let errors = "";
@@ -74,9 +69,8 @@ export function checkSummary(check: RenderedCheck) {
 /** The findings in words Core can act on, with the rules of its own stylesheet behind each. */
 export function findingsForCore(check: RenderedCheck) {
   const groups = grouped(check.findings);
-  const lines = groups.slice(0, 40).map(g => `- Rule ${g.rule}: ${g.issue}, on ${[...g.pages].join(", ")} (${[...g.views].join(" and ")})${g.trace ? `. Why: ${g.trace}` : ""}`);
+  const lines = groups.slice(0, 40).map(g => `- Rule ${g.rule}: ${g.issue}, on ${[...g.pages].join(", ")} (${[...g.views].join(" and ")})`);
   const more = groups.length > 40 ? `\n…and ${groups.length - 40} more of the same kinds.` : "";
   return (`The check of ${check.subject} on the rendered pages (desktop and phone) found the problems below against the design rules. ` +
-    "For each, \"Why\" names the rules of your stylesheet that set the text and the background behind it, in source order (a later or more specific rule wins). " +
-    "Fix every one at its cause, keeping the design otherwise as it is:\n" + lines.join("\n") + more).slice(0, 19_500);
+    "Fix each at its cause in the design, keeping the design otherwise as it is:\n" + lines.join("\n") + more).slice(0, 19_500);
 }
