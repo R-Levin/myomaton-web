@@ -174,9 +174,12 @@ const wordsInstructions = "This is a word change. The page's layout stays as it 
 
 /** A layout change: each section names its heading piece, and every text in its component is a piece number (task 1a). */
 function layoutSchema(words: Piece[]) {
-  const ids = (kind: Piece["kind"]) => words.filter(piece => piece.kind === kind).map(piece => piece.id);
-  const one = (kind: Piece["kind"], nullable = false) => ids(kind).length
-    ? nullable ? { type: ["string", "null"], enum: [...ids(kind), null] } : { type: "string", enum: ids(kind) } : { type: "null" };
+  // Piece numbers by pattern, not a list of every number: a long page would pass the format's limit on listed values.
+  // Core's check refuses any number that isn't one of the page's pieces, or the wrong kind, and says which.
+  const has = (kind: Piece["kind"]) => words.some(piece => piece.kind === kind);
+  const number = { type: "string", pattern: "^w[1-9][0-9]*$" };
+  const one = (kind: Piece["kind"], nullable = false) => has(kind)
+    ? nullable ? { type: ["string", "null"], pattern: number.pattern } : number : { type: "null" };
   const defs = structuredClone(nativeComponentSchema.$defs) as unknown as { nativeNode: { anyOf: { properties: Record<string, unknown> }[] } } & Record<string, unknown>;
   for (const shape of defs.nativeNode.anyOf) {
     const kind = (shape.properties.kind as { enum: string[] }).enum[0]!;
@@ -195,7 +198,7 @@ function layoutSchema(words: Piece[]) {
 
 /** A word change: only the pieces it changes, removes or adds (task 1a). */
 function wordsSchema(words: Piece[]) {
-  const id = { type: "string", enum: words.map(piece => piece.id) };
+  const id = { type: "string", pattern: "^w[1-9][0-9]*$", description: `One of the page's pieces, w1 to w${words.length}` };
   const list = (properties: Record<string, unknown>) => ({ type: "array", items: { type: "object", additionalProperties: false, required: Object.keys(properties), properties } });
   return { type: "object", additionalProperties: false, required: ["change", "remove", "add"], properties: {
     change: list({ id, text: { type: "string" } }), remove: { type: "array", items: id },
