@@ -138,7 +138,9 @@ export function tasks(record: ServiceRecord): Task[] {
   }
   const writing = [...byTarget.values()].map(requests => ({ id: "write:" + requests[0].id, who: "core" as const,
     what: `Write the ${label(requests[0])}`, requestIds: requests.map(request => request.id) }));
-  const reviewing = record.ledger.changes.filter(change => change.status === "proposed").map(change => ({ id: "review:" + change.id,
+  // A proposal replaced by a newer one is no longer waiting for Review, though its Change stays on the record.
+  const replaced = new Set(record.products.filter(item => item.status === "superseded").map(item => item.changeId));
+  const reviewing = record.ledger.changes.filter(change => change.status === "proposed" && !replaced.has(change.id)).map(change => ({ id: "review:" + change.id,
     who: change.consequence === "customer-approval" ? "client" as const : "specialist" as const, what: `Review ${change.difference.summary}`, changeId: change.id }));
   // A Request on the site as a whole (such as the Client's reason for not publishing yet) is the Specialist's to answer.
   const answering = record.ledger.requests.filter(request => request.status === "open" && request.target.grain === "site" &&
