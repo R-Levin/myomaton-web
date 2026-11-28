@@ -20,7 +20,7 @@
         "--ai-run",
         "c0-milestone-3",
         "--cap",
-        "21",
+        "24",
         "--review-site",
         "runtime-content/private/review-sites/new/miopages-org.json"
       ],

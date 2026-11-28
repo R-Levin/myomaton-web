@@ -1588,3 +1588,6 @@ Principal approves.
   on a page: "should ultimately be driven by need. Neither extravagant nor too constricted. Use
   your limit for now if that is easier." Claude's numbers are a rough ceiling for this pass, never
   a target, and not a standing rule.
+
+- **Nov 27 — cap raised to $24.** For the last three page layouts (Scope & Fit and Free Review
+  corrected to keep every word; Direct Start blocked by the cap). About $0.85 expected.

@@ -12,7 +12,7 @@ We are in milestone 3, one real AI run on C0, accepted against baseline Part 1 (
 holds the agreed near-term work under that plan.
 
 **Where the Principal looks:** miopages.org (password-protected review WordPress), drafts only.
-**Spending:** C0 milestone 3 run, $18.78 of a $21 cap. Ask before any paid step, and state both
+**Spending:** C0 milestone 3 run, $18.78 of a $24 cap. Ask before any paid step, and state both
 the development cost and the production equivalent.
 
 ## Now
@@ -40,8 +40,8 @@ the development cost and the production equivalent.
    - Step 4: new design (Direction v16) approved; checked on miopages.org. Seven page layouts
      approved (words unchanged; frames 114 to about 40; no indigo opening; no pull quotes).
      Left: Scope & Fit (Core dropped a section) and Free Review (rewrote the headline) go back to
-     Core with "keep every word"; Direct Start's layout was blocked by the cap. Needs a cap raise
-     (about $0.85 real; each call sets aside about $2.50).
+     Core with "keep every word"; Direct Start's layout was blocked by the cap. Cap raised to
+     $24 ("Yes, raise to $24", Nov 27); in progress.
 
 ## Next (agreed, in order)
 
