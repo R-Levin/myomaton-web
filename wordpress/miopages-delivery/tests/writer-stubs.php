@@ -125,3 +125,13 @@ if (!function_exists('wp_json_encode')) { function wp_json_encode(mixed $value):
 if (!function_exists('update_option')) { function update_option(string $key, mixed $value, mixed $autoload = null): bool { $GLOBALS['harness_options'][$key] = $value; return true; } }
 if (!function_exists('get_post_type')) { function get_post_type(int $id): string|false { return get_post($id)->post_type ?? false; } }
 if (!function_exists('wp_update_post')) { function wp_update_post(array $post, ...$args): int { global $wpdb; $wpdb->pages[$post['ID']] = [...($wpdb->pages[$post['ID']] ?? []), ...$post]; return $post['ID']; } }
+
+// WordPress's own block parser (from a local WordPress copy), and the cleaning functions, for Core-rendered pages.
+if (!function_exists('parse_blocks')) {
+    $wpIncludes = getenv('WORDPRESS_SOURCE') ? rtrim((string) getenv('WORDPRESS_SOURCE'), '/') . '/wp-includes' : dirname(__DIR__, 4) . '/p022-wp-validation/wordpress/wp-includes';
+    foreach (['class-wp-block-parser-block.php', 'class-wp-block-parser-frame.php', 'class-wp-block-parser.php'] as $file) require_once $wpIncludes . '/' . $file;
+    function parse_blocks(string $content): array { return array_map(static fn($block) => (array) $block + ['innerBlocks' => []], (new WP_Block_Parser())->parse($content)); }
+}
+if (!function_exists('esc_url')) { function esc_url(string $url): string { return str_replace('&', '&#038;', htmlspecialchars($url, ENT_QUOTES)); } }
+// The harness has no kses; WordPress's real wp_kses_post cleans the markup on a live site.
+if (!function_exists('wp_kses_post')) { function wp_kses_post(string $content): string { return $content; } }

@@ -196,3 +196,39 @@ test("an editor left open on an older copy is told Core took over and cannot sav
   assert.equal(php.status, 0, php.stderr);
   assert.equal(php.stdout.trim(), "PASS");
 });
+
+test("a page Core rendered from the site's components reaches WordPress as ordinary blocks, links filled in, nothing else let through", async () => {
+  const { renderPage } = await import("../lib/platform/site/render");
+  const sitePage = { path: "/", title: "Fixture home", menuLabel: "Home", searchTitle: "Fixture", searchDescription: "Fixture",
+    content: [{ id: "h1", type: "heading" as const, text: "A clear fixture opening" }, { id: "t1", type: "text" as const, text: "What the fixture business does." },
+      { id: "p1", type: "picture" as const, shows: "The fixture team at work", alt: "Team at work" }, { id: "a1", type: "action" as const, label: "Start now", page: "/start" },
+      { id: "x1", type: "placeholder" as const, need: "testimonial", text: "A short quote from a real customer." }, { id: "h2", type: "heading" as const, text: "What customers say" }],
+    layout: [{ id: "s1", component: "opening" as const, variant: "split", band: "contrast" as const, slots: { heading: ["h1"], text: ["t1"], picture: ["p1"], actions: ["a1"] } },
+      { id: "s2", component: "points" as const, variant: null, band: "light" as const, slots: { heading: ["h2"], items: ["x1"] } }] };
+  const markup = renderPage(sitePage, { link: path => `miopages:page:${path}`, picture: () => null, defaultVariant: () => "columns" });
+  const startMarkup = renderPage({ ...sitePage, path: "/start", title: "Start", content: [{ id: "h1", type: "heading" as const, text: "Start here" },
+    { id: "t1", type: "text" as const, text: "Begin." }], layout: [{ id: "s1", component: "text" as const, variant: null, band: "light" as const, slots: { heading: ["h1"], text: ["t1"] } }] },
+    { link: path => `miopages:page:${path}`, picture: () => null, defaultVariant: () => "single" });
+  const components = { candidate: { ...review.candidate,
+    pages: [{ id: home, path: "/", title: "Fixture home", composition: "components-v1" as const, navigationLabel: "Home", markup },
+      { id: start, path: "/start", title: "Start", composition: "components-v1" as const, navigationLabel: "Start", markup: startMarkup }], actions: [] }, unresolvedActions: [] };
+  const signed = bindReviewDraft({ site, installationId, streamId: randomUUID(), revision: 1, previousDigest: null, source: { intakeId, workflowVersion: 31 },
+    review: components as unknown as ReviewInput, brand });
+  const result = writer([JSON.stringify(reviewDraftEnvelope(signed, "fixture-key", publicKeyBase64, privateKey))]);
+  assert.equal(result.status, 0, result.stderr);
+  const homeHtml: string = JSON.parse(result.stdout).applied[0].posts["/"];
+  assert.match(homeHtml, /mp-c-opening mp-v-split mp-band-contrast/, "Core's components arrive as rendered");
+  assert.match(homeHtml, /Image for position only/, "an unchosen picture is a marked FPO frame");
+  assert.match(homeHtml, /Content needed/, "needed material is a marked placeholder");
+  assert.match(homeHtml, /page_id=\d+&amp;preview=true|page_id=\d+&#038;preview=true/, "the link to another page is filled in");
+  assert.ok(!homeHtml.includes("miopages:"), "no reference is left unresolved");
+
+  // Anything but ordinary core blocks is refused.
+  const sneaky = { ...components, candidate: { ...components.candidate, pages: [{ ...components.candidate.pages[0], markup: markup + "\n<!-- wp:html --><div>Raw HTML</div><!-- /wp:html -->" },
+    components.candidate.pages[1]] } };
+  const refused = bindReviewDraft({ site, installationId, streamId: randomUUID(), revision: 1, previousDigest: null, source: { intakeId, workflowVersion: 32 },
+    review: sneaky as unknown as ReviewInput, brand });
+  const second = writer([JSON.stringify(reviewDraftEnvelope(refused, "fixture-key", publicKeyBase64, privateKey))]);
+  assert.notEqual(second.status, 0);
+  assert.match(second.stderr + second.stdout, /block that is not allowed/);
+});
