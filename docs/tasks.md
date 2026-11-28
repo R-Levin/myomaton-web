@@ -21,15 +21,18 @@ the development cost and the production equivalent.
    containers so we might go back to one of the old states." (Nov 27)
    - Done: states A and B recorded (`docs/states.md`, tags `c0-state-a-2026-11-26` and
      `c0-state-b-2026-11-27`, a private record snapshot, a miopages.org database export).
-   - Done: triage in `docs/triage-2026-11-27.md`. Waiting on the Principal's decision on its
-     recommended path.
+   - Done: triage in `docs/triage-2026-11-27.md`; its path approved (task 1).
 
 1. **The presentation of C0's draft is broken throughout; replace it, keeping the content.**
    - "A bloated, inexplicable deformed clone." "One example out of a thousand broken shards of
      glass." (Nov 27) The Principal's examples (overlapping boxes, scores of FPO frames, button
      notes) illustrate the whole; they aren't a checklist. Keep perspective.
-   - Status: the path is in the triage (keep the content, redo the presentation once to an agreed
-     brief); waiting on the Principal's decision.
+   - Decided: "Go ahead and follow your suggestions." (Nov 27) The triage path, in order: see the
+     drafts on miopages.org as the Principal does; find and fix the overlapping; a short design
+     brief for the Principal's OK; one clean Core pass keeping the content; check on
+     miopages.org before showing.
+   - Status: step 1 needs the Principal's explicit OK to create a WordPress login for Claude's
+     checks on miopages.org.
 
 ## Next (agreed, in order)
 
