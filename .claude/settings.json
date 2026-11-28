@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"process.stdout.write('TASK LIST (docs/tasks.md): check your response against it, and update it in this turn if anything changes.\\n\\n' + require('fs').readFileSync('docs/tasks.md','utf8'))\""
+          }
+        ]
+      }
+    ]
+  }
+}

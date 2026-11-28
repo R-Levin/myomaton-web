@@ -26,6 +26,10 @@
 
 ## Check before acting (every session, and again after any context summary)
 The Principal should never have to chase these (Nov 27, after a day of avoidable mistakes):
+0. **The task list is `docs/tasks.md`.** It's shown with every message (`.claude/settings.json`
+   hook). Check each response against it; update it in the same turn whenever a task is added,
+   changed, started or finished, quoting the Principal's words. Work only on what's on it, or what
+   is agreed in conversation and added to it first.
 1. **Re-read the record before doing anything** after a session start *or a context summary*:
    this file, the top of `runtime-content/chat-recovery.md`, `docs/what-lives-where.md`, and the
    latest entries of `docs/owner-critical-conversations.md`. A summary loses details; the record

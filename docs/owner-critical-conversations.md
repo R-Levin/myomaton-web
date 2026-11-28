@@ -1577,3 +1577,8 @@ Principal approves.
   a private picture folder added, and C0's current draft sent (pages 82–91, with its 34 pictures).
   Standing directions added to CLAUDE.md so the record is re-read before acting, including after
   a context summary.
+
+- **Nov 27 — one task list, consulted every time.** The Principal: make sure there is a real system
+  to track our tasks, and reference it before every response. Done: `docs/tasks.md` holds the
+  agreed tasks with the Principal's own words, and a Claude Code hook shows it with every message.
+  CLAUDE.md requires checking each response against it and updating it in the same turn.
