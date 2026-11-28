@@ -26,6 +26,12 @@ A. **Handoff document** (`docs/HANDOFF.md`): everything someone needs to carry o
 B. **Simplified version:** AI research → a nice site → WordPress (miopages.org) for the Principal to
    look at; words and layout managed separately and simply. Check every step: am I adding bloat, rules,
    or my own opinions? Paid AI calls still need the Principal's OK.
+   - Done Nov 28: `docs/HANDOFF.md`. Built (free): `lib/simple-site/` (site = pages of sections; each
+     section's layout and words kept apart), `scripts/simple-site/write.ts` (one AI call),
+     `to-wordpress.ts` (theme, logo, draft pages, menu on miopages.org), `look.ts` (screens), theme
+     `wordpress/miopages-simple` (October colors, WordPress's own menu; now active on miopages.org).
+     Tried end to end with a free stand-in (then trashed). Waiting: the Principal's OK for the one
+     paid call (well under $1, inside the approved $28 cap, $24.63 spent).
 
 Everything below is history and on hold.
 

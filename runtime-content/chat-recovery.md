@@ -1,3 +1,6 @@
+## Nov 28 ~07:30 UTC: HANDOFF.md written; simplified version built and tried (stand-in)
+Next on the Principal's OK: npx tsx scripts/simple-site/write.ts --ai-run c0-milestone-3 --cap 28 --out runtime-content/simple-site/c0 ; then to-wordpress.ts --site runtime-content/simple-site/c0 ; then look.ts and judge by eye. Theme miopages-simple is active on miopages.org.
+
 ## Nov 28 ~06:30 UTC: STOPPED; rethink written (docs/rethink-2026-11-28.md)
 Principal rejected the first review as rehash; asked for a blank-sheet rethink starting from the Oct 12 site. Written; waiting. No building or spending. Old drafts 53-61 trashed (copies kept).
 
