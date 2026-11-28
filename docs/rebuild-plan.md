@@ -224,3 +224,11 @@ Plain server-rendered pages, one form per action, every action checking who is a
   picture. Open: frames that need labeled diagrams (Core could draw them as SVG, or an image
   generator could make them); the pictures lean on desk-and-documents scenes; credits page for
   Pixabay creators before any public release.
+- *Nov 27, milestone 3 continued (about $15.80 of an $18 cap; not accepted):* design rules
+  (`docs/design-rules.md`) replace the earlier layout and stylesheet limits; the footer is part of
+  the Site plan; the theme now guarantees the mechanics (readable text, phone menu, no sideways
+  scrolling, tap sizes, visible FPO frames, reduced motion); a rendered-page check exists and can
+  be sent to Core. Core redesigned C0, and the draft went to **miopages.org**, re-connected to the
+  new Core (pages 82–91). The Principal's verdict: not good: still the same design, bloated, too
+  many FPO frames, elements overlapping, and the "not active" note under the wrong buttons. Next
+  steps are in `docs/tasks.md` (fix the draft, then a real redesign to an agreed brief).
