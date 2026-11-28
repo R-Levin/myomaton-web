@@ -1,3 +1,6 @@
+## Nov 28 ~06:30 UTC: STOPPED; rethink written (docs/rethink-2026-11-28.md)
+Principal rejected the first review as rehash; asked for a blank-sheet rethink starting from the Oct 12 site. Written; waiting. No building or spending. Old drafts 53-61 trashed (copies kept).
+
 ## Nov 28 ~05:30 UTC: C0 pass done; review draft 2 on miopages.org ($24.63 of $28)
 All ten pages current with Nov 27 words (verified), layouts to the brief (mended / earlier layouts adopted). Rendered check: findings only on old drafts 53-61. Screens: runtime-content/ai-runs/c0-milestone-3/site-draft-11. Waiting for the Principal's look; then brand color and font; old drafts question.
 

@@ -26,6 +26,10 @@ below is on hold until then.
   start there and just keep working until you have some kind of an idea ... No more talking tonight."
   Now: find the mid-October site, learn how and why it worked, review everything since, and think
   from a blank sheet. Work quietly; no spending, no hosted changes.
+- Done Nov 28: `docs/rethink-2026-11-28.md`. The Oct 12 site (7 pages, ~300-600 words, 4 section kinds,
+  no pictures or placeholders, people editing) worked; Core's instructions mandate the bloat ("use all
+  of it", "visually rich", "never leave the spot out") and nothing subtracts. Idea: make Core work the
+  way October was made. Waiting for the Principal.
 
 0. **Triage, then decide the path.** "Start with that. But first record everything into logical
    containers so we might go back to one of the old states." (Nov 27)
