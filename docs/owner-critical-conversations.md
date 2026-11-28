@@ -1648,3 +1648,5 @@ Principal approves.
   me to look at it. And you're going to make it so that the words and the layout can be managed in a
   logical way that doesn't handcuff us ... ask yourself, as much as you need to, am I adding bloat here? Am
   I creating rules? ... Get started, no more."
+
+- **Nov 28 — one paid call for the simplified site approved.** "Yes" to Core writing C0's site in one call inside the $28 cap. Cost $0.12; run total $24.75.

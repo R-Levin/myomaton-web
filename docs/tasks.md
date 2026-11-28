@@ -12,7 +12,7 @@ We are in milestone 3, one real AI run on C0, accepted against baseline Part 1 (
 holds the agreed near-term work under that plan.
 
 **Where the Principal looks:** miopages.org (password-protected review WordPress), drafts only.
-**Spending:** C0 milestone 3 run, $24.63 of a $28 cap. Ask before any paid step, and state both
+**Spending:** C0 milestone 3 run, $24.75 of a $28 cap. Ask before any paid step, and state both
 the development cost and the production equivalent.
 
 ## Now
@@ -30,8 +30,9 @@ B. **Simplified version:** AI research → a nice site → WordPress (miopages.o
      section's layout and words kept apart), `scripts/simple-site/write.ts` (one AI call),
      `to-wordpress.ts` (theme, logo, draft pages, menu on miopages.org), `look.ts` (screens), theme
      `wordpress/miopages-simple` (October colors, WordPress's own menu; now active on miopages.org).
-     Tried end to end with a free stand-in (then trashed). Waiting: the Principal's OK for the one
-     paid call (well under $1, inside the approved $28 cap, $24.63 spent).
+     Tried end to end with a free stand-in (then trashed). Paid call approved ("Yes", Nov 28): $0.12.
+     Core wrote 5 pages (Home, Service, Why MioPages, Free Review, Getting Started; ~240-350 words
+     each), now drafts on miopages.org (pages 154-158). Waiting for the Principal's look.
 
 Everything below is history and on hold.
 
