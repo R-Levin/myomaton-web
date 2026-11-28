@@ -1,3 +1,6 @@
+## Nov 28 ~05:30 UTC: C0 pass done; review draft 2 on miopages.org ($24.63 of $28)
+All ten pages current with Nov 27 words (verified), layouts to the brief (mended / earlier layouts adopted). Rendered check: findings only on old drafts 53-61. Screens: runtime-content/ai-runs/c0-milestone-3/site-draft-11. Waiting for the Principal's look; then brand color and font; old drafts question.
+
 ## Nov 28 ~03:30 UTC: C0 layout pass running (cap $28, approved)
 Restored Nov 27 words on /, how-it-works, service, pricing, ownership-and-exit, proof (free). Nine layout-only requests queued with examples (/ 4, how 3, service 4, pricing 4, ownership 4, proof 5, scope 6, review 6, start 5); FAQ unchanged. Core running (watch: ledger attempts to 159). Then: check words (workspace 'Words unchanged'), layout counts, approve, send to miopages.org, check there.
 

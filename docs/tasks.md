@@ -12,7 +12,7 @@ We are in milestone 3, one real AI run on C0, accepted against baseline Part 1 (
 holds the agreed near-term work under that plan.
 
 **Where the Principal looks:** miopages.org (password-protected review WordPress), drafts only.
-**Spending:** C0 milestone 3 run, $20.70 of a $28 cap. Ask before any paid step, and state both
+**Spending:** C0 milestone 3 run, $24.63 of a $28 cap. Ask before any paid step, and state both
 the development cost and the production equivalent.
 
 ## Now
@@ -69,8 +69,15 @@ the development cost and the production equivalent.
    - Built and tested on the free stand-in (Nov 28): words and layout grains in the engine and Core's
      writer; a layout that changes, drops or invents a word is refused; going back to any earlier page
      version (no AI); "Words unchanged" or the exact changed lines on each proposed page. All ten real
-     C0 pages pass offline. Cap raised to $28 ("Yes", Nov 28). In progress: restore the Nov 27 words
-     where they drifted, then one layout change per page to the brief.
+     C0 pages pass offline. Cap raised to $28 ("Yes", Nov 28).
+   - Done Nov 28 ($3.93): Nov 27 words restored on six pages (free); Core's layouts with the words
+     kept apart; Core's slips mended (no word touched); where an earlier layout was better, that
+     layout with the approved words (free). All ten pages approved, words identical to Nov 27;
+     pictures 114 to 39, boxes 243 to 151, nested boxes 51 to 11, pull quotes 15 to 1. Sent to
+     miopages.org (review draft 2). Rendered check: the new pages pass; its problems are on the 9
+     old Nov 23 drafts. Open: 11 nested boxes remain (Home 4); the 9-link menu doesn't fit one line
+     even at 1440px, so desktop shows the menu button (as the rule says). Next: the Principal looks
+     on miopages.org, then brand color and font.
 
 ## Next (agreed, in order)
 
