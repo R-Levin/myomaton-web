@@ -4,7 +4,7 @@ import { clientPeople } from "@/lib/platform/accounts/people";
 import { readMyBusiness } from "@/lib/platform/intake/my-business";
 import { currentSite, tasks } from "@/lib/platform/service/cycle";
 import { accounts, acting, serviceRuntime } from "@/lib/platform/service/runtime";
-import { addPerson, askPublish, beginLaunch, checkRendered, directRequest, enterEmail, proposeFact, readBack, removePerson, restorePage, review, runCore, sendDrafts, sendFindings, specialistRequest } from "../actions";
+import { addPerson, askPublish, beginLaunch, checkRendered, directRequest, enterEmail, proposeFact, readBack, removePerson, adoptPageLayout, restorePage, review, runCore, sendDrafts, sendFindings, specialistRequest } from "../actions";
 import { compareWords } from "@/lib/platform/service/page-words";
 import type { PageContent, ProductVersion } from "@/lib/platform/service/cycle";
 import { checkSummary, findingsForCore, lastRenderedCheck, type RenderedCheck } from "@/lib/platform/service/rendered-check";
@@ -127,7 +127,7 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
           <details key={item.changeId} className="mb-2 rounded border border-neutral-200 p-3"><summary className="cursor-pointer font-medium">{productName(item)}, version {item.version}</summary>
             <div className="mt-2"><Content item={item} /></div>
             {item.kind === "page" && <EarlierVersions item={item} versions={record.products.filter(entry => entry.id === item.id && entry.version !== item.version)}
-              restore={version => restorePage.bind(null, id, item.path!, version)} />}</details>)) : <p className="text-neutral-600">None yet.</p>}
+              restore={version => restorePage.bind(null, id, item.path!, version)} adopt={version => adoptPageLayout.bind(null, id, item.path!, version)} />}</details>)) : <p className="text-neutral-600">None yet.</p>}
       </Section>
 
       <Section title="Ask Core for a change" note="Your own request as Specialist, on a Work product. Core reworks it and the new version comes back for review.">
@@ -219,7 +219,8 @@ function WordsCheck({ proposed, current }: { proposed: ProductVersion; current?:
 }
 
 /** Every earlier version of a page is kept; a Specialist can make one current again (going back, no AI). */
-function EarlierVersions({ item, versions, restore }: { item: ProductVersion; versions: ProductVersion[]; restore: (version: number) => () => Promise<void> }) {
+function EarlierVersions({ item, versions, restore, adopt }: { item: ProductVersion; versions: ProductVersion[]; restore: (version: number) => () => Promise<void>;
+  adopt: (version: number) => () => Promise<void> }) {
   if (!versions.length) return null;
   return (
     <div className="mt-3 border-t border-neutral-200 pt-2 text-sm">
@@ -228,7 +229,8 @@ function EarlierVersions({ item, versions, restore }: { item: ProductVersion; ve
         const diff = compareWords(item.content as PageContent, entry.content as PageContent);
         return (<li key={entry.changeId} className="flex flex-wrap items-center gap-2">
           <span>Version {entry.version}, {entry.at.slice(0, 16).replace("T", " ")} UTC, {entry.status}; {diff.unchanged ? "same words" : `${lines(diff.gone.length + diff.added.length)} differ`}</span>
-          <form action={restore(entry.version)}><button className="rounded border border-neutral-300 px-2 py-0.5 text-xs">Make it current again</button></form></li>);
+          <form action={restore(entry.version)}><button className="rounded border border-neutral-300 px-2 py-0.5 text-xs">Make it current again</button></form>
+          {!diff.unchanged && <form action={adopt(entry.version)}><button className="rounded border border-neutral-300 px-2 py-0.5 text-xs">Use its layout with the current words</button></form>}</li>);
       })}</ul>
     </div>);
 }

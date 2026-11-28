@@ -90,6 +90,70 @@ export function compareWords(before: PageContent, after: PageContent) {
 export type LayoutSection = { heading: string; role: string; visual: unknown; moreVisuals?: unknown; block: unknown };
 export type Layout = { sections: LayoutSection[] };
 
+/** A plain slot for a mended or wrapped piece: the neighbor's type and alignment, never its box or tint. */
+const plainLayout = (like?: NativeNode): NativeNode["layout"] => ({ arrangement: "flow", columns: [], gap: "medium", inset: "none", surface: "none",
+  align: like?.layout.align === "center" ? "center" : "start", measure: like?.layout.measure ?? "reading", typeScale: like && like.layout.typeScale !== "display" ? like.layout.typeScale : "body",
+  span: 12, mobileOrder: 0, border: false, rounded: false });
+const plainNode = (kind: NativeNode["kind"], text: string | null, extra: Partial<NativeNode> = {}): NativeNode =>
+  ({ kind, text, level: null, items: [], ordered: false, reference: null, children: [], layout: plainLayout(), ...extra });
+
+/** A section that isn't yet a designed component, as one: its heading, its paragraphs, its groups, then any supporting component. */
+function asDesigned(section: Section): NativeComponent {
+  if (isNative(section.block) && section.block.mode === "section") return section.block;
+  const paragraphs = (text: string) => text.split(/\n\s*\n/u).map(part => part.trim()).filter(Boolean).map(part => plainNode("paragraph", part));
+  const children = [plainNode("heading", section.heading, { level: section.role === "hero" ? 1 : 2 }), ...paragraphs(section.body)];
+  if (isGroups(section.block)) for (const group of section.block.groups) {
+    if (group.heading.trim()) children.push(plainNode("heading", group.heading, { level: 3 }));
+    children.push(...paragraphs(group.body));
+    if (group.items.length) children.push(plainNode("list", null, { items: [...group.items] }));
+  }
+  if (isNative(section.block)) children.push(section.block.root);
+  return { version: 2, name: "section-" + (section.role ?? "intro"), purpose: "The section as written", mode: "section", root: plainNode("group", null, { children }) };
+}
+
+/**
+ * An earlier version's layout, holding the current version's words: the arrangement of `example`
+ * with each of its texts replaced by the number of the current piece it is (the same words), or the
+ * one it most resembles (a reworded line). Texts of the example that match nothing are left out,
+ * and pieces it lacks are mended back in (mendLayout). No AI: the layout is the designer's own,
+ * from an earlier version; the words are the approved ones.
+ */
+export function layoutFromExample(current: PageContent, example: PageContent): Layout {
+  const pieces = pageWords(current), free = new Set(pieces.map(piece => piece.id));
+  const norm = (text: string) => text.replace(/\s+/gu, " ").trim();
+  const words = (text: string) => new Set(norm(text).toLowerCase().split(/[^a-z0-9']+/u).filter(Boolean));
+  const likeness = (a: string, b: string) => { const x = words(a), y = words(b); let both = 0; for (const w of x) if (y.has(w)) both++; return both / Math.max(1, Math.min(x.size, y.size), (x.size + y.size) / 3); };
+  const exact = new Map<string, string[]>();
+  for (const piece of pieces) exact.set(norm(piece.text), [...exact.get(norm(piece.text)) ?? [], piece.id]);
+  const slots = spots(structuredClone(example)), copy = structuredClone(example), copied = spots(copy);
+  // First the texts that are the same words, then the reworded ones by likeness, so a match is never taken twice.
+  const chosen = new Map<number, string>();
+  slots.forEach((slot, index) => {
+    const id = (exact.get(norm(slot.get())) ?? []).find(candidate => free.has(candidate) && pieces.find(p => p.id === candidate)!.kind === slot.kind);
+    if (id) { chosen.set(index, id); free.delete(id); }
+  });
+  slots.forEach((slot, index) => {
+    if (chosen.has(index)) return;
+    let best: string | undefined, score = 0.5;
+    for (const piece of pieces) if (free.has(piece.id) && piece.kind === slot.kind) { const s = likeness(slot.get(), piece.text); if (s > score) { score = s; best = piece.id; } }
+    if (best) { chosen.set(index, best); free.delete(best); }
+  });
+  copied.forEach((slot, index) => slot.set(chosen.get(index) ?? "unmatched"));
+  return { sections: (copy.sections as Section[]).map(section => {
+    const block = structuredClone(asDesigned(section));
+    const drop = (node: NativeNode) => {
+      node.children = node.children.filter(child => !(child.kind !== "action" && child.text === "unmatched" && !child.children.length));
+      if (node.kind === "list") node.items = node.items.filter(item => item !== "unmatched");
+      if (node.kind !== "action" && node.text === "unmatched") node.text = node.kind === "image" ? null : node.text;
+      node.children.forEach(drop);
+    };
+    if (isNative(block)) drop(block.root);
+    const opening = (node: NativeNode): string | undefined => node.kind === "heading" && (node.level === 1 || node.level === 2) ? node.text ?? undefined : node.children.map(opening).find(Boolean);
+    return { heading: isNative(block) ? opening(block.root) ?? section.heading : section.heading, role: section.role ?? "intro", visual: section.visual,
+      moreVisuals: section.moreVisuals ?? [], block };
+  }) };
+}
+
 /**
  * Mend the slips a designer makes placing a hundred numbered pieces, without touching a word: a
  * piece left out goes back right after the piece it followed on the page; a heading set in a text
@@ -105,9 +169,7 @@ export function mendLayout(previous: PageContent, layout: Layout): { layout: Lay
   type Place = { id: string; section: number; node?: NativeNode; parent?: NativeNode; item?: number; header?: true };
   const known = (id: unknown) => typeof id === "string" && byId.has(id.trim());
   const blank = (kind: NativeNode["kind"], text: string, like?: NativeNode, level: number | null = null): NativeNode =>
-    ({ kind, text, level, items: [], ordered: false, reference: null, children: [],
-      layout: like ? { ...like.layout, arrangement: "flow", columns: [] } : { arrangement: "flow", columns: [], gap: "medium", inset: "none", surface: "none",
-        align: "start", measure: "reading", typeScale: "body", span: 12, mobileOrder: 0, border: false, rounded: false } });
+    ({ kind, text, level, items: [], ordered: false, reference: null, children: [], layout: plainLayout(like) });
   const seen = new Set<string>(), places = new Map<string, Place>(), lost: string[] = [];
   out.sections.forEach((section, s) => {
     const block = section.block as NativeComponent | undefined;

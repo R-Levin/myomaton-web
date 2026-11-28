@@ -6,7 +6,7 @@ import type { Asset } from "./assets";
 import type { SiteFooter } from "./site-footer";
 import { fingerprint } from "../canonical/model";
 import { directionIdentity, pageIdentity, reportIdentity, sitePlanIdentity, versionPages } from "../work-products/pages";
-import { arrangementOf, compareWords, pageWords, type Piece } from "./page-words";
+import { arrangementOf, compareWords, fillLayout, layoutFromExample, mendLayout, pageWords, type Piece } from "./page-words";
 
 /**
  * Core's one engine (rebuild plan, milestone 1). Every piece of work is the same cycle of shared
@@ -264,6 +264,32 @@ export function restore(record: ServiceRecord, input: { id: string; at: string; 
   const proposed = { ...record, ledger, products: [...products, { id, kind: "page" as const, version, path: input.path,
     content: versionedPage(record, id, structuredClone(earlier.content) as PageContent), changeId, at: input.at, status: "proposed" as const }] };
   return respond(proposed, changeId, input.by, "approve", input.at);
+}
+
+/**
+ * A Specialist proposes an earlier version's layout for a page, holding its current, approved words
+ * (layoutFromExample): no AI, a layout change like any other, shown for Review with its words check.
+ */
+export function adoptLayout(record: ServiceRecord, input: { id: string; at: string; by: Person; path: string; version: number }): ServiceRecord {
+  if (input.by.role !== "operator" && input.by.role !== "owner") throw new CycleError("not-permitted", "Only a Specialist proposes a page's layout");
+  const id = pageIdentity(record.account.managedSiteId, input.path), base = current(record, id);
+  const example = record.products.find(item => item.id === id && item.version === input.version);
+  if (!base || !example) throw new CycleError("not-found", "No such version of that page");
+  if (record.ledger.requests.some(request => request.id === input.id + ":request")) return record;
+  const before = base.content as PageContent;
+  const content = fillLayout(before, mendLayout(before, layoutFromExample(before, example.content as PageContent)).layout);
+  if (!compareWords(before, content).unchanged) throw new CycleError("invalid", "That layout would change the page's words");
+  const requestId = input.id + ":request", words = `Use the layout of version ${example.version} of the page ${input.path}, with its current words.`;
+  let ledger = takeIn(record.ledger, { id: input.id, at: input.at, by: input.by }, [{ id: requestId, at: input.at,
+    origin: { kind: "operator", by: input.by, channel: "core-screen" }, target: { grain: "page-layout", path: input.path, example: example.version }, words }]);
+  const version = Math.max(0, ...record.products.filter(item => item.id === id).map(item => item.version)) + 1, changeId = `${id}:v${version}`;
+  ledger = decide(ledger, { id: changeId + ":decision", at: input.at, by: input.by, requestIds: [requestId], outcome: "change", reasoning: words },
+    [{ id: changeId, label: `page-v${version}`, at: input.at, requestIds: [requestId],
+      target: { grain: "page-layout", path: input.path, workProduct: { id, version: base.version } }, base: { version: record.version, digest: fingerprint(base.content) },
+      difference: { summary: `the layout of the page ${input.path}, version ${version} (the layout of version ${example.version})` }, preserve: [], consequence: "operator-review" }]);
+  const products = record.products.map(item => item.id === id && item.status === "proposed" ? { ...item, status: "superseded" as const } : item);
+  return { ...record, ledger, products: [...products, { id, kind: "page" as const, version, path: input.path,
+    content: versionedPage(record, id, content), changeId, at: input.at, status: "proposed" as const }] };
 }
 
 /** A Page's Sections keep their identities across Versions, as delivery has always given them. */

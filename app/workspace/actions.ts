@@ -7,7 +7,7 @@ import { accountKnowledge } from "@/lib/platform/knowledge/account";
 import { factKey } from "@/lib/platform/knowledge/facts";
 import { confirmOnPublish, factsToConfirmOnPublish } from "@/lib/platform/knowledge/publish";
 import { currentFacts, recordFacts } from "@/lib/platform/knowledge/store";
-import { ask, citedBySite, direct, proposePublish, respond, restore, startLaunch, tasks, work, type Kind, type ServiceRecord } from "@/lib/platform/service/cycle";
+import { adoptLayout, ask, citedBySite, direct, proposePublish, respond, restore, startLaunch, tasks, work, type Kind, type ServiceRecord } from "@/lib/platform/service/cycle";
 import { deliverDraft, takeInReadBack } from "@/lib/platform/service/delivery";
 import { readBackOperatorSite } from "@/lib/platform/wordpress-delivery/operator-review";
 import { findingsForCore, lastRenderedCheck, runRenderedCheck } from "@/lib/platform/service/rendered-check";
@@ -228,6 +228,14 @@ export async function specialistRequest(webPresenceId: string, form: FormData) {
     const pageGrain = target.kind === "page" && grain ? grain as "page" | "page-words" | "page-layout" : undefined;
     return ask(record, { id: `specialist:${ctx.person.id}:${at}`, at, by: ctx.person, ...target, words: words.slice(0, 20_000),
       ...(pageGrain && pageGrain !== "page" && { grain: pageGrain }), ...(pageGrain === "page-layout" && example && { example }) });
+  });
+}); }
+
+/** A Specialist proposes an earlier version's layout for a page, with its current words (no AI). */
+export async function adoptPageLayout(webPresenceId: string, path: string, version: number) { await shown(webPresenceId, async () => {
+  await change(webPresenceId, "specialist", (record, ctx) => {
+    const at = now();
+    return adoptLayout(record, { id: `adopt:${ctx.person.id}:${at}`, at, by: ctx.person, path, version });
   });
 }); }
 

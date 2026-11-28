@@ -7,7 +7,7 @@ import test from "node:test";
 import { fingerprint } from "../lib/platform/canonical/model";
 import { initializeResponsesUsageLedger, type ResponsesTransport } from "../lib/platform/intake/intelligent-responses";
 import { createAiWriter } from "../lib/platform/service/ai-writer";
-import { ask, current, currentSite, openRecord, respond, restore, startLaunch, tasks, work, type PageContent, type ServiceRecord } from "../lib/platform/service/cycle";
+import { adoptLayout, ask, current, currentSite, openRecord, respond, restore, startLaunch, tasks, work, type PageContent, type ServiceRecord } from "../lib/platform/service/cycle";
 import { compareWords } from "../lib/platform/service/page-words";
 import { pageIdentity } from "../lib/platform/work-products/pages";
 import { offlineAi } from "./helpers/simulated-ai";
@@ -166,5 +166,27 @@ test("going back: an earlier version of a page becomes current again, exactly, w
     assert.equal(compareWords(first.content as PageContent, now.content as PageContent).unchanged, true);
     assert.equal(ai.sent.length, sent, "no AI call");
     assert.throws(() => restore(record, { id: "restore-2", at: "2026-11-28T11:04:00.000Z", by: client, path: "/service", version: first.version }), /Only a Specialist/u);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("an earlier version's layout with the current words, as a layout change for Review, no AI", async () => {
+  const root = await mkdtemp(join(tmpdir(), "miopages-page-adopt-"));
+  try {
+    const ai = aiFor();
+    const launch = await launched(root, ai.transport), writer = launch.writer;
+    let record = launch.record;
+    record = ask(record, { id: "layout-a", at: "2026-11-28T11:00:00.000Z", by: specialist, kind: "page", path: "/service", grain: "page-layout", words: "Relay." });
+    record = await work(record, tasks(record).find(item => item.who === "core")!, writer, knowledge, "2026-11-28T11:01:00.000Z");
+    const laid = record.products.find(item => item.status === "proposed")!;
+    record = respond(record, laid.changeId, specialist, "approve", "2026-11-28T11:02:00.000Z");
+    record = ask(record, { id: "words-a", at: "2026-11-28T11:03:00.000Z", by: specialist, kind: "page", path: "/service", grain: "page-words", words: "Reword." });
+    record = await work(record, tasks(record).find(item => item.who === "core")!, writer, knowledge, "2026-11-28T11:04:00.000Z");
+    record = respond(record, record.products.find(item => item.status === "proposed")!.changeId, specialist, "approve", "2026-11-28T11:05:00.000Z");
+    const now = servicePage(record), sent = ai.sent.length;
+    record = adoptLayout(record, { id: "adopt-1", at: "2026-11-28T11:06:00.000Z", by: specialist, path: "/service", version: 1 });
+    const proposed = record.products.find(item => item.status === "proposed")!;
+    assert.equal(compareWords(now.content as PageContent, proposed.content as PageContent).unchanged, true, "the current words");
+    assert.equal(record.ledger.changes.find(change => change.id === proposed.changeId)!.target.grain, "page-layout");
+    assert.equal(ai.sent.length, sent, "no AI call");
   } finally { await rm(root, { recursive: true, force: true }); }
 });
