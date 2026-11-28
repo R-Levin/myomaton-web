@@ -1621,3 +1621,13 @@ Principal approves.
   copied in full (server `~/miopages-private/archive-nov28-old-drafts`, and locally) and moved to
   WordPress's trash; the paid workspace stopped. No further building or spending until the review is
   discussed.
+
+- **Nov 28 — the review was not a rethink; start from the site that worked.** On the review
+  (`docs/review-2026-11-28-stop.md`): "Your suggestions are just rehashed ideas already discussed at length.
+  [I] specifically said to you think with a clean sheet of paper on how to best do this and you just kept
+  doing the same things ... you need to review everything and then think from a blank sheet of paper ...
+  for God's sake a pretty decent website was built a month and a half ago without all this bloated
+  overload so just start there and just keep working until you have some kind of an idea and don't throw
+  ridiculous stuff at me like you just did with stuff we already discussed. Get going. No more talking
+  tonight." Meaning: no menus of known options; a real review of everything, starting from the decent
+  site of about mid-October and why it worked, then a genuinely new idea. Work quietly until there is one.

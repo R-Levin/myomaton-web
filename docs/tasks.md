@@ -21,6 +21,11 @@ the development cost and the production equivalent.
 through the entire project and rethink this." No building or spending. The one task now: the
 project-wide review (`docs/review-2026-11-28-stop.md`), then discuss it with the Principal. Everything
 below is on hold until then.
+- Nov 28, later: that review was rejected: "rehashed ideas ... think from a blank sheet of paper ... a
+  pretty decent website was built a month and a half ago without all this bloated overload so just
+  start there and just keep working until you have some kind of an idea ... No more talking tonight."
+  Now: find the mid-October site, learn how and why it worked, review everything since, and think
+  from a blank sheet. Work quietly; no spending, no hosted changes.
 
 0. **Triage, then decide the path.** "Start with that. But first record everything into logical
    containers so we might go back to one of the old states." (Nov 27)
