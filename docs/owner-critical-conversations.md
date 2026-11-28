@@ -1670,3 +1670,10 @@ Principal approves.
   Ongoing. Then: the project instructions must make Claude follow agreed work. Approved: CLAUDE.md now
   requires plan mode and the Principal's approval before building or changing anything, and "conversation
   only" means no actions; sessions start in plan mode (`.claude/settings.json`).
+
+- **Nov 29 — recovery program approved.** After working through what's broken and reading the code: "Most
+  likely there is a huge recovery component, but most of the tools need to be rethought or rebuilt." Two
+  corrections to the draft: "we are not building for C0 ... C0 will be our test case however", and the work
+  "must apply to the ongoing processes and modifications." Then: "OK, I approve the plan. I only need input
+  when it makes sense, but you should never make important changes without discussion." The program is
+  `docs/recovery-program-2026-11-29.md`.

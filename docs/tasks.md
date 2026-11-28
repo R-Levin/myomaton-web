@@ -17,26 +17,20 @@ the development cost and the production equivalent.
 
 ## Now
 
-Nov 28: "The first thing you're going to do is document everything and then put it in a proper document
-that I can use to move on if I have to ... Then ... create a simplified version that you do not add your
-opinions on ... a nice site using the AI research ... places it on WordPress and allows me to look at it
-... the words and the layout can be managed in a logical way that doesn't handcuff us."
+**The recovery program** (`docs/recovery-program-2026-11-29.md`), approved Nov 29: "OK, I approve the plan.
+I only need input when it makes sense, but you should never make important changes without discussion."
+We build the product (any Client, Launch and Ongoing); C0 is only the test case.
 
-A. **Handoff document** (`docs/HANDOFF.md`): everything someone needs to carry on without Claude.
-B. **Simplified version:** AI research → a nice site → WordPress (miopages.org) for the Principal to
-   look at; words and layout managed separately and simply. Check every step: am I adding bloat, rules,
-   or my own opinions? Paid AI calls still need the Principal's OK.
-   - Done Nov 28: `docs/HANDOFF.md`. Built (free): `lib/simple-site/` (site = pages of sections; each
-     section's layout and words kept apart), `scripts/simple-site/write.ts` (one AI call),
-     `to-wordpress.ts` (theme, logo, draft pages, menu on miopages.org), `look.ts` (screens), theme
-     `wordpress/miopages-simple` (October colors, WordPress's own menu; now active on miopages.org).
-     Tried end to end with a free stand-in (then trashed). Paid call approved ("Yes", Nov 28): $0.12.
-     Core wrote 5 pages (Home, Service, Why MioPages, Free Review, Getting Started; ~240-350 words
-     each), now drafts on miopages.org (pages 154-158). The Principal: this regressed to October; what was
-     wanted was removing the broken things Claude added, keeping what made sites professional, and a clear
-     understanding of what we are looking for. STOPPED until the Principal looks in the morning.
+1. One design source: the tokens plus the site's component choices; one theme stylesheet.
+2. A site component set on WordPress blocks, with content slots and variants.
+3. Content as its own record, laid into the slots.
+4. Pages written with the whole site in view; the instructions rewritten.
+5. Changes at any scope (section to whole site; content, layout or design), for Launch and Ongoing.
+6. Policing removed or made visible; the simplified side path retired.
+7. Free stand-in run to miopages.org: **Look 1** (the Principal).
+8. Paid run on the test case (ask first, with an estimate): **Look 2** (the Principal).
 
-Everything below is history and on hold.
+Earlier tasks below are history.
 
 0. **Triage, then decide the path.** "Start with that. But first record everything into logical
    containers so we might go back to one of the old states." (Nov 27)

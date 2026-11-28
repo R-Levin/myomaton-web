@@ -66,6 +66,9 @@ Reading, searching and diagnosing need no approval. Building or changing anythin
 content, settings, WordPress, paid calls) starts in plan mode: say what will be done, what's
 kept, what's removed and what it costs, and wait for the Principal's approval. No work begins
 otherwise. Sessions start in plan mode (`.claude/settings.json`).
+The Principal: "I only need input when it makes sense, but you should never make important changes
+without discussion." Important means anything that changes what the product does, how sites look, or
+the agreed plan. Routine engineering inside an agreed plan goes ahead.
 
 ## Stop and ask the Principal (one clear question, precise scope)
 - Any paid AI/provider call, or sending protected business data to a provider
