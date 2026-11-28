@@ -15,11 +15,15 @@ async function main() {
   const base = arg("base", "http://127.0.0.1:4481").replace(/\/$/u, ""), out = arg("out", "runtime-content/draft-pdf");
   const login = await readFile(arg("login", "runtime-content/preview-wordpress-login.txt"), "utf8");
   const user = /^User:\s*(.+)$/mu.exec(login)?.[1]?.trim(), password = /^Password:\s*(.+)$/mu.exec(login)?.[1]?.trim();
-  if (!user || !password || !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/u.test(base)) throw Error("A local preview address and its login file are required");
+  // The review site's password gate, when the login file names one (miopages.org); never printed.
+  const gateUser = /^Gate user:\s*(.+)$/mu.exec(login)?.[1]?.trim(), gatePassword = /^Gate password:\s*(.+)$/mu.exec(login)?.[1]?.trim();
+  const named = /https?:\/\/[^/\s]+/u.exec(login)?.[0];
+  if (!user || !password || !(/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/u.test(base) || base === named)) throw Error("A local preview, or the review site named in the login file, and its login are required");
+  const gate = gateUser && gatePassword ? { httpCredentials: { username: gateUser, password: gatePassword } } : {};
   await mkdir(out, { recursive: true });
   const browser = await chromium.launch({ executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: true });
   try {
-    const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+    const context = await browser.newContext({ ...gate, viewport: { width: 1440, height: 1000 } });
     await context.addInitScript("window.__name = (f) => f");
     const page = await context.newPage();
     await page.goto(base + "/wp-login.php");

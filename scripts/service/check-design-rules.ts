@@ -185,12 +185,16 @@ async function main() {
 const override = overrideFile ? await readFile(overrideFile, "utf8") : undefined;
 const login = await readFile(arg("login", "runtime-content/preview-wordpress-login.txt"), "utf8");
 const user = /^User:\s*(.+)$/mu.exec(login)?.[1]?.trim(), password = /^Password:\s*(.+)$/mu.exec(login)?.[1]?.trim();
-if (!user || !password || !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/u.test(base)) throw Error("A local preview address and its login file are required");
+// The review site's password gate, when the login file names one (miopages.org); never printed.
+  const gateUser = /^Gate user:\s*(.+)$/mu.exec(login)?.[1]?.trim(), gatePassword = /^Gate password:\s*(.+)$/mu.exec(login)?.[1]?.trim();
+  const named = /https?:\/\/[^/\s]+/u.exec(login)?.[0];
+  if (!user || !password || !(/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/u.test(base) || base === named)) throw Error("A local preview, or the review site named in the login file, and its login are required");
+  const gate = gateUser && gatePassword ? { httpCredentials: { username: gateUser, password: gatePassword } } : {};
 const browser = await chromium.launch({ executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: true });
 const findings: Finding[] = [];
 const notes: string[] = [];
 try {
-  const signIn = await browser.newContext();
+  const signIn = await browser.newContext({ ...gate });
   const page = await signIn.newPage();
   await page.goto(base + "/wp-login.php");
   await page.fill("#user_login", user);
@@ -205,7 +209,7 @@ try {
   await mkdir(out, { recursive: true });
   for (const [view, width, height] of views) {
     for (const motion of ["no-preference", "reduce"] as const) {
-      const context = await browser.newContext({ viewport: { width, height }, reducedMotion: motion, storageState: state });
+      const context = await browser.newContext({ ...gate, viewport: { width, height }, reducedMotion: motion, storageState: state });
       // tsx names functions with a helper the page does not have; give the page a no-op one.
       await context.addInitScript("window.__name = (f) => f");
       const tab: Page = await context.newPage();

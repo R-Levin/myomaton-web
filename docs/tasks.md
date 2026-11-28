@@ -31,8 +31,11 @@ the development cost and the production equivalent.
      drafts on miopages.org as the Principal does; find and fix the overlapping; a short design
      brief for the Principal's OK; one clean Core pass keeping the content; check on
      miopages.org before showing.
-   - Status: step 1 needs the Principal's explicit OK to create a WordPress login for Claude's
-     checks on miopages.org.
+   - Step 1 done: a login for Claude's checks (approved), and the drafts seen on miopages.org.
+   - Step 2 found: the overlapping comes from Core's own design stylesheet (pictures pushed over
+     the text panels, boxes inside boxes), not today's theme changes; the redesign removes it.
+   - Step 3: design brief `docs/design-brief-c0-2026-11-27.md`, waiting on the Principal's OK
+     and a cap raise to about $21.
 
 ## Next (agreed, in order)
 
